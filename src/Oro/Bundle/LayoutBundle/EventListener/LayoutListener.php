@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,26 +22,20 @@ use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
  */
 class LayoutListener
 {
-    /**
-     * @var LayoutHelper
-     */
-    protected $layoutHelper;
+    /** @var LayoutHelper */
+    private $layoutHelper;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @var LayoutManager
+     * @param LayoutHelper       $layoutHelper
+     * @param ContainerInterface $container
      */
-    protected $layoutManager;
-
-    /**
-     * @param LayoutHelper  $layoutHelper
-     * @param LayoutManager $layoutManager
-     */
-    public function __construct(
-        LayoutHelper $layoutHelper,
-        LayoutManager $layoutManager
-    ) {
+    public function __construct(LayoutHelper $layoutHelper, ContainerInterface $container)
+    {
         $this->layoutHelper = $layoutHelper;
-        $this->layoutManager = $layoutManager;
+        $this->container = $container;
     }
 
     /**
@@ -92,10 +87,10 @@ class LayoutListener
             $response = new Response($layout->render());
         } else {
             $this->configureContext($context, $layoutAnnotation);
-            $blockThemes = $layoutAnnotation->getBlockThemes();
-            $this->layoutManager->getLayoutBuilder()->setBlockTheme($blockThemes);
-
-            $response = $this->getLayoutResponse($context, $request);
+            /** @var LayoutManager $layoutManager */
+            $layoutManager = $this->container->get('oro_layout.layout_manager');
+            $layoutManager->getLayoutBuilder()->setBlockTheme($layoutAnnotation->getBlockThemes());
+            $response = $this->getLayoutResponse($context, $request, $layoutManager);
         }
 
         $event->setResponse($response);
@@ -129,24 +124,27 @@ class LayoutListener
     /**
      * @param ContextInterface $context
      * @param Request          $request
+     * @param LayoutManager    $layoutManager
+     *
      * @return Response
      */
     protected function getLayoutResponse(
         ContextInterface $context,
-        Request $request
+        Request $request,
+        LayoutManager $layoutManager
     ) {
         $blockIds = $request->get('layout_block_ids');
         if (is_array($blockIds) && $blockIds) {
             $response = [];
             foreach ($blockIds as $blockId) {
                 if ($blockId) {
-                    $layout = $this->layoutManager->getLayout($context, $blockId);
+                    $layout = $layoutManager->getLayout($context, $blockId);
                     $response[$blockId] = $layout->render();
                 }
             }
             $response = new JsonResponse($response);
         } else {
-            $layout = $this->layoutManager->getLayout($context);
+            $layout = $layoutManager->getLayout($context);
             $response = new Response($layout->render());
         }
         return $response;

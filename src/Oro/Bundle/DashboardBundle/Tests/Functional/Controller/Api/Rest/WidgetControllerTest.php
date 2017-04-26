@@ -10,9 +10,6 @@ use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class WidgetControllerTest extends WebTestCase
 {
     /**

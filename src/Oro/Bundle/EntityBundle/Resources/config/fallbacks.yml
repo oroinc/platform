@@ -1,8 +1,4 @@
 services:
-    oro_entity.fallback.resolver.entity_fallback_resolver.link:
-        tags:
-            - { name: oro_service_link, service: oro_entity.fallback.resolver.entity_fallback_resolver }
-
     oro_entity.fallback.resolver.entity_fallback_resolver:
         class: Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver
         arguments:

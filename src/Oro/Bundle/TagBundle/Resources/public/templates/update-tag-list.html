@@ -3,10 +3,9 @@
     <li data-id="<%= tag.get('id') %>">
         <span class="label label-info">
             <%- tag.get('name') %>
-            <% if ((options.filter === 'owner' && options.unassign) ||
-                (options.filter !== 'owner' && options.unassignGlobal)) { %>
+            <% if (options.unassign) { %>
                 <span class="select2-search-choice-close" data-action="remove-tag" />
-            <%} %>
+            <% } %>
         </span>
     </li>
 <%}) %>

@@ -107,15 +107,15 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
     {
         $this->localizationManager->method('getLocalization')
             ->will($this->returnValueMap([
-                [1, $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1'])],
-                [2, $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2'])],
-                [3, $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3'])],
+                [1, true, $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1'])],
+                [2, true, $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2'])],
+                [3, true, $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3'])],
             ]));
 
         $this->localizationManager->method('getLocalizations')->willReturn([
-            $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1']),
-            $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2']),
-            $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3']),
+            1 => $this->getEntity(Localization::class, ['id' => 1, 'name' => 'Localization 1']),
+            2 => $this->getEntity(Localization::class, ['id' => 2, 'name' => 'Localization 2']),
+            3 => $this->getEntity(Localization::class, ['id' => 3, 'name' => 'Localization 3']),
         ]);
 
         $this->localizationChoicesProvider->method('getLocalizationChoices')->willReturn([

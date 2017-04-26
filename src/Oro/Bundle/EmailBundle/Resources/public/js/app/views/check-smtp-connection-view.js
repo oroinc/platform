@@ -43,6 +43,7 @@ define(function(require) {
                         this.showMessage('success', 'oro.email.smtp_connection.success', $messageContainer);
                     }
                 }, this),
+                errorHandlerMessage: false,
                 error: _.bind(function() {
                     this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
                 }, this),

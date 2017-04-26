@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -38,9 +39,7 @@ class StartTransitionButtonProviderExtension extends AbstractStartTransitionButt
             $isAvailable = $button->getTransition()->isAvailable($workflowItem, $errors);
         } catch (\Exception $e) {
             $isAvailable = false;
-            if (null !== $errors) {
-                $errors->add(['message' => $e->getMessage(), 'parameters' => []]);
-            }
+            $this->addError($button, $e, $errors);
         }
 
         return $isAvailable;
@@ -56,11 +55,20 @@ class StartTransitionButtonProviderExtension extends AbstractStartTransitionButt
     protected function buildWorkflowItem(Transition $transition, Workflow $workflow, ButtonSearchContext $searchContext)
     {
         $workflowItem = new WorkflowItem();
-
-        return $workflowItem->setEntityClass($workflow->getDefinition()->getRelatedEntity())
+        $workflowItem
+            ->setEntityClass($workflow->getDefinition()->getRelatedEntity())
             ->setDefinition($workflow->getDefinition())
             ->setWorkflowName($workflow->getName())
             ->setData(new WorkflowData([$transition->getInitContextAttribute() => $searchContext]));
+
+        // populate WorkflowData with variables
+        if ($variables = $workflow->getVariables()) {
+            foreach ($variables as $name => $variable) {
+                $workflowItem->getData()->set($name, $variable->getValue());
+            }
+        }
+
+        return $workflowItem;
     }
 
     /**
@@ -91,5 +99,13 @@ class StartTransitionButtonProviderExtension extends AbstractStartTransitionButt
     private function getNodeInitTransitions($value, array $data = null)
     {
         return ($data && array_key_exists($value, $data)) ? $data[$value] : [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getApplication()
+    {
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
     }
 }

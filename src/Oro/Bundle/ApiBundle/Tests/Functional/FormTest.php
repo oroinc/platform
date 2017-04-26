@@ -17,7 +17,7 @@ class FormTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([]);
+        $this->initClient();
     }
 
     protected function tearDown()

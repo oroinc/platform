@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
 
 class Select2Entity extends Element
 {
@@ -16,15 +17,40 @@ class Select2Entity extends Element
         $results = $this->getSuggestions();
 
         if (1 < count($results)) {
+            // Try remove (Add new) records
+            $results = array_filter($results, function (NodeElement $result) {
+                return !stripos($result->getText(), 'Add new');
+            });
+
+            if (1 === count($results)) {
+                array_shift($results)->click();
+                $this->getDriver()->waitForAjax();
+                return;
+            }
+
             foreach ($results as $result) {
-                if ($result->getText() == $value) {
+                if (trim($result->getText()) == $value) {
                     $result->click();
 
                     return;
                 }
             }
 
-            self::fail(sprintf('Many results "%s" was found, but no one exactly match', $value));
+            self::fail(
+                sprintf(
+                    'Expected "%s" value, but got "%s" values',
+                    $value,
+                    implode(
+                        ', ',
+                        array_map(
+                            function (NodeElement $result) {
+                                return trim($result->getText());
+                            },
+                            $results
+                        )
+                    )
+                )
+            );
         }
 
         self::assertNotCount(0, $results, sprintf('Not found result for "%s"', $value));
@@ -102,7 +128,7 @@ class Select2Entity extends Element
         if (!$this->isOpen()) {
             $openArrow = $this->getParent()->find('css', '.select2-arrow');
             // Although ajax is already loaded element need some extra time to appear by js animation
-            $openArrow->waitFor(1500, function (NodeElement $element) {
+            $openArrow->waitFor(60, function (NodeElement $element) {
                 return $element->isVisible();
             });
             $openArrow->click();
@@ -129,5 +155,29 @@ class Select2Entity extends Element
                 return $element->isVisible();
             }
         ));
+    }
+
+    /**
+     * @param string $buttonName
+     */
+    public function openFromPlusButtonDropDown($buttonName)
+    {
+        $parent = $this->getParent()->getParent();
+        $parent->find('css', '.entity-create-dropdown button')->click();
+
+        // Get element again cause dom updated after dropdown is pressed
+        $parent = $this->getPage()->find('xpath', $parent->getXpath());
+        $parent->findButton($buttonName)->press();
+    }
+
+    /**
+     * @return UiDialog
+     */
+    public function openSelectEntityPopup()
+    {
+        $this->getParent()->getParent()->find('css', '.entity-select-btn')->click();
+        $this->getDriver()->waitForAjax();
+
+        return $this->elementFactory->createElement('UiDialog');
     }
 }

@@ -7,6 +7,7 @@ use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
 class MenuUpdateDatasource implements DatasourceInterface
@@ -20,31 +21,25 @@ class MenuUpdateDatasource implements DatasourceInterface
     /** @var string */
     protected $scopeType;
 
-    /** @var array */
+    /** @var MenuConfiguration */
     protected $menuConfiguration;
 
     /**
-     * @param BuilderChainProvider $chainProvider
-     * @param MenuManipulator $menuManipulator
-     * @param string $scopeType
+     * @param BuilderChainProvider  $chainProvider
+     * @param MenuManipulator       $menuManipulator
+     * @param string                $scopeType
+     * @param MenuConfiguration    $menuConfiguration
      */
-    public function __construct(BuilderChainProvider $chainProvider, MenuManipulator $menuManipulator, $scopeType)
-    {
+    public function __construct(
+        BuilderChainProvider $chainProvider,
+        MenuManipulator $menuManipulator,
+        $scopeType,
+        MenuConfiguration $menuConfiguration
+    ) {
         $this->chainProvider = $chainProvider;
         $this->menuManipulator = $menuManipulator;
         $this->scopeType = $scopeType;
-    }
-
-    /**
-     * @param array $configuration
-     *
-     * @return MenuUpdateDatasource
-     */
-    public function setMenuConfiguration(array $configuration)
-    {
-        $this->menuConfiguration = $configuration;
-
-        return $this;
+        $this->menuConfiguration = $menuConfiguration;
     }
 
     /**
@@ -52,7 +47,11 @@ class MenuUpdateDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
-        $grid->setDatasource(clone $this);
+        $datasource = clone $this;
+        if (isset($config['scope_type'])) {
+            $datasource->scopeType = $config['scope_type'];
+        }
+        $grid->setDatasource($datasource);
     }
 
     /**
@@ -62,7 +61,8 @@ class MenuUpdateDatasource implements DatasourceInterface
     {
         $rows = [];
 
-        foreach ($this->menuConfiguration['tree'] as $name => $item) {
+        $tree = $this->menuConfiguration->getTree();
+        foreach ($tree as $name => $item) {
             $menuItem = $this->chainProvider->get($name);
             if ($menuItem->getExtra('scope_type') === $this->scopeType && !$menuItem->getExtra('read_only')) {
                 $rows[] = new ResultRecord($this->menuManipulator->toArray($menuItem));

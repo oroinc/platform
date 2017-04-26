@@ -1,16 +1,14 @@
 parameters:
-    oro_importexport.reader.csv.class: Oro\Bundle\ImportExportBundle\Reader\CsvFileReader
-    oro_importexport.reader.entity.class: Oro\Bundle\ImportExportBundle\Reader\EntityReader
-    oro_importexport.reader.template_fixture.class: Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
+    oro_importexport.file.split_csv_file.size_of_batch: 100
 
 services:
     oro_importexport.reader.csv:
-        class: %oro_importexport.reader.csv.class%
+        class: Oro\Bundle\ImportExportBundle\Reader\CsvFileReader
         arguments:
             - '@oro_importexport.context_registry'
 
     oro_importexport.reader.entity:
-        class: %oro_importexport.reader.entity.class%
+        class: Oro\Bundle\ImportExportBundle\Reader\EntityReader
         arguments:
             - '@oro_importexport.context_registry'
             - '@doctrine'
@@ -20,7 +18,17 @@ services:
             - [setAclHelper, ['@oro_security.acl_helper']]
 
     oro_importexport.reader.template_fixture:
-        class: %oro_importexport.reader.template_fixture.class%
+        class: Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
         arguments:
             - '@oro_importexport.context_registry'
             - '@oro_importexport.template_fixture.manager'
+
+    oro_importexport.splitter.csv:
+        class: Oro\Bundle\ImportExportBundle\Splitter\SplitterCsvFile
+        arguments:
+            - '@oro_importexport.reader.csv'
+            - '%oro_importexport.file.split_csv_file.size_of_batch%'
+            - '@oro_importexport.file.file_manager'
+        tags:
+            - { name: oro_importexport.splitter, alias: csv}
+            - { name: oro_importexport.splitter, alias: default}

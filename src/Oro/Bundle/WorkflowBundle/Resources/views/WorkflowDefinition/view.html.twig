@@ -211,6 +211,14 @@
                     entity.priority
                 ) }}
 
+                {% set applications %}
+                    {% if entity.applications is not empty %}
+                        {{ UI.renderList(entity.applications) }}
+                    {% else %}
+                        {{ 'N/A'|trans }}
+                    {% endif %}
+                {% endset %}
+
                 {% set activeGroups %}
                     {% if entity.exclusiveActiveGroups is not empty %}
                         {{ UI.renderList(entity.exclusiveActiveGroups) }}
@@ -227,6 +235,7 @@
                     {% endif %}
                 {% endset %}
 
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.applications.label'|trans, applications) }}
                 {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_active_groups.label'|trans, activeGroups) }}
                 {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_record_groups.label'|trans, recordGroups) }}
             </div>
@@ -316,6 +325,41 @@
             ]
         },
     ] %}
+
+    {% if variables is defined and variables|length %}
+        {% set variablesInfo %}
+            <div class="widget-content">
+                <div class="row-fluid form-horizontal">
+                    <div class="responsive-block">
+                        {% for variable in variables %}
+                            <div class="control-group">
+                                <label class="control-label">
+                                    {% if variable.options.form_options is defined and variable.options.form_options.tooltip is defined %}
+                                        {{ UI.tooltip(variable.options.form_options.tooltip) }}
+                                    {% endif %}
+                                    {{ variable.label }}
+                                </label>
+                                <div class="controls">
+                                    <div class="control-label">
+                                        {{ ((variable.value is iterable) ? variable.value|join(', ') : variable.value) }}
+                                        {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.variable_definitions.variables[variable.name]) }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+            'subblocks': [
+                {'data':  [variablesInfo]},
+            ]
+        }]) %}
+
+    {% endif %}
 
     {% set id = 'workflowDefinitionView' %}
     {% set data = {'dataBlocks': dataBlocks} %}

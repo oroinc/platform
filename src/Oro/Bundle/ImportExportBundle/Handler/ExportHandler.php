@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\RouterInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 
 class ExportHandler extends AbstractHandler
 {
@@ -28,6 +27,19 @@ class ExportHandler extends AbstractHandler
      * @var ConfigManager
      */
     protected $configManager;
+
+    /**
+     * @var FileManager
+     */
+    protected $fileManager;
+
+    /**
+     * @param FileManager $fileManager
+     */
+    public function setFileManager(FileManager $fileManager)
+    {
+        $this->fileManager = $fileManager;
+    }
 
     /**
      * @param MimeTypeGuesser $mimeTypeGuesser
@@ -75,7 +87,8 @@ class ExportHandler extends AbstractHandler
         if ($outputFilePrefix === null) {
             $outputFilePrefix = $processorAlias;
         }
-        $fileName   = $this->generateExportFileName($outputFilePrefix, $outputFormat);
+        $fileName = FileManager::generateFileName($outputFilePrefix, $outputFormat);
+        $filePath = FileManager::generateTmpFilePath($fileName);
         $entityName = $this->processorRegistry->getProcessorEntityName(
             $processorType,
             $processorAlias
@@ -87,7 +100,7 @@ class ExportHandler extends AbstractHandler
                     [
                         'processorAlias' => $processorAlias,
                         'entityName'     => $entityName,
-                        'filePath'       => $fileName
+                        'filePath'       => $filePath
                     ],
                     $options
                 )
@@ -104,6 +117,8 @@ class ExportHandler extends AbstractHandler
         );
 
         $url = $this->configManager->get('oro_ui.application_url');
+        $this->fileManager->writeFileToStorage($filePath, $fileName);
+        unlink($filePath);
         if ($jobResult->isSuccessful()) {
             $url .= $this->router->generate('oro_importexport_export_download', ['fileName' => basename($fileName)]);
             $context = $jobResult->getContext();
@@ -163,18 +178,14 @@ class ExportHandler extends AbstractHandler
      */
     public function handleDownloadExportResult($fileName)
     {
-        $fullFileName = $this->fileSystemOperator
-            ->getTemporaryFile($fileName, true)
-            ->getRealPath();
-
+        $content = $this->fileManager->getContent($fileName);
         $headers     = [];
-        $contentType = $this->getFileContentType($fullFileName);
+        $contentType = $this->getFileContentType($fileName);
         if ($contentType !== null) {
             $headers['Content-Type'] = $contentType;
         }
 
-        $response = new BinaryFileResponse($fullFileName, 200, $headers);
-        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+        $response = new Response($content, 200, $headers);
 
         return $response;
     }
@@ -190,18 +201,5 @@ class ExportHandler extends AbstractHandler
         $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
         return $this->mimeTypeGuesser->guessByFileExtension($extension);
-    }
-
-    /**
-     * Builds a name of exported file
-     *
-     * @param string $prefix
-     * @param string $extension
-     * @return string
-     */
-    protected function generateExportFileName($prefix, $extension)
-    {
-        return $this->fileSystemOperator
-            ->generateTemporaryFileName($prefix, $extension);
     }
 }

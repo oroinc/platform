@@ -8,7 +8,10 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
+use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
@@ -145,7 +148,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             $decisionMaker
         );
         $this->context = new PermissionGrantingStrategyContext($this->selector);
-        $contextLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $contextLink = $this->getMockBuilder(ServiceLink::class)
             ->disableOriginalConstructor()
             ->getMock();
         $contextLink->expects($this->any())
@@ -159,7 +162,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $this->rsid = new RoleSecurityIdentity('TestRole');
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue($user));
@@ -289,7 +292,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testIsGrantedCallsAuditLoggerOnGrant()
     {
-        $logger = $this->createMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->createMock(AuditLoggerInterface::class);
         $logger
             ->expects($this->once())
             ->method('logIfNeeded');
@@ -304,7 +307,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testIsGrantedCallsAuditLoggerOnDeny()
     {
-        $logger = $this->createMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->createMock(AuditLoggerInterface::class);
         $logger
             ->expects($this->once())
             ->method('logIfNeeded');
@@ -384,15 +387,15 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         );
 
         /**
-         * @var EntitySecurityMetadataProvider|\PHPUnit_Framework_MockObject_MockObject $entitySecurityMetadataProvider
+         * @var EntitySecurityMetadataProvider|\PHPUnit_Framework_MockObject_MockObject $securityMetadataProvider
          */
-        $entitySecurityMetadataProvider = $this->createMock(
-            'Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider'
-        );
-        $entitySecurityMetadataProvider->expects($this->any())
+        $securityMetadataProvider = $this->getMockBuilder(EntitySecurityMetadataProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityMetadataProvider->expects($this->any())
             ->method('isProtectedEntity')
             ->willReturn(true);
-        $entitySecurityMetadataProvider->expects($this->any())
+        $securityMetadataProvider->expects($this->any())
             ->method('getMetadata')
             ->with(get_class($obj))
             ->willReturnCallback(function () use ($obj) {
@@ -406,7 +409,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
                 return new EntitySecurityMetadata('ACL', get_class($obj), '', 'Label', [], '', '', $fields);
             });
 
-        $this->strategy->setSecurityMetadataProvider($entitySecurityMetadataProvider);
+        $securityMetadataProviderLink = $this->getMockBuilder(ServiceLink::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityMetadataProviderLink->expects(self::any())
+            ->method('getService')
+            ->willReturn($securityMetadataProvider);
+        $this->strategy->setSecurityMetadataProvider($securityMetadataProviderLink);
 
         // regular field
         $this->assertTrue(

@@ -7,7 +7,6 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('oro/filter/choice-filter');
-    var messenger = require('oroui/js/messenger');
     var tools = require('oroui/js/tools');
     require('jquery.select2');
 
@@ -139,9 +138,6 @@ define(function(require) {
                     },
                     success: function(response) {
                         self.trigger(successEventName, response);
-                    },
-                    error: function(jqXHR) {
-                        messenger.showErrorMessage(__('Sorry, an unexpected error has occurred.'), jqXHR.responseJSON);
                     }
                 });
             } else {
@@ -395,20 +391,16 @@ define(function(require) {
             }
 
             var data = this.$(this.elementSelector).inputWidget('data');
-            _.each(value.value, function(id) {
-                if (this.selectedData[id]) {
+            _.each(data, function(elem) {
+                if (!('id' in elem)) {
                     return;
                 }
 
-                var item = _.find(data, function(item) {
-                    return item.id === id;
-                });
-
-                if (!item) {
+                if (this.selectedData[elem.id]) {
                     return;
                 }
 
-                this.selectedData[item.id] = item;
+                this.selectedData[elem.id] = elem;
             }, this);
         },
 

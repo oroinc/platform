@@ -18,6 +18,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -42,25 +43,28 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var WorkflowApplicabilityFilterInterface[] */
     private $applicabilityFilters = [];
 
-    /** @var array */
-    private $startedWorkflows = [];
+    /** @var StartedWorkflowsBag */
+    private $startedWorkflowsBag;
 
     /**
-     * @param WorkflowRegistry         $workflowRegistry
-     * @param DoctrineHelper           $doctrineHelper
+     * @param WorkflowRegistry $workflowRegistry
+     * @param DoctrineHelper $doctrineHelper
      * @param EventDispatcherInterface $eventDispatcher
-     * @param WorkflowEntityConnector  $entityConnector
+     * @param WorkflowEntityConnector $entityConnector
+     * @param StartedWorkflowsBag $startedWorkflowsBag
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         DoctrineHelper $doctrineHelper,
         EventDispatcherInterface $eventDispatcher,
-        WorkflowEntityConnector $entityConnector
+        WorkflowEntityConnector $entityConnector,
+        StartedWorkflowsBag $startedWorkflowsBag
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->doctrineHelper = $doctrineHelper;
         $this->eventDispatcher = $eventDispatcher;
         $this->entityConnector = $entityConnector;
+        $this->startedWorkflowsBag = $startedWorkflowsBag;
     }
 
     /**
@@ -542,16 +546,19 @@ class WorkflowManager implements LoggerAwareInterface
      */
     protected function isStartAllowedForEntity(Workflow $workflow, $entity)
     {
+        $startedWorkflowsBag = $this->startedWorkflowsBag;
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId && array_key_exists($workflow->getName(), $this->startedWorkflows)) {
-            foreach ($this->startedWorkflows[$workflow->getName()] as $startedEntity) {
+        $workflowName = $workflow->getName();
+
+        if ($entityId && $startedWorkflowsBag->hasWorkflowEntity($workflowName)) {
+            foreach ($startedWorkflowsBag->getWorkflowEntities($workflowName) as $startedEntity) {
                 $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
                 if ($startedEntityId && ($startedEntityId === $entityId)) {
                     return false;
                 }
             }
         }
-        $this->startedWorkflows[$workflow->getName()][] = $entity;
+        $startedWorkflowsBag->addWorkflowEntity($workflowName, $entity);
 
         return true;
     }
@@ -564,15 +571,17 @@ class WorkflowManager implements LoggerAwareInterface
      */
     protected function unsetStartedWorkflowForEntity(Workflow $workflow, $entity)
     {
+        $startedWorkflowsBag = $this->startedWorkflowsBag;
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId === null || !array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+        $workflowName = $workflow->getName();
+
+        if ($entityId === null || !$startedWorkflowsBag->hasWorkflowEntity($workflowName)) {
             return;
         }
 
-        foreach ($this->startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
-            $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
-            if ($startedEntityId && ($startedEntityId === $entityId)) {
-                unset($this->startedWorkflows[$workflow->getName()][$key]);
+        foreach ($startedWorkflowsBag->getWorkflowEntities($workflowName) as $startedEntity) {
+            if ($this->doctrineHelper->getSingleEntityIdentifier($startedEntity) === $entityId) {
+                $startedWorkflowsBag->removeWorkflowEntity($workflowName, $startedEntity);
                 break;
             }
         }

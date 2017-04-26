@@ -7,9 +7,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiFormValidationTest extends RestJsonApiTestCase
 {
 

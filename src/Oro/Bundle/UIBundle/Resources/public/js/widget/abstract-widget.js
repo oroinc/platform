@@ -347,6 +347,7 @@ define(function(require) {
                         '_wid': this.getWid()
                     },
                     success: _.bind(this._onContentLoad, this),
+                    errorHandlerMessage: false,
                     error: _.bind(this._onContentLoadFail, this)
                 });
                 this.loading = form.data('jqxhr');
@@ -674,7 +675,8 @@ define(function(require) {
             var options = {
                 url: url,
                 type: method,
-                data: data === void 0 ? '' : data + '&'
+                data: data === void 0 ? '' : data + '&',
+                errorHandlerMessage: false
             };
 
             options.data += '_widgetContainer=' + this.options.type + '&_wid=' + this.getWid();
@@ -719,9 +721,11 @@ define(function(require) {
             if (this.deferredRender) {
                 this.deferredRender
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(function() {
-                        throw new Error('Widget rendering failed');
-                    });
+                    .fail(_.bind(function() {
+                        if (!this.disposing && !this.disposed) {
+                            throw new Error('Widget rendering failed');
+                        }
+                    }, this));
             } else {
                 this._triggerContentLoadEvents();
             }

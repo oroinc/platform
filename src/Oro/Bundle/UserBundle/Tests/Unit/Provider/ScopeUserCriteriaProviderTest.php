@@ -97,10 +97,6 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
                 'context' => ['user' => $user],
                 'criteria' => ['user' => $user],
             ],
-            'array_context_with_user_key_invalid_value' => [
-                'context' => ['user' => 123],
-                'criteria' => [],
-            ],
             'array_context_without_user_key' => [
                 'context' => [],
                 'criteria' => [],

@@ -37,6 +37,12 @@ define([
         /** @property Boolean */
         showCloseButton: config.showCloseButton,
 
+        /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
+        launcherMode: '',
+
+        /** @property {String}: 'show' | 'hide' */
+        actionsState: '',
+
         /** @property */
         baseMarkup:
             '<div class="more-bar-holder">' +
@@ -77,7 +83,7 @@ define([
 
         /** @property */
         launcherItemTemplate: _.template(
-            '<li class="launcher-item"></li>'
+            '<li class="launcher-item <% if (className) { %> <%= \'mode-\' + className %> <% } %>"></li>'
         ),
 
         /** @property */
@@ -103,6 +109,11 @@ define([
                 this.actionsHideCount = opts.themeOptions.actionsHideCount;
             }
 
+            if (_.isObject(opts.themeOptions.launcherOptions)) {
+                this.launcherMode = opts.themeOptions.launcherOptions.launcherMode || this.launcherMode;
+                this.actionsState = opts.themeOptions.launcherOptions.actionsState || this.actionsState;
+            }
+
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
             _.each(this.actions, function(action) {
@@ -121,6 +132,7 @@ define([
             }
             delete this.actions;
             delete this.column;
+
             this.$('.dropdown-toggle').dropdown('destroy');
             ActionCell.__super__.dispose.apply(this, arguments);
         },
@@ -176,7 +188,7 @@ define([
          */
         createLaunchers: function() {
             return _.map(this.actions, function(action) {
-                return action.createLauncher({});
+                return action.createLauncher({launcherMode: this.launcherMode});
             }, this);
         },
 
@@ -192,7 +204,17 @@ define([
                 return this;
             }
 
-            if (this.actions.length < this.actionsHideCount) {
+            var switchToSimpleMode = this.actions.length < this.actionsHideCount;
+
+            if (this.actionsState === 'show') {
+                switchToSimpleMode = true;
+            }
+
+            if (this.actionsState === 'hide') {
+                switchToSimpleMode = false;
+            }
+
+            if (switchToSimpleMode) {
                 isSimplifiedMarkupApplied = true;
                 this.baseMarkup = this.simpleBaseMarkup;
                 this.launchersListTemplate = this.simpleLaunchersListTemplate;
@@ -264,7 +286,7 @@ define([
          * @return {jQuery} Rendered element wrapped with jQuery
          */
         renderLauncherItem: function(launcher, params) {
-            params = params || {};
+            params = _.extend(params || {}, {className: launcher.launcherMode});
             var result = $(this.launcherItemTemplate(params));
             var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);

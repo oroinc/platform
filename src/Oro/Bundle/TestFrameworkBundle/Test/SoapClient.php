@@ -40,9 +40,6 @@ class SoapClient extends BasicSoapClient
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
-        //save directly in _SERVER array
-        $_SERVER['HTTP_SOAPACTION'] = $action;
-        $_SERVER['CONTENT_TYPE'] = 'application/soap+xml';
         //make POST request
         $this->client->request(
             'POST',
@@ -50,12 +47,10 @@ class SoapClient extends BasicSoapClient
             array(),
             array(),
             array(
-                'CONTENT_TYPE' => $_SERVER['CONTENT_TYPE']
+                'CONTENT_TYPE' => 'application/soap+xml'
             ),
             (string)$request
         );
-        unset($_SERVER['HTTP_SOAPACTION']);
-        unset($_SERVER['CONTENT_TYPE']);
 
         $response = $this->client->getResponse();
         $content = $response->getContent();

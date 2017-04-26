@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
 {
     /**

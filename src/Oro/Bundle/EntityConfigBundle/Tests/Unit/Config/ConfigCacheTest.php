@@ -324,10 +324,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 $cacheKey,
-                [
-                    ConfigCache::VALUES_KEY     => [self::SCOPE => $configValues],
-                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
-                ]
+                [[self::SCOPE => $configValues], self::FIELD_TYPE]
             )
             ->willReturn(true);
 
@@ -442,20 +439,12 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->cache->expects($this->once())
             ->method('fetch')
             ->with($cacheKey)
-            ->willReturn(
-                [
-                    ConfigCache::VALUES_KEY     => ['another' => $anotherConfigValues],
-                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
-                ]
-            );
+            ->willReturn([['another' => $anotherConfigValues], self::FIELD_TYPE]);
         $this->cache->expects($this->once())
             ->method('save')
             ->with(
                 $cacheKey,
-                [
-                    ConfigCache::VALUES_KEY     => ['another' => $anotherConfigValues, self::SCOPE => $configValues],
-                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
-                ]
+                [['another' => $anotherConfigValues, self::SCOPE => $configValues], self::FIELD_TYPE]
             )
             ->willReturn(true);
 
@@ -627,12 +616,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->cache->expects($this->once())
             ->method('fetch')
             ->with($cacheKey)
-            ->willReturn(
-                [
-                    ConfigCache::VALUES_KEY     => [self::SCOPE => $configValues],
-                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
-                ]
-            );
+            ->willReturn([[self::SCOPE => $configValues], self::FIELD_TYPE]);
 
         $this->assertEquals(
             $config,
@@ -751,12 +735,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->cache->expects($this->once())
             ->method('fetch')
             ->with($cacheKey)
-            ->willReturn(
-                [
-                    ConfigCache::VALUES_KEY     => ['another' => $anotherConfigValues],
-                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
-                ]
-            );
+            ->willReturn([['another' => $anotherConfigValues], self::FIELD_TYPE]);
 
         $this->assertNull(
             $this->configCache->getFieldConfig(
@@ -895,54 +874,25 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
     public function saveConfigurableProvider()
     {
         return [
-            [false, true, null, [ConfigCache::FLAG_KEY => true]],
-            [false, false, null, [ConfigCache::FLAG_KEY => false]],
-            [[], true, null, [ConfigCache::FLAG_KEY => true]],
-            [[], false, null, [ConfigCache::FLAG_KEY => false]],
-            [[ConfigCache::FLAG_KEY => true], true, null, [ConfigCache::FLAG_KEY => true]],
-            [[ConfigCache::FLAG_KEY => false], true, null, [ConfigCache::FLAG_KEY => true]],
-            [[ConfigCache::FLAG_KEY => false], false, null, [ConfigCache::FLAG_KEY => false]],
-            [[ConfigCache::FLAG_KEY => true], false, null, [ConfigCache::FLAG_KEY => false]],
-            [
-                [ConfigCache::FIELDS_KEY => ['field' => true]],
-                true,
-                null,
-                [ConfigCache::FIELDS_KEY => ['field' => true], ConfigCache::FLAG_KEY => true]
-            ],
-            [
-                [ConfigCache::FIELDS_KEY => ['field' => true]],
-                false,
-                null,
-                [ConfigCache::FIELDS_KEY => ['field' => true], ConfigCache::FLAG_KEY => false]
-            ],
-            [false, true, 'field', [ConfigCache::FIELDS_KEY => ['field' => true]]],
-            [false, false, 'field', [ConfigCache::FIELDS_KEY => ['field' => false]]],
-            [[], true, 'field', [ConfigCache::FIELDS_KEY => ['field' => true]]],
-            [[], false, 'field', [ConfigCache::FIELDS_KEY => ['field' => false]]],
-            [
-                [ConfigCache::FIELDS_KEY => ['field' => true]],
-                true,
-                'field',
-                [ConfigCache::FIELDS_KEY => ['field' => true]]
-            ],
-            [
-                [ConfigCache::FIELDS_KEY => ['field' => false]],
-                true,
-                'field',
-                [ConfigCache::FIELDS_KEY => ['field' => true]]
-            ],
-            [
-                [ConfigCache::FIELDS_KEY => ['field' => false]],
-                false,
-                'field',
-                [ConfigCache::FIELDS_KEY => ['field' => false]]
-            ],
-            [
-                [ConfigCache::FIELDS_KEY => ['field' => true]],
-                false,
-                'field',
-                [ConfigCache::FIELDS_KEY => ['field' => false]]
-            ],
+            [false, true, null, [true]],
+            [false, false, null, [false]],
+            [[], true, null, [true]],
+            [[], false, null, [false]],
+            [[], null, null, []],
+            [[true], true, null, [true]],
+            [[false], true, null, [true]],
+            [[false], false, null, [false]],
+            [[true], false, null, [false]],
+            [[null, ['field' => true]], true, null, [true, ['field' => true]]],
+            [[null, ['field' => true]], false, null, [false, ['field' => true]]],
+            [false, true, 'field', [null, ['field' => true]]],
+            [false, false, 'field', [null, ['field' => false]]],
+            [[], true, 'field', [null, ['field' => true]]],
+            [[], false, 'field', [null, ['field' => false]]],
+            [[null, ['field' => true]], true, 'field', [null, ['field' => true]]],
+            [[null, ['field' => false]], true, 'field', [null, ['field' => true]]],
+            [[null, ['field' => false]], false, 'field', [null, ['field' => false]]],
+            [[null, ['field' => true]], false, 'field', [null, ['field' => false]]],
         ];
     }
 
@@ -966,17 +916,17 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         return [
             [false, null, null],
             [[], null, null],
-            [[ConfigCache::FLAG_KEY => true], null, true],
-            [[ConfigCache::FLAG_KEY => false], null, false],
-            [[ConfigCache::FIELDS_KEY => []], null, null],
+            [[true], null, true],
+            [[false], null, false],
+            [[null], null, null],
             [false, 'field', null],
             [[], 'field', null],
-            [[ConfigCache::FLAG_KEY => true], 'field', null],
-            [[ConfigCache::FLAG_KEY => false], 'field', null],
-            [[ConfigCache::FIELDS_KEY => []], 'field', null],
-            [[ConfigCache::FIELDS_KEY => ['field1' => true]], 'field2', null],
-            [[ConfigCache::FIELDS_KEY => ['field' => true]], 'field', true],
-            [[ConfigCache::FIELDS_KEY => ['field' => false]], 'field', false],
+            [[true], 'field', null],
+            [[false], 'field', null],
+            [[null], 'field', null],
+            [[null, ['field1' => true]], 'field2', null],
+            [[null, ['field' => true]], 'field', true],
+            [[null, ['field' => false]], 'field', false],
         ];
     }
 

@@ -81,6 +81,7 @@ class StaticSegmentManager
             $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
             $this->applyOrganizationLimit($segment, $qb);
             $query = $qb->getQuery();
+            $query->setMaxResults($segment->getRecordsLimit());
 
             $segmentQuery = $query->getSQL();
             $segmentQuery = substr_replace($segmentQuery, $insertString, stripos($segmentQuery, 'from'), 0);

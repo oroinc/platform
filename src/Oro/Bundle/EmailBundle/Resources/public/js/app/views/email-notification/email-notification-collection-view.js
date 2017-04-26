@@ -11,7 +11,6 @@ define(function(require) {
     var emailsGridRouteBuilder = require('oroemail/js/util/emails-grid-route-builder');
     var EmailNotificationView = require('./email-notification-item-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var messenger = require('oroui/js/messenger');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
@@ -122,9 +121,7 @@ define(function(require) {
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
                 }, this),
-                error: function(model, response) {
-                    messenger.showErrorMessage(__('oro.email.error.mark_as_read'), response.responseJSON || {});
-                }
+                errorHandlerMessage: __('oro.email.error.mark_as_read')
             });
         },
 

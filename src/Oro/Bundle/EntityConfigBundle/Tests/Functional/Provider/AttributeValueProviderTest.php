@@ -12,9 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadActivityTargets;
 
-/**
- * @dbIsolation
- */
 class AttributeValueProviderTest extends WebTestCase
 {
     /**

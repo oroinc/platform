@@ -6,6 +6,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
     // current version: http://select2.github.io/select2/
     // last version: http://select2.github.io/examples.html
     require('jquery.select2');
@@ -40,6 +41,7 @@ define(function(require) {
                 var data = this.$el.data(this.widgetFunctionName);
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
+                this.disableKeyboard();
             }
         },
 
@@ -101,6 +103,18 @@ define(function(require) {
 
         disable: function() {
             return this.applyWidgetFunction('enable', arguments);
+        },
+
+        disableKeyboard: function() {
+            var select = this.$el;
+            var selectContainer = this.container();
+            var isSearchHidden = selectContainer.find('.select2-search-hidden').length;
+            var minimumResultsForSearch = this.initializeOptions.minimumResultsForSearch;
+            var optionsLength = select.find('option').length;
+
+            if (tools.isMobile() && (isSearchHidden || optionsLength < minimumResultsForSearch)) {
+                selectContainer.find('input').hide();
+            }
         }
     });
 

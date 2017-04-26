@@ -15,12 +15,6 @@ use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 
 class ContextListener
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage = false;
-
-    /** @var OrganizationManager */
-    private $manager = false;
-
     /** @var ContainerInterface */
     private $container;
 
@@ -39,7 +33,8 @@ class ContextListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $token = $this->getTokenStorage()->getToken();
+        $tokenStorage = $this->getTokenStorage();
+        $token = $tokenStorage->getToken();
         if ($token instanceof OrganizationContextTokenInterface && $token->getOrganizationContext()) {
             try {
                 $token->setOrganizationContext(
@@ -51,7 +46,7 @@ class ContextListener
                     $exception->setOrganizationName($token->getOrganizationContext()->getName());
                     $exception->setToken($token);
                     $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
-                    $this->getTokenStorage()->setToken(null);
+                    $tokenStorage->setToken(null);
                     throw $exception;
                 }
             } catch (NoResultException $e) {
@@ -65,11 +60,7 @@ class ContextListener
      */
     protected function getTokenStorage()
     {
-        if ($this->tokenStorage === false) {
-            $this->tokenStorage = $this->container->get('security.token_storage');
-        }
-
-        return $this->tokenStorage;
+        return $this->container->get('security.token_storage');
     }
 
     /**
@@ -77,10 +68,6 @@ class ContextListener
      */
     protected function getOrganizationManager()
     {
-        if ($this->manager === false) {
-            $this->manager = $this->container->get('oro_organization.organization_manager');
-        }
-
-        return $this->manager;
+        return $this->container->get('oro_organization.organization_manager');
     }
 }

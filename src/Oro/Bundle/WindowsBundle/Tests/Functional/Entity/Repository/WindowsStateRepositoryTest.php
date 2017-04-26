@@ -7,9 +7,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
-/**
- * @dbIsolation
- */
 class WindowsStateRepositoryTest extends WebTestCase
 {
     protected function setUp()

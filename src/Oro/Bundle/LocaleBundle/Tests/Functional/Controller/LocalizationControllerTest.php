@@ -4,17 +4,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Functional\Controller;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LocalizationControllerTest extends WebTestCase
 {
     const NAME = 'Localization name';
@@ -29,10 +26,15 @@ class LocalizationControllerTest extends WebTestCase
     const UPDATED_FORMATTING_CODE = 'es_ES';
     const PARENT_LOCALIZATION = 'es';
 
+    /** @var LocalizationManager */
+    private $manager;
+
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData']);
+
+        $this->manager = $this->getContainer()->get('oro_locale.manager.localization');
     }
 
     public function testIndex()
@@ -60,6 +62,11 @@ class LocalizationControllerTest extends WebTestCase
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        $localizationId = $this->getLocalization(self::NAME)->getId();
+        $cachedLocalization = $this->manager->getLocalization($localizationId);
+        $this->assertInstanceOf(Localization::class, $cachedLocalization);
+        $this->assertEquals($localizationId, $cachedLocalization->getId());
 
         $html = $crawler->html();
         $this->assertContains('Localization has been saved', $html);
@@ -114,6 +121,12 @@ class LocalizationControllerTest extends WebTestCase
 
         $html = $crawler->html();
         $this->assertContains('Localization has been saved', $html);
+
+        $localizationId = $this->getLocalization(self::UPDATED_NAME)->getId();
+        $cachedLocalization = $this->manager->getLocalization($localizationId);
+        $this->assertInstanceOf(Localization::class, $cachedLocalization);
+        $this->assertEquals($localizationId, $cachedLocalization->getId());
+        $this->assertEquals(self::UPDATED_LANGUAGE_CODE, $cachedLocalization->getLanguageCode());
 
         return $id;
     }
@@ -176,6 +189,9 @@ class LocalizationControllerTest extends WebTestCase
 
         $this->client->request('GET', $this->getUrl('oro_locale_localization_view', ['id' => $id]));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
+
+        $cachedLocalization = $this->manager->getLocalization($id);
+        $this->assertNull($cachedLocalization);
     }
 
     /**

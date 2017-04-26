@@ -10,6 +10,7 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -24,7 +25,10 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 class GridViewController extends RestController
 {
     /**
+     * @param Request $request
+     *
      * @return Response
+     *
      * @Post("/gridviews")
      * @ApiDoc(
      *      description="Create grid view",
@@ -37,17 +41,19 @@ class GridViewController extends RestController
      *     permission="CREATE"
      * )
      */
-    public function postAction()
+    public function postAction(Request $request)
     {
-        $this->checkCreatePublicAccess();
+        $this->checkCreateSharedAccess($request);
 
         return $this->handleCreateRequest();
     }
 
     /**
+     * @param Request $request
      * @param int $id
      *
      * @return Response
+     *
      * @Put("/gridviews/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Update grid view",
@@ -63,14 +69,11 @@ class GridViewController extends RestController
      *     permission="EDIT"
      * )
      */
-    public function putAction($id)
+    public function putAction(Request $request, $id)
     {
+        /** @var GridView $gridView */
         $gridView = $this->getManager()->find($id);
-        if ($gridView->getType() === GridView::TYPE_PUBLIC) {
-            $this->checkEditPublicAccess($gridView);
-        } else {
-            $this->checkCreatePublicAccess();
-        }
+        $this->checkSharedAccess($request, $gridView);
 
         return $this->handleUpdateRequest($id);
     }
@@ -146,29 +149,28 @@ class GridViewController extends RestController
     }
 
     /**
-     * @param GridView $gridView
+     * @param GridView $view
+     * @param Request  $request
      *
      * @throws AccessDeniedException
      */
-    protected function checkEditPublicAccess(GridView $gridView)
+    protected function checkSharedAccess(Request $request, GridView $view)
     {
-        if ($gridView->getType() !== GridView::TYPE_PUBLIC) {
-            return;
+        if ($request->request->get('type') !== $view->getType()) {
+            if (!$this->getSecurityFacade()->isGranted('oro_datagrid_gridview_publish')) {
+                throw new AccessDeniedException();
+            }
         }
-
-        if ($this->getSecurityFacade()->isGranted('oro_datagrid_gridview_update_public')) {
-            return;
-        }
-
-        throw new AccessDeniedException();
     }
 
     /**
+     * @param Request $request
+     *
      * @throws AccessDeniedException
      */
-    protected function checkCreatePublicAccess()
+    protected function checkCreateSharedAccess(Request $request)
     {
-        if ($this->getRequest()->request->get('type') !== GridView::TYPE_PUBLIC) {
+        if ($request->request->get('type') !== GridView::TYPE_PUBLIC) {
             return;
         }
 

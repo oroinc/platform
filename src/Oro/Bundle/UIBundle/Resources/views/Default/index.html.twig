@@ -122,7 +122,9 @@
                                 {% placeholder breadcrumb %}
                             {% endblock breadcrumb %}
                         </div>
-                        {% placeholder pin_button %}
+                        {% block pin_button %}
+                            {% placeholder pin_button %}
+                        {% endblock pin_button %}
                         <div id="before-content-addition">
                             {% block before_content_addition %}{% endblock before_content_addition %}
                         </div>

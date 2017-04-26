@@ -6,7 +6,7 @@ $charset: 'UTF-8';
 @include font-face('custom-icon-font', '#{$global-url}/orofrontend/default/fonts/custom-font-icon/custom-font-icon', normal, normal);
 
 $base-font: 'Lato','Helvetica', Arial, sans-serif;
-$bae-font-minor: 'Roboto','Helvetica', Arial, sans-serif;
+$base-font-minor: 'Roboto','Helvetica', Arial, sans-serif;
 $base-font-icon: 'custom-font-icon';
 
 // Font sizes

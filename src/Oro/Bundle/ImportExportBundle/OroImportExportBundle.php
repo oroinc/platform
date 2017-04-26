@@ -6,6 +6,7 @@ use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerComp
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\SplitterCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\WriterCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,5 +26,6 @@ class OroImportExportBundle extends Bundle
         $container->addCompilerPass(new TemplateEntityRepositoryCompilerPass());
         $container->addCompilerPass(new FormatterProviderPass());
         $container->addCompilerPass(new WriterCompilerPass());
+        $container->addCompilerPass(new SplitterCompilerPass());
     }
 }

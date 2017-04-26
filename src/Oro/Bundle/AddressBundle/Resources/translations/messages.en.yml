@@ -7,24 +7,50 @@
 
 oro:
     address:
-        city.label:          City
-        country.label:       Country
-        entity_description:  Represent address
+        entity_description:  A place where people or organizations are located with whom the user is in touch and does business with.
         entity_label:        Address
         entity_plural_label: Addresses
-        first_name.label:    First name
+        city:
+            label:           City
+            description:     The city specified in the address record.
+        first_name:
+            label:           First name
+            description:     First name of the contact person.
         id.label:            Id
-        label.label:         Label
-        last_name.label:     Last name
-        middle_name.label:   Middle name
-        name_prefix.label:   Name prefix
-        name_suffix.label:   Name suffix
-        organization.label:  Organization
-        postal_code.label:   Zip/Postal Code
-        region.label:        State
+        label:
+            label:           Label
+            description:     The identifier for an address record
+        last_name:
+            label:           Last name
+            description:     Last name of the contact person.
+        middle_name:
+            label:           Middle name
+            description:     Middle name of the contact person.
+        name_prefix:
+            label:           Name prefix
+            description:     Name prefix or honorific of the contact person (Mr./Ms., Dr., Prof., etc.)
+        name_suffix:
+            label:           Name suffix
+            description:     Name suffix of the contact person (Sr./Jr., M.D., OBE, etc.)
+        organization:
+            label:           Organization
+            description:     Organization that the contact person belongs to.
+        postal_code:
+            label:           Zip/Postal Code
+            description:     The postal code specified in the address record.
         region_text.label:   State
-        street.label:        Street
-        street2.label:       Street 2
+        street:
+            label:           Street
+            description:     The street specified in the address record.
+        street2:
+            label:           Street 2
+            description:     The street specified in the address record.
+        created:
+            label:           Created at
+            description:     The date and time of resource record creation.
+        updated:
+            label:           Updated at
+            description:     The date and time of the last update of the resource record.
 
         country_name.label:      Country name
         country_iso2_code.label: Country ISO2 code
@@ -39,33 +65,53 @@ oro:
         region:
             entity_label:        State
             entity_plural_label: States
-            entity_description:  Represent address region
-            name.label:          Name
-            country.label:       Country
-            combined_code.label: Combined code
-            code.label:          Code
+            entity_description:  Administrative units withing a country.
+            name:
+                label:           Name
+                description:     The name used to refer to a region on the interface.
+            country:
+                label:           Country
+                description:     The country that a region is a part of.
+            combined_code:
+                label:           Combined code
+                description:     The identifier of an entity. The region (country subdivision) code according to ISO 3166-2.
+            code:
+                label:           Code
+                description:     The part of after hyphen of an ISO 3166-2 region code.
 
             country_name.label:      Country name
             country_iso2_code.label: Country ISO2 code
             country_iso3_code.label: Country ISO3 code
 
+            label:           State
+            description:     The region specified in the address record.
+
         country:
             entity_label:         Country
             entity_plural_label:  Countries
-            entity_description:   Represent address country
-            regions.label:        States
+            entity_description:   A country represents an element of an address record.
+            regions:
+                label:            States
+                description:      Administrative units within a country.
             regions_code.label:   State codes
             regions_name.label:   State names
-            name.label:           Name
-            iso3_code.label:      ISO3 code
-            iso2_code.label:      ISO2 code
+            name:
+                label:            Name
+                description:      The name that identifies the country record
+            iso3_code:
+                label:            ISO3 code
+                description:      A country three-letter code.
+            iso2_code:
+                label:            ISO2 code
+                description:      The identifier of an entity.
+            label:                Country
+            description:          The country specified in the address record.
+
         addresstype:
             entity_label:         Address Type
             entity_plural_label:  Address Types
             entity_description:   Represent address type
             name.label:           Name
-            label.label:          Label
-        action:
-            read_dictionaries:
-                label: "Access address drop-downs"
-                description: "See drop-down menus for Countries, streets, etc. in the Address forms"
+            label:
+                label:            Label
+                description:      Label of the address type ('Shipping' or 'Billing').

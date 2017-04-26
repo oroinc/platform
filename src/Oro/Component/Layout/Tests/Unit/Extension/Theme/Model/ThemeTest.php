@@ -2,8 +2,14 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ThemeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Theme */
@@ -85,6 +91,78 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->theme->getDescription());
     }
 
+    public function testAddPageTemplate()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertEquals(
+            new ArrayCollection(['key_route_name' => $pageTemplate]),
+            $this->theme->getPageTemplates()
+        );
+    }
+
+    public function testAddPageTemplateForce()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+        $newPageTemplate = new PageTemplate('NewLabel', 'key', 'route_name');
+        $this->theme->addPageTemplate($newPageTemplate, true);
+
+        $this->assertEquals(
+            new ArrayCollection(['key_route_name' => $newPageTemplate]),
+            $this->theme->getPageTemplates()
+        );
+    }
+
+    public function testAddPageTemplateAlreadyExists()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+        $newPageTemplate = new PageTemplate('NewLabel', 'key', 'route_name');
+        $newPageTemplate->setDescription('Description');
+        $this->theme->addPageTemplate($newPageTemplate);
+
+        $this->assertCount(1, $this->theme->getPageTemplates());
+        $this->assertEquals(
+            new ArrayCollection(['key_route_name' => $pageTemplate->setDescription('Description')]),
+            $this->theme->getPageTemplates()
+        );
+    }
+
+    public function testGetPageTemplate()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertEquals($pageTemplate, $this->theme->getPageTemplate('key', 'route_name'));
+    }
+
+    public function testGetPageTemplateWithWrongKey()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertFalse($this->theme->getPageTemplate('key1', 'route_name'));
+    }
+
+    public function testGetPageTemplateWithWrongRouteName()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertFalse($this->theme->getPageTemplate('key', 'route_name1'));
+    }
+
+    public function testGetPageTemplateDisabled()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $pageTemplate->setEnabled(false);
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertFalse($this->theme->getPageTemplate('key', 'route_name'));
+    }
+
     public function testConfigMethods()
     {
         $config = [
@@ -98,5 +176,30 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('default value', $this->theme->getConfigByKey('unknown key', 'default value'));
         $this->theme->setConfigByKey('unknown key', 'unknown value');
         $this->assertEquals('unknown value', $this->theme->getConfigByKey('unknown key', 'default value'));
+    }
+
+    public function testAddPageTemplateTitle()
+    {
+        $this->theme->addPageTemplateTitle('some_route', 'Some title');
+        $this->assertEquals('Some title', $this->theme->getPageTemplateTitle('some_route'));
+    }
+
+    public function testGetNotExistingPageTemplateTitle()
+    {
+        $this->theme->addPageTemplateTitle('some_route', 'Some title');
+        $this->assertEquals(null, $this->theme->getPageTemplateTitle('not_existing_route'));
+    }
+
+    public function testGetPageTemplateTitles()
+    {
+        $expected = [
+            'some_route' => 'Some route',
+            'some_other_route' => 'Some other route',
+        ];
+
+        $this->theme->addPageTemplateTitle('some_route', 'Some route');
+        $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
+        $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
+        $this->assertEquals($expected, $this->theme->getPageTemplateTitles());
     }
 }

@@ -1,14 +1,11 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\NotificationBundle\Async\Topics as EmailTopics;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -21,6 +18,9 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -65,9 +65,9 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $logger;
 
     /**
-     * @var ImportExportJobSummaryResultService
+     * @var ImportExportResultSummarizer
      */
-    private $importExportJobSummaryResultService;
+    private $importExportResultSummarizer;
 
     /**
      * @param ExportHandler $exportHandler
@@ -78,7 +78,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param SecurityFacade $securityFacade
      * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
-     * @param ImportExportJobSummaryResultService $importExportJobSummaryResultService
+     * @param ImportExportResultSummarizer $importExportResultSummarizer
      */
     public function __construct(
         ExportHandler $exportHandler,
@@ -89,7 +89,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         SecurityFacade $securityFacade,
         TokenStorageInterface $tokenStorage,
         LoggerInterface $logger,
-        ImportExportJobSummaryResultService $importExportJobSummaryResultService
+        ImportExportResultSummarizer $importExportResultSummarizer
     ) {
         $this->exportHandler = $exportHandler;
         $this->jobRunner = $jobRunner;
@@ -99,7 +99,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->securityFacade = $securityFacade;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
-        $this->importExportJobSummaryResultService = $importExportJobSummaryResultService;
+        $this->importExportResultSummarizer = $importExportResultSummarizer;
     }
 
     /**
@@ -139,7 +139,12 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             return self::REJECT;
         }
 
-        $jobUniqueName = Topics::EXPORT . '_' . $body['processorAlias'];
+        $jobUniqueName = sprintf(
+            'importexport_%s_%s_%s',
+            $body['exportType'],
+            $body['processorAlias'],
+            $body['userId']
+        );
 
         $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
         $this->tokenStorage->setToken($token);
@@ -187,7 +192,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     protected function sendNotificationMessage($jobUniqueName, array $exportResult, $user)
     {
-        list($subject, $body) = $this->importExportJobSummaryResultService->processSummaryExportResultForNotification(
+        list($subject, $body) = $this->importExportResultSummarizer->processSummaryExportResultForNotification(
             $jobUniqueName,
             $exportResult
         );

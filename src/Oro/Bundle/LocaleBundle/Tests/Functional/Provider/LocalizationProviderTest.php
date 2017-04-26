@@ -9,9 +9,6 @@ use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LocalizationProviderTest extends WebTestCase
 {
     /**
@@ -30,11 +27,6 @@ class LocalizationProviderTest extends WebTestCase
         $this->loadFixtures(['Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData']);
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass('OroLocaleBundle:Localization');
         $this->repository = $this->em->getRepository('OroLocaleBundle:Localization');
-    }
-
-    public function tearDown()
-    {
-        unset($this->em, $this->repository);
     }
 
     public function testCache()

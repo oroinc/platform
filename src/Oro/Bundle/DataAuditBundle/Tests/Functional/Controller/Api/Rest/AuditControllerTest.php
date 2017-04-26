@@ -11,6 +11,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ResponseExtension;
 
+/**
+ * @dbIsolationPerTest
+ */
 class AuditControllerTest extends WebTestCase
 {
     use ResponseExtension;
@@ -19,21 +22,12 @@ class AuditControllerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->initClient([], $this->generateWsseAuthHeader(), true);
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
-        self::$loadedFixtures = [];
+        $this->initClient([], $this->generateWsseAuthHeader());
     }
 
     public function testShouldReturn401IfNotAuthenticated()
     {
-        $this->getClient()->setServerParameters([]);
+        $this->client->setServerParameters([]);
 
         $this->client->request('GET', $this->getUrl('oro_api_get_audits'));
 
@@ -610,7 +604,7 @@ class AuditControllerTest extends WebTestCase
      */
     protected function getEntityManager()
     {
-        return $this->getClient()->getContainer()->get('doctrine.orm.entity_manager');
+        return $this->client->getContainer()->get('doctrine.orm.entity_manager');
     }
 
     /**

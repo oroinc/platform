@@ -9,7 +9,7 @@ use Doctrine\ORM\Query;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
@@ -160,7 +160,7 @@ class EntityReader extends IteratorBasedReader
      */
     protected function createSourceIterator($source)
     {
-        return (new BufferedQueryResultIterator($source))
+        return (new BufferedIdentityQueryResultIterator($source))
             ->setPageLoadedCallback(function (array $rows) {
                 if (!$this->dispatcher->hasListeners(Events::AFTER_ENTITY_PAGE_LOADED)) {
                     return $rows;

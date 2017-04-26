@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 
+/**
+ * @dbIsolationPerTest
+ */
 class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
 {
     /**

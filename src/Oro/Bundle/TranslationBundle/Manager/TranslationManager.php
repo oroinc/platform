@@ -64,18 +64,12 @@ class TranslationManager
      */
     public function createTranslation($key, $value, $locale, $domain = self::DEFAULT_DOMAIN)
     {
-        $cacheKey = $this->getCacheKey($locale, $domain, $key);
-        if (!array_key_exists($cacheKey, $this->translations)) {
-            $translationValue = new Translation();
-            $translationValue
-                ->setTranslationKey($this->findTranslationKey($key, $domain))
-                ->setLanguage($this->getLanguageByCode($locale))
-                ->setValue($value);
+        $translation = new Translation();
 
-            $this->translations[$cacheKey] = $translationValue;
-        }
-
-        return $this->translations[$cacheKey];
+        return $translation
+            ->setTranslationKey($this->findTranslationKey($key, $domain))
+            ->setLanguage($this->getLanguageByCode($locale))
+            ->setValue($value);
     }
 
     /**
@@ -106,23 +100,22 @@ class TranslationManager
             return null;
         }
 
+        $cacheKey = $this->getCacheKey($locale, $domain, $key);
+
         if (null === $value && null !== $translation) {
-            $cacheKey = $this->getCacheKey($locale, $domain, $key);
             $translation->setValue($value);
             $this->translations[$cacheKey] = $translation;
             return null;
         }
 
         if (null !== $value && null === $translation) {
-            $translation = $this->createTranslation($key, $value, $locale, $domain);
+            $translation = array_key_exists($cacheKey, $this->translations)
+                ? $this->translations[$cacheKey]
+                : $this->createTranslation($key, $value, $locale, $domain);
         }
 
         if (null !== $translation) {
-            $translation->setValue($value);
-            $translation->setScope($scope);
-
-            $cacheKey = $this->getCacheKey($locale, $domain, $key);
-            $this->translations[$cacheKey] = $translation;
+            $this->translations[$cacheKey] = $translation->setValue($value)->setScope($scope);
         }
 
         return $translation;

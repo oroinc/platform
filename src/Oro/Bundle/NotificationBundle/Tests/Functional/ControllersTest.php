@@ -8,9 +8,6 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 use Symfony\Component\DomCrawler\Form;
 
-/**
- * @dbIsolation
- */
 class ControllersTest extends WebTestCase
 {
     use ResponseExtension;

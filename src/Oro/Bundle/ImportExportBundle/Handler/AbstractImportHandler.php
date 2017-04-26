@@ -2,11 +2,34 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Job\JobResult;
 
 abstract class AbstractImportHandler extends AbstractHandler
 {
+    /**
+     * @param string $process
+     * @param string $jobName
+     * @param string $processorAlias
+     * @param array $options
+     */
+    public function handle($process, $jobName, $processorAlias, array $options = [])
+    {
+        switch ($process) {
+            case ProcessorRegistry::TYPE_IMPORT:
+                return $this->handleImport($jobName, $processorAlias, $options);
+                break;
+            case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
+                return $this->handleImportValidation($jobName, $processorAlias, $options);
+                break;
+            default:
+                throw new InvalidArgumentException(
+                    sprintf('Not Found method for handle of "%s" process.', $process)
+                );
+        }
+    }
+
     /**
      * @var string
      */
@@ -156,5 +179,33 @@ abstract class AbstractImportHandler extends AbstractHandler
         $this->jobExecutor->setValidationMode($isValidationMode);
 
         return $jobResult;
+    }
+
+    /**
+     * @param array $counts
+     * @param string $entityName
+     * @return string
+     */
+    protected function getImportInfo($counts, $entityName)
+    {
+        $add = 0;
+        $update = 0;
+
+        if (isset($counts['add'])) {
+            $add += $counts['add'];
+        }
+        if (isset($counts['update'])) {
+            $update += $counts['update'];
+        }
+        if (isset($counts['replace'])) {
+            $update += $counts['replace'];
+        }
+
+        $importInfo = $this->translator->trans(
+            'oro.importexport.import.alert',
+            ['%added%' => $add, '%updated%' => $update, '%entities%' => $this->getEntityPluralName($entityName)]
+        );
+
+        return $importInfo;
     }
 }

@@ -9,9 +9,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ControllersTest extends WebTestCase
 {
     use MessageQueueExtension;
@@ -23,8 +20,6 @@ class ControllersTest extends WebTestCase
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
         $this->client->useHashNavigation(true);
-
-        $this->setUpMessageCollector();
     }
 
     public function testIndex()
@@ -179,7 +174,7 @@ class ControllersTest extends WebTestCase
                 'format' => 'csv',
                 'batchSize' => 200,
                 'parameters' => [
-                    'gridName' => 'oro_segment_grid_3',
+                    'gridName' => 'oro_segment_grid_' . $id,
                     'gridParameters' => [
                         '_filter' => [
                             'c1' => [

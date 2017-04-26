@@ -46,8 +46,8 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($metadataFactory));
 
         $this->doctrine->expects($this->once())
-            ->method('getManagers')
-            ->will($this->returnValue(array('default' => $em)));
+            ->method('getManagerNames')
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))
@@ -81,8 +81,8 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($metadataFactory));
 
         $this->doctrine->expects($this->once())
-            ->method('getManagers')
-            ->will($this->returnValue(array('default' => $em)));
+            ->method('getManagerNames')
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))
@@ -117,8 +117,8 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($metadataFactory));
 
         $this->doctrine->expects($this->once())
-            ->method('getManagers')
-            ->will($this->returnValue(array('default' => $em)));
+            ->method('getManagerNames')
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))
@@ -155,8 +155,8 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($metadata));
 
         $this->doctrine->expects($this->once())
-            ->method('getManagers')
-            ->will($this->returnValue(array('default' => $em)));
+            ->method('getManagerNames')
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))

@@ -31,6 +31,7 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->entity->getUpdatedAt());
         $this->assertNull($this->entity->getLastRun());
         $this->assertNull($this->entity->getOrganization());
+        $this->assertNull($this->entity->getRecordsLimit());
 
         $testData = uniqid('name');
         $this->entity->setName($testData);
@@ -71,6 +72,10 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $testData = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $this->entity->setOrganization($testData);
         $this->assertSame($testData, $this->entity->getOrganization());
+
+        $testData = 10;
+        $this->entity->setRecordsLimit($testData);
+        $this->assertSame($testData, $this->entity->getRecordsLimit());
     }
 
     public function testLifecycleCallbacks()

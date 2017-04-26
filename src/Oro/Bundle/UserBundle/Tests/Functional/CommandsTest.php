@@ -11,9 +11,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class CommandsTest extends WebTestCase
 {
     protected function setUp()

@@ -8,6 +8,9 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 
+/**
+ * @dbIsolationPerTest
+ */
 class DbalMessageConsumerTest extends WebTestCase
 {
     use DbalSchemaExtensionTrait;
@@ -19,15 +22,11 @@ class DbalMessageConsumerTest extends WebTestCase
         $this->initClient();
 
         $this->ensureTableExists('message_queue');
-
-        $this->startTransaction();
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-
-        $this->rollbackTransaction();
 
         $this->dropTable('message_queue');
     }

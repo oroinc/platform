@@ -6,10 +6,13 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\Common\Inflector\Inflector;
 use Guzzle\Http\Client;
 use Guzzle\Plugin\Cookie\Cookie;
 use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
 use Guzzle\Plugin\Cookie\CookiePlugin;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
@@ -17,6 +20,26 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 class ImportExportContext extends OroFeatureContext implements KernelAwareContext, OroPageObjectAware
 {
     use KernelDictionary, PageObjectDictionary;
+
+    /**
+     * @var EntityAliasResolver
+     */
+    private $aliasResolver;
+
+    /**
+     * @var ProcessorRegistry
+     */
+    private $processorRegistry;
+
+    /**
+     * @param EntityAliasResolver $aliasResolver
+     * @param ProcessorRegistry $processorRegistry
+     */
+    public function __construct(EntityAliasResolver $aliasResolver, ProcessorRegistry $processorRegistry)
+    {
+        $this->aliasResolver = $aliasResolver;
+        $this->processorRegistry = $processorRegistry;
+    }
 
     /**
      * @var string Path to saved template
@@ -31,10 +54,19 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     /**
      * Download data template from entity grid page
      *
-     * @When /^(?:|I )download Data Template file$/
+     * @When /^(?:|I )download "(?P<entity>([\w\s]+))" Data Template file$/
      */
-    public function iDownloadDataTemplateFile()
+    public function iDownloadDataTemplateFile($entity)
     {
+        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
+        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+
+        self::assertCount(1, $processors, sprintf(
+            'Too many processors ("%s") for export "%s" entity',
+            implode(', ', $processors),
+            $entity
+        ));
+
         $importButton = $this->getSession()
             ->getPage()
             ->findLink('Import');
@@ -50,7 +82,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
 
         $url = $this->locatePath($this->getContainer()->get('router')->generate(
             'oro_importexport_export_template',
-            ['processorAlias' => 'oro_sales_opportunity']
+            ['processorAlias' => array_shift($processors)]
         ));
         $this->template = tempnam(sys_get_temp_dir(), 'opportunity_template_');
 
@@ -69,6 +101,19 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
         $response = $request->send();
 
         self::assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * @param string $entityName
+     * @return string
+     */
+    protected function convertEntityNameToAlias($entityName)
+    {
+        $name = strtolower($entityName);
+        $nameParts = explode(' ', $name);
+        $nameParts = array_map([new Inflector(), 'singularize'], $nameParts);
+
+        return implode('', $nameParts);
     }
 
     /**
@@ -138,8 +183,8 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     public function iImportFile()
     {
         $this->tryImportFile();
-        $this->getSession()->getPage()->pressButton('Import');
-        $this->waitForAjax();
+        // todo: CRM-7599 Replace sleep to appropriate logic
+        sleep(5);
     }
 
     /**
@@ -150,7 +195,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     public function tryImportFile()
     {
         $page = $this->getSession()->getPage();
-        $page->clickLink('Import');
+        $page->clickLink('Import file');
         $this->waitForAjax();
         $this->createElement('ImportFileField')->attachFile($this->importFile);
         $page->pressButton('Submit');

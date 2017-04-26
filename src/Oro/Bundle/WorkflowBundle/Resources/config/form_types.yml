@@ -98,3 +98,10 @@ services:
             - '@oro_workflow.restriction.manager'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
+    oro_workflow.form.type.variables:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType'
+        arguments:
+            - '@oro_workflow.variable_guesser'
+        tags:
+            - { name: form.type, alias: oro_workflow_variables }

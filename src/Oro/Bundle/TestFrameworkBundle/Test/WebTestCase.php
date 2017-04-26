@@ -4,66 +4,71 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 
-use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
-use Oro\Component\Testing\DbIsolationExtension;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\Testing\DbIsolationExtension;
 
 /**
  * Abstract class for functional and integration tests
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
     use DbIsolationExtension;
 
     /** Annotation names */
-    const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
-    const DB_REINDEX_ANNOTATION   = 'dbReindex';
+
+    /**
+     * Use to avoid transaction rollbacks with Connection::transactional and missing on conflict in Doctrine
+     * SQLSTATE[25P02] current transaction is aborted, commands ignored until end of transaction block
+     */
+    const NEST_TRANSACTIONS_WITH_SAVEPOINTS = 'nestTransactionsWithSavepoints';
 
     /** Default WSSE credentials */
-    const USER_NAME     = 'admin';
+    const USER_NAME = 'admin';
     const USER_PASSWORD = 'admin_api_key';
 
     /**  Default user name and password */
-    const AUTH_USER         = 'admin@example.com';
-    const AUTH_PW           = 'admin';
+    const AUTH_USER = 'admin@example.com';
+    const AUTH_PW = 'admin';
     const AUTH_ORGANIZATION = 1;
 
     /**
      * @var bool[]
      */
-    private static $dbIsolation;
+    private static $dbIsolationPerTest = [];
 
     /**
      * @var bool[]
      */
-    private static $dbIsolationPerTest;
-
-    /**
-     * @var bool[]
-     */
-    private static $dbReindex;
+    private static $nestTransactionsWithSavepoints = [];
 
     /**
      * @var Client
      */
-    protected static $clientInstance;
+    private static $clientInstance;
 
     /**
      * @var Client
@@ -71,34 +76,71 @@ abstract class WebTestCase extends BaseWebTestCase
     private static $soapClientInstance;
 
     /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @var SoapClient
-     */
-    protected $soapClient;
-
-    /**
      * @var array
      */
     protected static $loadedFixtures = [];
+
+    /** @var Client */
+    protected $client;
+
+    /** @var Client */
+    protected $soapClient;
+
+    /** @var callable */
+    private static $resetCallback;
 
     /**
      * @var ReferenceRepository
      */
     private static $referenceRepository;
 
+    protected function setUp()
+    {
+    }
+
+    /**
+     * In order to disable kernel shutdown
+     * @see \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::tearDown
+     */
     protected function tearDown()
+    {
+    }
+
+    /**
+     * @before
+     * @internal
+     */
+    protected function beforeTest()
+    {
+        if (!self::$resetCallback) {
+            $self = $this;
+            self::$resetCallback = function () use ($self) {
+                $self->client = null;
+                $self->soapClient = null;
+            };
+        }
+    }
+
+    /**
+     * @after
+     * @internal
+     */
+    protected function afterTest()
     {
         if (self::getDbIsolationPerTestSetting()) {
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
+            self::$referenceRepository = null;
+
+            self::resetClient();
         }
     }
 
-    public static function setUpBeforeClass()
+    /**
+     * @beforeClass
+     * @internal
+     */
+    public static function beforeClass()
     {
         /**
          * In case we have isolated test we should have clean env before run it,
@@ -107,62 +149,84 @@ abstract class WebTestCase extends BaseWebTestCase
          *   for not isolated tests (ex. GetRestJsonApiTest),
          *   so we will have client without transaction started in our test
          */
-        self::$clientInstance = null;
+        self::resetClient();
     }
 
-    public static function tearDownAfterClass()
+    /**
+     * @afterClass
+     * @internal
+     */
+    public static function afterClass()
     {
-        if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
-            self::rollbackTransaction();
+        self::rollbackTransaction();
+        self::$loadedFixtures = [];
+        self::$referenceRepository = null;
+
+        if (self::$resetCallback) {
+            call_user_func(self::$resetCallback);
+            self::$resetCallback = null;
         }
 
-        self::$clientInstance = null;
-        self::$soapClientInstance = null;
-        self::$loadedFixtures = [];
+        self::resetClient();
     }
 
     /**
      * Creates a Client.
      *
      * @param array $options An array of options to pass to the createKernel class
-     * @param array $server  An array of server parameters
-     * @param bool  $force If this option - true, will reset client on each initClient call
+     * @param array $server An array of server parameters
+     * @param bool $force If this option - true, will reset client on each initClient call
      *
      * @return Client A Client instance
      */
     protected function initClient(array $options = [], array $server = [], $force = false)
     {
-        if ($force) {
-            $this->resetClient();
+        if (self::isClassHasAnnotation(get_called_class(), 'dbIsolation')) {
+            throw new \RuntimeException(
+                sprintf(
+                    '@dbIsolation is default behavior now, please remove annotation from %s',
+                    get_called_class()
+                )
+            );
         }
 
-        if (self::getDbIsolationPerTestSetting()) {
-            $this->resetClient();
+        if ($force) {
+            throw new \RuntimeException(
+                sprintf(
+                    '%s::initClient asked to do force reset, use @%s instead',
+                    get_called_class(),
+                    self::DB_ISOLATION_PER_TEST_ANNOTATION
+                )
+            );
         }
 
         if (!self::$clientInstance) {
-            // Fix for: The "native_profiler" extension is not enabled in "*.html.twig".
-            // If you still getting this exception please run "php app/console cache:clear --env=test --no-debug".
-            // The cache will be cleared and warmed up without the twig profiler.
-            if (!isset($options['debug'])) {
-                $options['debug'] = false;
+            self::$clientInstance = static::createClient($options, $server);
+
+            if (self::isClassHasAnnotation(get_called_class(), 'dbReindex')) {
+                throw new \RuntimeException(
+                    sprintf(
+                        '%s::initClient asked to do reindex, use %s instead and add tearDown method',
+                        get_called_class(),
+                        SearchExtensionTrait::class
+                    )
+                );
             }
 
-            $this->client = self::$clientInstance = static::createClient($options, $server);
-
-            if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
-                //This is a workaround for MyISAM search tables that are not transactional
-                if (self::getDbReindexSetting()) {
-                    self::getContainer()->get('oro_search.search.engine.indexer')->reindex();
-                }
-
-                $this->startTransaction();
-            }
+            $this->startTransaction(self::hasNestTransactionsWithSavepoints());
         } else {
             self::$clientInstance->setServerParameters($server);
         }
 
-        $this->client = self::$clientInstance;
+        return $this->client = self::$clientInstance;
+    }
+
+    /** {@inheritdoc} */
+    protected static function createKernel(array $options = array())
+    {
+        $options['debug'] = false;
+
+        return parent::createKernel($options);
     }
 
     /**
@@ -174,24 +238,35 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$clientInstance->setServerParameters(static::generateBasicAuthHeader($login, $login));
         } else {
             self::$clientInstance->setServerParameters([]);
-            $this->client->getCookieJar()->clear();
+            self::$clientInstance->getCookieJar()->clear();
         }
+    }
+
+    /**
+     * @param string $email
+     */
+    protected function updateUserSecurityToken($email)
+    {
+        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['email' => $email]);
+
+        $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
+        $this->getContainer()->get('security.token_storage')->setToken($token);
     }
 
     /**
      * Reset client and rollback transaction
      */
-    protected function resetClient()
+    protected static function resetClient()
     {
         if (self::$clientInstance) {
-            if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
-                self::$loadedFixtures = [];
-                $this->rollbackTransaction();
-            }
-
-            $this->client = null;
             self::$clientInstance = null;
         }
+
+        if (self::$soapClientInstance) {
+            self::$soapClientInstance = null;
+        }
+
+        static::ensureKernelShutdown();
     }
 
     /**
@@ -199,37 +274,77 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function getKernelClass()
     {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
+        if (isset($_SERVER['KERNEL_DIR'])) {
+            $dir = $_SERVER['KERNEL_DIR'];
+
+            if (!is_dir($dir)) {
+                $phpUnitDir = static::getPhpUnitXmlDir();
+                if (is_dir("$phpUnitDir/$dir")) {
+                    $dir = "$phpUnitDir/$dir";
+                }
+            }
+        } else {
+            $dir = static::getPhpUnitXmlDir();
+        }
 
         $finder = new Finder();
         $finder->name('AppKernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
-
-        if (count($results)) {
-            $file  = current($results);
-            $class = $file->getBasename('.php');
-
-            require_once $file;
-        } else {
-            $class = parent::getKernelClass();
+        if (!count($results)) {
+            throw new \RuntimeException(
+                'Either set KERNEL_DIR in your phpunit.xml according to' .
+                ' https://symfony.com/doc/current/book/testing.html#your-first-functional-test' .
+                ' or override the WebTestCase::createKernel() method.'
+            );
         }
+
+        $file = current($results);
+        $class = $file->getBasename('.php');
+
+        require_once $file;
 
         return $class;
     }
 
     /**
-     * Get value of dbIsolation option from annotation of called class
+     * Process and replace all references and functions to values
      *
-     * @return bool
+     * @param  array|string $data Can be path to yml template file or array
+     * @return array|string
      */
-    private static function getDbIsolationSetting()
+    protected static function processTemplateData($data)
     {
-        $calledClass = get_called_class();
-        if (!isset(self::$dbIsolation[$calledClass])) {
-            self::$dbIsolation[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_ISOLATION_ANNOTATION);
+        if (!self::$referenceRepository) {
+            return $data;
         }
 
-        return self::$dbIsolation[$calledClass];
+        /** @var AliceFixtureLoader $aliceLoader */
+        $aliceLoader = self::getContainer()->get('oro_test.alice_fixture_loader');
+        $aliceLoader->setReferences(self::$referenceRepository->getReferences());
+
+        if (is_string($data)) {
+            try {
+                $file = $aliceLoader->locateFile($data);
+                if (is_file($file)) {
+                    $data = Yaml::parse(file_get_contents($file));
+                }
+            } catch (\InvalidArgumentException $e) {
+            }
+        }
+
+        if (is_array($data)) {
+            array_walk_recursive($data, function (&$item) use ($aliceLoader) {
+                $item = $aliceLoader->getProcessor()->process($item, [], null);
+            });
+        } elseif (is_int($data) || is_string($data)) {
+            $data = $aliceLoader->getProcessor()->process($data, [], null);
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf('Expected argument of type "array or string", "%s" given.', gettype($data))
+            );
+        }
+
+        return $data;
     }
 
     /**
@@ -251,18 +366,17 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get value of dbIsolation option from annotation of called class
-     *
      * @return bool
      */
-    private static function getDbReindexSetting()
+    private static function hasNestTransactionsWithSavepoints()
     {
         $calledClass = get_called_class();
-        if (!isset(self::$dbReindex[$calledClass])) {
-            self::$dbReindex[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_REINDEX_ANNOTATION);
+        if (!isset(self::$nestTransactionsWithSavepoints[$calledClass])) {
+            self::$nestTransactionsWithSavepoints[$calledClass] =
+                self::isClassHasAnnotation($calledClass, self::NEST_TRANSACTIONS_WITH_SAVEPOINTS);
         }
 
-        return self::$dbReindex[$calledClass];
+        return self::$nestTransactionsWithSavepoints[$calledClass];
     }
 
     /**
@@ -279,8 +393,8 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * @param string $wsdl
-     * @param array  $options
-     * @param bool   $force
+     * @param array $options
+     * @param bool $force
      *
      * @return SoapClient
      * @throws \Exception
@@ -314,7 +428,7 @@ abstract class WebTestCase extends BaseWebTestCase
             }
             //save to file
             $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
-            $fl = fopen($file, "w");
+            $fl = fopen($file, 'bw');
             fwrite($fl, $wsdl);
             fclose($fl);
 
@@ -323,82 +437,87 @@ abstract class WebTestCase extends BaseWebTestCase
             unlink($file);
         }
 
-        $this->soapClient = self::$soapClientInstance;
+        return $this->soapClient = self::$soapClientInstance;
     }
 
     /**
      * Builds up the environment to run the given command.
      *
      * @param string $name
-     * @param array  $params
+     * @param array $params
+     * @param bool $cleanUp strip new lines and multiple spaces, removes dependency on terminal columns
      *
      * @return string
      */
-    protected static function runCommand($name, array $params = [])
+    protected static function runCommand($name, array $params = [], $cleanUp = true)
     {
         /** @var KernelInterface $kernel */
         $kernel = self::getContainer()->get('kernel');
 
         $application = new Application($kernel);
         $application->setAutoExit(false);
+        $application->setTerminalDimensions(120, 50);
 
-        $argv = ['application', $name];
+        $args = ['application', $name];
         foreach ($params as $k => $v) {
             if (is_bool($v)) {
                 if ($v) {
-                    $argv[] = $k;
+                    $args[] = $k;
                 }
             } else {
                 if (!is_int($k)) {
-                    $argv[] = $k;
+                    $args[] = $k;
                 }
-                $argv[] = $v;
+                $args[] = $v;
             }
         }
-        $input = new ArgvInput($argv);
+        $input = new ArgvInput($args);
         $input->setInteractive(false);
 
-        $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'r+');
+        $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'br+');
         $output = new StreamOutput($fp);
 
         $application->run($input, $output);
 
         rewind($fp);
-        return stream_get_contents($fp);
+
+        $content = stream_get_contents($fp);
+
+        if ($cleanUp) {
+            $content = preg_replace(['/\s{2,}\n\s{2,}/', '/(\n|\s{2,})+/'], ['', ' '], $content);
+        }
+
+        return trim($content);
     }
 
     /**
      * @param string[] $fixtures Each fixture can be a class name or a path to nelmio/alice file
-     * @param bool     $force
+     * @param bool     $force    Load fixtures even if its was loaded
      *
      * @link https://github.com/nelmio/alice
      */
     protected function loadFixtures(array $fixtures, $force = false)
     {
+        if ($force) {
+            throw new \RuntimeException(
+                sprintf(
+                    '%s::loadFixtures asked to do force load, use @%s instead',
+                    get_called_class(),
+                    self::DB_ISOLATION_PER_TEST_ANNOTATION
+                )
+            );
+        }
+
         $container = $this->getContainer();
         $fixtureIdentifierResolver = new AliceFixtureIdentifierResolver($container->get('kernel'));
 
-        $fixtures = array_map(
-            function ($value) use ($fixtureIdentifierResolver) {
-                return $fixtureIdentifierResolver->resolveId($value);
-            },
-            $fixtures
-        );
-        if (!$force) {
-            $fixtures = array_values(array_filter(
-                $fixtures,
-                function ($value) {
-                    return !in_array($value, self::$loadedFixtures, true);
-                }
-            ));
-            if (!$fixtures) {
-                return;
-            }
+        $filteredFixtures = $this->filterFixtures($fixtures, $force);
+        if (!$filteredFixtures) {
+            return;
         }
-        self::$loadedFixtures = array_merge(self::$loadedFixtures, $fixtures);
 
         $loader = new DataFixturesLoader(new AliceFixtureFactory(), $fixtureIdentifierResolver, $container);
-        foreach ($fixtures as $fixture) {
+        foreach ($filteredFixtures as $fixture) {
             $loader->addFixture($fixture);
         }
 
@@ -406,6 +525,34 @@ abstract class WebTestCase extends BaseWebTestCase
         $executor->execute($loader->getFixtures(), true);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
+    }
+
+    /**
+     * @param array  $fixtures Existing references that will be filtered
+     * @param bool   $force    Load fixtures even if its was loaded
+     * @return array
+     */
+    protected function filterFixtures(array $fixtures, $force = false)
+    {
+        $container = $this->getContainer();
+        $fixtureIdentifierResolver = new AliceFixtureIdentifierResolver($container->get('kernel'));
+        $filteredFixtures = [];
+
+        foreach ($fixtures as $fixture) {
+            $filteredFixtures[$fixtureIdentifierResolver->resolveId($fixture)] = $fixture;
+        }
+
+        if (!$force) {
+            $removeLoadedFixturesCallback = function ($fixtureId) {
+                return !in_array($fixtureId, self::$loadedFixtures, true);
+            };
+
+            $filteredFixtures = array_filter($filteredFixtures, $removeLoadedFixturesCallback, ARRAY_FILTER_USE_KEY);
+        }
+
+        self::$loadedFixtures = array_merge(self::$loadedFixtures, array_keys($filteredFixtures));
+
+        return $filteredFixtures;
     }
 
     /**
@@ -464,8 +611,8 @@ abstract class WebTestCase extends BaseWebTestCase
      * Generates a URL or path for a specific route based on the given parameters.
      *
      * @param string $name
-     * @param array  $parameters
-     * @param bool   $absolute
+     * @param array $parameters
+     * @param bool $absolute
      *
      * @return string
      */
@@ -506,7 +653,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public function addOroDefaultPrefixToUrlInParameterArray(&$data, $urlParameterKey)
     {
         $oroDefaultPrefix = $this->getUrl('oro_default');
-        
+
         $replaceOroDefaultPrefixCallback = function (&$value) use ($oroDefaultPrefix, $urlParameterKey) {
             if (!is_null($value[$urlParameterKey])) {
                 $value[$urlParameterKey] = str_replace(
@@ -578,13 +725,13 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function generateRandomString($length = 10)
     {
         $random = "";
-        srand((double) microtime() * 1000000);
+        mt_srand((double)microtime() * 1000000);
         $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $char_list .= "abcdefghijklmnopqrstuvwxyz";
         $char_list .= "1234567890_";
 
         for ($i = 0; $i < $length; $i++) {
-            $random .= substr($char_list, (rand() % (strlen($char_list))), 1);
+            $random .= substr($char_list, (mt_rand() % (strlen($char_list))), 1);
         }
 
         return $random;
@@ -593,8 +740,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Generate WSSE authorization header
      *
-     * @param string      $userName
-     * @param string      $userPassword
+     * @param string $userName
+     * @param string $userPassword
      * @param string|null $nonce
      *
      * @return array
@@ -605,11 +752,11 @@ abstract class WebTestCase extends BaseWebTestCase
         $nonce = null
     ) {
         if (null === $nonce) {
-            $nonce = uniqid();
+            $nonce = uniqid('nonce', true);
         }
 
-        $created  = date('c');
-        $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
+        $created = date('c');
+        $digest = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
         $wsseHeader = [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
@@ -630,7 +777,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param string $userName
      * @param string $userPassword
-     * @param int    $userOrganization
+     * @param int $userOrganization
      *
      * @return array
      */
@@ -640,8 +787,8 @@ abstract class WebTestCase extends BaseWebTestCase
         $userOrganization = self::AUTH_ORGANIZATION
     ) {
         return [
-            'PHP_AUTH_USER'         => $userName,
-            'PHP_AUTH_PW'           => $userPassword,
+            'PHP_AUTH_USER' => $userName,
+            'PHP_AUTH_PW' => $userPassword,
             'PHP_AUTH_ORGANIZATION' => $userOrganization
         ];
     }
@@ -681,8 +828,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Checks json response status code and return content as array
      *
-     * @param Response   $response
-     * @param int        $statusCode
+     * @param Response $response
+     * @param int $statusCode
      * @param string|int $message
      *
      * @return array
@@ -696,8 +843,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert response is json and has status code
      *
-     * @param Response    $response
-     * @param int         $statusCode
+     * @param Response $response
+     * @param int $statusCode
      * @param string|null $message
      */
     public static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
@@ -712,8 +859,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert response is json and has status code
      *
-     * @param Response    $response
-     * @param int         $statusCode
+     * @param Response $response
+     * @param int $statusCode
      * @param string|null $message
      */
     public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
@@ -725,8 +872,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert response is html and has status code
      *
-     * @param Response    $response
-     * @param int         $statusCode
+     * @param Response $response
+     * @param int $statusCode
      * @param string|null $message
      */
     public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
@@ -738,8 +885,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert response status code equals
      *
-     * @param Response    $response
-     * @param int         $statusCode
+     * @param Response $response
+     * @param int $statusCode
      * @param string|null $message
      */
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
@@ -779,8 +926,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert response content type equals
      *
-     * @param Response    $response
-     * @param string      $contentType
+     * @param Response $response
+     * @param string $contentType
      * @param string|null $message
      */
     public static function assertResponseContentTypeEquals(Response $response, $contentType, $message = null)
@@ -795,8 +942,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert that intersect of $actual with $expected equals $expected
      *
-     * @param array  $expected
-     * @param array  $actual
+     * @param array $expected
+     * @param array $actual
      * @param string $message
      */
     public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
@@ -872,7 +1019,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getClient()
     {
-        return $this->client;
+        return self::getClientInstance();
     }
 
     /**
@@ -880,6 +1027,10 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getSoapClient()
     {
-        return $this->soapClient;
+        if (!self::$soapClientInstance) {
+            throw new \LogicException('Client is not initialized, call "initSoapClient" method first');
+        }
+
+        return self::$soapClientInstance;
     }
 }

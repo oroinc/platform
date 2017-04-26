@@ -1,7 +1,7 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
-use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,26 +10,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+
 class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
     use LimitsExtensionsCommandTrait;
-
-    /**
-     * @var QueueConsumer
-     */
-    protected $consumer;
-
-    /**
-     * ConsumeMessagesCommand constructor.
-     * @param QueueConsumer $consumer
-     */
-    public function __construct(QueueConsumer $consumer)
-    {
-        parent::__construct('oro:message-queue:transport:consume');
-        
-        $this->consumer = $consumer;
-    }
 
     /**
      * {@inheritdoc}
@@ -44,8 +30,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
                 'To use this broker you have to explicitly set a queue to consume from '.
                 'and a message processor service')
             ->addArgument('queue', InputArgument::REQUIRED, 'Queues to consume from')
-            ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service')
-        ;
+            ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service');
     }
 
     /**
@@ -70,11 +55,13 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
 
         $runtimeExtensions = new ChainExtension($extensions);
 
+        /** @var QueueConsumer $consumer */
+        $consumer = $this->container->get('oro_message_queue.consumption.queue_consumer');
         try {
-            $this->consumer->bind($queueName, $messageProcessor);
-            $this->consumer->consume($runtimeExtensions);
+            $consumer->bind($queueName, $messageProcessor);
+            $consumer->consume($runtimeExtensions);
         } finally {
-            $this->consumer->getConnection()->close();
+            $consumer->getConnection()->close();
         }
     }
 }

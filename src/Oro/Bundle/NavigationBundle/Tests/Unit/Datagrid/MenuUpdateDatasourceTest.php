@@ -6,6 +6,7 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\Util\MenuManipulator;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
@@ -23,6 +24,9 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $scopeType = 'default';
 
+    /** @var MenuConfiguration|\PHPUnit_Framework_MockObject_MockObject */
+    protected $menuConfiguration;
+
     /**
      * {@inheritdoc}
      */
@@ -30,8 +34,16 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->chainProvider = $this->createMock(BuilderChainProvider::class);
         $this->menuManipulator = $this->createMock(MenuManipulator::class);
+        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->datasource = new MenuUpdateDatasource($this->chainProvider, $this->menuManipulator, $this->scopeType);
+        $this->datasource = new MenuUpdateDatasource(
+            $this->chainProvider,
+            $this->menuManipulator,
+            $this->scopeType,
+            $this->menuConfiguration
+        );
     }
 
     public function testProcess()
@@ -53,7 +65,9 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetResults(array $menu, $resultCount)
     {
-        $this->datasource->setMenuConfiguration(['tree' => [$menu['name'] => $menu]]);
+        $this->menuConfiguration->expects(self::once())
+            ->method('getTree')
+            ->willReturn([$menu['name'] => $menu]);
 
         $factory = new MenuFactory();
         $menuItem = $factory->createItem($menu['name'], $menu);

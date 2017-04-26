@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder as MaskBuilder;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 {
@@ -22,21 +22,21 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      * @param MetadataProviderInterface                  $metadataProvider
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowRegistry                           $workflowRegistry
+     * @param WorkflowManager                            $workflowManager
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         MetadataProviderInterface $metadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
-        WorkflowRegistry $workflowRegistry
+        WorkflowManager $workflowManager
     ) {
         parent::__construct(
             $objectIdAccessor,
             $metadataProvider,
             $entityOwnerAccessor,
             $decisionMaker,
-            $workflowRegistry
+            $workflowManager
         );
 
         $this->permissions = [
@@ -89,7 +89,7 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         return $this->permissions;
     }
@@ -179,7 +179,7 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
             list($transitionName, $fromStep, $toStep) = explode('|', $fieldName);
             // detect that given transition is start
             if ('' === $fromStep) {
-                $workflow = $this->workflowRegistry->getWorkflow($workflowName);
+                $workflow = $this->getWorkflowManager()->getWorkflow($workflowName);
                 $transition = $workflow->getTransitionManager()->getTransition($transitionName);
                 if ($transition->isStart() && !$transition->isEmptyInitOptions()) {
                     return null;

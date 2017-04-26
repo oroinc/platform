@@ -2,23 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
-use Exception;
-
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class StartTransitionHandler
 {
@@ -31,9 +29,7 @@ class StartTransitionHandler
     /** @var TransitionHelper */
     protected $transitionHelper;
 
-    /**
-     * @var FeatureChecker
-     */
+    /** @var FeatureChecker */
     protected $featureChecker;
 
     /**
@@ -69,6 +65,7 @@ class StartTransitionHandler
         }
 
         $responseCode = null;
+        $responseMessage = null;
         $workflowItem = null;
         try {
             $dataArray = [];
@@ -94,18 +91,24 @@ class StartTransitionHandler
             $workflowItem = $this->workflowManager->startWorkflow($workflowName, $entity, $transition, $dataArray);
         } catch (HttpException $e) {
             $responseCode = $e->getStatusCode();
+            $responseMessage = $e->getMessage();
         } catch (WorkflowNotFoundException $e) {
             $responseCode = 404;
+            $responseMessage = $e->getMessage();
         } catch (UnknownAttributeException $e) {
             $responseCode = 400;
+            $responseMessage = $e->getMessage();
         } catch (InvalidTransitionException $e) {
             $responseCode = 400;
+            $responseMessage = $e->getMessage();
         } catch (ForbiddenTransitionException $e) {
             $responseCode = 403;
-        } catch (Exception $e) {
+            $responseMessage = $e->getMessage();
+        } catch (\Exception $e) {
             $responseCode = 500;
+            $responseMessage = $e->getMessage();
         }
 
-        return $this->transitionHelper->createCompleteResponse($workflowItem, $responseCode);
+        return $this->transitionHelper->createCompleteResponse($workflowItem, $responseCode, $responseMessage);
     }
 }

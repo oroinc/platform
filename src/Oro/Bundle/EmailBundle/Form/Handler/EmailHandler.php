@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Psr\Log\LoggerInterface;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,10 +68,8 @@ class EmailHandler
 
             if ($this->form->isValid()) {
                 try {
-                    $this->emailProcessor->process(
-                        $model,
-                        $this->emailProcessor->getEmailOrigin($model->getFrom(), $model->getOrganization())
-                    );
+                    $this->emailProcessor->process($model, $model->getOrigin());
+
                     return true;
                 } catch (\Exception $ex) {
                     $this->logger->error('Email sending failed.', ['exception' => $ex]);

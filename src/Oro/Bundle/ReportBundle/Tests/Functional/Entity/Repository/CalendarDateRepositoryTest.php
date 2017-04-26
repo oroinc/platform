@@ -6,9 +6,6 @@ use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class CalendarDateRepositoryTest extends WebTestCase
 {
     /**

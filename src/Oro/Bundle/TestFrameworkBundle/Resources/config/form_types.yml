@@ -1,0 +1,5 @@
+services:
+    oro_test.form.type.oro_test_workflow_aware_entity_type:
+        class: 'Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType'
+        tags:
+            - { name: form.type, alias: oro_test_workflow_aware_entity_type }

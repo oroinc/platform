@@ -10,9 +10,6 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 
-/**
- * @dbIsolation
- */
 class SegmentSnapshotRepositoryTest extends WebTestCase
 {
     protected function setUp()

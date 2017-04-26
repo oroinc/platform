@@ -2,19 +2,36 @@
 
 namespace Oro\Bundle\ConfigBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ConfigExtension extends \Twig_Extension
 {
-    /** @var ConfigManager */
-    protected $cm;
+    /** @var ContainerInterface */
+    protected $container;
+
+    /** @var ConfigManager|null */
+    private $configManager;
 
     /**
-     * @param ConfigManager $cm
+     * @param ContainerInterface $container
      */
-    public function __construct(ConfigManager $cm)
+    public function __construct(ContainerInterface $container)
     {
-        $this->cm = $cm;
+        $this->container = $container;
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    protected function getConfigManager()
+    {
+        if (null === $this->configManager) {
+            $this->configManager = $this->container->get('oro_config.user');
+        }
+
+        return $this->configManager;
     }
 
     /**
@@ -22,7 +39,9 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return ['oro_config_value' => new \Twig_Function_Method($this, 'getConfigValue')];
+        return [
+            new \Twig_SimpleFunction('oro_config_value', [$this, 'getConfigValue'])
+        ];
     }
 
     /**
@@ -32,7 +51,7 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getConfigValue($name)
     {
-        return $this->cm->get($name);
+        return $this->getConfigManager()->get($name);
     }
 
     /**

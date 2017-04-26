@@ -41,6 +41,7 @@ datagrids:
                 where:
                     and:
                         - o.id = @oro_security.security_facade->getOrganizationId
+                groupBy: a.id, o.name, author
         columns:
             action:
                 label: oro.dataaudit.datagrid.action
@@ -156,6 +157,7 @@ datagrids:
                 where:
                     and:
                         - a.objectClass = :objectClass AND a.objectId = :objectId
+                groupBy: a.id
         columns:
             author:
                 label: oro.dataaudit.datagrid.author

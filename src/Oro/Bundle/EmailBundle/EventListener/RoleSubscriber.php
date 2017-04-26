@@ -8,6 +8,7 @@ use Doctrine\ORM\Events;
 
 use Doctrine\Common\EventSubscriber;
 
+use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -70,17 +71,21 @@ class RoleSubscriber implements EventSubscriber
         }
 
         $aclManager = $this->getAclManager();
-        $oid = $aclManager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
         foreach ($this->insertedRoles as $role) {
             $sid = $aclManager->getSid($role);
-            $maskBuilder = $aclManager->getMaskBuilder($oid)
-                ->add('VIEW_SYSTEM')
-                ->add('CREATE_SYSTEM')
-                ->add('EDIT_SYSTEM');
-            $aclManager->setPermission($sid, $oid, $maskBuilder->get());
+            $mask = 0;
+            foreach (EmailVoter::SUPPORTED_CLASSES as $className) {
+                $oid = $aclManager->getOid('entity:' . $className);
+                foreach (['VIEW', 'CREATE', 'EDIT'] as $permission) {
+                    $maskBuilder = $aclManager->getMaskBuilder($oid, $permission);
+                    $maskBuilder->add($permission . '_SYSTEM');
+                    $mask |= $maskBuilder->get();
+                }
+                $aclManager->setPermission($sid, $oid, $mask);
+            }
         }
-        $this->insertedRoles = [];
 
+        $this->insertedRoles = [];
         $aclManager->flush();
     }
 

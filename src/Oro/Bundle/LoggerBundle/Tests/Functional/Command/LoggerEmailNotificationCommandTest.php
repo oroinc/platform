@@ -4,9 +4,6 @@ namespace Oro\Bundle\LoggerBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LoggerEmailNotificationCommandTest extends WebTestCase
 {
     /**
@@ -54,6 +51,6 @@ class LoggerEmailNotificationCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:email-notification', ['--help']);
 
-        $this->assertContains("Usage:\n  oro:logger:email-notification [options]", $result);
+        $this->assertContains("Usage: oro:logger:email-notification [options]", $result);
     }
 }

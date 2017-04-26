@@ -2,90 +2,109 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class TitleExtension extends \Twig_Extension
 {
     const EXT_NAME = 'oro_title';
 
-    /**
-     * @var TitleServiceInterface
-     */
-    protected $titleService;
+    /** @var ContainerInterface */
+    protected $container;
+
+    /** @var array */
+    protected $templateFileTitleDataStack = [];
 
     /**
-     * @var array
+     * @param ContainerInterface $container
      */
-    protected $templateFileTitleDataStack = array();
-
-    /**
-     * @param TitleServiceInterface $titleService
-     */
-    public function __construct(TitleServiceInterface $titleService)
+    public function __construct(ContainerInterface $container)
     {
-        $this->titleService = $titleService;
+        $this->container = $container;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * @return TitleService
+     */
+    protected function getTitleService()
+    {
+        return $this->container->get('oro_navigation.title_service');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
-        return array(
-            'oro_title_render' => new \Twig_Function_Method($this, 'render'),
-            'oro_title_render_short' => new \Twig_Function_Method($this, 'renderShort'),
-            'oro_title_render_serialized' => new \Twig_Function_Method($this, 'renderSerialized'),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_title_render', [$this, 'render']),
+            new \Twig_SimpleFunction('oro_title_render_short', [$this, 'renderShort']),
+            new \Twig_SimpleFunction('oro_title_render_serialized', [$this, 'renderSerialized']),
+        ];
     }
 
     /**
-     * Register new token parser
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getTokenParsers()
     {
-        return array(
+        return [
             new TitleSetTokenParser()
-        );
+        ];
     }
 
     /**
      * Renders title
      *
-     * @param null $titleData
+     * @param string|null $titleData
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function render($titleData = null)
+    public function render($titleData = null, $menuName = null)
     {
-        return $this->titleService
+        $route = $this->getCurrenRoute();
+
+        return $this->getTitleService()
+            ->loadByRoute($route, $menuName)
             ->setData($this->getTitleData())
-            ->render(array(), $titleData, null, null, true);
+            ->render([], $titleData, null, null, true);
     }
 
     /**
      * Renders short title
      *
-     * @param null $titleData
+     * @param string|null $titleData
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function renderShort($titleData = null)
+    public function renderShort($titleData = null, $menuName = null)
     {
-        return $this->titleService
+        $route = $this->getCurrenRoute();
+
+        return $this->getTitleService()
+            ->loadByRoute($route, $menuName)
             ->setData($this->getTitleData())
-            ->render(array(), $titleData, null, null, true, true);
+            ->render([], $titleData, null, null, true, true);
     }
 
     /**
      * Returns json serialized data
      *
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function renderSerialized()
+    public function renderSerialized($menuName = null)
     {
-        return $this->titleService->setData($this->getTitleData())->getSerialized();
+        $route = $this->getCurrenRoute();
+
+        return $this->getTitleService()
+            ->loadByRoute($route, $menuName)
+            ->setData($this->getTitleData())
+            ->getSerialized();
     }
 
     /**
@@ -100,7 +119,7 @@ class TitleExtension extends \Twig_Extension
      * @param string|null $templateScope
      * @return TitleExtension
      */
-    public function set(array $options = array(), $templateScope = null)
+    public function set(array $options = [], $templateScope = null)
     {
         $this->addTitleData($options, $templateScope);
         return $this;
@@ -110,7 +129,7 @@ class TitleExtension extends \Twig_Extension
      * @param array $options
      * @param string|null $templateScope
      */
-    protected function addTitleData(array $options = array(), $templateScope = null)
+    protected function addTitleData(array $options = [], $templateScope = null)
     {
         if (!$templateScope) {
             $backtrace = debug_backtrace(false);
@@ -122,7 +141,7 @@ class TitleExtension extends \Twig_Extension
         }
 
         if (!isset($this->templateFileTitleDataStack[$templateScope])) {
-            $this->templateFileTitleDataStack[$templateScope] = array();
+            $this->templateFileTitleDataStack[$templateScope] = [];
         }
         $this->templateFileTitleDataStack[$templateScope][] = $options;
     }
@@ -132,9 +151,9 @@ class TitleExtension extends \Twig_Extension
      */
     protected function getTitleData()
     {
-        $result = array();
+        $result = [];
         if ($this->templateFileTitleDataStack) {
-            $result = array();
+            $result = [];
             foreach (array_reverse($this->templateFileTitleDataStack) as $templateOptions) {
                 foreach ($templateOptions as $options) {
                     $result = array_replace_recursive($result, $options);
@@ -142,6 +161,17 @@ class TitleExtension extends \Twig_Extension
             }
         }
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    private function getCurrenRoute()
+    {
+        return $this->container
+            ->get('request_stack')
+            ->getCurrentRequest()
+            ->get('_route');
     }
 
     /**

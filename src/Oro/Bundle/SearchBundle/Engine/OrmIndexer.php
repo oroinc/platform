@@ -13,9 +13,6 @@ use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 
 class OrmIndexer extends AbstractIndexer
 {
-    /** @var array */
-    protected $drivers = [];
-
     /** @var SearchIndexRepository */
     private $indexRepository;
 
@@ -37,14 +34,6 @@ class OrmIndexer extends AbstractIndexer
         DbalStorer $dbalStorer
     ) {
         parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
-    }
-
-    /**
-     * @param array $drivers
-     */
-    public function setDrivers(array $drivers)
-    {
-        $this->drivers = $drivers;
     }
 
     /**
@@ -78,13 +67,21 @@ class OrmIndexer extends AbstractIndexer
         if (!$entities) {
             return false;
         }
+        $sortedEntitiesData = [];
+        foreach ($entities as $entity) {
+            if (!$this->doctrineHelper->isManageableEntity($entity)) {
+                continue;
+            }
+            $entityClass = $this->doctrineHelper->getEntityClass($entity);
+            $sortedEntitiesData[$entityClass][] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        }
 
         $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
-
         $hasDeletedEntities = !empty($existingItems);
-        foreach ($existingItems as $items) {
-            foreach ($items as $item) {
-                $this->getIndexManager()->remove($item);
+        foreach ($sortedEntitiesData as $entityClass => $entityIds) {
+            $batches = array_chunk($entityIds, $this->getBatchSize());
+            foreach ($batches as $batch) {
+                $this->getIndexRepository()->removeEntities($batch, $entityClass);
             }
         }
 
@@ -203,8 +200,6 @@ EOF;
         }
 
         $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
-        $this->indexRepository->setDriversClasses($this->drivers);
-        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
     }

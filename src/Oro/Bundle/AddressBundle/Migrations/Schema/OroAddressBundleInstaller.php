@@ -9,11 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroAddressBundleInstaller implements Installation
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**

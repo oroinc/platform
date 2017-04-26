@@ -5,9 +5,6 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Command;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 
-/**
- * @dbIsolation
- */
 class OroTranslationLoadCommandTest extends WebTestCase
 {
     protected function setUp()

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
@@ -67,18 +68,16 @@ class EmailQueryFactory
      */
     public function applyAcl(QueryBuilder $qb)
     {
-        $user = $this->securityFacade->getLoggedUser();
-        $organization = $this->getOrganization();
-
-        $mailboxIds = $this->mailboxManager->findAvailableMailboxIds($user, $organization);
-
         $exprs = [$qb->expr()->eq('eu.owner', ':owner')];
+
+        $organization = $this->getOrganization();
         if ($organization) {
             $exprs[] = $qb->expr()->eq('eu.organization ', ':organization');
             $qb->setParameter('organization', $organization->getId());
         }
         $uoCheck = call_user_func_array([$qb->expr(), 'andX'], $exprs);
 
+        $mailboxIds = $this->getAvailableMailboxIds();
         if (!empty($mailboxIds)) {
             $qb->andWhere(
                 $qb->expr()->orX(
@@ -90,7 +89,154 @@ class EmailQueryFactory
         } else {
             $qb->andWhere($uoCheck);
         }
-        $qb->setParameter('owner', $user->getId());
+
+        $qb->setParameter('owner', $this->securityFacade->getLoggedUserId());
+    }
+
+    /**
+     * Apply custom ACL checks in case of threaded emails view enabled.
+     * Adds additional WHERE condition:
+     *
+     * o0_.id IN (
+     *  SELECT max(u.id)
+     *  FROM OroEmailBundle:EmailUser as u
+     *  INNER JOIN OroEmailBundle:Email as m on u.email_id = m.id
+     *  WHERE
+     *    m.thread_id is not null
+     *    AND (
+     *      (
+     *        u.user_owner_id = {owner_id}
+     *        AND u.organization_id = {organization_id}
+     *      )
+     *      OR u.mailbox_owner_id IN ( {allowed_mailboxes_ids} )
+     *    )
+     *  GROUP BY m.thread_id
+     * )
+     * OR (o3_.is_head = 1 AND o3_.thread_id is null)
+     *
+     * @param QueryBuilder $qb
+     */
+    public function applyAclThreadsGrouping(QueryBuilder $qb)
+    {
+        $innerQb = $qb->getEntityManager()->createQueryBuilder();
+        $innerQb
+            ->select('MAX(u.id)')
+            ->from('OroEmailBundle:EmailUser', 'u')
+            ->innerJoin('OroEmailBundle:Email', 'm', 'WITH', 'u.email = m.id')
+            ->where(
+                $innerQb->expr()->andX(
+                    $innerQb->expr()->isNotNull('m.thread'),
+                    $this->getOwningExpression($innerQb->expr(), 'u')
+                )
+            )
+            ->groupBy('m.thread');
+
+        $qb->andWhere(
+            $qb->expr()->orX(
+                $qb->expr()->in('eu.id', $innerQb->getDQL()),
+                $qb->expr()->andX(
+                    $qb->expr()->isNull('e.thread'),
+                    $qb->expr()->eq('e.head', 'TRUE')
+                )
+            )
+        );
+    }
+
+    /**
+     * In case of threaded emails view enabled, adds email counting (SELECT COUNT) expression.
+     *
+     * SELECT COUNT(eu.id)
+     *   FROM oro_email_user AS eu
+     *   INNER JOIN oro_email e ON (eu.email_id = e.id)
+     *   WHERE
+     *     e.thread_id = o3_.thread_id
+     *     AND (
+     *       (
+     *         eu.user_owner_id = {owner_id}
+     *         AND eu.organization_id = {organization_id}
+     *       )
+     *       OR eu.mailbox_owner_id IN ( {allowed_mailboxes_ids} )
+     *    )
+     *    AND o3_.thread_id IS NOT NULL -- `o3_` is alias for `oro_email` table from base query
+     * as thread_email_count
+     *
+     * @param QueryBuilder $qb
+     * @param bool         $isThreadGroupingEnabled
+     */
+    public function addEmailsCount(QueryBuilder $qb, $isThreadGroupingEnabled)
+    {
+        // in case threading view is disabled the default value for counting is `0`
+        $selectExpression = '0 AS thread_email_count';
+
+        if ($isThreadGroupingEnabled) {
+            $innerQb = $qb->getEntityManager()->createQueryBuilder();
+            $innerQb
+                ->select('COUNT(emailUser.id)')
+                ->from('OroEmailBundle:EmailUser', 'emailUser')
+                ->innerJoin('OroEmailBundle:Email', 'email', 'WITH', 'emailUser.email = email.id')
+                ->where(
+                    $innerQb->expr()->andX(
+                        $innerQb->expr()->isNotNull('e.thread'),
+                        $innerQb->expr()->eq('email.thread', 'e.thread'),
+                        $this->getOwningExpression($innerQb->expr(), 'emailUser')
+                    )
+                );
+
+            $selectExpression = '(' . $innerQb->getDQL() . ') AS thread_email_count';
+        }
+
+        $qb->addSelect($selectExpression);
+    }
+
+    /**
+     * Builds owning expression part, being used in case of threaded emails view enabled.
+     *
+     *  (
+     *    eu.user_owner_id = {owner_id}
+     *    AND eu.organization_id = {organization_id}
+     *  )
+     *  OR eu.mailbox_owner_id IN ( {allowed_mailboxes_ids} )
+     *
+     * @param Expr   $expr
+     * @param string $tableAlias
+     *
+     * @return Expr\Andx|Expr\Comparison|Expr\Orx
+     */
+    protected function getOwningExpression($expr, $tableAlias)
+    {
+        $user         = $this->securityFacade->getLoggedUser();
+        $organization = $this->getOrganization();
+
+        if ($organization === null) {
+            $ownerExpression =
+                $expr->eq($tableAlias . '.owner', $user->getId());
+        } else {
+            $ownerExpression = $expr->andX(
+                $expr->eq($tableAlias . '.owner', $user->getId()),
+                $expr->eq($tableAlias . '.organization', $organization->getId())
+            );
+        }
+
+        $availableMailboxIds = $this->getAvailableMailboxIds();
+        if ($availableMailboxIds) {
+            return $expr->orX(
+                $ownerExpression,
+                $expr->in($tableAlias . '.mailboxOwner', $this->getAvailableMailboxIds())
+            );
+        } else {
+            return $ownerExpression;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAvailableMailboxIds()
+    {
+        return $this->mailboxManager->findAvailableMailboxIds(
+            $this->securityFacade->getLoggedUser(),
+            $this->getOrganization()
+        );
     }
 
     /**

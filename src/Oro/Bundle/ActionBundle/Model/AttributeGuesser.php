@@ -12,6 +12,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Oro\Bundle\ActionBundle\Exception\AttributeException;
+use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AttributeGuesser
@@ -52,10 +53,15 @@ class AttributeGuesser
     protected $formTypeMapping = array();
 
     /**
-     * @param FormRegistry    $formRegistry
+     * @var DoctrineTypeMappingProvider|null
+     */
+    protected $doctrineTypeMappingProvider;
+
+    /**
+     * @param FormRegistry $formRegistry
      * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider  $entityConfigProvider
-     * @param ConfigProvider  $formConfigProvider
+     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $formConfigProvider
      */
     public function __construct(
         FormRegistry $formRegistry,
@@ -67,6 +73,14 @@ class AttributeGuesser
         $this->managerRegistry = $managerRegistry;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->formConfigProvider = $formConfigProvider;
+    }
+
+    /**
+     * @param DoctrineTypeMappingProvider|null $doctrineTypeMappingProvider
+     */
+    public function setDoctrineTypeMappingProvider(DoctrineTypeMappingProvider $doctrineTypeMappingProvider = null)
+    {
+        $this->doctrineTypeMappingProvider = $doctrineTypeMappingProvider;
     }
 
     /**
@@ -163,7 +177,7 @@ class AttributeGuesser
                 : 'entity';
             $class = $multiple
                 ? 'Doctrine\Common\Collections\ArrayCollection'
-                :  $metadata->getAssociationTargetClass($field);
+                : $metadata->getAssociationTargetClass($field);
 
             return $this->formatResult(
                 $this->getLabel($metadata->getName(), $field, $multiple),
@@ -313,16 +327,18 @@ class AttributeGuesser
      */
     protected function guessAttributeParametersScalarField(ClassMetadata $metadata, $field)
     {
+        $typeMappings = $this->getRegisteredTypeMappings();
+
         if ($metadata->hasField($field)) {
             $doctrineType = $metadata->getTypeOfField($field);
-            if (!isset($this->doctrineTypeMapping[$doctrineType])) {
+            if (!isset($typeMappings[$doctrineType])) {
                 return null;
             }
 
             return $this->formatResult(
                 $this->getLabel($metadata->getName(), $field),
-                $this->doctrineTypeMapping[$doctrineType]['type'],
-                $this->doctrineTypeMapping[$doctrineType]['options']
+                $typeMappings[$doctrineType]['type'],
+                $typeMappings[$doctrineType]['options']
             );
         } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)) {
             $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
@@ -330,12 +346,27 @@ class AttributeGuesser
             if (!$metadata->hasAssociation($field)) {
                 return $this->formatResult(
                     $entityConfig->get('label'),
-                    $this->doctrineTypeMapping[$fieldType]['type'],
-                    $this->doctrineTypeMapping[$fieldType]['options']
+                    $typeMappings[$fieldType]['type'],
+                    $typeMappings[$fieldType]['options']
                 );
             }
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRegisteredTypeMappings()
+    {
+        if ($this->doctrineTypeMappingProvider !== null) {
+            return array_merge(
+                $this->doctrineTypeMapping,
+                $this->doctrineTypeMappingProvider->getDoctrineTypeMappings()
+            );
+        }
+
+        return $this->doctrineTypeMapping;
     }
 }

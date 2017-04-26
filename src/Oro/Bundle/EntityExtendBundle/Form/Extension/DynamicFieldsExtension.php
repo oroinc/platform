@@ -10,12 +10,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
@@ -23,6 +23,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class DynamicFieldsExtension extends AbstractTypeExtension
@@ -44,22 +45,28 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param ConfigManager       $configManager
      * @param RouterInterface     $router
      * @param TranslatorInterface $translator
      * @param DoctrineHelper      $doctrineHelper
+     * @param FeatureChecker      $featureChecker
      */
     public function __construct(
         ConfigManager $configManager,
         RouterInterface $router,
         TranslatorInterface $translator,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        FeatureChecker $featureChecker
     ) {
         $this->configManager    = $configManager;
         $this->router           = $router;
         $this->translator       = $translator;
         $this->doctrineHelper   = $doctrineHelper;
+        $this->featureChecker   = $featureChecker;
         $this->propertyAccessor = new PropertyAccessor();
     }
 
@@ -252,6 +259,12 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
+        if ($extendConfig->has('target_entity')
+            && !$this->featureChecker->isResourceEnabled($extendConfig->get('target_entity'), 'entities')
+        ) {
+            return false;
+        }
+
         return
             $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
             && ExtendHelper::isFieldAccessible($extendConfig)

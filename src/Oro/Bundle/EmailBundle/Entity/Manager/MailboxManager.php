@@ -85,7 +85,7 @@ class MailboxManager
      * @param User $user
      * @param Organization $organization
      *
-     * @return EmailOrigin
+     * @return EmailOrigin[]
      */
     public function findAvailableOrigins(User $user, Organization $organization)
     {

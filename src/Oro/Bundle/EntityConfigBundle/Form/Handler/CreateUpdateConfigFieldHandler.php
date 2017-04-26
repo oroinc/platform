@@ -106,6 +106,9 @@ class CreateUpdateConfigFieldHandler
             $additionalFieldOptions
         );
 
+        // all relations created via UI should be bidirectional
+        $fieldOptions['extend']['bidirectional'] = true;
+
         $newFieldModel = $this->configManager->createConfigFieldModel(
             $entityConfigModel->getClassName(),
             $fieldName,

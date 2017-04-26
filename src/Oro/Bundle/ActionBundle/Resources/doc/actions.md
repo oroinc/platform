@@ -6,6 +6,7 @@ Table of Contents
  - [Run Action Group](#run-action-group-run_action_group)
  - [Format Name](#format-name)
  - [Create Date](#create-date)
+ - [Resolve Destination Page](#resolve-destination-page)
 
 Run Action Group `@run_action_group`
 ------------------------------------
@@ -108,3 +109,43 @@ Copy Values
 ```
 - @copy_values: [$.to, $.from1, $.from2, {key: 'value'}]
 ```
+
+
+Resolve Destination Page
+------------------------
+
+**Class:** Oro\Bundle\ActionBundle\Action\ResolveDestinationPage
+
+**Alias:** resolve_destination_page
+
+**Description:** Resolve redirect url by route name from entity configuration. Used route parameters `routeName` or `routeView`.
+
+**Options:**
+ - destination / 0 - name of route that should be specified in `@Config` annotation of entity
+ - entity / 1 - (optional) property path of original entity (by default equals `entity`)
+ - attribute / 2 - (optional) target property path where result of action will be saved (by default equals `redirectUrl`)
+
+**Configuration Example**
+```
+- @resolve_destination_page: view
+
+#OR
+
+- @resolve_destination_page: ['view', $.entity, $.attribute]
+
+#OR
+
+- @resolve_destination_page:
+    name: index
+    entity: $.data.entity
+
+#OR
+
+- @resolve_destination_page:
+    name: index
+    entity: $.entity
+    attribute: $.attribute
+```
+Allowed values for parameter `destination`:
+ - for index page (`routeName`) value can be `name`
+ - for view page (`routeView`) value can be `view`

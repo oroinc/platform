@@ -49,7 +49,7 @@ define(['backbone', './model'
         },
 
         /**
-         * Remove item from collection, or uncheck "owner" if filter is not in global mdoe
+         * Remove item from collection, or uncheck "owner" if filter is not in global mode
          *
          * @param {string|number} id
          * @param {string} filterState

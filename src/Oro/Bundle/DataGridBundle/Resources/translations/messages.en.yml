@@ -31,8 +31,11 @@ oro:
             label: Page
             totalPages: of %totalPages%
             totalRecords: Total of %totalRecords% records
+            prev: Prev
+            next: Next
         pagesize:
             label: View per page
+            labelShort: Per page
     grid:
         mass_action:
             label: Mass Actions
@@ -58,11 +61,8 @@ oro:
             delete: Delete
             clone: Clone
             gridview_create_public:
-                label: Share grid view
-                description: Share custom grid views with other users
-            gridview_edit_public:
-                label: Unshare grid view
-                description: Unshare custom grid views
+                label: Share data view
+                description: Share custom data views with other users
             gridview_export:
                 label: Export grid view
                 description: Export data from Grid view

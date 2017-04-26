@@ -12,14 +12,6 @@ ACL implementation from Oro UserBundle.
 
 <a name="first-menu"></a>
 
-### Initialize Page Titles
-
-To load page titles from configs and controller annotations execute following command:
-
-```
-php app/console oro:navigation:init
-```
-
 ### Menu data sources
 
 Menu data can come from different sources:
@@ -116,6 +108,10 @@ menu_config:
             show_non_authorized: <boolean>      # show for non-authorized users
             display: <boolean>                  # disable showing of menu item
             display_children: <boolean>         # disable showing of menu item children
+            position: <integer>                 # menu item position
+            extras:                             # extra parameters for container renderer
+                brand: <string>
+                brandLink: <string>
 
     tree:
         <menu_alias>                            # menu alias
@@ -124,12 +120,8 @@ menu_config:
             read_only: <boolean>                # disable ability to edit menu in UI
             max_nesting_level: <integer>        # menu max nesting level
             merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
-            extras:                             # extra parameters for container renderer
-                brand: <string>
-                brandLink: <string>
             children:                           # submenu items
                 <links to items hierarchy>
-                position: <integer>             # menu item posiotion
 ```
 
 To change merge strategy of tree node there are 3 possible options:
@@ -160,12 +152,6 @@ Title can be defined with annotation together with route annotation:
 
 ```
 @TitleTemplate("Route title with %%parameter%%")
-```
-
-After titles update following command should be executed:
-
-```
-php app/console oro:navigation:init
 ```
 
 ## Rendering Menus

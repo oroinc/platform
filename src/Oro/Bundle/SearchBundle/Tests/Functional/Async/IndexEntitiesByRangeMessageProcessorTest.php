@@ -9,23 +9,14 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
- * @dbIsolationPerTest
+ * @nestTransactionsWithSavepoints
  * @group search
  */
 class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 {
     protected function setUp()
     {
-        parent::setUp();
-
         $this->initClient();
-    }
-
-    public function testCouldBeConstructedByContainer()
-    {
-        $instance = $this->getContainer()->get('oro_search.async.message_processor.index_entities_by_range');
-
-        $this->assertInstanceOf(IndexEntitiesByRangeMessageProcessor::class, $instance);
     }
 
     public function testShouldCreateIndexForEntity()

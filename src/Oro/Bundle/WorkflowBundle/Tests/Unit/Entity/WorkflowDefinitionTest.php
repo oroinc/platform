@@ -38,6 +38,8 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyCollections($this->workflowDefinition, [
             ['scopes', new Scope()],
         ]);
+
+        $this->assertPropertyAccessors($this->workflowDefinition, [['applications', ['some_application'], true]]);
     }
 
     public function testSetScopesConfig()
@@ -157,6 +159,13 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['group1', 'group2'], $this->workflowDefinition->getExclusiveRecordGroups());
 
         $this->assertTrue($this->workflowDefinition->hasExclusiveRecordGroups());
+    }
+
+    public function testIsForceAutostart()
+    {
+        $this->assertFalse($this->workflowDefinition->isForceAutostart());
+        $this->workflowDefinition->setConfiguration([WorkflowDefinition::CONFIG_FORCE_AUTOSTART => true]);
+        $this->assertTrue($this->workflowDefinition->isForceAutostart());
     }
 
     /**

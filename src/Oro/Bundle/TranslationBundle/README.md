@@ -12,3 +12,4 @@ and form types for their rendering.
 - [Console commands](./Resources/doc/reference/commands.md)
 - [Translation Strategies](./Resources/doc/reference/translation_strategies.md)
 - [Translation Context Resolver](./Resources/doc/reference/context_resolver.md)
+- [Migrations](./Resources/doc/reference/migrations.md)

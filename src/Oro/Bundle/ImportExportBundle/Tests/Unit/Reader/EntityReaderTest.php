@@ -147,7 +147,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
         $this->assertAttributeInstanceOf(
-            'Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator',
+            'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
             'sourceIterator',
             $this->reader
         );
@@ -193,7 +193,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
         $this->assertAttributeInstanceOf(
-            'Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator',
+            'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
             'sourceIterator',
             $this->reader
         );
@@ -249,7 +249,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
         $this->assertAttributeInstanceOf(
-            'Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator',
+            'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
             'sourceIterator',
             $this->reader
         );

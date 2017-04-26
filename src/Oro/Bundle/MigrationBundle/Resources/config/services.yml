@@ -8,7 +8,6 @@ parameters:
     oro_migration.migrations.extension_manager.class:    Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
     oro_migration.migration.extension.rename.class:      Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
     oro_migration.tools.schema_dumper.class:             Oro\Bundle\MigrationBundle\Tools\SchemaDumper
-    oro_migration.twig.schema_dumper.class:              Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
     oro_migration.migration.extension.data_storage.class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
 services:
     oro_migration.db_id_name_generator:
@@ -67,7 +66,8 @@ services:
         lazy: true
 
     oro_migration.twig.schema_dumper:
-        class: %oro_migration.twig.schema_dumper.class%
+        class: Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
+        public: false
         arguments:
             - '@doctrine'
         tags:

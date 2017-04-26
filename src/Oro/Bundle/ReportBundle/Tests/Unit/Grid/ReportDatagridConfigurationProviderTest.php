@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
-use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
 class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,11 +54,16 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->disableOriginalConstructor()
             ->getMock();
 
+        $entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $builder = new ReportDatagridConfigurationBuilder(
             $this->functionProvider,
             $this->virtualFieldProvider,
             $this->doctrine,
-            new DatagridGuesserMock()
+            new DatagridGuesserMock(),
+            $entityNameResolver
         );
 
         $builder->setConfigManager($this->configManager);

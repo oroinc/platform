@@ -25,6 +25,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class WorkflowAttributesType extends AbstractType
 {
@@ -74,6 +75,11 @@ class WorkflowAttributesType extends AbstractType
      * @var TranslatorInterface
      */
     protected $translator;
+
+    /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
@@ -212,6 +218,11 @@ class WorkflowAttributesType extends AbstractType
         if ($propertyPath->getLength() >= 2) {
             array_shift($pathElements);
             $fieldName = implode('.', $pathElements);
+        }
+
+        // checking virtual attributes
+        if (!$this->getPropertyAccessor()->isWritable($entity, $fieldName)) {
+            return true;
         }
 
         return $this->propertyPathSecurityHelper->isGrantedByPropertyPath(
@@ -408,6 +419,18 @@ class WorkflowAttributesType extends AbstractType
         $attributeOptions['options'] = array_merge_recursive($attributeOptions['options'], $typeGuess->getOptions());
 
         return $attributeOptions;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if ($this->propertyAccessor === null) {
+            $this->propertyAccessor = new PropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 
     /**

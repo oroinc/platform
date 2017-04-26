@@ -50,7 +50,7 @@ class OroLayoutExtension extends Extension
 
         if ($config['view']['annotations']) {
             $loader->load('view_annotations.yml');
-            $this->addClassesToCompile(['Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener']);
+            $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\LayoutListener']);
         }
 
         $container->setParameter(
@@ -84,7 +84,10 @@ class OroLayoutExtension extends Extension
         $themeResourceProviderDef = $container->getDefinition(self::THEME_RESOURCE_PROVIDER_SERVICE_ID);
         $themeResourceProviderDef->replaceArgument(2, $excludedPaths);
 
-        $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
+        $this->addClassesToCompile([
+            'Oro\Bundle\LayoutBundle\EventListener\ThemeListener',
+            'Oro\Bundle\LayoutBundle\Request\LayoutHelper'
+        ]);
     }
 
     /**
@@ -127,7 +130,8 @@ class OroLayoutExtension extends Extension
             self::RESOURCES_FOLDER_PATTERN,
             [
                 new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/assets.yml'),
-                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/images.yml')
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/images.yml'),
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/page_templates.yml'),
             ]
         );
 

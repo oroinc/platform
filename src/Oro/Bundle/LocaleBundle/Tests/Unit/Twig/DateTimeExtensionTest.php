@@ -2,45 +2,31 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var DateTimeExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var DateTimeExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formatter;
 
     protected function setUp()
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+        $this->formatter = $this->getMockBuilder(DateTimeFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new DateTimeExtension($this->formatter);
-    }
 
-    public function testGetFilters()
-    {
-        $filters = $this->extension->getFilters();
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.formatter.date_time', $this->formatter)
+            ->getContainer($this);
 
-        $this->assertCount(4, $filters);
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $this->assertEquals('oro_format_datetime', $filters[0]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[1]);
-        $this->assertEquals('oro_format_date', $filters[1]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[2]);
-        $this->assertEquals('oro_format_day', $filters[2]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[3]);
-        $this->assertEquals('oro_format_time', $filters[3]->getName());
+        $this->extension = new DateTimeExtension($container);
     }
 
     public function testFormatDateTime()
@@ -62,7 +48,10 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $dateType, $timeType, $locale, $timeZone)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->formatDateTime($value, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_datetime', [$value, $options])
+        );
     }
 
     /**
@@ -105,7 +94,10 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $dateType, $locale, $timeZone ?: 'UTC')
             ->will($this->returnValue($expected));
 
-        $this->assertEquals($expected, $this->extension->formatDate($value, $options));
+        $this->assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_format_date', [$value, $options])
+        );
     }
 
     /**
@@ -142,7 +134,10 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $dateType, $locale, $timeZone ?: 'UTC')
             ->will($this->returnValue($expected));
 
-        $this->assertEquals($expected, $this->extension->formatDay($value, $options));
+        $this->assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_format_day', [$value, $options])
+        );
     }
 
     /**
@@ -185,7 +180,10 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $timeType, $locale, $timeZone ?: 'UTC')
             ->will($this->returnValue($expected));
 
-        $this->assertEquals($expected, $this->extension->formatTime($value, $options));
+        $this->assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_format_time', [$value, $options])
+        );
     }
 
     public function testGetName()

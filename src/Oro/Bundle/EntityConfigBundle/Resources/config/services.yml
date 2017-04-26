@@ -6,7 +6,6 @@ parameters:
     oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
     oro_entity_config.event_listener.entityconfig_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigGridListener
     oro_entity_config.event_listener.entityfields_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
-    oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
     oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
     oro_entity_config.helper.entity_config.class:               Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper
     oro_entity_config.attribute.entity.attribute_group.class:   Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup
@@ -17,6 +16,7 @@ services:
             - { name: oro_service_link, service: doctrine.orm.config_entity_manager }
 
     oro_entity_config.link.config_manager:
+        deprecated: The "%service_id%" service is deprecated since 2.1.
         tags:
             - { name: oro_service_link, service: oro_entity_config.config_manager }
 
@@ -97,7 +97,6 @@ services:
         arguments:
             - '@oro_entity_config.config_cache_impl'
             - '@oro_entity_config.model_cache_impl'
-            - %kernel.debug%
 
     oro_entity_config.config_cache_impl:
         public: false
@@ -159,12 +158,10 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.auditfield-log-grid, method: onBuildBefore }
 
     oro_entity_config.twig.extension.config:
-        class: %oro_entity_config.twig.extension.config.class%
+        class: Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
+        public: false
         arguments:
-            - '@oro_entity_config.config_manager'
-            - '@router'
-            - '@oro_entity.entity_class_name_helper'
-            - '@oro_entity.doctrine_helper'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -252,6 +249,7 @@ services:
             - '@oro_entity_extend.extend.field_name_validation_helper'
             - '@oro_entity_config.config.config_helper'
             - '@session'
+            - '@event_dispatcher'
 
     oro_entity_config.config.config_helper:
         class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
@@ -317,10 +315,11 @@ services:
 
     oro_entity_config.twig.extension.dynamic_fields_attribute_decorator:
         class: 'Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator'
+        public: false
         decorates: oro_entity_extend.twig.extension.dynamic_fields
         arguments:
-            - "@oro_entity_config.twig.extension.dynamic_fields_attribute_decorator.inner"
-            - "@oro_entity_config.config.attributes_config_helper"
+            - '@oro_entity_config.twig.extension.dynamic_fields_attribute_decorator.inner'
+            - '@service_container'
 
     oro_entity_config.datagrid.attribute_family_actions_configuration:
         class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
@@ -414,3 +413,9 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
+    oro_entity_config.event_listener.attribute_after_remove_field:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\AfterRemoveFieldListener
+        arguments:
+          - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.field.after_remove, method: onAfterRemove }

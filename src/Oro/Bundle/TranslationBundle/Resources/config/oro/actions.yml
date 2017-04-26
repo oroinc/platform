@@ -305,6 +305,8 @@ operations:
 
     oro_translation_translation_remove:
         label: oro.translation.action.remove_translation
+        frontend_options:
+            confirmation: oro.translation.action.confirmation.remove_translation.message
         acl_resource: [TRANSLATE, $language]
         applications: [default]
         datagrids:

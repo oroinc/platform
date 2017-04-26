@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
@@ -14,6 +15,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  * Class Email
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  *
  * @package Oro\Bundle\EmailBundle\Form\Model
  */
@@ -37,6 +39,9 @@ class Email implements OrganizationAwareInterface
 
     /** @var string */
     protected $from;
+
+    /** @var EmailOrigin */
+    protected $origin;
 
     /** @var string[] */
     protected $to = [];
@@ -202,6 +207,14 @@ class Email implements OrganizationAwareInterface
      */
     public function getFrom()
     {
+        if (!$this->from && $this->getOrigin()) {
+            if ($this->getOrigin()->getMailbox()) {
+                $this->from = $this->getOrigin()->getMailbox()->getEmail();
+            } elseif ($this->getOrigin()->getOwner()) {
+                $this->from = $this->getOrigin()->getOwner()->getEmail();
+            }
+        }
+
         return $this->from;
     }
 
@@ -215,6 +228,30 @@ class Email implements OrganizationAwareInterface
     public function setFrom($from)
     {
         $this->from = $from;
+
+        return $this;
+    }
+
+    /**
+     * Get email origin
+     *
+     * @return EmailOrigin
+     */
+    public function getOrigin()
+    {
+        return $this->origin;
+    }
+
+    /**
+     * Set email origin
+     *
+     * @param EmailOrigin $origin
+     *
+     * @return $this
+     */
+    public function setOrigin($origin)
+    {
+        $this->origin = $origin;
 
         return $this;
     }

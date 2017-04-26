@@ -7,8 +7,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProviderInterface;
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptions;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 
@@ -55,7 +59,8 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             $this->resourceDocProvider,
             $this->apiDocParser,
             $this->translator,
-            $this->ownershipConfigProvider
+            $this->ownershipConfigProvider,
+            new RequestDependedTextProcessor(new RequestExpressionMatcher())
         );
     }
 
@@ -524,6 +529,74 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
             ],
             $this->context->getResult()
+        );
+    }
+
+    public function testProcessRequestDependedContentForEntityDocumentation()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'documentation'    => '{@request:json_api}JSON API{@/request}{@request:rest}REST{@/request}'
+        ];
+
+        $this->context->getRequestType()->set(new RequestType([RequestType::JSON_API]));
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'documentation'    => 'JSON API'
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessRequestDependedContentForFieldDescription()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => [
+                    'description' => '{@request:json_api}JSON API{@/request}{@request:rest}REST{@/request}'
+                ]
+            ]
+        ];
+
+        $this->context->getRequestType()->set(new RequestType([RequestType::JSON_API]));
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'description' => 'JSON API'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessRequestDependedContentForFilterDescription()
+    {
+        $filters = new FiltersConfig();
+        $filter1 = $filters->addField('field1');
+        $filter1->setDescription('{@request:json_api}JSON API{@/request}{@request:rest}REST{@/request}');
+
+        $this->context->getRequestType()->set(new RequestType([RequestType::JSON_API]));
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject([]));
+        $this->context->setFilters($filters);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            'JSON API',
+            $filter1->getDescription()
         );
     }
 }

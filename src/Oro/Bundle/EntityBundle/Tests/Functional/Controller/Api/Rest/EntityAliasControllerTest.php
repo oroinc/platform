@@ -4,9 +4,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class EntityAliasControllerTest extends WebTestCase
 {
     protected function setUp()

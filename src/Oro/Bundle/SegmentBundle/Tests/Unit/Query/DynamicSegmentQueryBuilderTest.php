@@ -171,7 +171,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $builder->build($segment);
 
         $this->assertEmpty($qb->getDQLPart('groupBy'));
-        $this->assertEmpty($qb->getDQLPart('orderBy'));
+        $this->assertNotEmpty($qb->getDQLPart('orderBy'));
         $this->assertNotEmpty($qb->getDQLPart('join'));
     }
 

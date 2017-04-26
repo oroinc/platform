@@ -31,7 +31,8 @@ define(function(require) {
             translateLinkLabel: null,
             priority: 0,
             exclusive_active_groups: [],
-            exclusive_record_groups: []
+            exclusive_record_groups: [],
+            applications: []
         },
 
         MAX_HISTORY_LENGTH: 50,
@@ -40,6 +41,7 @@ define(function(require) {
         entityFieldUtil: null,
         entityFields: null,
         entityFieldsInitialized: false,
+        availableDestinations: {},
 
         positionIncrementPx: 35,
 
@@ -193,6 +195,18 @@ define(function(require) {
 
         setSystemEntities: function(entities) {
             this.systemEntities = entities;
+        },
+
+        getAvailableDestinations: function() {
+            return this.availableDestinations;
+        },
+
+        setAvailableDestinations: function(destinations) {
+            this.availableDestinations = destinations;
+        },
+
+        getEntityRoutes: function() {
+            return this.entityFieldUtil.getEntityRoutes();
         },
 
         getOrAddAttributeByPropertyPath: function(propertyPath) {

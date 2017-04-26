@@ -85,6 +85,22 @@ class AcmeTestBundle implements Migration
 }
 ```
 
+Extend fields can be also marked as unique:
+ ```
+    $table->addColumn(
+    'phone',
+    'string',
+    [
+        'length' => 255,
+        'oro_options'   => [
+            'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM, 'unique' => true,],
+            'dataaudit' => ['auditable' => true]
+        ]
+    ]
+    );
+    $table->addUniqueIndex(['phone'], 'oro_idx_user_phone');
+ ```
+
 Add relation
 ------------
 Creating relations is more complex task than creation of regular field. Oro Platform provides a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php) to help you. To use this extension your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtensionAwareInterface.php). The following example shows how to create many-to-one relation:
@@ -182,8 +198,6 @@ Same principle applied to field name, in case above - it should be less than 27 
 To load a list of options you can use data fixtures, for example:
 
 ``` php
-<?php
-
 <?php
 
 namespace Oro\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;

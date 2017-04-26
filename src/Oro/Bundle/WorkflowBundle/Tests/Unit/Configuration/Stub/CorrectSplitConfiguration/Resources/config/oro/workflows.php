@@ -1,46 +1,47 @@
 <?php
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
-return array(
-    'first_workflow' => array(
+return [
+    'first_workflow' => [
         'entity' => 'First\Entity',
         'is_system' => true,
         'start_step' => 'first_step',
         'entity_attribute' => 'my_entity',
         'steps_display_ordered' => true,
-        'steps' => array(
-            'first_step' => array(
+        'steps' => [
+            'first_step' => [
                 'order' => 1,
                 'is_final' => true,
-                'entity_acl' => array(
-                    'first_attribute' => array('update' => false, 'delete' => true)
-                ),
-                'allowed_transitions' => array('first_transition'),
-            )
-        ),
-        'attributes' => array(
-            'first_attribute' => array(
+                'entity_acl' => [
+                    'first_attribute' => ['update' => false, 'delete' => true]
+                ],
+                'allowed_transitions' => ['first_transition'],
+            ]
+        ],
+        'attributes' => [
+            'first_attribute' => [
                 'type' => 'object',
-                'options' => array(
+                'options' => [
                     'class' => 'DateTime'
-                ),
+                ],
                 'property_path' => null
-            ),
-            'second_attribute' => array(
+            ],
+            'second_attribute' => [
                 'type' => 'entity',
-                'entity_acl' => array(
+                'entity_acl' => [
                     'update' => true,
                     'delete' => false,
-                ),
+                ],
                 'property_path' => 'first_attribute.test',
-                'options' => array(
+                'options' => [
                     'class' => 'DateTime',
-                )
-            )
-        ),
-        'transitions' => array(
-            'first_transition' => array(
+                ]
+            ]
+        ],
+        'transitions' => [
+            'first_transition' => [
                 'step_to' => 'first_step',
                 'is_start' => true,
                 'is_hidden' => true,
@@ -49,75 +50,104 @@ return array(
                 'acl_message' => 'Test ACL message',
                 'transition_definition' => 'first_transition_definition',
                 'display_type' => 'page',
-                'frontend_options' => array(
+                'frontend_options' => [
                     'class' => 'foo'
-                ),
+                ],
                 'page_template' => 'Workflow:Test:pageTemplate.html.twig',
                 'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
                 'form_type' => 'custom_workflow_transition',
-                'form_options' => array(
-                    'attribute_fields' => array(
-                        'first_attribute' => array(
+                'form_options' => [
+                    'attribute_fields' => [
+                        'first_attribute' => [
                             'form_type' => 'text',
                             'label' => 'First Attribute',
-                            'options' => array(
+                            'options' => [
                                 'required' => 1
-                            )
-                        )
-                    )
-                ),
-            )
-        ),
-        'transition_definitions' => array(
-            'first_transition_definition' => array(
-                'preactions' => array(
-                    array(
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            'transition_with_form_options_configuration' =>
+                [
+                    'step_to' => 'first_step',
+                    'transition_definition' => 'first_transition_definition',
+                    'is_start' => false,
+                    'is_hidden' => false,
+                    'is_unavailable_hidden' => false,
+                    'acl_message' => null,
+                    'frontend_options' => [],
+                    'form_type' => 'oro_workflow_transition',
+                    'display_type' => 'dialog',
+                    'form_options' => [
+                        WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                            'handler' => 'handler',
+                            'template' => 'template',
+                            'data_provider' => 'data_provider',
+                            'data_attribute' => 'form_data',
+                        ],
+
+                    ],
+                    'page_template' => null,
+                    'dialog_template' => null,
+                    'init_entities' => [],
+                    'init_routes' => [],
+                    'init_datagrids' => [],
+                    'init_context_attribute' => 'init_context',
+                    'triggers' => [],
+                ],
+
+        ],
+        'transition_definitions' => [
+            'first_transition_definition' => [
+                'preactions' => [
+                    [
                         '@custom_action' => null
-                    )
-                ),
-                'preconditions' => array(
+                    ]
+                ],
+                'preconditions' => [
                     '@true' => null
-                ),
-                'conditions' => array(
-                    '@and' => array(
+                ],
+                'conditions' => [
+                    '@and' => [
                         '@true' => null,
-                        '@or' => array(
-                            'parameters' => array(
+                        '@or' => [
+                            'parameters' => [
                                 '@true' => null,
-                                '@equals' => array(
-                                    'parameters' => array(1, 1),
+                                '@equals' => [
+                                    'parameters' => [1, 1],
                                     'message' => 'Not equals'
-                                )
-                            )
-                        ),
+                                ]
+                            ]
+                        ],
                         'message' => 'Fail upper level'
-                    )
-                ),
-                'actions' => array(
-                    array(
+                    ]
+                ],
+                'actions' => [
+                    [
                         '@custom_action' => null
-                    )
-                )
-            )
-        ),
-    ),
-    'second_workflow' => array(
+                    ]
+                ]
+            ]
+        ],
+    ],
+    'second_workflow' => [
         'entity' => 'Second\Entity',
         'is_system' => false,
         'start_step' => 'second_step',
         'entity_attribute' => 'entity',
         'steps_display_ordered' => false,
-        'steps' => array(
-            'second_step' => array(
+        'steps' => [
+            'second_step' => [
                 'order' => 1,
                 'is_final' => false,
-                'allowed_transitions' => array(),
-                'entity_acl' => array(),
-            )
-        ),
-        'attributes' => array(),
-        'transitions' => array(
-            'second_transition' => array(
+                'allowed_transitions' => [],
+                'entity_acl' => [],
+            ]
+        ],
+        'attributes' => [],
+        'transitions' => [
+            'second_transition' => [
                 'step_to' => 'second_step',
                 'is_start' => false,
                 'is_hidden' => false,
@@ -126,22 +156,23 @@ return array(
                 'acl_message' => null,
                 'transition_definition' => 'second_transition_definition',
                 'display_type' => 'dialog',
-                'frontend_options' => array(
+                'frontend_options' => [
                     'icon' => 'bar'
-                ),
+                ],
                 'page_template' => null,
                 'dialog_template' => null,
                 'form_type' => WorkflowTransitionType::NAME,
-                'form_options' => array(),
-            )
-        ),
-        'transition_definitions' => array(
-            'second_transition_definition' => array(
-                'preactions' => array(),
-                'preconditions' => array(),
-                'conditions' => array(),
-                'actions' => array()
-            )
-        ),
-    )
-);
+                'form_options' => [],
+            ]
+        ],
+        'transition_definitions' => [
+            'second_transition_definition' => [
+                'preactions' => [],
+                'preconditions' => [],
+                'conditions' => [],
+                'actions' => []
+            ]
+        ],
+        'applications' => ['other_application'],
+    ]
+];

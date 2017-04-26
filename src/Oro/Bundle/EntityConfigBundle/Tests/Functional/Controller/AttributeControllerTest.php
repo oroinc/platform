@@ -10,7 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\UIBundle\Route\Router;
 
 /**
- * @dbIsolation
  * @group dist
  */
 class AttributeControllerTest extends AbstractConfigControllerTest

@@ -1,0 +1,7 @@
+services:
+    oro_gaufrette.file_manager:
+        class: Oro\Bundle\GaufretteBundle\FileManager
+        abstract: true
+        calls:
+            - [setFilesystemMap, ['@knp_gaufrette.filesystem_map']]
+            - [setProtocol, ["@=container.hasParameter('knp_gaufrette.stream_wrapper.protocol') ? parameter('knp_gaufrette.stream_wrapper.protocol') : ''"]]

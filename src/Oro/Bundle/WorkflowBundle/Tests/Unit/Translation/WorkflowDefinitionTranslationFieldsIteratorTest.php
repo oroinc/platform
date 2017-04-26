@@ -50,6 +50,13 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                     'attribute_1' => [
                         'label' => 'attribute_1_label'
                     ]
+                ],
+                'variable_definitions' => [
+                    'variables' => [
+                        'var1' => [
+                            'label' => 'my_var'
+                        ]
+                    ]
                 ]
             ]
         );
@@ -65,6 +72,11 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 ],
                 'attributes' => [
                     'attribute_1' => []
+                ],
+                'variable_definitions' => [
+                    'variables' => [
+                        'var1' => []
+                    ]
                 ]
             ]
         );
@@ -80,6 +92,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                     'oro.workflow.test_workflow.step.step_1.label' => 'step_1_label',
                     'oro.workflow.test_workflow.step.step_2.label' => 'step_2_label',
                     'oro.workflow.test_workflow.attribute.attribute_1.label' => 'attribute_1_label',
+                    'oro.workflow.test_workflow.variable.var1.label' => 'my_var'
                 ]
             ],
             'with lacks' => [
@@ -90,7 +103,8 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                     'oro.workflow.test_workflow.step.step_1.label' => null,
                     'oro.workflow.test_workflow.step.step_2.label' => null,
                     'oro.workflow.test_workflow.attribute.attribute_1.label' => null,
-                    'oro.workflow.test_workflow.transition.transition_1.warning_message' => null
+                    'oro.workflow.test_workflow.transition.transition_1.warning_message' => null,
+                    'oro.workflow.test_workflow.variable.var1.label' => null
                 ]
             ]
         ];
@@ -166,6 +180,13 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                     'attribute_1' => [
                         'label' => 'attribute_1_label'
                     ]
+                ],
+                'variable_definitions' => [
+                    'variables' => [
+                        'var1' => [
+                            'label' => 'my_var'
+                        ]
+                    ]
                 ]
             ]
         );
@@ -203,6 +224,13 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 'attributes' => [
                     'attribute_1' => [
                         'label' => '*modified*attribute_1_label'
+                    ]
+                ],
+                'variable_definitions' => [
+                    'variables' => [
+                        'var1' => [
+                            'label' => '*modified*my_var'
+                        ]
                     ]
                 ]
             ]
@@ -243,6 +271,11 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 ],
                 'attributes' => [
                     'attribute_1' => []
+                ],
+                'variable_definitions' => [
+                    'variables' => [
+                        'var1' => []
+                    ]
                 ]
             ]
         );
@@ -279,6 +312,13 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 'attributes' => [
                     'attribute_1' => [
                         'label' => '*modified*'
+                    ]
+                ],
+                'variable_definitions' => [
+                    'variables' => [
+                        'var1' => [
+                            'label' => '*modified*'
+                        ]
                     ]
                 ]
             ]

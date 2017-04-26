@@ -2,13 +2,13 @@
 namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
 use Oro\Component\MessageQueue\Job\Schema as UniqueJobSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInterface
 {
@@ -19,7 +19,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**

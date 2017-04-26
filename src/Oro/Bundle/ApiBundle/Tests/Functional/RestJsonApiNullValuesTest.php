@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDefaultAndNull;
 
+/**
+ * @dbIsolationPerTest
+ */
 class RestJsonApiNullValuesTest extends DefaultAndNullTestCase
 {
     /**

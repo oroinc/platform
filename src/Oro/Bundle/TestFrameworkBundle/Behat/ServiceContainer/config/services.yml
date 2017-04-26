@@ -32,6 +32,7 @@ services:
             - '@symfony2_extension.kernel'
         tags:
             - { name: event_dispatcher.subscriber, priority: 10 }
+            - { name: 'message_queue_isolator_aware' }
 
     oro_test.listener.step_duration_measure_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
@@ -104,6 +105,12 @@ services:
         tags:
             - { name: 'context.initializer' }
 
+    oro_behat_extension.message_queue_isolator_initializer:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\MessageQueueIsolatorInitializer
+        tags:
+            - { name: 'context.initializer' }
+            - { name: 'message_queue_isolator_aware' }
+
     oro_test.context.fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader
         arguments:
@@ -111,9 +118,9 @@ services:
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
-            - ~
         tags:
             - { name: 'suite_aware' }
+            - { name: 'message_queue_isolator_aware' }
 
     oro_test.entity_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
@@ -152,3 +159,10 @@ services:
             - '@context.factory'
         tags:
             - { name: 'environment.handler', priority: 100 }
+
+    oro_test.context.oro_behat_class_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\OroBehatClassResolver
+        arguments:
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: 'context.class_resolver' }

@@ -11,7 +11,7 @@ class SidebarConfigMenu extends Element
     {
         $this->find('css', 'a[data-action="accordion:expand-all"]')->click();
         $link = $this->findLink($locator);
-        $link->waitFor(1500, function (NodeElement $link) {
+        $link->waitFor(60, function (NodeElement $link) {
             return $link->isVisible();
         });
         $link->click();

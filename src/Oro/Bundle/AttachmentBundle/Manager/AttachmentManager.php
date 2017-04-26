@@ -22,6 +22,8 @@ class AttachmentManager
      */
     const READ_COUNT = FileManager::READ_BATCH_SIZE;
 
+    const ATTACHMENT_FILE_ROUTE = 'oro_attachment_file';
+
     const DEFAULT_IMAGE_WIDTH = 100;
     const DEFAULT_IMAGE_HEIGHT = 100;
     const SMALL_IMAGE_WIDTH = 32;
@@ -238,7 +240,7 @@ class AttachmentManager
             )
         );
         return $this->router->generate(
-            'oro_attachment_file',
+            static::ATTACHMENT_FILE_ROUTE,
             [
                 'codedString' => $urlString,
                 'extension'   => $entity->getExtension()

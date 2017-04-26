@@ -56,8 +56,7 @@ define(function(require) {
             CREATE: false,
             EDIT: false,
             DELETE: false,
-            SHARE: false,
-            EDIT_SHARED: false
+            SHARE: false
         },
 
         /** @property */
@@ -423,7 +422,9 @@ define(function(require) {
             if (this._isCurrentViewSystem()) {
                 // in this case we need to set default to false on current default view
                 isDefault = 0;
-                id = defaultModel.id;
+                if (defaultModel) {
+                    id = defaultModel.id;
+                }
             }
             return $.post(
                 routing.generate('oro_datagrid_api_rest_gridview_default', {
@@ -433,17 +434,11 @@ define(function(require) {
                 }),
                 {},
                 function(response) {
-                    defaultModel.set({is_default: false});
+                    if (defaultModel) {
+                        defaultModel.set({is_default: false});
+                    }
                     currentViewModel.set({is_default: true});
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-                }
-            ).fail(
-                function(response) {
-                    if (response.status === 404) {
-                        self._showFlashMessage('error', __('oro.datagrid.gridView.error.not_found'));
-                    } else {
-                        self._showFlashMessage('error', __('oro.ui.unexpected_error'));
-                    }
                 }
             );
         },
@@ -553,14 +548,7 @@ define(function(require) {
                     name: 'save',
                     enabled: this.viewDirty &&
                             typeof currentView !== 'undefined' &&
-                            currentView.get('editable') &&
-                            (
-                                currentView.get('type') === 'private' ||
-                                (
-                                   currentView.get('type') === 'public' &&
-                                   this.permissions.EDIT_SHARED
-                                   )
-                            )
+                            currentView.get('editable')
                 },
                 {
                     label: __('oro.datagrid.action.save_grid_view_as'),
@@ -571,14 +559,7 @@ define(function(require) {
                     label: __('oro.datagrid.action.rename_grid_view'),
                     name: 'rename',
                     enabled: typeof currentView !== 'undefined' &&
-                            currentView.get('editable') &&
-                            (
-                                currentView.get('type') === 'private' ||
-                                (
-                                    currentView.get('type') === 'public' &&
-                                    this.permissions.EDIT_SHARED
-                                    )
-                                )
+                            currentView.get('editable')
                 },
                 {
                     label: __('oro.datagrid.action.share_grid_view'),
@@ -593,7 +574,7 @@ define(function(require) {
                     enabled: typeof currentView !== 'undefined' &&
                             currentView.get('editable') &&
                             currentView.get('type') === 'public' &&
-                            this.permissions.EDIT_SHARED
+                            this.permissions.SHARE
                 },
                 {
                     label: __('oro.datagrid.action.discard_grid_view_changes'),

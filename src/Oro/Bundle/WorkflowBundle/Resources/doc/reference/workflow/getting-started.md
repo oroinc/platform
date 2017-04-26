@@ -154,23 +154,40 @@ In some cases, an application may be configured with several workflows that are 
 For example, with default package, we have the standard workflow that somehow does not cover business logic that client might need.
 So we can implement another workflow for the same related entity and that two workflows are conflicting with each other by data or logic operations. 
 For that cases, we bring new approach for developers to configure their workflows on mutually exclusive manner.
-There two levels of exclusiveness at this moment: activation level and record level.
+There two levels of exclusiveness at this moment: *activation level* and *record level*.
 
 ###Activation level exclusiveness - `exclusive_active_groups` 
-If your custom workflow represents a replacement flow for some already existent workflows you may provide a possibility to secure your customization by ensuring  that only one of them can be activated in the system at a time. This can be performed by defining *common exclusive activation group* for both workflows. That can be done in workflow configuration node named `exclusive_active_groups`.
+If your custom workflow represents a replacement flow for some already existent workflows you may provide a possibility
+ to secure your customization by ensuring  that only one of them can be activated in the system at a time.
+ 
+ This can be performed by defining *common exclusive activation group* for both workflows. 
+ That can be done in workflow configuration node named `exclusive_active_groups`.
+
 For example, we have `basic_sales_flow` and `my_shop_sales_flow` workflows.
 They are both use the same related entity (let's say Order) and `my_shop_sales_flow` is a full replacement for another one. 
-So we need to force administrators to enable only one of them. In that case, we can provide a common group in workflows configurations under `exclusive_active_groups` node. Let's name it 'sales'.
-So, now, when an administrator will attempt to activate one of that groups there would be an additional check for group conflicts and notice generated if another workflow in the group 'sales' is already active. So that two workflows would never be active at once.
+So we need to force administrators to enable only one of them. In that case, we can provide a common group in workflows 
+configurations under `exclusive_active_groups` node. Let's name it 'sales'.
+So, now, when an administrator will attempt to activate one of that groups there would be an additional check for group 
+conflicts and notice generated if another workflow in the group 'sales' is already active. So that two workflows would never be active at once.
 
 ###Record level exclusiveness - `exclusive_record_groups`
 Another level of exclusiveness is a record level. 
-This level provides a possibility to have several active workflows at one time with one limitation - only one workflow can be started for a related entity within a same *exclusive record group*. So that if you have workflows that can bring different ways to reach the goal of common business process around same entity (*but* not both at once), you may configure that workflow with the same group in `exclusive_record_groups` at their configurations.
-So, when **no** workflows were performed for an entity in same exclusive record group, there would be the possibility to launch starting transitions from any of them. But, when one of that workflows was started - you may not perform any actions from another workflow (and start it as well). That is a ramification of a business process that can be reached by the `exclusive_record_group` node in workflows configuration.
+This level provides a possibility to have several active workflows at one time
+ with one limitation - only one workflow can be started for a related entity within a same *exclusive record group*. 
+ So that if you have workflows that can bring different ways to reach the goal of common business process around same entity (*but* not both at once),
+ you may configure that workflow with the same group in `exclusive_record_groups` at their configurations.
+
+So, when **no** workflows were performed for an entity in the same exclusive record group,
+there would be the possibility to launch starting transitions from any of them. 
+But, when one of that workflows was started - you may not perform any actions from another workflow (and start it as well). 
+That is a ramification of a business process that can be reached by the `exclusive_record_group` in workflows configuration.
 
 ###Priority Case
-Let's say, you have two exclusive workflows at the level of a single record and both of them has automated start transitions (e.g. automatically performs start transition when a new instance of their common related entity is created).
-In that case, you may configure `priority` flag in workflow configurations so when a new record of the related entity created workflows would be processed by that priority flag and the second one from same exclusive record group will not perform its start transition if there already present another workflow record from the same exclusive group.
+Let's say, you have two exclusive workflows at the level of a single record and both of them has automated start transitions 
+(e.g. automatically performs start transition when a new instance of their common related entity is created).
+In that case, you may configure `priority` flag in workflow configurations. So when a new record of the related entity created 
+workflows would be processed by that priority flag and the second one from same exclusive record group will not perform its start transition 
+if there already present another workflow record from the same exclusive group.
 For example `first_workflow` and `second_workflow` workflows. In a case when we need to process `second_workflow` workflow before `first_workflow`, we can determine its priority level higher than another.
 Then, when new `SomeEntity` entity will be persisted, a system would perform `second_workflow` workflow start transition first.
 Additionally, if start transition of dominant workflow has unmet its conditions to start, then the second workflow would have a chance to start its flow as well.
@@ -178,9 +195,10 @@ Additionally, if start transition of dominant workflow has unmet its conditions 
 Filtering by Scopes
 -------------------
 
-If the scope configuration is provided for the workflow, the Oro application will use only the workflows, selected by filtering all available workflows using the scopes defined for `worflow_definition` scope type. 
+If a scope configuration is provided for a workflow, the Oro application will use only workflows 
+selected by filtering all available workflows using scopes defined for `worflow_definition` scope type. 
 
-Example of scope configuration in :
+Example of scope configuration:
 ```YAML
         scopes:
             -
@@ -190,16 +208,20 @@ Example of scope configuration in :
                 scopeField2: 3
                 scopeField3: 77             
 ```
-**Note**: The scopeField1, scopeField2, and scopeField3 are scope criteria that are delivered by scope providers. Scope provider should be registered in Oro application for the `workflow_definition` scope type.  
+**Note**: The `scopeField1`, `scopeField2`, and `scopeField3` are scope criteria that are delivered by scope providers. 
+Scope provider should be registered in Oro application for the `workflow_definition` scope type.  
 
 For more information about scopes see [ScopeBundle documentation](../../../../../ScopeBundle/Resources/doc/scope.md).
 
 Initial Transitions
 -------------------
 To provide an ability to start some workflow from *not related entity* we have special functionality that called **initial transitions**.
-It is a special type of transition configuration that allows us to use transition as an initiative (as it comes from the name) for new workflow instance (workflow item) creation.
-The main difference from *start transitions* is that *init transition* can be invoked from almost any part of an application within indirect relation to main workflow entity or without it (if we able to fill all necessary data of main entity).
-Distinctive configuration features of *init transitions* are special nodes `init_entities`, `init_routes`, `init_datagrids` in transition configuration together with `is_start: true`.
+It is a special type of transition configuration that allows us to use transition as an initiative (as it comes from the name) 
+for new workflow instance (workflow item) creation.
+The main difference from *start transitions* is that *init transition* can be invoked from almost any part of an application 
+within indirect relation to main workflow entity or without it (if we able to fill all necessary data of main entity).
+Distinctive configuration features of *init transitions* are special nodes `init_entities`, `init_routes`, `init_datagrids` 
+in transition configuration together with `is_start: true`.
 For more details see [configuration reference](./configuration-reference.md#transitions-configuration) section.
 
 Disabling Operations
@@ -224,8 +246,8 @@ It can be done trough `disable_operations` configuration node:
 Configuration
 -------------
 
-All Workflow entities are described in configuration. Look at example of simple Workflow configuration that performs
-some action with User entity.
+All Workflow entities are described in configuration. Look at the sample of Workflow configuration that performs
+some action with `User` entity.
 
 ```YAML
 workflows:
@@ -233,6 +255,7 @@ workflows:
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
         entity_attribute: user                    # attribute name of current entity that can be used in configuration
         start_step: started                       # step that will be assigned automatically to new entities
+        force_autostart: false                    # if `start_step` is defined: force start workflow on entity creation like from cli, message queue (without any filters like applications, scopes, features)
         steps_display_ordered: true               # defines whether all steps will be shown on view page in steps widget
         defaults:
             active: true                          # active by default
@@ -240,6 +263,7 @@ workflows:
         exclusive_record_groups:
             - unique_run                          # only one started workflow for the `entity` from specified groups can exist at time
         priority: 100                             # has priority of 100
+        applications: [ commerce ]                # web application availability level 
         scopes:
             -                                     # definition of configuration for one scope
                 scopeField1: 42                   # context for scope will have field `scopeField1` and entity with id `42`
@@ -256,7 +280,6 @@ workflows:
                 order: 20                         # steps will be shown in ascending
                 allowed_transitions:              # order of step
                    - add_email                    # new email should be added on this transition
-
         attributes:                                           # list of all existing attributes in workflow
             first_name:                                       # first name of a user
                 property_path: user.firstName                 # path to entity property (automatically defined attribute metadata)
@@ -288,6 +311,8 @@ workflows:
                                 required: true              # define this field as required
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
+                display_type: page                          # form will be opened in separate page
+                destination_page: index                     # after submitting form will be opened index page of workflow`s related entity 
             add_email:                                      # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions
@@ -313,7 +338,6 @@ workflows:
                         queued: false                                       # handle trigger not in queue
                         relation: user                                      # relation to Workflow entity
                         require: "entity.status = 'pending'"                # expression language condition
-
         transition_definitions:                                   # list of all existing transition definitions
             set_name_definition: []                               # definitions for transition "set_name", no extra conditions or actions here
             add_email_definition:                                 # definition for transition "add_email"

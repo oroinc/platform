@@ -15,9 +15,6 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEnt
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class WorkflowItemRepositoryTest extends WebTestCase
 {
     /**
@@ -88,26 +85,26 @@ class WorkflowItemRepositoryTest extends WebTestCase
     /**
      * @dataProvider getGroupedWorkflowNameAndWorkflowStepNameProvider
      *
-     * @param bool $withWorkflowName
+     * @param array $entities
+     * @param array $workflows
+     * @param string $withWorkflowName
+     * @param array|null $workflowNames
      */
-    public function testGetGroupedWorkflowNameAndWorkflowStepName($withWorkflowName = true)
-    {
-        $entities = [
-            $this->getReference('workflow_aware_entity.15'),
-            $this->getReference('workflow_aware_entity.16')
-        ];
-
-        $workflowNames = [
-            LoadWorkflowDefinitions::WITH_START_STEP,
-            LoadWorkflowDefinitions::MULTISTEP,
-            LoadWorkflowDefinitions::NO_START_STEP
-        ];
+    public function testGetGroupedWorkflowNameAndWorkflowStepName(
+        array $entities,
+        array $workflows,
+        $withWorkflowName = true,
+        array $workflowNames = null
+    ) {
+        $entities = array_map(function ($reference) {
+            return $this->getReference($reference);
+        }, $entities);
 
         $expectedData = [];
 
         /** @var WorkflowAwareEntity $entity */
         foreach ($entities as $entity) {
-            foreach ($workflowNames as $workflowName) {
+            foreach ($workflows as $workflowName) {
                 /** @var WorkflowItem $workflowItem */
                 $workflowItem = $this->getContainer()
                     ->get('oro_workflow.manager')
@@ -126,23 +123,19 @@ class WorkflowItemRepositoryTest extends WebTestCase
         }
 
         $result = $this->repository->getGroupedWorkflowNameAndWorkflowStepName(
-            'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+            WorkflowAwareEntity::class,
             array_map(
                 function (WorkflowAwareEntity $entity) {
                     return $entity->getId();
                 },
                 $entities
             ),
-            $withWorkflowName
+            $withWorkflowName,
+            $workflowNames
         );
 
-        /** @var WorkflowAwareEntity $entity */
-        foreach ($entities as $entity) {
-            $this->assertContains($entity->getId(), array_keys($result));
-            foreach ($result[$entity->getId()] as $data) {
-                $this->assertContains($data, $expectedData[$entity->getId()]);
-            }
-        }
+
+        $this->assertEquals($expectedData, $result);
     }
 
     /**
@@ -151,8 +144,49 @@ class WorkflowItemRepositoryTest extends WebTestCase
     public function getGroupedWorkflowNameAndWorkflowStepNameProvider()
     {
         return [
-            [true],
-            [false]
+            [
+                'entities' => [
+                    'workflow_aware_entity.15',
+                    'workflow_aware_entity.16',
+                ],
+                'workflows' => [
+                    LoadWorkflowDefinitions::WITH_START_STEP,
+                    LoadWorkflowDefinitions::NO_START_STEP,
+                    LoadWorkflowDefinitions::MULTISTEP,
+                ],
+                'withWorkflowName' => true,
+                'names' => null,
+            ],
+            [
+                'entities' => [
+                    'workflow_aware_entity.15',
+                    'workflow_aware_entity.16',
+                ],
+                'workflows' => [
+                    LoadWorkflowDefinitions::WITH_START_STEP,
+                    LoadWorkflowDefinitions::NO_START_STEP,
+                    LoadWorkflowDefinitions::MULTISTEP,
+                ],
+                'withWorkflowName' => false,
+                'names' => null,
+            ],
+            [
+                'entities' => [
+                    'workflow_aware_entity.15',
+                    'workflow_aware_entity.16',
+                ],
+                'workflows' => [
+                    LoadWorkflowDefinitions::WITH_START_STEP,
+                ],
+                'withWorkflowName' => true,
+                'names' => [LoadWorkflowDefinitions::WITH_START_STEP],
+            ],
+            [
+                'entities' => [],
+                'workflows' => [],
+                'withWorkflowName' => true,
+                'names' => [],
+            ],
         ];
     }
 
@@ -204,11 +238,10 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
         $this->assertCount(LoadWorkflowAwareEntities::COUNT, $items);
 
-        $expected = [];
         // 21 because "test_multistep_flow" was second loaded workflows in fixtures
         for ($i = 21; $i < 21 + LoadWorkflowAwareEntities::COUNT; $i++) {
             $item = $this->getReference('test_multistep_flow_item.' . $i);
-            
+
             $this->assertContains($item, $items);
         }
     }

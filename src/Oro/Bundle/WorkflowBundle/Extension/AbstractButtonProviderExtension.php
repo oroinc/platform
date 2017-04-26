@@ -3,25 +3,36 @@
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareInterface;
+use Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareTrait;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-abstract class AbstractButtonProviderExtension implements ButtonProviderExtensionInterface
+abstract class AbstractButtonProviderExtension implements
+    ButtonProviderExtensionInterface,
+    ApplicationProviderAwareInterface
 {
+    use ApplicationProviderAwareTrait;
+
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
     /** @var RouteProviderInterface */
     protected $routeProvider;
+
+    /** @var DestinationPageResolver */
+    protected $destinationPageResolver;
 
     /** @var ButtonContext */
     private $baseButtonContext;
@@ -29,11 +40,16 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param RouteProviderInterface $routeProvider
+     * @param DestinationPageResolver $destinationPageResolver
      */
-    public function __construct(WorkflowRegistry $workflowRegistry, RouteProviderInterface $routeProvider)
-    {
+    public function __construct(
+        WorkflowRegistry $workflowRegistry,
+        RouteProviderInterface $routeProvider,
+        DestinationPageResolver $destinationPageResolver
+    ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->routeProvider = $routeProvider;
+        $this->destinationPageResolver = $destinationPageResolver;
     }
 
     /**
@@ -42,7 +58,12 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         $buttons = [];
-        $groups = (array) $buttonSearchContext->getGroup();
+        $groups = (array)$buttonSearchContext->getGroup();
+
+        // Skip if wrong application
+        if (!$this->checkApplication()) {
+            return $buttons;
+        }
 
         // Skip if custom buttons group defined
         if ($groups &&
@@ -80,6 +101,7 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
                 ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
                 ->setRouteName($searchContext->getRouteName())
                 ->setGroup($searchContext->getGroup())
+                ->setOriginalUrl($this->destinationPageResolver->getOriginalUrl())
                 ->setExecutionRoute($this->routeProvider->getExecutionRoute());
         }
 
@@ -138,4 +160,40 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
         Workflow $workflow,
         ButtonContext $buttonContext
     );
+
+    /**
+     * @return string
+     */
+    abstract protected function getApplication();
+
+    /**
+     * @return bool
+     */
+    protected function checkApplication()
+    {
+        $application = $this->getApplication();
+
+        return (null !== $this->applicationProvider->getCurrentApplication()) &&
+        ($application === $this->applicationProvider->getCurrentApplication());
+    }
+
+    /**
+     * @param ButtonInterface $button
+     * @param \Exception $e
+     * @param Collection $errors
+     */
+    protected function addError(ButtonInterface $button, \Exception $e, Collection $errors = null)
+    {
+        if (null === $errors) {
+            return;
+        }
+
+        $errors->add([
+            'message' => $e->getMessage(),
+            'parameters' => [
+                'button' => $button->getName(),
+                'exception' => get_class($e),
+            ]
+        ]);
+    }
 }

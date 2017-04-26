@@ -61,7 +61,8 @@ class WorkflowDefinitionCloner
             ->setSystem($source->isSystem())
             ->setPriority($source->getPriority())
             ->setExclusiveActiveGroups($source->getExclusiveActiveGroups())
-            ->setExclusiveRecordGroups($source->getExclusiveRecordGroups());
+            ->setExclusiveRecordGroups($source->getExclusiveRecordGroups())
+            ->setApplications($source->getApplications());
 
         return $definition;
     }

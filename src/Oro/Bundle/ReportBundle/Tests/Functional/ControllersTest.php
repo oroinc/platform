@@ -9,9 +9,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ControllersTest extends WebTestCase
 {
     use MessageQueueExtension;
@@ -23,8 +20,6 @@ class ControllersTest extends WebTestCase
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
         $this->client->useHashNavigation(true);
-
-        $this->setUpMessageCollector();
     }
 
     public function testIndex()
@@ -58,8 +53,11 @@ class ControllersTest extends WebTestCase
     /**
      * @depends testCreate
      * @dataProvider reportDataProvider
+     *
+     * @param array $report
+     * @param array $reportResult
      */
-    public function stestView(array $report, array $reportResult)
+    public function testView(array $report, array $reportResult)
     {
         $response = $this->client->requestGrid(
             'reports-grid',

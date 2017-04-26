@@ -2,7 +2,7 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% oro_title_set({params : { "%role%": form.vars.value.label } }) %}
+{% oro_title_set({params : { "%role%": form.vars.value.label, "%entityName%": 'oro.user.role.entity_label'|trans } }) %}
 {% set gridName = 'role-users-grid' %}
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
 
@@ -25,7 +25,7 @@
     {% set html = UI.saveAndCloseButton({
         'class': 'btn-success role-submit',
         'route': 'oro_user_role_view',
-        'params': {'id': '$id'}
+        'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
     }) %}
     {% if resource_granted('oro_user_role_create') %}
         {% set html = html ~ UI.saveAndNewButton({
@@ -37,7 +37,7 @@
         {% set html = html ~ UI.saveAndStayButton({
             'class': 'btn-success main-group role-submit',
             'route': 'oro_user_role_update',
-            'params': {'id': '$id'}
+            'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
         }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}

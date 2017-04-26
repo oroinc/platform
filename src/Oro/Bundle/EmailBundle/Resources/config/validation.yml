@@ -19,9 +19,6 @@ Oro\Bundle\EmailBundle\Form\Model\Email:
     constraints:
         - Oro\Bundle\EmailBundle\Validator\Constraints\EmailRecipients: ~
     properties:
-        from:
-            - NotBlank:     ~
-            - Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress: ~
         to:
             - Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress: ~
         cc:

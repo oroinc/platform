@@ -5,9 +5,6 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Action;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
-/**
- * @dbIsolation
- */
 class DeleteTest extends WebTestCase
 {
     /**

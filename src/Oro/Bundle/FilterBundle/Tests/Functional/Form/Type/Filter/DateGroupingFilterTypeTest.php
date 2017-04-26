@@ -14,7 +14,6 @@ class DateGroupingFilterTypeTest extends WebTestCase
      */
     public function setUp()
     {
-        parent::setUp();
         $this->initClient();
     }
 

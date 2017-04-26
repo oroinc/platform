@@ -2,75 +2,67 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title;
 
-use Oro\Bundle\NavigationBundle\Title\TranslationExtractor;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\MessageCatalogue;
+
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+use Oro\Bundle\NavigationBundle\Title\TranslationExtractor;
 
 class TranslationExtractorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TranslationExtractor
-     */
-    private $extractor;
+    /** @var TranslationExtractor */
+    private $translatorExtractor;
+
+    /** @var TitleReaderRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    private $titleReaderRegistry;
+
+    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $router;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $titleService;
-
-    /**
-     * Set up test environment
+     * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->titleService = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\TitleService')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->titleReaderRegistry = $this->getMockBuilder(TitleReaderRegistry::class)->getMock();
+        $this->router = $this->getMockBuilder(RouterInterface::class)->getMock();
 
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translatorExtractor = new TranslationExtractor(
+            $this->titleReaderRegistry,
+            $this->router
+        );
+    }
 
-        $route = $this->getMockBuilder('Symfony\Component\Routing\Route')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $routeCollection = $this->createMock('Symfony\Component\Routing\RouteCollection');
-        $routeCollection
-            ->expects($this->once())
+    public function testExtract()
+    {
+        $routes = ['route_1' => new Route('route_1', ['_controller' => 'TestBundle/Controller/TestController'])];
+
+        /** @var RouteCollection|\PHPUnit_Framework_MockObject_MockObject $routeCollection */
+        $routeCollection = $this->getMockBuilder(RouteCollection::class)->getMock();
+        $routeCollection->expects($this->once())
             ->method('all')
-            ->will($this->returnValue(array($route)));
+            ->willReturn($routes);
 
         $this->router
             ->expects($this->once())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection));
+            ->willReturn($routeCollection);
 
-        $this->extractor = new TranslationExtractor($this->titleService, $this->router);
-    }
+        $this->titleReaderRegistry
+            ->expects($this->once())
+            ->method('getTitleByRoute')
+            ->with('route_1')
+            ->willReturn('test.title');
 
-    /**
-     * Test message extract
-     */
-    public function testExtract()
-    {
-        $messageCatalogue = $this->getMockBuilder('Symfony\Component\Translation\MessageCatalogue')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MessageCatalogue|\PHPUnit_Framework_MockObject_MockObject $catalogue */
+        $catalogue = $this->getMockBuilder(MessageCatalogue::class)->disableOriginalConstructor()->getMock();
+        $catalogue->expects($this->once())
+            ->method('set')
+            ->with('test.title', 'prefix_test.title');
 
-        $repo = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Entity\Repository\TitleRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo->expects($this->once())
-            ->method('getTitles')
-            ->will($this->returnValue(array(array('title' => 'Test title', 'shortTitle' => 'Test short title'))));
-
-        $this->titleService->expects($this->once())
-            ->method('getStoredTitlesRepository')
-            ->will($this->returnValue($repo));
-
-        $messageCatalogue->expects($this->once())
-            ->method('set')->with('Test short title', '__Test short title');
-
-        $this->extractor->setPrefix('__');
-        $this->extractor->extract('', $messageCatalogue);
+        $this->translatorExtractor->setPrefix('prefix_');
+        $this->translatorExtractor->extract('TestBundle', $catalogue);
     }
 }

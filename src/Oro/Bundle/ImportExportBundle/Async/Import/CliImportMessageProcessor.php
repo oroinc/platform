@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
+
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
 
 class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -29,32 +30,47 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     private $jobRunner;
 
     /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
-
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
 
+    /**
+     * @var ImportExportResultSummarizer
+     */
+    private $importExportResultSummarizer;
+
+    /**
+     * @var FileManager
+     */
+    private $fileManager;
+
+    /**
+     * @var JobStorage
+     */
+    private $jobStorage;
+
+    /**
+     * @param CliImportHandler $cliImportHandler
+     * @param JobRunner $jobRunner
+     * @param ImportExportResultSummarizer $importExportResultSummarizer
+     * @param JobStorage $jobStorage
+     * @param LoggerInterface $logger
+     * @param FileManager $fileManager
+     */
     public function __construct(
         CliImportHandler $cliImportHandler,
         JobRunner $jobRunner,
-        MessageProducerInterface $producer,
-        ConfigManager $configManager,
-        LoggerInterface $logger
+        ImportExportResultSummarizer $importExportResultSummarizer,
+        JobStorage $jobStorage,
+        LoggerInterface $logger,
+        FileManager $fileManager
     ) {
         $this->cliImportHandler = $cliImportHandler;
         $this->jobRunner = $jobRunner;
-        $this->producer = $producer;
-        $this->configManager = $configManager;
+        $this->importExportResultSummarizer = $importExportResultSummarizer;
+        $this->jobStorage = $jobStorage;
         $this->logger = $logger;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -63,69 +79,60 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = JSON::decode($message->getBody());
-        $body = array_replace_recursive([
-            'fileName' => null,
-            'notifyEmail' => null,
-            'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
-            'processorAlias' => null,
-            'options' => []
-        ], $body);
 
-
-        if (! $body['processorAlias'] || ! $body['fileName']) {
-            $this->logger->critical(
-                sprintf('Invalid message'),
-                ['message' => $message]
-            );
+        if (! isset(
+            $body['fileName'],
+            $body['jobName'],
+            $body['processorAlias'],
+            $body['jobId'],
+            $body['process'],
+            $body['originFileName']
+        )) {
+            $this->logger->critical('Invalid message', ['message' => $body]);
 
             return self::REJECT;
         }
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            sprintf('oro:import:cli:%s:%s', $body['processorAlias'], $message->getMessageId()),
-            function () use ($body) {
-                $this->cliImportHandler->setImportingFileName($body['fileName']);
+        $body = array_replace_recursive([
+            'options' => []
+        ], $body);
 
-                $result = $this->cliImportHandler->handleImport(
+        $result = $this->jobRunner->runDelayed(
+            $body['jobId'],
+            function (JobRunner $jobRunner, Job $job) use ($body) {
+                $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
+                $this->cliImportHandler->setImportingFileName($filePath);
+                $result = $this->cliImportHandler->handle(
+                    $body['process'],
                     $body['jobName'],
                     $body['processorAlias'],
-                    $body['inputFormat'],
-                    $body['inputFilePrefix'],
                     $body['options']
                 );
-
-                $summary = sprintf(
-                    'Import from file %s for the %s is completed, success: %s, counts: %d, errors: %d, message: %s',
-                    $body['fileName'],
-                    $result['success'],
-                    $result['counts'],
-                    $result['errors'],
-                    $result['message']
+                $this->saveJobResult($job, $result);
+                $this->logger->info(
+                    $this->importExportResultSummarizer->getSummaryMessage(
+                        array_merge(['originFileName' => $body['originFileName']], $result),
+                        $body['process'],
+                        $this->logger
+                    ),
+                    ['message' => $body]
                 );
-
-                $this->logger->info($summary);
-
-                if ($body['notifyEmail']) {
-                    $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-                    $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
-                    $this->producer->send(
-                        NotificationTopics::SEND_NOTIFICATION_EMAIL,
-                        [
-                            'fromEmail' => $fromEmail,
-                            'fromName' => $fromName,
-                            'toEmail' => $body['notifyEmail'],
-                            'subject' => $result['message'],
-                            'body' => $summary
-                        ]
-                    );
-                }
-
                 return $result['success'];
             }
         );
 
+        $this->fileManager->deleteFile($body['fileName']);
+
         return $result ? self::ACK : self::REJECT;
+    }
+
+    protected function saveJobResult(Job $job, array $data)
+    {
+        unset($data['message']);
+        unset($data['importInfo']);
+        $job = $this->jobStorage->findJobById($job->getId());
+        $job->setData($data);
+        $this->jobStorage->saveJob($job);
     }
 
     /**
@@ -133,6 +140,6 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::IMPORT_CLI];
+        return [Topics::CLI_IMPORT];
     }
 }

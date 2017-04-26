@@ -7,8 +7,8 @@
     "require": {
         "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
-        "liip/imagine-bundle": "1.5.*",
-        "knplabs/knp-gaufrette-bundle": "dev-master"
+        "liip/imagine-bundle": "1.7.*",
+        "oro/gaufrette-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\AttachmentBundle": "" }

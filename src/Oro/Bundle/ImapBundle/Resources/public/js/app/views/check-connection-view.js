@@ -76,6 +76,7 @@ define(function(require) {
                         }
                     }
                 }, this),
+                errorHandlerMessage: false,
                 error: _.bind(function() {
                     this.showMessage('error', 'oro.imap.connection.error', $messageContainer);
                 }, this),

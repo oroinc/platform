@@ -115,6 +115,7 @@ define(function(require) {
                         });
                         this._hideLoading();
                     }, this),
+                    errorHandlerMessage: false,
                     error: _.bind(function(collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
                     }, this)
@@ -159,6 +160,7 @@ define(function(require) {
                         this._hideLoading();
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
                     }, this),
+                    errorHandlerMessage: false,
                     error: _.bind(function(model, response) {
                         if (!_.isUndefined(response.status) && response.status === 403) {
                             this._showForbiddenError(response.responseJSON || {});

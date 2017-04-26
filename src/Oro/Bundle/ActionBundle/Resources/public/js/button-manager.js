@@ -108,9 +108,9 @@ define(function(require) {
                         this.doResponse(response, e);
                     }, this))
                     .fail(_.bind(function(jqXHR) {
-                        var response = _.defaults(jqXHR.responseJSON, {
+                        var response = _.defaults(jqXHR.responseJSON || {}, {
                             success: false,
-                            message: ''
+                            message: this.options.action ? this.options.action.label : ''
                         });
 
                         response.message = __('Could not perform action') + ': ' + response.message;

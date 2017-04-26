@@ -65,3 +65,8 @@ Permissions
 
 The `OroSecurityBundle` provides possibility to use custom permissions for entities.
 See [Permissions](./Resources/doc/permissions.md) for details.
+
+Configurable Permissions
+-----------
+
+See [Configurable Permissions](./Resources/doc/configurable-permissions.md) for details.

@@ -229,7 +229,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $themes = Yaml::parse(__DIR__.'/sample_data/assets.yml');
+        $themes = Yaml::parse(file_get_contents(__DIR__.'/sample_data/assets.yml'));
         $this->themeManager = new ThemeManager(new ThemeFactory(), $themes);
         $this->layoutResource = new LayoutResource($this->themeManager, new Filesystem(), __DIR__);
         $content = $this->layoutResource->getContent();

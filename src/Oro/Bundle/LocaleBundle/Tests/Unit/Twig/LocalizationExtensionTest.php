@@ -6,9 +6,12 @@ use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Twig\LocalizationExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class LocalizationExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /**  @var LocalizationExtension */
     protected $extension;
 
@@ -26,25 +29,23 @@ class LocalizationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->languageCodeFormatter = $this
-            ->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter')
+        $this->languageCodeFormatter = $this->getMockBuilder(LanguageCodeFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->formattingCodeFormatter = $this
-            ->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter')
+        $this->formattingCodeFormatter = $this->getMockBuilder(FormattingCodeFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new LocalizationExtension(
-            $this->languageCodeFormatter,
-            $this->formattingCodeFormatter,
-            $this->localizationHelper
-        );
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.formatter.language_code', $this->languageCodeFormatter)
+            ->add('oro_locale.formatter.formatting_code', $this->formattingCodeFormatter)
+            ->add('oro_locale.helper.localization', $this->localizationHelper)
+            ->getContainer($this);
+
+        $this->extension = new LocalizationExtension($container);
     }
 
     public function tearDown()
@@ -57,26 +58,6 @@ class LocalizationExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetFilters()
-    {
-        /* @var $filters \Twig_SimpleFilter[] */
-        $filters = $this->extension->getFilters();
-
-        $this->assertCount(4, $filters);
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $this->assertEquals('oro_language_code_title', $filters[0]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[1]);
-        $this->assertEquals('oro_locale_code_title', $filters[1]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[2]);
-        $this->assertEquals('oro_formatting_code_title', $filters[2]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[3]);
-        $this->assertEquals('localized_value', $filters[3]->getName());
-    }
-
     public function testGetName()
     {
         $this->assertEquals(LocalizationExtension::NAME, $this->extension->getName());
@@ -84,18 +65,31 @@ class LocalizationExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFormattingTitleByCode()
     {
+        $expected = 'result';
+
         $this->formattingCodeFormatter->expects($this->once())
             ->method('format')
-            ->with('en_CA');
-        $this->extension->getFormattingTitleByCode('en_CA');
+            ->with('en_CA')
+            ->willReturn($expected);
+
+        self::assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_formatting_code_title', ['en_CA'])
+        );
     }
 
     public function testGetLanguageTitleByCode()
     {
+        $expected = 'result';
+
         $this->languageCodeFormatter->expects($this->once())
             ->method('format')
-            ->with('en');
+            ->with('en')
+            ->willReturn($expected);
 
-        $this->extension->getLanguageTitleByCode('en');
+        self::assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_language_code_title', ['en'])
+        );
     }
 }

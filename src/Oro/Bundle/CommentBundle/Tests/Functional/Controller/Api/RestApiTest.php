@@ -4,9 +4,6 @@ namespace Oro\Bundle\CommentBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class RestApiTest extends WebTestCase
 {
     protected function setUp()

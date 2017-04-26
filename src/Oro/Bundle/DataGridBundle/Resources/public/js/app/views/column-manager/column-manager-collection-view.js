@@ -7,11 +7,18 @@ define(function(require) {
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var ColumnFilterModel = require('orodatagrid/js/app/models/column-manager/column-filter-model');
     var ColumnManagerItemView = require('./column-manager-item-view');
+    var module = require('module');
+    var config = module.config();
     require('jquery-ui');
+
+    config = _.extend({
+        templateSelector: null
+    }, config);
 
     ColumnManagerCollectionView = BaseCollectionView.extend({
         animationDuration: 0,
         template: require('tpl!orodatagrid/templates/column-manager/column-manager-collection.html'),
+        templateSelector: config.templateSelector,
         itemView: ColumnManagerItemView,
 
         className: 'dropdown-menu',
@@ -56,6 +63,7 @@ define(function(require) {
             if (!(this.filterModel instanceof ColumnFilterModel)) {
                 throw new TypeError('Invalid required option "filterModel"');
             }
+
             options.filterer = _.bind(this.filterModel.filterer, this.filterModel);
             ColumnManagerCollectionView.__super__.initialize.apply(this, arguments);
         },

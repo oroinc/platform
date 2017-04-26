@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Testwork\Suite\Suite;
@@ -59,11 +60,11 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param string $name Element name
-     * @param Element $context
+     * @param NodeElement $context
      *
      * @return Element
      */
-    public function createElement($name, Element $context = null)
+    public function createElement($name, NodeElement $context = null)
     {
         if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
@@ -86,11 +87,11 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param $selector String or array
-     * @param Element $element Context element xpath of which will prepend before given selector
+     * @param NodeElement $element Context element xpath of which will prepend before given selector
      *
      * @return array Xpath selector ['type' => 'xpath', 'locator' => '//']
      */
-    protected function prepend($selector, Element $element)
+    protected function prepend($selector, NodeElement $element)
     {
         $xpath = $this->selectorManipulator->prepend(
             $this->selectorManipulator->getSelectorAsXpath($this->selectorsHandler, $selector),
@@ -105,12 +106,21 @@ class OroElementFactory implements SuiteAwareInterface
      * Specific element most commonly has more wide interface than NodeElement
      *
      * @param string $name Element name
-     * @param NodeElement $element
-     *
+     * @param NodeElement|null $element
      * @return Element
+     * @throws ElementNotFoundException
      */
-    public function wrapElement($name, NodeElement $element)
+    public function wrapElement($name, $element)
     {
+        if (null === $element) {
+            throw new ElementNotFoundException(
+                $this->mink->getSession()->getDriver(),
+                'OroElement',
+                'NodeElement',
+                $name
+            );
+        }
+
         if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find element with "%s" name',
@@ -163,6 +173,35 @@ class OroElementFactory implements SuiteAwareInterface
             ->injectOptions($element, $this->configuration[$name]);
 
         return $element;
+    }
+
+    /**
+     * @param string $name
+     * @param NodeElement|null $context
+     * @return Element[]
+     */
+    public function findAllElements($name, NodeElement $context = null)
+    {
+        if (!$this->hasElement($name)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not find element with "%s" name',
+                $name
+            ));
+        }
+
+        $elementSelector = $this->configuration[$name]['selector'];
+        if ($context) {
+            $elementSelector = $this->prepend($elementSelector, $context);
+        }
+
+        $elements = $this->mink->getSession()->getPage()->findAll(
+            $elementSelector['type'],
+            $elementSelector['locator']
+        );
+
+        return array_map(function (NodeElement $element) use ($name) {
+            return $this->wrapElement($name, $element);
+        }, $elements);
     }
 
     /**

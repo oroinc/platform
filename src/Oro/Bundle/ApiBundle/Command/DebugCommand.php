@@ -78,18 +78,38 @@ class DebugCommand extends AbstractDebugCommand
 
         $output->writeln('<info>All Actions:</info>');
         $table = new Table($output);
-        $table->setHeaders(['Action', 'Groups']);
+        $table->setHeaders(['Action', 'Groups', 'Details']);
 
         $i = 0;
+        $totalNumberOfProcessors = 0;
+        $allProcessorsIds = [];
         foreach ($processorBag->getActions() as $action) {
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
             }
-            $table->addRow([$action, implode(PHP_EOL, $processorBag->getActionGroups($action))]);
+            $processorIds = $this->getProcessorIds($processorBag, $action);
+            $allProcessorsIds = array_merge($allProcessorsIds, $processorIds);
+            $numberOfProcessors = count($processorIds);
+            $totalNumberOfProcessors += $numberOfProcessors;
+            $table->addRow([
+                $action,
+                implode(PHP_EOL, $processorBag->getActionGroups($action)),
+                sprintf('Number of processors: %s', $numberOfProcessors)
+            ]);
             $i++;
         }
 
         $table->render();
+
+        $output->writeln(
+            sprintf('<info>Total number of processors:</info> %s', $totalNumberOfProcessors)
+        );
+        $output->writeln(
+            sprintf(
+                '<info>Total number of processor services:</info> %s',
+                count(array_unique($allProcessorsIds))
+            )
+        );
 
         $output->writeln('<info>Public Actions:</info>');
         foreach ($actionProcessorBag->getActions() as $action) {
@@ -251,5 +271,26 @@ class DebugCommand extends AbstractDebugCommand
                 $items
             )
         );
+    }
+
+    /**
+     * @param ProcessorBagInterface $processorBag
+     * @param string                $action
+     *
+     * @return string[]
+     */
+    protected function getProcessorIds(ProcessorBagInterface $processorBag, $action)
+    {
+        $context = new Context();
+        $context->setAction($action);
+        $processors = $processorBag->getProcessors($context);
+        $processors->setApplicableChecker(new ChainApplicableChecker());
+
+        $result = [];
+        foreach ($processors as $processor) {
+            $result[] = $processors->getProcessorId();
+        }
+
+        return array_unique($result);
     }
 }

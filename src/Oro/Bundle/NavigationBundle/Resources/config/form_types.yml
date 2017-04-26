@@ -2,4 +2,4 @@ services:
     oro_navigation.form.type.menu_update:
         class: 'Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType'
         tags:
-            - { name: form.type, alias: oro_navigation_menu_update }
+            - { name: form.type}

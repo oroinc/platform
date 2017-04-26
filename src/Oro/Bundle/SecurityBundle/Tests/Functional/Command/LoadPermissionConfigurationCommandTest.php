@@ -18,9 +18,6 @@ use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundleIncorrect\
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\CumulativeResourceManager;
 
-/**
- * @dbIsolation
- */
 class LoadPermissionConfigurationCommandTest extends WebTestCase
 {
     /**

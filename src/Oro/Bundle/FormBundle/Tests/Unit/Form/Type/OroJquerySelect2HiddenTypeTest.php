@@ -173,9 +173,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                     ],
                     'attr'    => [
                         'data-selected-data' => json_encode(
-                            [
-                                ['id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value']
-                            ]
+                            ['id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value']
                         )
                     ]
                 ]
@@ -218,9 +216,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                     ],
                     'attr'    => [
                         'data-selected-data' => json_encode(
-                            [
-                                ['id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value']
-                            ]
+                            ['id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value']
                         )
                     ]
                 ]

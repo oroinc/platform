@@ -10,7 +10,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
@@ -225,7 +225,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $iteration    = 0;
         $entityName   = $this->getEntityName($args);
         $queryBuilder = $args->getResults()->getSource();
-        $results      = new DeletionIterableResult($queryBuilder);
+        $results      = new IterableResult($queryBuilder);
         $results->setBufferSize(self::FLUSH_BATCH_SIZE);
         $this->listenerManager->disableListeners(['oro_search.index_listener']);
         // if huge amount data must be deleted

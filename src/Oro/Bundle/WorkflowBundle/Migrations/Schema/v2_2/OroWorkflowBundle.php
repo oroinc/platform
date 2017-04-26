@@ -23,6 +23,8 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $this->addIndex($schema);
+
         $table = $schema->getTable(self::TABLE_NAME);
         $table->addColumn('exclusive_active_groups', 'simple_array', [
             'comment' => '(DC2Type:simple_array)',
@@ -48,5 +50,14 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $comparator = new Comparator();
 
         return $comparator->compare($schema, $toSchema)->toSql($this->platform);
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addIndex(Schema $schema)
+    {
+        $table = $schema->getTable('oro_workflow_item');
+        $table->addIndex(['entity_class', 'entity_id'], 'oro_workflow_item_entity_idx', []);
     }
 }

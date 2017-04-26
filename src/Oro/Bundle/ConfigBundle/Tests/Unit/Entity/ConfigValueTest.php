@@ -40,6 +40,9 @@ class ConfigValueTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $accessor->getValue($obj, $property));
     }
 
+    /**
+     * @return array
+     */
     public function propertiesDataProvider()
     {
         return [

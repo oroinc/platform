@@ -42,8 +42,8 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function prepareDataProvider()
     {
-        $source = Yaml::parse(__DIR__.'/data/layout.yml')['layouts'];
-        $sourceMultiple = Yaml::parse(__DIR__.'/data/layout_multiple_add_tree.yml')['layouts'];
+        $source = Yaml::parse(file_get_contents(__DIR__.'/data/layout.yml'))['layouts'];
+        $sourceMultiple = Yaml::parse(file_get_contents(__DIR__.'/data/layout_multiple_add_tree.yml'))['layouts'];
         return [
             'tree' => [
                 'source' => $source,

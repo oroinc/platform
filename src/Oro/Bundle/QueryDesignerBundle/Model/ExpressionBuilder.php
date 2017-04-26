@@ -130,7 +130,7 @@ class ExpressionBuilder
     {
         return array_reduce(
             $restrictions,
-            function ($expr = null, Restriction $restriction) {
+            function ($expr, Restriction $restriction) {
                 if ($expr === null) {
                     return $restriction->getRestriction();
                 }

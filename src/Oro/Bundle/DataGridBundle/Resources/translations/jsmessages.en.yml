@@ -38,9 +38,12 @@
 "oro.datagrid.no.results": "No {{ entityHint }} was found to match your search. Try modifying your search criteria..."
 "oro.datagrid.no.columns": "No columns configured for this grid"
 "oro.datagrid.pagination.label": "Page"
+"oro.datagrid.pagination.prev": "Prev"
+"oro.datagrid.pagination.next": "Next"
 "oro.datagrid.pagination.totalPages": "of {{ totalPages }}"
 "oro.datagrid.pagination.visibleItems": "Showing {{ count }} of {{ total }} records"
 "oro.datagrid.pagination.totalRecords": "Total of {{ totalRecords }} records"
+"oro.datagrid.pagination.totalRecordsShort": "{{ totalRecords }} total records"
 oro.datagrid.extension.export.label: "Export Grid"
 oro.datagrid.extension.export.tooltip: "With this button you will export the content of the grid as it appears to you, with filters and sorting applied. All pages will be exported."
 oro_datagrid.label_add_filter: "Manage filters"
@@ -76,6 +79,9 @@ oro:
             title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
+            unselect_all: "Unselect All"
+            deselect_all: "Deselect All"
+            reset: "Reset"
             filter:
                 all: 'All'
                 selected: 'Selected'
@@ -106,9 +112,7 @@ oro:
         mass_action:
             title: Mass Actions
             delete:
-                selected_message: >
-                    You have selected {{ selected }} records.<br/>
-                    Are you sure you want to delete them?
+                selected_message: You have selected {{ selected }} record.<br/> Are you sure you want to delete it?|You have selected {{ selected }} records.<br/> Are you sure you want to delete them?
                 max_limit_message: >
                     The maximum number of records that can be deleted at once is {{ max_limit }}.<br/>
                     Are you sure you want to delete first {{ max_limit }} records in the selection?

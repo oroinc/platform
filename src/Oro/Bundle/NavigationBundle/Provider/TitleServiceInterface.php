@@ -8,7 +8,8 @@ interface TitleServiceInterface
      * Set properties from array
      *
      * @param array $values
-     * @return $this
+     *
+     * @return TitleServiceInterface
      */
     public function setData(array $values);
 
@@ -19,16 +20,29 @@ interface TitleServiceInterface
      * @param null  $title
      * @param null  $prefix
      * @param null  $suffix
+     * @param bool  $isJSON
+     * @param bool  $isShort
+     *
      * @return string
      */
-    public function render($params = array(), $title = null, $prefix = null, $suffix = null);
+    public function render(
+        $params = [],
+        $title = null,
+        $prefix = null,
+        $suffix = null,
+        $isJSON = false,
+        $isShort = false
+    );
 
     /**
-     * Load title template from database
+     * Load title template for current route from title readers
      *
-     * @param string $route
+     * @param string      $route
+     * @param string|null $menuName
+     *
+     * @return TitleServiceInterface
      */
-    public function loadByRoute($route);
+    public function loadByRoute($route, $menuName = null);
 
     /**
      * Return serialized title data
@@ -36,11 +50,4 @@ interface TitleServiceInterface
      * @return string
      */
     public function getSerialized();
-
-    /**
-     * Updates title index
-     *
-     * @param array $routes
-     */
-    public function update($routes);
 }

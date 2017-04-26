@@ -33,11 +33,10 @@ services:
 
     oro_message_queue.client.route_message_processor:
         class: 'Oro\Component\MessageQueue\Router\RouteRecipientListProcessor'
-        public: true
         arguments:
             - '@oro_message_queue.client.router'
         tags:
-            - { name: 'oro_message_queue.client.message_processor', 'topicName': 'oro_message_queue.route_message' }
+            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_message_queue.route_message' }
 
     oro_message_queue.client.message_processor_registry:
         class: 'Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry'
@@ -47,17 +46,14 @@ services:
 
     oro_message_queue.client.meta.topic_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry'
-        public: true
         arguments: [[]]
 
     oro_message_queue.client.meta.destination_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
-        public: true
         arguments: ['@oro_message_queue.client.config', [], 'default']
 
     oro_message_queue.client.delegate_message_processor:
         class: 'Oro\Component\MessageQueue\Client\DelegateMessageProcessor'
-        public: false
         arguments:
             - '@oro_message_queue.client.message_processor_registry'
 
@@ -80,44 +76,29 @@ services:
 
     oro_message_queue.client.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
-        public: false
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
 
     oro_message_queue.client.consume_messages_command:
         class: 'Oro\Component\MessageQueue\Client\ConsumeMessagesCommand'
-        public: true
-        arguments:
-            - '@oro_message_queue.client.queue_consumer'
-            - '@oro_message_queue.client.delegate_message_processor'
-            - '@oro_message_queue.client.meta.destination_meta_registry'
-            - '@logger'
         tags:
-            - { name: 'console.command' }
+            - { name: console.command }
 
     oro_message_queue.client.meta.topics_command:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicsCommand'
-        arguments:
-            - '@oro_message_queue.client.meta.topic_meta_registry'
         tags:
-            - { name: 'console.command' }
+            - { name: console.command }
 
     oro_message_queue.client.meta.destinations_command:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationsCommand'
-        arguments:
-            - '@oro_message_queue.client.meta.destination_meta_registry'
         tags:
-            - { name: 'console.command' }
+            - { name: console.command }
 
     oro_message_queue.client.create_queues_command:
         class: 'Oro\Component\MessageQueue\Client\CreateQueuesCommand'
-        public: true
-        arguments:
-            - '@oro_message_queue.client.meta.destination_meta_registry'
-            - '@oro_message_queue.client.driver'
         tags:
-            - { name: 'console.command' }
+            - { name: console.command }
 
     oro_message_queue.profiler.message_queue_collector:
         class: 'Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector'

@@ -75,13 +75,12 @@ define(function(require) {
                 dataType: 'json',
                 data: {
                     targets: [{entity: contextTargetClass, id: id}]
-                }
+                },
+                errorHandlerMessage: __('oro.ui.item_add_error')
             }).done(function() {
                 messenger.notificationFlashMessage('success', __('oro.activity.contexts.added'));
                 mediator.trigger('widget_success:activity_list:item:update');
                 mediator.trigger('widget:doRefresh:activity-context-activity-list-widget');
-            }).fail(function(response) {
-                messenger.showErrorMessage(__('oro.ui.item_add_error'), response.responseJSON || {});
             }).always(function() {
                 gridWidget._hideLoading();
                 if (!dialogWidgetName) {

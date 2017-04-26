@@ -32,7 +32,6 @@ class WorkflowDefinitionRepository extends EntityRepository
     public function getScopedByNames(array $names, ScopeCriteria $scopeCriteria)
     {
         $qb = $this->createQueryBuilder('wd');
-        $qb->select('wd');
         $qb->join('wd.scopes', 'scopes', Join::WITH)
             ->andWhere($qb->expr()->in('wd.name', ':names'))
             ->setParameter('names', $names);
@@ -48,5 +47,19 @@ class WorkflowDefinitionRepository extends EntityRepository
     public function findActive()
     {
         return $this->findBy(['active' => true], ['priority' => 'ASC']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllRelatedEntityClasses()
+    {
+        $data = $this->createQueryBuilder('wd')
+            ->resetDQLPart('select')
+            ->select('DISTINCT(wd.relatedEntity) AS class_name')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column($data, 'class_name');
     }
 }

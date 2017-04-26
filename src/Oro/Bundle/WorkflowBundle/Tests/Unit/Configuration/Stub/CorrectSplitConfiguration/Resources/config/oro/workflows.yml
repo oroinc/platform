@@ -19,3 +19,5 @@ workflows:
                     icon: bar
         transition_definitions:
             second_transition_definition: []
+        applications: ['other_application']
+        force_autostart: true

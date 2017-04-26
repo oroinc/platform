@@ -1,0 +1,11 @@
+request:
+    search: +-
+    offset: ~
+    max_results: ~
+response:
+    records_count: 0
+    count: 0
+    rest:
+        data: []
+    soap:
+        item: []

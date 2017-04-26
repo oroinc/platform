@@ -2,106 +2,52 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Twig;
 
+use Symfony\Component\Routing\RouterInterface;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ConfigExtension
-     */
-    protected $twigExtension;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ConfigExtension */
+    protected $extension;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     protected function setUp()
     {
-        $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $router                = $this->createMock('Symfony\Component\Routing\RouterInterface');
-        $entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
+        $router = $this->createMock(RouterInterface::class);
+        $entityClassNameHelper = $this->getMockBuilder(EntityClassNameHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->twigExtension = new ConfigExtension(
-            $this->configManager,
-            $router,
-            $entityClassNameHelper,
-            $doctrineHelper
-        );
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_entity_config.config_manager', $this->configManager)
+            ->add('router', $router)
+            ->add('oro_entity.entity_class_name_helper', $entityClassNameHelper)
+            ->add('oro_entity.doctrine_helper', $doctrineHelper)
+            ->getContainer($this);
 
-    protected function tearDown()
-    {
-        unset($this->configManager);
-        unset($this->twigExtension);
-    }
-
-    public function testGetFunctions()
-    {
-        $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(8, $functions);
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[0];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_entity_config', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getClassConfig'), $function->getCallable());
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[1];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_entity_config_value', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getClassConfigValue'), $function->getCallable());
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[2];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_field_config', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getFieldConfig'), $function->getCallable());
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[3];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_field_config_value', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getFieldConfigValue'), $function->getCallable());
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[4];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_entity_route', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getClassRoute'), $function->getCallable());
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[5];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_entity_metadata_value', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getClassMetadataValue'), $function->getCallable());
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[6];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_entity_view_link', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getViewLink'), $function->getCallable());
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[7];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_entity_object_view_link', $function->getName());
-        $this->assertEquals(array($this->twigExtension, 'getEntityViewLink'), $function->getCallable());
+        $this->extension = new ConfigExtension($container);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(ConfigExtension::NAME, $this->twigExtension->getName());
+        $this->assertEquals(ConfigExtension::NAME, $this->extension->getName());
     }
 
     public function testGetClassConfigNoConfig()
@@ -115,7 +61,10 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getConfig');
 
-        $this->assertEquals(array(), $this->twigExtension->getClassConfig($className));
+        $this->assertEquals(
+            [],
+            self::callTwigFunction($this->extension, 'oro_entity_config', [$className])
+        );
     }
 
     public function testGetFieldConfigNoConfig()
@@ -130,7 +79,10 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getProvider');
 
-        $this->assertEquals([], $this->twigExtension->getFieldConfig($className, $fieldName));
+        $this->assertEquals(
+            [],
+            self::callTwigFunction($this->extension, 'oro_field_config', [$className, $fieldName])
+        );
     }
 
     /**
@@ -173,9 +125,17 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($configEntity);
 
         if ($inputScope) {
-            $actualConfig = $this->twigExtension->getFieldConfig($className, $fieldName, $inputScope);
+            $actualConfig = self::callTwigFunction(
+                $this->extension,
+                'oro_field_config',
+                [$className, $fieldName, $inputScope]
+            );
         } else {
-            $actualConfig = $this->twigExtension->getFieldConfig($className, $fieldName);
+            $actualConfig = self::callTwigFunction(
+                $this->extension,
+                'oro_field_config',
+                [$className, $fieldName]
+            );
         }
 
         $this->assertEquals($config, $actualConfig);
@@ -205,7 +165,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getProvider');
 
-        $this->assertNull($this->twigExtension->getFieldConfigValue($className, $fieldName, 'test'));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_field_config_value', [$className, $fieldName, 'test'])
+        );
     }
 
     /**
@@ -250,9 +212,17 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($configEntity);
 
         if ($inputScope) {
-            $actualConfig = $this->twigExtension->getFieldConfigValue($className, $fieldName, $attrName, $inputScope);
+            $actualConfig = self::callTwigFunction(
+                $this->extension,
+                'oro_field_config_value',
+                [$className, $fieldName, $attrName, $inputScope]
+            );
         } else {
-            $actualConfig = $this->twigExtension->getFieldConfigValue($className, $fieldName, $attrName);
+            $actualConfig = self::callTwigFunction(
+                $this->extension,
+                'oro_field_config_value',
+                [$className, $fieldName, $attrName]
+            );
         }
 
         $this->assertEquals($config, $actualConfig);
@@ -303,9 +273,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             );
 
         if ($inputScope) {
-            $actualConfig = $this->twigExtension->getClassConfig($className, $inputScope);
+            $actualConfig = self::callTwigFunction($this->extension, 'oro_entity_config', [$className, $inputScope]);
         } else {
-            $actualConfig = $this->twigExtension->getClassConfig($className);
+            $actualConfig = self::callTwigFunction($this->extension, 'oro_entity_config', [$className]);
         }
         $this->assertEquals($config, $actualConfig);
     }
@@ -335,7 +305,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getConfig');
 
-        $this->assertNull($this->twigExtension->getClassConfigValue($className, 'test'));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_entity_config_value', [$className, 'test'])
+        );
     }
 
     public function testGetClassConfigValue()
@@ -372,16 +344,16 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         // test default scope
         $this->assertEquals(
             'entity_val',
-            $this->twigExtension->getClassConfigValue($className, 'test')
+            self::callTwigFunction($this->extension, 'oro_entity_config_value', [$className, 'test'])
         );
         // test with specified scope
         $this->assertEquals(
             'another_val',
-            $this->twigExtension->getClassConfigValue($className, 'test', 'another')
+            self::callTwigFunction($this->extension, 'oro_entity_config_value', [$className, 'test', 'another'])
         );
         // test undefined attribute
         $this->assertNull(
-            $this->twigExtension->getClassConfigValue($className, 'undefined')
+            self::callTwigFunction($this->extension, 'oro_entity_config_value', [$className, 'undefined'])
         );
     }
 
@@ -396,7 +368,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getEntityMetadata');
 
-        $this->assertNull($this->twigExtension->getClassRoute($className));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_entity_route', [$className])
+        );
     }
 
     public function testGetClassRouteInNonStrictMode()
@@ -414,7 +388,10 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())->method('getEntityMetadata')
             ->with($className)->willReturn($metadata);
 
-        $this->assertSame($viewRoute, $this->twigExtension->getClassRoute($className));
+        $this->assertSame(
+            $viewRoute,
+            self::callTwigFunction($this->extension, 'oro_entity_route', [$className])
+        );
     }
 
     public function testGetClassRouteShouldPassArgumentsToDelegatingMethod()
@@ -432,7 +409,10 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())->method('getEntityMetadata')
             ->with($className)->willReturn($metadata);
 
-        $this->assertSame($createRoute, $this->twigExtension->getClassRoute($className, 'create', $strict));
+        $this->assertSame(
+            $createRoute,
+            self::callTwigFunction($this->extension, 'oro_entity_route', [$className, 'create', $strict])
+        );
     }
 
     public function testGetClassMetadataValueNoConfig()
@@ -446,7 +426,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getConfig');
 
-        $this->assertNull($this->twigExtension->getClassMetadataValue($className, 'test'));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_entity_metadata_value', [$className, 'test'])
+        );
     }
 
     public function testGetClassMetadataValueNoAttr()
@@ -462,7 +444,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->will($this->returnValue(true));
 
-        $this->assertNull($this->twigExtension->getClassMetadataValue($className, 'test'));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_entity_metadata_value', [$className, 'test'])
+        );
     }
 
     public function testGetClassMetadataValue()
@@ -489,6 +473,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->willReturn($metadata);
 
-        $this->assertSame($attrVal, $this->twigExtension->getClassMetadataValue($className, $attrName));
+        $this->assertSame(
+            $attrVal,
+            self::callTwigFunction($this->extension, 'oro_entity_metadata_value', [$className, $attrName])
+        );
     }
 }

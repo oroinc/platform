@@ -14,6 +14,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     const PERMISSION2 = 'PERMISSION2';
     const PERMISSION3 = 'PERMISSION3';
 
+    /** @var array */
     private $permissions = [
         self::PERMISSION1 => [
             'label' => 'Label for Permission 1',
@@ -54,18 +55,18 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $bundle1  = new TestBundle1();
-        $bundle2  = new TestBundle2();
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
         $bundles = [$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)];
 
         CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
 
-        $this->provider = new PermissionConfigurationProvider(new PermissionListConfiguration(), $bundles);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->provider);
+        $this->provider = $this->getMockBuilder(PermissionConfigurationProvider::class)
+            ->setConstructorArgs([new PermissionListConfiguration(), $bundles])
+            ->setMethods(['getConfigPath'])
+            ->getMock();
+        $this->provider->expects($this->any())
+            ->method('getConfigPath')->willReturn('permissions.yml');
     }
 
     public function testCorrectConfiguration()
@@ -76,7 +77,6 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             self::PERMISSION3 => $this->permissions[self::PERMISSION3],
         ];
 
-        $this->loadConfig('permissions.yml');
         $permissions = $this->provider->getPermissionConfiguration();
         $this->assertEquals($expectedPermissions, $permissions);
     }
@@ -88,19 +88,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             self::PERMISSION3 => $this->permissions[self::PERMISSION3],
         ];
 
-        $this->loadConfig('permissions.yml');
         $permissions = $this->provider->getPermissionConfiguration(array_keys($expectedPermissions));
         $this->assertEquals($expectedPermissions, $permissions);
-    }
-
-    /**
-     * @param string $path
-     */
-    protected function loadConfig($path)
-    {
-        $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider');
-        $reflectionProperty = $reflection->getProperty('configPath');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->provider, $path);
     }
 }

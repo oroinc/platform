@@ -12,7 +12,7 @@ Table of Contents
 Add Custom Action
 ----------------------
 
-To add custom action add a service to DIC with tag "oro_workflow.action", for example:
+To add custom action add a service to DIC with tag "oro_action.action", for example:
 
 ```
 parameters:
@@ -21,7 +21,7 @@ services:
     oro_workflow.action.close_workflow:
         class: %oro_workflow.action.close_workflow.class%
         tags:
-            - { name: oro_workflow.action, alias: close_workflow }
+            - { name: oro_action.action, alias: close_workflow }
 ```
 
 Symbol "|" in alias can be used to have several aliases. Note that service class must implement

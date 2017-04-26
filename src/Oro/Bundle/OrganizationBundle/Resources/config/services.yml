@@ -7,11 +7,7 @@ parameters:
     oro_organization.business_unit.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_organization.organization.manager.api.class:           Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
-    oro_organization.twig.get_owner.class:                     Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension
-    oro_organization.twig.business_units.class:                Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension
-
     oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
-    oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
     oro_organization.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
 
@@ -89,21 +85,15 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.acl.object_id_accessor'
         lazy: true
+
     #
     # Twig
     #
-    oro_organization.twig.get_owner:
-        class: %oro_organization.twig.get_owner.class%
+    oro_organization.twig.organization_extension:
+        class: Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
+        public: false
         arguments:
-            - '@oro_entity_config.provider.ownership'
-            - '@oro_security.owner.entity_owner_accessor'
-        tags:
-            - { name: twig.extension }
-
-    oro_organization.twig.business_units:
-        class: %oro_organization.twig.business_units.class%
-        arguments:
-            - '@oro_organization.business_unit_manager'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 

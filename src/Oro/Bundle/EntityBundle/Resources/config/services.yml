@@ -24,7 +24,6 @@ parameters:
     oro_entity.entity_provider.class:                                                  Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                                            Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                                       Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
-    oro_entity.twig.extension.entity.class:                                            Oro\Bundle\EntityBundle\Twig\EntityExtension
     oro_entity.routing_helper.class:                                                   Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
     oro_entity.extension.unique_entity_extension.class:                                Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
     oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
@@ -228,14 +227,13 @@ services:
         arguments:
             - '@oro_entity.entity_field_provider'
             - '@oro_entity.entity_provider'
+            - '@oro_entity_config.helper.entity_config'
 
     oro_entity.twig.extension.entity:
-        class: %oro_entity.twig.extension.entity.class%
+        class: Oro\Bundle\EntityBundle\Twig\EntityExtension
+        public: false
         arguments:
-            - '@oro_entity.entity_identifier_accessor'
-            - '@oro_entity.routing_helper'
-            - '@oro_entity.entity_name_resolver'
-            - '@oro_entity.entity_alias_resolver'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -469,3 +467,22 @@ services:
         class: Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager
         arguments:
             - [] # database checkers. filled by DatabaseCheckerCompilerPass
+
+    oro_entity.database.trigger_driver.mysql:
+        class: 'Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoMysql'
+        public: false
+        arguments:
+             - '@oro_entity.doctrine_helper'
+
+    oro_entity.database.trigger_driver.pgsql:
+        class: 'Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoPgsql'
+        public: false
+        arguments:
+             - '@oro_entity.doctrine_helper'
+
+    oro_entity.database_triggers.manager.abstract:
+        class: 'Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerManager'
+        abstract: true
+        calls:
+            - [addDriver, ['@oro_entity.database.trigger_driver.mysql']]
+            - [addDriver, ['@oro_entity.database.trigger_driver.pgsql']]

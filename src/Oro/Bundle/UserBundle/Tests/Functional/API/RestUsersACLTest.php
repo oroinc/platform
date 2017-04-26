@@ -5,9 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class RestUsersACLTest extends WebTestCase
 {
     const DEFAULT_USER_ID = '1';

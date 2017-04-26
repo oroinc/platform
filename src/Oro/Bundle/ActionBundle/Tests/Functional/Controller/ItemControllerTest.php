@@ -8,9 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
-/**
- * @dbIsolation
- */
 class ItemControllerTest extends WebTestCase
 {
     /**

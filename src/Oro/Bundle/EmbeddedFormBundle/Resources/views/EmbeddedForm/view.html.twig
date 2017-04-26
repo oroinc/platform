@@ -61,6 +61,7 @@
     {% set formPreview %}
     <div class="widget-content">
         <iframe
+            id="embedded-form"
             src="{{ url('oro_embedded_form_submit', {'id': entity.id}) }}"
             width="640"
             height="800"

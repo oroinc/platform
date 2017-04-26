@@ -3,16 +3,12 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class ActivityListRoleControllerTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
             'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData',
             'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadUserData'

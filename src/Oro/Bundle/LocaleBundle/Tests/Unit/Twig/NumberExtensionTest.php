@@ -2,73 +2,31 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Twig\NumberExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class NumberExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var NumberExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var NumberExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formatter;
 
     protected function setUp()
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
+        $this->formatter = $this->getMockBuilder(NumberFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new NumberExtension($this->formatter);
-    }
 
-    public function testGetFuntions()
-    {
-        $functions = $this->extension->getFunctions();
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.formatter.number', $this->formatter)
+            ->getContainer($this);
 
-        $this->assertCount(4, $functions);
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $functions[0]);
-        $this->assertEquals('oro_locale_number_attribute', $functions[0]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $functions[1]);
-        $this->assertEquals('oro_locale_number_text_attribute', $functions[1]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $functions[2]);
-        $this->assertEquals('oro_locale_number_symbol', $functions[2]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $functions[3]);
-        $this->assertEquals('oro_currency_symbol_prepend', $functions[3]->getName());
-    }
-
-    public function testGetFilters()
-    {
-        $filters = $this->extension->getFilters();
-
-        $this->assertCount(7, $filters);
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $this->assertEquals('oro_format_number', $filters[0]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[1]);
-        $this->assertEquals('oro_format_currency', $filters[1]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[2]);
-        $this->assertEquals('oro_format_decimal', $filters[2]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[3]);
-        $this->assertEquals('oro_format_percent', $filters[3]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[4]);
-        $this->assertEquals('oro_format_spellout', $filters[4]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[5]);
-        $this->assertEquals('oro_format_duration', $filters[5]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[6]);
-        $this->assertEquals('oro_format_ordinal', $filters[6]->getName());
+        $this->extension = new NumberExtension($container);
     }
 
     public function testGetAttribute()
@@ -82,7 +40,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($attribute, $style, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->getAttribute($attribute, $style, $locale));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_locale_number_attribute', [$attribute, $style, $locale])
+        );
     }
 
     public function testGetTextAttribute()
@@ -96,7 +57,14 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($attribute, $style, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->getTextAttribute($attribute, $style, $locale));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction(
+                $this->extension,
+                'oro_locale_number_text_attribute',
+                [$attribute, $style, $locale]
+            )
+        );
     }
 
     public function testGetSymbol()
@@ -110,7 +78,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($symbol, $style, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->getSymbol($symbol, $style, $locale));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_locale_number_symbol', [$symbol, $style, $locale])
+        );
     }
 
     public function testFormat()
@@ -130,7 +101,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $style, $attributes, $textAttributes, $symbols, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->format($value, $style, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_number', [$value, $style, $options])
+        );
     }
 
     public function testFormatCurrency()
@@ -154,7 +128,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $currency, $attributes, $textAttributes, $symbols, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->formatCurrency($value, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_currency', [$value, $options])
+        );
     }
 
     public function testFormatDecimal()
@@ -176,7 +153,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->formatDecimal($value, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_decimal', [$value, $options])
+        );
     }
 
     public function testFormatPercent()
@@ -198,7 +178,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->formatPercent($value, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_percent', [$value, $options])
+        );
     }
 
     public function testFormatSpellout()
@@ -220,7 +203,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->formatSpellout($value, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_spellout', [$value, $options])
+        );
     }
 
     public function testFormatDuration()
@@ -242,7 +228,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->formatDuration($value, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_duration', [$value, $options])
+        );
     }
 
     public function testFormatOrdinal()
@@ -264,7 +253,10 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->formatOrdinal($value, $options));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_format_ordinal', [$value, $options])
+        );
     }
 
     public function testGetName()

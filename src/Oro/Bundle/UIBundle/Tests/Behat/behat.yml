@@ -1,0 +1,22 @@
+oro_behat_extension:
+  elements:
+    Entity Edit Button:
+      selector: 'a.edit-button'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Flash Message:
+      selector: '.flash-messages-holder div.alert'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    ControlGroup:
+      class: Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup
+
+    UiDialog:
+      selector: 'div.ui-dialog'
+      class: Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog
+
+    ContextSelector:
+      selector:
+        type: xpath
+        locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "btn-group")]'
+      class: Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector

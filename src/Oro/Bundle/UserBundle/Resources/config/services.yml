@@ -9,7 +9,6 @@ parameters:
     oro_user.role.entity.class:                   Oro\Bundle\UserBundle\Entity\Role
     oro_user.security.provider.class:             Oro\Bundle\UserBundle\Security\UserProvider
     oro_user.security.login.class:                Oro\Bundle\UserBundle\EventListener\LoginSubscriber
-    oro_user.twig.user_extension.class:           Oro\Bundle\UserBundle\Twig\OroUserExtension
     oro_user.user_menu.builder.class:             Oro\Bundle\UserBundle\Menu\UserMenuBuilder
     oro_user.role.listener.class:                 Oro\Bundle\UserBundle\EventListener\RoleListener
     oro_user.role.manager.class:                  Oro\Bundle\UserBundle\Entity\Manager\RoleManager
@@ -80,7 +79,7 @@ services:
     oro_user.listener.password_changed_subscriber:
         class: Oro\Bundle\UserBundle\EventListener\PasswordChangedSubscriber
         arguments:
-            - '@oro_entity_extend.enum_value_provider'
+            - '@service_container'
         tags:
             - { name: doctrine.event_subscriber }
 
@@ -115,8 +114,10 @@ services:
             - { name: doctrine.event_listener, event: prePersist }
 
     oro_user.twig.user_extension:
-        class:                        %oro_user.twig.user_extension.class%
-        arguments:                    ["@oro_user.gender_provider", "@security.context"]
+        class: Oro\Bundle\UserBundle\Twig\OroUserExtension
+        public: false
+        arguments:
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -149,7 +150,7 @@ services:
     oro_user.impersonation_authenticator:
         class: Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_security.token.factory.username_password_organization'
             - '@event_dispatcher'
             - '@router'
@@ -390,20 +391,6 @@ services:
             - '@oro_user.provider.role_privilege_category_provider'
             - '@oro_user.form.handler.abstract.acl_role='
 
-    oro_user.provider.role_privilege_capability_provider_commerce:
-            class: %oro_user.provider.role_privilege_capability_provider.class%
-            arguments:
-                - '@translator'
-                - '@oro_user.provider.role_privilege_category_provider'
-                - '@oro_user.form.handler.acl_role.commerce='
-
-    oro_user.provider.role_privilege_capability_provider_backend:
-            class: %oro_user.provider.role_privilege_capability_provider.class%
-            arguments:
-                - '@translator'
-                - '@oro_user.provider.role_privilege_category_provider'
-                - '@oro_user.form.handler.acl_role.backend='
-
     oro_user.datagrid.datasource.role_permission_datasource:
         class: %oro_user.datagrid.datasource.role_permission_datasource.class%
         arguments:
@@ -505,7 +492,6 @@ services:
         class: Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber
         arguments:
             - '@security.token_storage'
-
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
 

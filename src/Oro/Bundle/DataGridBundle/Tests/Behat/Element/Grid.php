@@ -4,11 +4,21 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use WebDriver\Exception\ElementNotVisible;
 
-class Grid extends Element
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
+
+/**
+ * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
+ * @method GridRow getRowByContent($content) @see Table::getRowByContent($content)
+ * @method GridRow[] getRows() @see Table::getRows()
+ */
+class Grid extends Table
 {
+    const TABLE_ROW_ELEMENT = 'GridRow';
+    const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
+    const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
+
     /**
      * @param string $title
      * @throws \Exception
@@ -22,54 +32,21 @@ class Grid extends Element
     }
 
     /**
-     * Get Element tr by row number
-     *
-     * @param int $rowNumber Number of grid record starting from 1
-     * @return GridRow tr element of grid
-     */
-    public function getRowByNumber($rowNumber)
-    {
-        $rowIndex = $rowNumber - 1;
-        $rows = $this->getRows();
-
-        self::assertArrayHasKey(
-            $rowIndex,
-            $rows,
-            sprintf('Can\'t get %s row, because there are only %s rows in grid', $rowNumber, count($rows))
-        );
-
-        return $rows[$rowIndex];
-    }
-
-    /**
-     * Get Element tr by row content
-     *
-     * @param string $content Any content that can identify row
-     * @return GridRow tr element of grid
-     */
-    public function getRowByContent($content)
-    {
-        $gridRow = $this->findElementContains('GridRow', $content);
-        self::assertTrue($gridRow->isIsset(), sprintf('Grid has no record with "%s" content', $content));
-
-        return $gridRow;
-    }
-
-    /**
      * @param int $number
+     * @param int $cellNumber
      */
-    public function checkFirstRecords($number)
+    public function checkFirstRecords($number, $cellNumber = 0)
     {
         $rows = $this->getRows();
 
-        self::assertGreaterThan(
+        self::assertGreaterThanOrEqual(
             $number,
             count($rows),
             sprintf('Can\'t check %s records, because grid has only %s records', $number, count($rows))
         );
 
         for ($i = 0; $i < $number; $i++) {
-            $rows[$i]->checkMassActionCheckbox();
+            $rows[$i]->checkMassActionCheckbox($cellNumber);
         }
     }
 
@@ -129,11 +106,6 @@ class Grid extends Element
         $pageSizeElement->clickLink($number);
     }
 
-    public function assertNoRecords()
-    {
-        self::assertCount(0, $this->getRows());
-    }
-
     /**
      * @param string $content
      * @param string $action
@@ -162,20 +134,8 @@ class Grid extends Element
             $link = $row->find('named', ['link', $action]);
         }
 
-        if (!$link) {
-            throw new ElementNotFoundException($this->getDriver(), 'link', 'id|title|alt|text', $action);
-        }
+        self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $row->getText(), $action));
 
         return $link;
-    }
-
-    /**
-     * @return GridRow[]
-     */
-    public function getRows()
-    {
-        return array_map(function (NodeElement $element) {
-            return $this->elementFactory->wrapElement('GridRow', $element);
-        }, $this->findAll('css', 'tbody tr'));
     }
 }

@@ -4,9 +4,6 @@ namespace Oro\Bundle\CronBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ScheduleControllerTest extends WebTestCase
 {
     protected function setUp()

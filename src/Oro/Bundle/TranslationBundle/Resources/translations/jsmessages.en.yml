@@ -5,3 +5,8 @@
 "Download finished.": "Download finished."
 "Update finished.": "Update finished."
 "Up to date": "Up to date"
+
+oro.translation:
+    action:
+        confirmation:
+            remove_translation.message: 'Delete translated value?'

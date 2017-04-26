@@ -18,10 +18,13 @@
 {% if pageParams.parent_route is defined %}
     {% set indexPath = path(pageParams.parent_route, pageParams.parent_route_parameters is defined ? pageParams.parent_route_parameters : []) %}
 {% else %}
-    {% set indexPath = null %}
+    {% set indexPath = app.request.query.get('originalUrl') %}
 {% endif %}
 
 {% oro_title_set({params : {"%workflow_title%": pageTitle ~ ' - ' ~ indexLabel} }) %}
+
+{% block pin_button %}
+{% endblock pin_button %}
 
 {% block navButtons %}
     {% if indexPath %}
@@ -104,17 +107,19 @@
         </script>
         </div>
     {% endset %}
-
-    {% set dataBlocks = [
-        {
-            'title': 'General Information'|trans,
-            'class': 'active',
-            'subblocks': [{'data' : [transitionFormWidget] }]
-        }
-    ] %}
-
-    {% set id = 'transitionPage' %}
-    {% set data = {'dataBlocks': dataBlocks} %}
-
-    {{ parent() }}
+    {% if transition.hasFormConfiguration() %}
+        {{ transitionFormWidget }}
+    {% else %}
+        {% set dataBlocks = [
+            {
+                'title': 'General Information'|trans,
+                'class': 'active',
+                'subblocks': [{'data' : [transitionFormWidget] }]
+            }
+        ] %}
+    
+        {% set id = 'transitionPage' %}
+        {% set data = {'dataBlocks': dataBlocks} %}
+        {{ parent() }}
+    {% endif %}
 {% endblock content_data %}

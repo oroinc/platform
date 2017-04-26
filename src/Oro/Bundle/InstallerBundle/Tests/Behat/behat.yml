@@ -1,0 +1,8 @@
+oro_behat_extension:
+  suites:
+    OroInstallerBundle:
+      contexts:
+        - OroInstallerBundle::FeatureContext
+        - Behat\MinkExtension\Context\MinkContext
+      paths:
+        - '@OroInstallerBundle/Tests/Behat/Features'

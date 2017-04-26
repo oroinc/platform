@@ -526,6 +526,16 @@ services:
         arguments:
             - '@file_locator'
 
+    oro_api.request_expression_matcher:
+        class: Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher
+        public: false
+
+    oro_api.request_depended_text_processor:
+        class: Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor
+        public: false
+        arguments:
+            - '@oro_api.request_expression_matcher'
+
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory
         public: false

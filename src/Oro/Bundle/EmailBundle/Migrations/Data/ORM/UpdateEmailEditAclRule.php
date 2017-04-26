@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -41,7 +42,7 @@ class UpdateEmailEditAclRule extends AbstractFixture implements
      */
     public function getVersion()
     {
-        return '1.1';
+        return '1.2';
     }
 
     /**
@@ -79,29 +80,27 @@ class UpdateEmailEditAclRule extends AbstractFixture implements
      */
     protected function updateUserRole(AclManager $manager)
     {
-        $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
-        $extension = $manager->getExtensionSelector()->select($oid);
-        $maskBuilders = $extension->getAllMaskBuilders();
-
         $roles = $this->getRoles();
         foreach ($roles as $role) {
             $sid = $manager->getSid($role);
-
-            foreach ($maskBuilders as $maskBuilder) {
-                foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM'] as $permission) {
-                    if ($maskBuilder->hasMask('MASK_' . $permission)) {
-                        $maskBuilder->add($permission);
+            foreach (EmailVoter::SUPPORTED_CLASSES as $className) {
+                $oid = $manager->getOid('entity:' . $className);
+                $extension = $manager->getExtensionSelector()->select($oid);
+                $maskBuilders = $extension->getAllMaskBuilders();
+                foreach ($maskBuilders as $maskBuilder) {
+                    foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM'] as $permission) {
+                        if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                            $maskBuilder->add($permission);
+                        }
                     }
+                    $manager->setPermission($sid, $oid, $maskBuilder->get());
                 }
-
-                $manager->setPermission($sid, $oid, $maskBuilder->get());
             }
         }
     }
 
     /**
-     * @param string $roleName
-     * @return Role|null
+     * @return Role[]
      */
     protected function getRoles()
     {

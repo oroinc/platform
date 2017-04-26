@@ -1,19 +1,18 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Oro\Component\MessageQueue\Job\RootJobProgressCalculator;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\RootJobProgressCalculator;
 
 class RootJobProgressCalculatorTest extends \PHPUnit_Framework_TestCase
 {
-
     public function calculateProgressProvider()
     {
         return [
             [[Job::STATUS_NEW, Job::STATUS_RUNNING], 0],
-            [[Job::STATUS_SUCCESS, Job::STATUS_RUNNING, Job::STATUS_RUNNING], 33.33],
-            [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED], 100],
+            [[Job::STATUS_SUCCESS, Job::STATUS_RUNNING, Job::STATUS_RUNNING], 0.3333],
+            [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED], 1],
         ];
     }
 

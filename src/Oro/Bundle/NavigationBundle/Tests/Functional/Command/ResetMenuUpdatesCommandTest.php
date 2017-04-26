@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Command;
 
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ResetMenuUpdatesCommandTest extends WebTestCase
 {
     /**
@@ -16,7 +14,7 @@ class ResetMenuUpdatesCommandTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
+            MenuUpdateData::class
         ]);
     }
 
@@ -42,7 +40,7 @@ class ResetMenuUpdatesCommandTest extends WebTestCase
     {
         return [
             'should show help' => [
-                '$expectedContent' => "Usage:\n  oro:navigation:menu:reset [options]",
+                '$expectedContent' => "Usage: oro:navigation:menu:reset [options]",
                 '$params'          => ['--help'],
                 '$rowsCount'       => 7
             ],

@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class JobProcessor
 {
@@ -97,6 +97,7 @@ class JobProcessor
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
+        $rootJob->addChildJob($job);
         $job->setJobProgress(0);
         $this->jobStorage->saveJob($job);
 
@@ -158,7 +159,7 @@ class JobProcessor
         }
 
         $job->setStatus(Job::STATUS_SUCCESS);
-        $job->setJobProgress(100);
+        $job->setJobProgress(1);
         $job->setStoppedAt(new \DateTime());
         $this->jobStorage->saveJob($job);
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\BatchBundle\Job;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
@@ -11,18 +10,19 @@ use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BaseRepository;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-
 /**
  * Handle case when job executed inside another job and performs EntityManger::clear
  * Cascade persist is not possible for JobInstance because of duplicates in database
  */
 class DoctrineJobRepository extends BaseRepository
 {
-    /** {@inheritdoc} */
-    public function __construct(EntityManager $entityManager, $jobExecutionClass)
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(EntityManager $entityManager, $jobExecutionClass = JobExecution::class)
     {
-        parent::__construct($entityManager, $jobExecutionClass);
+        $this->jobManager = $entityManager;
+        $this->jobExecutionClass = $jobExecutionClass;
 
         $this->jobManager->getConfiguration()->setSQLLogger(null);
     }

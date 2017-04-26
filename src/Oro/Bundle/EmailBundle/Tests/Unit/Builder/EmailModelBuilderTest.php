@@ -248,8 +248,8 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
                 'helperDecodeClassNameCalls' => 0,
                 'emGetRepositoryCalls' => 0,
                 'helperPreciseFullEmailAddressCalls' => 0,
-                'helperGetUserCalls' => 2,
-                'helperBuildFullEmailAddress' => 2,
+                'helperGetUserCalls' => 1,
+                'helperBuildFullEmailAddress' => 1,
             ],
         ];
     }

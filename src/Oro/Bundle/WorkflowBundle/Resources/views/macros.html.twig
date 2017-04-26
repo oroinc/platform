@@ -52,12 +52,27 @@
         'page-component-module': transitionData['page-component-module']|default('oroworkflow/js/app/components/button-component'),
         'page-component-options': transitionData['page-component-options']|default({})|merge({'displayType': transition.displayType})|json_encode,
     }) %}
-
-    {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
-        {% set data = data|merge({
-            'data-dialog-options': transition.frontendOptions.dialog|json_encode|raw
-        }) %}
-    {% endif %}
+    
+    {% if transition.frontendOptions is defined %}
+        
+        {% if transition.frontendOptions.dialog is defined %}
+            {% set data = data|merge({
+                'data-dialog-options': transition.frontendOptions.dialog|json_encode|raw
+            }) %}
+        {% endif %}
+        
+        {% set dialogOptions = [] %}
+    
+        {% if transition.frontendOptions.options is defined and transition.frontendOptions.options|length > 0 %}
+            {% set dialogOptions = data|merge(transition.frontendOptions.options) %}
+        {% endif %}
+    
+         {% if dialogOptions|length > 0 %}
+             {% set data = data|merge({
+                'dialog-options': {'dialogOptions': dialogOptions}|json_encode|raw
+             }) %}
+         {% endif %}
+     {% endif %}
 
     {% set label = transition.label|trans({},'workflows') %}
 

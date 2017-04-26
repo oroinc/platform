@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -33,7 +33,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendConfigDumper */
     protected $dumper;
 
-    /** @var ExtendEntityConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtendEntityConfigProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $extendEntityConfigProvider;
 
     public function setUp()
@@ -55,9 +55,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extendEntityConfigProvider = $this->getMockBuilder(ExtendEntityConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
 
         $this->cacheDir = __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR
             . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
@@ -192,18 +190,17 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateConfig()
     {
-        $this->markTestSkipped('Should be changed in scope of #BB-6620');
         $this->entityManagerBag->expects($this->exactly(2))
             ->method('getEntityManagers')
             ->willReturn([]);
 
+        /** @var AbstractEntityConfigDumperExtension $extension */
         $extension = $this->createMock(AbstractEntityConfigDumperExtension::class);
         $configId = new EntityConfigId('somescope', 'SomeClass');
         $config = new Config($configId, ['param1' => 'value1', 'upgradeable' => true]);
 
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
-            ->with(false, false)
             ->willReturn([$config]);
 
         $this->configManager->expects($this->once())

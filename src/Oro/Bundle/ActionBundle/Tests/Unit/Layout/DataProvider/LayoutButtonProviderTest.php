@@ -38,8 +38,7 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(null)
             ->getMock();
 
-        $this->buttonProvider = $this->getMockBuilder(ButtonProvider::class)
-            ->getMock();
+        $this->buttonProvider = $this->createMock(ButtonProvider::class);
 
         $this->contextProvider = $this->getMockBuilder(ButtonSearchContextProvider::class)
             ->disableOriginalConstructor()

@@ -15,9 +15,6 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 
-/**
- * @dbIsolation
- */
 class FullAccessTest extends WebTestCase
 {
     /** @var TestEntity */

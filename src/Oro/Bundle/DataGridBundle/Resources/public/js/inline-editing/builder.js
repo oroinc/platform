@@ -4,7 +4,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var console = window.console;
+    var error = require('oroui/js/error');
 
     var inlineEdititngBuilder = {
         /**
@@ -42,12 +42,7 @@ define(function(require) {
                 });
                 deferred.resolve();
             }).fail(function(e) {
-                if (console && console.error) {
-                    console.log(e);
-                    console.error('Inline editing loading failed. Reason: ' + e.message);
-                } else {
-                    throw e;
-                }
+                error.showErrorInConsole(e);
                 deferred.resolve();
             });
         },
@@ -131,13 +126,10 @@ define(function(require) {
                             columnMeta.inline_editing.enable$changeReason =
                                 'Automatically disabled due to absent editor realization';
                             if (behaviour === 'enable_selected') {
-                                // if user selected this column as editable and there is no editor - show an error
-                                if (console && console.error) {
-                                    console.error(
-                                        'Could not enable editing on grid column due to absent editor realization' +
-                                        ' for type `' + columnMeta.type + '`'
-                                    );
-                                }
+                                error.showErrorInConsole(
+                                    'Could not enable editing on grid column due to absent editor realization' +
+                                    ' for type `' + columnMeta.type + '`'
+                                );
                             }
                             return;
                         }

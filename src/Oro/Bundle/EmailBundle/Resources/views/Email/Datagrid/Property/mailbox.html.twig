@@ -1,0 +1,11 @@
+{% set origin = record.getValue('origin') %}
+{% set mailboxName = record.getValue('origin.mailboxName') %}
+{% set mailbox = record.getValue('origin.mailbox') %}
+{% if mailbox is not null %}
+    {% set mailboxName = mailbox.label %}
+{% elseif oro_class_name(origin) != 'Oro\\Bundle\\EmailBundle\\Entity\\InternalEmailOrigin' %}
+    {% set mailboxName = 'oro.email.mailbox_name.personal'|trans %}
+{% endif %}
+<span class="nowrap">
+    {{ mailboxName }}
+</span>

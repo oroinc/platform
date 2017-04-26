@@ -8,9 +8,7 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -51,14 +49,6 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $menu->setExtra('max_nesting_level', 2);
 
         $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
-        $user = new User();
-        $organization = new Organization();
-        $scope->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
-        $scope->expects($this->once())
-            ->method('getOrganization')
-            ->willReturn($organization);
 
         $update = new MenuUpdateStub();
         $update->setScope($scope);
@@ -74,7 +64,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
                 'menu',
                 [
                     'ignoreCache' => true,
-                    'scopeContext' => ['user' => $user, 'organization' => $organization]
+                    'scopeContext' => $scope
                 ]
             )
             ->will($this->returnValue($menu));
@@ -102,14 +92,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $menu->setExtra('max_nesting_level', 3);
 
         $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
-        $user = new User();
-        $organization = new Organization();
-        $scope->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
-        $scope->expects($this->once())
-            ->method('getOrganization')
-            ->willReturn($organization);
+
         $update = new MenuUpdateStub();
         $update->setScope($scope);
         $update->setMenu('menu');
@@ -125,7 +108,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
                 'menu',
                 [
                     'ignoreCache' => true,
-                    'scopeContext' => ['user' => $user, 'organization' => $organization]
+                    'scopeContext' => $scope
                 ]
             )
             ->will($this->returnValue($menu));
@@ -155,14 +138,6 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $update = new MenuUpdateStub();
 
         $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
-        $user = new User();
-        $organization = new Organization();
-        $scope->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
-        $scope->expects($this->once())
-            ->method('getOrganization')
-            ->willReturn($organization);
 
         $update->setScope($scope);
         $update->setMenu('menu');
@@ -177,7 +152,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
                 'menu',
                 [
                     'ignoreCache' => true,
-                    'scopeContext' => ['user' => $user, 'organization' => $organization]
+                    'scopeContext' => $scope
                 ]
             )
             ->will($this->returnValue($menu));

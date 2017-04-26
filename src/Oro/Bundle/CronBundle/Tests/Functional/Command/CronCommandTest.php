@@ -9,9 +9,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-/**
- * @dbIsolation
- */
 class CronCommandTest extends WebTestCase
 {
     use MessageQueueExtension;
@@ -80,7 +77,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv' => true]);
         $this->assertNotEmpty($result);
 
-        $this->assertContains("All commands scheduled\n", $result);
+        $this->assertContains("All commands scheduled", $result);
     }
 
     /**

@@ -25,6 +25,12 @@ oro:
             dynamic: Dynamic
             label:   Type
             static:  Manual
+            tooltip_text: >
+              "Dynamic" segments are updated as soon as any changes have taken place in the system.
+              "Manual" segments will be updated only following the user request in the View page of the Segment record.
+
+        records_limit:
+            label: Records limit
 
         form:
             choose_segment_type:    Choose segment type

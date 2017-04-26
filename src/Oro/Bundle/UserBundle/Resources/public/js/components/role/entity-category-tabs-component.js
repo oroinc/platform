@@ -40,7 +40,8 @@ define(function(require) {
             this.view = new TabCollectionView({
                 el: options._sourceElement,
                 animationDuration: 0,
-                collection: this.categories
+                collection: this.categories,
+                useDropdown: options.useDropdown
             });
 
             this.listenTo(this.categories, 'change', this.onCategoryChange);

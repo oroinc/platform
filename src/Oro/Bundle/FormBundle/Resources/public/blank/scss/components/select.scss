@@ -9,13 +9,17 @@
                              $select-border,
                              $select-border-radius,
                              $select-background-color,
-                             $select-color
+                             $select-color,
+                             $select-disable-platform-style
                             );
 
     background: $select-bg;
-
-    @if ($use-select-appearance) {
-        @include appearance();
+    
+    /* Hide expand button of select in IE11
+     * Remove when stop supporting IE11
+     */
+    &::-ms-expand {
+        display: none;
     }
 
     @include element-state('hover') {

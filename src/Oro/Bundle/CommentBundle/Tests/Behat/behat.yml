@@ -1,0 +1,13 @@
+oro_behat_extension:
+  elements:
+    Comment Form:
+      selector: 'form.comment-form'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Message: 'message'
+          Attachment: 'attachment[file]'
+
+    CommentItem:
+      class: Oro\Bundle\CommentBundle\Tests\Behat\Element\CommentItem
+      selector: 'li.comment-item'

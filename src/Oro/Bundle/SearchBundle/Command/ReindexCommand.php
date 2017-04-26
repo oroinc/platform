@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
-use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).
@@ -29,6 +31,12 @@ class ReindexCommand extends ContainerAwareCommand
                 'Full or compact class name of entity which should be reindexed' .
                 '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
             )
+            ->addOption(
+                'scheduled',
+                null,
+                InputOption::VALUE_NONE,
+                'Enforces a scheduled (background) reindexation'
+            )
             ->setDescription('Rebuild search index')
         ;
     }
@@ -39,8 +47,7 @@ class ReindexCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $class = $input->getArgument('class');
-
-        $this->getSearchIndexer()->reindex($class);
+        $isScheduled = $input->getOption('scheduled');
 
         $message = $class
             ? sprintf('Started reindex task for "%s" entity', $class)
@@ -48,13 +55,25 @@ class ReindexCommand extends ContainerAwareCommand
         ;
 
         $output->writeln($message);
+
+        $this->getSearchIndexer($isScheduled)->reindex($class);
+
+        if (false === $isScheduled) {
+            $output->writeln('Reindex finished successfully.');
+        }
     }
 
     /**
+     * @param bool $asyncIndexer False means regular, true async indexer
+     *
      * @return IndexerInterface
      */
-    protected function getSearchIndexer()
+    protected function getSearchIndexer($asyncIndexer = false)
     {
-        return $this->getContainer()->get('oro_search.async.indexer');
+        if (true === $asyncIndexer) {
+            return $this->getContainer()->get('oro_search.async.indexer');
+        }
+
+        return $this->getContainer()->get('oro_search.search.engine.indexer');
     }
 }

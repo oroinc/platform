@@ -41,6 +41,10 @@ define([
         if (this.disposed) {
             return;
         }
+        if (this.deferredRender) {
+            this.deferredRender.reject(this);
+            delete this.deferredRender;
+        }
         this.disposePageComponents();
         this.trigger('dispose', this);
         original.viewDispose.call(this);

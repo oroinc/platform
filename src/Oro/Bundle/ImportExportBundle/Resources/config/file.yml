@@ -2,7 +2,6 @@ parameters:
     oro_importexport.file.file_system_operator.class: Oro\Bundle\ImportExportBundle\File\FileSystemOperator
     oro_importexport.file.mime_type_guesser.class:    Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser
     oro_importexport.file.split_csv_file.class:       Oro\Bundle\ImportExportBundle\File\SplitterCsvFile
-    oro_importexport.file.split_csv_file.size_of_batch: 100
 
 services:
     oro_importexport.file.file_system_operator:
@@ -13,10 +12,3 @@ services:
 
     oro_importexport.file.mime_type_guesser:
         class: %oro_importexport.file.mime_type_guesser.class%
-
-    oro_importexport.file.split_csv_file:
-        class: %oro_importexport.file.split_csv_file.class%
-        arguments:
-            - '@oro_importexport.reader.csv'
-            - '%kernel.cache_dir%/import_export'
-            - '%oro_importexport.file.split_csv_file.size_of_batch%'

@@ -26,7 +26,7 @@
                     <ul>
                         {% for workflowToDeactivation in workflowsToDeactivation %}
                             <li>
-                                <a href="{{ path('oro_workflow_definition_view', {name: workflowToDeactivation.name}) }}">{{ workflowToDeactivation.label }}</a>
+                                <a href="{{ path('oro_workflow_definition_view', {name: workflowToDeactivation.name}) }}">{{ workflowToDeactivation.label|trans({},'workflows') }}</a>
                             </li>
                         {% endfor %}
                     </ul>

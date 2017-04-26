@@ -172,3 +172,53 @@ The created record is returned in the response.
 
 **The required field**
 ```
+
+The `{@request}` tag can be used to add documentation depends on the request type. The full signature of this tag is `{@request:expression}some text{@/request}`. The expression can contain the following operators:
+
+- `&` - logical AND
+- `|` - logical OR
+- `!` - logical NOT
+
+For example if it is required to add text for JSON API request type, but only if it is not REST API request, the following expression can be used: `json_api&!rest`.
+
+An example:
+
+```markdown
+# Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+
+## ACTIONS
+
+### create
+
+Create a new AcmeEntity record.
+The created record is returned in the response.
+
+{@inheritdoc}
+
+{@request:json_api}
+Example:
+
+`</api/entities>`
+
+` ` `JSON
+{
+    "data": {
+       "type": "entities",
+       "attributes": {
+          "name": "Test Entity"
+       }
+    }
+}
+` ` `
+{@/request}
+
+## FIELDS
+
+### name
+
+#### create
+
+{@inheritdoc}
+
+**The required field**
+```

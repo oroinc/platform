@@ -65,10 +65,10 @@ services:
   oro_behat_extension.isolation.inital_massage_queue_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\InitalMessageQueueIsolator'
     arguments:
-      - ~
       - '@symfony2_extension.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 50 }
+      - { name: 'message_queue_isolator_aware' }
 
   oro_behat_extension.isolation.doctrine_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator'

@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
@@ -34,22 +35,28 @@ class WorkflowEntityValidator extends ConstraintValidator
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
+    /** @var FieldHelper */
+    protected $fieldHelper;
+
     /**
-     * @param EntityManager              $entityManager
-     * @param DoctrineHelper             $doctrineHelper
+     * @param EntityManager $entityManager
+     * @param DoctrineHelper $doctrineHelper
      * @param WorkflowPermissionRegistry $permissionRegistry
-     * @param RestrictionManager         $restrictionManager
+     * @param RestrictionManager $restrictionManager
+     * @param FieldHelper $fieldHelper
      */
     public function __construct(
         EntityManager $entityManager,
         DoctrineHelper $doctrineHelper,
         WorkflowPermissionRegistry $permissionRegistry,
-        RestrictionManager $restrictionManager
+        RestrictionManager $restrictionManager,
+        FieldHelper $fieldHelper
     ) {
         $this->entityManager      = $entityManager;
         $this->doctrineHelper     = $doctrineHelper;
         $this->permissionRegistry = $permissionRegistry;
         $this->restrictionManager = $restrictionManager;
+        $this->fieldHelper        = $fieldHelper;
 
         $this->propertyAccessor = new PropertyAccessor();
     }
@@ -95,13 +102,12 @@ class WorkflowEntityValidator extends ConstraintValidator
     protected function validateNewEntity($object, WorkflowEntity $constraint, array $restrictions)
     {
         foreach ($restrictions as $restriction) {
-            $fieldValue = $this->propertyAccessor->getValue($object, $restriction['field']);
             if ($restriction['mode'] === 'full') {
-                if ($fieldValue instanceof EmptyItem && $fieldValue->isEmpty()) {
+                $fieldValue = $this->propertyAccessor->getValue($object, $restriction['field']);
+                if ($fieldValue === null || ($fieldValue instanceof EmptyItem && $fieldValue->isEmpty())) {
                     continue;
-                } elseif ($fieldValue !== null) {
-                    $this->addFieldViolation($restriction['field'], $constraint->createFieldMessage);
                 }
+                $this->addFieldViolation($restriction['field'], $constraint->createFieldMessage);
             } else {
                 $this->validateAllowedValues($object, $constraint->createFieldMessage, $restriction);
             }
@@ -116,42 +122,40 @@ class WorkflowEntityValidator extends ConstraintValidator
     protected function validateExistingEntity($object, WorkflowEntity $constraint, array $restrictions)
     {
         $permissions = $this->permissionRegistry->getEntityPermissions($object);
-        if ($permissions['UPDATE'] === false && $this->getEntityChangeSet($object)) {
-            $this->context->addViolation($constraint->updateEntityMessage);
-        } else {
-            $this->validateUpdatedFields($object, $constraint, $restrictions);
+
+        if (true === $permissions['UPDATE'] && empty($restrictions)) {
+            return;
         }
+
+        $changeSet = $this->getEntityChangeSet($object);
+        if (empty($changeSet)) {
+            return;
+        }
+
+        if ($permissions['UPDATE'] === false && $changeSet) {
+            $this->context->addViolation($constraint->updateEntityMessage);
+            return;
+        }
+
+        $restrictionsOnChangeSet = array_filter($restrictions, function ($restriction) use ($changeSet) {
+            return isset($changeSet[$restriction['field']]);
+        });
+
+        $this->validateUpdatedFields($object, $constraint, $restrictionsOnChangeSet);
     }
 
     /**
      * @param object         $object
      * @param WorkflowEntity $constraint
-     * @param array          $restrictions
+     * @param array          $restrictionsOnChangeSet
      */
-    protected function validateUpdatedFields($object, WorkflowEntity $constraint, array $restrictions)
+    protected function validateUpdatedFields($object, WorkflowEntity $constraint, array $restrictionsOnChangeSet)
     {
-        $changesSet = $this->getEntityChangeSet($object);
-
-        $restrictedFields = array_flip(
-            array_map(
-                function ($restriction) {
-                    return $restriction['field'];
-                },
-                $restrictions
-            )
-        );
-
-        if ($fields = array_intersect_key($changesSet, $restrictedFields)) {
-            foreach ($restrictions as $restriction) {
-                foreach ($fields as $key => $value) {
-                    if ($restriction['field'] === $key) {
-                        if ($restriction['mode'] === 'full') {
-                            $this->addFieldViolation($key, $constraint->updateFieldMessage);
-                        } else {
-                            $this->validateAllowedValues($object, $constraint->updateFieldMessage, $restriction);
-                        }
-                    }
-                }
+        foreach ($restrictionsOnChangeSet as $restriction) {
+            if ($restriction['mode'] === 'full') {
+                $this->addFieldViolation($restriction['field'], $constraint->updateFieldMessage);
+            } else {
+                $this->validateAllowedValues($object, $constraint->updateFieldMessage, $restriction);
             }
         }
     }
@@ -163,21 +167,27 @@ class WorkflowEntityValidator extends ConstraintValidator
      */
     protected function getEntityChangeSet($object)
     {
-        $class         = $this->doctrineHelper->getEntityClass($object);
-        $classMetadata = $this->entityManager->getClassMetadata($class);
-
+        $changesSet = [];
         $unitOfWork = $this->entityManager->getUnitOfWork();
-        $unitOfWork->recomputeSingleEntityChangeSet($classMetadata, $object);
+        $originalData = $unitOfWork->getOriginalEntityData($object);
 
-        $changesSet = $unitOfWork->getEntityChangeSet($object);
+        $class =  $this->doctrineHelper->getEntityClass($object);
+        $fieldList = $this->fieldHelper->getFields($class, true);
 
-        // @todo: This filter should be removed after BAP-10777
-        $changesSet = array_filter(
-            $changesSet,
-            function ($change) {
-                return $change[0] != $change[1];
+        foreach ($fieldList as $field) {
+            $fieldName = $field['name'];
+            // skip field, its a partially omitted one!
+            if (! (isset($originalData[$fieldName]) || array_key_exists($fieldName, $originalData))) {
+                continue;
             }
-        );
+
+            $actualValue = $this->fieldHelper->getObjectValue($object, $fieldName);
+            $originalValue = $originalData[$fieldName];
+
+            if ($actualValue !== $originalValue) {
+                $changesSet[$fieldName] = [$originalValue, $actualValue];
+            }
+        }
 
         return $changesSet;
     }

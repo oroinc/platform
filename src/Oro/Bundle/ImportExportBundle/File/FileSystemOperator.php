@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\File;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @deprecated since 2.1. Please use FileManager class for working with files instead as it supports gaufrette.
+ */
 class FileSystemOperator
 {
     /**

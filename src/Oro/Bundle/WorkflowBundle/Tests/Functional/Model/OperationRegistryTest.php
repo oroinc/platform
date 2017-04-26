@@ -12,9 +12,6 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @dbIsolation
- */
 class OperationRegistryTest extends WebTestCase
 {
     const ROOT_NODE_NAME = 'operations';

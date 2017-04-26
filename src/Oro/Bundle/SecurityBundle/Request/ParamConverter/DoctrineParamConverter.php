@@ -62,4 +62,34 @@ class DoctrineParamConverter extends BaseParamConverter
 
         return $isSet;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * The default Symfony's implementation is overridden to avoid loading
+     * all entity managers if an entity belongs to the default manager.
+     * Also avoid unnecessary "isTransient" call if the entity manager name is not configured.
+     * @see \Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter::supports
+     */
+    public function supports(ParamConverter $configuration)
+    {
+        if (null === $this->registry) {
+            return false;
+        }
+
+        $className = $configuration->getClass();
+        if (null === $className) {
+            return false;
+        }
+
+        $options = $this->getOptions($configuration);
+        $emName = $options['entity_manager'];
+        if (null === $emName) {
+            return null !== $this->registry->getManagerForClass($className);
+        }
+
+        return !$this->registry->getManager($emName)
+            ->getMetadataFactory()
+            ->isTransient($className);
+    }
 }

@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\DashboardBundle;
 
-use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\BigNumberProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\BigNumberProviderPass;
 use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\ValueConvertersPass;
+use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\WidgetProviderFilterPass;
 
 class OroDashboardBundle extends Bundle
 {
@@ -19,5 +20,6 @@ class OroDashboardBundle extends Bundle
 
         $container->addCompilerPass(new ValueConvertersPass());
         $container->addCompilerPass(new BigNumberProviderPass());
+        $container->addCompilerPass(new WidgetProviderFilterPass());
     }
 }

@@ -1,0 +1,39 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set isWidgetContext=true %}
+{% set formAction = app.request.uri  %}
+{% embed transition.getFormTemplate() with {'formAction': formAction}%}
+    {% block widget_context %}
+    {% endblock widget_context %}
+    {% block content %}
+        {% if saved %}
+            <div {{ UI.renderPageComponentAttributes({
+                module: 'oroui/js/app/components/widget-form-component',
+                options: {
+                    _wid: app.request.get('_wid'),
+                    data: data|default(null)
+                }
+            }) }}></div>
+        {% elseif formErrors|length > 0 %}
+            <div {{ UI.renderPageComponentAttributes({
+                module: 'oroui/js/app/components/widget-form-component',
+                options: {
+                    _wid: app.request.get('_wid'),
+                    formError: true,
+                    preventRemove: true
+                }
+            }) }}></div>
+            <script type="text/javascript">
+                require(['jquery'], function($) {
+                    $('div.layout-content.scrollable-container').css('overflow', 'auto');
+                });
+            </script>
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-error">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+        {% endif %}
+        {{ parent() }}
+    {% endblock content %}
+{% endembed %}
+

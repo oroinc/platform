@@ -11,7 +11,6 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var messenger = require('oroui/js/messenger');
-    var tools = require('oroui/js/tools');
     var routing = require('routing');
     var helper = require('oroworkflow/js/tools/workflow-helper');
     var WorkflowManagementView = require('../views/workflow-management-view');
@@ -21,7 +20,6 @@ define(function(require) {
     var StepModel = require('../models/step-model');
     var workflowModelFactory = require('../../tools/workflow-model-factory');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var console = window.console;
 
     /**
      * Builds workflow editor UI.
@@ -38,7 +36,8 @@ define(function(require) {
             this.workflowManagementView = new WorkflowManagementView({
                 el: $el,
                 stepsEl: '.workflow-definition-steps-list-container',
-                model: this.model
+                model: this.model,
+                entityFields: this.options.entityFields
             });
             this.historyManager = new HistoryNavigationComponent({
                 observedModel: this.model,
@@ -290,14 +289,9 @@ define(function(require) {
                     });
                     mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }, this),
+                'errorHandlerMessage': __('Could not save workflow.'),
                 'error': function(model, response) {
                     mediator.execute('hideLoading');
-                    var jsonResponse = response.responseJSON || {};
-
-                    if (tools.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
-                        console.error(jsonResponse.error);
-                    }
-                    messenger.notificationFlashMessage('error', __('Could not save workflow.'));
                 }
             });
         },

@@ -447,4 +447,13 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($layout, $result);
     }
+
+    public function testGetNotAppliedActions()
+    {
+        $this->layoutManipulator->expects($this->once())
+            ->method('getNotAppliedActions')
+            ->willReturn(['action1', 'action2']);
+
+        $this->assertSame(['action1', 'action2'], $this->layoutBuilder->getNotAppliedActions());
+    }
 }

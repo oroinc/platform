@@ -6,7 +6,9 @@
     '%entityName%': 'oro.locale.localization.entity_label'|trans
 } }) %}
 
-{% set formAction = entity.id ? path('oro_locale_localization_update', { 'id': entity.id }) : path('oro_locale_localization_create')  %}
+{% if formAction is not defined %}
+    {% set formAction = entity.id ? path('oro_locale_localization_update', { 'id': entity.id }) : path('oro_locale_localization_create')  %}
+{% endif %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {

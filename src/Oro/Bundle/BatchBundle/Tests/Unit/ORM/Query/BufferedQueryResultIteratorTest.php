@@ -6,8 +6,8 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
@@ -125,7 +125,9 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals($maxResults, $iterator->count());
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
+            . $maxResults
+            . ') AS e',
             $actualSql
         );
     }
@@ -156,7 +158,9 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals($maxResults, $iterator->count());
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
+            . $maxResults
+            . ') AS e',
             $actualSql
         );
     }
@@ -208,7 +212,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT '
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
             . BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE . ' OFFSET 0',
             $actualSqls[1]
         );
@@ -258,11 +262,13 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals($maxResults, $count);
         $this->assertCount(2, $actualSqls);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
+            . $maxResults
+            . ') AS e',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET 0',
             $actualSqls[1]
         );
     }
@@ -314,15 +320,17 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals($maxResults, $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
+            . $maxResults
+            . ') AS e',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET 0',
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 2',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET 2',
             $actualSqls[2]
         );
     }
@@ -378,16 +386,17 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals($maxResults, $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT '
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
             . $maxResults . ' OFFSET ' . $firstResult . ') AS e',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET ' . $firstResult,
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET ' . $firstResult,
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET ' . ($firstResult + $maxResults - 1),
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET '
+            . ($firstResult + $maxResults - 1),
             $actualSqls[2]
         );
     }
@@ -442,11 +451,11 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET 0',
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 2',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET 2',
             $actualSqls[2]
         );
     }
@@ -497,7 +506,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT '
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT '
             . BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE . ' OFFSET 0',
             $actualSqls[1]
         );
@@ -553,11 +562,11 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 2',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET 2',
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ ORDER BY e0_.a ASC LIMIT 2 OFFSET 0',
             $actualSqls[2]
         );
     }

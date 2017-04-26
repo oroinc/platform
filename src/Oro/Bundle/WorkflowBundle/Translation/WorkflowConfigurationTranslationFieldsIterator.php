@@ -59,6 +59,14 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
             }
         }
         unset($stepFieldValue);
+
+        foreach ($this->variableFields($this->configuration, $context) as $key => &$varField) {
+            yield $key => $varField;
+            if ($this->hasChanges()) {
+                $varField = $this->pickChangedValue();
+            }
+        }
+        unset($varField);
     }
 
     /**

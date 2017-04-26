@@ -4,9 +4,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Symfony\Component\Form\FormView;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
-use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {
@@ -22,12 +22,15 @@ class TwigRendererEngineTest extends RendererEngineTest
 
     public function testRenderBlock()
     {
-        $layoutHelper = $this->getMockLayoutHelper();
-        $layoutHelper->expects($this->once())
-            ->method('isProfilerEnabled')
-            ->will($this->returnValue(true));
+        $configManager = $this->getMockBuilder(ConfigManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects(self::once())
+            ->method('get')
+            ->with('oro_layout.debug_block_info')
+            ->willReturn(true);
 
-        $this->twigRendererEngine->setLayoutHelper($layoutHelper);
+        $this->twigRendererEngine->setConfigManager($configManager);
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
@@ -66,14 +69,6 @@ class TwigRendererEngineTest extends RendererEngineTest
         $this->twigRendererEngine->setEnvironment($environment);
 
         $this->twigRendererEngine->renderBlock($view, [$template, 'root'], 'root', $variables);
-    }
-
-    /**
-     * @return LayoutHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getMockLayoutHelper()
-    {
-        return $this->createMock('Oro\Bundle\LayoutBundle\Request\LayoutHelper');
     }
 
     public function createRendererEngine()

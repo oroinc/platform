@@ -2,48 +2,52 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
+use Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionHandler;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $transitionHelper;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $logger;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var Transition|\PHPUnit_Framework_MockObject_MockObject */
     private $transition;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject */
     private $workflowItem;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionHandler|\PHPUnit_Framework_MockObject_MockObject */
     private $transitionHandler;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     private $workflowManager;
 
     public function setUp()
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->transitionHelper = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper')
+        $this->transitionHelper = $this->getMockBuilder(TransitionHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
+        $this->logger = $this->getMockBuilder(LoggerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
+        $this->transition = $this->getMockBuilder(Transition::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+        $this->workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -59,8 +63,9 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
      *
      * @param \Exception $exception
      * @param int $expectedResponseCode
+     * @param string $expectedResponseMessage
      */
-    public function testHandleError($exception, $expectedResponseCode)
+    public function testHandleError($exception, $expectedResponseCode, $expectedResponseMessage)
     {
         $this->workflowManager
             ->method('transit')
@@ -85,14 +90,9 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('createCompleteResponse')
             ->with(
-                $this->callback(function ($workflowItem) {
-                    $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem', $workflowItem);
-                    return $workflowItem;
-                }),
-                $this->callback(function ($responseCode) use ($expectedResponseCode) {
-                    $this->assertEquals($expectedResponseCode, $responseCode);
-                    return $responseCode;
-                })
+                $this->isInstanceOf(WorkflowItem::class),
+                $this->equalTo($expectedResponseCode),
+                $this->equalTo($expectedResponseMessage)
             );
 
         $this->transitionHandler->handle($this->transition, $this->workflowItem);
@@ -107,18 +107,22 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
             '404' => [
                 new WorkflowNotFoundException('test_workflow'),
                 404,
+                'Workflow "test_workflow" not found',
             ],
             '400' => [
-                new InvalidTransitionException,
+                new InvalidTransitionException('400 message'),
                 400,
+                '400 message',
             ],
             '403' => [
-                new ForbiddenTransitionException,
+                new ForbiddenTransitionException('403 message'),
                 403,
+                '403 message',
             ],
             '500' => [
-                new \Exception,
+                new \Exception('500 message'),
                 500,
+                '500 message',
             ],
         ];
     }

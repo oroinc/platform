@@ -252,5 +252,38 @@ class Configuration implements ConfigurationInterface
 
         $configNode->append($assetsNode);
         $configNode->append($imagesNode);
+        $configNode->append($this->getPageTemplatesNode($treeBuilder));
+    }
+
+    /**
+     * @param TreeBuilder $treeBuilder
+     * @return ArrayNodeDefinition
+     */
+    protected function getPageTemplatesNode(TreeBuilder $treeBuilder)
+    {
+        $pageTemplatesNode = $treeBuilder->root('page_templates');
+        $pageTemplatesNode
+            ->children()
+                ->arrayNode('templates')
+                    ->info('List of page templates')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('route_name')->cannotBeEmpty()->end()
+                            ->scalarNode('key')->cannotBeEmpty()->end()
+                            ->scalarNode('label')->cannotBeEmpty()->end()
+                            ->scalarNode('description')->defaultNull()->end()
+                            ->scalarNode('screenshot')->defaultNull()->end()
+                            ->booleanNode('enabled')->defaultNull()->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('titles')
+                    ->useAttributeAsKey('titles')
+                        ->prototype('scalar')->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $pageTemplatesNode;
     }
 }

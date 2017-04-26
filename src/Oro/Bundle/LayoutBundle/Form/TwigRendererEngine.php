@@ -4,14 +4,15 @@ namespace Oro\Bundle\LayoutBundle\Form;
 
 use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class TwigRendererEngine extends BaseTwigRendererEngine
 {
-    /**
-     * @var LayoutHelper
-     */
-    protected $layoutHelper;
+    /** @var ConfigManager */
+    private $configManager;
+
+    /** @var bool */
+    private $profilerEnabled;
 
     /**
      * {@inheritdoc}
@@ -19,7 +20,7 @@ class TwigRendererEngine extends BaseTwigRendererEngine
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
     {
         $twigTemplate = current($resource);
-        if ($this->layoutHelper->isProfilerEnabled() && $twigTemplate instanceof \Twig_Template) {
+        if ($this->isProfilerEnabled() && $twigTemplate instanceof \Twig_Template) {
             $variables['attr']['data-layout-debug-block-id'] = $variables['id'];
             $variables['attr']['data-layout-debug-block-template'] = $twigTemplate->getTemplateName();
         }
@@ -28,10 +29,22 @@ class TwigRendererEngine extends BaseTwigRendererEngine
     }
 
     /**
-     * @param LayoutHelper $layoutHelper
+     * @param ConfigManager $configManager
      */
-    public function setLayoutHelper(LayoutHelper $layoutHelper)
+    public function setConfigManager(ConfigManager $configManager)
     {
-        $this->layoutHelper = $layoutHelper;
+        $this->configManager = $configManager;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isProfilerEnabled()
+    {
+        if (null === $this->profilerEnabled) {
+            $this->profilerEnabled = (bool)$this->configManager->get('oro_layout.debug_block_info');
+        }
+
+        return $this->profilerEnabled;
     }
 }

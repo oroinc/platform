@@ -5,11 +5,13 @@ namespace Oro\Bundle\SearchBundle\Entity\Repository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\SearchBundle\Engine\Orm\DBALPersisterInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Entity\AbstractItem;
+use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -206,5 +208,54 @@ class SearchIndexRepository extends EntityRepository implements DBALPersisterInt
     public function setRegistry($registry)
     {
         $this->registry = $registry;
+    }
+
+    /**
+     * @param array $entityIds
+     * @param string $entityClass
+     * @param string|null $entityAlias
+     */
+    public function removeEntities(array $entityIds, $entityClass, $entityAlias = null)
+    {
+        if (empty($entityIds)) {
+            return;
+        }
+
+        $queryBuilder = $this->createQueryBuilder('item');
+        $queryBuilder
+            ->andWhere($queryBuilder->expr()->in('item.recordId', ':entityIds'))
+            ->andWhere($queryBuilder->expr()->eq('item.entity', ':entityClass'))
+            ->setParameter('entityClass', $entityClass)
+            ->setParameter('entityIds', $entityIds);
+
+        if ($entityAlias) {
+            $queryBuilder
+                ->andWhere($queryBuilder->expr()->eq('item.alias', ':entityAlias'))
+                ->setParameter('entityAlias', $entityAlias);
+        }
+
+        $this->deleteFromIndexTextTable(clone $queryBuilder);
+
+        $queryBuilder->delete()->getQuery()->execute();
+    }
+
+    /**
+     * We need to remove data manually as fulltext index in MySQL is only available in MyISAM engine which doesn't
+     * support cascade deletes by a foreign key.
+     *
+     * @param QueryBuilder $subQueryBuilder
+     */
+    private function deleteFromIndexTextTable(QueryBuilder $subQueryBuilder)
+    {
+        $subQueryDQL = $subQueryBuilder->select('item.id')->getDQL();
+
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder
+            ->from(IndexText::class, 'indexText')
+            ->delete()
+            ->where($queryBuilder->expr()->in('indexText.item', $subQueryDQL))
+            ->setParameters($subQueryBuilder->getParameters())
+            ->getQuery()
+            ->execute();
     }
 }

@@ -12,9 +12,6 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 
-/**
- * @dbIsolation
- */
 class DatabasePersisterTest extends WebTestCase
 {
     /** @var EntityManager */

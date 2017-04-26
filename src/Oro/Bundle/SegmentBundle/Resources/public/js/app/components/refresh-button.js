@@ -17,7 +17,10 @@ define(function(require) {
 
     function run(url, reloadRequired) {
         mediator.execute('showLoading');
-        $.post(url).then(function() {
+        $.post({
+            url: url,
+            errorHandlerMessage: __(options.errorMessage)
+        }).done(function() {
             if (reloadRequired) {
                 mediator.once('page:update', function() {
                     mediator.execute('showFlashMessage', 'success', __(options.successMessage));
@@ -26,8 +29,6 @@ define(function(require) {
             } else {
                 mediator.execute('showFlashMessage', 'success', __(options.successMessage));
             }
-        }, function() {
-            mediator.execute('showFlashMessage', 'error', __(options.errorMessage));
         }).always(function() {
             mediator.execute('hideLoading');
         });

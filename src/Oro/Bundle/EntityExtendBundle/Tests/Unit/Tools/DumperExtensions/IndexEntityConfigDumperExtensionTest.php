@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityBundle\EntityConfig\IndexScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -221,10 +222,19 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
         $fieldConfig->set('is_extend', true);
 
+        $fieldConfig2 = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field2', 'string'));
+        $fieldConfig2->set('is_extend', true);
+        $fieldConfig2->set('unique', true);
+
         $datagridFieldConfig = new Config(
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
         $datagridFieldConfig->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
+
+        $datagridFieldConfig2 = new Config(
+            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field2', 'string')
+        );
+        $datagridFieldConfig2->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -233,7 +243,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configManager->expects($this->exactly(3))
+        $this->configManager->expects($this->exactly(4))
             ->method('getProvider')
             ->will(
                 $this->returnValueMap(
@@ -247,23 +257,36 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigs')
             ->will(
                 $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
+                    function ($className) use ($config, $fieldConfig, $fieldConfig2) {
                         if (empty($className)) {
                             return [$config];
                         }
 
-                        return [$fieldConfig];
+                        return [$fieldConfig, $fieldConfig2];
                     }
                 )
             );
-        $datagridConfigProvider->expects($this->once())
+        $datagridConfigProvider->expects($this->exactly(2))
             ->method('hasConfig')
-            ->with($datagridFieldConfig->getId()->getClassName(), $datagridFieldConfig->getId()->getFieldName())
-            ->will($this->returnValue(true));
-        $datagridConfigProvider->expects($this->once())
+            ->willReturnMap([
+                [$datagridFieldConfig->getId()->getClassName(), $datagridFieldConfig->getId()->getFieldName(), true],
+                [$datagridFieldConfig2->getId()->getClassName(), $datagridFieldConfig2->getId()->getFieldName(), true]
+            ]);
+
+        $datagridConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->with($datagridFieldConfig->getId()->getClassName(), $datagridFieldConfig->getId()->getFieldName())
-            ->will($this->returnValue($datagridFieldConfig));
+            ->willReturnMap([
+                [
+                    $datagridFieldConfig->getId()->getClassName(),
+                    $datagridFieldConfig->getId()->getFieldName(),
+                    $datagridFieldConfig
+                ],
+                [
+                    $datagridFieldConfig2->getId()->getClassName(),
+                    $datagridFieldConfig2->getId()->getFieldName(),
+                    $datagridFieldConfig2
+                ]
+            ]);
 
         $this->configManager->expects($this->once())
             ->method('persist')
@@ -272,7 +295,10 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->preUpdate();
 
         $this->assertEquals(
-            ['field1' => true],
+            [
+                'field1' => IndexScope::INDEX_SIMPLE,
+                'field2' => IndexScope::INDEX_UNIQUE
+            ],
             $config->get('index')
         );
     }

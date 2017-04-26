@@ -115,6 +115,22 @@ define(function(require) {
                     bottom: false
                 }
             },
+            actionOptions: {
+                refreshAction: {
+                    launcherOptions: {
+                        label: __('oro_datagrid.action.refresh'),
+                        className: 'btn',
+                        iconClassName: 'fa-repeat'
+                    }
+                },
+                resetAction: {
+                    launcherOptions: {
+                        label: __('oro_datagrid.action.reset'),
+                        className: 'btn',
+                        iconClassName: 'fa-refresh'
+                    }
+                }
+            },
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
@@ -226,6 +242,7 @@ define(function(require) {
 
             _.extend(this, this.defaults, opts);
             this._initToolbars(opts);
+            this._initActions(opts);
             this.exportOptions = {};
             _.extend(this.exportOptions, opts.exportOptions);
 
@@ -412,6 +429,16 @@ define(function(require) {
             this.toolbars = {};
             this.toolbarOptions = {};
             _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
+        },
+
+        /**
+         * @param {Object} opts
+         * @private
+         */
+        _initActions: function(opts) {
+            if (_.isObject(opts.themeOptions)) {
+                _.extend(this.actionOptions, opts.themeOptions.actionOptions);
+            }
         },
 
         /**
@@ -702,11 +729,7 @@ define(function(require) {
             if (!this.refreshAction) {
                 this.refreshAction = new RefreshCollectionAction({
                     datagrid: this,
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.refresh'),
-                        className: 'btn',
-                        iconClassName: 'fa-repeat'
-                    },
+                    launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
                 this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
@@ -732,11 +755,7 @@ define(function(require) {
             if (!this.resetAction) {
                 this.resetAction = new ResetCollectionAction({
                     datagrid: this,
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.reset'),
-                        className: 'btn',
-                        iconClassName: 'fa-refresh'
-                    },
+                    launcherOptions: this.actionOptions.resetAction.launcherOptions,
                     order: 200
                 });
 
@@ -898,6 +917,25 @@ define(function(require) {
                         });
                     }
                 });
+            });
+
+            this.listenTo(mediator, 'datagrid:changeColumnParam:' + this.name, function(columnName, option, value) {
+                this.changeColumnParam(columnName, option, value);
+            });
+        },
+
+        /**
+         * Changes column`s option  if such option exist
+         *
+         * @param columnName
+         * @param option
+         * @param value
+         */
+        changeColumnParam: function(columnName, option, value) {
+            this.columns.each(function(column) {
+                if (column.get('name') === columnName && option in column) {
+                    column.set(option, value);
+                }
             });
         },
 

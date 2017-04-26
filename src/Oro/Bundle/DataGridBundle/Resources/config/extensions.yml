@@ -172,3 +172,10 @@ services:
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.feature:
+        class: Oro\Bundle\DataGridBundle\Extension\Feature\FeatureExtension
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_datagrid.extension }

@@ -64,7 +64,7 @@ class TagsExtension extends AbstractTagsExtension
         return
             parent::isApplicable($config) &&
             !$this->isDisabled() &&
-            !$this->isReportOrSegmentGrid($config) &&
+            !$this->isUnsupportedGridPrefix($config) &&
             $this->isGridRootEntityTaggable($config) &&
             null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
             $this->isAccessGranted();
@@ -134,8 +134,7 @@ class TagsExtension extends AbstractTagsExtension
         $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
 
         $permissions = [
-            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY),
-            'oro_tag_unassign_global' => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_REMOVE_ID_KEY)
+            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY)
         ];
 
         return [

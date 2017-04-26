@@ -5,6 +5,7 @@ namespace Oro\Bundle\UIBundle\Route;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -16,9 +17,9 @@ class Router
     const ACTION_SAVE_CLOSE    = 'save_and_close';
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var SymfonyRouter
@@ -36,16 +37,16 @@ class Router
     protected $propertyAccessor;
 
     /**
-     * @param Request        $request
+     * @param RequestStack   $requestStack
      * @param SymfonyRouter  $router
      * @param SecurityFacade $securityFacade
      */
     public function __construct(
-        Request $request,
+        RequestStack $requestStack,
         SymfonyRouter $router,
         SecurityFacade $securityFacade
     ) {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->router = $router;
         $this->securityFacade = $securityFacade;
 
@@ -70,7 +71,7 @@ class Router
      */
     public function redirectAfterSave(array $saveAndStayRoute, array $saveAndCloseRoute, $entity = null)
     {
-        switch ($this->request->get(self::ACTION_PARAMETER)) {
+        switch ($this->requestStack->getCurrentRequest()->get(self::ACTION_PARAMETER)) {
             case self::ACTION_SAVE_AND_STAY:
                 /**
                  * If user has no permission to edit Save and close callback should be used
@@ -112,13 +113,15 @@ class Router
      */
     public function redirect($context)
     {
-        $rawRouteData = json_decode($this->getRawRouteData($this->request), true);
+        $request = $this->requestStack->getCurrentRequest();
+
+        $rawRouteData = json_decode($this->getRawRouteData($request), true);
 
         /**
          * Default route should be used in case of no input_action in request
          */
         if (!is_array($rawRouteData)) {
-            return new RedirectResponse($this->request->getUri());
+            return new RedirectResponse($request->getUri());
         }
 
         if ($this->hasRedirectUrl($rawRouteData)) {
@@ -177,7 +180,7 @@ class Router
          */
         if (!is_array($arrayData)) {
             return [
-                'route' => $this->request->getRequestUri()
+                'route' => $this->requestStack->getCurrentRequest()->getRequestUri()
             ];
         }
 
@@ -267,8 +270,7 @@ class Router
                 sprintf(
                     'Cannot parse route name from request parameter "%s". Value of key "%s" is not valid URL',
                     self::ACTION_PARAMETER,
-                    'redirectUrl',
-                    json_encode($arrayData)
+                    'redirectUrl'
                 )
             );
         }
@@ -319,7 +321,7 @@ class Router
      */
     protected function mergeRequestQueryParams(array $routeParams)
     {
-        $queryParams = $this->request->query->all();
+        $queryParams = $this->requestStack->getCurrentRequest()->query->all();
 
         if ($queryParams) {
             $routeParams = array_merge($queryParams, $routeParams);
@@ -340,7 +342,7 @@ class Router
      */
     protected function parseRouteParam($parameterValue, $context)
     {
-        if (strpos($parameterValue, '$') === 0) {
+        if (is_string($parameterValue) && strpos($parameterValue, '$') === 0) {
             return $this->propertyAccessor->getValue($context, substr($parameterValue, 1));
         }
 

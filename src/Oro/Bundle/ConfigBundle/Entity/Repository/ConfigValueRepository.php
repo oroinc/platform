@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ConfigBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\ConfigBundle\Entity\Config;
 
 /**
@@ -37,5 +36,17 @@ class ConfigValueRepository extends EntityRepository
             $builder->getQuery()->execute();
         }
         $this->getEntityManager()->commit();
+    }
+
+    /**
+     * @param string $section
+     */
+    public function removeBySection($section)
+    {
+        $qb = $this->createQueryBuilder('configValue');
+        $qb->delete()
+            ->where($qb->expr()->eq('configValue.section', ':section'))
+            ->setParameter('section', $section)
+            ->getQuery()->execute();
     }
 }

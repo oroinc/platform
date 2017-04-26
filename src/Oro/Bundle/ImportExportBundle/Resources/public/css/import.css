@@ -13,7 +13,6 @@
 .btn-group > .dropdown-menu a.import-validation-btn > .icon-download-alt {
     width: 17px;
 }
-/*.btn-group > .dropdown-menu > li > a:hover > .icon-download-alt,*/
 .btn-group > .dropdown-menu > li > a:hover > .icon-download-alt {
     background-image: url("../img/glyphicons-halflings.png")!important;
 }

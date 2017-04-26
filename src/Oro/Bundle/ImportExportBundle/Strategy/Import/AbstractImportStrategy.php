@@ -148,7 +148,11 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
 
         $identityValues = $searchContext;
         $identityValues += $this->fieldHelper->getIdentityValues($entity);
-        foreach ($identityValues as $fieldName => $value) {
+        foreach ($identityValues as $fieldName => &$value) {
+            if (is_object($value)) {
+                $value = $this->findExistingEntity($value);
+            }
+
             if ($value !== null ||
                 $this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)
             ) {

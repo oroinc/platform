@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 
-class OroImportExportExtension extends Extension
+class OroImportExportExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -29,5 +30,14 @@ class OroImportExportExtension extends Extension
         $loader->load('field.yml');
         $loader->load('services.yml');
         $loader->load('mq_processor.yml');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/oro/'));
+        $loader->load('gaufrette.yml');
     }
 }

@@ -18,7 +18,8 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         return new AdditionalFieldsExtension(
             $this->configManager,
             $this->entityClassResolver,
-            new DatagridGuesserMock()
+            new DatagridGuesserMock(),
+            $this->fieldsHelper
         );
     }
 

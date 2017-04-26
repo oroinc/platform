@@ -27,9 +27,13 @@ abstract class AliceFixture implements
     public function load(ObjectManager $manager)
     {
         $aliceReferenceRepository = $this->loader->getReferenceRepository();
-        $references = $this->referenceRepository->getReferences();
-        foreach ($references as $name => $object) {
+        $referenceRepository = $this->referenceRepository;
+
+        $references = array_keys($referenceRepository->getReferences());
+        foreach ($references as $name) {
             if (!$aliceReferenceRepository->containsKey($name)) {
+                /** Used gerReference method for every reference to make sure that it's not detached */
+                $object = $referenceRepository->getReference($name);
                 $aliceReferenceRepository->set($name, $object);
             }
         }
@@ -43,11 +47,10 @@ abstract class AliceFixture implements
 
         $references = $aliceReferenceRepository->toArray();
         foreach ($references as $name => $object) {
-            if (!$this->referenceRepository->hasReference($name)) {
-                $this->referenceRepository->setReference($name, $object);
+            if (!$referenceRepository->hasReference($name)) {
+                $referenceRepository->setReference($name, $object);
             }
         }
-        unset($references);
     }
 
     /**

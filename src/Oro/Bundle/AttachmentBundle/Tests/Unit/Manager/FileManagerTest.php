@@ -78,28 +78,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fileContent, $this->fileManager->getContent($fileEntity));
     }
 
-    public function testGetContentByFileName()
-    {
-        $fileName = 'testFile.txt';
-        $fileContent = 'test data';
-
-        $file = $this->getMockBuilder('Gaufrette\File')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $file->expects($this->once())
-            ->method('getContent')
-            ->willReturn($fileContent);
-
-        $this->filesystem->expects($this->never())
-            ->method('has');
-        $this->filesystem->expects($this->once())
-            ->method('get')
-            ->with($fileName)
-            ->willReturn($file);
-
-        $this->assertEquals($fileContent, $this->fileManager->getContent($fileName));
-    }
-
     /**
      * @expectedException \Gaufrette\Exception\FileNotFound
      */
@@ -115,44 +93,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new FileNotFound($fileName));
 
         $this->fileManager->getContent($fileName);
-    }
-
-    public function testGetContentWhenFileDoesNotExistAndRequestedIgnoreException()
-    {
-        $fileName = 'testFile.txt';
-
-        $this->filesystem->expects($this->once())
-            ->method('has')
-            ->with($fileName)
-            ->willReturn(false);
-        $this->filesystem->expects($this->never())
-            ->method('get');
-
-        $this->assertNull($this->fileManager->getContent($fileName, false));
-    }
-
-    public function testGetContentWhenFileExistsAndRequestedIgnoreException()
-    {
-        $fileName = 'testFile.txt';
-        $fileContent = 'test data';
-
-        $file = $this->getMockBuilder('Gaufrette\File')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $file->expects($this->once())
-            ->method('getContent')
-            ->willReturn($fileContent);
-
-        $this->filesystem->expects($this->once())
-            ->method('has')
-            ->with($fileName)
-            ->willReturn(true);
-        $this->filesystem->expects($this->once())
-            ->method('get')
-            ->with($fileName)
-            ->willReturn($file);
-
-        $this->assertEquals($fileContent, $this->fileManager->getContent($fileName, false));
     }
 
     public function testCreateFileEntity()
@@ -312,82 +252,5 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $memoryBuffer->seek(0);
 
         $this->assertEquals('Test data', $memoryBuffer->read(100));
-    }
-
-    public function testDeleteFile()
-    {
-        $fileName = 'text.txt';
-
-        $this->filesystem->expects($this->once())
-            ->method('has')
-            ->with($fileName)
-            ->willReturn(true);
-        $this->filesystem->expects($this->once())
-            ->method('delete')
-            ->with($fileName);
-
-        $this->fileManager->deleteFile($fileName);
-    }
-
-    public function testDeleteFileForNotExistingFile()
-    {
-        $fileName = 'text.txt';
-
-        $this->filesystem->expects($this->once())
-            ->method('has')
-            ->with($fileName)
-            ->willReturn(false);
-        $this->filesystem->expects($this->never())
-            ->method('delete');
-
-        $this->fileManager->deleteFile($fileName);
-    }
-
-    public function testDeleteFileWhenFileNameIsEmpty()
-    {
-        $this->filesystem->expects($this->never())
-            ->method('has');
-        $this->filesystem->expects($this->never())
-            ->method('delete');
-
-        $this->fileManager->deleteFile(null);
-    }
-
-    public function testWriteFileToStorage()
-    {
-        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
-        $fileName = 'test2.txt';
-
-        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
-
-        $this->filesystem->expects($this->once())
-            ->method('createStream')
-            ->with($fileName)
-            ->willReturn($resultStream);
-
-        $this->fileManager->writeFileToStorage($localFilePath, $fileName);
-        $resultStream->open(new StreamMode('rb+'));
-        $resultStream->seek(0);
-
-        $this->assertEquals('Test data', $resultStream->read(100));
-    }
-
-    public function testWriteToStorage()
-    {
-        $content = 'Test data';
-        $fileName = 'test2.txt';
-
-        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
-
-        $this->filesystem->expects($this->once())
-            ->method('createStream')
-            ->with($fileName)
-            ->willReturn($resultStream);
-
-        $this->fileManager->writeToStorage($content, $fileName);
-        $resultStream->open(new StreamMode('rb+'));
-        $resultStream->seek(0);
-
-        $this->assertEquals($content, $resultStream->read(100));
     }
 }

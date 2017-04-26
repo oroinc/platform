@@ -21,7 +21,7 @@ trait MessageProcessTrait
     {
         $sentMessages = $this->getSentMessages();
         $exportMessageData = reset($sentMessages);
-        $this->tearDownMessageCollector();
+        $this->clearMessageCollector();
 
         $message = new NullMessage();
         $message->setMessageId('abc');

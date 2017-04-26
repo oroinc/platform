@@ -7,6 +7,8 @@ use CG\Generator\PhpParameter;
 use CG\Generator\PhpProperty;
 
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper;
 use Symfony\Component\PropertyAccess\StringUtil;
 
 /**
@@ -111,8 +113,13 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     protected function generateProperties($propertyType, array $schema, PhpClass $class)
     {
         foreach ($schema[$propertyType] as $fieldName => $config) {
-            $class->setProperty(PhpProperty::create($fieldName)->setVisibility('protected'));
+            if ($propertyType === 'relation') {
+                if (!$this->isSupportedRelation($schema, $fieldName)) {
+                    continue;
+                }
+            }
 
+            $class->setProperty(PhpProperty::create($fieldName)->setVisibility('protected'));
             $isPrivate = is_array($config) && isset($config['private']) && $config['private'];
             if (!$isPrivate) {
                 $class
@@ -131,6 +138,26 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
                     );
             }
         }
+    }
+
+    protected function isSupportedRelation($schema, $fieldName)
+    {
+        $isSupportedRelation = true;
+
+        if (isset($schema['relationData'])) {
+            foreach ($schema['relationData'] as $relationData) {
+                /** @var FieldConfigId $fieldId */
+                $fieldId = $relationData['field_id'];
+                if ($fieldId instanceof FieldConfigId) {
+                    if ($fieldId->getFieldName() === $fieldName) {
+                        $isSupportedRelation = ExtendScopeHelper::isStateAvailableForProcessing($relationData['state']);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $isSupportedRelation;
     }
 
     /**

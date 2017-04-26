@@ -12,9 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
-/**
- * @dbIsolation
- */
 class WidgetControllerTest extends WebTestCase
 {
     const ROOT_NODE_NAME = 'operations';

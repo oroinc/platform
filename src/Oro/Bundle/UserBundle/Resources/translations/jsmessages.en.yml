@@ -9,7 +9,7 @@ oro:
             flash:
                 success: Reset password email has been sent to user
             popup:
-                question: User <b>{{ user }}</b> will receive reset password by email and will be disabled from login.
+                question: User <b>{{ user }}</b> will receive the email to reset password and will be disabled from login.
                 title: Reset password
                 label: Reset
             mass_action:
@@ -27,3 +27,4 @@ oro:
             label: Capabilities
             select_all: Select All
             no_capabilities_available: This group has no capabilities
+        content_outdated: "The current role has been updated. Please, <a href=\"#\" onclick=\"window.location.reload(false);return false;\">refresh the page</a> to view new changes"

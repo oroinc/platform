@@ -15,7 +15,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v2_0';
     }
 
     /**
@@ -96,9 +96,15 @@ class OroDataAuditBundleInstaller implements Installation
         $auditFieldTable->addColumn('new_date', 'date', ['notnull' => false]);
         $auditFieldTable->addColumn('new_time', 'time', ['notnull' => false]);
         $auditFieldTable->addColumn('new_datetime', 'datetime', ['notnull' => false]);
-        $auditFieldTable->addColumn('old_datetimetz', 'datetimetz', ['notnull' => false]);
+        $auditFieldTable->addColumn('old_datetimetz', 'datetimetz', [
+            'notnull' => false,
+            'comment' => '(DC2Type:datetimetz)'
+        ]);
         $auditFieldTable->addColumn('old_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
-        $auditFieldTable->addColumn('new_datetimetz', 'datetimetz', ['notnull' => false]);
+        $auditFieldTable->addColumn('new_datetimetz', 'datetimetz', [
+            'notnull' => false,
+            'comment' => '(DC2Type:datetimetz)'
+        ]);
         $auditFieldTable->addColumn('new_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $auditFieldTable->addColumn('visible', 'boolean', ['default' => '1']);
         $auditFieldTable->addColumn('old_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);

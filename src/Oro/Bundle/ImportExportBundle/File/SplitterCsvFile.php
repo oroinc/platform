@@ -16,6 +16,7 @@ class SplitterCsvFile
      * @var string
      */
     protected $storagePath;
+
     /**
      * @var integer
      */
@@ -50,7 +51,7 @@ class SplitterCsvFile
      * @param $pathFile string
      * @return array
      */
-    public function getSplitFiles($pathFile)
+    public function getSplittedFilesNames($pathFile)
     {
         $filename = basename($pathFile);
 

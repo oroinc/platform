@@ -2,43 +2,50 @@
 
 namespace Oro\Bundle\ReminderBundle\Twig;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ReminderExtension extends \Twig_Extension
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var SecurityContext
+     * @param ContainerInterface $container
      */
-    protected $securityContext;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @var MessageParamsProvider
+     * @return TokenStorageInterface
      */
-    protected $messageParamsProvider;
+    protected function getSecurityTokenStorage()
+    {
+        return $this->container->get('security.token_storage');
+    }
 
     /**
-     * @param EntityManager         $entityManager
-     * @param SecurityContext       $securityContext
-     * @param MessageParamsProvider $messageParamsProvider
+     * @return MessageParamsProvider
      */
-    public function __construct(
-        EntityManager $entityManager,
-        SecurityContext $securityContext,
-        MessageParamsProvider $messageParamsProvider
-    ) {
-        $this->entityManager         = $entityManager;
-        $this->securityContext       = $securityContext;
-        $this->messageParamsProvider = $messageParamsProvider;
+    protected function getMessageParamsProvider()
+    {
+        return $this->container->get('oro_reminder.web_socket.message_params_provider');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->container->get('doctrine')->getManagerForClass(Reminder::class);
     }
 
     /**
@@ -46,12 +53,12 @@ class ReminderExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction(
                 'oro_reminder_get_requested_reminders_data',
-                array($this, 'getRequestedRemindersData')
+                [$this, 'getRequestedRemindersData']
             )
-        );
+        ];
     }
 
     /**
@@ -62,17 +69,21 @@ class ReminderExtension extends \Twig_Extension
     public function getRequestedRemindersData()
     {
         /** @var User|null */
-        $user = $this->securityContext->getToken() ? $this->securityContext->getToken()->getUser() : null;
-
-        if (is_object($user) && $user instanceof User) {
-            $reminders = $this->entityManager
-                ->getRepository('OroReminderBundle:Reminder')
-                ->findRequestedReminders($user);
-
-            return $this->messageParamsProvider->getMessageParamsForReminders($reminders);
+        $user = null;
+        $token = $this->getSecurityTokenStorage()->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
         }
 
-        return array();
+        if ($user instanceof User) {
+            $reminders = $this->getEntityManager()
+                ->getRepository(Reminder::class)
+                ->findRequestedReminders($user);
+
+            return $this->getMessageParamsProvider()->getMessageParamsForReminders($reminders);
+        }
+
+        return [];
     }
 
     /**

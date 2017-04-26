@@ -10,9 +10,6 @@ use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class AjaxControllerTest extends WebTestCase
 {
     const ROOT_NODE_NAME = 'operations';

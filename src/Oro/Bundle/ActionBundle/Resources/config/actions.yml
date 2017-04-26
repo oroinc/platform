@@ -28,6 +28,15 @@ services:
         tags:
             - { name: oro_action.action, alias: configurable }
 
+    oro_action.action.resolve_destination_page:
+        class: 'Oro\Bundle\ActionBundle\Action\ResolveDestinationPage'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_action.resolver.destination_page_resolver'
+            - '@request_stack'
+        tags:
+            - { name: oro_action.action, alias: resolve_destination_page }
+
     oro_action.action.create_datetime:
         class: 'Oro\Component\Action\Action\CreateDateTime'
         arguments:

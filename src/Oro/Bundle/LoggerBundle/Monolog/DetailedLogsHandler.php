@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\LoggerBundle\Monolog;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\HandlerInterface;
-use Monolog\Logger;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 
 class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInterface
 {
@@ -43,7 +45,9 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
      */
     public function isHandling(array $record)
     {
-        return true;
+        $this->setLevel($this->getLogLevel());
+
+        return parent::isHandling($record);
     }
 
     /**
@@ -64,15 +68,15 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
 
     public function close()
     {
-        if (empty($this->buffer)) {
+        if (count($this->buffer) === 0) {
             return;
         }
-        $monologLevel = $this->getLogLevel();
+
         $this->handler->handleBatch(
             array_filter(
                 $this->buffer,
-                function ($record) use ($monologLevel) {
-                    return $record['level'] >= $monologLevel;
+                function ($record) {
+                    return $record['level'] >= $this->level;
                 }
             )
         );
@@ -83,16 +87,38 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
      */
     private function getLogLevel()
     {
+        /** @var CacheProvider $cache */
+        $cache = $this->container->get('oro_logger.cache');
+        if ($cache->contains(Configuration::LOGS_LEVEL_KEY)) {
+            return $cache->fetch(Configuration::LOGS_LEVEL_KEY);
+        }
+
         $logLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
-        if ($this->container->has('oro_config.user')) {
+        if ($this->isInstalled() && $this->container->has('oro_config.user')) {
             /** @var ConfigManager $config */
             $config = $this->container->get('oro_config.user');
-            $endTimestamp = $config->get('oro_logger.detailed_logs_end_timestamp');
-            if (null !== $endTimestamp && time() <= $endTimestamp) {
-                $logLevel = $config->get('oro_logger.detailed_logs_level');
+
+            $curTimestamp = time();
+            $endTimestamp = $config->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY));
+            if (null !== $endTimestamp && $curTimestamp <= $endTimestamp) {
+                $logLevel = $config->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY));
+
+                $cache->save(Configuration::LOGS_LEVEL_KEY, $logLevel, $endTimestamp - $curTimestamp);
+
+                return $logLevel;
             }
         }
 
-        return Logger::toMonologLevel($logLevel);
+        $cache->save(Configuration::LOGS_LEVEL_KEY, $logLevel);
+
+        return $logLevel;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isInstalled()
+    {
+        return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
     }
 }

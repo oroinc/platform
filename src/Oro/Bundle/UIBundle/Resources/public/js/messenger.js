@@ -5,8 +5,9 @@ define([
     'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',
     'oroui/js/mediator',
+    'oroui/js/error',
     'bootstrap'
-], function($, _, tools, MultiUseResourceManager, SHA256, mediator) {
+], function($, _, tools, MultiUseResourceManager, SHA256, mediator, error) {
     'use strict';
 
     var defaults = {
@@ -19,7 +20,6 @@ define([
     var queue = [];
     var groupedMessages = {};
     var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
-    var console = window.console;
 
     /**
      * Same arguments as for Oro.NotificationMessage
@@ -141,18 +141,7 @@ define([
             showErrorMessage: function(message, err) {
                 var msg = message;
                 if (!_.isUndefined(err) && !_.isNull(err)) {
-                    if (!_.isUndefined(console)) {
-                        console.error(_.isUndefined(err.stack) ? err : err.stack);
-                    }
-                    if (tools.debug) {
-                        if (!_.isUndefined(err.message)) {
-                            msg += ': ' + err.message;
-                        } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
-                            msg += ': ' + err.errors.join();
-                        } else if (_.isString(err)) {
-                            msg += ': ' + err;
-                        }
-                    }
+                    error.showErrorInConsole(err);
                 }
                 return this.notificationFlashMessage('error', msg);
             },

@@ -3,14 +3,22 @@ Feature: User login
   As an OroCRM admin
   I need to be able to authenticate
 
-Scenario: Success login
-  Given I am on Login page
-  And I fill "Login Form" with:
-    | Username | admin |
-    | Password | admin |
-  And I press "Log in"
-  And I should be on Admin Dashboard page
+  Scenario: Success login
+    Given I am logged out
+    And I am on Login page
+    And I fill "Login Form" with:
+      | Username | admin |
+      | Password | admin |
+    When I press "Log in"
+    Then I should be on Admin Dashboard page
 
-Scenario: Fail login
-  Given I login as "user" user
-  And I should see "Invalid user name or password."
+  Scenario: Fail login
+    Given I am logged out
+    When I login as "user" user
+    Then I should see "Invalid user name or password."
+
+  Scenario: Redirect already logged user
+    Given I login as "admin" user
+    And I should be on Admin Dashboard page
+    When I am on Login page
+    Then I should be on Admin Dashboard page

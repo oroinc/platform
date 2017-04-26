@@ -103,6 +103,11 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         return false;
     }
 
+    public function getTag()
+    {
+        return 'cache';
+    }
+
     /**
      * @param string $commandline The command line to run
      */

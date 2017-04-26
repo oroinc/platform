@@ -83,7 +83,7 @@ The context class: [GetContext](../../Processor/Get/GetContext.php). Also see [C
 
 The main processor class: [GetProcessor](../../Processor/GetProcessor.php).
 
-Existing worker processors: [processors.get.yml](../../Resources/config/processors.get.yml) or run `php app/console oro:api:debug get`.
+Existing worker processors: [processors.get.yml](../../Resources/config/processors.get.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug get`.
 
 This action has the following processor groups:
 
@@ -116,7 +116,7 @@ The context class: [GetListContext](../../Processor/GetList/GetListContext.php).
 
 The main processor class: [GetListProcessor](../../Processor/GetListProcessor.php).
 
-Existing worker processors: [processors.get_list.yml](../../Resources/config/processors.get_list.yml) or run `php app/console oro:api:debug get_list`.
+Existing worker processors: [processors.get_list.yml](../../Resources/config/processors.get_list.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug get_list`.
 
 This action has the following processor groups:
 
@@ -149,7 +149,7 @@ The context class: [DeleteContext](../../Processor/Delete/DeleteContext.php). Al
 
 The main processor class: [DeleteProcessor](../../Processor/DeleteProcessor.php).
 
-Existing worker processors: [processors.delete.yml](../../Resources/config/processors.delete.yml) or run `php app/console oro:api:debug delete`.
+Existing worker processors: [processors.delete.yml](../../Resources/config/processors.delete.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug delete`.
 
 This action has the following processor groups:
 
@@ -188,7 +188,7 @@ The context class: [DeleteListContext](../../Processor/DeleteList/DeleteListCont
 
 The main processor class: [DeleteListProcessor](../../Processor/DeleteListProcessor.php).
 
-Existing worker processors: [processors.delete_list.yml](../../Resources/config/processors.delete_list.yml) or run `php app/console oro:api:debug delete_list`.
+Existing worker processors: [processors.delete_list.yml](../../Resources/config/processors.delete_list.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug delete_list`.
 
 This action has the following processor groups:
 
@@ -221,7 +221,7 @@ The context class: [CreateContext](../../Processor/Create/CreateContext.php). Al
 
 The main processor class: [CreateProcessor](../../Processor/CreateProcessor.php).
 
-Existing worker processors: [processors.create.yml](../../Resources/config/processors.create.yml) or run `php app/console oro:api:debug create`.
+Existing worker processors: [processors.create.yml](../../Resources/config/processors.create.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug create`.
 
 This action has the following processor groups:
 
@@ -255,7 +255,7 @@ The context class: [UpdateContext](../../Processor/Update/UpdateContext.php). Al
 
 The main processor class: [UpdateProcessor](../../Processor/UpdateProcessor.php).
 
-Existing worker processors: [processors.update.yml](../../Resources/config/processors.update.yml) or run `php app/console oro:api:debug update`.
+Existing worker processors: [processors.update.yml](../../Resources/config/processors.update.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug update`.
 
 This action has the following processor groups:
 
@@ -289,7 +289,7 @@ The context class: [GetSubresourceContext](../../Processor/Subresource/GetSubres
 
 The main processor class: [GetSubresourceProcessor](../../Processor/Subresource/GetSubresourceProcessor.php).
 
-Existing worker processors: [processors.get_subresource.yml](../../Resources/config/processors.get_subresource.yml) or run `php app/console oro:api:debug get_subresource`.
+Existing worker processors: [processors.get_subresource.yml](../../Resources/config/processors.get_subresource.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug get_subresource`.
 
 This action has the following processor groups:
 
@@ -322,7 +322,7 @@ The context class: [GetRelationshipContext](../../Processor/Subresource/GetRelat
 
 The main processor class: [GetRelationshipProcessor](../../Processor/Subresource/GetRelationshipProcessor.php).
 
-Existing worker processors: [processors.get_relationship.yml](../../Resources/config/processors.get_relationship.yml) or run `php app/console oro:api:debug get_relationship`.
+Existing worker processors: [processors.get_relationship.yml](../../Resources/config/processors.get_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug get_relationship`.
 
 This action has the following processor groups:
 
@@ -355,7 +355,7 @@ The context class: [UpdateRelationshipContext](../../Processor/Subresource/Updat
 
 The main processor class: [UpdateRelationshipProcessor](../../Processor/Subresource/UpdateRelationshipProcessor.php).
 
-Existing worker processors: [processors.update_relationship.yml](../../Resources/config/processors.update_relationship.yml) or run `php app/console oro:api:debug update_relationship`.
+Existing worker processors: [processors.update_relationship.yml](../../Resources/config/processors.update_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug update_relationship`.
 
 This action has the following processor groups:
 
@@ -388,7 +388,7 @@ The context class: [AddRelationshipContext](../../Processor/Subresource/AddRelat
 
 The main processor class: [AddRelationshipProcessor](../../Processor/Subresource/AddRelationshipProcessor.php).
 
-Existing worker processors: [processors.add_relationship.yml](../../Resources/config/processors.add_relationship.yml) or run `php app/console oro:api:debug add_relationship`.
+Existing worker processors: [processors.add_relationship.yml](../../Resources/config/processors.add_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug add_relationship`.
 
 This action has the following processor groups:
 
@@ -421,7 +421,7 @@ The context class: [AddRelationshipContext](../../Processor/Subresource/AddRelat
 
 The main processor class: [AddRelationshipProcessor](../../Processor/Subresource/AddRelationshipProcessor.php).
 
-Existing worker processors: [processors.delete_relationship.yml](../../Resources/config/processors.delete_relationship.yml) or run `php app/console oro:api:debug delete_relationship`.
+Existing worker processors: [processors.delete_relationship.yml](../../Resources/config/processors.delete_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml) or run `php app/console oro:api:debug delete_relationship`.
 
 This action has the following processor groups:
 

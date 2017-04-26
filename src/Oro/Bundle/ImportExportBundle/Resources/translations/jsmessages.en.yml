@@ -8,7 +8,9 @@ oro:
             starting.message: 'Starting import...'
             success.message: 'Import started successfully. You will receive email notification upon completion.'
             fail.message: 'Could not start import, please try again.'
+            form_fail.message: 'Error: Bad or missing file,  Please choose a valid file to import.'
         import_validation:
             starting.message: 'Starting import validation...'
             success.message: 'Import validation started successfully. You will receive email notification upon completion.'
             fail.message: 'Could not start import validation, please try again.'
+            form_fail.message: 'Error: Bad or missing file,  Please choose a valid file for import validation.'

@@ -2,23 +2,31 @@
 
 namespace Oro\Bundle\ThemeBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 
 class ThemeExtension extends \Twig_Extension
 {
     const NAME = 'oro_theme';
 
-    /**
-     * @var ThemeRegistry
-     */
-    protected $themeRegistry;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param ThemeRegistry $themeRegistry
+     * @param ContainerInterface $container
      */
-    public function __construct(ThemeRegistry $themeRegistry)
+    public function __construct(ContainerInterface $container)
     {
-        $this->themeRegistry = $themeRegistry;
+        $this->container = $container;
+    }
+
+    /**
+     * @return ThemeRegistry
+     */
+    protected function getThemeRegistry()
+    {
+        return $this->container->get('oro_theme.registry');
     }
 
     /**
@@ -26,10 +34,10 @@ class ThemeExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('oro_theme_logo', array($this, 'getThemeLogo')),
-            new \Twig_SimpleFunction('oro_theme_icon', array($this, 'getThemeIcon')),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_theme_logo', [$this, 'getThemeLogo']),
+            new \Twig_SimpleFunction('oro_theme_icon', [$this, 'getThemeIcon']),
+        ];
     }
 
     /**
@@ -40,7 +48,7 @@ class ThemeExtension extends \Twig_Extension
     public function getThemeLogo()
     {
         $result = '';
-        $activeTheme = $this->themeRegistry->getActiveTheme();
+        $activeTheme = $this->getThemeRegistry()->getActiveTheme();
         if ($activeTheme) {
             $result = $activeTheme->getLogo();
         }
@@ -55,7 +63,7 @@ class ThemeExtension extends \Twig_Extension
     public function getThemeIcon()
     {
         $result = '';
-        $activeTheme = $this->themeRegistry->getActiveTheme();
+        $activeTheme = $this->getThemeRegistry()->getActiveTheme();
         if ($activeTheme) {
             $result = $activeTheme->getIcon();
         }

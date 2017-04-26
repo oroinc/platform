@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -52,6 +53,7 @@ class WorkflowDefinition implements DomainObjectInterface
 {
     const CONFIG_SCOPES = 'scopes';
     const CONFIG_DATAGRIDS = 'datagrids';
+    const CONFIG_FORCE_AUTOSTART = 'force_autostart';
 
     /**
      * @var string
@@ -219,6 +221,13 @@ class WorkflowDefinition implements DomainObjectInterface
     protected $updatedAt;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="applications", type="simple_array", nullable=false)
+     */
+    protected $applications = [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -243,6 +252,16 @@ class WorkflowDefinition implements DomainObjectInterface
     public function __toString()
     {
         return (string)$this->getLabel();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForceAutostart()
+    {
+        return array_key_exists(self::CONFIG_FORCE_AUTOSTART, $this->configuration)
+            ? (bool)$this->configuration[self::CONFIG_FORCE_AUTOSTART]
+            : false;
     }
 
     /**
@@ -911,5 +930,24 @@ class WorkflowDefinition implements DomainObjectInterface
         return array_key_exists(self::CONFIG_DATAGRIDS, $this->configuration)
             ? (array)$this->configuration[self::CONFIG_DATAGRIDS]
             : [];
+    }
+    /**
+     * @return array
+     */
+    public function getApplications()
+    {
+        return $this->applications;
+    }
+
+    /**
+     * @param array $applications
+     *
+     * @return $this
+     */
+    public function setApplications(array $applications)
+    {
+        $this->applications = array_map('strtolower', $applications);
+
+        return $this;
     }
 }

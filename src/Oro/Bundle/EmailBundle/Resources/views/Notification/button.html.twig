@@ -89,7 +89,7 @@
     </div>
 </script>
 {% endif %}
-{% if oro_config_value('oro_email.show_recent_emails_in_user_bar') and feature_enabled('email') %}
+{% if feature_enabled('email') and oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
 <li class="email-notification-menu dropdown"
     title="{{ 'oro.email.notification.menu_item.hint'|trans }}"
     data-page-component-options="{{ {

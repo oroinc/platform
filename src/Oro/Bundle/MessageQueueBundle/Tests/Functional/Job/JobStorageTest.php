@@ -6,18 +6,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
+/**
+ * @dbIsolationPerTest
+ */
 class JobStorageTest extends WebTestCase
 {
     public function setUp()
     {
-        $this->initClient([], [], true);
-
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        $this->rollbackTransaction();
+        $this->initClient();
     }
 
     public function testCouldGetJobStorageAsServiceFromContainer()

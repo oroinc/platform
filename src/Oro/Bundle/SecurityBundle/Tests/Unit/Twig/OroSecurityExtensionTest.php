@@ -2,54 +2,53 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Twig;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Model\AclPermission;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var OroSecurityExtension
-     */
-    protected $twigExtension;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $permissionManager;
+
+    /** @var OroSecurityExtension */
+    protected $extension;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->permissionManager = $this->getMockBuilder(PermissionManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->twigExtension = new OroSecurityExtension($this->securityFacade);
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_security.security_facade', $this->securityFacade)
+            ->add('oro_security.acl.permission_manager', $this->permissionManager)
+            ->getContainer($this);
 
-    protected function tearDown()
-    {
-        unset($this->securityFacade);
-        unset($this->twigExtension);
+        $this->extension = new OroSecurityExtension($container);
     }
 
     public function testGetName()
     {
-        $this->assertEquals('oro_security_extension', $this->twigExtension->getName());
-    }
-
-    public function testGetFunctions()
-    {
-        $expectedFunctions = array(
-            'resource_granted' => 'checkResourceIsGranted',
-        );
-
-        $actualFunctions = $this->twigExtension->getFunctions();
-        $this->assertSameSize($expectedFunctions, $actualFunctions);
-
-        foreach ($expectedFunctions as $twigFunction => $internalMethod) {
-            $this->assertArrayHasKey($twigFunction, $actualFunctions);
-            $this->assertInstanceOf('\Twig_Function_Method', $actualFunctions[$twigFunction]);
-            $this->assertAttributeEquals($internalMethod, 'method', $actualFunctions[$twigFunction]);
-        }
+        $this->assertEquals('oro_security_extension', $this->extension->getName());
     }
 
     public function testCheckResourceIsGranted()
@@ -59,6 +58,87 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('test_acl'))
             ->will($this->returnValue(true));
 
-        $this->assertTrue($this->twigExtension->checkResourceIsGranted('test_acl'));
+        $this->assertTrue(
+            self::callTwigFunction($this->extension, 'resource_granted', ['test_acl'])
+        );
+    }
+
+    public function testGetOrganizations()
+    {
+        $user = new User();
+        $disabledOrganization = new Organization();
+        $organization = new Organization();
+
+        $organization->setEnabled(true);
+
+        $user->setOrganizations(new ArrayCollection(array($organization, $disabledOrganization)));
+        $token = $this->createMock(TokenInterface::class);
+
+        $this->securityFacade->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($user));
+
+        $result = self::callTwigFunction($this->extension, 'get_enabled_organizations', []);
+
+        $this->assertInternalType('array', $result);
+        $this->assertCount(1, $result);
+        $this->assertSame($organization, $result[0]);
+    }
+
+    public function testGetCurrentOrganizationWorks()
+    {
+        $organization = $this->createMock(Organization::class);
+
+        $token = $this->createMock(OrganizationContextTokenInterface::class);
+
+        $this->securityFacade->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
+        $this->assertSame(
+            $organization,
+            self::callTwigFunction($this->extension, 'get_current_organization', [])
+        );
+    }
+
+    public function testGetCurrentOrganizationWorksWithNotOrganizationContextToken()
+    {
+        $token = $this->createMock(TokenInterface::class);
+
+        $this->securityFacade->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->never())->method($this->anything());
+
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'get_current_organization', [])
+        );
+    }
+
+    public function testGetPermission()
+    {
+        $aclPermission = new AclPermission();
+        $aclPermission->setName('test name');
+
+        $permission = new Permission();
+
+        $this->permissionManager->expects($this->once())
+            ->method('getPermissionByName')
+            ->with('test name')
+            ->willReturn($permission);
+
+        $this->assertSame(
+            $permission,
+            self::callTwigFunction($this->extension, 'acl_permission', [$aclPermission])
+        );
     }
 }

@@ -9,6 +9,7 @@
         ) {
             var response = {{ response|json_encode|raw }};
             var responseCode = {{ responseCode|json_encode|raw }};
+            var responseMessage = {{ responseMessage|json_encode|raw }};
             var transitionSuccess = {{ transitionSuccess|json_encode|raw }};
 
             widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
@@ -18,7 +19,7 @@
                     return;
                 }
 
-                widget.trigger('transitionFailure', {status: responseCode});
+                widget.trigger('transitionFailure', {status: responseCode, message: responseMessage});
             });
         });
     </script>

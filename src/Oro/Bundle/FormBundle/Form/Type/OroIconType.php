@@ -35,8 +35,12 @@ class OroIconType extends AbstractType
 
         $vars = ['configs' => $options['configs']];
         if ($form->getData()) {
+            $selectedData = ['id' => $form->getData(), 'text' => $form->getData()];
+            if (isset($options['configs']['multiple']) && $options['configs']['multiple']) {
+                $selectedData = [$selectedData];
+            }
             $vars['attr'] = [
-                'data-selected-data' => json_encode([['id' => $form->getData(), 'text' => $form->getData()]])
+                'data-selected-data' => json_encode($selectedData)
             ];
         }
 

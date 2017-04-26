@@ -35,7 +35,7 @@
                     rates: {}
                 }
             }) }}>
-                <div class="value-field input-append">
+                <div class="multicurrency-fields-wrapper value-field input-append">
                     {{ form_widget(form.value) }}
                     {% if form.currency.vars.hidden_field %}
                         <span class="add-on">{{ form.currency.vars.choices[0].label }}</span>
@@ -44,9 +44,25 @@
                         {{ form_widget(form.currency) }}
                     {% endif %}
                 </div>
+                {% if form.baseCurrencyValue is defined %}
+                    <div class="base-currency">
+                        <div class="base-currency-field input-append">
+                            {{ form_widget(form.baseCurrencyValue) }}
+                            {% if defaultCurrency is defined %}
+                                <span class="add-on">{{ defaultCurrency }}</span>
+                            {% else %}
+                                <span class="add-on">{{ form_widget(form.currency) }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="default-currency-equivalent" data-name="default-currency-equivalent"></div>
+                {{ form_errors(form) }}
                 {{ form_errors(form.currency) }}
                 {{ form_errors(form.value) }}
+                {% if form.baseCurrencyValue is defined %}
+                    {{ form_errors(form.baseCurrencyValue) }}
+                {% endif %}
             </div>
         </div>
     </div>

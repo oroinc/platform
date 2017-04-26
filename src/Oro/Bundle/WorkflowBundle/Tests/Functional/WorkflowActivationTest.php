@@ -11,9 +11,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
 
-/**
- * @dbIsolation
- */
 class WorkflowActivationTest extends WebTestCase
 {
     /** @var WorkflowManager */

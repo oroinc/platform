@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Async\Manager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
@@ -94,7 +94,7 @@ class AssociationManager
                     $ownerColumnName
                 );
 
-            $ownerIds = (new BufferedQueryResultIterator($ownerIdsQb))
+            $ownerIds = (new BufferedIdentityQueryResultIterator($ownerIdsQb))
                 ->setBufferSize(self::OWNER_IDS_BUFFER_SIZE)
                 ->setPageLoadedCallback(function (array $rows) use ($emailOwnerClassName) {
                     $this->producer->send(
@@ -131,7 +131,7 @@ class AssociationManager
             /** @var QueryBuilder $emailQB */
             foreach ($emailsQB as $emailQB) {
                 $emailIds = [];
-                $emails = (new BufferedQueryResultIterator($emailQB))
+                $emails = (new BufferedIdentityQueryResultIterator($emailQB))
                     ->setBufferSize(self::EMAIL_BUFFER_SIZE)
                     ->setPageCallback(function () use (
                         &$owner,
@@ -199,11 +199,11 @@ class AssociationManager
     /**
      * @param QueryBuilder $ownerQb
      *
-     * @return BufferedQueryResultIterator
+     * @return \Iterator
      */
     protected function getOwnerIterator(QueryBuilder $ownerQb)
     {
-        return (new BufferedQueryResultIterator($ownerQb))
+        return (new BufferedIdentityQueryResultIterator($ownerQb))
             ->setBufferSize(1)
             ->setPageCallback(function () {
                 $this->getEmailEntityManager()->flush();

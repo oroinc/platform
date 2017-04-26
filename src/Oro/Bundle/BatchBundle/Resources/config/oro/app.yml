@@ -1,0 +1,12 @@
+doctrine:
+    orm:
+        entity_managers:
+            batch:
+                connection: default
+                mappings:
+                    AkeneoBatchBundle:
+                        mapping: true
+                        is_bundle: true
+                metadata_cache_driver:
+                    type: service
+                    id:   oro_batch.cache.doctrine_metadata

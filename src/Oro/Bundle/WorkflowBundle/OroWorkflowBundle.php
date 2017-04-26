@@ -7,12 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddAttributeNormalizerCompilerPass;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddWorkflowValidationLoaderCompilerPass;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\EventTriggerExtensionCompilerPass;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowConfigurationHandlerCompilerPass;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowDefinitionBuilderExtensionCompilerPass;
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 
 class OroWorkflowBundle extends Bundle
 {
@@ -23,12 +18,12 @@ class OroWorkflowBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new AddAttributeNormalizerCompilerPass());
-        $container->addCompilerPass(new AddWorkflowValidationLoaderCompilerPass());
-        $container->addCompilerPass(new WorkflowChangesEventsCompilerPass());
-        $container->addCompilerPass(new EventTriggerExtensionCompilerPass());
-        $container->addCompilerPass(new WorkflowConfigurationHandlerCompilerPass);
-        $container->addCompilerPass(new WorkflowDefinitionBuilderExtensionCompilerPass);
+        $container->addCompilerPass(new Compiler\AddAttributeNormalizerCompilerPass());
+        $container->addCompilerPass(new Compiler\AddWorkflowValidationLoaderCompilerPass());
+        $container->addCompilerPass(new Compiler\WorkflowChangesEventsCompilerPass());
+        $container->addCompilerPass(new Compiler\EventTriggerExtensionCompilerPass());
+        $container->addCompilerPass(new Compiler\WorkflowConfigurationHandlerCompilerPass);
+        $container->addCompilerPass(new Compiler\WorkflowDefinitionBuilderExtensionCompilerPass);
 
         $addTopicMetaPass = AddTopicMetaPass::create();
         $addTopicMetaPass->add(Topics::EXECUTE_PROCESS_JOB);

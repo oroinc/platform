@@ -37,6 +37,7 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
         $threadQueryBuilder = $manager->getRepository('OroEmailBundle:Email')->createQueryBuilder('entity');
         $threadQueryBuilder->distinct()->select('entity.xThreadId');
         $threadQueryBuilder->addCriteria($criteria);
+        $threadQueryBuilder->orderBy('entity.xThreadId'); // critical for paginating on Postgre SQL
 
         $iterator = new BufferedQueryResultIterator($threadQueryBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);

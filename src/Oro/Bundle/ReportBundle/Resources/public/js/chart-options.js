@@ -141,11 +141,12 @@ define(function(require) {
 
             var optionsTemplate = this.optionsTemplate;
 
-            $.each(this.items, function() {
+            $.each(this.items, function(index, currentItem) {
                 var options = this.func;
                 var chain = util.pathToEntityChain(this.name).slice(1);
                 var entity = chain[chain.length - 1];
                 var items = data.results;
+                var updatedLabel = currentItem.label;
                 if (!entity || !Util.filterFields([entity.field], exclude).length) {
                     return;
                 }
@@ -156,7 +157,7 @@ define(function(require) {
                         item = _.findWhere(items, {path: this.path});
                         if (!item) {
                             item = {
-                                text: this.field.label,
+                                text: updatedLabel ? updatedLabel : this.field.label,
                                 path: this.path,
                                 children: []
                             };
@@ -175,7 +176,7 @@ define(function(require) {
                             id = this.path;
                         }
                         items.push({
-                            text: this.field.label,
+                            text: updatedLabel ? updatedLabel : this.field.label,
                             id: id
                         });
                     }

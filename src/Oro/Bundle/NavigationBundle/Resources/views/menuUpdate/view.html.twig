@@ -19,15 +19,15 @@
                     {% set actionButtons %}
                         <div class="pull-right">
                             {{ resetButton({
-                                'dataUrl': path('oro_navigation_menuupdate_reset', {menuName: entity.root.name, scopeId: scope.id}),
-                                'dataRedirect': path(menuViewRoute, {menuName: entity.root.name, scopeId: scope.id}),
+                                'dataUrl': path(routePrefix ~ 'ajax_reset', {menuName: entity.root.name, context: context}),
+                                'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.root.name, context: context}),
                                 'menuKey': entity.root.name
                             }) }}
 
                             {{ UI.buttonSeparator() }}
 
                             {% set html = UI.button({
-                                'path' : path(menuCreateRoute, {menuName: entity.root.name, scopeId: scope.id}),
+                                'path' : path(routePrefix ~ 'create', {menuName: entity.root.name, context: context}),
                                 'aCss': 'btn-primary',
                                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
                                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
@@ -40,8 +40,8 @@
                             'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                             'dataMethod': 'POST',
                             'dataRedirect': app.request.uri,
-                            'dataUrl': path('oro_navigation_menuupdate_create', {scopeId: scope.id, menuName: entity.name, parentKey: entity.name, 'isDivider': true}),
-                            'successMessage': 'oro.navigation.menuupdate.divider_created'
+                            'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: entity.name, parentKey: entity.name, 'isDivider': true}),
+                            'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')
                             }) %}
 
                             {% set parameters = {
@@ -74,7 +74,7 @@
 
         <div class="layout-content scrollable-container">
             {% block content_data %}
-                <div class="left-panel-container"
+                <div class="left-panel-container tree-component-container"
                      data-page-component-module="orodatagrid/js/app/components/grid-sidebar-component"
                      data-page-component-options="{{ componentOptions|json_encode }}">
                     <div class="placeholder">
@@ -93,20 +93,27 @@
                                         'data' : tree,
                                         'menu' : entity.root.name,
                                         'nodeId': entity.root.name,
-                                        'scopeId' : scope.id,
+                                        'context' : context,
                                         'updateAllowed' : true,
-                                        'onRootSelectRoute' : menuViewRoute,
-                                        'onSelectRoute' : menuUpdateRoute,
-                                        'onMoveRoute' : 'oro_navigation_menuupdate_move'
+                                        'view' : 'oronavigation/js/app/views/tree-manage-view',
+                                        'onRootSelectRoute' : routePrefix ~ 'view',
+                                        'onSelectRoute' : routePrefix ~ 'update',
+                                        'onMoveRoute' : routePrefix ~ 'ajax_move',
+                                        'successMessage': movedMessage|default('oro.ui.jstree.move_node_error')
                                     } %}
 
                                     {{ UI.renderJsTree(
                                         {
-                                            'module': 'oronavigation/js/app/components/tree-manage-component',
                                             'label': 'oro.navigation.menu.menu_list_default.label'|trans,
                                             'treeOptions': treeOptions
                                         },
-                                        ['expand', 'collapse']
+                                        {
+                                            'move': {
+                                                'view': 'oroui/js/app/views/jstree/move-action-view',
+                                                'routeName': routePrefix ~ 'move',
+                                                'routeParams': {menuName: entity.root.name, context: context}
+                                            }
+                                        }
                                     ) }}
                                 </div>
                             </div>
@@ -131,7 +138,7 @@
     {% set parameters = parameters|merge({
         'data': {
             'message': 'oro.navigation.menuupdate.reset_confirm'|trans({ '%menuKey%' : parameters.menuKey }),
-            'success-message': 'oro.navigation.menuupdate.reset_message'|trans({ '%menuKey%' : parameters.menuKey }),
+            'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : parameters.menuKey }),
             'ok-text': 'oro.navigation.menuupdate.reset_ok_text'|trans,
             'title': 'oro.navigation.menuupdate.reset_title'|trans,
             'url': url

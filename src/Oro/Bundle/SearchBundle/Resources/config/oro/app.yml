@@ -20,3 +20,9 @@ doctrine:
                 metadata_cache_driver:
                     type: service
                     id:   oro_search.cache.doctrine_metadata
+fos_rest:
+    exception:
+        messages:
+            'Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError': true
+        codes:
+            'Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError': HTTP_BAD_REQUEST

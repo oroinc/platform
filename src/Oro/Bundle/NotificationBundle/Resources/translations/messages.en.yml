@@ -14,6 +14,8 @@ oro:
 
         form:
             choose_event: Choose an event...
+            recipient_list:
+                empty: At least one Recipient must be specified.
 
         datagrid:
             action:

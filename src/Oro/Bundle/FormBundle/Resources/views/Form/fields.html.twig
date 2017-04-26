@@ -184,7 +184,7 @@
             {%- else -%}
                 {{ label|trans({}, translation_domain) }}
             {%- endif -%}
-            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
+             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {%- endif -%}
     {% endspaceless %}
@@ -700,10 +700,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {{ UI.renderJsTree(
         {
-            'module': form.vars.pageComponentModule,
             'treeOptions': form.vars.treeOptions
-        },
-        ['expand', 'collapse']
+        }
     ) }}
 
     {{ form_widget(form) }}

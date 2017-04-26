@@ -264,6 +264,8 @@ services:
             - [setAclManager, ["@oro_security.acl.manager"]]
             - [setAclPrivilegeRepository, ["@oro_security.acl.privilege_repository"]]
             - [setManagerRegistry, ["@doctrine"]]
+            - [setConfigurableName, ['default']]
+            - [setConfigurableFilter, ["@oro_security.filter.configurable_permission_filter"]]
 
     oro_user.form.handler.acl_role:
         parent: oro_user.form.handler.abstract.acl_role
@@ -271,18 +273,6 @@ services:
         calls:
             - [setRequest, ["@=service('request_stack').getCurrentRequest()"]]
             - [addExtensionFilter, ['action', '']]    # only default group actions are allowed
-
-    oro_user.form.handler.acl_role.commerce:
-        parent: oro_user.form.handler.abstract.acl_role
-        calls:
-            - [addExtensionFilter, ['action', 'commerce']]
-            - [addExtensionFilter, ['entity', 'commerce']]
-
-    oro_user.form.handler.acl_role.backend:
-        parent: oro_user.form.handler.abstract.acl_role
-        calls:
-            - [addExtensionFilter, ['action', '']]
-            - [addExtensionFilter, ['entity', '']]
 
     oro_user.form.handler.set_password:
         class: %oro_user.form.handler.set_password.class%

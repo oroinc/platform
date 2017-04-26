@@ -10,6 +10,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -88,7 +89,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
 
         self::assertBenchmark(
             __METHOD__,
-            7,
+            6.5,
             function () use ($configManager) {
                 $configManager->getConfigs('test');
             }
@@ -118,7 +119,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
 
         self::assertBenchmark(
             __METHOD__,
-            2,
+            1.7,
             function () use ($configManager) {
                 $configManager->getConfigs('test', 'Entity1');
             }
@@ -178,7 +179,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
 
         self::assertBenchmark(
             __METHOD__,
-            1.3,
+            1.1,
             function () use ($configManager) {
                 $configManager->getIds('test', 'Entity1');
             }
@@ -193,9 +194,42 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
 
         self::assertBenchmark(
             __METHOD__,
-            1.3,
+            1.1,
             function () use ($configManager) {
                 $configManager->getIds('test', 'Entity1', true);
+            }
+        );
+    }
+
+    public function testHasConfigForEntity()
+    {
+        $configManager = $this->createConfigManager();
+        $className = 'Entity1';
+        // warm-up cache
+        $this->assertTrue($configManager->hasConfig($className));
+
+        self::assertBenchmark(
+            __METHOD__,
+            0.1,
+            function () use ($configManager, $className) {
+                $configManager->hasConfig($className);
+            }
+        );
+    }
+
+    public function testHasConfigForField()
+    {
+        $configManager = $this->createConfigManager();
+        $className = 'Entity1';
+        $fieldName = 'field1';
+        // warm-up cache
+        $this->assertTrue($configManager->hasConfig($className, $fieldName));
+
+        self::assertBenchmark(
+            __METHOD__,
+            0.1,
+            function () use ($configManager, $className, $fieldName) {
+                $configManager->hasConfig($className, $fieldName);
             }
         );
     }
@@ -420,17 +454,13 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->willReturn(null);
 
-        $databaseChecker = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $databaseChecker->expects(self::any())
-            ->method('checkDatabase')
-            ->willReturn(true);
+        $lockObject = new LockObject();
+        $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], true);
 
         return new ConfigManager(
             $this->eventDispatcher,
             $this->metadataFactory,
-            new ConfigModelManager($emLink, new LockObject(), $databaseChecker),
+            new ConfigModelManager($emLink, $lockObject, $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache(new ArrayCache(), new ArrayCache())
         );

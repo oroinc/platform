@@ -44,6 +44,7 @@
             data: data,
             enableFilters: enableFilters,
             enableToggleFilters: enableToggleFilters,
+            filterContainerSelector: renderParams.filterContainerSelector is defined ? renderParams.filterContainerSelector : null,
             filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : null,
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
@@ -51,9 +52,8 @@
             themeOptions: renderParams.themeOptions|default({}),
             toolbarOptions: renderParams.toolbarOptions|default({})
         } %}
-
         <div id="{{ gridId }}"
-             data-page-component-module="orodatagrid/js/app/components/datagrid-component"
+             data-page-component-module="{{ renderParams.datagridComponent|default("orodatagrid/js/app/components/datagrid-component") }}"
              data-page-component-name="{{ options.gridName }}"
              data-page-component-options="{{ options|json_encode }}"
              {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}>

@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Twig;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -11,34 +13,55 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class EntityExtension extends \Twig_Extension
 {
-    /** @var EntityIdAccessor */
-    protected $entityIdAccessor;
-
-    /** @var EntityRoutingHelper */
-    protected $entityRoutingHelper;
-
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param EntityIdAccessor    $entityIdAccessor
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param EntityNameResolver  $entityNameResolver
-     * @param EntityAliasResolver $entityAliasResolver
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        EntityIdAccessor $entityIdAccessor,
-        EntityRoutingHelper $entityRoutingHelper,
-        EntityNameResolver $entityNameResolver,
-        EntityAliasResolver $entityAliasResolver
-    ) {
-        $this->entityIdAccessor    = $entityIdAccessor;
-        $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->entityNameResolver  = $entityNameResolver;
-        $this->entityAliasResolver = $entityAliasResolver;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @return EntityIdAccessor
+     */
+    protected function getEntityIdAccessor()
+    {
+        return $this->container->get('oro_entity.entity_identifier_accessor');
+    }
+
+    /**
+     * @return EntityRoutingHelper
+     */
+    protected function getEntityRoutingHelper()
+    {
+        return $this->container->get('oro_entity.routing_helper');
+    }
+
+    /**
+     * @return EntityNameResolver
+     */
+    protected function getEntityNameResolver()
+    {
+        return $this->container->get('oro_entity.entity_name_resolver');
+    }
+
+    /**
+     * @return EntityAliasResolver
+     */
+    protected function getEntityAliasResolver()
+    {
+        return $this->container->get('oro_entity.entity_alias_resolver');
+    }
+
+    /**
+     * @return EntityFallbackResolver
+     */
+    protected function getEntityFallbackResolver()
+    {
+        return $this->container->get('oro_entity.fallback.resolver.entity_fallback_resolver');
     }
 
     /**
@@ -50,7 +73,8 @@ class EntityExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_class_name', [$this, 'getClassName']),
             new \Twig_SimpleFunction('oro_url_class_name', [$this, 'getUrlClassName']),
             new \Twig_SimpleFunction('oro_class_alias', [$this, 'getClassAlias']),
-            new \Twig_SimpleFunction('oro_action_params', [$this, 'getActionParams'])
+            new \Twig_SimpleFunction('oro_action_params', [$this, 'getActionParams']),
+            new \Twig_SimpleFunction('oro_entity_fallback_value', [$this, 'getFallbackValue']),
         ];
     }
 
@@ -80,10 +104,11 @@ class EntityExtension extends \Twig_Extension
         }
 
         $className = ClassUtils::getRealClass($object);
+        if (!$escape) {
+            return $className;
+        }
 
-        return $escape
-            ? $this->entityRoutingHelper->getUrlSafeClassName($className)
-            : $className;
+        return $this->getEntityRoutingHelper()->getUrlSafeClassName($className);
     }
 
     /**
@@ -94,7 +119,7 @@ class EntityExtension extends \Twig_Extension
      */
     public function getUrlClassName($className)
     {
-        return $this->entityRoutingHelper->getUrlSafeClassName($className);
+        return $this->getEntityRoutingHelper()->getUrlSafeClassName($className);
     }
 
     /**
@@ -114,8 +139,8 @@ class EntityExtension extends \Twig_Extension
         $className = ClassUtils::getRealClass($object);
 
         return $isPlural
-            ? $this->entityAliasResolver->getPluralAlias($className)
-            : $this->entityAliasResolver->getAlias($className);
+            ? $this->getEntityAliasResolver()->getPluralAlias($className)
+            : $this->getEntityAliasResolver()->getAlias($className);
     }
 
     /**
@@ -130,9 +155,9 @@ class EntityExtension extends \Twig_Extension
             return [];
         }
 
-        return $this->entityRoutingHelper->getRouteParameters(
+        return $this->getEntityRoutingHelper()->getRouteParameters(
             $this->getClassName($object, true),
-            $this->entityIdAccessor->getIdentifier($object),
+            $this->getEntityIdAccessor()->getIdentifier($object),
             $action
         );
     }
@@ -147,7 +172,19 @@ class EntityExtension extends \Twig_Extension
      */
     public function getEntityName($object, $locale = null)
     {
-        return $this->entityNameResolver->getName($object, null, $locale);
+        return $this->getEntityNameResolver()->getName($object, null, $locale);
+    }
+
+    /**
+     * @param object $object
+     * @param string $objectFieldName
+     * @param int    $level
+     *
+     * @return mixed
+     */
+    public function getFallbackValue($object, $objectFieldName, $level = 1)
+    {
+        return $this->getEntityFallbackResolver()->getFallbackValue($object, $objectFieldName, $level);
     }
 
     /**

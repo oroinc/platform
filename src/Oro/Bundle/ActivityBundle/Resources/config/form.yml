@@ -11,6 +11,7 @@ services:
             - '@security.token_storage'
             - '@event_dispatcher'
             - '@oro_entity.entity_name_resolver'
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: form.type, alias: oro_activity_contexts_select }
 

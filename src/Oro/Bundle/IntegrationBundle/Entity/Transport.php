@@ -28,6 +28,13 @@ abstract class Transport
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+    
+    /**
+     * @var Channel
+     *
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel", mappedBy="transport")
+     */
+    protected $channel;
 
     /**
      * @return mixed
@@ -35,6 +42,26 @@ abstract class Transport
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param Channel $channel
+     *
+     * @return $this
+     */
+    public function setChannel(Channel $channel)
+    {
+        $this->channel = $channel;
+
+        return $this;
+    }
+
+    /**
+     * @return Channel
+     */
+    public function getChannel()
+    {
+        return $this->channel;
     }
 
     /**

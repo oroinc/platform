@@ -17,6 +17,7 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_Test
     use EntityTrait;
 
     const ENTITY_CLASS = WorkflowAwareEntity::class;
+    const ENTITY_ID = 42;
     const FIELD = 'name';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -130,10 +131,14 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_Test
 
     /**
      * @param int $id
+     * @param array $fields
      * @return WorkflowAwareEntity|object
      */
-    protected function getMainEntity($id = 42)
+    protected function getMainEntity($id = self::ENTITY_ID, array $fields = [])
     {
-        return $this->getEntity(self::ENTITY_CLASS, ['id' => $id]);
+        return $this->getEntity(
+            self::ENTITY_CLASS,
+            array_merge(['id' => $id], $fields)
+        );
     }
 }

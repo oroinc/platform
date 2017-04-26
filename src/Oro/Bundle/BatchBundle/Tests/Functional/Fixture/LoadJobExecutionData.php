@@ -8,9 +8,13 @@ use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class LoadJobExecutionData extends AbstractFixture
+class LoadJobExecutionData extends AbstractFixture implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /** @var array */
     protected $jobInstances = [];
 
@@ -19,6 +23,8 @@ class LoadJobExecutionData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
+        $manager = $this->container->get('akeneo_batch.job_repository')->getJobManager();
+
         $this->clearJobTables($manager);
         $this->loadJobInstances($manager);
         $this->loadJobExecutions($manager);

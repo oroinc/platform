@@ -25,6 +25,9 @@ Datagrid listens on mediator for events:
 
 - `datagrid:doReset:<gridName>`
   Reset datagrid state
+  
+- `datagrid:changeColumnParam:<gridName>` - `columnName`, `option`, `value`
+  Sets column option value
 
 ###DOM events
 Datagrid emits DOM events on its $el element:

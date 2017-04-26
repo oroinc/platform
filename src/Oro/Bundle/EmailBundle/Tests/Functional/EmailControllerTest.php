@@ -4,9 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class EmailControllerTest extends WebTestCase
 {
     protected function setUp()
@@ -109,6 +106,9 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertResponseStatusCodeEquals($result, 200);
         $this->assertResponseContentTypeEquals($result, $attachment->getContentType());
+
+        $path = substr($this->client->getRequest()->getPathInfo(), 1);
+        $this->getContainer()->get('oro_attachment.file_manager')->deleteFile($path);
     }
 
     public function testDownloadAttachments()

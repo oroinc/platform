@@ -57,6 +57,18 @@ define(function(require) {
         },
 
         /**
+         *
+         * @returns {Array.<Object>}
+         */
+        getEntityRoutes: function() {
+            if (!this.data[this.entity]) {
+                return {};
+            }
+
+            return this.data[this.entity].routes || {};
+        },
+
+        /**
          * Parses path-string and returns array of objects
          *
          * Field Path:

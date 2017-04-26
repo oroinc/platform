@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
 
-/**
- * @dbIsolation
- */
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {
     protected function setUp()
@@ -64,7 +61,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
-        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName, '--no-ansi']);
+        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName], false);
 
         if ($exists) {
             $this->assertNotContains('No workflow definitions found.', $result);

@@ -1,0 +1,51 @@
+/*
+  Added during the fix of the bug: https://magecore.atlassian.net/browse/BB-7435
+  TODO: Should be refactor after closed https://magecore.atlassian.net/browse/BAP-13952
+*/
+.oro-workflow-transition-form {
+  textarea {
+    @extend .textarea;
+  }
+
+  .controls {
+    &.validation-error {
+      padding: 0;
+    }
+  }
+
+  .control-label {
+    label {
+      display: block;
+      margin-bottom: 12px;
+
+      font-size: $base-font-size;
+    }
+
+    &.validation-error {
+      background: none;
+
+      min-height: 10px;
+      padding: 0;
+
+      line-height: initial;
+
+      &:before {
+        display: none;
+      }
+
+      label {
+        color: get-color('additional', 'dark');
+
+        font-size: $base-font-size;
+      }
+    }
+  }
+}
+
+@include breakpoint('mobile-landscape') {
+  .oro-workflow-transition-form {
+    textarea {
+      width: 100%;
+    }
+  }
+}

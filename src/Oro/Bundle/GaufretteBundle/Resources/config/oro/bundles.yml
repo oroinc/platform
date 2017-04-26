@@ -1,0 +1,3 @@
+bundles:
+    - Knp\Bundle\GaufretteBundle\KnpGaufretteBundle
+    - Oro\Bundle\GaufretteBundle\OroGaufretteBundle

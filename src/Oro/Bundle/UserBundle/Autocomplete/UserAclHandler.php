@@ -341,8 +341,12 @@ class UserAclHandler implements SearchHandlerInterface
                     $organization->getId()
                 );
             }
-            $queryBuilder->join('user.businessUnits', 'bu')
-                ->andWhere($queryBuilder->expr()->in('bu.id', $resultBuIds));
+            $queryBuilder->join('user.businessUnits', 'bu');
+            if ($resultBuIds) {
+                $queryBuilder->andWhere($queryBuilder->expr()->in('bu.id', $resultBuIds));
+            } else {
+                $queryBuilder->andWhere('1 = 0');
+            }
         }
 
         return $queryBuilder->getQuery();

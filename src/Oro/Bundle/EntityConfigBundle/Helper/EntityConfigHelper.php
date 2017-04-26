@@ -25,6 +25,17 @@ class EntityConfigHelper
     }
 
     /**
+     * @param string $class
+     * @return array
+     */
+    public function getAvailableRoutes($class)
+    {
+        $metadata = $this->getConfigManager()->getEntityMetadata($this->configProvider->getClassName($class));
+
+        return $metadata ? $metadata->getRoutes() : [];
+    }
+
+    /**
      * @param string|object $class
      * @param array $routes
      * @param string $groupName

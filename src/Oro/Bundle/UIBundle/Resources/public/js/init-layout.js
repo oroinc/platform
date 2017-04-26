@@ -396,16 +396,14 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                                     mediator.execute('redirectTo', {url: redirectTo});
                                 }
                             } else {
-                                mediator.execute('hideLoading');
                                 mediator.execute('showFlashMessage', 'success', el.data('success-message'));
                             }
                         },
-                        error: function() {
-                            var message;
-                            message = el.data('error-message') ||
-                                __('An unexpected error has occurred. Please contact the system administrator.');
+                        errorHandlerMessage: function() {
+                            return el.data('error-message') || true;
+                        },
+                        complete: function() {
                             mediator.execute('hideLoading');
-                            mediator.execute('showMessage', 'error', message);
                         }
                     });
                 });

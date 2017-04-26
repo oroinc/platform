@@ -4,15 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
-use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
 use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
 
-/**
- * @dbIsolation
- */
 class MenuUpdateRepositoryTest extends WebTestCase
 {
     use UserUtilityTrait;
@@ -33,7 +30,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
 
         $this->loadFixtures(
             [
-                LoadMenuUpdateData::class
+                MenuUpdateData::class
             ]
         );
     }
@@ -50,6 +47,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
         array $expectedMenuUpdateReferences
     ) {
         $scopeIds = $this->getScopeIdsByReferences($scopeReferences);
+        /** @var MenuUpdate[] $actualMenuUpdates */
         $actualMenuUpdates = $this->repository->findMenuUpdatesByScopeIds($menuName, $scopeIds);
         $this->assertCount(count($expectedMenuUpdateReferences), $actualMenuUpdates);
         $menuUpdateIds = [];
@@ -71,24 +69,24 @@ class MenuUpdateRepositoryTest extends WebTestCase
                 'menu' => 'application_menu',
                 'scopeReferences' => [LoadScopeData::DEFAULT_SCOPE],
                 'expectedMenuUpdateReferences' => [
-                    LoadMenuUpdateData::MENU_UPDATE_1,
-                    LoadMenuUpdateData::MENU_UPDATE_1_1,
-                    LoadMenuUpdateData::MENU_UPDATE_2,
-                    LoadMenuUpdateData::MENU_UPDATE_2_1,
-                    LoadMenuUpdateData::MENU_UPDATE_2_1_1,
+                    MenuUpdateData::MENU_UPDATE_1,
+                    MenuUpdateData::MENU_UPDATE_1_1,
+                    MenuUpdateData::MENU_UPDATE_2,
+                    MenuUpdateData::MENU_UPDATE_2_1,
+                    MenuUpdateData::MENU_UPDATE_2_1_1,
                 ]
             ],
             'global and user scopes' => [
                 'menu' => 'application_menu',
                 'scopeReferences' => [LoadScopeData::DEFAULT_SCOPE, LoadScopeUserData::SIMPLE_USER_SCOPE],
                 'expectedMenuUpdateReferences' => [
-                    LoadMenuUpdateData::MENU_UPDATE_1,
-                    LoadMenuUpdateData::MENU_UPDATE_1_1,
-                    LoadMenuUpdateData::MENU_UPDATE_2,
-                    LoadMenuUpdateData::MENU_UPDATE_2_1,
-                    LoadMenuUpdateData::MENU_UPDATE_2_1_1,
-                    LoadMenuUpdateData::MENU_UPDATE_3,
-                    LoadMenuUpdateData::MENU_UPDATE_3_1,
+                    MenuUpdateData::MENU_UPDATE_1,
+                    MenuUpdateData::MENU_UPDATE_1_1,
+                    MenuUpdateData::MENU_UPDATE_2,
+                    MenuUpdateData::MENU_UPDATE_2_1,
+                    MenuUpdateData::MENU_UPDATE_2_1_1,
+                    MenuUpdateData::MENU_UPDATE_3,
+                    MenuUpdateData::MENU_UPDATE_3_1,
                 ]
             ],
         ];
@@ -125,19 +123,19 @@ class MenuUpdateRepositoryTest extends WebTestCase
                 'menu' => 'application_menu',
                 'scopeReference' => LoadScopeData::DEFAULT_SCOPE,
                 'expectedMenuUpdateReferences' => [
-                    LoadMenuUpdateData::MENU_UPDATE_1,
-                    LoadMenuUpdateData::MENU_UPDATE_1_1,
-                    LoadMenuUpdateData::MENU_UPDATE_2,
-                    LoadMenuUpdateData::MENU_UPDATE_2_1,
-                    LoadMenuUpdateData::MENU_UPDATE_2_1_1,
+                    MenuUpdateData::MENU_UPDATE_1,
+                    MenuUpdateData::MENU_UPDATE_1_1,
+                    MenuUpdateData::MENU_UPDATE_2,
+                    MenuUpdateData::MENU_UPDATE_2_1,
+                    MenuUpdateData::MENU_UPDATE_2_1_1,
                 ]
             ],
             'user scope' => [
                 'menu' => 'application_menu',
                 'scopeReference' => LoadScopeUserData::SIMPLE_USER_SCOPE,
                 'expectedMenuUpdateReferences' => [
-                    LoadMenuUpdateData::MENU_UPDATE_3,
-                    LoadMenuUpdateData::MENU_UPDATE_3_1,
+                    MenuUpdateData::MENU_UPDATE_3,
+                    MenuUpdateData::MENU_UPDATE_3_1,
                 ]
             ],
         ];

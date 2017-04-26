@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -17,6 +18,7 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowApplicabilityFilterInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
@@ -77,7 +79,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $this->workflowRegistry,
             $this->doctrineHelper,
             $this->eventDispatcher,
-            $this->entityConnector
+            $this->entityConnector,
+            new StartedWorkflowsBag()
         );
         $this->workflowManager->setLogger($this->logger);
     }
@@ -1173,10 +1176,21 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $restrictionManager */
+        $variableManager = $this->getMockBuilder(VariableManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(
-                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
-            )
+            ->setConstructorArgs([
+                $doctrineHelper,
+                    $aclManager,
+                    $restrictionManager,
+                    null,
+                    $attributeManager,
+                    $transitionManager,
+                    $variableManager
+                ])
             ->setMethods(
                 [
                     'isTransitionAllowed',

@@ -42,7 +42,7 @@ services:
         public: false
         arguments:
             - '@oro_importexport.context_registry'
-            - '@translator'
+            - '@oro_translation.repository.language'
 
     # Writer
     oro_translation.importexport.writer.translations:

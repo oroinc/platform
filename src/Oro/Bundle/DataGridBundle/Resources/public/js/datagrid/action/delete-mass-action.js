@@ -135,7 +135,8 @@ define([
                     this.allowOk = false;
                 } else if (data.deletable <= data.max_limit) {
                     if (data.deletable >= data.selected) {
-                        this.confirmMessage = __(this.confirmMessages.selected_message, {selected: data.selected});
+                        var placeholders = {selected: data.selected};
+                        this.confirmMessage = __(this.confirmMessages.selected_message, placeholders, data.selected);
                     } else {
                         this.confirmMessage = __(this.confirmMessages.restricted_access_message, {
                             deletable: data.deletable,

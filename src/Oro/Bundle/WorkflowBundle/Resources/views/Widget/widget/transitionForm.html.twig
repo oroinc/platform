@@ -51,7 +51,7 @@
                   id="{{ form.vars.id }}"
                   name="{{ form.vars.name }}"
                   action="{{ app.request.uri }}"
-                  class="form-dialog"
+                  class="form-dialog oro-workflow-transition-form"
             {% if transition.frontendOptions.pageComponent is defined %}{{ UI.renderPageComponentAttributes(transition.frontendOptions.pageComponent) }}{% endif %}>
                 {{ form_row(form) }}
             </form>

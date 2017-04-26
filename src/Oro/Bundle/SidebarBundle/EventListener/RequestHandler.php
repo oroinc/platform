@@ -10,12 +10,6 @@ use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 
 class RequestHandler
 {
-    /** @var WidgetDefinitionRegistry */
-    private $widgetDefinitionsRegistry = false;
-
-    /** @var AssetHelper */
-    private $assetHelper = false;
-
     /** @var ContainerInterface */
     private $container;
 
@@ -32,8 +26,8 @@ class RequestHandler
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $definitions = $this->getWidgetDefinitionsRegistry()->getWidgetDefinitions();
-
+        $widgetDefinitionsRegistry = $this->getWidgetDefinitionsRegistry();
+        $definitions = $widgetDefinitionsRegistry->getWidgetDefinitions();
         if ($definitions->isEmpty()) {
             return;
         }
@@ -47,7 +41,7 @@ class RequestHandler
             }
         }
 
-        $this->getWidgetDefinitionsRegistry()->setWidgetDefinitions($definitions);
+        $widgetDefinitionsRegistry->setWidgetDefinitions($definitions);
     }
 
     /**
@@ -55,11 +49,7 @@ class RequestHandler
      */
     protected function getWidgetDefinitionsRegistry()
     {
-        if ($this->widgetDefinitionsRegistry === false) {
-            $this->widgetDefinitionsRegistry = $this->container->get('oro_sidebar.widget_definition.registry');
-        }
-
-        return $this->widgetDefinitionsRegistry;
+        return $this->container->get('oro_sidebar.widget_definition.registry');
     }
 
     /**
@@ -67,10 +57,6 @@ class RequestHandler
      */
     protected function getAssetHelper()
     {
-        if ($this->assetHelper === false) {
-            $this->assetHelper = $this->container->get('assets.packages');
-        }
-
-        return $this->assetHelper;
+        return $this->container->get('assets.packages');
     }
 }
