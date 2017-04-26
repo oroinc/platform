@@ -2,8 +2,6 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
-use Symfony\Component\Filesystem\LockHandler;
-
 class JobRunner
 {
     /**
@@ -27,28 +25,17 @@ class JobRunner
     }
 
     /**
-     * @param string   $ownerId
-     * @param string   $name
+     * @param string $ownerId
+     * @param string $name
      * @param \Closure $runCallback
      *
      * @return mixed
-     *
-     * @throws \Exception
      */
     public function runUnique($ownerId, $name, \Closure $runCallback)
     {
-        $lockHandler = new LockHandler(sprintf('%s_%s', 'oro_message_queue_unique_job', $name));
-        if (!$lockHandler->lock()) {
-            return null;
-        }
-
         $rootJob = $this->jobProcessor->findOrCreateRootJob($ownerId, $name, true);
         if (!$rootJob) {
-            $rootJob = $this->jobProcessor->findRootJobByUniqueName($name);
-            if (!$rootJob) {
-                $lockHandler->release();
-                return null;
-            }
+            return null;
         }
 
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $rootJob);
@@ -65,13 +52,11 @@ class JobRunner
 
         $result = $this->callbackResult($runCallback, $childJob);
 
-        if (! $childJob->getStoppedAt()) {
+        if (!$childJob->getStoppedAt()) {
             $result
                 ? $this->jobProcessor->successChildJob($childJob)
                 : $this->jobProcessor->failChildJob($childJob);
         }
-
-        $lockHandler->release();
 
         return $result;
     }
