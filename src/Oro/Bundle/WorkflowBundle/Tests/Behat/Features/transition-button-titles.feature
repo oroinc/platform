@@ -26,6 +26,10 @@ Feature: Transition button titles
     And I fill "Workflow Step Edit Form" with:
       | Name | Step With Titles and Attributes |
     And I press "Apply"
+    And I press "Add step"
+    And I fill "Workflow Step Edit Form" with:
+      | Name | Step on Page With Titles and Attributes |
+    And I press "Apply"
 
     And I press "Add transition"
     And I fill "Workflow Transition Edit Info Form" with:
@@ -64,6 +68,21 @@ Feature: Transition button titles
       | Entity field | First name |
     And press "Add"
     And press "Apply"
+    And press "Add transition"
+    And fill "Workflow Transition Edit Info Form" with:
+      | Name             | Transit on Page With Titles and Attributes                 |
+      | From step        | Step With Titles and Attributes                            |
+      | To step          | Step on Page With Titles and Attributes                    |
+      | View form        | Separate page                                              |
+      | Destination Page | Original Page                                              |
+      | Warning message  | Transit on Page With Titles and Attributes Warning Message |
+      | Button Label     | Transit on Page With Titles and Attributes Label           |
+      | Button Title     | Transit on Page With Titles and Attributes Title           |
+    And press "Attributes"
+    And fill "Workflow Transition Edit Attributes Form" with:
+      | Entity field | First name |
+    And press "Add"
+    And press "Apply"
 
     And save and close form
     And click "Activate"
@@ -96,9 +115,9 @@ Feature: Transition button titles
     Then I should see following grid:
       | Step | Workflow Button titles: Step Without Button Title |
 
-    When I click "Transit With Titles Title" on row "user1@example.com" in grid
+    When I click "Transit With Titles Label" on row "user1@example.com" in grid
     Then I should see "UiWindow" with elements:
-      | Title        | Transit With Titles Title           |
+      | Title        | Transit With Titles Label           |
       | Content      | Transit With Titles Warning Message |
       | okButton     | Yes                                 |
       | cancelButton | Cancel                              |
@@ -106,14 +125,21 @@ Feature: Transition button titles
     Then I should see following grid:
       | Step | Workflow Button titles: Step With Button Titles |
 
-    When I click "Transit With Titles and Attributes Title" on row "user1@example.com" in grid
+    When I click "Transit With Titles and Attributes Label" on row "user1@example.com" in grid
     Then I should see "UiDialog" with elements:
-      | Title        | Transit With Titles and Attributes Title |
+      | Title        | Transit With Titles and Attributes Label |
       | okButton     | Submit                                   |
       | cancelButton | Cancel                                   |
     And click "Submit"
     Then I should see following grid:
       | Step | Workflow Button titles: Step With Titles and Attributes |
+
+    When I click "Transit on Page With Titles and Attributes Label" on row "user1@example.com" in grid
+    Then I should see that "Workflow Page Title" contains "Transit on Page With Titles and Attributes Label"
+    And I should see "Transit on Page With Titles and Attributes Warning Message"
+    And click "Submit"
+    Then I should see following grid:
+      | Step | Workflow Button titles: Step on Page With Titles and Attributes |
 
   Scenario: Check Titles on View Page
     Given I go to System/ User Management/ Users
@@ -143,7 +169,7 @@ Feature: Transition button titles
       | title | Transit With Titles Title |
     When I click "Transit With Titles Label"
     Then I should see "UiWindow" with elements:
-      | Title        | Transit With Titles Title           |
+      | Title        | Transit With Titles Label           |
       | Content      | Transit With Titles Warning Message |
       | okButton     | OK                                  |
       | cancelButton | Cancel                              |
@@ -153,7 +179,14 @@ Feature: Transition button titles
       | title | Transit With Titles and Attributes Title |
     When I click "Transit With Titles and Attributes Label"
     Then I should see "UiDialog" with elements:
-      | Title        | Transit With Titles and Attributes Title |
+      | Title        | Transit With Titles and Attributes Label |
       | okButton     | Submit                                   |
       | cancelButton | Cancel                                   |
+    And click "Submit"
+
+    Then I should see "Transit on Page With Titles and Attributes Label" button with attributes:
+      | title | Transit on Page With Titles and Attributes Title |
+    When I click "Transit on Page With Titles and Attributes Label"
+    Then I should see that "Workflow Page Title" contains "Transit on Page With Titles and Attributes Label"
+    And I should see "Transit on Page With Titles and Attributes Warning Message"
     And click "Submit"

@@ -22,6 +22,9 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      * Example: And I append grid "test-grid" for active workflow "My Workflow Title"
      *
      * @Then /^(?:|I )append grid "(?P<gridName>[^"]*)" for active workflow "(?P<workflowTitle>[^"]*)"$/
+     *
+     * @param string $gridName
+     * @param string $workflowTitle
      */
     public function iAppendGridForActiveWorkflow($gridName, $workflowTitle)
     {
@@ -33,6 +36,28 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $workflow->getDefinition()->setConfiguration($configuration);
 
         $this->getContainer()->get('doctrine')->getManagerForClass(WorkflowDefinition::class)->flush();
+    }
+
+    /**
+     * Example: And I allow workflow "My Workflow Title" for "default" application
+     *
+     * @Then /^(?:|I )allow workflow "(?P<workflowTitle>[^"]*)" for "(?P<group>[^"]*)" application$/
+     *
+     * @param string $workflowTitle
+     * @param string $group
+     */
+    public function iAllowWorkflowForApplication($workflowTitle, $group)
+    {
+        $workflow = $this->getWorkflowByTitle($workflowTitle);
+        self::assertNotNull($workflow, sprintf('There is no workflow with title "%s"', $workflowTitle));
+
+        $applications = $workflow->getDefinition()->getApplications();
+        $applications[] = $group;
+
+        $workflow->getDefinition()->setApplications($applications);
+
+        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine->getManagerForClass(WorkflowDefinition::class)->flush();
     }
 
     /**

@@ -1,5 +1,9 @@
 oro_behat_extension:
   elements:
+    Workflow Page Title:
+      selector: 'div.top-row h1, h1.page-title span.page-title__text'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     Workflow Transition Form:
       selector: 'form[name="oro_workflow_transition"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form

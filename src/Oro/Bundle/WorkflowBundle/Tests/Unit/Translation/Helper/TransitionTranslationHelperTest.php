@@ -89,6 +89,28 @@ class TransitionTranslationHelperTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
             ],
+            'full labels without predefined title' => [
+                'input' => [
+                    'translates' => [
+                        ['UntranslatedLabel', [], 'workflows', null, 'TranslatedLabel'],
+                        ['UntranslatedButtonLabel', [], 'workflows', null, 'TranslatedButtonLabel'],
+                        ['UntranslatedButtonTitle', [], 'workflows', null, 'TranslatedButtonTitle'],
+                    ],
+                    'label' => 'UntranslatedLabel',
+                    'buttonLabel' => 'UntranslatedButtonLabel',
+                    'buttonTitle' => 'UntranslatedButtonTitle',
+                    'frontendOptions' => []
+                ],
+                'expected' => [
+                    'buttonLabel' => 'TranslatedButtonLabel',
+                    'buttonTitle' => 'TranslatedButtonTitle',
+                    'frontendOptions' => [
+                        'message' => [
+                            'title' => 'TranslatedButtonLabel',
+                        ],
+                    ]
+                ],
+            ],
             'no translate for button title' => [
                 'input' => [
                     'translates' => [

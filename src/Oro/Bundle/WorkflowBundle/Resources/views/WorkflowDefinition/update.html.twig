@@ -222,7 +222,7 @@
                                 </div>
 
                                 <div class="control-group">
-                                    {{ _self.render_label("oro.workflow.form.button_label.label"|trans) }}
+                                    {{ _self.render_label("oro.workflow.form.button_label.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_label.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="button_label" value="<%- button_label %>">
                                         <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_label) { %>
@@ -231,7 +231,7 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
-                                    {{ _self.render_label("oro.workflow.form.button_title.label"|trans) }}
+                                    {{ _self.render_label("oro.workflow.form.button_title.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_title.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="button_title" value="<%- button_title %>">
                                         <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_title) { %>

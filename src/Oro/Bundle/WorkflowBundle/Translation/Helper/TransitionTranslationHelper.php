@@ -41,7 +41,7 @@ class TransitionTranslationHelper
 
         $frontendOptions = $transition->getFrontendOptions();
         if (empty($frontendOptions['message']['title'])) {
-            $frontendOptions['message']['title'] = $transition->getButtonTitle();
+            $frontendOptions['message']['title'] = $transition->getButtonLabel();
         }
         $transition->setFrontendOptions($frontendOptions);
     }

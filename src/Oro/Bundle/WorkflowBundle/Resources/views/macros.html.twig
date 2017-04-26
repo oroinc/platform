@@ -75,6 +75,7 @@
     
     {% set data = data|merge({
         message: (message|default({}))|json_encode,
+        'transition-label': label
     }) %}
     
     {% set class %}
