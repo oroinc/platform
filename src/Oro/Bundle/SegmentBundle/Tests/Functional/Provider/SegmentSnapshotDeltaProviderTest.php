@@ -36,23 +36,6 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         $this->assertEquals($expectedEntityIds, $addedEntityIds->current());
     }
 
-    public function testGetAddedEntityIdsSegmentWithoutId()
-    {
-        $segment = new Segment();
-        $segment->setEntity(Segment::class);
-        $segment->setDefinition(json_encode(LoadSegmentDeltaData::SEGMENT_DEFINITION));
-        $expectedEntityIds = [
-            ['id' => $this->getReference(LoadSegmentDeltaData::SEGMENT_EXISTING)->getId()],
-            ['id' => $this->getReference(LoadSegmentDeltaData::SEGMENT_ADDED)->getId()]
-        ];
-
-        $actualEntityIds = $this->provider->getAddedEntityIds($segment)->current();
-
-        $expectedEntityIds = sort($expectedEntityIds);
-        $actualEntityIds = sort($actualEntityIds);
-        $this->assertEquals($expectedEntityIds, $actualEntityIds);
-    }
-
     public function testGetRemovedEntityIds()
     {
         $segment = $this->getReference(LoadSegmentDeltaData::SEGMENT);
@@ -64,14 +47,15 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         $this->assertEquals($expectedEntityIds, $removedEntityIds->current());
     }
 
-    public function testGetRemovedEntityIdsSegmentWithoutId()
+    public function testGetAllEntityIds()
     {
-        $segment = new Segment();
-        $segment->setEntity(Segment::class);
-        $segment->setDefinition(json_encode(LoadSegmentDeltaData::SEGMENT_DEFINITION));
+        $segment = $this->getReference(LoadSegmentDeltaData::SEGMENT);
+        $expectedEntityIds = [
+            ['id' => $this->getReference(LoadSegmentDeltaData::SEGMENT_EXISTING)->getId()],
+            ['id' => $this->getReference(LoadSegmentDeltaData::SEGMENT_ADDED)->getId()],
+        ];
 
-        $actualEntityIds = $this->provider->getRemovedEntityIds($segment);
-
-        $this->assertEmpty($actualEntityIds);
+        $removedEntityIds = $this->provider->getAllEntityIds($segment);
+        $this->assertEquals($expectedEntityIds, $removedEntityIds->current());
     }
 }

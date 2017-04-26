@@ -59,22 +59,20 @@ class SegmentSnapshotDeltaProvider
         $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
         $entitySegmentQueryBuilder->select($identifierField);
 
-        if ($segment->getId()) {
-            $segmentSnapshotQueryBuilder = $this->getSegmentSnapshotQueryBuilder($segment);
-            $entitySegmentQueryBuilder->andWhere(
-                $entitySegmentQueryBuilder->expr()->notIn(
-                    $identifierField,
-                    $segmentSnapshotQueryBuilder->getDQL()
-                )
-            );
+        $segmentSnapshotQueryBuilder = $this->getSegmentSnapshotQueryBuilder($segment);
+        $entitySegmentQueryBuilder->andWhere(
+            $entitySegmentQueryBuilder->expr()->notIn(
+                $identifierField,
+                $segmentSnapshotQueryBuilder->getDQL()
+            )
+        );
 
-            foreach ($segmentSnapshotQueryBuilder->getParameters() as $parameter) {
-                $entitySegmentQueryBuilder->setParameter(
-                    $parameter->getName(),
-                    $parameter->getValue(),
-                    $parameter->getType()
-                );
-            }
+        foreach ($segmentSnapshotQueryBuilder->getParameters() as $parameter) {
+            $entitySegmentQueryBuilder->setParameter(
+                $parameter->getName(),
+                $parameter->getValue(),
+                $parameter->getType()
+            );
         }
 
         return $this->getResultBatches(new BufferedIdentityQueryResultIterator($entitySegmentQueryBuilder));
@@ -82,14 +80,10 @@ class SegmentSnapshotDeltaProvider
 
     /**
      * @param Segment $segment
-     * @return \Generator|array
+     * @return \Generator
      */
     public function getRemovedEntityIds(Segment $segment)
     {
-        if (!$segment->getId()) {
-            return [];
-        }
-
         $entitySegmentQueryBuilder = $this->dynamicSegmentQB->getQueryBuilder($segment);
         $rootAliases = $entitySegmentQueryBuilder->getRootAliases();
         $rootAlias = reset($rootAliases);
@@ -113,6 +107,21 @@ class SegmentSnapshotDeltaProvider
         }
 
         return $this->getResultBatches(new BufferedIdentityQueryResultIterator($segmentSnapshotQueryBuilder));
+    }
+
+    /**
+     * @param Segment $segment
+     * @return \Generator
+     */
+    public function getAllEntityIds(Segment $segment)
+    {
+        $entitySegmentQueryBuilder = $this->dynamicSegmentQB->getQueryBuilder($segment);
+        $rootAliases = $entitySegmentQueryBuilder->getRootAliases();
+        $rootAlias = reset($rootAliases);
+        $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
+        $entitySegmentQueryBuilder->select($identifierField);
+
+        return $this->getResultBatches(new BufferedIdentityQueryResultIterator($entitySegmentQueryBuilder));
     }
 
     /**
