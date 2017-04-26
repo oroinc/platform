@@ -1,0 +1,164 @@
+services:
+    ## INITIALIZE
+
+    ## initialize base context attributes - max priority
+    oro_workflow.transit.initalize.base_context.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\BaseContextInitProcessor
+        arguments:
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: initialize, priority: 255 }
+
+    # workflow feature check
+    oro_workflow.transit.initialize.feature_check.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\FeatureCheckProcessor
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: initialize, priority: 200}
+
+    # initialize context options for start transition
+    oro_workflow.start_transit.initialize_context.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\StartContextInitProcessor
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: initialize, isStart: true, priority: 150 }
+
+    # initialize initial data for start transition for custom init options
+    oro_workflow.start_transit.initialize.data.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\StartInitDataProcessor
+        arguments:
+            - '@oro_action.provider.button_search_context'
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: initialize
+                isStart: true
+                hasInitOptions: true
+                priority: 100
+
+    # configure START transition temporary WorkflowItem instance
+    oro_workflow.start_transit.configure.workflow_item.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\StartWorkflowItemProcessor
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: configure, isStart: true, priority: 50 }
+
+    # configure form options
+    oro_workflow.transit.configure.default_from.options.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormOptionsProcessor
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: configure, customForm: false }
+
+    # form_init for custom form
+    oro_workflow.transit.configure.custom_form.options.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormOptionsProcessor
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: configure, customForm: true }
+
+    ## createForm: factory
+    oro_workflow.transit.create_form.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\FormFactoryProcessor
+        arguments:
+            - '@form.factory'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: createForm }
+
+    ## FORM HANDLERS
+    # regular transition default form processing
+    oro_workflow.transit.default_from.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormProcessor
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: processForm, customForm: false, isStart: false }
+
+    # start transition default form processing
+    oro_workflow.start_transit.default_form.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormStartHandleProcessor
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: processForm, customForm: false, isStart: true }
+
+    # processes both: start and regular transit
+    oro_workflow.transit.custom_form.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormProcessor
+        arguments:
+            - '@oro_form.registry.form_handler'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: processForm, customForm: true }
+
+    ## TRANSIT HANDLERS
+
+    # prepare to handle START transition DEFAULT form data
+    oro_workflow.start_transit.handle.custom_form_data.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFromStartWorkflowDataProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: handle
+                isStart: true
+                saved: true
+                customForm: true
+                priority: 50
+
+    # prepare to handle START transition CUSTOM form data
+    oro_workflow.start_transit.handle.default_from_data.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFromStartWorkflowDataProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: handle
+                isStart: true
+                saved: true
+                customForm: false
+                priority: 50
+
+    #handle start transition
+    oro_workflow.start_transit.handle.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\StartHandleProcessor
+        arguments:
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: handle, isStart: true, saved: true, priority: 10 }
+
+    #handle regular transition
+    oro_workflow.transit.handle.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionHandleProcessor
+        arguments:
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: handle, isStart: false, saved: true }
+
+    # NORMALIZERS
+    # normalise failures
+    oro_workflow.transit.normalize.error.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\ErrorNormalizeProcessor
+        arguments:
+            - '@logger'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: normalize, state: failure }
+            - { name: monolog.logger, channel: oro_workflow.processor }
+
+    oro_workflow.transit.normalize.resolve_frontend_options:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionOptionsResolveProcessor
+        arguments:
+            - '@oro_workflow.resolver.transition_options_resolver'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: normalize, state: ok, priority: 200 }
+
+    # RESULT PROVIDERS
+    # RESULT: failure http response
+    oro_workflow.transit.result.error.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\ErrorResponseProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                state: failure
+                priority: -200

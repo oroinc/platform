@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Cache;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-
-use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
+use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 
 class CacheConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,8 +24,8 @@ class CacheConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $compiler->process($container);
 
         $fileCacheDef = new Definition(
-            'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
-            ['%kernel.cache_dir%/oro']
+            MemoryCacheChain::class,
+            [[$this->getFilesystemCache('%kernel.cache_dir%/oro')]]
         );
         $fileCacheDef->setAbstract(true);
         $this->assertEquals(
@@ -29,8 +34,8 @@ class CacheConfigurationPassTest extends \PHPUnit_Framework_TestCase
         );
 
         $dataCacheDef = new Definition(
-            'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
-            ['%kernel.cache_dir%/oro_data']
+            MemoryCacheChain::class,
+            [[$this->getFilesystemCache('%kernel.cache_dir%/oro_data')]]
         );
         $dataCacheDef->setAbstract(true);
         $this->assertEquals(
@@ -39,10 +44,10 @@ class CacheConfigurationPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testExistCacheDefinitionsShouldNotBeChanged()
+    public function testExistingCacheDefinitionsShouldNotBeChanged()
     {
-        $fileCacheDef = new Definition('TestFileCache');
-        $dataCacheDef = new Definition('TestDataCache');
+        $fileCacheDef = new Definition(ArrayCache::class);
+        $dataCacheDef = new Definition(ArrayCache::class);
 
         $container = new ContainerBuilder();
         $container->setDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE, $fileCacheDef);
@@ -52,13 +57,34 @@ class CacheConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $compiler->process($container);
 
         $this->assertEquals(
-            $fileCacheDef,
+            (new Definition(
+                MemoryCacheChain::class,
+                [[$fileCacheDef]]
+            ))->setAbstract(true),
             $container->getDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE)
         );
         $this->assertEquals(
-            $dataCacheDef,
+            (new Definition(
+                MemoryCacheChain::class,
+                [[$dataCacheDef]]
+            ))->setAbstract(true),
             $container->getDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE)
         );
+    }
+
+    public function testExceptionIsThrownWhenInvalidCacheProviderGiven()
+    {
+        $fileCacheDef = new Definition(Cache::class);
+        $dataCacheDef = new Definition(Cache::class);
+
+        $container = new ContainerBuilder();
+        $container->setDefinition(CacheConfigurationPass::FILE_CACHE_SERVICE, $fileCacheDef);
+        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $dataCacheDef);
+
+        $compiler = new CacheConfigurationPass();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $compiler->process($container);
     }
 
     public function testDataCacheManagerConfiguration()
@@ -90,5 +116,20 @@ class CacheConfigurationPassTest extends \PHPUnit_Framework_TestCase
             $expectedDataCacheManagerDef,
             $container->getDefinition(CacheConfigurationPass::MANAGER_SERVICE_KEY)
         );
+    }
+
+    /**
+     * @param string $path
+     * @return Definition
+     */
+    private function getFilesystemCache($path)
+    {
+        $cacheDefinition = new Definition(
+            FilesystemCache::class,
+            [$path]
+        );
+        $cacheDefinition->setAbstract(true);
+
+        return $cacheDefinition;
     }
 }
