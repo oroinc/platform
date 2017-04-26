@@ -9,7 +9,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionPass;
-use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DoctrineTypeMappingProviderPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\MassActionProviderPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\OperationRegistryFilterPass;
