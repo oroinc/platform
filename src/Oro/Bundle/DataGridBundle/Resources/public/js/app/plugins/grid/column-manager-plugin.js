@@ -49,7 +49,9 @@ define(function(require) {
 
             this.main.columns.each(function(column, i) {
                 // set initial order
-                column.set('order', i, {silent: true});
+                if (column.get('order') !== Infinity) {
+                    column.set('order', i, {silent: true});
+                }
                 // collect manageable columns
                 if (column.get('manageable') !== false) {
                     managedColumns.push(column);
