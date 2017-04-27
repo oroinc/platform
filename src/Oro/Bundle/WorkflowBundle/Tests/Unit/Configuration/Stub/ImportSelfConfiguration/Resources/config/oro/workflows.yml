@@ -1,0 +1,36 @@
+imports:
+    - { workflow: foo,  as: bar, replace: ['transitions.transition_one']}
+    - { workflow: bar,  as: change, replace: []}
+workflows:
+    foo:
+        entity: Some\Entity
+        steps:
+            step_a:
+                allowed_transitions: []
+
+        attributes:
+            attribute1:
+                type: string
+        transitions:
+            transition_one:
+                is_start: true
+                step_to: step_a
+                frontend_options:
+                    icon: foo
+    bar:
+        entity: Some\Another\Entity
+        steps:
+            step_a:
+                allowed_transitions: ['transition_two']
+            step_b:
+                is_final: true
+        attributes:
+            attribute1:
+                type: string
+        transitions:
+            transition_two:
+                step_to: step_b
+                frontend_options:
+                    icon: foo
+    change:
+        entity: MyOwn\SuperCustom\Entity

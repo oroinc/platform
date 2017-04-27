@@ -1,3 +1,5 @@
+@ticket-BAP-14021
+@automatically-ticket-tagged
 @fixture-japanese-language.yml
 Feature: Language management
   In order to manage available languages

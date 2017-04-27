@@ -1,3 +1,5 @@
+@ticket-BAP-10956
+@automatically-ticket-tagged
 Feature: User Notes
   In order to have ability to manage notes
   As OroCRM sales rep

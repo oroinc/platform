@@ -1,3 +1,5 @@
+@ticket-BAP-13745
+@automatically-ticket-tagged
 Feature: Business Unit crud
   In order to keep organize my business structure
   As administrator
