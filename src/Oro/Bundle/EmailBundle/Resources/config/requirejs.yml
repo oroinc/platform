@@ -29,6 +29,7 @@ config:
         'oroemail/js/app/components/mark-unread-button': 'bundles/oroemail/js/app/components/mark-unread-button.js'
         'oroemail/js/app/components/folder-tree-component': 'bundles/oroemail/js/app/components/folder-tree-component.js'
         'oro/select2-email-recipients-component': 'bundles/oroemail/js/app/components/select2-email-recipients-component.js'
+        'oroemail/js/app/components/auto-response-rule-component': 'bundles/oroemail/js/app/components/auto-response-rule-component.js'
 
         'oroemail/js/datagrid/auto-response-rules-extension': 'bundles/oroemail/js/datagrid/auto-response-rules-extension.js'
         'oroemail/js/datagrid/listen-to-read-email-extension': 'bundles/oroemail/js/datagrid/listen-to-read-email-extension.js'

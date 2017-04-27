@@ -42,4 +42,19 @@ class CountryRepositoryTest extends WebTestCase
             }
         }
     }
+
+    public function testGetAllCountryNamesArray()
+    {
+        /** @var Country $testCountry */
+        $testCountry = $this->getReference(LoadCountryData::COUNTRY_MEXICO);
+        $countries = $this->repository->getAllCountryNamesArray();
+        $this->assertContains(
+            [
+                'iso2Code' => $testCountry->getIso2Code(),
+                'iso3Code' => $testCountry->getIso3Code(),
+                'name' => $testCountry->getName(),
+            ],
+            $countries
+        );
+    }
 }

@@ -48,9 +48,11 @@
             filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : null,
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
+            showViewsInCustomElement: renderParams.showViewsInCustomElement is defined ? renderParams.showViewsInCustomElement : false,
             inputName: oro_datagrid_build_inputname(datagrid.name),
             themeOptions: renderParams.themeOptions|default({}),
-            toolbarOptions: renderParams.toolbarOptions|default({})
+            toolbarOptions: renderParams.toolbarOptions|default({}),
+            gridViewsOptions: renderParams.gridViewsOptions|default({}),
         } %}
         <div id="{{ gridId }}"
              data-page-component-module="{{ renderParams.datagridComponent|default("orodatagrid/js/app/components/datagrid-component") }}"

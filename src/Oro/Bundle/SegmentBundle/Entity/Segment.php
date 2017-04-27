@@ -15,7 +15,7 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  * Segment
  *
  * @ORM\Table(name="oro_segment")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository")
  * @ORM\HasLifecycleCallbacks
  * @Config(
  *      routeName="oro_segment_index",
@@ -437,5 +437,17 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
         $this->recordsLimit = $recordsLimit;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDynamic()
+    {
+        if ($this->getType()) {
+            return $this->getType()->getName() === SegmentType::TYPE_DYNAMIC;
+        }
+
+        return false;
     }
 }

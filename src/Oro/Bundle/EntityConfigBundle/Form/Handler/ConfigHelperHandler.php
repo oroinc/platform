@@ -120,6 +120,7 @@ class ConfigHelperHandler
     {
         return [
             'entity_config' => $this->configHelper->getEntityConfigByField($fieldConfigModel, 'entity'),
+            'non_extended_entities_classes' => $this->configHelper->getNonExtendedEntitiesClasses(),
             'field_config' => $this->configHelper->getFieldConfig($fieldConfigModel, 'entity'),
             'field' => $fieldConfigModel,
             'form' => $form->createView(),

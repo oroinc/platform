@@ -3,8 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
+use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
 abstract class AbstractImportHandler extends AbstractHandler
 {
@@ -28,6 +31,26 @@ abstract class AbstractImportHandler extends AbstractHandler
                     sprintf('Not Found method for handle of "%s" process.', $process)
                 );
         }
+    }
+
+
+    /**
+     * @param string $jobName
+     * @param string $processorType
+     * @param FileStreamWriter $writer
+     * @return array
+     */
+    public function splitImportFile($jobName, $processorType, FileStreamWriter $writer)
+    {
+        $reader = $this->getJobReader($jobName, $processorType);
+
+        if (! $reader instanceof AbstractFileReader) {
+            throw new LogicException('Reader must be instance of AbstractFileReader');
+        }
+        $this->batchFileManager->setReader($reader);
+        $this->batchFileManager->setWriter($writer);
+
+        return $this->batchFileManager->splitFile($this->getImportingFileName());
     }
 
     /**
@@ -131,12 +154,15 @@ abstract class AbstractImportHandler extends AbstractHandler
             $counts['process'] = 0;
             $counts['read'] = $context->getReadCount();
             $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['replace'] = $context->getReplaceCount();
+            $counts['process'] += $counts['replace'] =  $context->getReplaceCount();
             $counts['process'] += $counts['update'] = $context->getUpdateCount();
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
             $counts['error_entries'] = $context->getErrorEntriesCount();
             $counts['errors'] += count($context->getErrors());
-
+            // for cases when data wasn't imported
+            if (! $jobResult->isSuccessful()) {
+                $counts['add'] = $counts['replace'] = $counts['update'] = $counts['delete'] = 0;
+            }
             return $counts;
         }
 

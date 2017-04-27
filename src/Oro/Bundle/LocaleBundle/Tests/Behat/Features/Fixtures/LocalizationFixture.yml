@@ -1,0 +1,53 @@
+include:
+    - ../../../../../../../../../platform/src/Oro/Bundle/TranslationBundle/Tests/Behat/Features/Fixtures/LanguageFixture.yml
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization1:
+        string: 'Localization 1'
+
+    title_localization2:
+        string: 'Localization 2'
+
+    title_localization3:
+        string: 'Localization 3'
+
+    title_localization4:
+        string: 'Localization 4'
+
+    title_localization5:
+        string: 'Localization 5'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization1:
+        name: 'Localization1'
+        language: '@language1'
+        formattingCode: 'en_CA'
+        titles: ['@title_localization1']
+
+    localization2:
+        name: 'Localization2'
+        language: '@language2'
+        formattingCode: 'en_CA'
+        titles: ['@title_localization2']
+        parentLocalization: '@localization1'
+
+    localization3:
+        name: 'Localization3'
+        language: '@language3'
+        formattingCode: 'en_CA'
+        titles: ['@title_localization3']
+        parentLocalization: '@localization1'
+
+    localization4:
+        name: 'Localization4'
+        language: '@language4'
+        formattingCode: 'en_CA'
+        titles: ['@title_localization4']
+        parentLocalization: '@localization2'
+
+    localization5:
+        name: 'Localization5'
+        language: '@language5'
+        formattingCode: 'en_CA'
+        titles: ['@title_localization5']
+        parentLocalization: '@localization2'

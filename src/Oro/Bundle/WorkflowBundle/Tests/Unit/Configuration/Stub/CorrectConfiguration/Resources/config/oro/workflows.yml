@@ -53,6 +53,19 @@ workflows:
                 var3:
                     type: 'string'
                     value: null
+                first_object:
+                    type: object
+                    value: '2017-03-15 00:00:00'
+                    options:
+                        class: DateTime
+                var_entity:
+                    type: entity
+                    property_path: null
+                    value: 1
+                    entity_acl:
+                        delete: false
+                    options:
+                        class: Oro\Bundle\UserBundle\Entity\User
 
         disable_operations:
             operation1: [entity1, entity2]
@@ -72,6 +85,8 @@ workflows:
                 destination_page: index
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
+                message_parameters:
+                    test: param
                 init_entities:
                     - entity1
                 init_routes:

@@ -17,7 +17,7 @@ layout:
                 themeOptions:
                     cellActionsHideCount: 3
                     cellLauncherOptions:
-                        launcherMode: 'icon-only' # 'icon-text' | 'icon-text' | 'text-only'
+                        launcherMode: 'icon-only' # 'icon-only' | 'icon-text' | 'text-only'
                         actionsState:  'hide'     # 'hide' | 'show'
 ```
 

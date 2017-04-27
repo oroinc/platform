@@ -4,38 +4,41 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
+use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\EntityBundle\ORM\Registry;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-
-use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
-use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
-use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
-use Oro\Bundle\EntityBundle\ORM\Registry;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
-use Oro\Bundle\EmailBundle\Form\Type\EmailType;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
-use Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
-use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailTypeTest extends TypeTestCase
 {
@@ -78,6 +81,21 @@ class EmailTypeTest extends TypeTestCase
      * @var EmailOriginHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $emailOriginHelper;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
+     * @var HtmlTagProvider
+     */
+    protected $htmlTagProvider;
+
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
 
     protected function setUp()
     {
@@ -231,6 +249,15 @@ class EmailTypeTest extends TypeTestCase
                     ->disableOriginalConstructor()
                     ->getMock();
 
+        $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->validator
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
+        $this->validator
+            ->method('getMetadataFor')
+            ->with('Symfony\Component\Form\Form')
+            ->willReturn($this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock());
+
         $contextsSelectType = new ContextsSelectType(
             $this->em,
             $configManager,
@@ -259,7 +286,8 @@ class EmailTypeTest extends TypeTestCase
                     $emailOriginFromType->getName() => $emailOriginFromType
                 ],
                 []
-            )
+            ),
+            new ValidatorExtension($this->validator),
         ];
     }
 
@@ -316,7 +344,6 @@ class EmailTypeTest extends TypeTestCase
                     'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
                     'intention'          => 'email',
                     'csrf_protection'    => true,
-                    'cascade_validation' => true
                 ]
             );
 
@@ -330,6 +357,9 @@ class EmailTypeTest extends TypeTestCase
         $this->assertEquals('oro_email_email', $type->getName());
     }
 
+    /**
+     * @return array
+     */
     public function messageDataProvider()
     {
         return [

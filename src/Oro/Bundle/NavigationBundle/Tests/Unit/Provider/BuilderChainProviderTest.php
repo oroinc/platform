@@ -135,6 +135,35 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeCount(1, 'menus', $this->provider);
     }
 
+    /**
+     * @dataProvider aliasDataProvider
+     * @param string $alias
+     * @param string $menuName
+     */
+    public function testGetWithoutCheck($alias, $menuName)
+    {
+        $options = ['check_access' => false];
+
+        $item = new MenuItemStub();
+
+        $menu = new MenuItemStub();
+        $menu->addChild($item);
+
+        $this->factory->expects($this->once())
+            ->method('createItem')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $builder = $this->getMenuBuilderMock();
+        $builder->expects($this->once())
+            ->method('build')
+            ->with($menu, $options, $menuName);
+        $this->provider->addBuilder($builder, $alias);
+
+        $this->assertInstanceOf('Knp\Menu\ItemInterface', $this->provider->get($menuName, $options));
+        $this->assertAttributeCount(0, 'menus', $this->provider);
+    }
+
     public function testGetCached()
     {
         $options = array();

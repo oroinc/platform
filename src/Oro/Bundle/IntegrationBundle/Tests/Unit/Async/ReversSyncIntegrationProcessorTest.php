@@ -16,6 +16,7 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Test\JobRunner;
@@ -25,6 +26,7 @@ use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,6 +59,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $this->createLoggerMock()
         );
     }
@@ -74,6 +77,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $logger
         );
 
@@ -96,6 +100,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $this->createLoggerMock()
         );
 
@@ -121,6 +126,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $logger
         );
 
@@ -155,6 +161,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $logger
         );
 
@@ -192,6 +199,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $this->createTypeRegistryMock(),
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $logger
         );
 
@@ -236,6 +244,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $reversSyncProcessorMock,
             $typeRegistryMock,
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $this->createLoggerMock()
         );
 
@@ -252,6 +261,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setType('theIntegrationType');
+        $integration->setOrganization(new Organization());
 
         $entityManagerMock = $this->createEntityManagerStub();
         $entityManagerMock
@@ -276,6 +286,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $typeRegistryMock,
             $jobRunner,
+            $this->createTokenStorageMock(),
             $this->createLoggerMock()
         );
 
@@ -296,6 +307,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setType('theIntegrationType');
+        $integration->setOrganization(new Organization());
 
         $entityManagerMock = $this->createEntityManagerStub();
         $entityManagerMock
@@ -319,6 +331,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createReversSyncProcessorMock(),
             $typeRegistryMock,
             new JobRunner(),
+            $this->createTokenStorageMock(),
             $this->createLoggerMock()
         );
 
@@ -395,5 +408,14 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     private function createLoggerMock()
     {
         return $this->createMock(LoggerInterface::class);
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject | TokenStorageInterface
+     */
+    private function createTokenStorageMock()
+    {
+        return $this->createMock(TokenStorageInterface::class);
     }
 }

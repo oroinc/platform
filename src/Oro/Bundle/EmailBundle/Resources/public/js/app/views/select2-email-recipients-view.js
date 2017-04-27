@@ -3,7 +3,6 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var base64 = require('base64');
     var BaseView = require('oroform/js/app/views/select2-view');
 
     var Select2EmailRecipientsView = BaseView.extend({
@@ -92,16 +91,17 @@ define(function(require) {
         _selectHighlighted: function(originalMethod) {
             var val = this.select2.search.val();
             if (val) {
-                var id = this._generateId(val);
                 var valueExistsAlready = _.some(this.select2.opts.element.inputWidget('data'), function(item) {
-                    return id === item.id;
+                    return val === item.text;
                 });
 
                 if (!valueExistsAlready) {
                     this.select2.onSelect({
-                        id: id,
+                        id: this._generateId(val),
                         text: val
                     });
+                } else {
+                    return false;
                 }
             }
             return originalMethod.apply(this.select2, _.rest(arguments));
@@ -161,14 +161,13 @@ define(function(require) {
                 if (withoutLast) {
                     rest = parts.pop();
                 }
-                var existingIds = _.pluck(this.select2.data(), 'id');
+                var existingValues = _.pluck(this.select2.data(), 'text');
                 parts.forEach(_.bind(function(item) {
                     item = item.trim();
                     if (item.length > 0) {
-                        var id = this._generateId(item);
-                        if (!_.contains(existingIds, id)) {
+                        if (!_.contains(existingValues, item)) {
                             this.select2.onSelect({
-                                id: id,
+                                id: this._generateId(item),
                                 text: item
                             }, {noFocus: !withoutLast});
                         }
@@ -181,7 +180,7 @@ define(function(require) {
         },
 
         _generateId: function(value) {
-            return base64.encode(encodeURIComponent(value));
+            return value;
         }
     }, {
         SEPARATORS: [',', ';']

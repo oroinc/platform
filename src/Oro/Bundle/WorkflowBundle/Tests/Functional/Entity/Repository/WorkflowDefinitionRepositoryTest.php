@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
@@ -104,5 +105,13 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->assertInternalType('array', $result);
         $this->assertGreaterThanOrEqual(1, count($result));
         $this->assertContains(WorkflowAwareEntity::class, $result);
+        $this->assertContains(Item::class, $result);
+
+        $result = $this->repository->getAllRelatedEntityClasses(true);
+
+        $this->assertInternalType('array', $result);
+        $this->assertGreaterThanOrEqual(1, count($result));
+        $this->assertContains(WorkflowAwareEntity::class, $result);
+        $this->assertNotContains(Item::class, $result);
     }
 }

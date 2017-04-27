@@ -1,5 +1,7 @@
-@fixture-../../../../../UserBundle/Tests/Behat/Features/Fixtures/user.yml
-@fixture-../../../../../OrganizationBundle/Tests/Behat/Features/Fixtures/BusinessUnit.yml
+@ticket-BAP-14137
+@automatically-ticket-tagged
+@fixture-OroUserBundle:user.yml
+@fixture-OroOrganizationBundle:BusinessUnit.yml
 Feature: Adding attributes for workflow transition
   In order to specify attributes for workflow transitions
   As an Administrator
@@ -36,6 +38,39 @@ Feature: Adding attributes for workflow transition
     And I press "Add"
     And I press "Apply"
     And I save and close form
+# Update cache
+    When I go to System/Localization/Translations
+    And I press "Update Cache"
+    Then I should see "Translation Cache has been updated" flash message
+
+  Scenario: Edit a workflow
+    Given I login as administrator
+    When I go to System/Workflows
+    And I click edit User Workflow Test in grid
+    And I click "Transition One"
+    And I click "Attributes"
+    And I fill "Workflow Transition Edit Attributes Form" with:
+      | Entity field | Avatar        |
+      | Label        | User`s avatar |
+    And I press "Add"
+    And I press "Apply"
+    And I save and close form
+
+  Scenario: Clone a workflow
+    Given I login as administrator
+    When I go to System/Workflows
+    And I click clone User Workflow Test in grid
+    And I fill "Workflow Edit Form" with:
+      | Name           | Cloned User Workflow Test |
+      | Related Entity | User                      |
+    And I click "Transition One"
+    And I click "Attributes"
+    And I fill "Workflow Transition Edit Attributes Form" with:
+      | Entity field | Organization        |
+      | Label        | User`s organization |
+    And I press "Add"
+    And I press "Apply"
+    And I save and close form
     And I press "Activate"
 # press Activate button in popup
     And I press "Activate"
@@ -50,6 +85,8 @@ Feature: Adding attributes for workflow transition
     When I click "Transition One"
     And I fill in "User`s first name" with "New Charlie`s Name"
     And I fill in "User`s owner" with "Child Business Unit"
+    And I should see "User`s avatar"
+    And I should see "User`s organization"
     When click "Submit"
     Then I should see "Step One"
     And I should see "New Charlie`s Name"

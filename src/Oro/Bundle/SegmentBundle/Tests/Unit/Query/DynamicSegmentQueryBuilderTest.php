@@ -19,8 +19,11 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
+use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
+
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
@@ -89,11 +92,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         );
         $result  = preg_replace('/(ts)(\d+)/', 't1', $result);
         $this->assertSame(
-            sprintf(
-                'SELECT DISTINCT t1.%s FROM %s t1 WHERE t1.email LIKE :string1',
-                self::TEST_IDENTIFIER_NAME,
-                self::TEST_ENTITY
-            ),
+            'SELECT t1.userName, t1.id FROM AcmeBundle:UserEntity t1 WHERE t1.email LIKE :string1',
             $result
         );
     }
@@ -205,14 +204,18 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $virtualFieldProvider = new ConfigVirtualFieldProvider($entityHierarchyProvider, []);
 
         $doctrine = $doctrine ? : $this->getDoctrine();
-        $builder  = new DynamicSegmentQueryBuilder(
-            new RestrictionBuilder($manager),
-            $manager,
-            $virtualFieldProvider,
-            $doctrine
-        );
 
-        return $builder;
+        $serviceLink = $this->getMockBuilder(ServiceLink::class)->disableOriginalConstructor()->getMock();
+        $serviceLink->expects($this->once())
+            ->method('getService')
+            ->willReturn(new SegmentQueryConverter(
+                $manager,
+                $virtualFieldProvider,
+                $doctrine,
+                new RestrictionBuilder($manager)
+            ));
+
+        return new DynamicSegmentQueryBuilder($serviceLink, $doctrine);
     }
 
 

@@ -196,7 +196,6 @@ By default the following form options are set:
 | --- | --- |
 | data_class | The class name of the entity |
 | validation_groups | ['Default', 'api'] |
-| extra_fields_message | This form should not contain extra fields: "{{ extra_fields }}" |
 
 Example:
 

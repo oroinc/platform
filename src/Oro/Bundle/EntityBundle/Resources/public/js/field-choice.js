@@ -7,6 +7,7 @@ define(function(require) {
     var Util = require('./entity-fields-util');
     require('jquery-ui');
     require('jquery.select2');
+    require('oroui/js/input-widget-manager');
 
     $.widget('oroentity.fieldChoice', {
         options: {
@@ -26,6 +27,10 @@ define(function(require) {
              *      [{name: 'id'}]    - will exclude all entries that has property "name" equals to "id"
              */
             exclude: [],
+            /*
+             * Format same as exclude option
+             */
+            include: [],
             fieldsLoaderSelector: ''
         },
 
@@ -80,6 +85,7 @@ define(function(require) {
                     return result.id !== void 0 ? result.id : result.pagePath;
                 },
                 data: function() {
+                    instance = self.element.data('select2');
                     var pagePath = (instance && instance.pagePath) || '';
                     var results = self._select2Data(pagePath);
                     return {
@@ -103,7 +109,6 @@ define(function(require) {
             }, this.options.select2);
 
             this.element.inputWidget('create', 'select2', {initializeOptions: select2Options});
-            instance = this.element.data('select2');
         },
 
         _destroy: function() {
@@ -163,6 +168,7 @@ define(function(require) {
                 .data('data', data);
 
             this.util.init(entity, data);
+            this.element.inputWidget('refresh');
         },
 
         setValue: function(value) {
@@ -218,6 +224,10 @@ define(function(require) {
 
             if (!_.isEmpty(this.options.exclude)) {
                 entityFields = Util.filterFields(entityFields, this.options.exclude);
+            }
+
+            if (!_.isEmpty(this.options.include)) {
+                entityFields = Util.filterFields(entityFields, this.options.include, true);
             }
 
             $.each(entityFields, function() {

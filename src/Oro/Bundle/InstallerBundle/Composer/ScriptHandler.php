@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\InstallerBundle\Composer;
 
+use Composer\Script\Event;
 use Sensio\Bundle\DistributionBundle\Composer\ScriptHandler as SensioScriptHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
-use Composer\Script\Event;
+use Symfony\Component\Yaml\Yaml;
 
 class ScriptHandler extends SensioScriptHandler
 {
@@ -54,6 +54,9 @@ class ScriptHandler extends SensioScriptHandler
         $permissionHandler = new PermissionsHandler();
         foreach ($directories as $directory) {
             $permissionHandler->setPermissions($directory);
+        }
+        if (file_exists($importExportDir = 'app/import_export')) {
+            $permissionHandler->setPermissions($importExportDir);
         }
     }
 
@@ -146,6 +149,7 @@ class ScriptHandler extends SensioScriptHandler
         if (!$pluginInstalled) {
             throw new \RuntimeException(
                 'NPM/Bower Dependency Manager for Composer is not installed. Please run from CLI:'.PHP_EOL.
+                '> composer self-update'.PHP_EOL.
                 '> composer global require fxp/composer-asset-plugin'.PHP_EOL.
                 'See https://github.com/fxpio/composer-asset-plugin for details and usage.'.PHP_EOL
             );

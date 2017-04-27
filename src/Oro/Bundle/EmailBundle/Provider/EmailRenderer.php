@@ -251,22 +251,28 @@ class EmailRenderer extends \Twig_Environment
                     }
 
                     // check if value exists
-                    $that->getValue($value, $propertyPath);
+                    $valueToRender = $that->getValue($value, $propertyPath);
 
                     $propertyName = lcfirst(Inflector::classify($propertyPath));
-                    if (is_object($value) && array_key_exists('default_formatter', $config)) {
-                        $valueClass       = ClassUtils::getRealClass($value);
-                        $defaultFormatter = $config['default_formatter'];
-                        if (array_key_exists($valueClass, $defaultFormatter)
-                            && array_key_exists($propertyName, $defaultFormatter[$valueClass])
-                            && !is_null($defaultFormatter[$valueClass][$propertyName])
-                        ) {
-                            return sprintf(
-                                '{{ %s|oro_format(\'%s\') }}',
-                                $path,
-                                $config['default_formatter'][ClassUtils::getRealClass($value)][$propertyName]
-                            );
+                    if (is_object($value)) {
+                        if (array_key_exists('default_formatter', $config)) {
+                            $valueClass       = ClassUtils::getRealClass($value);
+                            $defaultFormatter = $config['default_formatter'];
+                            if (array_key_exists($valueClass, $defaultFormatter)
+                                && array_key_exists($propertyName, $defaultFormatter[$valueClass])
+                                && !is_null($defaultFormatter[$valueClass][$propertyName])
+                            ) {
+                                return sprintf(
+                                    '{{ %s|oro_format(\'%s\') }}',
+                                    $path,
+                                    $config['default_formatter'][ClassUtils::getRealClass($value)][$propertyName]
+                                );
+                            }
                         }
+                    }
+
+                    if (is_object($valueToRender)) {
+                        return sprintf(sprintf('{{ %s|oro_format_name }}', $path));
                     }
 
                     return sprintf('{{ %s|oro_html_sanitize }}', $path);

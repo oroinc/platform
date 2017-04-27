@@ -108,4 +108,43 @@ class LanguageRepositoryTest extends WebTestCase
             $this->assertTrue(in_array($translation, $result));
         }
     }
+
+    /**
+     * @param Language[] $expected
+     * @param bool $enabled
+     *
+     * @dataProvider getLanguagesDataProvider
+     */
+    public function testGetLanguages(array $expected, $enabled)
+    {
+        $current = array_map(function (Language $lang) {
+            return $lang->getCode();
+        }, $this->repository->getLanguages($enabled));
+
+        $this->assertEquals($expected, $current);
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getLanguagesDataProvider()
+    {
+        yield 'only enabled' => [
+            'expected' => [
+                'en',
+                LoadLanguages::LANGUAGE2,
+                LoadLanguages::LANGUAGE3,
+            ],
+            'enabled' => true,
+        ];
+        yield 'all' => [
+            'expected' => [
+                'en',
+                LoadLanguages::LANGUAGE1,
+                LoadLanguages::LANGUAGE2,
+                LoadLanguages::LANGUAGE3,
+            ],
+            'enabled' => false,
+        ];
+    }
 }

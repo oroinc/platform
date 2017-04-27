@@ -12,6 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
@@ -40,6 +41,9 @@ class CommentApiManager extends ApiEntityManager
 
     /** @var EntityNameResolver */
     protected $entityNameResolver;
+
+    /** @var AttachmentManager */
+    protected $attachmentManager;
 
     /** @var AttachmentProvider */
     protected $attachmentProvider;
@@ -81,6 +85,14 @@ class CommentApiManager extends ApiEntityManager
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
         $this->setEventDispatcher($eventDispatcher);
+    }
+
+    /**
+     * @param AttachmentManager $attachmentManager
+     */
+    public function setAttachmentManager(AttachmentManager $attachmentManager)
+    {
+        $this->attachmentManager = $attachmentManager;
     }
 
     /**
@@ -221,6 +233,7 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * Get resized avatar
+     * @todo Should be moved after BAP-11405
      *
      * @param User $user
      *
@@ -229,7 +242,10 @@ class CommentApiManager extends ApiEntityManager
     protected function getCommentAvatarImageUrl($user)
     {
         $attachment = PropertyAccess::createPropertyAccessor()->getValue($user, self::AVATAR_FIELD_NAME);
-        if ($attachment && $attachment->getFilename()) {
+        if ($attachment &&
+            $attachment->getFilename() &&
+            ($this->attachmentManager instanceof AttachmentManager)
+        ) {
             $entityClass = ClassUtils::getRealClass($user);
             $config = $this->configManager
                 ->getProvider('attachment')

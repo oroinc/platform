@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Parameter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -14,14 +16,13 @@ class DateGroupingFilter extends ChoiceFilter
 {
     use ArrayTrait;
 
+    const NAME = 'date_grouping';
     const COLUMN_NAME_SUFFIX = 'DateGroupingFilter';
     const CALENDAR_TABLE = 'calendarDate';
     const CALENDAR_COLUMN = 'date';
     const CALENDAR_TABLE_FOR_GROUPING = 'calendarDate1';
     const CALENDAR_COLUMN_FOR_GROUPING = 'date';
-    const FIRST_JOINED_TABLE = 'order1';
-    const SECOND_JOINED_TABLE = 'order2';
-    const JOINED_COLUMN = 'createdAt';
+    const JOINED_TABLE = 'joinedTableAlias';
     const TARGET_COLUMN = 'date';
     const QUARTER_LENGTH = 3;
 
@@ -89,6 +90,7 @@ class DateGroupingFilter extends ChoiceFilter
                 );
                 break;
             case DateGroupingFilterType::TYPE_MONTH:
+                $this->handleCalendarDateSelect($qb, DateGroupingFilterType::TYPE_MONTH);
                 $this->addFilter(DateGroupingFilterType::TYPE_MONTH, $qb);
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
@@ -97,11 +99,12 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_MONTH],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                );
+                )->addGroupBy($columnName);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_MONTH);
                 break;
             case DateGroupingFilterType::TYPE_QUARTER:
+                $this->handleCalendarDateSelect($qb, DateGroupingFilterType::TYPE_QUARTER);
                 $this->addFilter(DateGroupingFilterType::TYPE_QUARTER, $qb);
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
@@ -110,19 +113,20 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_QUARTER],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                );
+                )->addGroupBy($columnName);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_QUARTER;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_QUARTER);
                 break;
             default:
+                $this->handleCalendarDateSelect($qb, DateGroupingFilterType::TYPE_YEAR);
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
                     sprintf(
                         "%s as $columnName",
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                );
+                )->addGroupBy($columnName);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_QUARTER;
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_YEAR;
@@ -130,6 +134,41 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return true;
+    }
+
+    /**
+     * Apply cast of filter type on calendar date select
+     *
+     * @param QueryBuilder $qb
+     * @param $filterType
+     */
+    protected function handleCalendarDateSelect(QueryBuilder $qb, $filterType)
+    {
+        $configDataName = $this->get(FilterUtility::DATA_NAME_KEY);
+
+        // Resetting dql selects for the need of altering the first one . By convention the first one is set as data
+        // for the filter
+        $selects = $qb->getDQLPart('select');
+        $qb->resetDQLPart('select');
+
+        // Retrieve first select
+        $calendarDateSelect = array_shift($selects);
+
+        // Retrieve first part of Select expression
+        $selectParts = $calendarDateSelect->getParts();
+        $firstPart = array_shift($selectParts);
+
+        // Apply filter type cast on date
+        $partWithCast = sprintf('%s(%s)', $filterType, $configDataName);
+        $firstPart = str_replace($configDataName, $partWithCast, $firstPart);
+
+        // Add new updated select
+        $qb->addSelect($firstPart);
+
+        // Add the rest of original selects
+        foreach ($selects as $select) {
+            $qb->add('select', $select, true);
+        }
     }
 
     /**
@@ -164,18 +203,22 @@ class DateGroupingFilter extends ChoiceFilter
      */
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
-        $whereClauseParameters = $qb->getParameters();
-        $extraWhereClauses = !$qb->getDQLPart('where') ?:
+        $extraWhereClauses = !$qb->getDQLPart('where') ? null :
             $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts());
+        $whereClauseParameters = $this->getExtraWhereParameters($qb->getParameters(), $extraWhereClauses);
         $usedDates = $this->getUsedDates(
             $filterType,
             $this->config['calendar_table_for_grouping'],
             $this->config['calendar_column_for_grouping'],
-            $this->config['first_joined_table'],
+            $this->config['joined_table'],
             $this->config['joined_column'],
             $extraWhereClauses,
             $whereClauseParameters
         );
+
+        if (!$usedDates) {
+            return;
+        }
 
         $qb->andWhere(
             $qb->expr()->orX(
@@ -303,9 +346,8 @@ class DateGroupingFilter extends ChoiceFilter
             ->getOr('calendar_table_for_grouping', self::CALENDAR_TABLE_FOR_GROUPING);
         $this->config['calendar_column_for_grouping'] = $this
             ->getOr('calendar_column_for_grouping', self::CALENDAR_COLUMN_FOR_GROUPING);
-        $this->config['first_joined_table'] = $this->getOr('first_joined_table', self::FIRST_JOINED_TABLE);
-        $this->config['second_joined_table'] = $this->getOr('second_joined_table', self::SECOND_JOINED_TABLE);
-        $this->config['joined_column'] = $this->getOr('joined_column', self::JOINED_COLUMN);
+        $this->config['joined_table'] = $this->getOr('joined_table', self::JOINED_TABLE);
+        $this->config['joined_column'] = $this->get('joined_column');
         $this->config['target_column'] = $this->getOr('target_column', self::TARGET_COLUMN);
         $this->config['not_nullable_field'] = $this->get('not_nullable_field');
         $this->config['calendar_entity'] = $this->get('calendar_entity');
@@ -335,6 +377,25 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return $extraWhereClauses;
+    }
+
+    /**
+     * @param ArrayCollection $parameters
+     * @param string $whereClauseParts
+     * @return ArrayCollection
+     */
+    protected function getExtraWhereParameters(ArrayCollection $parameters, $whereClauseParts)
+    {
+        $extraParameters = new ArrayCollection();
+
+        foreach ($parameters as $parameter) {
+            /* @var $parameter Parameter */
+            if (false !== strpos($whereClauseParts, sprintf(':%s', $parameter->getName()))) {
+                $extraParameters->add($parameter);
+            }
+        }
+
+        return $extraParameters;
     }
 
     /**

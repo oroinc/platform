@@ -17,6 +17,8 @@ They are located in Resources/public/js directory and use javascript namespace O
 - [Oro.Filter.MultiSelectDecorator](#orofiltermultiselectdecorator)
 - [Oro.Filter.DateFilter](#orofilterdatefilter)
 - [Oro.Filter.DateTimeFilter](#orofilterdatetimefilter)
+- [Oro.Filter.DateGroupingFilter](#orofilterdategroupingfilter)
+- [Oro.Filter.SkipEmptyPeriodsFilter](#orofilterskipemptyperiodsfilter)
 - [Example of Usage](#example-of-usage)
 - [References](#references)
 
@@ -269,6 +271,52 @@ _Oro.Filter.DateFilter_
 * choices
 * typeValues
 * externalWidgetOptions
+
+###Oro.Filter.DateGroupingFilter
+
+This widget supports value input and operator type input.
+
+**Rendered As**
+
+Same as parent widget but also contains radio buttons for operator choices
+
+**Parent**
+
+_Oro.Filter.ChoiceFilter_
+
+**Inherit Properties**
+
+* name
+* label
+* enabled
+* choices
+
+**Properties Description**
+
+* **choices** - list of filter types: Day, Month, Quarter, Year.
+
+###Oro.Filter.SkipEmptyPeriodsFilter
+
+This widget supports value input and operator type input.
+
+**Rendered As**
+
+Same as parent widget but also contains radio buttons for operator choices
+
+**Parent**
+
+_Oro.Filter.ChoiceFilter_
+
+**Inherit Properties**
+
+* name
+* label
+* enabled
+* choices
+
+**Properties Description**
+
+* **choices** - list of filter types: Yes, No.
 
 ###Example of Usage
 

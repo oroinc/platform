@@ -20,6 +20,11 @@ class ProcessLogger
     protected $logger;
 
     /**
+     * @var bool
+     */
+    protected $enabled = true;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param LoggerInterface $logger
      */
@@ -30,12 +35,23 @@ class ProcessLogger
     }
 
     /**
+     * @param bool $enabled
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
      * @param string $message
      * @param ProcessTrigger $trigger
      * @param ProcessData $data
      */
     public function debug($message, ProcessTrigger $trigger, ProcessData $data)
     {
+        if (!$this->enabled) {
+            return;
+        }
         if ($this->logger) {
             $context = ['definition' => $trigger->getDefinition()->getName()];
             if ($trigger->getEvent()) {

@@ -98,17 +98,4 @@ class FeatureContext extends OroFeatureContext implements
         $this->getSession('second_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
-
-    /**
-     * Alias for setting parameters on configuration forms
-     * Example:     When I set configuration to:
-     *                | Minimal password length      | 10   |
-     *                | Require a number             | true |
-     *
-     * @When /^(?:|I )set configuration to:$/
-     */
-    public function iSetConfiguration(TableNode $tableNode)
-    {
-        $this->oroMainContext->iFillFormWith($tableNode, 'SystemConfigForm');
-    }
 }

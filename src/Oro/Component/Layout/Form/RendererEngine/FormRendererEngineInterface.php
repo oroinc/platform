@@ -44,8 +44,11 @@ interface FormRendererEngineInterface extends BaseFormRendererEngineInterfaceInt
      *                                     considered, then the ones of its parent etc.
      * @param array    $blockNameHierarchy The block name hierarchy, with the root block
      *                                     at the beginning.
+     * @param int      $hierarchyLevel     The level in the hierarchy at which to start
+     *                                     looking. Level 0 indicates the root block, i.e.
+     *                                     the first element of $blockNameHierarchy.
      *
      * @return mixed The renderer resource or false, if none was found
      */
-    public function switchToNextParentResource(FormView $view, array $blockNameHierarchy);
+    public function switchToNextParentResource(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 }

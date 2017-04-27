@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -38,7 +39,7 @@ class Config
     protected $recordId;
 
     /**
-     * @var array
+     * @var ConfigValue[]
      *
      * @ORM\OneToMany(targetEntity="ConfigValue", mappedBy="config",
      *      cascade={"ALL"}, orphanRemoval=true)
@@ -119,7 +120,7 @@ class Config
     }
 
     /**
-     * @param $values
+     * @param Collection|ConfigValue[] $values
      *
      * @return $this
      */

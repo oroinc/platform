@@ -1,0 +1,52 @@
+<?php
+
+namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
+
+use Symfony\Component\Form\Form;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+
+class NonExtendedEntityBidirectionalValidator extends ConstraintValidator
+{
+    /**
+     * ConfigManager
+     */
+    protected $configManager;
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validate($value, Constraint $constraint)
+    {
+        $config = $this->configManager->getEntityConfig('extend', $value['target_entity']);
+        $isBidirectional = (bool)$value['bidirectional'];
+
+        if (!$config->is('is_extend') && $isBidirectional) {
+            $this->context->buildViolation($constraint->message)
+                ->addViolation();
+        }
+
+        /** @var Form $parentForm */
+        $parentForm = $this->context->getRoot();
+
+        /** @var FieldConfigModel $fieldConfig */
+        $fieldConfig = $parentForm->getConfig()->getOption('config_model');
+
+        if ($fieldConfig->getType() == RelationType::ONE_TO_MANY && !$isBidirectional) {
+            $this->context->buildViolation($constraint->unidirectionalNotAllowedMessage)
+                ->addViolation();
+        }
+    }
+}

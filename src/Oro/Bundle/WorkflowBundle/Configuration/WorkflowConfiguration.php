@@ -275,8 +275,21 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                             ->scalarNode('type')
                                 ->isRequired()
                             ->end()
+                            ->arrayNode('entity_acl')
+                                ->children()
+                                    ->booleanNode('update')
+                                        ->defaultTrue()
+                                    ->end()
+                                    ->booleanNode('delete')
+                                        ->defaultTrue()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->scalarNode('property_path')
+                                ->defaultNull()
+                            ->end()
                             ->variableNode('value')
-                                ->isRequired()
+                                ->defaultNull()
                             ->end()
                             ->arrayNode('options')
                                 ->prototype('variable')
@@ -394,11 +407,14 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode(self::NODE_INIT_CONTEXT_ATTRIBUTE)
                         ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
+                    ->arrayNode('message_parameters')
+                        ->prototype('variable')->end()
+                    ->end()
                     ->append($this->getTransitionTriggers())
                 ->end()
                 ->validate()
                     ->always(function ($value) {
-                        if ($value['display_type'] == 'page' && empty($value['form_options'])) {
+                        if ($value['display_type'] === 'page' && empty($value['form_options'])) {
                             throw new WorkflowException(
                                 'Display type "page" require "form_options" to be set.'
                             );

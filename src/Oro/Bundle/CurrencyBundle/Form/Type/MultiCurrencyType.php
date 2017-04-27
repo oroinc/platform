@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 
 class MultiCurrencyType extends PriceType
@@ -61,6 +64,8 @@ class MultiCurrencyType extends PriceType
                 ]
             );
 
+        $builder->get('value')->addModelTransformer(new MoneyValueTransformer());
+
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {
@@ -77,5 +82,13 @@ class MultiCurrencyType extends PriceType
                 $event->getForm()->add('baseCurrencyValue', 'oro_money', $options);
             }
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['currencyRates'] = [];
     }
 }

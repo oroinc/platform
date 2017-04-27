@@ -8,7 +8,6 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -109,11 +108,10 @@ class CommandExecutor
 
         if (array_key_exists('--process-isolation', $params)) {
             unset($params['--process-isolation']);
-            $server = self::getServer();
             $pb = new ProcessBuilder();
             $pb
                 ->add($this->getPhp())
-                ->add($server['argv'][0]);
+                ->add($_SERVER['argv'][0]);
 
             if (array_key_exists('--process-timeout', $params)) {
                 $pb->setTimeout($params['--process-timeout']);
@@ -377,13 +375,12 @@ class CommandExecutor
      */
     public static function isCurrentCommand($command, $isPrefix = false)
     {
-        $server = self::getServer();
-        if (isset($server['argv']) && php_sapi_name() === 'cli') {
+        if (isset($_SERVER['argv']) && php_sapi_name() === 'cli') {
             if (!$isPrefix) {
-                return in_array($command, $server['argv'], true);
+                return in_array($command, $_SERVER['argv'], true);
             }
 
-            foreach ($server['argv'] as $arg) {
+            foreach ($_SERVER['argv'] as $arg) {
                 if (is_string($arg) && strpos($arg, $command) === 0) {
                     return true;
                 }
@@ -391,15 +388,5 @@ class CommandExecutor
         }
 
         return false;
-    }
-
-    /**
-     * Get access to $_SERVER super global variable
-     *
-     * @return array
-     */
-    protected static function getServer()
-    {
-        return Request::createFromGlobals()->server->all();
     }
 }

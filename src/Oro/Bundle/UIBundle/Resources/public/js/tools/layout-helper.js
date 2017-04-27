@@ -18,7 +18,11 @@ define(function(require) {
             var $element = $(elementSelector, elementContext || this.elementContext);
 
             var calculateHeight = function() {
-                $element.css('min-height', $(window).height() - $element.offset().top);
+                var height = $(window).height() - $element.offset().top;
+                $element.css({
+                    'height': height,
+                    'min-height': height
+                });
             };
 
             layout.onPageRendered(calculateHeight);

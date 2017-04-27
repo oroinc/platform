@@ -14,7 +14,6 @@ class TagCollectionApiType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'cascade_validation'   => true,
                 'allow_add'            => true,
                 'type'                 => 'oro_tag_tag_api',
             ]

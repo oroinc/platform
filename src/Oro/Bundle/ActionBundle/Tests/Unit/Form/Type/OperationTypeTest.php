@@ -87,9 +87,17 @@ class OperationTypeTest extends FormIntegrationTestCase
     {
         return [
             'existing data' => [
-                'defaultData' => $this->createOperationData(['field1' => 'data1', 'field2' => 'data2']),
+                'defaultData' => $this->createOperationData([
+                    'field1' => 'data1',
+                    'field2' => 'data2',
+                    'data' => (object)['property1' => 'data3'],
+                ]),
                 'inputOptions' => [
-                    'operation' => $this->createOperation(),
+                    'operation' => $this->createOperation([
+                        'field1' => [],
+                        'field2' => [],
+                        'field3' => ['property_path' => 'entity.property1'],
+                    ]),
                     'attribute_fields' => [
                         'field1'  => [
                             'form_type' => 'text',
@@ -100,10 +108,17 @@ class OperationTypeTest extends FormIntegrationTestCase
                             'form_type' => 'text',
                             'label' => 'Field2 Label Orig'
                         ],
+                        'field3' => [
+                            'form_type' => 'text',
+                        ],
                     ],
                 ],
-                'submittedData' => ['field1' => 'data1', 'field2' => 'data2'],
-                'expectedData' => $this->createOperationData(['field1' => 'data1', 'field2' => 'data2']),
+                'submittedData' => ['field1' => 'data1', 'field2' => 'data2', 'field3' => 'data3'],
+                'expectedData' => $this->createOperationData([
+                    'field1' => 'data1',
+                    'field2' => 'data2',
+                    'data' => (object)['property1' => 'data3'],
+                ]),
                 'expectedChildrenOptions' => [
                     'field1'  => [
                         'required' => true,
@@ -116,9 +131,13 @@ class OperationTypeTest extends FormIntegrationTestCase
                 ]
             ],
             'new data' => [
-                'defaultData' => $this->createOperationData(),
+                'defaultData' => $this->createOperationData(['data' => (object)['property1' => null]]),
                 'inputOptions' => [
-                    'operation' => $this->createOperation(),
+                    'operation' => $this->createOperation([
+                        'field1' => [],
+                        'field2' => [],
+                        'field3' => ['property_path' => 'entity.property1']
+                    ]),
                     'attribute_fields' => [
                         'field1'  => [
                             'form_type' => 'text'
@@ -126,10 +145,20 @@ class OperationTypeTest extends FormIntegrationTestCase
                         'field2' => [
                             'form_type' => 'text'
                         ],
+                        'field3' => [
+                            'form_type' => 'text',
+                        ],
                     ],
                 ],
-                'submittedData' => ['field1' => 'data1', 'field2' => 'data2'],
-                'expectedData' => $this->createOperationData(['field1' => 'data1', 'field2' => 'data2'], true),
+                'submittedData' => ['field1' => 'data1', 'field2' => 'data2', 'field3' => 'data3'],
+                'expectedData' => $this->createOperationData(
+                    [
+                        'field1' => 'data1',
+                        'field2' => 'data2',
+                        'data' => (object)['property1' => 'data3']
+                    ],
+                    true
+                ),
                 'expectedChildrenOptions' => [
                     'field1'  => [
                         'required' => false,
@@ -149,7 +178,10 @@ class OperationTypeTest extends FormIntegrationTestCase
                     ]
                 ),
                 'inputOptions' => [
-                    'operation' => $this->createOperation(),
+                    'operation' => $this->createOperation([
+                        'field1' => [],
+                        'field2' => [],
+                    ]),
                     'attribute_fields' => [
                         'field1'  => [
                             'form_type' => 'text'
@@ -186,9 +218,11 @@ class OperationTypeTest extends FormIntegrationTestCase
                 'expectedDefaultData' => $this->createOperationData(
                     [
                         'field1' => 'default_field1_value',
-                        'field2' => 'default_field2_value'
+                        'field2' => 'default_field2_value',
+                        'default_field1' => 'default_field1_value',
+                        'default_field2' => 'default_field2_value',
                     ],
-                    false
+                    true
                 )
             ],
         ];
@@ -218,7 +252,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         return [
             [
                 'options' => [
-                    'operation' => $this->createOperation(),
+                    'operation' => $this->createOperation(['field' => []]),
                     'attribute_fields' => [
                         'field'  => [
                             'form_type' => 'text'
@@ -231,7 +265,7 @@ class OperationTypeTest extends FormIntegrationTestCase
             ],
             [
                 'options' => [
-                    'operation' => $this->createOperation(true),
+                    'operation' => $this->createOperation([]),
                     'attribute_fields' => [
                         'field'  => [
                             'form_type' => 'text'
@@ -244,7 +278,7 @@ class OperationTypeTest extends FormIntegrationTestCase
             ],
             [
                 'options' => [
-                    'operation' => $this->createOperation(),
+                    'operation' => $this->createOperation(['field' => []]),
                     'attribute_fields' => [
                         'field' => null
                     ],
@@ -274,10 +308,10 @@ class OperationTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param bool $noAttributes
+     * @param array $attributes
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createOperation($noAttributes = false)
+    protected function createOperation(array $attributes = [])
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeManager $attributeManager */
         $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
@@ -286,16 +320,21 @@ class OperationTypeTest extends FormIntegrationTestCase
         $attributeManager->expects($this->any())
             ->method('getAttribute')
             ->willReturnCallback(
-                function ($attributeName) use ($noAttributes) {
-                    if ($noAttributes) {
+                function ($attributeName) use ($attributes) {
+                    if (!isset($attributes[$attributeName])) {
                         return null;
                     }
+
+                    $attributeDefinition = $attributes[$attributeName];
 
                     $attribute = new Attribute();
                     $attribute
                         ->setName($attributeName)
                         ->setLabel(ucfirst($attributeName) . ' Label')
-                        ->setType('text');
+                        ->setType(isset($attributeDefinition['type']) ? $attributeDefinition['type'] : 'text')
+                        ->setPropertyPath(
+                            isset($attributeDefinition['property_path']) ? $attributeDefinition['property_path'] : null
+                        );
 
                     return $attribute;
                 }

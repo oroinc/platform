@@ -125,7 +125,6 @@ table.grid {
       min-height: 1px;
       position: relative;
       margin-right: 4px;
-      text-transform: capitalize;
     }
   }
 }
@@ -211,6 +210,44 @@ table.grid {
   &.active {
     z-index: 3;
     padding: 0 5px 0 4px;
+
+    &.workflow-step-final {
+      .workflow-steps-item-arrow-container {
+        color: #46545f;
+        background: #e0e8ed;
+        border-top: 1px solid #e0e8ed;
+        border-bottom: 1px solid #e0e8ed;
+
+        .workflow-step-arrow-right {
+          &:before {
+            display: none;
+          }
+
+          &:after {
+            border-left: 9px solid #e0e8ed;
+          }
+        }
+      }
+
+      &:last-child {
+        .workflow-steps-item-arrow-container {
+          color: #46545f;
+          background: #e0e8ed;
+          border-top: 1px solid #e0e8ed;
+          border-bottom: 1px solid #e0e8ed;
+
+          .workflow-step-arrow-right {
+            &:before {
+              display: none;
+            }
+
+            &:after {
+              border-left: 9px solid #e0e8ed;
+            }
+          }
+        }
+      }
+    }
 
     &:first-child {
       padding-left: 0;
@@ -396,12 +433,22 @@ table.grid {
   background: #dff2d4;
   text-align: center;
   white-space: nowrap;
+
+  &.workflow-step-final {
+    color: #46545f;
+    background: #e0e8ed;
+  }
 }
 
 .workflow-controls {
   width: 2%;
   padding: 0 0 0 10px;
   text-align: right;
+  .workflow-transition-buttons {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+  }
 }
 
 .workflow-collapse {
@@ -470,6 +517,12 @@ table.grid {
       word-break: break-all;
     }
   }
+}
+
+.transition-example-container .transition-btn-example .btn {
+  max-width: 294px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* mobile version */

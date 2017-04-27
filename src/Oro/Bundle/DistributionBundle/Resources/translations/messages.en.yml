@@ -18,6 +18,9 @@ oro:
             up_to_date_version: 'Up to date version'
             install_new: 'Install New Package'
             unknown: unknown
+            already_installed: 'Package has already been installed'
+            not_installed: 'Package "%package%" is not yet installed'
+            no_updates: 'No updates available for package "%package%"'
         action:
             install: Install
             update: Update

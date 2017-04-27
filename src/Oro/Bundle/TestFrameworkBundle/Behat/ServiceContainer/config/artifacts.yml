@@ -1,0 +1,36 @@
+services:
+  oro_test.artifacts.runtime_subscriber:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\RunTimeSubscriber
+    arguments:
+      - '@event_dispatcher'
+      - '@oro_test.artifacts.progress_artifacts_subscriber'
+      - '@oro_test.artifacts.pretty_artifacts_subscriber'
+    tags:
+      - { name: event_dispatcher.subscriber, priority: 10 }
+
+  oro_test.artifacts.pretty_artifacts_subscriber:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\PrettyArtifactsSubscriber
+    arguments:
+      - '@output.formatter.pretty'
+      - '@mink'
+
+  oro_test.artifacts.progress_artifacts_subscriber:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ProgressArtifactsSubscriber
+    arguments:
+      - '@output.progress.statistics'
+      - '@output.formatter.progress'
+      - '@mink'
+
+  oro_test.artifacts.ftp_handler:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\FtpHandler
+    arguments:
+      - []
+    tags:
+      - { name: 'artifacts_handler' }
+
+  oro_test.artifacts.local_handler:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\LocalHandler
+    arguments:
+      - []
+    tags:
+      - { name: 'artifacts_handler' }

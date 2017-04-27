@@ -45,6 +45,10 @@ class TableRow extends Element
     {
         $value = trim($value);
 
+        if (empty($value)) {
+            return $value;
+        }
+
         if (preg_match('/^[0-9]+$/', $value)) {
             return (int) $value;
         } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/', $value, $matches)) {

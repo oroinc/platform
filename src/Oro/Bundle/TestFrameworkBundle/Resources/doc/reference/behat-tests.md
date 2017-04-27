@@ -38,7 +38,7 @@ composer install
 Install application without fixture in prod mode:
 
 ```bash
-app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=ORO --env=prod --sample-data=n
+app/console oro:install  --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=ORO --env=prod --sample-data=n
 ```
 
 ### Run tests
@@ -112,13 +112,13 @@ java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriv
 Run tests with Selenium and Firefox:
 
 ```bash
-vendor/bin/behat -p selenium2
+bin/behat -p selenium2
 ```
 
 Run tests with PhantomJs
 
 ```bash
-vendor/bin/behat
+bin/behat
 ```
 
 #### Fail tests
@@ -374,12 +374,21 @@ Alice is a library that allows you easily create fixtures in yml format.
 See [Alice Documentation](https://github.com/nelmio/alice/blob/2.x/README.md).
 
 Fixtures should be located in ```{BundleName}/Tests/Behat/Features/Fixtures``` directory.
-For load fixture before feature add tag with fixture file name and ```@fixture-``` prefix.
+For load fixture before feature add tag with fixture file name and ```@fixture-``` prefix e.g. ```@fixture-mass_action.yml```
 
 ```gherkin
-#package/crm/src/OroCRM/Bundle/ContactBundle/Tests/Behat/Features/contact-grid.feature
-@fixture-contacts.yml
-Feature: Contacts grid
+#package/crm/src/Oro/Bundle/CRMBundle/Tests/Behat/Features/mass_delete.feature
+@fixture-mass_action.yml
+Feature: Mass Delete records
+```
+
+Also it is possible to load fixtures for other bundles using shortcut syntax ```@fixture-OroOrganizationBundle:BusinessUnit.yml```
+
+```gherkin
+#package/platform/src/Oro/Bundle/WorkflowBundle/Tests/Behat/Features/workflow-with-attributes.feature
+@fixture-OroUserBundle:user.yml
+@fixture-OroOrganizationBundle:BusinessUnit.yml
+Feature: Adding attributes for workflow transition
 ```
 
 #### Entity references

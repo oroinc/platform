@@ -101,7 +101,7 @@ class OperationFormHandler
             if ($form->isValid()) {
                 $operation->execute($actionData, $data['errors']);
 
-                $data['response'] = $this->getResponseData($actionData, $flashBag);
+                $data['response'] = $this->getResponseData($actionData, $flashBag, $operation);
 
                 if ($this->hasRedirect($data)) {
                     return new RedirectResponse($data['response']['redirectUrl'], 302);
@@ -218,18 +218,22 @@ class OperationFormHandler
 
     /**
      * @param ActionData $context
-     *
      * @param FlashBagInterface $flashBag
+     * @param Operation $operation
+     *
      * @return array
      */
-    private function getResponseData(ActionData $context, FlashBagInterface $flashBag)
+    private function getResponseData(ActionData $context, FlashBagInterface $flashBag, Operation $operation)
     {
-        $response = ['success' => true];
+        $response = ['success' => true, 'pageReload' => $operation->getDefinition()->isPageReload()];
 
         if ($context->getRedirectUrl()) {
             $response['redirectUrl'] = $context->getRedirectUrl();
         } elseif ($context->getRefreshGrid()) {
             $response['refreshGrid'] = $context->getRefreshGrid();
+        }
+
+        if ($context->getRefreshGrid() || !$response['pageReload']) {
             $response['flashMessages'] = $flashBag->all();
         }
 

@@ -10,4 +10,7 @@ styles:
         - 'bundles/oroform/default/scss/variables/textarea-config.scss'
         - 'bundles/oroform/default/scss/variables/label-config.scss'
         - 'bundles/oroform/default/scss/styles.scss'
-    filters: ['cssrewrite', 'cssmin']
+
+stylebook_styles:
+    inputs:
+        - 'bundles/oroform/default/scss/settings/global-settings.scss'

@@ -14,7 +14,7 @@ class OroConfigBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -80,7 +80,7 @@ class OroConfigBundleInstaller implements Installation
             $schema->getTable('oro_config'),
             ['config_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }

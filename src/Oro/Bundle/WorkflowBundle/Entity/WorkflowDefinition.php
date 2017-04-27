@@ -19,6 +19,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  * @ORM\Table(name="oro_workflow_definition")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @Config(
+ *      mode="hidden",
  *      routeName="oro_workflow_definition_index",
  *      routeView="oro_workflow_definition_view",
  *      defaultValues={
@@ -307,6 +308,25 @@ class WorkflowDefinition implements DomainObjectInterface
     public function hasDisabledOperations()
     {
         return !empty($this->configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getVirtualAttributes()
+    {
+        $virtualAttributes = [];
+
+        $attributes = $this->getConfiguration()['attributes'];
+        foreach ($attributes as $attributeName => $attributeOptions) {
+            if (!isset($attributeOptions['options']['virtual']) || !$attributeOptions['options']['virtual']) {
+                continue;
+            }
+
+            $virtualAttributes[$attributeName] = $attributeOptions;
+        }
+
+        return $virtualAttributes;
     }
 
     /**

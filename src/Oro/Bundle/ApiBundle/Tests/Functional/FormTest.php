@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
+use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
-use Symfony\Component\Form\FormInterface;
-
-use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
+use Symfony\Component\Form\FormInterface;
 
 class FormTest extends WebTestCase
 {
@@ -233,7 +233,6 @@ class FormTest extends WebTestCase
     protected function getRootForm(array $options = [])
     {
         $options['data_class'] = self::TEST_CLASS;
-        $options['extra_fields_message'] = 'This form should not contain extra fields: "{{ extra_fields }}"';
         $form = $this->getContainer()->get('form.factory')->create($this->getType(), null, $options);
 
         return $form;

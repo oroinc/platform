@@ -4,6 +4,7 @@ namespace Oro\Component\Config\Tests\Unit\Loader;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -87,6 +88,34 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
+    public function testIsResourceFreshNoChangesWithFewLoaders()
+    {
+        $bundle      = new TestBundle1();
+        $bundleClass = get_class($bundle);
+        $bundleDir   = dirname((new \ReflectionClass($bundle))->getFileName());
+
+        $loader1 = new FolderingCumulativeFileLoader('{folder}', '\w+', [
+            new YamlCumulativeFileLoader('Resources/config/{folder}/test.yml'),
+            new YamlCumulativeFileLoader('Resources/config/{folder}/none.yml'),
+        ]);
+
+        $loader2 = new FolderingCumulativeFileLoader('{folder}', '\w+', [
+            new YamlCumulativeFileLoader('Resources/config/another non word/test.yml'),
+        ]);
+
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
+        $loader1->registerFoundResource($bundleClass, $bundleDir, '', $resource);
+        $loader2->registerFoundResource($bundleClass, $bundleDir, '', $resource);
+
+        $loadTime = $this->getLastMTime($bundleDir) + 1;
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
+        $loader1->registerFoundResource($bundleClass, $bundleDir, '', $resource);
+        $loader2->registerFoundResource($bundleClass, $bundleDir, '', $resource);
+
+        $this->assertTrue($loader1->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
+        $this->assertTrue($loader2->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
+    }
+
     public function testIsResourceFreshExistingFileWasChanged()
     {
         $bundle      = new TestBundle1();
@@ -154,6 +183,28 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         rmdir(dirname($filePath));
 
         $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
+    }
+
+    public function testIsResourceFreshException()
+    {
+        $bundle      = new TestBundle1();
+        $bundleClass = get_class($bundle);
+        $bundleDir   = dirname((new \ReflectionClass($bundle))->getFileName());
+
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
+
+        $ymlLoader = $this->createMock(YamlCumulativeFileLoader::class);
+        $ymlLoader->expects($this->once())
+            ->method('isResourceFresh')
+            ->with($bundleClass, $bundleDir, '', $resource, 0)
+            ->willThrowException(new \Exception('error'));
+
+        $loader = new FolderingCumulativeFileLoader('{folder}', '\w+', $ymlLoader);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('error');
+
+        $loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, 0);
     }
 
     /**

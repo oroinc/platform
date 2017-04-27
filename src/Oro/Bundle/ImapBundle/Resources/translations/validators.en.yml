@@ -1,0 +1,4 @@
+oro.imap:
+    validator:
+      configuration:
+          folders_are_not_selected: At least one folder of mailbox is required to be selected.

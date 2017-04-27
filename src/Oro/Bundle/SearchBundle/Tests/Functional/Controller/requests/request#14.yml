@@ -1,7 +1,7 @@
 # offset test case
 request:
     supported_engines: [orm]
-    search: \"item1@mail.com\"
+    search: \"item1@mail.net\"
     offset: 0
     max_results: 1
 response:

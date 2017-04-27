@@ -21,7 +21,6 @@ services:
     oro_windows.manager.windows_state.abstract:
         class: %oro_windows.manager.windows_state.class%
         abstract: true
-        private: true
         arguments:
             - '@security.token_storage'
             - '@oro_entity.doctrine_helper'

@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
@@ -63,6 +64,18 @@ class WorkflowDefinitionEntityListener
             if (!$conflictingWorkflows->isEmpty()) {
                 throw $this->generateException($definition, $conflictingWorkflows->getValues());
             }
+        }
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     *
+     * @throws WorkflowRemoveException
+     */
+    public function preRemove(WorkflowDefinition $definition)
+    {
+        if ($definition->isSystem()) {
+            throw new WorkflowRemoveException($definition->getName());
         }
     }
 

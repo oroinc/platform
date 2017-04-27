@@ -99,12 +99,6 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         $functionReturnType,
         $isDistinct = false
     ) {
-        if ($isDistinct) {
-            $columnExpr = 'DISTINCT ' . (string)$columnExpr;
-        } else { //Restrict select with id field only
-            return;
-        }
-
         if ($functionExpr !== null) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,
@@ -168,9 +162,11 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function addOrderByColumn($columnAlias, $columnSorting)
     {
-        $columnNames = array_flip($this->columnAliases);
-        $columnName = $columnNames[$columnAlias];
-        $prefixedColumnName = $this->getTableAliasForColumn($columnName) . '.' . $columnName;
-        $this->qb->addOrderBy($prefixedColumnName, $columnSorting);
+        if ($this->columnAliases && $columnAlias) {
+            $columnNames = array_flip($this->columnAliases);
+            $columnName = $columnNames[$columnAlias];
+            $prefixedColumnName = $this->getTableAliasForColumn($columnName) . '.' . $columnName;
+            $this->qb->addOrderBy($prefixedColumnName, $columnSorting);
+        }
     }
 }

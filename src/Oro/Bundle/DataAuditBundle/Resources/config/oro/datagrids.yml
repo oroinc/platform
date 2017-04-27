@@ -2,7 +2,7 @@ datagrids:
     audit-grid:
         acl_resource: oro_dataaudit_history
         options:
-            entityHint: audit
+            entityHint: audits
         source:
             type: orm
             query:

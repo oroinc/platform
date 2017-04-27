@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailType extends AbstractType
 {
@@ -137,6 +138,9 @@ class EmailType extends AbstractType
                 'required' => false,
                 'allow_add' => true,
                 'prototype' => false,
+                'constraints' => [
+                    new Valid()
+                ],
                 'options' => [
                     'required' => false,
                 ],
@@ -255,7 +259,6 @@ class EmailType extends AbstractType
                 'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
                 'intention'          => 'email',
                 'csrf_protection'    => true,
-                'cascade_validation' => true,
             ]
         );
     }

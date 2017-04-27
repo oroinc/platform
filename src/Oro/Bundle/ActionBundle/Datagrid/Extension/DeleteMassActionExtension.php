@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -50,7 +51,10 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
             return parent::isDeleteActionExists($config, $key);
         }
 
-        $operation = $this->operationRegistry->findByName(self::OPERATION_NAME);
+        $operation = $this->operationRegistry->findByName(
+            self::OPERATION_NAME,
+            new OperationFindCriteria($this->getEntity($config), null, $config->getName(), $this->groups)
+        );
 
         if (!$operation instanceof Operation) {
             return false;

@@ -99,17 +99,13 @@ class OroLayoutExtension extends Extension
      */
     protected function loadThemeResources(ContainerBuilder $container)
     {
-        $resourceLoaders = [
-            new FolderingCumulativeFileLoader(
-                self::RESOURCES_FOLDER_PLACEHOLDER,
-                self::RESOURCES_FOLDER_PATTERN,
-                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
-            )
-        ];
+        $resourceLoader = new FolderingCumulativeFileLoader(
+            self::RESOURCES_FOLDER_PLACEHOLDER,
+            self::RESOURCES_FOLDER_PATTERN,
+            new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
+        );
 
-        $resourceLoaders[] = new YamlCumulativeFileLoader('Resources/config/oro/layout.yml');
-
-        $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoaders);
+        $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoader);
 
         return $configLoader->load($container);
     }

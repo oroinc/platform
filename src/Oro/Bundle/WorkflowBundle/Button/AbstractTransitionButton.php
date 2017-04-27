@@ -82,9 +82,16 @@ abstract class AbstractTransitionButton implements ButtonInterface
     {
         $showDialog = $this->transition->getDisplayType() !== 'page';
 
+        $frontendOptions = $this->transition->getFrontendOptions();
+        if (isset($frontendOptions['dialog']['dialogOptions'])) {
+            $frontendOptions['options'] = isset($frontendOptions['options'])
+                ? array_merge($frontendOptions['options'], $frontendOptions['dialog']['dialogOptions'])
+                : $frontendOptions['dialog']['dialogOptions'];
+        }
+
         return array_merge(
             [
-                'frontendOptions' => $this->transition->getFrontendOptions(),
+                'frontendOptions' => $frontendOptions,
                 'hasForm' => $this->transition->hasForm(),
                 'showDialog' => $showDialog,
                 'routeParams' => [
@@ -154,5 +161,12 @@ abstract class AbstractTransitionButton implements ButtonInterface
     public function getTransition()
     {
         return $this->transition;
+    }
+
+    public function __clone()
+    {
+        if ($this->transition) {
+            $this->transition = clone $this->transition;
+        }
     }
 }

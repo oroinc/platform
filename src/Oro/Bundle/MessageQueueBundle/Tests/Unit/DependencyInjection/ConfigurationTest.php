@@ -140,6 +140,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ]
         ]]);
 
+        $pidDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'oro-message-queue';
+
         $this->assertEquals([
             'transport' => [
                 'default' => [
@@ -148,8 +150,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'dbal' => [
                     'connection' => 'default',
                     'table' => 'oro_message_queue',
-                    'orphan_time' => 300,
+                    'pid_file_dir' => $pidDir,
                     'polling_interval' => 1000,
+                    'consumer_process_pattern' => ':consume'
                 ],
             ]
         ], $config);

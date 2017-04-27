@@ -5,6 +5,6 @@ layout:
 
         - '@add':
             id: logo
-            parentId: page_header
-            blockType: container
+            parentId: middle_bar_logo
+            blockType: block
 

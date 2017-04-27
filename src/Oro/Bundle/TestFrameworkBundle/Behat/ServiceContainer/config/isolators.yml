@@ -79,4 +79,3 @@ services:
       - '@oro_test.alice_loader'
     tags:
       - { name: 'oro_behat.isolator', priority: 300 }
-      - { name: 'suite_aware' }

@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\NavigationBundle\Entity\Title;
-use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 
 class RouteChoiceTypeTest extends FormIntegrationTestCase
 {
@@ -21,14 +23,19 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     private $router;
 
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleReaderRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $registry;
+    private $readerRegistry;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleTranslator|\PHPUnit_Framework_MockObject_MockObject
      */
     private $translator;
+
+    /**
+     * @var TitleService|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $titleService;
 
     /**
      * @var RouteChoiceType
@@ -40,12 +47,17 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
      */
     protected function setUp()
     {
-
-        $this->translator = $this->getTranslator();
-        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->router = $this->createMock(RouterInterface::class);
+        $this->readerRegistry = $this->createMock(TitleReaderRegistry::class);
+        $this->translator = $this->createMock(TitleTranslator::class);
+        $this->titleService = $this->createMock(TitleService::class);
 
-        $this->formType = new RouteChoiceType($this->router, $this->registry, $this->translator);
+        $this->formType = new RouteChoiceType(
+            $this->router,
+            $this->readerRegistry,
+            $this->translator,
+            new ServiceLink($this->titleService)
+        );
 
         parent::setUp();
     }
@@ -163,10 +175,11 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
             ->method('getRouteCollection')
             ->willReturn($routeCollection);
 
-        $this->registry->expects($this->never())
+        $this->readerRegistry
+            ->expects($this->never())
             ->method($this->anything());
 
-        $options = ['add_titles' => false];
+        $options = ['add_titles' => false, 'menu_name' => 'menu'];
 
         $resolver = new OptionsResolver();
         $this->formType->configureOptions($resolver);

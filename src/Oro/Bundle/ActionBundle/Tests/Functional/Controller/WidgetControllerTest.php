@@ -199,7 +199,7 @@ class WidgetControllerTest extends WebTestCase
                     'message' => 'new message',
                     'description' => 'Test Description'
                 ],
-                'expectedMessage' => 'widget.trigger(\'formSave\', {"success":true});'
+                'expectedMessage' => 'widget.trigger(\'formSave\', {"success":true,"pageReload":true});'
             ],
             'operation not allowed' => [
                 'entity' => LoadTestEntityData::TEST_ENTITY_2,
@@ -534,7 +534,7 @@ class WidgetControllerTest extends WebTestCase
                 'frontend_options' => ['show_dialog' => true],
                 'attributes' => [
                     'message_attr' => ['label' => 'Message', 'type' => 'string'],
-                    'descr_attr' => ['property_path' => 'data.description']
+                    'descr_attr' => ['label' => 'Description', 'type' => 'string']
                 ],
                 'form_options' => [
                     'attribute_fields' => [

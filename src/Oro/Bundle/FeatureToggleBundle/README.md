@@ -7,8 +7,8 @@ How to define new feature
 -------------------------
 
 Features are defined with configuration files place in Resources/oro/features.yml.
-Each feature consists of required options: title and toggle. Out of the box feature may be configured with next sections:
- - title - feature title
+Each feature consists of one required option - the label. Out of the box feature may be configured with next sections:
+ - label - feature title
  - description - feature description
  - toggle - system configuration option key that will be used as feature toggle
  - dependencies - list of feature names that current feature depends on
@@ -24,7 +24,7 @@ Example of features.yml configuration
 ```yml
 features:
     acme:
-        title: acme.feature.label
+        label: acme.feature.label
         description: acme.feature.description
         toggle: acme.feature_enabled
         dependencies:
@@ -44,6 +44,8 @@ features:
             - acme_some_operation
         api_resources:
             - Acme\Bundle\Entity\Page
+        commands:
+            - oro:search:index
 ```
 
 Adding new options to feature configuration
@@ -217,7 +219,7 @@ Feature state checking
 ----------------------
 
 Feature state is checked by feature voters. All voters are called each time you use the `isFeatureEnabled()` or `isResourceEnabled()` method on feature checker.
-Feature checker makes the decision based on configured strategy defined in system configuration, which can be: affirmative, consensus or unanimous.
+Feature checker makes the decision based on configured strategy defined in system configuration or per feature, which can be: affirmative, consensus or unanimous.
 
 By default `ConfigVoter` is registered to check features availability.
 It checks feature state based on value of toggle option, defined in features.yml configuration.
@@ -298,4 +300,52 @@ oro_featuretoggle:
     strategy: affirmative
     allow_if_all_abstain: true
     allow_if_equal_granted_denied: false
+```
+or in feature definition
+```yml
+features:
+    acme:
+        label: acme.feature.label
+        strategy: affirmative
+        allow_if_all_abstain: true
+        allow_if_equal_granted_denied: false
+```
+
+
+Using checker for commands
+--------------------------
+In case if we run commands as subcommands we can't skip it globally.
+To avoid running such commands you have to add implementation of FeatureCheckerAwareInterface
+to your parent command, add FeatureCheckerHolderTrait usage and use featureChecker that
+injected automatically direct to your command.
+
+```php
+<?php
+
+namespace Acme\Bundle\FixtureBundle\Command;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerAwareInterface;
+
+class LoadDataFixturesCommand implements FeatureCheckerAwareInterface
+{
+
+    use FeatureCheckerHolderTrait;
+    
+    protected function execeute(InputInterface $input, OutputInterface $output)
+    {
+        $commands = [
+            'oro:cron:analytic:calculate' => [],
+            'oro:b2b:lifetime:recalculate'          => ['--force' => true]
+        ];
+    
+        foreach ($commands as $commandName => $options) {
+            if ($this->featureChecker->isResourceEnabled($commandName, 'commands')) {
+                $command = $this->getApplication()->find($commandName);
+                $input = new ArrayInput(array_merge(['command' => $commandName], $options));
+                $command->run($input, $output);
+            }
+        }
+    }
+}
 ```

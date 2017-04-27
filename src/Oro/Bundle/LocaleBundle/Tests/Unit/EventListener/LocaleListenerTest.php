@@ -9,9 +9,14 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\EventListener\LocaleListener;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var LocaleListener */
     protected $listener;
 
@@ -160,7 +165,9 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
                 'installed' => '2012-12-12T12:12:12+02:00',
                 'isSetLocale' => true,
                 'language' => 'en_US',
-                'localization' => (new Localization())->setLanguageCode('en_US'),
+                'localization' => (new Localization())->setLanguage(
+                    $this->getEntity(Language::class, ['code' => 'en_US',])
+                ),
             ],
         ];
     }

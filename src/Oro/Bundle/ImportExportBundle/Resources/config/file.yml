@@ -1,7 +1,6 @@
 parameters:
     oro_importexport.file.file_system_operator.class: Oro\Bundle\ImportExportBundle\File\FileSystemOperator
     oro_importexport.file.mime_type_guesser.class:    Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser
-    oro_importexport.file.split_csv_file.class:       Oro\Bundle\ImportExportBundle\File\SplitterCsvFile
 
 services:
     oro_importexport.file.file_system_operator:

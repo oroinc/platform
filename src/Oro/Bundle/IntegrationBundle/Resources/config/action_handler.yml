@@ -1,0 +1,81 @@
+services:
+    oro_integration.action_handler.channel_delete:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\ChannelDeleteActionHandler'
+        arguments:
+            - '@oro_integration.delete_manager'
+
+    oro_integration.action_handler.channel_disable:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\ChannelDisableActionHandler'
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    oro_integration.action_handler.channel_enable:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\ChannelEnableActionHandler'
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    oro_integration.action_handler.channel_error:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Error\FlashBagChannelActionErrorHandler'
+        public: false
+        arguments:
+            - '@session'
+
+    oro_integration.action_handler.decorator.channel_delete_dispatcher:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerDispatcherDecorator'
+        public: false
+        decorates: oro_integration.action_handler.channel_delete
+        decoration_priority: 10
+        arguments:
+            - '@event_dispatcher'
+            - '@oro_integration.factory.event.channel_delete'
+            - '@oro_integration.action_handler.decorator.channel_delete_dispatcher.inner'
+            - '@oro_integration.action_handler.channel_error'
+
+    oro_integration.action_handler.decorator.channel_disable_dispatcher:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerDispatcherDecorator'
+        public: false
+        decorates: oro_integration.action_handler.channel_disable
+        decoration_priority: 10
+        arguments:
+            - '@event_dispatcher'
+            - '@oro_integration.factory.event.channel_disable'
+            - '@oro_integration.action_handler.decorator.channel_disable_dispatcher.inner'
+            - '@oro_integration.action_handler.channel_error'
+
+    oro_integration.action_handler.decorator.channel_enable_dispatcher:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerDispatcherDecorator'
+        public: false
+        decorates: oro_integration.action_handler.channel_enable
+        decoration_priority: 10
+        arguments:
+            - '@event_dispatcher'
+            - '@oro_integration.factory.event.channel_enable'
+            - '@oro_integration.action_handler.decorator.channel_enable_dispatcher.inner'
+            - '@oro_integration.action_handler.channel_error'
+
+    oro_integration.action_handler.decorator.channel_delete_transaction:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerTransactionDecorator'
+        public: false
+        decorates: oro_integration.action_handler.channel_delete
+        decoration_priority: 5
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_integration.action_handler.decorator.channel_delete_transaction.inner'
+
+    oro_integration.action_handler.decorator.channel_disable_transaction:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerTransactionDecorator'
+        public: false
+        decorates: oro_integration.action_handler.channel_disable
+        decoration_priority: 5
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_integration.action_handler.decorator.channel_disable_transaction.inner'
+
+    oro_integration.action_handler.decorator.channel_enable_transaction:
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerTransactionDecorator'
+        public: false
+        decorates: oro_integration.action_handler.channel_enable
+        decoration_priority: 5
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_integration.action_handler.decorator.channel_enable_transaction.inner'

@@ -60,13 +60,13 @@ class TranslationWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->translationManager->expects($this->at(0))
             ->method('saveTranslation')
-            ->with('key1', 'value1', 'lang1', 'domain1');
+            ->with('key1', 'value1', 'lang1', 'domain1', Translation::SCOPE_UI);
         $this->translationManager->expects($this->at(1))
             ->method('saveTranslation')
-            ->with('key2', 'value2', 'lang2', 'domain2');
+            ->with('key2', 'value2', 'lang2', 'domain2', Translation::SCOPE_UI);
         $this->translationManager->expects($this->at(2))
             ->method('saveTranslation')
-            ->with('key3', 'value3', 'lang3', 'domain3');
+            ->with('key3', 'value3', 'lang3', 'domain3', Translation::SCOPE_UI);
         $this->translationManager->expects($this->at(3))->method('flush')->with(true);
 
         $this->writer->write($items);

@@ -33,12 +33,11 @@ class LocalizationType extends AbstractType
                 ]
             )
             ->add(
-                'languageCode',
+                'language',
                 LanguageSelectType::NAME,
                 [
                     'required' => true,
-                    'label' => 'oro.locale.localization.language_code.label',
-                    'placeholder' => 'oro.locale.localization.form.placeholder.select_language'
+                    'label' => 'oro.locale.localization.language.label'
                 ]
             )
             ->add(
@@ -46,8 +45,7 @@ class LocalizationType extends AbstractType
                 FormattingSelectType::NAME,
                 [
                     'required' => true,
-                    'label' => 'oro.locale.localization.formatting_code.label',
-                    'placeholder' => 'oro.locale.localization.form.placeholder.select_formatting'
+                    'label' => 'oro.locale.localization.formatting_code.label'
                 ]
             )
             ->add(

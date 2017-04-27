@@ -10,6 +10,8 @@ services:
         public: false
         arguments:
             - '@oro_workflow.serializer.variable.normalizer'
+            - '@oro_workflow.variable_guesser'
+            - '@translator'
         public: false
 
     oro_workflow.step_assembler:
@@ -22,6 +24,7 @@ services:
             - '@oro_action.expression.factory'
             - '@oro_action.action_factory'
             - '@oro_workflow.form_options_configuration_assembler'
+            - '@oro_workflow.resolver.transition_options_resolver'
 
     oro_workflow.workflow_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler'

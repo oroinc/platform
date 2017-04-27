@@ -12,20 +12,6 @@ class ParentLocalizationSearchHandler extends AbstractParentEntitySearchHandler
      */
     protected function getChildrenIds($localization)
     {
-        $ids = [];
-
-        if ($localization instanceof Localization && !$localization->getChildLocalizations()->isEmpty()) {
-            foreach ($localization->getChildLocalizations() as $child) {
-                $childrenIds = $this->getChildrenIds($child);
-
-                foreach ($childrenIds as $id) {
-                    $ids[] = $id;
-                }
-
-                $ids[] = $child->getId();
-            }
-        }
-
-        return array_unique($ids);
+        return $localization instanceof Localization ? $localization->getChildrenIds() : [];
     }
 }

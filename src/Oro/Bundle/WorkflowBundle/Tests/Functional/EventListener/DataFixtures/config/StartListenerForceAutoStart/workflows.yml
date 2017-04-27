@@ -1,0 +1,49 @@
+workflows:
+    test_flow_force_autostart_different_app:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults: { active: true }
+        force_autostart: true
+        applications: ['unknown']
+        start_step: open
+        steps:
+            open:
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
+
+    test_flow_no_force_autostart_different_app:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults: { active: true }
+        applications: ['unknown']
+        start_step: open
+        steps:
+            open:
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
+
+    test_flow_no_force_autostart_default_app:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults: { active: true }
+        applications: ['default']
+        start_step: open
+        steps:
+            open:
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition

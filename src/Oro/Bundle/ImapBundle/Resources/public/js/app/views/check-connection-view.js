@@ -12,6 +12,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     CheckConnectionView = BaseView.extend({
+        SUCCESS_MESSAGE_DELAY: 5000,
         route: 'oro_imap_connection_check',
         entity: 'user',
         entityId: 0,
@@ -54,6 +55,7 @@ define(function(require) {
             var $messageContainer = this.$el.find('.check-connection-messages');
             mediator.execute('showLoading');
             this.clear();
+            $messageContainer.find('.alert').remove();
             $.ajax({
                 type: 'POST',
                 url: this.getUrl(),
@@ -87,9 +89,10 @@ define(function(require) {
         },
 
         showMessage: function(type, message, container) {
+            var delay = type === 'error' ? 0 : this.SUCCESS_MESSAGE_DELAY;
             messenger.notificationFlashMessage(type, __(message), {
                 container: container,
-                delay: 5000
+                delay: delay
             });
         },
 

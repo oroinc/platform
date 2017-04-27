@@ -1,11 +1,12 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
     'oroui/js/modal',
     'oroui/js/tools',
     'backbone',
     'oroworkflow/js/transition-executor'
-], function($, _, Modal, tools, Backbone, performTransition) {
+], function($, _, __, Modal, tools, Backbone, performTransition) {
     'use strict';
 
     /**
@@ -36,7 +37,7 @@ define([
                     autoResize: true
                 }
             };
-            var additionalOptions = element.data('data-dialog-options');
+            var additionalOptions = element.data('dialog-options');
             if (additionalOptions) {
                 if (!_.isUndefined(additionalOptions)) {
                     additionalOptions.dialogOptions = _.extend(
@@ -57,21 +58,45 @@ define([
             });
         };
 
-        var showConfirmationModal = function() {
+        /**
+         * @param {function} callback
+         */
+        var showConfirmationModal = function(callback) {
             var message = element.data('message');
-            var modalOptions = {
-                title: element.data('transition-label'),
-                content: message
-            };
-            if (element.data('transition-confirmation-options')) {
-                modalOptions = $.extend({}, modalOptions, element.data('transition-confirmation-options'));
-                modalOptions.template = _.template(element.data('transition-confirmation-options').template);
+            var modalOptions = {};
+            if (typeof message === 'string') {
+                modalOptions = {
+                    content: message,
+                    title: element.data('transition-label')
+                };
+            } else {
+                modalOptions = message;
             }
+
+            var confirmation = element.data('confirmation');
+            var placeholders = confirmation.message_parameters || {};
+            if (confirmation.title || '') {
+                modalOptions.title = __(confirmation.title, $.extend({}, placeholders));
+            }
+            if (confirmation.message || '') {
+                modalOptions.content = __(confirmation.message, $.extend({}, placeholders));
+            }
+            if (confirmation.okText || '') {
+                modalOptions.okText = __(confirmation.okText, $.extend({}, placeholders));
+            }
+            if (confirmation.cancelText || '') {
+                modalOptions.cancelText = __(confirmation.cancelText, $.extend({}, placeholders));
+            }
+
             var confirm = new Modal(modalOptions);
 
-            confirm.on('ok', function() {
-                performTransition(element, null, pageRefresh);
-            });
+            if (callback) {
+                confirm.on('ok', callback);
+            } else {
+                confirm.on('ok', function() {
+                    performTransition(element, null, pageRefresh);
+                });
+            }
             confirm.on('cancel', function() {
                 resetInProgress();
             });
@@ -86,17 +111,13 @@ define([
         element.one('transitions_success', resetInProgress);
         element.one('transitions_failure', resetInProgress);
 
-        if (element.data('dialog-url')) {
+        var dialogUrl = element.data('dialogUrl');
+        if (!_.isEmpty(element.data('confirmation')) || !dialogUrl && !_.isEmpty(element.data('message'))) {
+            showConfirmationModal(dialogUrl ? showDialog : null);
+        } else if (dialogUrl) {
             showDialog();
-            return;
+        } else {
+            performTransition(element, null, pageRefresh);
         }
-
-        if (element.data('message')) {
-            showConfirmationModal();
-            return;
-        }
-
-        performTransition(element, null, pageRefresh);
     };
-
 });

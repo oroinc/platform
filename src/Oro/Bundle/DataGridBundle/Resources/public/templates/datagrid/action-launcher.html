@@ -39,12 +39,12 @@
             data-key="<%= item.key %>">
             <% if (launcherMode == 'icon-text') { %>
                 <i class="fa-<%= icon %> hide-text"></i>
-                <%= label %>
+                <%= item.label %>
             <% } else if (launcherMode == 'icon-only') { %>
                 <i class="fa-<%= icon %> hide-text"></i>
             <% } else if (launcherMode == 'text-only') { %>
                 <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
-                <%= label %>
+                <%= item.label %>
             <% } %>
         </a></li>
     <% }) %>

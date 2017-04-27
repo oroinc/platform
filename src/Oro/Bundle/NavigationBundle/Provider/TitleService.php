@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
+use Knp\Menu\ItemInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class TitleService implements TitleServiceInterface
 {
     /**
@@ -99,6 +103,7 @@ class TitleService implements TitleServiceInterface
         if (null !== $title && $isJSON) {
             try {
                 $data = $this->jsonDecode($title);
+                $this->checkRenderParams($data, $isShort);
                 $params = $data['params'];
                 if ($isShort) {
                     $title = $data['short_template'];
@@ -256,9 +261,12 @@ class TitleService implements TitleServiceInterface
      *
      * @param array $params
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function setParams(array $params)
     {
+        $this->validateParams($params);
+
         $this->params = $params;
 
         return $this;
@@ -278,20 +286,17 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Create title template for current route and menu name
+     *
+     * @param string      $route
+     * @param string      $title
+     * @param string|null $menuName
+     *
+     * @return string
      */
-    protected function createTitle($route, $title, $menuName = null)
+    public function createTitle($route, $title, $menuName = null)
     {
-        $titleData = [];
-
-        if ($title) {
-            $titleData[] = $title;
-        }
-
-        $breadcrumbLabels = $this->getBreadcrumbs($route, $menuName);
-        if (count($breadcrumbLabels)) {
-            $titleData = array_merge($titleData, $breadcrumbLabels);
-        }
+        $titleData = $this->mergeTitleWithBreadcrumbLabels($route, $title, $menuName);
 
         $globalTitleSuffix = $this->userConfigManager->get('oro_navigation.title_suffix');
         if ($globalTitleSuffix) {
@@ -302,12 +307,33 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
+     * @param array $data
+     * @param bool $isShort
+     *
+     * @throws \RuntimeException
+     */
+    protected function checkRenderParams(array $data, $isShort)
+    {
+        if (!isset($data['params'])) {
+            throw new \RuntimeException('Missing key "params" in JSON title.');
+        }
+
+        if ($isShort) {
+            if (!array_key_exists('short_template', $data)) {
+                throw new \RuntimeException('Missing key "short_template" in JSON title.');
+            }
+        } elseif (!array_key_exists('template', $data)) {
+            throw new \RuntimeException('Missing key "template" in JSON title.');
+        }
+    }
+
+    /**
      * @param string      $route
      * @param string|null $menuName
      *
      * @return array
      */
-    protected function getBreadcrumbs($route, $menuName = null)
+    protected function getBreadcrumbLabels($route, $menuName = null)
     {
         if (!$menuName) {
             $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
@@ -316,6 +342,24 @@ class TitleService implements TitleServiceInterface
         /** @var BreadcrumbManagerInterface $breadcrumbManager */
         $breadcrumbManager = $this->breadcrumbManagerLink->getService();
         return $breadcrumbManager->getBreadcrumbLabels($menuName, $route);
+    }
+
+    /**
+     * @param string|null $menuName
+     * @param bool $isInverse
+     * @param string|null $route
+     *
+     * @return array
+     */
+    protected function getBreadcrumbs($menuName = null, $isInverse = true, $route = null)
+    {
+        if (!$menuName) {
+            $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
+        }
+
+        /** @var BreadcrumbManagerInterface $breadcrumbManager */
+        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
+        return $breadcrumbManager->getBreadcrumbs($menuName, $isInverse, $route);
     }
 
     /**
@@ -330,7 +374,7 @@ class TitleService implements TitleServiceInterface
     private function getShortTitle($route, $title, $menuName = null)
     {
         if (!$title) {
-            $breadcrumbs = $this->getBreadcrumbs($route, $menuName);
+            $breadcrumbs = $this->getBreadcrumbLabels($route, $menuName);
             if (count($breadcrumbs)) {
                 $title = $breadcrumbs[0];
             }
@@ -344,10 +388,15 @@ class TitleService implements TitleServiceInterface
      */
     public function getSerialized()
     {
+        $params = [];
+        foreach ($this->getParams() as $paramName => $paramValue) {
+            //Explicitly case object to string because json_encode can not serialize it correct
+            $params[$paramName] = is_object($paramValue) ? (string)$paramValue : $paramValue;
+        }
         $data = [
             'template'       => $this->getTemplate(),
             'short_template' => $this->getShortTemplate(),
-            'params'         => $this->getParams()
+            'params'         => $params
         ];
         if ($this->prefix) {
             $data['prefix'] = $this->prefix;
@@ -395,5 +444,55 @@ class TitleService implements TitleServiceInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @param string $route
+     * @param string $title
+     * @param string $menuName
+     *
+     * @return array
+     */
+    protected function mergeTitleWithBreadcrumbLabels($route, $title, $menuName)
+    {
+        $titleData = [];
+        if ($title) {
+            $titleData[] = $title;
+        }
+        $breadcrumbLabels = $this->getBreadcrumbLabels($route, $menuName);
+        if (count($breadcrumbLabels)) {
+            $breadcrumbs = $this->getBreadcrumbs($menuName, false, $route);
+            if (count($breadcrumbs)) {
+                /** @var ItemInterface $menuItem */
+                $menuItem = $breadcrumbs[0]['item'];
+                $routes = $menuItem->getExtra('routes', []);
+                if ($routes === [$route] && $title) {
+                    unset($breadcrumbLabels[0]);
+                }
+            }
+
+            $titleData = array_merge($titleData, $breadcrumbLabels);
+        }
+
+        return $titleData;
+    }
+
+    /**
+     * @param array $params
+     * @throws \InvalidArgumentException
+     */
+    private function validateParams(array $params)
+    {
+        foreach ($params as $key => $value) {
+            if (is_object($value) && !method_exists($value, '__toString')) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Object of type %s used for "%s" title param don\'t have __toString() method.',
+                        get_class($value),
+                        $key
+                    )
+                );
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ parameters:
     oro_distribution.composer.installer.class:                Composer\Installer
     oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
     oro_distribution.composer.json_file.class:                Composer\Json\JsonFile
-    oro_distribution.composer_json:                           %kernel.root_dir%/../composer.json
+    oro_distribution.composer_json:                           '%kernel.root_dir%/../composer.json'
 
     #
     # BAP-10865: Hide "Package Manager" from menu
@@ -137,3 +137,20 @@ services:
         class: %oro_distribution.form.type.composer_repository.class%
         tags:
             - { name: form.type, alias: oro_composer_repository }
+
+    # Translations
+    # event listeners
+    oro_distribution.locale_listener:
+        class: 'Oro\Bundle\DistributionBundle\EventListener\LocaleListener'
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    # DBAL Loader
+    oro_distribution.database_translation.loader:
+        class: 'Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: translation.loader, alias: oro_dbal_translation }

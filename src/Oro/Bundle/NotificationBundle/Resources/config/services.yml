@@ -204,6 +204,8 @@ services:
         arguments:
             - '@oro_email.direct_mailer'
             - '@oro_email.mailer.processor'
+            - '@doctrine'
+            - '@oro_email.email_renderer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

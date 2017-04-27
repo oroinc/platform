@@ -31,7 +31,7 @@ define(function(require) {
 
         getTemplateFunction: function() {
             if (!this.template) {
-                this.template = $('#email-attachment-list-row-view').html();
+                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-list-row-view.html');
             }
 
             return EmailAttachmentListRowView.__super__.getTemplateFunction.call(this);

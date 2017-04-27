@@ -5,6 +5,22 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 /**
  * This class provides a set of functions intended to manipulation with the join identifiers.
  *
+ * Format description:
+ *      ::, +, |, . - literals
+ *      [] - values enclosed in square brackets are optional
+ *      () - group
+ *      *  - expression can be repeated many times
+ *      <class>  - class name of entity
+ *      <field-name> - name of the field
+ *      <join-type> - type of join (left, inner, ...)
+ *      <join-condition-type> - (ON, WITH, ...)
+ *      <join-condition> - part after ON keyword
+ *      <field> - <field-name>[|<join-type>[|<join-condition-type>[|<join-condition>]]]
+ *
+ * Formats:
+ *      [<class>::]<field>([+<class>[::<class>]::<field>])*
+ *      <field-name>[.<field>]([+<class>[::<class>]::<field>])*
+ *
  * The join identifier is a string which unique identifies
  * each JOIN used in a query.
  * Examples:

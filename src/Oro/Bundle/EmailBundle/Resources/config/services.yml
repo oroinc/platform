@@ -82,7 +82,7 @@ parameters:
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
     oro_email.emailfolder.datagrid_view_list.class:   Oro\Bundle\EmailBundle\Datagrid\EmailFolderViewList
-    oro_email.emailseen.datagrid_view_list.class:   Oro\Bundle\EmailBundle\Datagrid\EmailSeenViewList
+    oro_email.emailseen.datagrid_view_list.class:     Oro\Bundle\EmailBundle\Datagrid\EmailSeenViewList
 
     # Datagrid event listeners
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
@@ -424,6 +424,7 @@ services:
             - '@oro_email.mailer.processor'
             - '@oro_email.email_renderer'
             - '@logger'
+            - '@translator'
             - %locale%
 
     oro_email.link.autoresponserule_manager:
@@ -588,6 +589,8 @@ services:
             - '@oro_entity.entity_name_resolver'
             - '@oro_email.mailbox.manager'
             - '@oro_security.security_facade'
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
@@ -1015,6 +1018,12 @@ services:
 
     oro_email.email_user.provider.email_user_entity_name_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailUserEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }
+
+    oro_email.email_body_entity_name_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider
         public: false
         tags:
             - { name: oro_entity.name_provider, priority: 0 }

@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
+use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\DataGridBundle\Provider\MultiGridProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/activities")
@@ -44,7 +45,7 @@ class ActivityController extends Controller
     /**
      * @Route("/{activity}/{id}/context", name="oro_activity_context")
      *
-     * @Template("OroActivityBundle:Activity/dialog:context.html.twig")
+     * @Template("OroDataGridBundle:Grid/dialog:multi.html.twig")
      *
      * @param string $activity
      * @param string $id
@@ -63,54 +64,60 @@ class ActivityController extends Controller
             throw new AccessDeniedException();
         }
 
-        $entityTargets    = $this->get('oro_activity.provider.context_grid')
-                                 ->getSupportedTargets($entity);
-
         $entityClassAlias = $this->get('oro_entity.entity_alias_resolver')
-                                 ->getPluralAlias($entityClass);
+            ->getPluralAlias($entityClass);
 
         return [
+            'multiGridComponent'     => 'oroactivity/js/app/components/activity-context-component',
+            'gridWidgetName'         => 'activity-context-grid',
+            'dialogWidgetName'       => 'activity-context-dialog',
             'sourceEntity'           => $entity,
             'sourceEntityClassAlias' => $entityClassAlias,
-            'entityTargets'          => $entityTargets,
+            'entityTargets'          => $this->getSupportedTargets($entity),
             'params'                 => [
-                'grid_path' => $this->generateUrl(
-                    'oro_activity_context_grid',
-                    ['activity' => $activity, 'id' => $id],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                )
+                'grid_query' => [
+                    'params' => [
+                        'activityClass' => $activity,
+                        'activityId'    => $id,
+                    ],
+                ],
             ]
         ];
     }
 
     /**
-     * @Route("/{activity}/{id}/context/grid/{entityClass}", name="oro_activity_context_grid")
-     *
-     * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
-     *
-     * @param string $entityClass
-     * @param string $activity
-     * @param string $id
+     * @param object $entity
      *
      * @return array
+     * [
+     *     [
+     *         'label' => label,
+     *         'gridName' => gridName,
+     *         'className' => className,
+     *     ],
+     * ]
      */
-    public function contextGridAction($activity, $id, $entityClass = null)
+    protected function getSupportedTargets($entity)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
-        $gridName = $this->get('oro_activity.provider.context_grid')->getContextGridByEntity($entityClass);
+        $entityClass = ClassUtils::getClass($entity);
+        $targetClasses = array_keys($this->getActivityManager()->getActivityTargets($entityClass));
 
-        // Need to specify parameters for Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
-        $params = [
-            'activityClass' => $activity,
-            'activityId'    => $id,
-            'class_name'    => $entityClass,
-        ];
+        return $this->getMultiGridProvider()->getEntitiesData($targetClasses);
+    }
 
-        return [
-            'gridName'     => $gridName,
-            'multiselect'  => false,
-            'params'       => $params,
-            'renderParams' => []
-        ];
+    /**
+     * @return ActivityManager
+     */
+    protected function getActivityManager()
+    {
+        return $this->get('oro_activity.manager');
+    }
+
+    /**
+     * @return MultiGridProvider
+     */
+    protected function getMultiGridProvider()
+    {
+        return $this->get('oro_datagrid.multi_grid_provider');
     }
 }

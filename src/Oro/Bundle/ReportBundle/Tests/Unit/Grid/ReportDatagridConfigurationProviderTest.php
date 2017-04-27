@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 
@@ -36,6 +37,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
      */
     protected $configManager;
 
+    /**
+     * @var DatagridDateGroupingBuilder|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $dateGroupingBuilder;
+
     protected function setUp()
     {
         $this->functionProvider = $this->createMock(
@@ -65,6 +71,10 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             new DatagridGuesserMock(),
             $entityNameResolver
         );
+        $this->dateGroupingBuilder = $this->getMockBuilder(DatagridDateGroupingBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $builder->setDateGroupingBuilder($this->dateGroupingBuilder);
 
         $builder->setConfigManager($this->configManager);
 

@@ -35,7 +35,7 @@ class ResponseHistoryListener
     /** @var string */
     protected $navigationHistoryItemType;
 
-    /** var ItemFactory */
+    /** @var ItemFactory */
     protected $navItemFactory;
 
     /** @var SecurityContextInterface */

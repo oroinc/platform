@@ -10,12 +10,41 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ActionTestCase extends WebTestCase
 {
+    /** @var ActionGroupRegistry */
+    private $actionGroupRegistry;
+
+    /**
+     * @return ActionGroupRegistry
+     */
+    protected function getActionGroupRegistry()
+    {
+        if (null === $this->actionGroupRegistry) {
+            $this->actionGroupRegistry = $this->getContainer()->get('oro_action.action_group_registry');
+        }
+
+        return $this->actionGroupRegistry;
+    }
+
+    /**
+     * @param string $name
+     * @param array $data
+     * @return ActionData
+     */
+    protected function executeActionGroup($name, array $data = [])
+    {
+        $actionGroup = $this->getActionGroupRegistry()->get($name);
+
+        return $actionGroup->execute(new ActionData($data));
+    }
+
     /**
      * @return string
      */
@@ -125,7 +154,8 @@ abstract class ActionTestCase extends WebTestCase
                 'success' => $isSuccess,
                 'message' => '',
                 'messages' => [],
-                'redirectUrl' => $this->getUrl($redirectUrl)
+                'redirectUrl' => $this->getUrl($redirectUrl),
+                'pageReload' => true
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );

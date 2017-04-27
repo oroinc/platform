@@ -242,16 +242,10 @@ class UiExtension extends \Twig_Extension
 
         $this->renderedWidgets[$optionsHash] = true;
 
-        if (!array_key_exists('url', $options)) {
-            throw new \InvalidArgumentException('Option url is required');
-        }
+        $this->validateOptions($options);
 
-        if (!array_key_exists('widgetType', $options)) {
-            throw new \InvalidArgumentException('Option widgetType is required');
-        } else {
-            $widgetType = $options['widgetType'];
-            unset($options['widgetType']);
-        }
+        $widgetType = $options['widgetType'];
+        unset($options['widgetType']);
 
         if (!isset($options['wid'])) {
             $options['wid'] = $this->getUniqueIdentifier();
@@ -272,7 +266,8 @@ class UiExtension extends \Twig_Extension
         $options['url'] = $this->getUrlWithContainer(
             $options['url'],
             $widgetType,
-            $options['wid']
+            $options['wid'],
+            isset($options['widgetTemplate']) ? $options['widgetTemplate'] : null
         );
 
         $request = $this->getRequest();
@@ -291,17 +286,37 @@ class UiExtension extends \Twig_Extension
     }
 
     /**
+     * @param array $options
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateOptions(array $options)
+    {
+        if (!array_key_exists('url', $options)) {
+            throw new \InvalidArgumentException('Option url is required');
+        }
+
+        if (!array_key_exists('widgetType', $options)) {
+            throw new \InvalidArgumentException('Option widgetType is required');
+        }
+    }
+
+    /**
      * @param string $url
      * @param string $widgetType
      * @param string $wid
+     * @param string|null $widgetTemplate
      *
      * @return string
      */
-    protected function getUrlWithContainer($url, $widgetType, $wid)
+    protected function getUrlWithContainer($url, $widgetType, $wid, $widgetTemplate = null)
     {
         if (strpos($url, '_widgetContainer=') === false) {
             $parts = parse_url($url);
             $widgetPart = '_widgetContainer=' . $widgetType . '&_wid=' . $wid;
+            if ($widgetTemplate && $widgetTemplate !== $widgetType) {
+                $widgetPart .= '&_widgetContainerTemplate=' . $widgetTemplate;
+            }
             if (array_key_exists('query', $parts)) {
                 $separator = $parts['query'] ? '&' : '';
                 $newQuery = $parts['query'] . $separator . $widgetPart;

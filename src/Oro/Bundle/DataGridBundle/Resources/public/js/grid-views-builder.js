@@ -4,10 +4,17 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
     var GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
     var GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
     var gridContentManager = require('orodatagrid/js/content-manager');
     var gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
+
+    var config = require('module').config();
+    config = _.extend({
+        GridViewsView: GridViewsView
+    }, config);
+
     var gridViewsBuilder = {
         /**
          * Runs grid views builder
@@ -27,14 +34,27 @@ define(function(require) {
                     gridViews: {},
                     options: {}
                 }),
+                gridViewsOptions: _.defaults({}, options.gridViewsOptions),
                 enableViews: options.enableViews,
                 $gridEl: options.$el,
                 showInNavbar: options.showViewsInNavbar,
+                showInCustomElement: options.showViewsInCustomElement,
+                GridViewsView: config.GridViewsView,
                 buildViews: function(grid) {
                     var gridViews = gridViewsBuilder.build.call(this, grid.collection);
                     deferred.resolve(gridViews);
                 }
             };
+
+            if (_.isString(self.GridViewsView)) {
+                self.buildViews = _.wrap(self.buildViews, function(buildViews, grid) {
+                    tools.loadModule(this.GridViewsView)
+                        .then(_.bind(function(GridViewsView) {
+                            this.GridViewsView = GridViewsView;
+                            buildViews.call(this, grid);
+                        }, this));
+                });
+            }
 
             options.gridPromise.done(function(grid) {
                 if (_.contains(options.builders, 'orofilter/js/datafilter-builder')) {
@@ -68,15 +88,21 @@ define(function(require) {
          */
         build: function(collection) {
             var gridViews;
+            var $gridViews;
+            var GridViewsView = this.GridViewsView;
             var options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
                 var gridViewsOptions = _.extend({collection: collection}, options);
 
                 if (this.showInNavbar) {
-                    var $gridViews = $(gridGridViewsSelector);
+                    $gridViews = $(gridGridViewsSelector);
                     gridViewsOptions.title = $gridViews.text();
 
                     gridViews = new GridViewsView(gridViewsOptions);
+                    $gridViews.html(gridViews.render().$el);
+                } else if (this.showInCustomElement) {
+                    gridViews = new GridViewsView(gridViewsOptions);
+                    $gridViews = $(this.showInCustomElement);
                     $gridViews.html(gridViews.render().$el);
                 } else {
                     gridViews = new GridViewsView(gridViewsOptions);
@@ -108,6 +134,8 @@ define(function(require) {
 
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;
+            options.gridViewsOptions = this.gridViewsOptions;
+
             return _.omit(options, ['views']);
         },
 

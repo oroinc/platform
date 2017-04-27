@@ -26,6 +26,7 @@ define(function(require) {
     var scrollHelper = require('oroui/js/tools/scroll-helper');
     var PageableCollection =  require('../pageable-collection');
     var util = require('./util');
+    var tools = require('oroui/js/tools');
 
     /**
      * Basic grid class.
@@ -212,7 +213,7 @@ define(function(require) {
         },
 
         /**
-         * @param {Object} options
+         * @param {Object} opts
          * @private
          */
         _validateOptions: function(opts) {
@@ -333,8 +334,10 @@ define(function(require) {
             });
         },
 
-        onCollectionUpdateState: function() {
-            this.selectState.reset();
+        onCollectionUpdateState: function(collection, state) {
+            if (this.stateIsResettable(collection.previousState, state)) {
+                this.selectNone();
+            }
         },
 
         onCollectionModelRemove: function(model) {
@@ -419,6 +422,20 @@ define(function(require) {
                 obj.selected = this.selectState.get('rows');
                 obj.inset = this.selectState.get('inset');
             }
+        },
+
+        /**
+         * @param {*} previousState
+         * @param {*} state
+         * @returns {boolean} TRUE if values are not equal, otherwise - FALSE
+         */
+        stateIsResettable: function(previousState, state) {
+            var fields = ['filters', 'gridView', 'pageSize'];
+
+            return !tools.isEqualsLoosely(
+                _.pick(previousState, fields),
+                _.pick(state, fields)
+            );
         },
 
         /**
@@ -618,6 +635,7 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
+            var ComponentConstructor =  this.collection.options.modules.columnManagerComponentCustom || null;
             var toolbar;
             var sortActions = this.sortActions;
             var toolbarOptions = {
@@ -625,6 +643,7 @@ define(function(require) {
                 actions:      this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
                 columns:      this.columns,
+                componentConstructor: ComponentConstructor,
                 addToolbarAction: function(action) {
                     toolbarOptions.actions.push(action);
                     sortActions(toolbarOptions.actions);

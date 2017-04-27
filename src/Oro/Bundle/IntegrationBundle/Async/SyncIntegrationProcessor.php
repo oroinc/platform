@@ -3,10 +3,10 @@ namespace Oro\Bundle\IntegrationBundle\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use Oro\Bundle\IntegrationBundle\Authentication\Token\IntegrationTokenAwareTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
-use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 
@@ -23,16 +23,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAwareInterface, TopicSubscriberInterface
 {
     use ContainerAwareTrait;
+    use IntegrationTokenAwareTrait;
 
     /**
      * @var RegistryInterface
      */
     private $doctrine;
-    
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
     
     /**
      * @var SyncProcessorRegistry
@@ -130,7 +126,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
 
         $em->getConnection()->getConfiguration()->setSQLLogger(null);
 
-        $this->updateToken($integration);
+        $this->setTemporaryIntegrationToken($integration);
         $integration->getTransport()->getSettingsBag()->set('page_size', $body['transport_batch_size']);
 
         $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($integration, $body) {
@@ -145,19 +141,5 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         });
 
         return $result ? self::ACK : self::REJECT;
-    }
-
-    /**
-     * @param Integration $integration
-     */
-    protected function updateToken(Integration $integration)
-    {
-        $token = $this->tokenStorage->getToken();
-        if (false == $token) {
-            $token = new ConsoleToken();
-            $this->tokenStorage->setToken($token);
-        }
-
-        $token->setOrganizationContext($integration->getOrganization());
     }
 }

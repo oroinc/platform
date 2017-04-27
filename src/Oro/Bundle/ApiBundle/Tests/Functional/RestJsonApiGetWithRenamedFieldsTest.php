@@ -36,7 +36,6 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
 
     public function testFilteringByRenamedIdentityField()
     {
-        $this->markTestSkipped('Due to BAP-10954');
         $params = [
             'filter[id]' => (string)$this->getReference('test_product2')->getId()
         ];
@@ -58,7 +57,6 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
 
     public function testFilteringByRenamedField()
     {
-        $this->markTestSkipped('Due to BAP-10954');
         $params = [
             'filter[renamedName]' => 'product 2'
         ];
@@ -80,7 +78,6 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
 
     public function testFilteringByRenamedRelatedField()
     {
-        $this->markTestSkipped('Due to BAP-10954');
         $params = [
             'filter[productType.renamedName]' => 'type2'
         ];
@@ -108,7 +105,6 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
      */
     public function testSortingByRenamedField($params, $expected)
     {
-        $this->markTestSkipped('Due to BAP-10954');
         $this->updateProductExpectedData($expected);
 
         $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);

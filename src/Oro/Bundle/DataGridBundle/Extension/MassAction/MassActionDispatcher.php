@@ -103,9 +103,10 @@ class MassActionDispatcher
         $datagrid->getParameters()->mergeKey(OrmFilterExtension::FILTER_ROOT_PARAM, $filters);
 
         // create mediator
-        $massAction     = $this->getMassActionByName($actionName, $datagrid);
-        $identifier     = $this->getIdentifierField($massAction);
-        $qb             = $this->getDatagridQuery($datagrid, $identifier, $inset, $values);
+        $massAction       = $this->getMassActionByName($actionName, $datagrid);
+        $identifier       = $this->getIdentifierField($massAction);
+        $objectIdentifier = $this->getObjectIdentifier($massAction);
+        $qb               = $this->getDatagridQuery($datagrid, $identifier, $inset, $values, $objectIdentifier);
 
         //prepare query builder
         $qb->setMaxResults(null);
@@ -115,15 +116,14 @@ class MassActionDispatcher
         ) {
             $qb = $this->aclHelper->apply($qb);
         }
-
         $resultIterator = $this->getResultIterator($qb);
+
         $handlerArgs    = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
 
         // perform mass action
         $handler = $this->getMassActionHandler($massAction);
-        $result  = $handler->handle($handlerArgs);
 
-        return $result;
+        return $handler->handle($handlerArgs);
     }
 
     /**
@@ -131,15 +131,18 @@ class MassActionDispatcher
      * @param string            $identifierField
      * @param bool              $inset
      * @param array             $values
+     * @param string            $objectIdentifier
+     *
+     * @throws LogicException
      *
      * @return QueryBuilder
-     * @throws LogicException
      */
     protected function getDatagridQuery(
         DatagridInterface $datagrid,
         $identifierField = 'id',
         $inset = true,
-        $values = []
+        $values = [],
+        $objectIdentifier = null
     ) {
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof SearchDatasource) {
@@ -152,9 +155,13 @@ class MassActionDispatcher
         if ($values) {
             $valueWhereCondition =
                 $inset
-                    ? $qb->expr()->in($identifierField, $values)
-                    : $qb->expr()->notIn($identifierField, $values);
+                    ? $qb->expr()->in($identifierField, ':values')
+                    : $qb->expr()->notIn($identifierField, ':values');
             $qb->andWhere($valueWhereCondition);
+            $qb->setParameter('values', $values);
+        }
+        if ($objectIdentifier) {
+            $qb->addSelect($objectIdentifier);
         }
 
         return $qb;
@@ -164,7 +171,7 @@ class MassActionDispatcher
      * @param string            $massActionName
      * @param DatagridInterface $datagrid
      *
-     * @return \Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface
+     * @return MassActionInterface
      * @throws LogicException
      */
     protected function getMassActionByName($massActionName, DatagridInterface $datagrid)
@@ -235,7 +242,7 @@ class MassActionDispatcher
     }
 
     /**
-     * @param Actions\MassActionInterface $massAction
+     * @param MassActionInterface $massAction
      *
      * @throws LogicException
      *
@@ -249,5 +256,15 @@ class MassActionDispatcher
         }
 
         return $identifier;
+    }
+
+    /**
+     * @param MassActionInterface $massAction
+     *
+     * @return string|null
+     */
+    protected function getObjectIdentifier(MassActionInterface $massAction)
+    {
+        return $massAction->getOptions()->offsetGetOr('object_identifier');
     }
 }

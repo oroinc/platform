@@ -7,14 +7,13 @@ use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\BatchBundle\Step\StepExecutor;
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 
@@ -26,19 +25,9 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
     protected $fileManager;
 
     /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
-
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
 
     /**
      * @var bool
@@ -48,17 +37,9 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
     /**
      * @param FileManager $fileManager
      */
-    public function __construct(FileManager $fileManager)
+    public function setFileManager(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
-    }
-
-    /**
-     * @param RouterInterface $router
-     */
-    public function setRouter(RouterInterface $router)
-    {
-        $this->router = $router;
     }
 
     /**
@@ -67,14 +48,6 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
-    }
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function setConfigManager(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
     }
 
     /**
@@ -105,7 +78,7 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
 
         $contextParameters['filePath'] = $filePath;
 
-        $context  = new Context($contextParameters);
+        $context = new Context($contextParameters);
         $executor = new StepExecutor();
         $executor->setBatchSize($batchSize);
         $executor
@@ -119,21 +92,24 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         }
 
         $executor->execute($this);
-
-        $url = null;
         $this->fileManager->writeFileToStorage($filePath, $fileName);
-        unlink($filePath);
-
-        if (! $this->exportFailed) {
-            $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
-                'oro_importexport_export_download',
-                ['fileName' => $fileName]
-            );
+        @unlink($filePath);
+        $readsCount = $context->getReadCount() ?: 0;
+        $errorsCount = count($context->getFailureExceptions());
+        $errors = array_slice(array_merge($context->getErrors(), $context->getFailureExceptions()), 0, 100);
+        if ($writer instanceof ClosableInterface) {
+            $writer->close();
+        }
+        if ($reader instanceof ClosableInterface) {
+            $reader->close();
         }
 
         return [
             'success' => !$this->exportFailed,
-            'url' => $url,
+            'file' => $fileName,
+            'readsCount' => $readsCount,
+            'errorsCount' => $errorsCount,
+            'errors' => $errors
          ];
     }
 
@@ -149,5 +125,19 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         $this->exportFailed = true;
 
         $this->logger->error(sprintf('[DataGridExportHandle] Error message: %s', $reason), ['element' => $element]);
+    }
+
+    /**
+     * @param DatagridExportIdFetcher $idFetcher
+     * @param array $parameters
+     *
+     * @return array
+     */
+    public function getExportingEntityIds(DatagridExportIdFetcher $idFetcher, array $parameters)
+    {
+        $context  = new Context($parameters);
+        $idFetcher->setImportExportContext($context);
+
+        return $idFetcher->getGridDataIds();
     }
 }

@@ -5,22 +5,12 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 
 use Akeneo\Bundle\BatchBundle\Item\ParseException;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
-class CsvFileReader extends AbstractReader
+class CsvFileReader extends AbstractFileReader
 {
-    /**
-     * @var \SplFileInfo
-     */
-    protected $fileInfo;
-
-    /**
-     * @var \SplFileObject
-     */
-    protected $file;
-
     /**
      * @var string
      */
@@ -36,15 +26,6 @@ class CsvFileReader extends AbstractReader
      */
     protected $escape = '\\';
 
-    /**
-     * @var bool
-     */
-    protected $firstLineIsHeader = true;
-
-    /**
-     * @var array
-     */
-    protected $header;
 
     /**
      * {@inheritdoc}
@@ -130,13 +111,7 @@ class CsvFileReader extends AbstractReader
      */
     protected function initializeFromContext(ContextInterface $context)
     {
-        if (!$context->hasOption('filePath')) {
-            throw new InvalidConfigurationException(
-                'Configuration of CSV reader must contain "filePath".'
-            );
-        } else {
-            $this->setFilePath($context->getOption('filePath'));
-        }
+        parent::initializeFromContext($context);
 
         if ($context->hasOption('delimiter')) {
             $this->delimiter = $context->getOption('delimiter');
@@ -157,28 +132,5 @@ class CsvFileReader extends AbstractReader
         if ($context->hasOption('header')) {
             $this->header = $context->getOption('header');
         }
-    }
-
-    /**
-     * @param string $filePath
-     * @throws InvalidArgumentException
-     */
-    protected function setFilePath($filePath)
-    {
-        $this->fileInfo = new \SplFileInfo($filePath);
-
-        if (!$this->fileInfo->isFile()) {
-            throw new InvalidArgumentException(sprintf('File "%s" does not exists.', $filePath));
-        } elseif (!$this->fileInfo->isReadable()) {
-            throw new InvalidArgumentException(sprintf('File "%s" is not readable.', $this->fileInfo->getRealPath()));
-        }
-    }
-
-    /**
-     * @param ContextInterface $context
-     */
-    public function initializeByContext(ContextInterface $context)
-    {
-        $this->initializeFromContext($context);
     }
 }

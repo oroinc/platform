@@ -72,6 +72,11 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     private $allCollectionUpdates;
 
     /**
+     * @var \SplObjectStorage
+     */
+    private $tokenStorage;
+
+    /**
      * @var boolean
      */
     private $enabled = true;
@@ -105,6 +110,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->allUpdates = new \SplObjectStorage;
         $this->allDeletions = new \SplObjectStorage;
         $this->allCollectionUpdates = new \SplObjectStorage;
+        $this->tokenStorage = new \SplObjectStorage;
     }
 
     /**
@@ -130,6 +136,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->findAuditableUpdates($em);
         $this->findAuditableDeletions($em);
         $this->findAuditableCollectionUpdates($em);
+
+        if ($token = $this->securityTokenStorage->getToken()) {
+            $this->tokenStorage[$em] = $token;
+        }
     }
 
     private function emHasChanges($em)
@@ -184,7 +194,8 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 'collections_updated' => [],
             ];
 
-            $securityToken = $this->securityTokenStorage->getToken();
+            //we need this solution as the token can be cleared by the mq extension
+            $securityToken = $this->getSecurityToken($em);
             if (null !== $securityToken) {
                 $user = $securityToken->getUser();
                 if ($user instanceof AbstractUser) {
@@ -197,6 +208,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
                 if ($securityToken->hasAttribute('IMPERSONATION')) {
                     $body['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
+                }
+
+                if ($securityToken->hasAttribute('owner_description')) {
+                    $body['owner_description'] = $securityToken->getAttribute('owner_description');
                 }
             }
             if (empty($body = $this->processMessageBody($em, $body))) {
@@ -212,7 +227,13 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $this->allUpdates->detach($em);
             $this->allDeletions->detach($em);
             $this->allCollectionUpdates->detach($em);
+            $this->tokenStorage->detach($em);
         }
+    }
+
+    private function getSecurityToken(EntityManager $em)
+    {
+        return $this->tokenStorage->contains($em) ? $this->tokenStorage[$em] : $this->securityTokenStorage->getToken();
     }
 
     /**

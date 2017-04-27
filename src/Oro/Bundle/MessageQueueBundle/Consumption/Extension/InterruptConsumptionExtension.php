@@ -37,6 +37,7 @@ class InterruptConsumptionExtension extends AbstractExtension
             );
 
             $context->setExecutionInterrupted(true);
+            $context->setInterruptedReason('The cache was cleared.');
 
             return;
         }
@@ -50,6 +51,7 @@ class InterruptConsumptionExtension extends AbstractExtension
             );
 
             $context->setExecutionInterrupted(true);
+            $context->setInterruptedReason('The cache was cleared.');
         }
     }
 }
