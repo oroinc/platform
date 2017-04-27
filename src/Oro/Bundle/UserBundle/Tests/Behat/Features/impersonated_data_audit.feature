@@ -1,3 +1,5 @@
+@ticket-BAP-12594
+@automatically-ticket-tagged
 @not-automated
 Feature: Identify changes made by impersonated user in Data Audit
   In order to see changes made by impersonated users

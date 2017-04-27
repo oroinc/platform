@@ -1,3 +1,5 @@
+@ticket-BAP-13139
+@automatically-ticket-tagged
 @fixture-OroUserBundle:user.yml
 @fixture-LanguageFixture.yml
 Feature: Applying language settings in system configuration
