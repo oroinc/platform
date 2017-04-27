@@ -33,6 +33,6 @@ class IntegrationIconProvider implements IntegrationIconProviderInterface
             }
         }
 
-        return '';
+        return null;
     }
 }

@@ -65,7 +65,7 @@ class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'channelType' => 'unknownChannelType',
-                'expectedIconUri' => ''
+                'expectedIconUri' => null
             ],
         ];
     }
@@ -82,7 +82,7 @@ class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
 
         $actual = $this->provider->getIcon($this->createChannel(self::CHANNEL_TYPE));
 
-        static::assertSame('', $actual);
+        static::assertNull($actual);
     }
 
     /**

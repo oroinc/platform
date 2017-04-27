@@ -9,7 +9,7 @@ interface IntegrationIconProviderInterface
     /**
      * @param Channel $channel
      *
-     * @return string
+     * @return string|null
      */
     public function getIcon(Channel $channel);
 }
