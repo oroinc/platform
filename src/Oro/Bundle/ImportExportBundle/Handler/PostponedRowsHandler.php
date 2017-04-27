@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -13,6 +15,8 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 
 class PostponedRowsHandler
 {
+    const MAX_ATTEMPTS = 5;
+
     /**
      * @var FileManager
      */
@@ -29,18 +33,26 @@ class PostponedRowsHandler
     private $writerChain;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @param FileManager              $fileManager
      * @param MessageProducerInterface $messageProducer
      * @param WriterChain              $writerChain
+     * @param TranslatorInterface      $translator
      */
     public function __construct(
         FileManager $fileManager,
         MessageProducerInterface $messageProducer,
-        WriterChain $writerChain
+        WriterChain $writerChain,
+        TranslatorInterface $translator
     ) {
         $this->fileManager = $fileManager;
         $this->messageProducer = $messageProducer;
         $this->writerChain = $writerChain;
+        $this->translator = $translator;
     }
 
     /**
@@ -80,13 +92,18 @@ class PostponedRowsHandler
      * @param Job       $currentJob
      * @param string    $fileName
      * @param array     $body
+     * @param array     $result
      */
-    public function postpone(JobRunner $jobRunner, Job $currentJob, $fileName, array $body)
+    public function postpone(JobRunner $jobRunner, Job $currentJob, $fileName, array $body, array &$result)
     {
         $attempts = isset($body['attempts']) ? (int)$body['attempts'] + 1 : 1;
 
-        // @todo refactor in BB-8550
-        if ($attempts >= 3) {
+        if ($attempts > self::MAX_ATTEMPTS) {
+            if (array_key_exists('postponedRows', $result) && !empty($result['postponedRows'])) {
+                $result['errors'][] = $this->translator->trans('oro.importexport.import.postponed_rows',
+                    ['%postponedRows%' => count($result['postponedRows'])]);
+                $result['counts']['errors']++;
+            }
             return;
         }
 

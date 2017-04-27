@@ -155,7 +155,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
             $fileName = $this
                 ->postponedRowsHandler->writeRowsToFile($result['postponedRows'], $body['fileName']);
 
-            $this->postponedRowsHandler->postpone($jobRunner, $job, $fileName, $body);
+            $this->postponedRowsHandler->postpone($jobRunner, $job, $fileName, $body, $result);
         }
 
         $this->saveJobResult($job, $result);

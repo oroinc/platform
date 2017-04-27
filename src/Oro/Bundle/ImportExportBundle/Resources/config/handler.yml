@@ -55,3 +55,4 @@ services:
             - '@oro_importexport.file.file_manager'
             - '@oro_message_queue.client.message_producer'
             - '@oro_importexport.writer.writer_chain'
+            - '@translator'
