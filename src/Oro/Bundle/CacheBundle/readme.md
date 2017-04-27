@@ -6,6 +6,7 @@ The `OroCacheBundle` is responsible for operations with various kinds of caches.
 Table of Contents
 -----------------
  - [Abstract cache services](#abstract-cache-services)
+ - [APC cache](#apc-cache)
  - [Warm up config cache](#warm-up-config-cache)
 
 Abstract cache services
