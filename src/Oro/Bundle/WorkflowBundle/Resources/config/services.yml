@@ -176,33 +176,27 @@ services:
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
-    oro_workflow.handler.transition_helper:
-        class: 'Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper'
+    oro_workflow.handler.widget_template.transition_helper:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionWidgetTemplateHelper'
         arguments:
             - '@fos_rest.view_handler'
             - '@twig'
 
-    oro_workflow.handler.transition_handler:
-        class: 'Oro\Bundle\WorkflowBundle\Handler\TransitionHandler'
+    oro_workflow.provider.page_data.start_transition:
+        class: Oro\Bundle\WorkflowBundle\Provider\PageData\StartTransitionPageDataProvider
         arguments:
             - '@oro_workflow.manager'
-            - '@oro_workflow.handler.transition_helper'
-            - '@logger'
-        tags:
-            - { name: monolog.logger, channel: oro_workflow }
+            - '@oro_action.helper.context'
+            - '@event_dispatcher'
+            - '@oro_workflow.provider.start_transition_route'
+            - '@router'
 
-    oro_workflow.handler.start_transition_handler:
-        class: 'Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler'
+    oro_workflow.provider.page_data.transition:
+        class: Oro\Bundle\WorkflowBundle\Provider\PageData\TransitionPageDataProvider
         arguments:
             - '@oro_workflow.manager'
-            - '@oro_workflow.serializer.data.serializer'
-            - '@oro_workflow.handler.transition_helper'
-            - '@oro_featuretoggle.checker.feature_checker'
-
-    oro_workflow.handler.transition.form:
-        class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler'
-        arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.provider.transition_route'
+            - '@router'
 
     oro_workflow.database_checker:
         public: false
@@ -538,20 +532,14 @@ services:
         arguments:
             - '@oro_action.resolver.options_resolver'
 
-    oro_workflow.handler.transition.form.page_form:
-        class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionCustomFormHandler'
-        arguments:
-            - '@oro_form.registry.form_handler'
-
     oro_workflow.helper.transition_widget:
         class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper'
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@form.factory'
-            - '@oro_workflow.serializer.data.serializer'
 
     oro_workflow.helper.workflow_deactivation:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper'
         arguments:
             - '@oro_workflow.registry.system'
             - '@oro_workflow.helper.translation'
+

@@ -1,3 +1,5 @@
+@ticket-OEE-1217
+@automatically-ticket-tagged
 @not-automated
 Feature: Disable Emails per organization
   In order to lightweight the system not for all users

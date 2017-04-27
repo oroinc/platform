@@ -766,6 +766,7 @@ class OroMainContext extends MinkContext implements
         foreach ($table->getRows() as $row) {
             list($field, $value) = $row;
             $this->inlineEditField($field, $value);
+            $this->waitForAjax();
         }
     }
 

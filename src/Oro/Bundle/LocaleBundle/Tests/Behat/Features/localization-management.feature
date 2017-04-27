@@ -1,3 +1,5 @@
+@ticket-BAP-12371
+@automatically-ticket-tagged
 @fixture-LocalizationFixture.yml
 Feature: Localization management
   Manage available localizations

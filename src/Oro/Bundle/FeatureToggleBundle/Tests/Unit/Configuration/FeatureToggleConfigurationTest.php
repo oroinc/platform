@@ -39,6 +39,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'configuration' => [],
                 'entities' => [],
                 'field_configs' => [],
+                'commands' => []
             ]
         ];
 
@@ -73,7 +74,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'field_configs' => [],
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
-                'allow_if_equal_granted_denied' => true
+                'allow_if_equal_granted_denied' => true,
+                'commands' => []
             ]
         ];
 

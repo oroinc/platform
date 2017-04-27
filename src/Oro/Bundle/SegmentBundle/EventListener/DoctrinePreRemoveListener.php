@@ -6,22 +6,29 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 
 class DoctrinePreRemoveListener
 {
-    /** @var ConfigManager */
-    protected $cm;
-
     /** @var array */
     protected $deleteEntities;
 
+    /** @var ConfigManager */
+    private $cm;
+
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
     /**
-     * @param ConfigManager $cm
+     * @param ConfigManager  $cm
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ConfigManager $cm)
+    public function __construct(ConfigManager $cm, DoctrineHelper $doctrineHelper)
     {
         $this->cm = $cm;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -35,12 +42,12 @@ class DoctrinePreRemoveListener
         $className = ClassUtils::getClass($entity);
 
         if ($this->cm->hasConfig($className)) {
-            $metadata  = $args->getEntityManager()->getClassMetadata($className);
+            $metadata  = $this->doctrineHelper->getEntityMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
-            $this->deleteEntities[] = array(
+            $this->deleteEntities[] = [
                 'id'     => reset($entityIds),
                 'entity' => $entity
-            );
+            ];
         }
     }
 
@@ -50,9 +57,10 @@ class DoctrinePreRemoveListener
     public function postFlush(PostFlushEventArgs $args)
     {
         if ($this->deleteEntities) {
-            $em = $args->getEntityManager();
-            $em->getRepository('OroSegmentBundle:SegmentSnapshot')->massRemoveByEntities($this->deleteEntities);
-            $this->deleteEntities = array();
+            /** @var SegmentSnapshotRepository $repository */
+            $repository = $this->doctrineHelper->getEntityRepository('OroSegmentBundle:SegmentSnapshot');
+            $repository->massRemoveByEntities($this->deleteEntities);
+            $this->deleteEntities = [];
         }
     }
 }
