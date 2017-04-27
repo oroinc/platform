@@ -198,6 +198,13 @@ services:
             - '@oro_workflow.provider.transition_route'
             - '@router'
 
+    oro_workflow.handler.workflow_notification_handler:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler'
+        parent: oro_notification.email_handler
+        public: false
+        tags:
+            - { name: notification.handler, alias: workflow_notification_handler, priority: -100 }
+
     oro_workflow.database_checker:
         public: false
         class: Oro\Bundle\EntityBundle\Tools\DatabaseChecker
@@ -437,13 +444,19 @@ services:
             - '@translator'
 
     oro_workflow.filter.workflow:
-        class: 'Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter'
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter'
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_workflow.helper.translation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
+
+    oro_workflow.filter.workflow_translation:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter'
+        parent: oro_workflow.filter.workflow
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: workflow_translation, datasource: orm }
 
     oro_workflow.async.execute_process_job:
         class: 'Oro\Bundle\WorkflowBundle\Async\ExecuteProcessJobProcessor'

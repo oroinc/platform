@@ -41,7 +41,7 @@ class WorkflowColumnListenerTest extends \PHPUnit_Framework_TestCase
                     'columns' => [
                         WorkflowColumnListener::COLUMN_NAME => [
                             'label' => 'oro.workflow.translation.workflow.label',
-                            'type' => 'workflow',
+                            'type' => 'workflow_translation',
                             'data_name' => 'translationKey',
                         ],
                     ],
