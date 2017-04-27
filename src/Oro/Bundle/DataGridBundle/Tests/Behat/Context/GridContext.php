@@ -384,7 +384,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = trim($columns[$columnNumber-1]->text());
             // removing multiple spaces, newlines, tabs
-            $actualValue = preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue);
+            $actualValue = trim(preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue));
 
             self::assertEquals(
                 $value,
@@ -617,6 +617,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) "(?P<content>(.+))" in grid$/
+     * @Given /^(?:|I )click "(?P<action>(?:[^"]|\\")*)" on "(?P<content>(.+))" in grid$/
      */
     public function clickActionInRow($content, $action)
     {
