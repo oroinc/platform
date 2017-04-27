@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
@@ -15,6 +16,7 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -38,6 +40,30 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iDonTSelectAnyRecordFromGrid()
     {
         // No need to do anything
+    }
+
+    /**
+     * Example: And I should see following grid:
+     *            | First name | Last name | Primary Email     | Enabled | Status |
+     *            | John       | Doe       | admin@example.com | Enabled | Active |
+     *
+     * @Then /^(?:|I )should see following grid:$/
+     * @Then /^(?:|I )should see following "(?P<gridName>([\w\s]+))" grid:$/
+     */
+    public function iShouldSeeFollowingGrid(TableNode $table, $gridName = 'Grid')
+    {
+        $grid = $this->getGrid($gridName);
+
+        foreach ($table as $index => $row) {
+            $rowNumber = $index + 1;
+            foreach ($row as $columnTitle => $value) {
+                self::assertEquals(
+                    $value,
+                    $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle),
+                    sprintf('Unexpected value at %d row in grid', $rowNumber)
+                );
+            }
+        }
     }
 
     /**
@@ -89,6 +115,22 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^(?:|I )check (?P<content>\S+) record in grid$/
+     */
+    public function checkRecordInGrid($content)
+    {
+        $this->getGrid()->checkRecord($content);
+    }
+
+    /**
+     * @Then /^(?:|I )uncheck (?P<content>\S+) record in grid$/
+     */
+    public function uncheckRecordInGrid($content)
+    {
+        $this->getGrid()->uncheckRecord($content);
+    }
+
+    /**
      * Check two records in grid by one step
      * E.g. to check check accounts with "Columbia Pictures" and "Warner Brothers" content in it
      * Example: And check Warner Brothers and Columbia Pictures in grid
@@ -136,7 +178,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iUncheckFirstRecordsInColumn($number, $column)
     {
-        $this->getGrid()->checkFirstRecords($number, $column);
+        $this->getGrid()->uncheckFirstRecords($number, $column);
     }
 
     /**
@@ -146,7 +188,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iUncheckFirstRecordsInGrid($number)
     {
-        $this->getGrid()->checkFirstRecords($number);
+        $this->getGrid()->uncheckFirstRecords($number);
     }
 
     /**
@@ -243,13 +285,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Sort grid by column
      * Example: When sort grid by Created at
      * Example: But when I sort grid by First Name again
+     * Example: When I sort Quotes Grid by Updated At
      *
-     * @When /^(?:|when )(?:|I )sort grid by (?P<field>([\w\s]*[^again]))(?:| again)$/
+     * @When /^(?:|when )(?:|I )sort (?P<name>grid|[\s\w]+) by (?P<field>([\w\s]*[^again]))(?:| again)$/
      */
-    public function sortGridBy($field)
+    public function sortGridBy($field, $name = 'Grid')
     {
         $this->elementFactory
-            ->createElement('Grid')
+            ->createElement($name)
             ->getElement('GridHeader')
             ->findElementContains('GridHeaderLink', $field)
             ->click();
@@ -315,17 +358,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Phone   | +1 415-731-9375     |
      *            | Country | Ukraine             |
      *            | State   | Kharkivs'ka Oblast' |
+     * Example: Then I should see Charlie Sheen in Frontend Grid with following data:
+     *            | Email   | charlie@gmail.com   |
+     *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in grid with following data:$/
+     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in (grid|(?P<name>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in (grid|(?P<name>[\s\w]+)) with following data:$/
      */
-    public function assertRowValues($content, TableNode $table)
+    public function assertRowValues($content, TableNode $table, $name = 'Grid')
     {
         /** @var Grid $grid */
-        $grid = $this->elementFactory->findElementContains('Grid', $content);
+        $grid = $this->elementFactory->findElementContains($name, $content);
 
         /** @var TableHeader $gridHeader */
-        $gridHeader = $grid->getElement('GridHeader');
+        $gridHeader = $grid->getElement($grid::TABLE_HEADER_ELEMENT);
         $row = $grid->getRowByContent($content);
 
         $crawler = new Crawler($row->getHtml());
@@ -337,6 +383,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table->getRows() as list($header, $value)) {
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = trim($columns[$columnNumber-1]->text());
+            // removing multiple spaces, newlines, tabs
+            $actualValue = preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue);
 
             self::assertEquals(
                 $value,
@@ -540,12 +588,15 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then there is no records in grid
+     * Assert that provided grid element has no records in it
+     * Example: there is no records in Frontend Grid
+     *
+     * @Then /^there is no records in (grid|(?P<name>[\s\w]+))$/
      * @Then all records should be deleted
      */
-    public function thereIsNoRecordsInGrid()
+    public function thereIsNoRecordsInGrid($name = 'Grid')
     {
-        self::assertCount(0, $this->getGrid()->getRows());
+        self::assertCount(0, $this->getGrid($name)->getRows());
     }
 
     /**
@@ -570,6 +621,42 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function clickActionInRow($content, $action)
     {
         $this->getGrid()->clickActionLink($content, $action);
+    }
+
+    /**
+     * Check that row action links existing. Row searching by it's content
+     * Example: I should see following actions for Dutch in grid:
+     *           | View   |
+     *           | Edit   |
+     *           | Delete |
+     *
+     * @Given /^(?:|I )should see following actions for (?P<content>(?:[^"]|\\")*) in grid:$/
+     */
+    public function actionsForRowExist($content, TableNode $table)
+    {
+        $row = $this->getGrid()->getRowByContent($content);
+
+        foreach ($table as $item) {
+            // Grid Row will assert us if action does not exists
+            $row->getActionLink(reset($item));
+        }
+    }
+
+    /**
+     * Check that row action links existing. Row searching by it's content
+     * Example: I should not see following actions for Dutch in grid:
+     *           | Delete |
+     *
+     * @Given /^(?:|I )should not see following actions for (?P<content>(?:[^"]|\\")*) in grid:$/
+     */
+    public function actionsForRowNotExist($content, TableNode $table)
+    {
+        $row = $this->getGrid()->getRowByContent($content);
+
+        foreach ($table as $item) {
+            $action = $row->findActionLink(ucfirst(reset($item)));
+            self::assertNull($action, "$action still exists for $content row");
+        }
     }
 
     /**
@@ -776,13 +863,15 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Records in table on current page should match the count.
-     * Example: Then records in grid should be 5
+     * Example: Then records in current page grid should be 5
+     *          Then records in current Customer Quotes grid should be 1
      *
-     * @Then records in current page grid should be :count
+     * @Then /^records in current (?P<name>(?:page|[\s\w]+)) (grid )?should be (?P<count>(?:\d+))$/
      */
-    public function recordsInGridShouldBe($count)
+    public function recordsInGridShouldBe($name, $count)
     {
-        $gridRows = $this->getPage()->findAll('css', '.grid-container tbody tr');
+        $grid = $this->elementFactory->createElement($name);
+        $gridRows = $grid->findAll('css', 'tbody tr');
 
         self::assertCount((int) $count, $gridRows);
     }
@@ -807,10 +896,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string|null $grid
      * @return Grid
      */
-    private function getGrid($grid = null)
+    private function getGrid($grid = 'Grid')
     {
-        $grid = $grid ?: 'Grid';
-
         return $this->elementFactory->createElement($grid);
     }
 

@@ -3,7 +3,11 @@
 <script type="text/template" id="email-notification-item-template">
     <div class="info" data-id="<%- id %>">
         <div class="body">
-            <div class="title nowrap-ellipsis"><%- subject %></div>
+            <% if (subject) { %>
+                <div class="title nowrap-ellipsis"><%- subject %></div>
+            <% } else { %>
+                <div class="empty-subject nowrap-ellipsis">({{ 'oro.email.recent_emails_widget.no_subject'|trans }})</div>
+            <% } %>
             <div class="description nowrap-ellipsis"><%= bodyContent %></div>
         </div>
         <% if (seen) {  %>

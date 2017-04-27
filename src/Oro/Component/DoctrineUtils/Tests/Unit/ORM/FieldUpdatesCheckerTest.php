@@ -18,18 +18,18 @@ class FieldUpdatesCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFieldChangedWhenUnitOfWorkHasUpdates()
     {
-        $changedEntityOne = (new DummyEntity())->setId(1);
+        $updatedEntityOne = (new DummyEntity())->setId(1);
 
-        $changedEntityTwo = new DummyEntity();
-        $changedEntityTwo->setId(2)->setRelationEntity($changedEntityOne);
+        $updatedEntityTwo = new DummyEntity();
+        $updatedEntityTwo->setId(2)->setRelationEntity($updatedEntityOne);
 
         $fieldUpdatesChecker = new FieldUpdatesChecker(
-            $this->getManagerRegistry([$changedEntityOne, $changedEntityTwo]),
+            $this->getManagerRegistry([$updatedEntityOne, $updatedEntityTwo]),
             new PropertyAccessor()
         );
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
-            $changedEntityTwo,
+            $updatedEntityTwo,
             static::RELATION_FIELD
         ));
     }
@@ -74,22 +74,75 @@ class FieldUpdatesCheckerTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testIsFieldChangedWhenUnitOfWorkHasUpdatesDeletesAndInsertions()
+    {
+        $updatedEntityOne = (new DummyEntity())->setId(1);
+
+        $updatedEntityTwo = new DummyEntity();
+        $updatedEntityTwo->setId(2)->setRelationEntity($updatedEntityOne);
+
+        $deletedEntityOne = (new DummyEntity())->setId(1);
+
+        $deletedEntityTwo = new DummyEntity();
+        $deletedEntityTwo->setId(2)->setRelationEntity($deletedEntityOne);
+
+        $insertedEntityOne = (new DummyEntity())->setId(1);
+
+        $insertedEntityTwo = new DummyEntity();
+        $insertedEntityTwo->setId(2)->setRelationEntity($insertedEntityTwo);
+
+        $manager = $this->getManagerRegistry(
+            [$updatedEntityOne, $updatedEntityTwo],
+            [$deletedEntityOne, $deletedEntityTwo],
+            [$insertedEntityOne, $insertedEntityTwo]
+        );
+
+        $fieldUpdatesChecker = new FieldUpdatesChecker($manager, new PropertyAccessor());
+
+        $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
+            $updatedEntityTwo,
+            static::RELATION_FIELD
+        ));
+
+        $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
+            $deletedEntityTwo,
+            static::RELATION_FIELD
+        ));
+
+        $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
+            $insertedEntityTwo,
+            static::RELATION_FIELD
+        ));
+    }
+
     /**
-     * @param array $changedEntities
+     * @param array $insertedEntities
+     * @param array $updatedEntities
+     * @param array $deletedEntities
      *
      * @return ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getManagerRegistry(array $changedEntities = [])
-    {
+    private function getManagerRegistry(
+        array $updatedEntities = [],
+        array $insertedEntities = [],
+        array $deletedEntities = []
+    ) {
         $uow = $this
             ->getMockBuilder(UnitOfWork::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $uow
-            ->expects($this->once())
             ->method('getScheduledEntityUpdates')
-            ->willReturn($changedEntities);
+            ->willReturn($updatedEntities);
+
+        $uow
+            ->method('getScheduledEntityInsertions')
+            ->willReturn($insertedEntities);
+
+        $uow
+            ->method('getScheduledEntityDeletions')
+            ->willReturn($deletedEntities);
 
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
@@ -97,7 +150,6 @@ class FieldUpdatesCheckerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $entityManager
-            ->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
 
@@ -106,7 +158,6 @@ class FieldUpdatesCheckerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $managerRegistry
-            ->expects($this->once())
             ->method('getManager')
             ->willReturn($entityManager);
 

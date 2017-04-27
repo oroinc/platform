@@ -3,17 +3,25 @@
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
-use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
+use Psr\Log\LoggerInterface;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\PingableInterface;
+use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/integration")
@@ -79,11 +87,40 @@ class IntegrationController extends Controller
                 'message'    => $this->get('translator')->trans('oro.integration.sync_error_integration_deactivated'),
             ], Codes::HTTP_BAD_REQUEST);
         }
-        
+
+        /** @var TransportInterface $providerTransport */
+        $providerTransport = $this->getTypeRegistry()->getTransportTypeBySettingEntity(
+            $integration->getTransport(),
+            $integration->getType()
+        );
+
+        if ($providerTransport instanceof PingableInterface) {
+            try {
+                $providerTransport->init($integration->getTransport());
+                $isPingSuccessful = $providerTransport->ping();
+            } catch (\Exception $e) {
+                $isPingSuccessful = false;
+                $this->getLogger()->error(
+                    sprintf('[IntegrationSchedule] invalid credentials for integration %s', $integration->getId()),
+                    ['integration' => $integration]
+                );
+            }
+
+            if (false === $isPingSuccessful) {
+                return new JsonResponse([
+                    'successful' => false,
+                    'message' => $this->get('translator')->trans('oro.integration.sync_error_invalid_credentials'),
+                ], Codes::HTTP_BAD_REQUEST);
+            }
+        }
+
         $status  = Codes::HTTP_OK;
         $response = [
             'successful' => true,
-            'message'    => $this->get('translator')->trans('oro.integration.progress'),
+            'message'    => $this->get('translator')->trans(
+                'oro.integration.scheduled',
+                ['%url%' => $this->generateUrl('oro_message_queue_root_jobs', [], UrlGeneratorInterface::ABSOLUTE_URL)]
+            ),
         ];
 
         try {
@@ -151,5 +188,21 @@ class IntegrationController extends Controller
     protected function getSyncScheduler()
     {
         return $this->get('oro_integration.genuine_sync_scheduler');
+    }
+
+    /**
+     * @return TypesRegistry
+     */
+    protected function getTypeRegistry()
+    {
+        return $this->get('oro_integration.manager.types_registry');
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->get('logger');
     }
 }

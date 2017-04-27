@@ -36,9 +36,7 @@ Feature: Show "Update Schema" button for entity fields
     And I should see "Update Schema"
 
   Scenario: Update schema
-    Given I click "Update Schema"
-    Then I should see "Schema update confirmation"
-    And I press "Yes, Proceed"
+    Given I click update schema
     Then I should see "Schema updated"
     And I move backward one page
     And I should not see "Update Schema"

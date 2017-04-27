@@ -297,7 +297,12 @@
                     <div class="workflow-flowchart-controls clearfix"></div>
                     <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
                             'module': 'oroui/js/app/components/view-component',
-                            'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                            'options': {
+                                'view': 'oroui/js/app/views/zoomable-area-view',
+                                'autozoom': true,
+                                'minZoom': 0.05,
+                                'maxZoom': 5
+                            }
                         }) }}
                     >
                         <div class="workflow-flowchart clearfix"></div>

@@ -28,7 +28,7 @@ class ResetPasswordExtension extends AbstractExtension
 
         return
             $name &&
-            $name == self::USERS_GRID_NAME &&
+            $name === self::USERS_GRID_NAME &&
             $request &&
             $request->get('actionName', false) === 'reset_password';
     }

@@ -1,6 +1,7 @@
 api:
     entities:
         Oro\Bundle\IntegrationBundle\Entity\Channel:
+            documentation_resource: '@OroIntegrationBundle/Resources/doc/api/channel.md'
             actions:
                 create: false
                 update: false

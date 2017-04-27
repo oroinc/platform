@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Symfony\Component\Intl\Intl;
@@ -14,8 +15,8 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class LanguageProvider
 {
-    /** @var ObjectRepository|LanguageRepository */
-    protected $repository;
+    /** @var ManagerRegistry */
+    private $registry;
 
     /** @var LocaleSettings */
     protected $localeSettings;
@@ -24,13 +25,13 @@ class LanguageProvider
     protected $aclHelper;
 
     /**
-     * @param ObjectRepository $repository
+     * @param ManagerRegistry $registry
      * @param LocaleSettings $localeSettings
      * @param AclHelper $aclHelper
      */
-    public function __construct(ObjectRepository $repository, LocaleSettings $localeSettings, AclHelper $aclHelper)
+    public function __construct(ManagerRegistry $registry, LocaleSettings $localeSettings, AclHelper $aclHelper)
     {
-        $this->repository = $repository;
+        $this->registry = $registry;
         $this->localeSettings = $localeSettings;
         $this->aclHelper = $aclHelper;
     }
@@ -42,7 +43,7 @@ class LanguageProvider
      */
     public function getAvailableLanguages($onlyEnabled = false)
     {
-        $codes = $this->repository->getAvailableLanguageCodes($onlyEnabled);
+        $codes = $this->getRepository()->getAvailableLanguageCodes($onlyEnabled);
         $locales = Intl::getLocaleBundle()->getLocaleNames($this->localeSettings->getLanguage());
 
         return array_intersect_key($locales, array_flip($codes));
@@ -53,7 +54,7 @@ class LanguageProvider
      */
     public function getEnabledLanguages()
     {
-        return $this->repository->getAvailableLanguageCodes(true);
+        return $this->getRepository()->getAvailableLanguageCodes(true);
     }
 
     /**
@@ -61,7 +62,7 @@ class LanguageProvider
      */
     public function getAvailableLanguagesByCurrentUser()
     {
-        return $this->repository->getAvailableLanguagesByCurrentUser($this->aclHelper);
+        return $this->getRepository()->getAvailableLanguagesByCurrentUser($this->aclHelper);
     }
 
     /**
@@ -71,7 +72,7 @@ class LanguageProvider
      */
     public function getLanguages($onlyEnabled = false)
     {
-        return $this->repository->getLanguages($onlyEnabled);
+        return $this->getRepository()->getLanguages($onlyEnabled);
     }
 
     /**
@@ -79,6 +80,14 @@ class LanguageProvider
      */
     public function getDefaultLanguage()
     {
-        return $this->repository->findOneBy(['code' => Translator::DEFAULT_LOCALE]);
+        return $this->getRepository()->findOneBy(['code' => Translator::DEFAULT_LOCALE]);
+    }
+
+    /**
+     * @return LanguageRepository|ObjectRepository
+     */
+    protected function getRepository()
+    {
+        return $this->registry->getRepository(Language::class);
     }
 }

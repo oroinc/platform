@@ -88,7 +88,7 @@ class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
                     [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
                     [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
-                'value' => 'password',
+                'value' => '0',
                 'message' => 'oro.user.message.invalid_password.min_length',
 
             ],

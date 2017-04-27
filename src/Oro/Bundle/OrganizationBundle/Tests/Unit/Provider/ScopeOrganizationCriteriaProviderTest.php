@@ -1,14 +1,13 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,41 +27,17 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
     {
         $organization = new Organization();
 
-        $user = new AbstractUserStub();
-        $user->setOrganization($organization);
-
         /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
+        $token = $this->createMock(OrganizationContextTokenInterface::class);
 
         $this->tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
 
-        $actual = $this->provider->getCriteriaForCurrentScope();
-        $this->assertEquals([ScopeOrganizationCriteriaProvider::SCOPE_KEY => $organization], $actual);
-    }
-
-    public function testGetCriteriaForCurrentScopeForUser()
-    {
-        $organization = new Organization();
-
-        $user = new User();
-        $user->setCurrentOrganization($organization);
-
-        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
-        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
-
-        $this->tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
+            ->method('getOrganizationContext')
+            ->willReturn($organization);
 
         $actual = $this->provider->getCriteriaForCurrentScope();
         $this->assertEquals([ScopeOrganizationCriteriaProvider::SCOPE_KEY => $organization], $actual);
@@ -79,15 +54,10 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $actual);
     }
 
-    public function testGetCriteriaForCurrentScopeWithoutUser()
+    public function testGetCriteriaForCurrentScopeWithoutOrganizationAwareToken()
     {
-        $user = new \stdClass();
-
         /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
         $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user);
 
         $this->tokenStorage
             ->expects($this->once())

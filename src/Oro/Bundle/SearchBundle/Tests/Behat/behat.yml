@@ -16,3 +16,12 @@ oro_behat_extension:
     Search Result:
       class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
       route: 'oro_search_results'
+
+  suites:
+    OroSearchBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - OroSearchBundle::SearchContext
+      paths:
+        - '@OroSearchBundle/Tests/Behat/Features'
