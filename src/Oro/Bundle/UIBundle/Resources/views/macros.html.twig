@@ -1061,7 +1061,7 @@
 {% macro attributes(attr, excludes) %}
     {% spaceless %}
         {% set attr = attr|default({}) %}
-        {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue }}" {% endif %}{% endif %}{% endfor %}
+        {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue is iterable ? attrvalue|json_encode : attrvalue }}" {% endif %}{% endif %}{% endfor %}
     {% endspaceless %}
 {% endmacro %}
 
