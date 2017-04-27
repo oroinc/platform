@@ -92,6 +92,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->never())->method('rollback');
 
         $this->translationManager->expects($this->once())->method('invalidateCache')->with($this->testLocale);
+        $this->translationManager->expects($this->once())->method('clear');
 
         $this->persister->persist($this->testLocale, $this->testData);
     }
@@ -107,6 +108,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('rollback');
 
         $this->translationManager->expects($this->never())->method('invalidateCache');
+        $this->translationManager->expects($this->never())->method('clear');
 
         $this->persister->persist($this->testLocale, $this->testData);
     }
