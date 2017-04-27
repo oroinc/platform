@@ -1,3 +1,5 @@
+@ticket-BAP-11237
+@automatically-ticket-tagged
 Feature: Pin page
   In order to have fast access to some pages in system
   As crm user
