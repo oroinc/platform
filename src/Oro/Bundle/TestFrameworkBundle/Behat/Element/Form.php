@@ -39,13 +39,9 @@ class Form extends Element
                 );
             }
 
-            if (isset($this->options['mapping'][$label]['element'])) {
-                $field = $this->elementFactory->wrapElement(
-                    $this->options['mapping'][$label]['element'],
-                    $field
-                );
+            if (isset($this->options['mapping'][$label]['element'])) {$field = $this->elementFactory->wrapElement(
+                    $this->options['mapping'][$label]['element'], $field);
             }
-
             $field->setValue($value);
         }
         if ($isEmbeddedForm) {
