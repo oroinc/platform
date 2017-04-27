@@ -20,12 +20,6 @@ define(function(require) {
         /** @property {String} */
         className: 'modal oro-modal-normal',
 
-        /** @property {String} */
-        okButtonClass: 'btn-danger',
-
-        /** @property {Boolean} */
-        allowOk: true,
-
         /**
          * @param {Object} options
          */
@@ -40,8 +34,7 @@ define(function(require) {
                 title: __('Confirmation'),
                 okText: __('Yes'),
                 cancelText: __('Cancel'),
-                template: _.template(this.template, interpolate),
-                allowOk: this.allowOk
+                template: _.template(this.template, interpolate)
             }, options);
 
             arguments[0] = options;
