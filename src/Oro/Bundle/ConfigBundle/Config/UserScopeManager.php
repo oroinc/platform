@@ -50,6 +50,8 @@ class UserScopeManager extends AbstractScopeManager
      */
     public function setScopeId($scopeId)
     {
+        $this->dispatchScopeIdChangeEvent();
+
         $this->scopeId = $scopeId;
     }
 

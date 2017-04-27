@@ -28,6 +28,15 @@ services:
         tags:
             - { name: oro_action.action, alias: configurable }
 
+    oro_action.action.duplicate_entity:
+        class: 'Oro\Bundle\ActionBundle\Action\DuplicateEntity'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        calls:
+          - [setDuplicatorFactory, ['@oro_action.factory.duplicator_factory']]
+        tags:
+            - { name: oro_action.action, alias: duplicate|duplicate_entity }
+
     oro_action.action.resolve_destination_page:
         class: 'Oro\Bundle\ActionBundle\Action\ResolveDestinationPage'
         arguments:
@@ -263,3 +272,12 @@ services:
             - [setDispatcher, ['@event_dispatcher']]
         tags:
             - { name: oro_action.action, alias: extendable }
+
+    oro_action.action.increase_value:
+        class: 'Oro\Component\Action\Action\IncreaseValue'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        calls:
+            - [setDispatcher, ['@event_dispatcher']]
+        tags:
+            - { name: oro_action.action, alias: increase_value }

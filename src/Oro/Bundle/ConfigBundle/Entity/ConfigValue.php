@@ -40,7 +40,7 @@ class ConfigValue
      * @var Config
      *
      * @ORM\ManyToOne(targetEntity="Config", inversedBy="values")
-     * @ORM\JoinColumn(name="config_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="config_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $config;
 
@@ -135,7 +135,7 @@ class ConfigValue
     /**
      * Get config
      *
-     * @return string
+     * @return Config
      */
     public function getConfig()
     {

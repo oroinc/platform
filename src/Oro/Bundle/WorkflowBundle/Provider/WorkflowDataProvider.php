@@ -101,7 +101,8 @@ class WorkflowDataProvider
                 return [
                     'label' => $step->getLabel(),
                     'active' => $currentStep && $step->getName() === $currentStep->getName(),
-                    'possibleStepsCount' => count($helper->getStepsAfter($step))
+                    'possibleStepsCount' => count($helper->getStepsAfter($step)),
+                    'final' => $step->isFinal(),
                 ];
             },
             $steps

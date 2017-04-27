@@ -5,4 +5,8 @@
     box-sizing: border-box;
 
     @include clearfix();
+
+    &__inner {
+        padding: $page-header-inner-inner-offset;
+    }
 }

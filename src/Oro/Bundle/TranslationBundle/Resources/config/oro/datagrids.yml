@@ -109,6 +109,7 @@ datagrids:
                     - translationKey.key as key
                     - translationKey.domain as domain
                     - (CASE WHEN translation.value IS NULL THEN false ELSE true END) as status
+                    - translationEn.value as englishValue
                 from:
                     - { table: '%oro_translation.entity.language.class%', alias: language }
                 join:
@@ -124,6 +125,14 @@ datagrids:
                             alias: translation
                             conditionType: WITH
                             condition: 'translation.language = language AND translation.translationKey = translationKey'
+                        -
+                            join: '%oro_translation.entity.translation.class%'
+                            alias: translationEn
+                            conditionType: WITH
+                            condition: 'translationEn.translationKey = translationKey AND translationEn.language = :en_language'
+            bind_parameters:
+                -
+                    name: en_language
         inline_editing:
             enable: true
             behaviour: enable_selected
@@ -155,6 +164,11 @@ datagrids:
                             - key
                             - locale
                             - domain
+            current:
+                label: oro.translation.translation.current.label
+                type: twig
+                frontend_type: html
+                template: OroTranslationBundle:Translation:Datagrid/current.html.twig
             key:
                 label: oro.translation.translation_key.key.label
             domain:
@@ -168,6 +182,8 @@ datagrids:
                     data_name: language.id
                 status:
                     data_name: status
+                englishTranslation:
+                    data_name: englishValue
                 value:
                     data_name: value
                 key:
@@ -187,6 +203,9 @@ datagrids:
                 status:
                     type: boolean
                     data_name: status
+                englishTranslation:
+                    type: string
+                    data_name: englishValue
                 value:
                     type: string
                     data_name: value

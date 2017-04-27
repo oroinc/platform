@@ -14,7 +14,6 @@
     }
 </style>
 <div class="wrapper">
-    {% if exportResult['readsCount'] %}
         {% if exportResult['readsCount'] %}
             <p>
                 Export performed successfully.
@@ -24,11 +23,12 @@
         {% else %}
             <p>No {{ exportResult['entities'] }} found for export.</p>
         {% endif %}
-    {% else %}
-        <p>
-            Export operation failed, {{ exportResult['errorsCount'] }} error(s) found.
-            <a href="{{ exportResult['url'] }}" target="_blank">Error log</a>
-        </p>
-    {% endif %}
+
+        {% if exportResult['errorsCount'] %}
+            <p>
+                Export operation failed, {{ exportResult['errorsCount'] }} error(s) found.
+                <a href="{{ exportResult['downloadLogUrl'] }}" target="_blank">Error log</a>
+            </p>
+        {% endif %}
 </div>
 {% endspaceless %}

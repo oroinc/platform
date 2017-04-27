@@ -171,7 +171,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
             }
         }
 
-        if (!$targetFieldId && in_array($selfFieldId->getFieldType(), RelationType::$toManyRelations, true)) {
+        if (!$targetFieldId && in_array($selfFieldId->getFieldType(), RelationType::$anyToAnyRelations, true)) {
             $targetFieldId = new FieldConfigId(
                 'extend',
                 $targetEntityClass,

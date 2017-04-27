@@ -530,4 +530,4 @@ Storage configuration
 
 OroImportExportBundle uses [KnpGaufretteBundle](https://github.com/KnpLabs/KnpGaufretteBundle) for providing a filesystem abstraction layer.
 
-By default, it configured to store files in `var/import_export directory` of your project. You can change this in `parameters.yml` - variable `importexport.filesystems_storage`. User can reconfigure this settings. More info about KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).
+By default, it configured to store files in `app/import_export` directory of your project. You can change this in `Resources/config/oro/app.yml`. User can reconfigure this settings. More info about KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).

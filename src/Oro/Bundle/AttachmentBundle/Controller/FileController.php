@@ -82,17 +82,11 @@ class FileController extends Controller
             $height
         );
 
-        $customResolver = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
         $image = $thumbnail->getBinary();
+        $imageContent = $image->getContent();
+        $this->get('oro_attachment.media_cache_manager')->store($imageContent, $request->getPathInfo());
 
-        $this->get('liip_imagine.cache.manager')->store(
-            $image,
-            $request->getPathInfo(),
-            $thumbnail->getFilter(),
-            $customResolver
-        );
-
-        return new Response($image->getContent(), Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
+        return new Response($imageContent, Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
     }
 
     /**
@@ -103,14 +97,15 @@ class FileController extends Controller
      */
     public function getFilteredImageAction($id, $filter, $filename, Request $request)
     {
-        $file = $this->getFileByIdAndFileName($id, $filename);
-        $customResolver = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
-        $image = $this->get('oro_attachment.image_factory')->createImage(
-            $this->get('oro_attachment.file_manager')->getContent($file),
-            $filter
-        );
+        if (!$file = $this->getFileByIdAndFileName($id, $filename)) {
+            throw $this->createNotFoundException('Image not found in the database');
+        }
 
-        $this->get('liip_imagine.cache.manager')->store($image, $request->getPathInfo(), $filter, $customResolver);
+        if (!$image = $this->get('oro_attachment.image_resizer')->resizeImage($file, $filter)) {
+            throw $this->createNotFoundException('Image not found in the filesystem');
+        }
+
+        $this->get('oro_attachment.media_cache_manager')->store($image->getContent(), $request->getPathInfo());
 
         return new Response($image->getContent(), Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
     }

@@ -2,8 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 
@@ -15,12 +23,25 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
     /** @var Variable|\PHPUnit_Framework_MockObject_MockObject */
     protected $variable;
 
+    /** @var  ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $formConfigProvider;
+
     /**
      * Test setup.
      */
     protected function setUp()
     {
-        $this->guesser = new VariableGuesser();
+        $formRegistry = $this->createMock(FormRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->formConfigProvider = $this->createMock(ConfigProvider::class);
+
+        $this->guesser = new VariableGuesser(
+            $formRegistry,
+            $managerRegistry,
+            $entityConfigProvider,
+            $this->formConfigProvider
+        );
         $this->guesser->addFormTypeMapping('string', 'Symfony\Component\Form\Extension\Core\Type\TextType');
 
         $this->variable = $this->createMock(Variable::class);
@@ -28,34 +49,113 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test variable form guessing.
+     *
+     * @dataProvider guessVariableFormDataProvider
+     *
+     * @param TypeGuess $expected
+     * @param Variable  $variable
+     * @param array     $formMapping
+     * @param array     $formConfig
      */
-    public function testGuessVariableForm()
+    public function testGuessVariableForm(TypeGuess $expected, Variable $variable, $formMapping = [], $formConfig = [])
     {
-        $this->guesser->addFormTypeMapping('testType', 'formTestType', ['formOption' => 'optionValue']);
+        foreach ($formMapping as $mapping) {
+            $this->guesser->addFormTypeMapping(
+                $mapping['variableType'],
+                $mapping['formType'],
+                $mapping['formOptions']
+            );
+        }
 
-        $this->variable->expects($this->once())
-            ->method('getType')
-            ->will($this->returnValue('testType'));
+        if ($formConfig) {
+            $formConfigId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $formConfigObject = new Config($formConfigId, $formConfig);
+            $this->formConfigProvider->expects($this->once())->method('hasConfig')
+                ->with($formConfig['entity'])->will($this->returnValue(true));
+            $this->formConfigProvider->expects($this->once())->method('getConfig')
+                ->with($formConfig['entity'])->will($this->returnValue($formConfigObject));
+        }
 
-        $this->variable->expects($this->once())
-            ->method('getFormOptions')
-            ->will($this->returnValue([]));
+        $this->assertEquals($expected, $this->guesser->guessVariableForm($variable));
+    }
 
-        $this->variable->expects($this->exactly(2))
-            ->method('getLabel')
-            ->will($this->returnValue('testLabel'));
-
-        $this->variable->expects($this->exactly(2))
-            ->method('getValue')
-            ->will($this->returnValue('testValue'));
-
-        $typeGuess = $this->guesser->guessVariableForm($this->variable);
-
-        $this->assertInstanceOf(TypeGuess::class, $typeGuess);
-        $this->assertEquals($typeGuess->getType(), 'formTestType');
-        $this->assertContains('testLabel', $typeGuess->getOptions());
-        $this->assertContains('testValue', $typeGuess->getOptions());
-        $this->assertContains('optionValue', $typeGuess->getOptions());
+    /**
+     * @return array
+     */
+    public function guessVariableFormDataProvider()
+    {
+        return [
+            'scalar guess' => [ // test guessing scalar variables
+                'expected' => new TypeGuess(
+                    'formTestType',
+                    [
+                        'formOption' => 'optionValue',
+                        'label' => 'testLabel',
+                        'data' => 'testValue',
+                    ],
+                    TypeGuess::VERY_HIGH_CONFIDENCE
+                ),
+                'variable' => $this->createVariable(
+                    'testType',
+                    null,
+                    ['formOption' => 'optionValue'],
+                    'testValue',
+                    'testLabel'
+                ),
+                'formMapping' => [
+                    [
+                        'variableType' => 'testType',
+                        'formType' => 'formTestType',
+                        'formOptions' => [
+                            'formOption' => 'optionValue'
+                        ]
+                    ]
+                ],
+            ],
+            'configured entity guess' => [ // test guessing for entities that have a form type configured
+                'expected' => new TypeGuess(
+                    'test_type',
+                    [
+                        'key' => 'value',
+                        'constraints' => [
+                            new NotBlank(),
+                            new UserAuthenticationFieldsConstraint(),
+                            new GreaterThan(10)
+                        ]
+                    ],
+                    TypeGuess::VERY_HIGH_CONFIDENCE
+                ),
+                'variable' => $this->createVariable('entity', null, [
+                    'class' => 'TestEntity',
+                    'form_options' => [
+                        'constraints' => [
+                            'NotBlank' => null,
+                            UserAuthenticationFieldsConstraint::class => null,
+                            'GreaterThan' => 10,
+                        ]
+                    ]
+                ]),
+                'formMapping' => [],
+                'formConfig' => [
+                    'entity' => 'TestEntity',
+                    'form_type' => 'test_type',
+                    'form_options' => ['key' => 'value']
+                ],
+            ],
+            'entity guess' => [ // test guessing for entities that have defined their form type in the variable config
+                'expected' => new TypeGuess(
+                    'defined_type',
+                    [],
+                    TypeGuess::VERY_HIGH_CONFIDENCE
+                ),
+                'variable' => $this->createVariable('entity', null, [
+                    'form_type' => 'defined_type',
+                    'class' => 'TestEntity'
+                ]),
+            ],
+        ];
     }
 
     /**
@@ -117,5 +217,26 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
             ['string', 'label', null],
             ['string', 'value', null]
         ];
+    }
+
+    /**
+     * @param string $type
+     * @param string $propertyPath
+     * @param array  $options
+     * @param string   $value
+     * @param string   $label
+     *
+     * @return Variable
+     */
+    protected function createVariable($type, $propertyPath = null, array $options = [], $value = null, $label = null)
+    {
+        $variable = new Variable();
+        $variable->setType($type)
+            ->setPropertyPath($propertyPath)
+            ->setOptions($options)
+            ->setValue($value)
+            ->setLabel($label);
+
+        return $variable;
     }
 }

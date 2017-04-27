@@ -23,8 +23,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         'is_extend' => true,
         'origin' => ExtendScope::ORIGIN_CUSTOM,
         'owner' => ExtendScope::OWNER_CUSTOM,
-        'state' => ExtendScope::STATE_NEW,
-        'bidirectional' => false,
+        'state' => ExtendScope::STATE_NEW
     ];
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
@@ -340,7 +339,6 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'oneToMany|Test\Entity|Test\TargetEntity|owningSideField',
                     'target_entity' => 'Test\TargetEntity',
-                    'bidirectional' => false,
                 ]
             ],
             $resultFieldOptions
@@ -377,7 +375,6 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'manyToOne|Test\Entity|Test\TargetEntity|owningSideField',
                     'target_entity' => 'Test\TargetEntity',
-                    'bidirectional' => false,
                 ]
             ],
             $resultFieldOptions
@@ -427,6 +424,23 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($configProvider);
 
         $this->assertEquals($entityConfig, $this->configHelper->getEntityConfig($entityConfigModel, $scope));
+    }
+
+    public function testGetNonExtendedEntitiesClasses()
+    {
+        $entitiesConfig = [
+            $this->getEntityConfig('extended_1', ['is_extend' => true]),
+            $this->getEntityConfig('extended_2', ['is_extend' => true]),
+            $this->getEntityConfig('not_extended_1', ['is_extend' => false]),
+            $this->getEntityConfig('not_extended_2', ['is_extend' => false]),
+        ];
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfigs')
+            ->willReturn($entitiesConfig);
+
+        $this->assertEquals(['not_extended_1', 'not_extended_2'], $this->configHelper->getNonExtendedEntitiesClasses());
     }
 
     private function expectsGetClassNameAndFieldName()

@@ -16,4 +16,12 @@ class SidebarConfigMenu extends Element
         });
         $link->click();
     }
+
+    /**
+     * @return \Behat\Mink\Element\NodeElement[]
+     */
+    public function getIntegrations()
+    {
+        return $this->findAll('css', '#config_tab_group_integrations li a');
+    }
 }

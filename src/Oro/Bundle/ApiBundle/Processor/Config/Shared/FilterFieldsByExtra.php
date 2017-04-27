@@ -105,7 +105,7 @@ class FilterFieldsByExtra implements ProcessorInterface
 
         $allowedFields = $this->getAllowedFields($metadata, $fieldFilters);
         if (null !== $allowedFields) {
-            $idFieldNames = $metadata->getIdentifierFieldNames();
+            $idFieldNames = $this->getEntityIdentifierFieldNames($metadata, $definition);
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 if (!$field->isExcluded()
@@ -131,6 +131,26 @@ class FilterFieldsByExtra implements ProcessorInterface
                 }
             }
         }
+    }
+
+    /**
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     *
+     * @return array
+     */
+    protected function getEntityIdentifierFieldNames(ClassMetadata $metadata, EntityDefinitionConfig $definition)
+    {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        if (empty($idFieldNames)) {
+            $idFieldNames = [];
+            $metadataIdFieldNames = $metadata->getIdentifierFieldNames();
+            foreach ($metadataIdFieldNames as $propertyPath) {
+                $idFieldNames[] = $definition->findFieldNameByPropertyPath($propertyPath) ?: $propertyPath;
+            }
+        }
+
+        return $idFieldNames;
     }
 
     /**

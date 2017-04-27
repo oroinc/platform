@@ -104,6 +104,17 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'string',
                                 'value' => 'test',
                                 'options' => []
+                            ],
+                            'test_entity_var' => [
+                                'name' => 'entity_var_name',
+                                'type' => 'entity',
+                                'value' => 1,
+                                'property_path' => 'entity.test_variable',
+                                'entity_acl' => [
+                                    'delete' => false,
+                                ],
+                                'options' => [],
+                                'unknownKey' => 'unkownValue',
                             ]
                         ]
                     ]
@@ -173,6 +184,16 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                                 'name' => 'var_name',
                                 'type' => 'string',
                                 'value' => 'test',
+                                'options' => []
+                            ],
+                            'test_entity_var' => [
+                                'name' => 'entity_var_name',
+                                'type' => 'entity',
+                                'value' => 1,
+                                'property_path' => 'entity.test_variable',
+                                'entity_acl' => [
+                                    'delete' => false,
+                                ],
                                 'options' => []
                             ]
                         ]

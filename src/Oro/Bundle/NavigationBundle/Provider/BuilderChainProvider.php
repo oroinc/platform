@@ -105,13 +105,19 @@ class BuilderChainProvider implements MenuProviderInterface
         if (!array_key_exists($alias, $this->menus)) {
             if (!$ignoreCache && $this->cache && $this->cache->contains($alias)) {
                 $menuData = $this->cache->fetch($alias);
-                $this->menus[$alias] = $this->loader->load($menuData);
+                $menu = $this->loader->load($menuData);
             } else {
-                $this->buildMenu($alias, $options);
+                $menu = $this->buildMenu($alias, $options);
             }
-        }
 
-        return $this->menus[$alias];
+            // Add menu to the stack only if check_access is not set to false.
+            if (!isset($options['check_access']) || $options['check_access'] == true) {
+                $this->menus[$alias] = $menu;
+            }
+        } else {
+            $menu = $this->menus[$alias];
+        }
+        return $menu;
     }
 
     /**
@@ -201,12 +207,12 @@ class BuilderChainProvider implements MenuProviderInterface
             }
         }
 
-        $this->menus[$alias] = $menu;
-
         $this->sort($menu);
 
         if ($this->cache) {
             $this->cache->save($alias, $this->manipulator->toArray($menu));
         }
+
+        return $menu;
     }
 }

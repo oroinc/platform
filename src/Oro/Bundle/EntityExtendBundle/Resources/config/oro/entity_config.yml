@@ -341,6 +341,11 @@ entity_config:
                             block:          general
                             subblock:       properties
 
+                bidirectional:
+                    options:
+                        auditable:          false
+                        allowed_type:       [manyToOne, manyToMany, oneToMany]
+
                 # the relation key in the following format:
                 # relation_type|owning_entity|target_entity|field_name_in_owning_entity
                 # the relation key can be builded by ExtendHelper::buildRelationKey method

@@ -56,4 +56,14 @@ class ExpressionBuilder extends BaseExpressionBuilder
     {
         return new Comparison($field, Comparison::LIKE, new Value($value));
     }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @return Comparison
+     */
+    public function notLike($field, $value)
+    {
+        return new Comparison($field, Comparison::NOT_LIKE, new Value($value));
+    }
 }

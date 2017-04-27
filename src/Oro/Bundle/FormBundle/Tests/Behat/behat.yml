@@ -38,3 +38,6 @@ oro_behat_extension:
     Select2Entity:
       selector: '.select2-offscreen'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
+
+    Simple Color Picker Field:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroSimpleColorPickerField

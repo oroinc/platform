@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
@@ -345,7 +346,9 @@ class ConfigurationType extends AbstractType
         $resolver->setDefaults([
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'          => false,
+            'constraints'       => new Valid(),
             'add_check_button'  => true,
+            'skip_folders_validation' => false,
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];
 
@@ -356,7 +359,9 @@ class ConfigurationType extends AbstractType
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Smtp';
                 }
-
+                if (!$form->getConfig()->getOption('skip_folders_validation')) {
+                    $groups[] = 'CheckFolderSelection';
+                }
                 return $groups;
             },
         ]);

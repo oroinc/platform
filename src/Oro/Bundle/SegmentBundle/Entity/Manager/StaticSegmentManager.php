@@ -5,14 +5,12 @@ namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Parameter;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 
@@ -69,9 +67,11 @@ class StaticSegmentManager
             $this->em->beginTransaction();
             $date       = new \DateTime('now', new \DateTimeZone('UTC'));
             $dateString = '\'' . $date->format('Y-m-d H:i:s') . '\'';
+
             if ($this->em->getConnection()->getDriver()->getName() === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
                 $dateString = sprintf('TIMESTAMP %s', $dateString);
             }
+
             $insertString = sprintf(
                 ', %d, %s ',
                 $segment->getId(),
@@ -79,23 +79,24 @@ class StaticSegmentManager
             );
 
             $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
-            $this->applyOrganizationLimit($segment, $qb);
-            $query = $qb->getQuery();
-            $query->setMaxResults($segment->getRecordsLimit());
 
-            $segmentQuery = $query->getSQL();
-            $segmentQuery = substr_replace($segmentQuery, $insertString, stripos($segmentQuery, 'from'), 0);
+            $this->applyOrganizationLimit($segment, $qb);
+            $originalQuery = $qb->getQuery();
+            $identifier = $entityMetadata->getSingleIdentifierFieldName();
+            $selectSql = $this->getSelectSql($qb, $segment, $identifier);
+            $selectSql = substr_replace($selectSql, $insertString, stripos($selectSql, 'from'), 0);
 
             $fieldToSelect = 'entity_id';
-            if ($entityMetadata->getTypeOfField($entityMetadata->getSingleIdentifierFieldName()) === 'integer') {
+
+            if ($entityMetadata->getTypeOfField($identifier) === 'integer') {
                 $fieldToSelect = 'integer_entity_id';
             }
 
             $dbQuery = 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) (%s)';
-            $dbQuery = sprintf($dbQuery, $segmentQuery);
+            $dbQuery = sprintf($dbQuery, $selectSql);
 
             $statement = $this->em->getConnection()->prepare($dbQuery);
-            $this->bindParameters($statement, $query->getParameters());
+            $this->bindParameters($statement, $originalQuery->getParameters());
             $statement->execute();
 
             $this->em->commit();
@@ -109,6 +110,53 @@ class StaticSegmentManager
         $segment->setLastRun(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($segment);
         $this->em->flush();
+    }
+
+    /**
+     * Returns select sql if limit applied wraps it in JOIN
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Segment $segment
+     * @param $identifier
+     * @return string
+     */
+    private function getSelectSql(QueryBuilder $queryBuilder, Segment $segment, $identifier)
+    {
+        $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+
+        if (!$segment->getRecordsLimit()) {
+            $queryBuilder->resetDQLParts(['orderBy', 'select']);
+            $queryBuilder->select($tableAlias . '.' . $identifier);
+            $finalSelectSql = $queryBuilder->getQuery()->getSQL();
+        } else {
+            $queryBuilder->setMaxResults($segment->getRecordsLimit());
+            $originalSelectSql = $queryBuilder->getQuery()->getSQL();
+
+            $queryBuilder->resetDQLParts(['orderBy', 'select', 'where']);
+            $queryBuilder->setMaxResults(null);
+            $queryBuilder->select($tableAlias . '.' . $identifier);
+            $purifiedSelectSql = $queryBuilder->getQuery()->getSQL();
+            $originalIdentifierDoctrineAlias = $this->getDoctrineIdentifierAlias($identifier, $originalSelectSql);
+
+            $finalSelectSql = "$purifiedSelectSql  JOIN ($originalSelectSql) " .
+                "AS result_table ON result_table.$originalIdentifierDoctrineAlias=$identifier";
+        }
+
+        return $finalSelectSql;
+    }
+
+    /**
+     * Returns doctrine's auto generated identifier alias for column - something like this "id_0"
+     * @param string $identifier
+     * @param string $sql
+     * @return string
+     */
+    private function getDoctrineIdentifierAlias($identifier, $sql)
+    {
+        $regex = "/(?<=\b.$identifier AS )(?:[\w-]+)/is";
+        preg_match($regex, $sql, $matches);
+
+        return current($matches);
     }
 
     /**

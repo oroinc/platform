@@ -74,6 +74,11 @@ class PdoPgsql extends BaseDriver
                 $setOrderBy = false;
                 break;
 
+            case Query::OPERATOR_NOT_LIKE:
+                $searchString = parent::createNotContainsStringQuery($index, $useFieldName);
+                $setOrderBy = false;
+                break;
+
             case Query::OPERATOR_CONTAINS:
                 $searchString = $this->createContainsStringQuery($index, $useFieldName);
                 break;
@@ -246,7 +251,7 @@ class PdoPgsql extends BaseDriver
             }
         } elseif ($searchCondition === Query::OPERATOR_STARTS_WITH) {
             $qb->setParameter('value' . $index, $fieldValue . '%');
-        } elseif ($searchCondition === Query::OPERATOR_LIKE) {
+        } elseif ($searchCondition === Query::OPERATOR_LIKE || $searchCondition === Query::OPERATOR_NOT_LIKE) {
             $qb->setParameter('value' . $index, '%' . $fieldValue . '%');
         } else {
             $qb->setParameter('value' . $index, $fieldValue);

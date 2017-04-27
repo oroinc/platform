@@ -10,5 +10,6 @@ class DenormalizationStub
     public $birthday;
     public $time;
     public $obj;
+    public $obj2;
     public $collection;
 }

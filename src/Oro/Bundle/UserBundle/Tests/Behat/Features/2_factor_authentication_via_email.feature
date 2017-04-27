@@ -1,4 +1,6 @@
 @not-automated
+@ticket-OEE-1183
+@automatically-ticket-tagged
 Feature: two-factor authentication via email
   In order to increase login security level
   As Administrator user

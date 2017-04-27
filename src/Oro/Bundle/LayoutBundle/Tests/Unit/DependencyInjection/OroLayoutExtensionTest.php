@@ -196,27 +196,6 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['main', 'another'], $result->getGroups());
     }
 
-    public function testLoadWithBundleThemesConfig()
-    {
-        $container = new ContainerBuilder();
-
-        $bundle = new TestBundle();
-        CumulativeResourceManager::getInstance()->clear()
-            ->setBundles([$bundle->getName() => get_class($bundle)]);
-
-        $extension = new OroLayoutExtension();
-        $extension->load([], $container);
-
-        $expectedThemeNames = ['base', 'oro-black'];
-
-        $themes = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getAllThemes();
-        $themeNames = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
-
-        $this->assertSame(sort($expectedThemeNames), sort($themeNames));
-        $this->assertSame('Oro Black theme', $themes['oro-black']->getLabel());
-        $this->assertSame('Oro Black theme description', $themes['oro-black']->getDescription());
-    }
-
     protected function normalizeResources(array &$resources)
     {
         ksort($resources);

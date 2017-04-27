@@ -54,7 +54,8 @@ define(function(require) {
         listen: {
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
-            'page:request mediator': 'onPageChange'
+            'page:request mediator': 'onPageChange',
+            'layout:reposition mediator': 'resetDialogPosition'
         },
 
         /**
@@ -69,7 +70,7 @@ define(function(require) {
             _.defaults(dialogOptions, {
                 title: options.title,
                 limitTo: '#container',
-                minWidth: 375,
+                minWidth: 360,
                 minHeight: 150
             });
             if (tools.isMobile()) {
@@ -141,6 +142,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            $(window).off(this.eventNamespace());
             dialogManager.remove(this);
             if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({

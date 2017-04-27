@@ -15,7 +15,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
      * @param mixed $value
      * @param bool $testDefaultValue
      */
-    public function testGettersAndSetters($property, $value, $testDefaultValue)
+    public function testGettersAndSetters($property, $value, $testDefaultValue = false)
     {
         $setter = 'set' . ucfirst($property);
         $obj = new Variable();
@@ -35,12 +35,13 @@ class VariableTest extends \PHPUnit_Framework_TestCase
     public function propertiesDataProvider()
     {
         return [
-            'name' => ['name', 'test', false],
-            'label' => ['label', 'test', false],
-            'value' => ['value', 'my_string', false],
-            'type' => ['type', 'string', false],
-            'options' => ['options', ['key' => 'value'], false],
-            'options_default' => ['options', [], true]
+            'name' => ['name', 'test'],
+            'label' => ['label', 'test'],
+            'value' => ['value', 'my_string'],
+            'type' => ['type', 'string'],
+            'options' => ['options', ['key' => 'value']],
+            'options_default' => ['options', [], true],
+            'property_path' => ['propertyPath', 'entity.field']
         ];
     }
 
@@ -57,6 +58,36 @@ class VariableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['key' => 'test', 'key2' => 'test2'], $obj->getOptions());
         $obj->setOption('key', 'test_changed');
         $this->assertEquals('test_changed', $obj->getOption('key'));
+    }
+
+    /**
+     * Test get form options
+     */
+    public function testGetFormOptions()
+    {
+        $obj = new Variable();
+
+        $obj->setOptions(['form_options' => ['key' => 'test']]);
+        $this->assertEquals(['key' => 'test'], $obj->getFormOptions());
+    }
+
+    /**
+     * Test entity ACL
+     */
+    public function testEntityAclAllowed()
+    {
+        $variable = new Variable();
+
+        $this->assertTrue($variable->isEntityUpdateAllowed());
+        $this->assertTrue($variable->isEntityDeleteAllowed());
+
+        $variable->setEntityAcl(['update' => false, 'delete' => false]);
+        $this->assertFalse($variable->isEntityUpdateAllowed());
+        $this->assertFalse($variable->isEntityDeleteAllowed());
+
+        $variable->setEntityAcl(['update' => true, 'delete' => true]);
+        $this->assertTrue($variable->isEntityUpdateAllowed());
+        $this->assertTrue($variable->isEntityDeleteAllowed());
     }
 
     /**

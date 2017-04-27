@@ -8,5 +8,8 @@
 
 oro.translation:
     action:
-        confirmation:
-            remove_translation.message: 'Delete translated value?'
+        reset:
+            message: 'Reset translated value?'
+            confirm_title: 'Reset Confirmation'
+            confirm_content: 'Are you sure you want to reset selected translations to their original values?'
+            confirm_ok: 'Reset'

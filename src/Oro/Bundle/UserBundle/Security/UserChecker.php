@@ -13,6 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
+use Oro\Bundle\UserBundle\Exception\OrganizationException;
 
 class UserChecker extends BaseUserChecker
 {
@@ -38,6 +39,23 @@ class UserChecker extends BaseUserChecker
         $this->securityContextLink = $securityContextLink;
         $this->flashBag            = $flashBag;
         $this->translator          = $translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkPostAuth(UserInterface $user)
+    {
+        parent::checkPostAuth($user);
+
+        if ($user instanceof User && null !== $user->getAuthStatus()) {
+            if (!$this->hasOrganization($user)) {
+                $exception = new OrganizationException();
+                $exception->setUser($user);
+
+                throw $exception;
+            }
+        }
     }
 
     /**
@@ -73,5 +91,15 @@ class UserChecker extends BaseUserChecker
 
             throw $exception;
         }
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    protected function hasOrganization(User $user)
+    {
+        return $user->getOrganizations(true)->count() > 0;
     }
 }

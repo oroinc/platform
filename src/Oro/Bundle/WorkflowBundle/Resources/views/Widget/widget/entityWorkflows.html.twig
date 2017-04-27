@@ -31,7 +31,7 @@
                                         {% set steps = workflow.stepsData.steps %}
 
                                         {% if not workflow.isStarted and workflow.transitionsData|length > 1 %}
-                                            {% set steps = [{active: false, label: '...', possibleStepsCount: 0}] %}
+                                            {% set steps = [{active: false, label: '...', possibleStepsCount: 0, final: false}] %}
                                         {% endif %}
 
                                         <div class="workflow-scroller">
@@ -41,6 +41,7 @@
                                                 {% set manyVariantsRendered = false %}
 
                                                 {% for step in steps if not manyVariantsRendered %}
+                                                    {% set final = step.final %}
                                                     {% if isOrdered %}
                                                         {% set active = step.active %}
 
@@ -57,7 +58,7 @@
                                                             {% set manyVariantsFound = true %}
                                                         {% endif %}
 
-                                                        <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
+                                                        <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %} {% if final %}workflow-step-final{% endif %}">
                                                             <div class="workflow-steps-item-arrow-container" title="{{ step.label|trans({},'workflows') }}">
                                                                 <span class="workflow-step-arrow-left"></span>
                                                                 <span class="workflow-step-arrow-right"></span>
@@ -66,7 +67,7 @@
                                                         </li>
                                                     {% else %}
                                                         <li class="workflow-steps-item workflow-unordered-steps">
-                                                            <span class="workflow-unordered-step-name">{{ step.label|trans({},'workflows') }}</span>
+                                                            <span class="workflow-unordered-step-name  {% if final %}workflow-step-final{% endif %}">{{ step.label|trans({},'workflows') }}</span>
                                                         </li>
                                                     {% endif %}
                                                 {% endfor %}

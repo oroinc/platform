@@ -5,7 +5,6 @@ namespace Oro\Bundle\SoapBundle\Tests\EventListener;
 use Gedmo\Translatable\TranslatableListener;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 use Oro\Bundle\SoapBundle\EventListener\LocaleListener;

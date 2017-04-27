@@ -21,4 +21,15 @@ interface CurrencyQueryBuilderTransformerInterface
         $rootAlias = null,
         $newFieldName = null
     );
+
+    /**
+     * @param string $originalFieldName
+     * @param string $rootAlias
+     *
+     * @return string
+     */
+    public function getTransformSelectQueryForDataGrid(
+        $originalFieldName,
+        $rootAlias
+    );
 }

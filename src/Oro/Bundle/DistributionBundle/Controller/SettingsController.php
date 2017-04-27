@@ -2,19 +2,24 @@
 
 namespace Oro\Bundle\DistributionBundle\Controller;
 
-use Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType;
-use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Symfony\Component\HttpFoundation\Request;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
+
+use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
 
 class SettingsController extends Controller
 {
     /**
      * @Route("/settings")
      * @Template("OroDistributionBundle:Settings:index.html.twig")
+     *
+     * @param Request $request
+     *
+     * @return array
      */
     public function indexAction(Request $request)
     {

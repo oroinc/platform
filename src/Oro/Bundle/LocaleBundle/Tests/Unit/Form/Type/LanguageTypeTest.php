@@ -4,9 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageType;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
@@ -51,7 +53,7 @@ class LanguageTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('locale', $this->formType->getParent());
+        $this->assertEquals(OroChoiceType::NAME, $this->formType->getParent());
     }
 
     /**
@@ -161,6 +163,22 @@ class LanguageTypeTest extends FormIntegrationTestCase
                 ],
                 'options' => ['show_all' => false]
             ]
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        $choiceType = $this->getMockBuilder(OroChoiceType::class)
+            ->setMethods(['configureOptions', 'getParent'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+
+        return [
+            new PreloadedExtension([OroChoiceType::NAME => $choiceType], [])
         ];
     }
 }

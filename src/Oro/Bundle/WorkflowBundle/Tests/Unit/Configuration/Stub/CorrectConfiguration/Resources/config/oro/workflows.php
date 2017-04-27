@@ -63,16 +63,39 @@ return [
                     'type' => 'string',
                     'value' => 'Var1Value',
                     'options' => [],
+                    'property_path' => null,
                 ],
                 'var2' => [
                     'type' => 'array',
                     'value' => [1,2,3,4,5],
                     'options' => [],
+                    'property_path' => null,
                 ],
                 'var3' => [
                     'type' => 'string',
                     'value' => null,
                     'options' => [],
+                    'property_path' => null,
+                ],
+                'first_object' => [
+                    'type' => 'object',
+                    'property_path' => null,
+                    'value' => '2017-03-15 00:00:00',
+                    'options' => [
+                        'class' => 'DateTime'
+                    ]
+                ],
+                'var_entity' => [
+                    'type' => 'entity',
+                    'property_path' => null,
+                    'entity_acl' => [
+                        'update' => true,
+                        'delete' => false
+                    ],
+                    'options' => [
+                        'class' => 'Oro\Bundle\UserBundle\Entity\User'
+                    ],
+                    'value' => 1
                 ]
             ]
         ],
@@ -91,6 +114,7 @@ return [
                 'frontend_options' => [
                     'class' => 'foo'
                 ],
+                'message_parameters' => ['test' => 'param'],
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
                 'destination_page' => 'name',
@@ -181,6 +205,7 @@ return [
                     'init_context_attribute' => 'init_context',
                     'triggers' => [],
                     'destination_page' => '',
+                    'message_parameters' => [],
                 ],
             'transition_with_form_options_configuration_defaults' =>
                 [
@@ -209,6 +234,7 @@ return [
                     'init_context_attribute' => 'init_context',
                     'triggers' => [],
                     'destination_page' => '',
+                    'message_parameters' => [],
                 ],
         ],
         'transition_definitions' => [
@@ -292,6 +318,7 @@ return [
                 'init_routes' => [],
                 'init_datagrids' => [],
                 'init_context_attribute' => 'init_context',
+                'message_parameters' => [],
             ]
         ],
         'transition_definitions' => [

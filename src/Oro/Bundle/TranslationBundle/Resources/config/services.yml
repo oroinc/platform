@@ -18,7 +18,6 @@ parameters:
     oro_translation.guzzle_client.class:                        Guzzle\Http\Client
 
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
-    oro_translation.event_listener.language_change.class:       Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener
 
     oro_translation.strategy.provider.class:                    Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider
     oro_translation.strategy.default.class:                     Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy
@@ -180,8 +179,18 @@ services:
     oro_translation.packages_provider.translation:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider'
 
-    oro_translation.extension.transtation_packages_provider:
+    oro_translation.extension.transtation_packages_provider.abstract:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension'
+        abstract: true
+        public: false
+        arguments:
+            - '@oro_platform.composer.local_repo_factory'
+            - '@oro_distribution.composer'
+
+    oro_translation.extension.transtation_packages_provider:
+        parent: oro_translation.extension.transtation_packages_provider.abstract
+        calls:
+            - ['addPackage', ['Oro', 'oro/platform', '/src']]
         tags:
             - {name: oro_translation.extension.packages_provider}
 
@@ -195,13 +204,6 @@ services:
                 alias: HINT_TRANSLATABLE
                 output_walker: %oro_translation.translation_walker.class%
 
-    oro_translation.event_listener.language_change:
-        class: %oro_translation.event_listener.language_change.class%
-        arguments:
-            - '@oro_translation.database_translation.metadata.cache'
-        tags:
-            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
-
     oro_translation.event_listener.translation:
         class: 'Oro\Bundle\TranslationBundle\EventListener\TranslationListener'
         lazy: true
@@ -210,6 +212,14 @@ services:
             - 'import.language_translations_import_from_csv'
         tags:
             - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterImportTranslations}
+
+    oro_organization_config.event_listener.languages_change:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\LanguagesChangeListener'
+        arguments:
+            - '@oro_config.user'
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
 
     oro_translation.strategy.default:
         class: '%oro_translation.strategy.default.class%'
@@ -232,6 +242,13 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-language-grid, method: onResultAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-language-grid, method: onBuildBefore }
 
+    oro_translation.listener.datagrid.translation:
+        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslationListener'
+        arguments:
+            - '@oro_translation.provider.language'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
+
     oro_translation.repository.language:
         class: 'Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository'
         parent: oro_entity.abstract_repository
@@ -251,7 +268,7 @@ services:
     oro_translation.provider.language:
         class: 'Oro\Bundle\TranslationBundle\Provider\LanguageProvider'
         arguments:
-            - '@oro_translation.repository.language'
+            - '@doctrine'
             - '@oro_locale.settings'
             - '@oro_security.acl_helper'
 
@@ -305,3 +322,16 @@ services:
             - '@translator'
         tags:
             - { name: layout.data_provider, alias: translator }
+
+    oro_translation.mass_action.reset_translation:
+        class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction'
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.mass_action.type, type: reset_translations }
+
+    oro_translation.mass_action.reset_translation_handler:
+        class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassActionHandler'
+        arguments:
+           - '@oro_translation.manager.translation'
+           - '@translator'
+           - '@oro_security.acl_helper'

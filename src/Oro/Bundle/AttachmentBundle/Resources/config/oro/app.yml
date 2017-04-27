@@ -3,7 +3,13 @@ knp_gaufrette:
         attachments:
             local:
                 directory: '%kernel.root_dir%/%oro_attachment.attachments_dir%'
+        mediacache:
+            local:
+                directory: '%kernel.root_dir%/../web/%oro_attachment.media_cache_dir%'
     filesystems:
         attachments:
             adapter:    attachments
             alias:      attachments_filesystem
+        mediacache:
+            adapter:    mediacache
+            alias:      mediacache_filesystem

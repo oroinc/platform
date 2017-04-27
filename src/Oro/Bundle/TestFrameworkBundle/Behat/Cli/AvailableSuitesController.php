@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
+use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\SuiteRepository;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,11 +18,18 @@ class AvailableSuitesController implements Controller
     private $suiteRepository;
 
     /**
-     * @param array $suiteConfigurations
+     * @var SpecificationFinder
      */
-    public function __construct(SuiteRepository $suiteRepository)
+    private $specificationFinder;
+
+    /**
+     * @param SuiteRepository $suiteRepository
+     * @param SpecificationFinder $specificationFinder
+     */
+    public function __construct(SuiteRepository $suiteRepository, SpecificationFinder $specificationFinder)
     {
         $this->suiteRepository = $suiteRepository;
+        $this->specificationFinder = $specificationFinder;
     }
 
     /**
@@ -49,7 +57,12 @@ class AvailableSuitesController implements Controller
         }
 
         foreach ($this->suiteRepository->getSuites() as $suite) {
-            $output->writeln($suite->getName());
+            $iterators = $this->specificationFinder->findSuitesSpecifications([$suite]);
+            $countFeatures = array_sum(array_map('iterator_count', $iterators));
+
+            if (0 !== $countFeatures) {
+                $output->writeln($suite->getName());
+            }
         }
 
         return 0;

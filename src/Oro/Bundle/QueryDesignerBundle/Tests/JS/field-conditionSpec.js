@@ -1,4 +1,3 @@
-/*global xdescribe*/
 define(function(require) {
     'use strict';
 

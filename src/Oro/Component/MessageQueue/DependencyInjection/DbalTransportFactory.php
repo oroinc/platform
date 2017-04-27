@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Component\MessageQueue\DependencyInjection;
 
+use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
+use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
@@ -29,11 +31,17 @@ class DbalTransportFactory implements TransportFactoryInterface
      */
     public function addConfiguration(ArrayNodeDefinition $builder)
     {
+        $pidFileDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'oro-message-queue';
+
         $builder
             ->children()
                 ->scalarNode('connection')->defaultValue('default')->cannotBeEmpty()->end()
                 ->scalarNode('table')->defaultValue('oro_message_queue')->cannotBeEmpty()->end()
-                ->integerNode('orphan_time')->min(30)->defaultValue(300)->cannotBeEmpty()->end()
+                ->integerNode('pid_file_dir')->defaultValue($pidFileDir)->cannotBeEmpty()->end()
+                ->integerNode('consumer_process_pattern')
+                    ->defaultValue(':consume')
+                    ->cannotBeEmpty()
+                    ->end()
                 ->integerNode('polling_interval')->min(50)->defaultValue(1000)->cannotBeEmpty()->end()
         ;
     }
@@ -43,11 +51,26 @@ class DbalTransportFactory implements TransportFactoryInterface
      */
     public function createService(ContainerBuilder $container, array $config)
     {
+        $pidFileManager = new Definition(DbalPidFileManager::class);
+        $pidFileManager->setPublic(false);
+        $pidFileManager->setArguments([
+            $config['pid_file_dir'],
+        ]);
+        $pidFileManagerId = sprintf('oro_message_queue.consumption.%s.pid_file_manager', $this->name);
+        $container->setDefinition($pidFileManagerId, $pidFileManager);
+
+        $cliProcessManager = new Definition(DbalCliProcessManager::class);
+        $cliProcessManager->setPublic(false);
+        $cliProcessManagerId = sprintf('oro_message_queue.consumption.%s.cli_process_manager', $this->name);
+        $container->setDefinition($cliProcessManagerId, $cliProcessManager);
+
         $orphanExtension = new Definition(RedeliverOrphanMessagesDbalExtension::class);
         $orphanExtension->setPublic(false);
         $orphanExtension->addTag('oro_message_queue.consumption.extension', ['priority' => 20]);
         $orphanExtension->setArguments([
-            $config['orphan_time'],
+            new Reference($pidFileManagerId),
+            new Reference($cliProcessManagerId),
+            $config['consumer_process_pattern']
         ]);
         $container->setDefinition(
             sprintf('oro_message_queue.consumption.%s.redeliver_orphan_messages_extension', $this->name),

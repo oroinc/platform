@@ -9,4 +9,7 @@ class TreeCollection
 
     /** @var TreeItem */
     public $target;
+
+    /** @var TreeItem */
+    public $createRedirect;
 }

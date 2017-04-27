@@ -7,19 +7,19 @@ use Symfony\Component\DomCrawler\Crawler;
 class TableHeader extends Element
 {
     /**
-     * Try to guess header and return number of column starting from 1
+     * Try to guess header and return column number
      *
      * @param string $headerText Header of table column
-     * @return int Number of column starting from 1
+     * @return int column number
      */
     public function getColumnNumber($headerText)
     {
         $crawler = new Crawler($this->getHtml());
 
-        $i = 1;
+        $i = 0;
 
         /** @var \DOMElement $th */
-        foreach ($crawler->filter('th')->siblings() as $th) {
+        foreach ($crawler->filter('th') as $th) {
             if (false !== stripos($th->textContent, $headerText)) {
                 return $i;
             }

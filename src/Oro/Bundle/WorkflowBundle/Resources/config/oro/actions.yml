@@ -30,7 +30,7 @@ operations:
                     - '@call_service_method':
                         service: oro_workflow.translation.processor
                         method: translateWorkflowDefinitionFields
-                        method_parameters: [$.data]
+                        method_parameters: [$.data, true]
                     - '@clone_object':
                         target: $.data
                         attribute: $.clone
@@ -75,7 +75,7 @@ operations:
                 conditions:
                     '@not_blank': $.data.relatedEntity
                 parameters:
-                    service: oro_entity.entity_field_list_provider
+                    service: oro_workflow.entity_field_list_provider
                     method: getFields
                     method_parameters: [false, false, true, false, true, true]
                     attribute: $.entityFields
@@ -109,3 +109,58 @@ operations:
                     route: oro_workflow_definition_configure
                     route_parameters:
                         name: $name
+
+action_groups:
+    transit_workflow_by_record_group:
+        parameters:
+            entity:
+                type: object
+            transition:
+                type: string
+            recordGroup:
+                type: string
+        actions:
+            - '@get_available_workflow_by_record_group':
+                attribute: $.currentWorkflow
+                entity_class: $.entity
+                group_name: $.recordGroup
+
+            - '@transit_workflow':
+                entity: $.entity
+                workflow: $.currentWorkflow.name
+                transition: $.transition
+
+    update_workflow_item_by_record_group:
+        parameters:
+            entity:
+                type: object
+            recordGroup:
+                type: string
+            data:
+                type: array
+            flush:
+                type: bool
+                default: true
+        actions:
+            - '@get_available_workflow_by_record_group':
+                attribute: $.currentWorkflow
+                entity_class: $.entity
+                group_name: $.recordGroup
+
+            - '@call_service_method':
+                attribute: $.workflowItem
+                service: oro_workflow.manager
+                method: getWorkflowItem
+                method_parameters: [$.entity, $.currentWorkflow.name]
+
+            - '@copy_values': [$.workflowItem.data, $.data]
+
+            - '@call_method':
+                object: $.workflowItem
+                method: setUpdated
+
+            - '@flush_entity':
+                conditions:
+                    '@equal': [true, $.flush]
+                parameters:
+                    - $.workflowItem

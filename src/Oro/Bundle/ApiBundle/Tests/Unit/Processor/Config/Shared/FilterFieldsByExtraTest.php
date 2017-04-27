@@ -251,8 +251,8 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                     ]
                 ],
                 'association3' => [
-                    'exclusion_policy'       => 'all',
-                    'fields'                 => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
                         'id'     => null,
                         'field1' => null,
                     ]
@@ -389,8 +389,8 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         ]
                     ],
                     'association3' => [
-                        'exclusion_policy'       => 'all',
-                        'fields'                 => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
                             'id'     => null,
                             'field1' => null,
                         ]
@@ -508,6 +508,175 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                                 'exclude' => true
                             ],
                         ]
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForRenamedIdentifierFieldOfManageableEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'           => ['property_path' => 'realId'],
+                'field1'       => null,
+                'association1' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => ['id' => null]
+                ],
+                'association2' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => ['id' => null]
+                ],
+            ]
+        ];
+
+        $this->context->setExtras([new FilterFieldsConfigExtra(['primary_entity' => ['association1']])]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['realId']);
+        $rootEntityMetadata->expects($this->exactly(2))
+            ->method('hasAssociation')
+            ->willReturnMap(
+                [
+                    ['association1', true],
+                    ['association2', true],
+                ]
+            );
+        $rootEntityMetadata->expects($this->exactly(2))
+            ->method('getAssociationTargetClass')
+            ->willReturnMap(
+                [
+                    ['association1', 'Test\Association1Target'],
+                    ['association2', 'Test\Association2Target'],
+                ]
+            );
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(3))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $this->getClassMetadataMock('Test\Association1Target')],
+                    ['Test\Association2Target', true, $this->getClassMetadataMock('Test\Association2Target')],
+                ]
+            );
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false)
+            ->willReturn(self::TEST_CLASS_NAME);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'           => ['property_path' => 'realId'],
+                    'field1'       => ['exclude' => true],
+                    'association1' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => ['id' => null]
+                    ],
+                    'association2' => [
+                        'exclusion_policy' => 'all',
+                        'exclude'          => true,
+                        'fields'           => ['id' => null]
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForRenamedIdentifierFieldOfManageableEntityAndConfigHasIdentifierFields()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id'           => ['property_path' => 'realId'],
+                'field1'       => null,
+                'association1' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => ['id' => null]
+                ],
+                'association2' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => ['id' => null]
+                ],
+            ]
+        ];
+
+        $this->context->setExtras([new FilterFieldsConfigExtra(['primary_entity' => ['association1']])]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+        $rootEntityMetadata->expects($this->exactly(2))
+            ->method('hasAssociation')
+            ->willReturnMap(
+                [
+                    ['association1', true],
+                    ['association2', true],
+                ]
+            );
+        $rootEntityMetadata->expects($this->exactly(2))
+            ->method('getAssociationTargetClass')
+            ->willReturnMap(
+                [
+                    ['association1', 'Test\Association1Target'],
+                    ['association2', 'Test\Association2Target'],
+                ]
+            );
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(3))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                    ['Test\Association1Target', true, $this->getClassMetadataMock('Test\Association1Target')],
+                    ['Test\Association2Target', true, $this->getClassMetadataMock('Test\Association2Target')],
+                ]
+            );
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false)
+            ->willReturn(self::TEST_CLASS_NAME);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => ['property_path' => 'realId'],
+                    'field1'       => ['exclude' => true],
+                    'association1' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => ['id' => null]
+                    ],
+                    'association2' => [
+                        'exclusion_policy' => 'all',
+                        'exclude'          => true,
+                        'fields'           => ['id' => null]
                     ],
                 ]
             ],

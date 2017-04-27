@@ -50,13 +50,21 @@ class WorkflowDefinitionRepository extends EntityRepository
     }
 
     /**
+     * @param bool $activeOnly
      * @return array
      */
-    public function getAllRelatedEntityClasses()
+    public function getAllRelatedEntityClasses($activeOnly = false)
     {
-        $data = $this->createQueryBuilder('wd')
+        $qb = $this->createQueryBuilder('wd')
             ->resetDQLPart('select')
-            ->select('DISTINCT(wd.relatedEntity) AS class_name')
+            ->select('DISTINCT(wd.relatedEntity) AS class_name');
+
+        if ($activeOnly) {
+            $qb->where('wd.active = :active');
+            $qb->setParameter('active', true);
+        }
+
+        $data = $qb
             ->getQuery()
             ->getArrayResult();
 

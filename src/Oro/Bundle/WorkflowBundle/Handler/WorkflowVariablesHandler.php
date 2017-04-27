@@ -17,8 +17,8 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
     public function updateWorkflowVariables(WorkflowDefinition $definition, WorkflowData $data)
     {
         $workflowConfig = $definition->getConfiguration();
-        $variableDefinitionsConfig = &$workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
-        $variablesConfig = &$variableDefinitionsConfig[WorkflowConfiguration::NODE_VARIABLES];
+        $variableDefinitionsConfig = $workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+        $variablesConfig = $variableDefinitionsConfig[WorkflowConfiguration::NODE_VARIABLES];
 
         foreach ($data as $name => $value) {
             if (!isset($variablesConfig[$name])) {
@@ -27,6 +27,7 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
             $variablesConfig[$name]['value'] = $value;
         }
 
+        $variableDefinitionsConfig[WorkflowConfiguration::NODE_VARIABLES] = $variablesConfig;
         $workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS] = $variableDefinitionsConfig;
         $definition->setConfiguration($workflowConfig);
         $this->process($definition);

@@ -3,8 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -39,13 +37,6 @@ class AutoResponseRule
     protected $active = true;
 
     /**
-     * @var AutoResponseRuleCondition[]|Collection
-     * @ORM\OneToMany(targetEntity="AutoResponseRuleCondition", mappedBy="rule", cascade={"persist"})
-     * @ORM\OrderBy({"position"="ASC"})
-     */
-    protected $conditions;
-
-    /**
      * @var EmailTemplate
      *
      * @ORM\ManyToOne(targetEntity="EmailTemplate", cascade={"persist"})
@@ -69,9 +60,15 @@ class AutoResponseRule
      */
     protected $createdAt;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $definition;
+
     public function __construct()
     {
-        $this->conditions = new ArrayCollection();
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
@@ -97,14 +94,6 @@ class AutoResponseRule
     public function isActive()
     {
         return $this->active;
-    }
-
-    /**
-     * @return AutoResponseRuleCondition[]|Collection
-     */
-    public function getConditions()
-    {
-        return $this->conditions;
     }
 
     /**
@@ -143,43 +132,6 @@ class AutoResponseRule
     public function setActive($active = true)
     {
         $this->active = $active;
-
-        return $this;
-    }
-
-    /**
-     * @param AutoResponseRuleCondition[] $conditions
-     *
-     * @return $this
-     */
-    public function addConditions(array $conditions)
-    {
-        array_map([$this, 'addCondition'], $conditions);
-
-        return $this;
-    }
-
-    /**
-     * @param AutoResponseRuleCondition $condition
-     *
-     * @return $this
-     */
-    public function addCondition(AutoResponseRuleCondition $condition)
-    {
-        $this->conditions->add($condition);
-        $condition->setRule($this);
-
-        return $this;
-    }
-
-    /**
-     * @param AutoResponseRuleCondition $condition
-     *
-     * @return $this
-     */
-    public function removeCondition(AutoResponseRuleCondition $condition)
-    {
-        $this->conditions->removeElement($condition);
 
         return $this;
     }
@@ -226,6 +178,34 @@ class AutoResponseRule
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
+     * @param string $definition
+     *
+     * @return $this
+     */
+    public function setDefinition($definition)
+    {
+        $this->definition = $definition;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntity()
+    {
+        return 'email';
     }
 
     /**

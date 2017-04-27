@@ -21,7 +21,8 @@ abstract class WorkflowTestCase extends WebTestCase
     public static function loadWorkflowFrom($directory)
     {
         self::setConfigLoadDirectory($directory);
-        return self::runCommand(LoadWorkflowDefinitionsCommand::NAME, ['--no-ansi']);
+
+        return self::runCommand(LoadWorkflowDefinitionsCommand::NAME, ['--no-ansi'], true, true);
     }
 
     /**
@@ -48,5 +49,21 @@ abstract class WorkflowTestCase extends WebTestCase
         }
 
         return self::$configDirPropertyReflection;
+    }
+
+    /**
+     * @return \Oro\Bundle\WorkflowBundle\Model\WorkflowManager
+     */
+    protected static function getSystemWorkflowManager()
+    {
+        return self::getContainer()->get('oro_workflow.registry.workflow_manager')->getManager('system');
+    }
+
+    /**
+     * @return \Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
+     */
+    protected static function getSystemWorkflowRegistry()
+    {
+        return self::getContainer()->get('oro_workflow.registry.system');
     }
 }

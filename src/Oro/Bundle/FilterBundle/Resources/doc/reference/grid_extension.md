@@ -28,7 +28,7 @@ For example:
                     enabled: true|false #whether filter enabled or not. If filter is not enabled it will not be displayed in filter list but will be accessible in filter management.
                     disabled: true|false #If filter is disabled it will not be displayed in filter list and will not be available in filter management.
                     visible: true|false #If set to "false" - filter will not be displayed anywhere in UI. However, one can still set filter's value in backend or via url in frontend
-                    force_like: true|false #Different search engines uses different methods for text search. When `force_like` is set to true, text-based filters will use simple `LIKE %%` statement
+                    force_like: true|false #Different search engines uses different methods for text search. When `force_like` is set to true, text-based filters will use simple `LIKE %%` OR `NOT LIKE %%`statement which depends on a chosen operator
                     min_length: integer #In case of text-based filters this option introduce possibility to ignore filters with less characters then specified. Validation message will also appear
 
 ```
@@ -155,6 +155,24 @@ Provides filtering data by datetime values
 
 Validated by [DateTimeRangeFilterType](./filter_form_types.md#oro_type_datetime_range_filter-form-type)
 Rendered by [Oro.Filter.DateTimeFilter](./javascript_widgets.md#orofilterdatetimefilter)
+
+### DateGrouping filter
+
+Provides grouping dates using list of predefined choices: Day, Month, Quarter, Year
+
+`type: datetime`
+
+Validated by [DateGroupingFilterType](./filter_form_types.md#oro_type_dage_grouping_filter-form-type) on backend
+and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterdategroupingfilter)
+
+### SkipEmptyPeriods filter
+
+Provides skipping empty data using list of predefined choices: Yes, No
+
+`type: choice`
+
+Validated by [SkipEmptyPeriodsFilterType](./filter_form_types.md#oro_type_skip_empty_periods_filter-form-type) on backend
+and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterskipemptyperiodsfilter)
 
 Customization
 -------------

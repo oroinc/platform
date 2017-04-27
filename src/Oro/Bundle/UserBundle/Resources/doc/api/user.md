@@ -34,8 +34,7 @@ Example:
          "username":"testapiuser",
          "email":"testuser@oroinc.com",
          "firstName":"Bob",
-         "lastName":"Fedeson",
-         "password":"Password1!"
+         "lastName":"Fedeson"
       },
       "relationships":{  
          "owner":{  
@@ -221,18 +220,6 @@ Data should contain full collection of email addresses of the business customer.
 **Please note:**
 
 *This field is **required** and must remain defined.*
-
-### password
-
-#### create
-
-{@inheritdoc}
-
-**Please note:**
-
-*The password must conform to the system security policy.*
-
-**The required field**
 
 ## SUBRESOURCES
 

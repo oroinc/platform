@@ -6,12 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use JMS\Serializer\Annotation as Serializer;
+
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
@@ -86,11 +89,14 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     protected $titles;
 
     /**
-     * @var string
+     * @var Language
      *
-     * @ORM\Column(name="language_code", type="string", length=16, nullable=false)
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
+     * @ORM\JoinColumn(name="language_id", referencedColumnName="id", nullable=false, onDelete="RESTRICT")
+     *
+     * @Serializer\MaxDepth(1)
      */
-    protected $languageCode;
+    protected $language;
 
     /**
      * @var string
@@ -104,6 +110,8 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      *
      * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childLocalizations")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     *
+     * @Serializer\MaxDepth(3)
      */
     protected $parentLocalization;
 
@@ -111,6 +119,8 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      * @var Collection|Localization[]
      *
      * @ORM\OneToMany(targetEntity="Localization", mappedBy="parentLocalization")
+     *
+     * @Serializer\MaxDepth(3)
      */
     protected $childLocalizations;
 
@@ -142,15 +152,23 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     }
 
     /**
-     * @param string $languageCode
+     * @param Language $language
      *
      * @return $this
      */
-    public function setLanguageCode($languageCode)
+    public function setLanguage($language)
     {
-        $this->languageCode = $languageCode;
+        $this->language = $language;
 
         return $this;
+    }
+
+    /**
+     * @return Language
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 
     /**
@@ -158,7 +176,7 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      */
     public function getLanguageCode()
     {
-        return $this->languageCode;
+        return $this->language ? $this->language->getCode() : null;
     }
 
     /**
@@ -318,5 +336,41 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
         }
 
         return $localeHierarchy;
+    }
+
+    /**
+     * @param bool $includeOwnId
+     * @return array
+     */
+    public function getChildrenIds($includeOwnId = false)
+    {
+        $ids = $this->processChildrenIds($this);
+        if ($includeOwnId && $this->getId()) {
+            $ids[] = $this->getId();
+        }
+
+        $ids = array_unique($ids);
+
+        sort($ids);
+
+        return $ids;
+    }
+
+    /**
+     * @param Localization $localization
+     * @return array
+     */
+    protected function processChildrenIds(Localization $localization)
+    {
+        $ids = [];
+        foreach ($localization->getChildLocalizations() as $child) {
+            foreach ($this->processChildrenIds($child) as $id) {
+                $ids[] = $id;
+            }
+
+            $ids[] = $child->getId();
+        }
+
+        return $ids;
     }
 }

@@ -12,6 +12,7 @@ use Guzzle\Plugin\Cookie\Cookie;
 use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
 use Guzzle\Plugin\Cookie\CookiePlugin;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -101,6 +102,73 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
         $response = $request->send();
 
         self::assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * This method compares data from the downloaded file
+     *
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
+     *
+     * @param string    $entity
+     * @param TableNode $expectedEntities
+     */
+    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities)
+    {
+        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
+        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+
+        self::assertCount(1, $processors, sprintf(
+            'Too many processors ("%s") for export "%s" entity',
+            implode(', ', $processors),
+            $entity
+        ));
+
+        $processorName = array_shift($processors);
+        $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
+        $filePath = FileManager::generateTmpFilePath(
+            FileManager::generateFileName($processorName, 'csv')
+        );
+
+        $jobResult = $jobExecutor->executeJob(
+            'export',
+            'entity_export_to_csv',
+            [
+                'export' => [
+                    'processorAlias' => $processorName,
+                    'entityName' => $entityClass,
+                    'filePath' => $filePath,
+                ]
+            ]
+        );
+
+        static::assertTrue($jobResult->isSuccessful());
+
+        try {
+            $handler = fopen($filePath, 'rb');
+            $headers = fgetcsv($handler, 1000, ',');
+            $expectedHeaders = $expectedEntities->getRow(0);
+
+            foreach ($expectedHeaders as $key => $expectedHeader) {
+                static::assertEquals($expectedHeader, $headers[$key]);
+            }
+
+            $i = 1;
+            while (($data = fgetcsv($handler, 1000, ',')) !== false) {
+                $expectedEntityData = array_combine($headers, array_values($expectedEntities->getRow($i)));
+                $entityDataFromCsv = array_combine($headers, array_values($data));
+
+                foreach ($expectedEntityData as $property => $value) {
+                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                }
+
+                $i++;
+            }
+        } finally {
+            fclose($handler);
+            unlink($filePath);
+        }
+
+        static::assertCount($i, $expectedEntities->getRows());
     }
 
     /**

@@ -237,8 +237,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $result = $renderer->compileMessage(new EmailTemplate('', $content), ['entity' => $entity]);
 
         $this->assertEquals(
-            'content oro.email.variable.not.found, {{ entity.field1|oro_html_sanitize }}, ' .
-            '{{ entity.field2.field1|oro_html_sanitize }}, oro.email.variable.not.found, ' .
+            'content oro.email.variable.not.found, {{ entity.field1|oro_format_name }}, ' .
+            '{{ entity.field2.field1|oro_format_name }}, oro.email.variable.not.found, ' .
             '{{ system.currentDate }}',
             $renderedContent = $result[1]
         );

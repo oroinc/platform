@@ -16,7 +16,6 @@ class FormUtil
     {
         return [
             'validation_groups'    => ['Default', 'api'],
-            'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
         ];
     }
 

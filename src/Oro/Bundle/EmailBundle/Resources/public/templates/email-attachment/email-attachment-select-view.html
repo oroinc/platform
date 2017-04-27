@@ -1,0 +1,26 @@
+<div class="attachment-list-content">
+    <div class="filter-block">
+        <label><%= _.__('oro.email.attachment.select_file') %></label>
+        <input type="text" class="filter"/>
+    </div>
+    <div class="attachment-list">
+        <div class="no-items">
+            <p class="text-center"><%= _.__('oro.email.form.no_attachments') %></p>
+        </div>
+        <div class="group-block entity-attachments">
+            <b><%= _.__('oro.email.form.record_attachments') %></b>
+            <div class="entity-attachments-list"></div>
+        </div>
+        <div class="group-block thread-attachments">
+            <b><%= _.__('oro.email.form.thread_attachments') %></b>
+            <div class="thread-attachments-list"></div>
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+<div class="attachment-actions">
+    <div class="pull-right">
+        <a class="btn cancel"><%= _.__('Cancel') %></a>
+        <a class="btn btn-primary attach"><%= _.__('oro.email.form.attach') %></a>
+    </div>
+</div>

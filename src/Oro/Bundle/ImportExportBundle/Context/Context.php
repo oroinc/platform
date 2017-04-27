@@ -3,7 +3,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
-class Context implements ContextInterface
+class Context implements ContextInterface, BatchContextInterface
 {
     /**
      * @var array
@@ -256,5 +256,21 @@ class Context implements ContextInterface
         if ($this->hasOption($name)) {
             unset($this->configuration[$name]);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchSize()
+    {
+        return $this->getValue('batch_size');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchNumber()
+    {
+        return $this->getValue('batch_number');
     }
 }

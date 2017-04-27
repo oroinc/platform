@@ -53,15 +53,23 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    oro_datagrid.extension.action:
-        class: %oro_datagrid.extension.action.class%
+    oro_datagrid.extension.action.abstract:
+        abstract: true
         arguments:
             - '@service_container'
             - '@oro_security.security_facade'
             - '@translator'
-            - '@oro_datagrid.event.dispatcher'
+
+    oro_datagrid.extension.action:
+        class: '%oro_datagrid.extension.action.class%'
+        parent: oro_datagrid.extension.action.abstract
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_datagrid.action.callback_provider:
+        class: Oro\Bundle\DataGridBundle\Extension\Action\DatagridCallbackActionProvider
+        tags:
+            - { name: oro_datagrid.extension.action.provider, priority: 255 }
 
     oro_datagrid.extension.mass_delete_action:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension
@@ -72,8 +80,8 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.mass_action:
-        class: %oro_datagrid.extension.mass_action.class%
-        parent: oro_datagrid.extension.action
+        class: '%oro_datagrid.extension.mass_action.class%'
+        parent: oro_datagrid.extension.action.abstract
         tags:
             - { name: oro_datagrid.extension }
 

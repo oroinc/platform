@@ -104,6 +104,10 @@ define(function(require) {
         },
 
         render: function() {
+            if (this.jsTreeInstance) {
+                this.jsTreeInstance.destroy();
+            }
+
             this.$tree.jstree(this.jsTreeConfig);
             this.jsTreeInstance = $.jstree.reference(this.$tree);
 
@@ -111,7 +115,8 @@ define(function(require) {
             treeEvents = _.extend.apply({}, treeEvents);
             _.each(treeEvents, function(callback, event) {
                 if (this[callback]) {
-                    this.$tree.on(event, _.bind(this[callback], this));
+                    this.$tree.off(event + '.treeEvents');
+                    this.$tree.on(event + '.treeEvents', _.bind(this[callback], this));
                 }
             }, this);
 

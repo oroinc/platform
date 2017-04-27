@@ -112,6 +112,23 @@ class ConfigHelper
     }
 
     /**
+     * @return array
+     */
+    public function getNonExtendedEntitiesClasses()
+    {
+        $configs = $this->configManager->getConfigs('extend');
+
+        $nonExtendedClassNames = [];
+        foreach ($configs as $config) {
+            if (!$config->is('is_extend')) {
+                $nonExtendedClassNames[] = $config->getId()->getClassName();
+            }
+        }
+
+        return $nonExtendedClassNames;
+    }
+
+    /**
      * @param ConfigInterface $extendEntityConfig
      * @param $fieldType
      * @param array $additionalFieldOptions
@@ -127,8 +144,7 @@ class ConfigHelper
                 'is_extend' => true,
                 'origin' => ExtendScope::ORIGIN_CUSTOM,
                 'owner' => ExtendScope::OWNER_CUSTOM,
-                'state' => ExtendScope::STATE_NEW,
-                'bidirectional' => false
+                'state' => ExtendScope::STATE_NEW
             ]
         ];
 

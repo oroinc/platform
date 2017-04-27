@@ -97,7 +97,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('offsetSet');
 
         $this->builder->expects($this->once())->method('build')
-            ->with($configuration, $parameters)
+            ->with($configuration, $parameters, $additionalParameters)
             ->will($this->returnValue($datagrid));
 
         $this->assertEquals(
@@ -158,7 +158,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($configuration));
 
         $this->builder->expects($this->once())->method('build')
-            ->with($configuration, $parameters)
+            ->with($configuration, $parameters, $additionalParameters)
             ->will($this->returnValue($datagrid));
 
         $this->assertEquals(

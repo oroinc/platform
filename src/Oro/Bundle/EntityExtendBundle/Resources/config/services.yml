@@ -207,6 +207,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_enum_name }
 
+    oro_entity_extend.validator.non_extended_entity_bidirectional:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectionalValidator
+        arguments:
+            - "@oro_entity_config.config_manager"
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.non_extended_entity_bidirectional }
+
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%
         arguments:
@@ -544,3 +551,9 @@ services:
             - '@oro_entity.database_checker.state_manager'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
+
+    oro_entity_extend.enum_entity_name_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }

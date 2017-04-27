@@ -8,12 +8,21 @@ define(function(require) {
     var ModelAction = require('oro/datagrid/action/model-action');
 
     MapAction = ModelAction.extend({
+        /**
+         * @property {Object}
+         */
         options: {
             mapView: GoogleMaps
         },
 
+        /**
+         * @property {Boolean}
+         */
         dispatched: true,
 
+        /**
+        * @param {Object} options
+        */
         initialize: function(options) {
             MapAction.__super__.initialize.apply(this, arguments);
 
@@ -32,6 +41,7 @@ define(function(require) {
             }
             delete this.$mapContainerFrame;
             this.datagrid.off(null, null, this);
+            this.subviews[0].$el.off('click');
             MapAction.__super__.dispose.apply(this, arguments);
         },
 
@@ -39,11 +49,23 @@ define(function(require) {
             if (!this.subviews.length) {
                 return;
             }
+            this.subviews[0].$el.on('click', _.bind(this.onActionClick, this));
+        },
 
-            var $popoverTrigger = this.subviews[0].$el;
+        /**
+         * @param {jQuery.Event} e
+         */
+        onActionClick: function(e) {
+            e.preventDefault();
+            this.handlePopover(this.getPopoverConfig());
+        },
 
-            $popoverTrigger.popover({
-                placement: 'left',
+        getPopoverConfig: function() {
+            return _.extend({
+                placement: {
+                    placement: 'left',
+                    collision: 'flip'
+                },
                 hideOnScroll: false,
                 container: 'body',
                 animation: false,
@@ -51,18 +73,29 @@ define(function(require) {
                 closeButton: true,
                 class: 'map-popover',
                 content: this.$mapContainerFrame
-            }).on('shown.bs.popover', _.bind(function() {
+            }, this.popoverTpl ? {template: this.popoverTpl} : {});
+        },
+
+        /**
+         * @param {Object} config
+         */
+        handlePopover: function(config) {
+            var $popoverTrigger = this.subviews[0].$el;
+
+            $popoverTrigger.popover(config).on('shown.bs.popover', _.bind(function() {
                 this.mapView.updateMap(this.getAddress(), this.model.get('label'));
 
                 $(document).on('mouseup', _.bind(function(e) {
                     var $map = this.mapView.$el;
                     if (!$map.is(e.target) && !$map.has(e.target).length) {
-                        $popoverTrigger.popover('hide');
+                        $popoverTrigger.popover('destroy');
                     }
                 }, this));
             }, this)).on('hidden.bs.popover', _.bind(function() {
                 $(document).off('mouseup', null, this);
             }, this));
+
+            $popoverTrigger.popover('show');
         },
 
         getAddress: function() {

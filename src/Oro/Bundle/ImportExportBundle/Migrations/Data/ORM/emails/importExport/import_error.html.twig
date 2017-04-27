@@ -1,0 +1,20 @@
+@name =  import_error
+@subject = Cannot Import file {{ originFileName }}
+@isSystem = 1
+@isEditable = 1
+{% spaceless %}
+<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+<div class="wrapper">
+    <p>An error occurred while reading file {{ originFileName }}:</p>
+    <p>{{ error }}</p>
+</div>
+{% endspaceless %}

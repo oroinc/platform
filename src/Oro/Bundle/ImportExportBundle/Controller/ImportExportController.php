@@ -2,10 +2,21 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
@@ -14,21 +25,11 @@ use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ImportExportController extends Controller
 {
@@ -161,6 +162,7 @@ class ImportExportController extends Controller
         $jobName = $request->get('importValidateJob', JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV);
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
+        $token = $this->getSecurityToken()->getToken();
 
         $this->getMessageProducer()->send(
             Topics::PRE_HTTP_IMPORT,
@@ -169,6 +171,7 @@ class ImportExportController extends Controller
                 'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
                 'originFileName' => $originFileName,
                 'userId' => $this->getUser()->getId(),
+                'securityToken' => $this->getTokenSerializer()->serialize($token),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
                 'options' => $this->getOptionsFromRequest($request)
@@ -192,14 +195,16 @@ class ImportExportController extends Controller
         $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
+        $token = $this->getSecurityToken()->getToken();
 
         $this->getMessageProducer()->send(
             Topics::PRE_HTTP_IMPORT,
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT,
-                'originFileName' => $originFileName,
                 'userId' => $this->getUser()->getId(),
+                'originFileName' => $originFileName,
+                'securityToken' => $this->getTokenSerializer()->serialize($token),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
                 'options' => $this->getOptionsFromRequest($request)
@@ -222,17 +227,16 @@ class ImportExportController extends Controller
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
         $filePrefix = $request->get('filePrefix', null);
         $options = $this->getOptionsFromRequest($request);
+        $token = $this->getSecurityToken()->getToken();
 
-        $organization = $this->getSecurityFacade()->getOrganization();
-        $organizationId = $organization ? $organization->getId() : null;
-
-        $this->getMessageProducer()->send(Topics::EXPORT, [
+        $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
             'outputFilePrefix' => $filePrefix,
             'options' => $options,
             'userId' => $this->getUser()->getId(),
-            'organizationId' => $organizationId,
+            'organizationId' => $token->getOrganizationContext()->getId(),
+            'securityToken' => $this->getTokenSerializer()->serialize($token),
         ]);
 
         return new JsonResponse(['success' => true]);
@@ -335,7 +339,7 @@ class ImportExportController extends Controller
             $this->getOptionsFromRequest($request)
         );
 
-        return $this->redirect($result['url']);
+        return $this->redirectToRoute('oro_importexport_export_download', ['fileName' => $result['file']]);
     }
 
     /**
@@ -384,12 +388,12 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @Route("/import_export/import-error/{jobId}.log", name="oro_importexport_import_error_log")
+     * @Route("/import_export/job-error-log/{jobId}.log", name="oro_importexport_job_error_log")
      *
      * @param $jobId
      * @return Response
      */
-    public function importErrorLogAction($jobId)
+    public function importExportJobErrorLogAction($jobId)
     {
         $securityFacade = $this->get('oro_security.security_facade');
         if (!$securityFacade->isGranted('oro_importexport_import') &&
@@ -398,7 +402,7 @@ class ImportExportController extends Controller
             throw new AccessDeniedException('Insufficient permission');
         }
 
-        $job = $this->getDoctrine()->getManager()->getRepository(Job::class)->find($jobId);
+        $job = $this->getDoctrine()->getManagerForClass(Job::class)->getRepository(Job::class)->find($jobId);
 
         if (!$job) {
             throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
@@ -474,18 +478,26 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @return SecurityFacade
-     */
-    protected function getSecurityFacade()
-    {
-        return $this->get('oro_security.security_facade');
-    }
-
-    /**
      * @return CsvFileHandler
      */
     protected function getCsvFileHandler()
     {
         return $this->get('oro_importexport.handler.csv.file');
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    protected function getSecurityToken()
+    {
+        return $this->get('security.token_storage');
+    }
+
+    /**
+     * @return TokenSerializerInterface
+     */
+    protected function getTokenSerializer()
+    {
+        return $this->get('oro_security.token_serializer');
     }
 }

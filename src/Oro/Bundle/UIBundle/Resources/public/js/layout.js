@@ -240,7 +240,9 @@ define(function(require) {
             $parents.each(function() {
                 heightDiff += this.scrollTop;
             });
-            return heightDiff - this.getDevToolbarHeight() - this.PAGE_BOTTOM_PADDING;
+            heightDiff -= documentHeight - $('#container')[0].getBoundingClientRect().bottom;
+            heightDiff -= this.PAGE_BOTTOM_PADDING;
+            return heightDiff;
         },
 
         /**

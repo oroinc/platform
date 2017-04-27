@@ -8,6 +8,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\SkipEmptyPeriodsFilterType;
 
 class SkipEmptyPeriodsFilter extends ChoiceFilter
 {
+    const NAME = 'skip_empty_periods';
+
     /** @var array */
     protected $config = [];
 

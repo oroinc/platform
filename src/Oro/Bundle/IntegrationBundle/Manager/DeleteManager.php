@@ -12,7 +12,7 @@ class DeleteManager
     protected $em;
 
     /** @var DeleteProviderInterface[] */
-    protected $deleteProviders;
+    protected $deleteProviders = [];
 
     /**
      * @param EntityManager $em

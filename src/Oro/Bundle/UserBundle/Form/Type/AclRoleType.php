@@ -6,8 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
-use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
+use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
 
 class AclRoleType extends AbstractType
 {
@@ -66,6 +65,8 @@ class AclRoleType extends AbstractType
                 'mapped' => false,
             ]
         );
+
+        $builder->addEventSubscriber(new ChangeRoleSubscriber());
     }
 
     /**

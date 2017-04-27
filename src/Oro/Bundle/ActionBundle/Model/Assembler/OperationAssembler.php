@@ -72,6 +72,7 @@ class OperationAssembler extends AbstractAssembler
             ->setLabel($this->getOption($options, 'label'))
             ->setSubstituteOperation($this->getOption($options, 'substitute_operation', null))
             ->setEnabled($this->getOption($options, 'enabled', true))
+            ->setPageReload($this->getOption($options, 'page_reload', true))
             ->setOrder($this->getOption($options, 'order', 0))
             ->setFormType($this->getOption($options, 'form_type', OperationType::NAME))
             ->setButtonOptions($this->getOption($options, 'button_options', []))

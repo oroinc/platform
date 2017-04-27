@@ -16,8 +16,8 @@
 @function z($layer: 'base') {
     $layers: (
             'base': 1,
-            'fixed': 50,
-            'dropdown': 100,
+            'dropdown': 50,
+            'fixed': 100,
             'popup': 150,
             'hidden': -1
     );

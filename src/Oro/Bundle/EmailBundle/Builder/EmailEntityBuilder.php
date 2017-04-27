@@ -483,6 +483,16 @@ class EmailEntityBuilder
     }
 
     /**
+     * Get full class name of the EmailAddress entity
+     *
+     * @return string
+     */
+    public function getEmailAddressEntityClass()
+    {
+        return $this->emailAddressManager->getEmailAddressProxyClass();
+    }
+
+    /**
      * @return EmailBodyHelper
      */
     protected function getEmailBodyHelper()

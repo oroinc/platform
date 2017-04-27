@@ -93,7 +93,7 @@ operations:
             demo_attr:                                              # attribute name
                 label: Demo Field                                   # attribute label
                 type: string                                        # attribute type
-                property_path: data.demo                            # (optional if label and type are set) path to entity property, which helps to automatically defined attribute metadata
+                property_path: data.demo                            # (optional if label and type are set) path to entity property, which helps to automatically defined attribute metadata, and will be mapped for that property
                 options:                                            # attribute options
                     class: \Acme\Bundle\DemoBundle\Model\MyModel    # (optional) entity class name, set if type is entity
 

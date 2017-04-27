@@ -328,6 +328,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(null)
             ->getMock();
         $command->setApplication($application);
+        $command->setDefinition($definition);
 
         $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);

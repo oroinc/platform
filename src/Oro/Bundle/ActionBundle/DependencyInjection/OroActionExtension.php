@@ -23,5 +23,6 @@ class OroActionExtension extends Extension
         $loader->load('form_types.yml');
         $loader->load('actions.yml');
         $loader->load('services.yml');
+        $loader->load('duplicator.yml');
     }
 }

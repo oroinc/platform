@@ -2,7 +2,6 @@
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
@@ -52,6 +51,14 @@ class DbalMessageConsumer implements MessageConsumerInterface
         $this->connection = $session->getConnection();
         $this->dbal = $this->connection->getDBALConnection();
         $this->consumerId = uniqid('', true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getConsumerId()
+    {
+        return $this->consumerId;
     }
 
     /**
@@ -140,8 +147,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
         $row = $this->dbal->executeQuery(
             $sql,
-            ['id' => $message->getId(),],
-            ['id' => Type::INTEGER,]
+            ['id' => $message->getId(), ],
+            ['id' => Type::INTEGER, ]
         )->fetch();
         $affectedRows = null;
         if (count($row)) {
@@ -156,7 +163,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     $affectedRows = $this->dbal->delete(
                         $this->connection->getTableName(),
                         ['id' => $message->getId()],
-                        ['id' => Type::INTEGER,]
+                        ['id' => Type::INTEGER, ]
                     );
                     $this->dbal->commit();
                 } catch (\Exception $e) {
@@ -210,7 +217,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     $affectedRows = $this->dbal->delete(
                         $this->connection->getTableName(),
                         ['id' => $message->getId()],
-                        ['id' => Type::INTEGER,]
+                        ['id' => Type::INTEGER, ]
                     );
                     $this->dbal->commit();
                 } catch (\Exception $e) {
@@ -293,7 +300,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 $messageId = $row['id'];
 
                 $sql = sprintf(
-                    'UPDATE %s SET consumer_id=:consumerId, delivered_at=:deliveredAt WHERE id = :messageId',
+                    'UPDATE %s SET consumer_id=:consumerId  WHERE id = :messageId',
                     $this->connection->getTableName()
                 );
 
@@ -301,13 +308,11 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     $sql,
                     [
                         'messageId' => $messageId,
-                        'consumerId' => $this->consumerId,
-                        'deliveredAt' => $now,
+                        'consumerId' => $this->consumerId
                     ],
                     [
                         'messageId' => Type::STRING,
-                        'consumerId' => Type::STRING,
-                        'deliveredAt' => Type::INTEGER,
+                        'consumerId' => Type::STRING
                     ]
                 );
 

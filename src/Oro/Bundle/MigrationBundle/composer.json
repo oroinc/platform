@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/MigrationBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.0",
         "symfony/framework-bundle": "2.8.*",
         "oro/log": "dev-master"
     },

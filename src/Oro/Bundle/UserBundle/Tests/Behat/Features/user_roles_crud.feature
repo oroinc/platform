@@ -1,3 +1,5 @@
+@ticket-BAP-13807
+@automatically-ticket-tagged
 Feature: Managing users roles
   In order to control user permissions
   As an Administrator
@@ -61,14 +63,14 @@ Feature: Managing users roles
     Then the role has following active permissions:
       | Email-User Relation | View:None | Create:None | Edit:None |
     And I should see "Manage passwords"
-    When restricted VIEW permission for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default
-    And restricted CREATE permission for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default
-    And restricted password_management capability and group default
+    When permission VIEW for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default restricts in application
+    And permission CREATE for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default restricts in application
+    And capability password_management and group default restricts in application
     And I reload the page
     Then the role has not following permissions:
       | Email-User Relation | View | Create |
     And I should not see "Manage passwords"
-    When restricted all permissions for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default
+    When all permissions for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default restricts in application
     And I should see "Email-User Relation"
     And I reload the page
     Then I should not see "Email-User Relation"

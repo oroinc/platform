@@ -40,7 +40,6 @@ class ReminderIntervalType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class'         => 'Oro\\Bundle\\ReminderBundle\\Model\\ReminderInterval',
-                'cascade_validation' => true,
             )
         );
     }

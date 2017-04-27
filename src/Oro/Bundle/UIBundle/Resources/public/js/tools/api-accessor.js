@@ -157,7 +157,8 @@ define(function(require) {
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
                 url: this.getUrl(urlParameters),
-                data: JSON.stringify(this.formatBody(body))
+                data: JSON.stringify(this.formatBody(body)),
+                errorHandlerMessage: this.getErrorHandlerMessage(options)
             });
             var resultPromise = promise.then(_.bind(this.formatResult, this), _.bind(this.onAjaxError, this));
             if (options && options.processingMessage) {
@@ -171,6 +172,22 @@ define(function(require) {
             }
             resultPromise.abort = _.bind(promise.abort, promise);
             return resultPromise;
+        },
+
+        /**
+         * Get error handler message attribute
+         *
+         * @param options
+         * @returns {boolean} true if need to use global handler and false if not
+         * @protected
+         */
+        getErrorHandlerMessage: function(options) {
+            var errorHandlerMessage = true;
+            if (_.has(options, 'errorHandlerMessage') && options.errorHandlerMessage !== undefined) {
+                errorHandlerMessage = options.errorHandlerMessage;
+            }
+
+            return errorHandlerMessage;
         },
 
         /**

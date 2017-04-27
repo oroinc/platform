@@ -2,6 +2,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
 class SegmentTest extends \PHPUnit_Framework_TestCase
 {
@@ -91,5 +92,24 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $segment->doUpdate();
         $this->assertEmpty($segment->getCreatedAt());
         $this->assertInstanceOf('\DateTime', $segment->getUpdatedAt());
+    }
+
+    public function testIsDynamicFalse()
+    {
+        $segmentType = new SegmentType(SegmentType::TYPE_STATIC);
+        $segment = new Segment();
+
+        $this->assertFalse($segment->isDynamic());
+        $segment->setType($segmentType);
+        $this->assertFalse($segment->isDynamic());
+    }
+
+    public function testIsDynamicTrue()
+    {
+        $segmentType = new SegmentType(SegmentType::TYPE_DYNAMIC);
+        $segment = new Segment();
+        $segment->setType($segmentType);
+
+        $this->assertTrue($segment->isDynamic());
     }
 }

@@ -156,7 +156,7 @@ So we can implement another workflow for the same related entity and that two wo
 For that cases, we bring new approach for developers to configure their workflows on mutually exclusive manner.
 There two levels of exclusiveness at this moment: *activation level* and *record level*.
 
-###Activation level exclusiveness - `exclusive_active_groups` 
+### Activation level exclusiveness - `exclusive_active_groups` 
 If your custom workflow represents a replacement flow for some already existent workflows you may provide a possibility
  to secure your customization by ensuring  that only one of them can be activated in the system at a time.
  
@@ -170,7 +170,7 @@ configurations under `exclusive_active_groups` node. Let's name it 'sales'.
 So, now, when an administrator will attempt to activate one of that groups there would be an additional check for group 
 conflicts and notice generated if another workflow in the group 'sales' is already active. So that two workflows would never be active at once.
 
-###Record level exclusiveness - `exclusive_record_groups`
+### Record level exclusiveness - `exclusive_record_groups`
 Another level of exclusiveness is a record level. 
 This level provides a possibility to have several active workflows at one time
  with one limitation - only one workflow can be started for a related entity within a same *exclusive record group*. 
@@ -182,7 +182,7 @@ there would be the possibility to launch starting transitions from any of them.
 But, when one of that workflows was started - you may not perform any actions from another workflow (and start it as well). 
 That is a ramification of a business process that can be reached by the `exclusive_record_group` in workflows configuration.
 
-###Priority Case
+### Priority Case
 Let's say, you have two exclusive workflows at the level of a single record and both of them has automated start transitions 
 (e.g. automatically performs start transition when a new instance of their common related entity is created).
 In that case, you may configure `priority` flag in workflow configurations. So when a new record of the related entity created 

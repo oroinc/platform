@@ -77,7 +77,7 @@ services:
     oro_ui.config_settings.listener:
         class: %oro_ui.config_settings.listener.class%
         tags:
-            - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onBeforeSave }
+            - { name: kernel.event_listener, event: oro_config.settings_before_save.oro_ui.application_url, method: onBeforeSave }
 
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%

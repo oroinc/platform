@@ -475,6 +475,7 @@ class AclRoleHandler
      * Encode array of AclPrivilege objects into array of plain privileges
      *
      * @param array $allPrivileges
+     * @param bool $addExtensionName
      *
      * @return array
      */

@@ -111,6 +111,7 @@ services:
         class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
         arguments:
             - '@oro_locale.provider.localization_choices'
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_language_select }
 

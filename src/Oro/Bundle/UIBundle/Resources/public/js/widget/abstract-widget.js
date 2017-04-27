@@ -342,10 +342,7 @@ define(function(require) {
             if (form.find('[type="file"]').length) {
                 this.trigger('beforeContentLoad', this);
                 form.ajaxSubmit({
-                    data: {
-                        '_widgetContainer': this.options.type,
-                        '_wid': this.getWid()
-                    },
+                    data: this._getWidgetData(),
                     success: _.bind(this._onContentLoad, this),
                     errorHandlerMessage: false,
                     error: _.bind(this._onContentLoadFail, this)
@@ -679,9 +676,22 @@ define(function(require) {
                 errorHandlerMessage: false
             };
 
-            options.data += '_widgetContainer=' + this.options.type + '&_wid=' + this.getWid();
+            options.data += $.param(this._getWidgetData());
 
             return options;
+        },
+
+        _getWidgetData: function() {
+            var data = {
+                _widgetContainer: this.options.type,
+                _wid: this.getWid()
+            };
+
+            if (this.options.widgetTemplate) {
+                data._widgetContainerTemplate = this.options.widgetTemplate;
+            }
+
+            return data;
         },
 
         /**

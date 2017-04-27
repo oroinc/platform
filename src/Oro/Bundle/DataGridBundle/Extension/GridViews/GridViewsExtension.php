@@ -7,8 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
@@ -18,6 +17,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
+
 use Oro\Component\DependencyInjection\ServiceLink;
 
 class GridViewsExtension extends AbstractExtension
@@ -48,7 +50,7 @@ class GridViewsExtension extends AbstractExtension
     /** @var ServiceLink */
     protected $managerLink;
 
-    /** @var GridView|null|bool */
+    /** @var AbstractGridView|null|bool */
     protected $defaultGridView = false;
 
     /**
@@ -191,7 +193,7 @@ class GridViewsExtension extends AbstractExtension
      *
      * @param string $gridName
      *
-     * @return GridView|null
+     * @return AbstractGridView|null
      */
     protected function getDefaultView($gridName)
     {
@@ -240,7 +242,7 @@ class GridViewsExtension extends AbstractExtension
     /**
      * @return array
      */
-    private function getPermissions()
+    protected function getPermissions()
     {
         return [
             'VIEW'        => $this->securityFacade->isGranted('oro_datagrid_gridview_view'),
@@ -271,12 +273,12 @@ class GridViewsExtension extends AbstractExtension
     }
 
     /**
-     * @return User
+     * @return AbstractUser
      */
     protected function getCurrentUser()
     {
         $user = $this->securityFacade->getLoggedUser();
-        if ($user instanceof User) {
+        if ($user instanceof AbstractUser) {
             return $user;
         }
 
