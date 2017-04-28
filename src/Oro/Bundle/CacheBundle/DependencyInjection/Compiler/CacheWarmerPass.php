@@ -30,7 +30,6 @@ class CacheWarmerPass implements CompilerPassInterface
         foreach ($cacheProviders as $id => $attributes) {
             $definition = $container->getDefinition($id);
             $this->assertInstanceOf($definition, $container, ConfigCacheWarmerInterface::class);
-            $this->prepareDefinition($definition);
 
             if (isset($attributes[0]['dumper'])) {
                 $dumper = $attributes[0]['dumper'];
@@ -93,14 +92,6 @@ class CacheWarmerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition($dumper);
         $this->assertInstanceOf($definition, $container, ConfigMetadataDumperInterface::class);
-        $this->prepareDefinition($definition);
-    }
-
-    /**
-     * @param Definition $definition
-     */
-    protected function prepareDefinition(Definition $definition)
-    {
         $definition->setShared(false)->setPublic(false);
     }
 }
