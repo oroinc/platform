@@ -82,6 +82,7 @@ define(function(require) {
                     }
                 );
             }
+            mediator.trigger('grid-sidebar:load:' + this.options.sidebarAlias);
         },
 
         /**
@@ -93,28 +94,35 @@ define(function(require) {
                 this._getDatagridParams(),
                 data.params
             );
+            data = _.extend({reload: true, updateUrl: true}, data);
             var widgetParams = _.extend(
                 _.omit(this.options.widgetRouteParameters, this.options.gridParam),
                 params
             );
-            var self = this;
 
-            this._pushState(_.omit(params, _.isNull));
+            if (data.updateUrl) {
+                this._pushState(_.omit(params, _.isNull));
+            }
 
             this._patchGridCollectionUrl(params);
 
-            widgetManager.getWidgetInstanceByAlias(
-                this.options.widgetAlias,
-                function(widget) {
-                    widget.setUrl(routing.generate(self.options.widgetRoute, widgetParams));
-
-                    if (data.widgetReload) {
-                        widget.render();
-                    } else {
-                        mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName);
-                    }
+            if (_.has(this.gridCollection, 'state')) {
+                this.gridCollection.state.currentPage = 1;
+            }
+            if (data.reload) {
+                if (data.widgetReload) {
+                    var self = this;
+                    widgetManager.getWidgetInstanceByAlias(
+                        this.options.widgetAlias,
+                        function(widget) {
+                            widget.setUrl(routing.generate(self.options.widgetRoute, widgetParams));
+                            widget.render();
+                        }
+                    );
+                } else {
+                    mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName);
                 }
-            );
+            }
         },
 
         /**
@@ -222,6 +230,9 @@ define(function(require) {
          */
         _getDatagridParams: function() {
             var params = {};
+            if (!_.has(this.gridCollection, 'options')) {
+                return params;
+            }
             params[this.gridCollection.options.gridName] = this.gridCollection.urlParams;
 
             return params;
