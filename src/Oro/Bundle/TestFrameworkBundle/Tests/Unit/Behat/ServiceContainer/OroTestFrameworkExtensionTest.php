@@ -6,6 +6,8 @@ use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -27,13 +29,11 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilder = $this->getContainerBuilder($bundles);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
 
-        $config = [
+        $config = ['oro_test' => [
             'shared_contexts' => $this->sharedContexts,
-            'application_suites' => [],
-            'elements_namespace_suffix' => '\Tests\Behat\Page\Element',
-            'reference_initializer_class'
-                => 'Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer'
-        ];
+        ]];
+
+        $config = $this->processConfig($config);
 
         $extension = $this
             ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
@@ -52,12 +52,15 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
         $applicableSuites = ['OroUserBundle'];
 
-        $extension = new OroTestFrameworkExtension();
-        $extension->load($containerBuilder, [
+        $config = ['oro_test' => [
             'shared_contexts' => $sharedContexts,
             'application_suites' => $applicableSuites,
-            'reference_initializer_class' => 'ReferenceRepositoryInitializer'
-        ]);
+        ]];
+
+        $config = $this->processConfig($config);
+
+        $extension = new OroTestFrameworkExtension();
+        $extension->load($containerBuilder, $config);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
         $this->assertEquals($applicableSuites, $containerBuilder->getParameter('oro_test.application_suites'));
@@ -190,5 +193,20 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilder->setDefinition('symfony2_extension.context_initializer.kernel_aware', new Definition());
 
         return $containerBuilder;
+    }
+
+    /**
+     * @return array
+     */
+    private function processConfig(array $config = [])
+    {
+        $tree = new TreeBuilder();
+        $extension = new OroTestFrameworkExtension();
+        $root = $tree->root('oro_test');
+        $extension->configure($root);
+
+        $processor = new Processor();
+
+        return $processor->process($tree->buildTree(), $config);
     }
 }

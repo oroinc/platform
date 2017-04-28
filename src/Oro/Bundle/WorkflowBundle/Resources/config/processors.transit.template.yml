@@ -1,0 +1,57 @@
+services:
+    # normalize widget template common parameters
+    oro_workflow.transit.normalize.template_data.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CommonTemplateDataProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: normalize
+                saved: false
+                state: ok
+                resultType: template_response
+
+    # RESULT: form submit (saved: true), widget template (handles error as well)
+    oro_workflow.transit.result.form_submit.template_response.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor
+        arguments:
+            - '@fos_rest.view_handler'
+            - '@twig'
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: true
+                resultType: template_response
+
+    # RESULT: form open (saved: false), widget template, default form
+    oro_workflow.transit.result.response.default.template.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor
+        arguments:
+            - '@twig'
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: false
+                state: ok
+                customForm: false
+                resultType: template_response
+
+    # RESULT: form open (saved: false), widget template, custom form
+    oro_workflow.transit.result.custom.template.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CustomFormTemplateResponseProcessor
+        arguments:
+            - '@twig'
+            - '@oro_form.registry.form_template_data_provider'
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: false
+                state: ok
+                customForm: true
+                resultType: template_response

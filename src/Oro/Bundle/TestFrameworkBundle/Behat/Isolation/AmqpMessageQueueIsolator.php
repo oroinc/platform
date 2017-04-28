@@ -24,6 +24,11 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
     private $kernel;
 
     /**
+     * @var Process
+     */
+    private $process;
+
+    /**
      * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)
@@ -44,8 +49,8 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
             $this->kernel->getEnvironment(),
             $this->kernel->isDebug() ? '' : '--no-debug'
         );
-        $process = new Process($command, $this->kernel->getRootDir());
-        $process->start();
+        $this->process = new Process($command, $this->kernel->getRootDir());
+        $this->process->start();
         self::waitWhileProcessingMessages();
     }
 
@@ -54,10 +59,10 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
     {
         self::waitWhileProcessingMessages();
 
-        $process = new Process('pkill -f oro:message-queue:consume', $this->kernel->getRootDir());
+        $this->process = new Process('pkill -f oro:message-queue:consume', $this->kernel->getRootDir());
 
         try {
-            $process->run();
+            $this->process->run();
         } catch (RuntimeException $e) {
             //it's ok
         }
@@ -176,5 +181,13 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
         );
 
         return $result[1];
+    }
+
+    /**
+     * @return Process
+     */
+    public function getProcess()
+    {
+        return $this->process;
     }
 }

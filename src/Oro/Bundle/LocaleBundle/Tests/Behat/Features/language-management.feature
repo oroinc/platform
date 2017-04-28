@@ -1,3 +1,5 @@
+@ticket-BAP-14163
+@automatically-ticket-tagged
 Feature: Language management
   In order to manage available languages
   As Administrator

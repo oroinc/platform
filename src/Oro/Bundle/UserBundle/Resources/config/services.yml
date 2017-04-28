@@ -429,6 +429,11 @@ services:
         arguments:
             - '@oro_config.user'
 
+    oro_user.validator.user_without_role:
+        class: Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator
+        tags:
+            - { name: validator.constraint_validator,  alias: oro_user.validator.user_without_role }
+
     # Dashboard
     oro_user.dashboard.owner_helper:
         class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper

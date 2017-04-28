@@ -21,15 +21,7 @@ operations:
         frontend_options:
             confirmation:
                 message: oro.locale.localization.delete_confirm
+                component: oroui/js/delete-confirmation
         actions:
-            - '@assign_url':
-                attribute: $.rebuildCacheUrl
-                route: oro_translation_translation_index
-            - '@trans':
-                attribute: $.rebuildCacheMessage
-                id: oro.translation.translation.rebuild_cache_required
-                params:
-                    '%%path%%': $.rebuildCacheUrl
-            - '@flash_message':
-                message: $.rebuildCacheMessage
-                type: 'warning'
+            - '@run_action_group':
+                action_group: oro_translation_language_update_cache_message

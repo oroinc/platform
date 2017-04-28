@@ -134,6 +134,8 @@ class AttributeControllerTest extends AbstractConfigControllerTest
             ]
         ];
 
+        $this->arrayHasKey('is_visible', $formValues['oro_entity_config_type']['datagrid']);
+        $this->assertNotEquals(3, $formValues['oro_entity_config_type']['datagrid']['is_visible']);
         $this->client->request($form->getMethod(), $form->getUri(), $formValues);
         $this->assertResponse();
     }

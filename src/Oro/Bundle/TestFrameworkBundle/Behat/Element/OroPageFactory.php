@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Transformers\PageSuffixTransformerInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Transformers\PageSuffixTransformer;
 
 class OroPageFactory
 {
@@ -61,7 +61,7 @@ class OroPageFactory
             return $this->pageAliases[$name];
         }
         $variantsIterator = new NameVariantsIterator($name, ['', ' ', '_', '-']);
-        $variantsIterator->addPartsTransformer(new PageSuffixTransformerInterface());
+        $variantsIterator->addPartsTransformer(new PageSuffixTransformer());
         foreach ($variantsIterator as $pageName) {
             if (array_key_exists($pageName, $this->config)) {
                 return $this->pageAliases[$name] = $pageName;

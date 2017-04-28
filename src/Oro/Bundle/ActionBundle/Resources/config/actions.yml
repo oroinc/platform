@@ -272,3 +272,12 @@ services:
             - [setDispatcher, ['@event_dispatcher']]
         tags:
             - { name: oro_action.action, alias: extendable }
+
+    oro_action.action.increase_value:
+        class: 'Oro\Component\Action\Action\IncreaseValue'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        calls:
+            - [setDispatcher, ['@event_dispatcher']]
+        tags:
+            - { name: oro_action.action, alias: increase_value }

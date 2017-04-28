@@ -1,3 +1,5 @@
+@ticket-BAP-13745
+@automatically-ticket-tagged
 Feature: Business Unit crud
   In order to keep organize my business structure
   As administrator
@@ -72,5 +74,3 @@ Feature: Business Unit crud
     When click delete Demo Business Unit in grid
     And confirm deletion
     Then number of records should be 1
-
-

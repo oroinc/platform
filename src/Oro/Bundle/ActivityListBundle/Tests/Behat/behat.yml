@@ -1,6 +1,6 @@
 oro_behat_extension:
   elements:
-    ActivityList:
+    Activity List:
       selector: '.activity-list'
       class: Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList
 

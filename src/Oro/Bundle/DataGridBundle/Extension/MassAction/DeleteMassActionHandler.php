@@ -251,7 +251,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                 $this->processDelete($entity, $manager);
                 $iteration++;
 
-                if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
+                if ($iteration % self::FLUSH_BATCH_SIZE === 0) {
                     $this->finishBatch($manager, $entityName, $deletedIds);
                     $deletedIds = [];
                 }

@@ -4,38 +4,21 @@ namespace Oro\Bundle\DataGridBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Symfony\Component\Validator\Constraints as Assert;
-
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository")
- * @ORM\Table(name="oro_grid_view_user_rel")
  */
-class GridViewUser
+class GridViewUser extends AbstractGridViewUser
 {
     /**
-     * @var int $id
+     * @var AbstractGridView
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\DataGridBundle\Entity\GridView", inversedBy="users")
+     * @ORM\JoinColumn(name="grid_view_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      */
-    protected $id;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="alias", type="string")
-     */
-    protected $alias;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="grid_name", type="string")
-     */
-    protected $gridName;
+    protected $gridView;
 
     /**
      * @var User
@@ -45,33 +28,8 @@ class GridViewUser
      */
     protected $user;
 
-
     /**
-     * @var GridView
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\DataGridBundle\Entity\GridView", inversedBy="users")
-     * @ORM\JoinColumn(name="grid_view_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
-     */
-    protected $gridView;
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAlias()
-    {
-        return $this->alias;
-    }
-
-    /**
-     * @return User
+     * {@inheritdoc}
      */
     public function getUser()
     {
@@ -79,77 +37,11 @@ class GridViewUser
     }
 
     /**
-     * @return GridView
+     * {@inheritdoc}
      */
-    public function getGridView()
-    {
-        return $this->gridView;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGridName()
-    {
-        return $this->gridName;
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @param string $alias
-     *
-     * @return $this
-     */
-    public function setAlias($alias)
-    {
-        $this->alias = $alias;
-
-        return $this;
-    }
-
-    /**
-     * @param User $user
-     *
-     * @return $this
-     */
-    public function setUser($user)
+    public function setUser(AbstractUser $user = null)
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * @param GridView $gridView
-     *
-     * @return $this
-     */
-    public function setGridView(GridView $gridView)
-    {
-        $this->gridView = $gridView;
-
-        return $this;
-    }
-
-    /**
-     * @param string $gridName
-     *
-     * @return $this
-     */
-    public function setGridName($gridName)
-    {
-        $this->gridName = $gridName;
 
         return $this;
     }

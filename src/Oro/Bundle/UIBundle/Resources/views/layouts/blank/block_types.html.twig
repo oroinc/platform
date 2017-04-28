@@ -37,10 +37,16 @@
                 {% for breadcrumb in breadcrumbs %}
                     {{ not loop.first ? ' / ' }}
                     {% if breadcrumb.label is defined %}
-                        {% if breadcrumb.url and not loop.last %}
-                            <a href="{{ breadcrumb.url }}" class="breadcrumbs__link">{{ breadcrumb.label }}</a>
+                        {% if breadcrumb.uri is defined %}
+                            {% set url = breadcrumb.uri %}
                         {% else %}
-                            {{ breadcrumb.label }}
+                            {% set url = breadcrumb.url %}
+                        {% endif %}
+
+                        {% if url and not loop.last %}
+                            <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
+                        {% else %}
+                            {{ breadcrumb.label|trans }}
                         {% endif %}
                     {%  else %}
                         {{ breadcrumb }}

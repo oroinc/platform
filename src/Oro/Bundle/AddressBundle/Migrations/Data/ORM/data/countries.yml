@@ -444,6 +444,9 @@ AR:
         AR-E:
             combinedCode: AR-E
             code: E
+        AR-F:
+            combinedCode: AR-F
+            code: F
         AR-G:
             combinedCode: AR-G
             code: G

@@ -1,3 +1,5 @@
+@ticket-BAP-11224
+@automatically-ticket-tagged
 Feature: User user comment
   In order to have ability comment user
   As OroCRM sales rep
