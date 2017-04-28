@@ -1,0 +1,11 @@
+imports:
+    - { workflow: part_with_attribute, as: with_parts_from_file, replace: [], resource: '../stub_workflows_parts.yml'}
+workflows:
+    with_parts_from_file:
+        entity: Some\Entity
+        steps:
+            step_a: ~
+        transitions:
+            start:
+                step_to: step_a
+                is_start: true

@@ -1,0 +1,5 @@
+imports:
+    - { workflow: some_workflow_to_import, as: recipient_workflow }
+workflows:
+    recipient_workflow:
+        entity: Entity1

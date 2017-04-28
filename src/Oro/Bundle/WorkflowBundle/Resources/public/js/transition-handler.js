@@ -91,11 +91,6 @@ define([
                 modalOptions.cancelText = __(confirmation.cancelText, $.extend({}, placeholders));
             }
 
-            if (element.data('transition-confirmation-options')) {
-                modalOptions = $.extend({}, modalOptions, element.data('transition-confirmation-options'));
-                modalOptions.template = _.template(element.data('transition-confirmation-options').template);
-            }
-
             var confirm = new Modal(modalOptions);
 
             if (callback) {

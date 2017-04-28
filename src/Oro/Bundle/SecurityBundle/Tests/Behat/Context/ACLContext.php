@@ -94,6 +94,59 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
+
+    /**
+     * @Given /^(?P<user>(administrator|user)) has following permissions$/
+     */
+    public function userHasFollowingPermissions($user, TableNode $table)
+    {
+        $role = $this->getRole($user);
+        $this->getMink()->setDefaultSessionName('second_session');
+        $this->getSession()->resizeWindow(1920, 1080, 'current');
+
+        $this->loginAsAdmin();
+
+        $userRoleForm = $this->openRoleEditForm($role);
+
+        foreach ($table->getRows() as $row) {
+            $action = $row[0];
+            $singularizedEntity = trim(ucfirst(Inflector::singularize($row[1])));
+            $accessLevel = $row[2];
+            $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
+        }
+
+        $userRoleForm->saveAndClose();
+        $this->waitForAjax();
+
+        $this->getSession('second_session')->stop();
+        $this->getMink()->setDefaultSessionName('first_session');
+    }
+
+    /**
+     * @Given /^(?P<user>(administrator|user)) has following entity permissions enabled$/
+     */
+    public function userHasFollowingEntityPermissionsEnabled($user, TableNode $table)
+    {
+        $this->getMink()->setDefaultSessionName('second_session');
+        $this->getSession()->resizeWindow(1920, 1080, 'current');
+
+        $this->loginAsAdmin();
+
+        $role = $this->getRole($user);
+        $userRoleForm = $this->openRoleEditForm($role);
+
+        foreach ($table->getRows() as $row) {
+            $name = $row[0];
+            $userRoleForm->setCheckBoxPermission($name);
+        }
+
+        $userRoleForm->saveAndClose();
+        $this->waitForAjax();
+
+        $this->getSession('second_session')->stop();
+        $this->getMink()->setDefaultSessionName('first_session');
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * Set access level for several actions for specified entity for role
