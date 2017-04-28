@@ -39,7 +39,7 @@ class Grid extends Table
     {
         $list = $this->getViewList();
 
-        self::assertNotNull($list, 'Grid view list not found on the page');
+        self::assertTrue($list->isValid(), 'Grid view list not found on the page');
         $list->press();
     }
 
@@ -157,10 +157,10 @@ class Grid extends Table
     }
 
     /**
-     * @return NodeElement|null
+     * @return NodeElement
      */
     public function getViewList()
     {
-        return $this->elementFactory->createElement('GridViewList');
+        return $this->getElement('GridViewList');
     }
 }

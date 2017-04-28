@@ -104,7 +104,7 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewList:
-      selector: '.grid-views .btn-toolbar .btn-group.views-group, .grid-views .grid-views__title i'
+      selector: '.grid-views .btn-toolbar .btn-group.views-group, .grid-views .grid-views__header'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewOptions:
