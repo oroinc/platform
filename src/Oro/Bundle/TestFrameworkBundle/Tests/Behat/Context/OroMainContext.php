@@ -15,6 +15,7 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
 
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
+use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
@@ -26,6 +27,8 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
@@ -445,6 +448,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Given I click Websites in sidebar menu
+     *
+     * @Given /^(?:|I )click (?P<needle>[\w\s]+) in sidebar menu$/
+     */
+    public function iClickLinkInSidebarMenu($needle)
+    {
+        $sidebarMenu = $this->createElement('SidebarMenu');
+        self::assertTrue($sidebarMenu->isValid());
+        $sidebarMenu->clickLink($needle);
+    }
+
+    /**
      * Click on element on page
      * Example: When I click on "Help Icon"
      *
@@ -550,6 +565,20 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Assert modal window with given caption is visible
+     * Example: Then I should see "Changing Page URLs" modal window
+     *
+     * @Then /^(?:|I )should see "(?P<caption>(?:[^"]|\\")*)" modal window$/
+     */
+    public function iShouldSeeModalWindow($caption)
+    {
+        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
+        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+
+        self::assertElementContainsText('div.modal .modal-header', $caption);
     }
 
     /**
@@ -769,30 +798,116 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Inline edit field
+     * Inline grid field edit with click on empty space
      * Example: When I edit Status as "Open"
      * Example: Given I edit Probability as "30"
      *
-     * @When /^(?:|I )edit (?P<field>.+) as "(?P<value>.*)"$/
-     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)"$/
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" with click on empty space$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" with click on empty space$/
      */
-    public function inlineEditField($field, $value, $entityTitle = null)
+    public function inlineEditRecordInGridWithClickOnEmptySpace($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValue($field, $value);
+        $this->clickOnEmptySpace();
+        $this->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
+    }
+
+    /**
+     * Click on empty space
+     * Example: When I click on empty space
+     *
+     * @When /^(?:|I )click on empty space$/
+     */
+    public function clickOnEmptySpace()
+    {
+        $this->getPage()->find('css', '#container')->click();
+    }
+
+    /**
+     * Inline grid field edit by double click
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" by double click$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" by double click$/
+     */
+    public function inlineEditRecordInGridByDoubleclick($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueByDoubleClick($field, $value);
+    }
+
+    /**
+     * @param string $entityTitle
+     * @return \Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
+     */
+    protected function getGridRow($entityTitle = null)
     {
         /** @var Grid $grid */
         $grid = $this->createElement('Grid');
 
-        if (null === $entityTitle) {
+        if (null !== $entityTitle) {
             $row = $grid->getRowByContent($entityTitle);
         } else {
             $rows = $grid->getRows();
             self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.' .
-                PHP_EOL . 'You can specify row content for edit field in specific row.'));
+                PHP_EOL . 'You can specify row content for edit field in specific row.', count($rows)));
 
             $row = array_shift($rows);
         }
 
-        $row->setCellValue($field, $value);
+        return $row;
+    }
+
+    /**
+     * Inline edit field
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)"$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)"$/
+     */
+    public function inlineEditField($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueAndSave($field, $value);
         $this->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
+    }
+
+    /**
+     * Inline edit field and don't save
+     * Example: When I edit Status as "Open" without saving
+     * Example: Given I edit Probability as "30" without saving
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" without saving$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" without saving$/
+     */
+    public function inlineEditFieldWithoutSaving($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValue($field, $value);
+    }
+
+    /**
+     * Inline edit field and cancel
+     * Example: When I edit Status as "Open" and cancel
+     * Example: Given I edit Probability as "30" and cancel
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" and cancel$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" and cancel$/
+     */
+    public function inlineEditFieldAndCancel($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueAndCancel($field, $value);
     }
 
     /**
@@ -937,6 +1052,17 @@ class OroMainContext extends MinkContext implements
     protected function createOroForm()
     {
         return $this->createElement('OroForm');
+    }
+
+    /**
+     * @Given /^I restart message consumer$/
+     *
+     * @todo remove step from scenario and step implementation in scope of BAP-14637
+     */
+    public function iRestartMessageConsumer()
+    {
+        $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
+        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
     }
 
     /**
@@ -1129,5 +1255,33 @@ class OroMainContext extends MinkContext implements
             'yoffset' => 1,
         ]);
         $webDriverSession->buttonup();
+    }
+
+    /**
+     * This step is used for system configuration field
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And check Use Default for "Position" field
+     *
+     * @Given check Use Default for :label field
+     */
+    public function checkUseDefaultForField($label)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->checkUseDefaultCheckbox($label);
+    }
+
+    /**
+     * This step used for system configuration field
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And uncheck Use Default for "Position" field
+     *
+     * @Given uncheck Use Default for :label field
+     */
+    public function uncheckUseDefaultForField($label)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->uncheckUseDefaultCheckbox($label);
     }
 }

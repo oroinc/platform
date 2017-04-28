@@ -83,7 +83,7 @@ class UserRoleForm extends Form
 
         /** @var NodeElement $entityTr */
         foreach ($entityTrs as $entityTr) {
-            if (false !== strpos($entityTr->find('css', 'td div.entity-name')->getText(), $entity)) {
+            if ($entityTr->find('css', 'td div.entity-name')->getText() === $entity) {
                 return $entityTr;
             }
         }
