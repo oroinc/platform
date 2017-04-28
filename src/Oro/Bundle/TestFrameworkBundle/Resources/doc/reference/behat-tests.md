@@ -292,6 +292,24 @@ Feature: Payment Rules CRUD
       | Method | PayPal |
 ```
 
+#### Ebedded Form Mappings
+
+It's common happens that form appears in iframe.
+Behat can switch to iframe by it's id.
+For the appropriate filling the form in iframe you should to specify iframe id in form options:
+```yml
+oro_behat_extension:
+  elements:
+    Magento contact us form:
+      selector: 'div#page'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        embedded-id: embedded-form
+        mapping:
+          First name: 'oro_magento_contactus_contact_request[firstName]'
+          Last name: 'oro_magento_contactus_contact_request[lastName]'
+```
+
 #### Page element
 
 Page element encapsulate whole web page with it's url and path to this page.
