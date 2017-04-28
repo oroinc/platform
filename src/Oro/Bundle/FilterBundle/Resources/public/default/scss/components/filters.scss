@@ -302,8 +302,8 @@
                 .datefilter {
                     display: block;
 
-                    input[type="text"] {
-                        padding-left: 39px;
+                    .datepicker-input {
+                        padding-left: 30px;
                     }
 
 
@@ -312,7 +312,7 @@
 
                         pointer-events: none;
 
-                        margin: 8px 0 0 12px;
+                        margin: $offset-y-m 0 0 12px;
 
                         color: get-color('additional', 'middle');
                     }
