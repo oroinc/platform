@@ -280,43 +280,6 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         });
     }
 
-    public function testRunUniqueShouldContinueJobIfJobLostConnectWithBrocker()
-    {
-        $root = new Job();
-        $child = new Job();
-        $child->setStoppedAt(new \DateTime());
-
-        $jobProcessor = $this->createJobProcessorMock();
-        $jobProcessor
-            ->expects($this->once())
-            ->method('findOrCreateRootJob')
-            ->will($this->returnValue(null))
-        ;
-        $jobProcessor
-            ->expects($this->once())
-            ->method('findRootJobByUniqueName')
-            ->will($this->returnValue($root))
-        ;
-        $jobProcessor
-            ->expects($this->once())
-            ->method('findOrCreateChildJob')
-            ->will($this->returnValue($child))
-        ;
-        $jobProcessor
-            ->expects($this->never())
-            ->method('successChildJob')
-        ;
-        $jobProcessor
-            ->expects($this->never())
-            ->method('failChildJob')
-        ;
-
-        $jobRunner = new JobRunner($jobProcessor);
-        $jobRunner->runUnique('owner-id', 'job-name', function () {
-            return true;
-        });
-    }
-
     public function testCreateDelayedShouldCreateChildJobAndCallCallback()
     {
         $root = new Job();

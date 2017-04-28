@@ -1,3 +1,5 @@
+@ticket-BAP-12348
+@automatically-ticket-tagged
 Feature: Options in Grid View
 
   Scenario: Create new not default grid view

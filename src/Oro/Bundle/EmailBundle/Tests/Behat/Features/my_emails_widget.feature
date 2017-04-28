@@ -1,3 +1,5 @@
+@ticket-BAP-11239
+@automatically-ticket-tagged
 Feature: My emails widget
   I order to have quick notifications and quick access about new emails
   As a crm user

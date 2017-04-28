@@ -119,14 +119,6 @@ class JobStorageTest extends WebTestCase
         $this->assertEquals(Job::STATUS_CANCELLED, $resultJob->getStatus());
     }
 
-    public function testFindRootJobByUniqueJobName()
-    {
-        /** @var Job $referenceJob */
-        $referenceJob = $this->getReference(LoadJobData::JOB_1);
-        $resultJob = $this->jobStorage->findRootJobByUniqueJobName($referenceJob->getName());
-        $this->assertSame($referenceJob, $resultJob);
-    }
-
     public function testShouldThrowIfDuplicateJob()
     {
         /** @var Job $existedJob */
