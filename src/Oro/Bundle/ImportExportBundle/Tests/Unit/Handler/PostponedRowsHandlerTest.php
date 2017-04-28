@@ -108,6 +108,7 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
         $body = ['attempts' => 5];
         $result = [];
         $result['postponedRows'] = ['elem1', 'elem2'];
+
         $result['counts']['errors'] = 0;
         $this->messageProducer->expects($this->never())->method('send');
         $this->translator
