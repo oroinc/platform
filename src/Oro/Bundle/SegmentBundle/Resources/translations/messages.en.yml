@@ -48,3 +48,6 @@ oro:
 
         refresh_dialog:
             success: Segment successfully processed.
+
+        segment_filter_builder:
+            segment_name: Segment name

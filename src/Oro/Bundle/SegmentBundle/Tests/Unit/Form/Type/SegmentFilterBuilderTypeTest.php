@@ -105,42 +105,89 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                 ]
             ],
             'segment_type unknown value' => [['segment_entity' => '\stdClass', 'segment_type' => 'some_type']],
+            'add_name_field unsupported type' => [
+                [
+                    'segment_entity' => '\stdClass',
+                    'add_name_field' => 123
+                ]
+            ],
+            'name_field_required unsupported type' => [
+                [
+                    'segment_entity' => '\stdClass',
+                    'name_field_required' => 123
+                ]
+            ],
         ];
     }
 
-    public function testConfigureOptionsDefaultsAndAutoFill()
+    /**
+     * @dataProvider defaultsAndAutoFillOptionsDataProvider
+     *
+     * @param array $options
+     * @param array $expected
+     */
+    public function testConfigureOptionsDefaultsAndAutoFill($options, $expected)
     {
-        $entityClass = '\stdClass';
-        $this->assertNormalizersCalls($entityClass);
-
-        $options = [
-            'segment_entity' => $entityClass
-        ];
+        $this->assertNormalizersCalls('\stdClass');
 
         $resolver = new OptionsResolver();
         $this->formType->configureOptions($resolver);
-
-        $expected = [
-            'segment_entity' => $entityClass,
-            'data_class' => Segment::class,
-            'segment_type' => SegmentType::TYPE_DYNAMIC,
-            'segment_columns' => ['id'],
-            'segment_name_template' => 'Auto generated segment %s'
-        ];
 
         $this->assertEquals($expected, $resolver->resolve($options));
     }
 
     /**
+     * @return array
+     */
+    public function defaultsAndAutoFillOptionsDataProvider()
+    {
+        return [
+            'defaults' => [
+                'options' => [
+                    'segment_entity' => '\stdClass'
+                ],
+                'expected' => [
+                    'segment_entity' => '\stdClass',
+                    'data_class' => Segment::class,
+                    'segment_type' => SegmentType::TYPE_DYNAMIC,
+                    'segment_columns' => ['id'],
+                    'segment_name_template' => 'Auto generated segment %s',
+                    'add_name_field' => false,
+                    'name_field_required' => false
+                ]
+            ],
+            'name_field_required' => [
+                'options' => [
+                    'segment_entity' => '\stdClass',
+                    'add_name_field' => true,
+                    'name_field_required' => true,
+                ],
+                'expected' => [
+                    'segment_entity' => '\stdClass',
+                    'data_class' => Segment::class,
+                    'segment_type' => SegmentType::TYPE_DYNAMIC,
+                    'segment_columns' => ['id'],
+                    'segment_name_template' => 'Auto generated segment %s',
+                    'add_name_field' => true,
+                    'name_field_required' => true
+                ]
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider formDataProvider
+     *
      * @param array $data
      * @param array $expectedDefinition
+     * @param $segmentName
      */
-    public function testSubmitNew(array $data, array $expectedDefinition)
+    public function testSubmitNew(array $data, array $expectedDefinition, $segmentName)
     {
         $entityClass = '\stdClass';
         $options = [
-            'segment_entity' => $entityClass
+            'segment_entity' => $entityClass,
+            'add_name_field' => true
         ];
         $this->assertNormalizersCalls($entityClass);
         $segmentType = new SegmentType(SegmentType::TYPE_DYNAMIC);
@@ -175,21 +222,24 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($segmentType, $submittedData->getType());
         $this->assertEquals($owner, $submittedData->getOwner());
         $this->assertEquals($organization, $submittedData->getOrganization());
-        $this->assertContains('Auto generated segment', $submittedData->getName());
+        $this->assertContains($segmentName, $submittedData->getName());
         $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
     }
 
     /**
      * @dataProvider formDataProvider
+     *
      * @param array $data
      * @param array $expectedDefinition
+     * @param $segmentName
      */
-    public function testSubmitExisting(array $data, array $expectedDefinition)
+    public function testSubmitExisting(array $data, array $expectedDefinition, $segmentName)
     {
         $entityClass = '\stdClass';
         $options = [
             'segment_entity' => $entityClass,
             'segment_columns' => ['id'],
+            'add_name_field' => true
         ];
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -209,15 +259,20 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $form->submit($data);
         /** @var Segment $submittedData */
         $submittedData = $form->getData();
+        $this->assertContains($segmentName, $submittedData->getName());
         $this->assertInstanceOf(Segment::class, $submittedData);
         $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
     }
 
+    /**
+     * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function formDataProvider()
     {
         return [
             'without columns' => [
-                [
+                'data' => [
                     'entity' => '\stdClass',
                     'definition' => json_encode([
                         'filters' => [
@@ -231,7 +286,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                         ]
                     ])
                 ],
-                [
+                'expected definition' => [
                     'filters' => [
                         [
                             'columnName' => 'id',
@@ -249,10 +304,11 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                             'func' => null
                         ]
                     ]
-                ]
+                ],
+                'generated segment name' => 'Auto generated segment'
             ],
             'with columns' => [
-                [
+                'data' => [
                     'entity' => '\stdClass',
                     'definition' => json_encode([
                         'filters' => [
@@ -274,7 +330,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                         ]
                     ])
                 ],
-                [
+                'expected definition' => [
                     'filters' => [
                         [
                             'columnName' => 'id',
@@ -292,8 +348,46 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                             'func' => null
                         ]
                     ]
-                ]
-            ]
+                ],
+                'generated segment name' => 'Auto generated segment'
+            ],
+            'with custom name' => [
+                'data' => [
+                    'entity' => '\stdClass',
+                    'definition' => json_encode([
+                        'filters' => [
+                            [
+                                'columnName' => 'id',
+                                'criterion' => [
+                                    'filter' => 'number',
+                                    'data' => ['value' => 10, 'type' => 3]
+                                ]
+                            ]
+                        ]
+                    ]),
+                    'name' => 'Segment custom name'
+                ],
+                'expected definition' => [
+                    'filters' => [
+                        [
+                            'columnName' => 'id',
+                            'criterion' => [
+                                'filter' => 'number',
+                                'data' => ['value' => 10, 'type' => 3]
+                            ]
+                        ]
+                    ],
+                    'columns' => [
+                        [
+                            'name' => 'id',
+                            'label' => 'id',
+                            'sorting' => null,
+                            'func' => null
+                        ]
+                    ]
+                ],
+                'generated segment name' => 'Segment custom name'
+            ],
         ];
     }
 

@@ -1,3 +1,12 @@
+{% block oro_segment_filter_builder_row %}
+    {% if form.name is defined %}
+        {{ form_row(form.name,{
+            'attr': {'class': 'control-group-oro_segment_filter_builder_segment_name'}
+        }) }}
+    {% endif %}
+    {{ form_row(form) }}
+{% endblock %}
+
 {% block oro_segment_filter_builder_widget %}
     {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
     {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
