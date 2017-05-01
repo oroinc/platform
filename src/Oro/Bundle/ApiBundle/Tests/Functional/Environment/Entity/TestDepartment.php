@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Entity;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="test_department")
+ * @ORM\Table(name="test_api_department")
  */
 class TestDepartment implements TestFrameworkEntityInterface
 {
@@ -32,15 +33,15 @@ class TestDepartment implements TestFrameworkEntityInterface
      * @var TestDepartment|null
      *
      * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee",
+     *     targetEntity="Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestPerson",
      *     mappedBy="department"
      * )
      */
-    protected $employees;
+    protected $staff;
 
     public function __construct()
     {
-        $this->employees  = new ArrayCollection();
+        $this->staff  = new ArrayCollection();
     }
 
     /**
@@ -76,48 +77,48 @@ class TestDepartment implements TestFrameworkEntityInterface
     }
 
     /**
-     * @return Collection|TestEmployee[]
+     * @return Collection|TestPerson[]
      */
-    public function getEmployees()
+    public function getStaff()
     {
-        return $this->employees;
+        return $this->staff;
     }
 
     /**
-     * @param Collection $employees
+     * @param Collection $staff
      *
      * @return self
      */
-    public function setEmployees(Collection $employees)
+    public function setStaff(Collection $staff)
     {
-        $this->employees = $employees;
+        $this->staff = $staff;
 
         return $this;
     }
 
     /**
-     * @param TestEmployee $person
+     * @param TestPerson $person
      *
      * @return self
      */
-    public function addEmployee(TestEmployee $person)
+    public function addStaff(TestPerson $person)
     {
-        if (!$this->employees->contains($person)) {
-            $this->employees->add($person);
+        if (!$this->staff->contains($person)) {
+            $this->staff->add($person);
         }
 
         return $this;
     }
 
     /**
-     * @param TestEmployee $person
+     * @param TestPerson $person
      *
      * @return self
      */
-    public function removeEmployee(TestEmployee $person)
+    public function removeStaff(TestPerson $person)
     {
-        if ($this->employees->contains($person)) {
-            $this->employees->removeElement($person);
+        if ($this->staff->contains($person)) {
+            $this->staff->removeElement($person);
         }
 
         return $this;

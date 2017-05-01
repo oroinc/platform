@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
-
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
+use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 
 /**
@@ -18,12 +16,7 @@ class LanguageOperationsTest extends ActionTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures(
-            [
-                LoadLanguages::class,
-            ]
-        );
+        $this->loadFixtures([LoadLanguages::class,]);
         $this->client->disableReboot();
     }
 
@@ -68,124 +61,67 @@ class LanguageOperationsTest extends ActionTestCase
     {
         /** @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
-        $this->assertNull($language->getInstalledBuildDate());
-        $tmpDir = $this->getContainer()->get('oro_translation.service_provider')->getTmpDir('oro-test-trans');
-        $tmpDir .= '/' . LoadLanguages::LANGUAGE1;
-        $url = $this->getOperationDialogUrl($language, 'oro_translation_language_install');
-        $languageHelper = $this->getLanguageHelperMock($tmpDir);
-        $languageHelper->expects($this->any())
-            ->method('isAvailableInstallTranslates')
-            ->willReturn(true);
+        $this->assertLanguageHelperCalled('isAvailableInstallTranslates');
+        $this->assertExternalTranslationsProviderCalled();
 
-        $crawler = $this->client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $crawler = $this->assertOperationForm(
+            'oro_translation_language_install',
+            $language->getId(),
+            Language::class
+        );
 
         $form = $crawler->selectButton('Install')->form([
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
         ]);
 
-        // temporary file would be removed automatically
-        copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
-
-        $crawler = $this->submitOperationForm($form);
-
-        $this->assertContains('Language has been installed', $crawler->html());
-        $this->assertNotEmpty($this->getLanguageEntity($language->getId())->getInstalledBuildDate());
+        $this->assertOperationFormSubmitted($form, 'Language has been installed');
     }
 
     public function testUpdateLanguage()
     {
         /** @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE2);
-        $tmpDir = $this->getContainer()->get('oro_translation.service_provider')->getTmpDir('oro-test-trans');
-        $tmpDir .= '/' . LoadLanguages::LANGUAGE2;
-        $url = $this->getOperationDialogUrl($language, 'oro_translation_language_update');
-        $languageHelper = $this->getLanguageHelperMock($tmpDir);
-        $languageHelper->expects($this->any())
-            ->method('isAvailableUpdateTranslates')
-            ->willReturn(true);
+        $this->assertLanguageHelperCalled('isAvailableUpdateTranslates');
+        $this->assertExternalTranslationsProviderCalled();
 
-        $crawler = $this->client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-
-        // temporary file would be removed automatically
-        copy(__DIR__ . '/../DataFixtures/Translations/fr_FR.zip', $tmpDir . '.zip');
+        $crawler = $this->assertOperationForm(
+            'oro_translation_language_update',
+            $language->getId(),
+            Language::class
+        );
 
         $form = $crawler->selectButton('Update')->form([
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE2,
         ]);
 
-        $crawler = $this->submitOperationForm($form);
-
-        $this->assertContains('Language has been updated', $crawler->html());
+        $this->assertOperationFormSubmitted($form, 'Language has been updated');
     }
 
     /**
-     * @param Form $form
-     * @return Crawler
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExternalTranslationsProvider
      */
-    private function submitOperationForm(Form $form)
+    private function assertExternalTranslationsProviderCalled()
     {
-        $token = $this->getContainer()->get('session')->get('_csrf/oro_action_operation');
-        $this->getContainer()->get('session')->set('_csrf/oro_action_operation', $token);
-        $this->client->followRedirects(true);
-        $crawler = $this->client->submit($form);
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $provider = $this->createMock(ExternalTranslationsProvider::class);
+        $provider->expects($this->atLeastOnce())->method('updateTranslations')->willReturn(true);
 
-        return $crawler;
+        $this->getContainer()->set('oro_translation.provider.external_translations', $provider);
+
+        return $provider;
     }
 
     /**
-     * @param string $tmpDir
-     * @return \PHPUnit_Framework_MockObject_MockObject|LanguageHelper
+     * @param string $method
+     *
+     * @return LanguageHelper|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getLanguageHelperMock($tmpDir)
+    private function assertLanguageHelperCalled($method)
     {
-        $languageHelper = $this
-            ->getMockBuilder(LanguageHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $languageHelper->expects($this->any())
-            ->method('downloadLanguageFile')
-            ->willReturn($tmpDir);
-        $languageHelper->expects($this->any())
-            ->method('getLanguageStatistic')
-            ->willReturn(['lastBuildDate' => new \DateTime()]);
+        $languageHelper = $this->createMock(LanguageHelper::class);
+        $languageHelper->expects($this->atLeastOnce())->method($method)->willReturn(true);
 
         $this->getContainer()->set('oro_translation.helper.language', $languageHelper);
 
         return $languageHelper;
-    }
-
-    /**
-     * @param Language $language
-     * @param string $operationName
-     * @return string
-     */
-    private function getOperationDialogUrl(Language $language, $operationName)
-    {
-        return $this->getUrl(
-            $this->getOperationDialogRoute(),
-            [
-                'operationName' => $operationName,
-                'entityId' => $language->getId(),
-                'entityClass' => Language::class,
-                '_widgetContainer' => 'dialog',
-                '_wid' => 'test-uuid',
-            ]
-        );
-    }
-
-    /**
-     * @param int $id
-     * @return Language
-     */
-    private function getLanguageEntity($id)
-    {
-        return $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(Language::class)
-            ->getRepository(Language::class)
-            ->find($id);
     }
 }

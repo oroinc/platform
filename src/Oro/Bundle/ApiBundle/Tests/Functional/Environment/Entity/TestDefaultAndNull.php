@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Entity;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
- * @ORM\Table(name="test_default_and_null")
+ * @ORM\Table(name="test_api_default_and_null")
  * @ORM\Entity
  */
 class TestDefaultAndNull implements TestFrameworkEntityInterface

@@ -111,6 +111,24 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->helper->isAvailableInstallTranslates($language));
     }
 
+    public function testIsTranslationsAvailablePositive()
+    {
+        $this->statisticProvider->expects($this->once())
+            ->method('get')
+            ->willReturn([
+                ['code' => 'en']
+            ]);
+
+        $language = (new Language())->setCode('en');
+
+        $this->assertTrue($this->helper->isTranslationsAvailable($language));
+    }
+
+    public function testIsTranslationsAvailableNegative()
+    {
+        $this->assertFalse($this->helper->isTranslationsAvailable(new Language()));
+    }
+
     public function testIsAvailableUpdateTranslatesAndNoCode()
     {
         $this->statisticProvider->expects($this->never())->method('get');

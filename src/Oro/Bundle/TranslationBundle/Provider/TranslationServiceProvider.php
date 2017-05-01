@@ -185,9 +185,7 @@ class TranslationServiceProvider
 
         if ($isExtracted) {
             unlink($pathToSave);
-        }
 
-        if ($isExtracted) {
             $this->apply($locale, $targetDir);
 
             $this->cleanup($targetDir);
