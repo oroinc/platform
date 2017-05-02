@@ -556,3 +556,9 @@ services:
             - '@oro_workflow.registry.system'
             - '@oro_workflow.helper.translation'
 
+    oro_workflow.emailtemplate.variable_provider.entity:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\EntityVariablesProvider'
+        lazy: true
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }
