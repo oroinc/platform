@@ -103,6 +103,8 @@ class DatabasePersister
 
         // update timestamp in case when persist succeed
         $this->translationManager->invalidateCache($locale);
+        // Invalidate other caches
+        $this->translationManager->clear();
     }
 
     /**

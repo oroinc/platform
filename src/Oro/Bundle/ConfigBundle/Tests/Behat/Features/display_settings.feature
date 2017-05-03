@@ -1,3 +1,5 @@
+@ticket-BAP-14053
+@automatically-ticket-tagged
 @fixture-cases.yml
 @fixture-custom_report.yml
 @fixture-activities.yml

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Entity;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 class TestNestedName
 {

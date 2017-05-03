@@ -75,14 +75,12 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
         $this->createTestCustomEntityTables($schema);
-        $this->createTestDefaultAndNullTable($schema);
         $this->createTestDepartmentTable($schema);
-        $this->createTestPersonTable($schema);
+        $this->createTestEmployeeTable($schema);
         $this->createTestProductTable($schema);
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
         $this->createTestUserOwnershipTable($schema);
-        $this->createTestNestedObjectsTable($schema);
 
         /** Entity extensions generation */
         $this->extendScopeForTestActivity($schema);
@@ -91,7 +89,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestSearchItemForeignKeys($schema);
         $this->addTestSearchItemValueForeignKeys($schema);
         $this->addTestActivityForeignKeys($schema);
-        $this->addTestPersonForeignKeys($schema);
+        $this->addTestEmployeeForeignKeys($schema);
         $this->addTestProductForeignKeys($schema);
         $this->addTestUserOwnershipForeignKeys($schema);
 
@@ -137,28 +135,6 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /**
-     * Create test_default_and_null table
-     *
-     * @param Schema $schema
-     */
-    protected function createTestDefaultAndNullTable(Schema $schema)
-    {
-        $table = $schema->createTable('test_default_and_null');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('with_default_value_string', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('without_default_value_string', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('with_default_value_boolean', 'boolean', ['notnull' => false]);
-        $table->addColumn('without_default_value_boolean', 'boolean', ['notnull' => false]);
-        $table->addColumn('with_default_value_integer', 'integer', ['notnull' => false]);
-        $table->addColumn('without_default_value_integer', 'integer', ['notnull' => false]);
-        $table->addColumn('with_df_not_blank', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('with_df_not_null', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('with_not_blank', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('with_not_null', 'string', ['notnull' => false, 'length' => 255]);
-        $table->setPrimaryKey(['id']);
-    }
-
-    /**
      * Create test_department table
      *
      * @param Schema $schema
@@ -172,17 +148,16 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /**
-     * Create test_person table
+     * Create test_employee table
      *
      * @param Schema $schema
      */
-    protected function createTestPersonTable(Schema $schema)
+    protected function createTestEmployeeTable(Schema $schema)
     {
-        $table = $schema->createTable('test_person');
+        $table = $schema->createTable('test_employee');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('department_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('position', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['department_id'], 'IDX_A305D658AE80F5DF', []);
@@ -565,38 +540,6 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /**
-     * Create test_nested_objects table
-     *
-     * @param Schema $schema
-     */
-    public function createTestNestedObjectsTable(Schema $schema)
-    {
-        $table = $schema->createTable('test_nested_objects');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('related_class', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('related_id', 'integer', ['notnull' => false]);
-        $table->setPrimaryKey(['id']);
-    }
-
-    /**
-     * Add test_person foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addTestPersonForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('test_person');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('test_department'),
-            ['department_id'],
-            ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
-        );
-    }
-
-    /**
      * @param Schema $schema
      */
     private function extendScopeForTestActivity($schema)
@@ -661,6 +604,22 @@ class OroTestFrameworkBundleInstaller implements
             ['organization_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+    }
+
+    /**
+     * Add test_employee foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addTestEmployeeForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('test_employee');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('test_department'),
+            ['department_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
         );
     }
 

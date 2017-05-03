@@ -3,8 +3,8 @@
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-
 use Doctrine\ORM\Tools\SchemaTool;
+
 use Symfony\Component\Console\Helper\Table as TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,6 +17,7 @@ use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
@@ -66,6 +67,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 null,
                 InputOption::VALUE_NONE,
                 'Determines whether translation data need to be loaded or not'
+            )
+            ->addOption(
+                'skip-download-translations',
+                null,
+                InputOption::VALUE_NONE,
+                'Determines whether translation data need to be downloaded or not'
             );
 
         parent::configure();
@@ -514,10 +521,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $assetsOptions['--symlink'] = true;
         }
 
-        if (!$input->getOption('skip-translations')) {
-            $commandExecutor
-                ->runCommand('oro:translation:load', ['--process-isolation' => true]);
-        }
+        $this->processTranslations($input, $commandExecutor);
 
         if (!$skipAssets) {
             $commandExecutor->runCommand(
@@ -653,5 +657,21 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             && $this->getContainer()->getParameter('installed');
 
         return $isInstalled;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param CommandExecutor $commandExecutor
+     */
+    protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor)
+    {
+        if (!$input->getOption('skip-translations')) {
+            if (!$input->getOption('skip-download-translations')) {
+                $commandExecutor
+                    ->runCommand(OroLanguageUpdateCommand::NAME, ['--process-isolation' => true, '--all' => true]);
+            }
+            $commandExecutor
+                ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
+        }
     }
 }
