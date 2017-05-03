@@ -55,7 +55,9 @@ define(function(require) {
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange',
-            'layout:reposition mediator': 'resetDialogPosition'
+            'layout:reposition mediator': function(e) {
+                this.resetDialogPosition(e);
+            }
         },
 
         /**
@@ -462,6 +464,8 @@ define(function(require) {
                 if (minWidth > containerEl.clientWidth - left) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
+            } else {
+                dialog.css('width', this.options.dialogOptions.width);
             }
         },
 
