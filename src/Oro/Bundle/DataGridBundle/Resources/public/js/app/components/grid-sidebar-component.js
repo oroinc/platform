@@ -9,24 +9,19 @@ define(function(require) {
     var widgetManager = require('oroui/js/widget-manager');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var layoutHelper = require('oroui/js/tools/layout-helper');
 
     GridSidebarComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
         options: {
-            container: '',
-            sidebar: '',
             sidebarAlias: '',
             widgetAlias: '',
-            widgetContainer: '',
             widgetRoute: 'oro_datagrid_widget',
             widgetRouteParameters: {
                 gridName: ''
             },
-            gridParam: 'grid',
-            fixSidebarHeight: false
+            gridParam: 'grid'
         },
 
         /**
@@ -39,11 +34,6 @@ define(function(require) {
         /**
          * @property {Object}
          */
-        $container: {},
-
-        /**
-         * @property {Object}
-         */
         gridCollection: {},
 
         /**
@@ -51,20 +41,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-
-            this.$container = options._sourceElement;
-            this.$widgetContainer = $(options.widgetContainer);
-
             mediator.on('grid-sidebar:change:' + this.options.sidebarAlias, this.onSidebarChange, this);
-
-            this.$container.find('.control-minimize').click(_.bind(this.minimize, this));
-            this.$container.find('.control-maximize').click(_.bind(this.maximize, this));
-
-            if (this.options.fixSidebarHeight) {
-                layoutHelper.setAvailableHeight('.' + this.options.sidebar);
-            }
-
-            this._maximizeOrMaximize(null);
         },
 
         /**
@@ -149,40 +126,6 @@ define(function(require) {
             var paramsString = this._urlParamsToString(_.omit(params, ['saveState']));
             var current = mediator.execute('pageCache:getCurrent');
             mediator.execute('changeUrl', current.path + '?' + paramsString);
-        },
-
-        minimize: function() {
-            this._maximizeOrMaximize('off');
-        },
-
-        maximize: function() {
-            this._maximizeOrMaximize('on');
-        },
-
-        /**
-         * @private
-         * @param {String} state
-         */
-        _maximizeOrMaximize: function(state) {
-            var params = this._getQueryParamsFromUrl(location.search);
-
-            if (state === null) {
-                state = params.sidebar || 'on';
-            }
-
-            if (state === 'on') {
-                this.$container.addClass('grid-sidebar-maximized').removeClass('grid-sidebar-minimized');
-                this.$widgetContainer.addClass('grid-sidebar-maximized').removeClass('grid-sidebar-minimized');
-
-                delete params.sidebar;
-            } else {
-                this.$container.addClass('grid-sidebar-minimized').removeClass('grid-sidebar-maximized');
-                this.$widgetContainer.addClass('grid-sidebar-minimized').removeClass('grid-sidebar-maximized');
-
-                params.sidebar = state;
-            }
-
-            this._pushState(params);
         },
 
         /**
