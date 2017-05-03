@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
@@ -170,5 +171,20 @@ class GridRow extends TableRow
         self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $this->getText(), $action));
 
         return $link;
+    }
+
+    /**
+     * @return Element[]
+     */
+    public function getActionLinks()
+    {
+        if (null !== ($showMoreLink = $this->find('named', ['link', '...']))) {
+            $showMoreLink->mouseOver();
+            $links = $this->elementFactory->createElement('GridFloatingMenu')->getElements('GridRowAction');
+        } else {
+            $links = $this->getElements('GridRowAction');
+        }
+
+        return $links;
     }
 }
