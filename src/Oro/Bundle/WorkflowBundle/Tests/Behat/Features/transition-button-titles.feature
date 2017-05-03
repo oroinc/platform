@@ -425,46 +425,33 @@ Feature: Transition button titles
 
   Scenario: Check Button Title on the datagrid with Original Page and only Name in the transition
     When I click "Page Original transition with only name" on row "user1@example.com" in grid
-    Then I should see "UiWindow" with elements:
-      | Title        | Page Original transition with only name       |
-      | Content      | Are you sure you want to perform this action? |
-      | okButton     | Yes                                           |
-      | cancelButton | Cancel                                        |
-    And click "Yes"
+    Then I should see that "Workflow Page Title" contains "Page Original transition with only name"
+    And click "Submit"
     Then I should see user1@example.com in grid with following data:
       | Step | Step with Original Page with only Name |
 
   Scenario: Check Button Title on the datagrid with View Page and Message and Label in the transition
     When I click "Label TPML" on row "user1@example.com" in grid
-    Then I should see "UiWindow" with elements:
-      | Title        | Label TPML                                           |
-      | Content      | warning message text View Page and Message and Label |
-      | okButton     | Yes                                                  |
-      | cancelButton | Cancel                                               |
-    And click "Yes"
+    Then I should see that "Workflow Page Title" contains "Label TPML"
+    And I should see "warning message text View Page and Message and Label"
+    And click "Submit"
     And I go to System/ User Management/ Users
     Then I should see user1@example.com in grid with following data:
       | Step | Step with View Page and Message and Label |
 
   Scenario: Check Button Title on the datagrid with Index Page and Message and Title in the transition
     When I click "Page Index transition with Message and Title" on row "user1@example.com" in grid
-    Then I should see "UiWindow" with elements:
-      | Title        | Page Index transition with Message and Title          |
-      | Content      | warning message text Index Page and Message and Title |
-      | okButton     | Yes                                                   |
-      | cancelButton | Cancel                                                |
-    And click "Yes"
+    Then I should see that "Workflow Page Title" contains "Page Index transition with Message and Title"
+    And I should see "warning message text Index Page and Message and Title"
+    And click "Submit"
     Then I should see user1@example.com in grid with following data:
       | Step | Step with Index Page and Message and Title |
 
   Scenario: Check Button Title on the datagrid with Original Page and Message and Title and Label in the transition
     When I click "Label TPMTL" on row "user1@example.com" in grid
-    Then I should see "UiWindow" with elements:
-      | Title        | Label TPMTL                                                        |
-      | Content      | warning message text Original Page and Message and Title and Label |
-      | okButton     | Yes                                                                |
-      | cancelButton | Cancel                                                             |
-    And click "Yes"
+    Then I should see that "Workflow Page Title" contains "Label TPMTL"
+    And I should see "warning message text Original Page and Message and Title and Label"
+    And click "Submit"
     Then I should see user1@example.com in grid with following data:
       | Step | Step with Original Page and Message and Title and Label |
 
