@@ -1,3 +1,5 @@
+@ticket-BAP-13571
+@automatically-ticket-tagged
 @not-automated
 @draft
 Feature: Workflow parameters

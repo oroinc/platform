@@ -1,0 +1,88 @@
+// @theme: blank;
+
+.grid-header-cell {
+    font-weight: $datagrid-header-cell-font-weight;
+    text-align: $datagrid-header-cell-text-align;
+    
+    background: $datagrid-header-cell-background;
+
+    .table & {
+        padding: $datagrid-header-cell-offset;
+
+        vertical-align: $datagrid-header-cell-vertical-align;
+    }
+
+    .table-bordered & {
+        border-width: $datagrid-header-cell-border-width;
+    }
+
+    &.sortable {
+        .caret {
+            display: none;
+            margin: $datagrid-header-cell-caret-offset;
+            
+            border-top: $datagrid-header-cell-caret-size solid $datagrid-header-cell-caret-color;
+            border-right: $datagrid-header-cell-caret-size solid transparent;
+            border-left: $datagrid-header-cell-caret-size solid transparent;
+            vertical-align: middle;
+
+            transition: all .2s;
+        }
+    }
+
+    &.descending,
+    &.ascending {
+        .caret {
+            display: inline-block;
+        }
+    }
+    
+    &.descending {
+        .caret {
+            transform: rotate(180deg);
+        }
+    }
+
+    &.action-column {
+        width: $datagrid-header-cell-action-column-width;
+
+        text-align: $datagrid-header-cell-action-column-text-align;
+
+        &:before {
+            height: 10px;
+            
+            display: inline-block;
+            vertical-align: middle;
+
+            font-size: 24px;
+            line-height: 0;
+
+            color: get-color('additional', 'middle');
+
+            content: '...';
+        }
+    }
+    &__link {
+        font-size: $datagrid-header-cell-link-font-size;
+        line-height: $datagrid-header-cell-link-line-height;
+        font-weight: $datagrid-header-cell-link-font-weight;
+        color: $datagrid-header-cell-link-color;
+        
+        &:hover,
+        &:focus,
+        &:active {
+            color: $datagrid-header-cell-link-hover-color;
+            text-decoration: $datagrid-header-cell-link-hover-text-decoration;
+        }
+    }
+}
+
+@include breakpoint('tablet') {
+    .with-floating-header {
+        .grid-header-cell {
+            .caret {
+                margin-top: $offset-y-s;
+            }
+        }
+    }
+}

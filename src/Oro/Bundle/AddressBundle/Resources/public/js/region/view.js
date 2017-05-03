@@ -140,7 +140,7 @@ define(function(require) {
         switchInputWidget: function(display) {
             switch (this.switchState) {
                 case 'disable':
-                    this.target.inputWidget('disable', display);
+                    this.target.inputWidget('disable', !display);
                     break;
                 default: {
                     this.target.inputWidget(display ? 'show' : 'hide');

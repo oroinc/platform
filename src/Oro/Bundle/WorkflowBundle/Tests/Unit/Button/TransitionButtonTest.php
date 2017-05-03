@@ -164,4 +164,14 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('workflows', $this->button->getTranslationDomain());
     }
+
+    public function testClone()
+    {
+        $newButton = clone $this->button;
+        $this->assertEquals($newButton, $this->button);
+        $this->assertEquals($newButton->getTransition(), $this->button->getTransition());
+
+        $this->assertNotSame($newButton, $this->button);
+        $this->assertNotSame($newButton->getTransition(), $this->button->getTransition());
+    }
 }

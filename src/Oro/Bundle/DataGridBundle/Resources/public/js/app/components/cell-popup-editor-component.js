@@ -198,7 +198,7 @@ define(function(require) {
             }
 
             var cell = this.options.cell;
-            var serverUpdateData = this.view.getServerUpdateData();
+            var serverUpdateData = this.getServerUpdateData();
             this.formState = this.view.getFormState();
             var modelUpdateData = this.view.getModelUpdateData();
             cell.$el.addClass('loading');
@@ -584,6 +584,13 @@ define(function(require) {
                     }
                 }
             }
+        },
+
+        /**
+         * @return {Object}
+         */
+        getServerUpdateData: function() {
+            return this.view.getServerUpdateData();
         }
     });
 

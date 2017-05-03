@@ -1,0 +1,11 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+  japanese:
+    code: 'ja_JP'
+    enabled: true
+    organization: '@organization'
+    owner: '@admin'
+  dutch:
+    code: 'nl_NL'
+    enabled: true
+    organization: '@organization'
+    owner: '@admin'

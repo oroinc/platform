@@ -1,3 +1,5 @@
+@ticket-BAP-9337
+@automatically-ticket-tagged
 Feature: Show "Update Schema" button for entity fields
   In order to find out that schema update for custom entity fields is required, and be able to do it
   As a Site Administrator
@@ -36,9 +38,7 @@ Feature: Show "Update Schema" button for entity fields
     And I should see "Update Schema"
 
   Scenario: Update schema
-    Given I click "Update Schema"
-    Then I should see "Schema update confirmation"
-    And I press "Yes, Proceed"
+    Given I click update schema
     Then I should see "Schema updated"
     And I move backward one page
     And I should not see "Update Schema"

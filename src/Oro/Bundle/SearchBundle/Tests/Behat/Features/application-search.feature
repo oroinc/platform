@@ -1,3 +1,5 @@
+@ticket-BAP-11236
+@automatically-ticket-tagged
 @fixture-searchEntities.yml
 Feature: Application search
   In order to decrease time for search some common entities
@@ -38,7 +40,7 @@ Feature: Application search
     When I select 10 from per page list dropdown
     And I press next page button
     Then number of page should be 2
-    And records in grid should be 5
+    And records in current grid should be 5
 
   Scenario: Search by Business Units
     Given I follow "Search"

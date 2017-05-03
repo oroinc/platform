@@ -16,7 +16,6 @@ define([
      * @extends orodatagrid.datagrid.listener.AbstractGridChangeListener
      */
     ColumnFormListener = AbstractGridChangeListener.extend({
-
         /** @param {Object} */
         selectors: {
             included: null,

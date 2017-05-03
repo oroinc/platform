@@ -114,6 +114,7 @@ return [
                 'frontend_options' => [
                     'class' => 'foo'
                 ],
+                'message_parameters' => ['test' => 'param'],
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
                 'destination_page' => 'name',
@@ -204,6 +205,7 @@ return [
                     'init_context_attribute' => 'init_context',
                     'triggers' => [],
                     'destination_page' => '',
+                    'message_parameters' => [],
                 ],
             'transition_with_form_options_configuration_defaults' =>
                 [
@@ -232,6 +234,7 @@ return [
                     'init_context_attribute' => 'init_context',
                     'triggers' => [],
                     'destination_page' => '',
+                    'message_parameters' => [],
                 ],
         ],
         'transition_definitions' => [
@@ -315,6 +318,7 @@ return [
                 'init_routes' => [],
                 'init_datagrids' => [],
                 'init_context_attribute' => 'init_context',
+                'message_parameters' => [],
             ]
         ],
         'transition_definitions' => [

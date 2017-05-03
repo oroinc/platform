@@ -46,7 +46,7 @@ services:
             - '@oro_translation.js_dumper'
             - '@translation.loader'
             - '@oro_translation.database_translation.persister'
-            - %kernel.cache_dir%
+            - '%kernel.cache_dir%'
         lazy: true
 
     oro_translation.statistic_provider:
@@ -268,7 +268,7 @@ services:
     oro_translation.provider.language:
         class: 'Oro\Bundle\TranslationBundle\Provider\LanguageProvider'
         arguments:
-            - '@oro_translation.repository.language'
+            - '@doctrine'
             - '@oro_locale.settings'
             - '@oro_security.acl_helper'
 
@@ -334,5 +334,11 @@ services:
         arguments:
            - '@oro_translation.manager.translation'
            - '@translator'
+           - '@oro_security.acl_helper'
+
+    oro_translation.provider.external_translations:
+        class: 'Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider'
+        arguments:
+           - '@oro_translation.service_provider'
+           - '@oro_translation.helper.language'
            - '@oro_entity.doctrine_helper'
-           - '@oro_security.security_facade'

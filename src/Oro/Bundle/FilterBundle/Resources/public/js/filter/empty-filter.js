@@ -130,7 +130,7 @@ define([
             parentDiv.find('.dropdown-toggle').html(choiceName);
 
             this._handleEmptyFilter(type);
-
+            this.trigger('onClickChoiceValue', this);
             e.preventDefault();
         },
 

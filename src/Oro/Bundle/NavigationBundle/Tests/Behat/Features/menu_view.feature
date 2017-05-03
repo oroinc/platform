@@ -1,3 +1,5 @@
+@ticket-BAP-10860
+@automatically-ticket-tagged
 Feature: Change menu view
   In order to have best user experience for working with menu
   As an administrator
