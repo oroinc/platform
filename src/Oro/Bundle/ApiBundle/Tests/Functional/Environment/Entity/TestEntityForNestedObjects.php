@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Entity;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
- * @ORM\Table(name="test_nested_objects")
+ * @ORM\Table(name="test_api_nested_objects")
  * @ORM\Entity
  */
 class TestEntityForNestedObjects implements TestFrameworkEntityInterface
