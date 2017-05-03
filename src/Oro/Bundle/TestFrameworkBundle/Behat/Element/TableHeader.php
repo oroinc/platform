@@ -20,7 +20,7 @@ class TableHeader extends Element
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            if (false !== stripos($th->textContent, $headerText)) {
+            if (strtolower($th->textContent) === strtolower($headerText)) {
                 return $i;
             }
 

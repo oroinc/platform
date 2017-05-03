@@ -1,3 +1,5 @@
+@ticket-BAP-14559
+@automatically-ticket-tagged
 Feature: Create report
   In order to manage reports
   As administrator

@@ -1,0 +1,10 @@
+imports:
+    - { workflow: not_exists, as: for_that, replace: [] }
+workflows:
+    for_that:
+        entity: Entity
+        steps:
+            step: ~
+        transitions:
+            step_to: step
+            is_start: true

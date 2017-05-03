@@ -103,6 +103,10 @@ oro_behat_extension:
       selector: 'div.modal'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    GridViewList:
+      selector: '.grid-views .btn-toolbar .btn-group.views-group, .grid-views .grid-views__header'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     GridViewOptions:
       selector: '.grid-views .btn-toolbar .btn-group.actions-group'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

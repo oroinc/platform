@@ -1,3 +1,5 @@
+@ticket-BAP-11235
+@automatically-ticket-tagged
 Feature: Shortcuts feature
   In order to decrease time for performing some commonly used tasks
   As a user

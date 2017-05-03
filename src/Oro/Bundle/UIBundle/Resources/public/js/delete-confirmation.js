@@ -21,12 +21,6 @@ define(function(require) {
         className: 'modal oro-modal-danger',
 
         /** @property {String} */
-        okButtonClass: 'btn-danger',
-
-        /** @property {Boolean} */
-        allowOk: true,
-
-        /** @property {String} */
         okText: __('Yes, Delete'),
 
         /** @property {String} */
@@ -49,8 +43,7 @@ define(function(require) {
                 title: this.title,
                 okText: this.okText,
                 cancelText: this.cancelText,
-                template: _.template(this.template, interpolate),
-                allowOk: this.allowOk
+                template: _.template(this.template, interpolate)
             }, options);
 
             arguments[0] = options;

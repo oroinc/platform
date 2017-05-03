@@ -362,8 +362,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Email   | charlie@gmail.com   |
      *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in (grid|(?P<name>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in (grid|(?P<name>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_\@]+)) in (grid|(?P<name>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\@\(\)]+))" in (grid|(?P<name>[\s\w]+)) with following data:$/
      */
     public function assertRowValues($content, TableNode $table, $name = 'Grid')
     {
@@ -593,20 +593,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @Then /^there is no records in (grid|(?P<name>[\s\w]+))$/
      * @Then all records should be deleted
+     * @Then /^there is no records in grid "(?P<grid>([\w\s]+))"$/
      */
     public function thereIsNoRecordsInGrid($name = 'Grid')
     {
         self::assertCount(0, $this->getGrid($name)->getRows());
-    }
-
-    /**
-     * @Then /^there is no records in grid "(?P<grid>([\w\s]+))"$/
-     *
-     * @param string $grid
-     */
-    public function thereIsNoRecordsInGridWithName($grid)
-    {
-        self::assertCount(0, $this->getGrid($grid)->getRows());
     }
 
     /**
@@ -693,6 +684,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function clickViewOptions()
     {
         $this->elementFactory->createElement('GridViewOptionsLink')->click();
+    }
+
+    /**
+     * Expand grid view list on grid.
+     * Example: I click grid view list on "TestGrid" grid
+     *
+     * @Given /^(?:|I )click grid view list on "(?P<gridName>([\w\s]+))" grid$/
+     *
+     * @param string $gridName
+     */
+    public function clickViewList($gridName)
+    {
+        $grid = $this->getGrid($gridName);
+        $grid->clickViewList();
     }
 
     /**

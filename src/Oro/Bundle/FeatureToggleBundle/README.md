@@ -44,6 +44,8 @@ features:
             - acme_some_operation
         api_resources:
             - Acme\Bundle\Entity\Page
+        commands:
+            - oro:search:index
 ```
 
 Adding new options to feature configuration
@@ -307,4 +309,43 @@ features:
         strategy: affirmative
         allow_if_all_abstain: true
         allow_if_equal_granted_denied: false
+```
+
+
+Using checker for commands
+--------------------------
+In case if we run commands as subcommands we can't skip it globally.
+To avoid running such commands you have to add implementation of FeatureCheckerAwareInterface
+to your parent command, add FeatureCheckerHolderTrait usage and use featureChecker that
+injected automatically direct to your command.
+
+```php
+<?php
+
+namespace Acme\Bundle\FixtureBundle\Command;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerAwareInterface;
+
+class LoadDataFixturesCommand implements FeatureCheckerAwareInterface
+{
+
+    use FeatureCheckerHolderTrait;
+    
+    protected function execeute(InputInterface $input, OutputInterface $output)
+    {
+        $commands = [
+            'oro:cron:analytic:calculate' => [],
+            'oro:b2b:lifetime:recalculate'          => ['--force' => true]
+        ];
+    
+        foreach ($commands as $commandName => $options) {
+            if ($this->featureChecker->isResourceEnabled($commandName, 'commands')) {
+                $command = $this->getApplication()->find($commandName);
+                $input = new ArrayInput(array_merge(['command' => $commandName], $options));
+                $command->run($input, $output);
+            }
+        }
+    }
+}
 ```
