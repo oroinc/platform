@@ -98,6 +98,6 @@ class UniqueTrackingVisitRepositoryTest extends WebTestCase
         $this->assertSame(md5($visit->getUserIdentifier()), $uniqueVisit->getUserIdentifier());
         $visitDate = clone $visit->getFirstActionTime();
         $visitDate->setTimezone($timezone);
-        $this->assertEquals($visitDate->format('Y-m-d'), $uniqueVisit->getActionDate()->format('Y-m-d'));
+        $this->assertEquals($visitDate->format('Y-m-d'), $uniqueVisit->getFirstActionTime()->format('Y-m-d'));
     }
 }

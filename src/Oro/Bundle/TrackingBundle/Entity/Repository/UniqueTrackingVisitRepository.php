@@ -23,7 +23,7 @@ class UniqueTrackingVisitRepository extends EntityRepository
             $uniqueRecord->setTrackingWebsite($trackingVisit->getTrackingWebsite());
             $uniqueRecord->setUserIdentifier(md5($trackingVisit->getUserIdentifier()));
             $uniqueRecord->setVisitCount(1);
-            $uniqueRecord->setActionDate($this->getDateInSystemTimezone($trackingVisit, $timeZone));
+            $uniqueRecord->setFirstActionTime($this->getDateInSystemTimezone($trackingVisit, $timeZone));
             $this->getEntityManager()->persist($uniqueRecord);
         }
 
@@ -39,7 +39,7 @@ class UniqueTrackingVisitRepository extends EntityRepository
     {
         return $this->findOneBy([
             'userIdentifier' => md5($trackingVisit->getUserIdentifier()),
-            'actionDate' => $this->getDateInSystemTimezone($trackingVisit, $timeZone)
+            'firstActionTime' => $this->getDateInSystemTimezone($trackingVisit, $timeZone)
         ]);
     }
 

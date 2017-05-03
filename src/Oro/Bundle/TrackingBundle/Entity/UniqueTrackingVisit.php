@@ -49,7 +49,7 @@ class UniqueTrackingVisit
      *
      * @ORM\Column(name="action_date", type="date")
      */
-    protected $actionDate;
+    protected $firstActionTime;
 
     /**
      * @return int
@@ -100,18 +100,18 @@ class UniqueTrackingVisit
     /**
      * @return \DateTime
      */
-    public function getActionDate()
+    public function getFirstActionTime()
     {
-        return $this->actionDate;
+        return $this->firstActionTime;
     }
 
     /**
-     * @param \DateTime $actionDate
+     * @param \DateTime $firstActionTime
      * @return $this
      */
-    public function setActionDate(\DateTime $actionDate)
+    public function setFirstActionTime(\DateTime $firstActionTime)
     {
-        $this->actionDate = $actionDate;
+        $this->firstActionTime = $firstActionTime;
 
         return $this;
     }

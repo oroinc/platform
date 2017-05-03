@@ -17,7 +17,7 @@ class UniqueTrackingVisitTest extends \PHPUnit_Framework_TestCase
             ['trackingWebsite', new TrackingWebsite()],
             ['visitCount', 1],
             ['userIdentifier', md5('abc')],
-            ['actionDate', new \DateTime('2012-12-12')]
+            ['firstActionTime', new \DateTime('2012-12-12')]
         ]);
     }
 }
