@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Processor;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\RegistryDelegateProcessor;
 
 class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
@@ -197,12 +201,78 @@ class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
      */
     protected function getMockStepExecution()
     {
         return $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
+    }
+
+    public function testClose()
+    {
+        $entityName = 'entity_name';
+        $processorAlias = 'processor_alias';
+        $stepExecution = $this->getMockStepExecution();
+
+        $delegateProcessor = $this->createMock(ClosableInterface::class);
+        $delegateProcessor->expects($this->once())
+            ->method('close');
+
+        $this->processorRegistry->expects($this->once())->method('getProcessor')
+            ->with($this->delegateType, $processorAlias)
+            ->will($this->returnValue($delegateProcessor));
+
+        $context = $this->createMock(ContextInterface::class);
+        $this->contextRegistry->expects($this->once())->method('getByStepExecution')
+            ->with($stepExecution)
+            ->will($this->returnValue($context));
+
+        $context->expects($this->any())
+            ->method('getOption')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['entityName', null, $entityName],
+                        ['processorAlias', null, $processorAlias],
+                    ]
+                )
+            );
+
+        $this->processor->setStepExecution($stepExecution);
+        $this->processor->close();
+    }
+
+    public function testCloseNoClosableInterface()
+    {
+        $entityName = 'entity_name';
+        $processorAlias = 'processor_alias';
+        $stepExecution = $this->getMockStepExecution();
+
+        $delegateProcessor = new \stdClass();
+
+        $this->processorRegistry->expects($this->once())->method('getProcessor')
+            ->with($this->delegateType, $processorAlias)
+            ->will($this->returnValue($delegateProcessor));
+
+        $context = $this->createMock(ContextInterface::class);
+        $this->contextRegistry->expects($this->once())->method('getByStepExecution')
+            ->with($stepExecution)
+            ->will($this->returnValue($context));
+
+        $context->expects($this->any())
+            ->method('getOption')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['entityName', null, $entityName],
+                        ['processorAlias', null, $processorAlias],
+                    ]
+                )
+            );
+
+        $this->processor->setStepExecution($stepExecution);
+        $this->processor->close();
     }
 }
