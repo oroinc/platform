@@ -14,7 +14,6 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
@@ -1046,5 +1045,37 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$soapClientInstance;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrentDir()
+    {
+        return dirname((new \ReflectionClass($this))->getFileName());
+    }
+
+    /**
+     * @param string $folderName
+     * @param string $fileName
+     *
+     * @return string
+     */
+    protected function getTestResourcePath($folderName, $fileName)
+    {
+        return $this->getCurrentDir() . DIRECTORY_SEPARATOR .  $folderName . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    protected function isRelativePath($path)
+    {
+        return
+            0 !== strpos($path, '/')
+            && 0 !== strpos($path, '@')
+            && false === strpos($path, ':');
     }
 }
