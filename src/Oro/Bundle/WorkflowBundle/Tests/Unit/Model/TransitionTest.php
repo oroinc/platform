@@ -392,6 +392,14 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->transition->hasForm());
     }
 
+    public function testHasFormForPage()
+    {
+        $this->assertFalse($this->transition->hasForm()); // by default transition has form
+
+        $this->transition->setDisplayType('page');
+        $this->assertTrue($this->transition->hasForm());
+    }
+
     /**
      * @dataProvider initContextProvider
      *
