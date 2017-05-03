@@ -21,6 +21,7 @@ User interface layouts and controls.
 - [formatters](./Resources/doc/reference/formatters.md)
 - [Dynamic Assets](./Resources/doc/dynamic-assets.md)
 - [Input Widgets](./Resources/doc/reference/input-widgets.md)
+- [Error Handler](./Resources/doc/reference/error-handler.md)
 
 ## Configuration Settings
 
