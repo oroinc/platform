@@ -222,7 +222,7 @@
 
                     {% set data = data|merge({'dataBlocks': dataBlocks}) %}
                 {% endif  %}
-                {{ UI.scrollData(id, data, form) }}
+                {{ UI.scrollData(id, data, entity, form) }}
             {% endblock content_data %}
         </div>
         {% block sync_content_tags %}

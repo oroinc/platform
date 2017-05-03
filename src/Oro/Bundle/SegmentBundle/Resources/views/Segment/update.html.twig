@@ -165,7 +165,7 @@
         'hiddenData': form_widget(form.definition)
     } %}
 
-    {{ UI.scrollData(id, data, form) }}
+    {{ UI.scrollData(id, data, entity, form) }}
 
     {{ QD.query_designer_column_chain_template('column-chain-template') }}
     {{ segmentQD.initJsWidgets(type, form, entities, metadata) }}
