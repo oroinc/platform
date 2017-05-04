@@ -8,6 +8,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\ResponseTextException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -114,6 +115,18 @@ class OroMainContext extends MinkContext implements
                 'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
                 $timeElapsedSecs
             ));
+        }
+
+        // Check for unforeseen 500 errors
+        $error = $this->elementFactory->findElementContains(
+            'Alert Error Message',
+            'There was an error performing the requested operation. Please try again or contact us for assistance.'
+        );
+
+        if ($error->isIsset()) {
+            self::fail(
+                sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
+            );
         }
     }
 
