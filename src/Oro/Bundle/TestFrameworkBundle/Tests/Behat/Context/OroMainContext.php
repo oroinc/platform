@@ -321,12 +321,16 @@ class OroMainContext extends MinkContext implements
      * Assert that provided validation errors for given fields appeared
      * Example: Then I should see validation errors:
      *            | Subject         | This value should not be blank.  |
+     * Example: Then I should see "Some Form" validation errors:
+     *            | Subject         | This value should not be blank.  |
      *
      * @Then /^(?:|I )should see validation errors:$/
+     * @Then /^(?:|I )should see "(?P<formName>(?:[^"]|\\")*)" validation errors:$/
      */
-    public function iShouldSeeValidationErrors(TableNode $table)
+    public function iShouldSeeValidationErrors(TableNode $table, $formName = 'OroForm')
     {
-        $form = $this->createOroForm();
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
 
         foreach ($table->getRows() as $row) {
             list($label, $value) = $row;
