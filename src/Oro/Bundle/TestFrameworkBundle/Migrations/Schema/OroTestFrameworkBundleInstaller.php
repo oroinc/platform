@@ -97,6 +97,13 @@ class OroTestFrameworkBundleInstaller implements
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
 
+        $this->activityExtension->addActivityAssociation(
+            $schema,
+            'oro_note',
+            'test_activity_target',
+            true
+        );
+
         // add activity association if calendar package is installed
         if ($schema->hasTable('oro_calendar_event')) {
             $this->activityExtension->addActivityAssociation(

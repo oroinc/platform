@@ -5,7 +5,7 @@
             {# Show button for start or transit workflow #}
             {% set transitionLabel = data.transition.label|trans({},'workflows') %}
             
-            {% set frontendMessage = data.transition.frontendOptions.message %}
+            {% set frontendMessage = data.transition.frontendOptions.message|default({'message': '', 'message_parameters' : {}}) %}
             
             {% set transitionMessage = frontendMessage.message|trans(frontendMessage.message_parameters, 'workflows') %}
             {% if transitionMessage and transitionMessage != frontendMessage.message %}
