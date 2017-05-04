@@ -31,18 +31,6 @@ interface RestClientInterface
     public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array());
 
     /**
-     * Send GET request and return \SimpleXMLElement object
-     *
-     * @param string $resource Resource name or url
-     * @param array $params Request parameters
-     * @param mixed $headers
-     * @param mixed $options
-     * @return \SimpleXMLElement
-     * @throws RestException
-     */
-    public function getXML($resource, array $params = array(), array $headers = array(), array $options = array());
-
-    /**
      * Send POST request
      *
      * @param string $resource Resource name or url
