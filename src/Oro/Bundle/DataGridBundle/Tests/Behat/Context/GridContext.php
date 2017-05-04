@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
@@ -48,7 +49,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | John       | Doe       | admin@example.com | Enabled | Active |
      *
      * @Then /^(?:|I )should see following grid:$/
-     * @Then /^(?:|I )should see following "(?P<gridName>([\w\s]+))" grid:$/
      */
     public function iShouldSeeFollowingGrid(TableNode $table, $gridName = 'Grid')
     {
@@ -64,6 +64,18 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 );
             }
         }
+    }
+
+    /**
+     * Example: And I should see following "UsersGrid" grid:
+     *            | First name | Last name | Primary Email     | Enabled | Status |
+     *            | John       | Doe       | admin@example.com | Enabled | Active |
+     *
+     * @Then /^(?:|I )should see following "(?P<gridName>([\w\s]+))" grid:$/
+     */
+    public function iShouldSeeFollowingGridWithName($gridName, TableNode $table)
+    {
+        $this->iShouldSeeFollowingGrid($table, $gridName);
     }
 
     /**
@@ -634,6 +646,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: I should see only following actions for row #1 on "UsersGrid" grid:
+     *            | View |
+     *
+     * @Given /^(?:|I )should see only following actions for row #(?P<number>\d+) on "(?P<gridName>[^"]+)" grid:$/
+     *
+     * @param int $number
+     * @param string $gridName
+     * @param TableNode $table
+     */
+    public function iShouldSeeOnlyFollowingActionsForRow($number, $gridName, TableNode $table)
+    {
+        $row = $this->getGrid($gridName)->getRowByNumber($number);
+
+        $actions = array_map(
+            function (Element $action) {
+                return $action->getText();
+            },
+            $row->getActionLinks()
+        );
+
+        $rows = array_column($table->getRows(), 0);
+
+        self::assertEquals($rows, $actions);
+    }
+
+    /**
      * Check that row action links existing. Row searching by it's content
      * Example: I should not see following actions for Dutch in grid:
      *           | Delete |
@@ -879,6 +917,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $gridRows = $grid->findAll('css', 'tbody tr');
 
         self::assertCount((int) $count, $gridRows);
+    }
+
+    /**
+     * Example: Then I refresh "UsersGrid" grid
+     *
+     * @Then /^(?:|I )refresh "(?P<gridName>[^"]+)" grid$/
+     *
+     * @param string $gridName
+     */
+    public function iRefreshGrid($gridName)
+    {
+        $refreshButton = $this->getGrid($gridName)->getElement('GridToolbarActionRefresh');
+        $refreshButton->click();
+    }
+
+    /**
+     * Example: Then I reset "UsersGrid" grid
+     *
+     * @Then /^(?:|I )reset "(?P<gridName>[^"]+)" grid$/
+     *
+     * @param string $gridName
+     */
+    public function iResetGrid($gridName)
+    {
+        $refreshButton = $this->getGrid($gridName)->getElement('GridToolbarActionReset');
+        $refreshButton->click();
     }
 
     /**

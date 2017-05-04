@@ -146,6 +146,16 @@ class Element extends NodeElement
 
     /**
      * @param string $name
+     *
+     * @return Element[]
+     */
+    public function getElements($name)
+    {
+        return $this->elementFactory->findAllElements($name, $this);
+    }
+
+    /**
+     * @param string $name
      * @param string $text
      *
      * @return Element
