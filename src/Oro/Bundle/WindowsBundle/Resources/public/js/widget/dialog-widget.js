@@ -55,9 +55,7 @@ define(function(require) {
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange',
-            'layout:reposition mediator': function(e) {
-                this.resetDialogPosition(e);
-            }
+            'layout:reposition mediator': 'resetDialogPosition'
         },
 
         /**
