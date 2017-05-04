@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class DbalMessage implements MessageInterface
@@ -33,11 +34,6 @@ class DbalMessage implements MessageInterface
     /**
      * @var int
      */
-    private $priority;
-
-    /**
-     * @var int
-     */
     private $delay;
 
     public function __construct()
@@ -45,7 +41,6 @@ class DbalMessage implements MessageInterface
         $this->properties = [];
         $this->headers = [];
         $this->redelivered = false;
-        $this->priority = 0;
         $this->delay = null;
     }
 
@@ -150,7 +145,7 @@ class DbalMessage implements MessageInterface
      */
     public function getPriority()
     {
-        return $this->priority;
+        return (int) $this->getHeader('priority', MessagePriority::VERY_LOW);
     }
 
     /**
@@ -158,7 +153,9 @@ class DbalMessage implements MessageInterface
      */
     public function setPriority($priority)
     {
-        $this->priority = $priority;
+        $headers = $this->getHeaders();
+        $headers['priority'] = (int) $priority;
+        $this->setHeaders($headers);
     }
 
     /**

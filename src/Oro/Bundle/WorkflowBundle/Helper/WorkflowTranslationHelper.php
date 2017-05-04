@@ -202,6 +202,8 @@ class WorkflowTranslationHelper
 
         foreach ($config[WorkflowConfiguration::NODE_TRANSITIONS] as $item) {
             $keys[] = $item['label'];
+            $keys[] = $item['button_label'];
+            $keys[] = $item['button_title'];
             $keys[] = $item['message'];
         }
 
