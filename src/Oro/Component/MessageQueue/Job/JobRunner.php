@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
 class JobRunner
@@ -24,18 +25,17 @@ class JobRunner
     }
 
     /**
-     * @param string   $ownerId
-     * @param string   $name
+     * @param string $ownerId
+     * @param string $name
      * @param \Closure $runCallback
      *
      * @return mixed
-     *
-     * @throws \Exception
      */
     public function runUnique($ownerId, $name, \Closure $runCallback)
     {
-        if (! ($rootJob = $this->jobProcessor->findOrCreateRootJob($ownerId, $name, true))) {
-            return;
+        $rootJob = $this->jobProcessor->findOrCreateRootJob($ownerId, $name, true);
+        if (!$rootJob) {
+            return null;
         }
 
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $rootJob);
@@ -43,28 +43,19 @@ class JobRunner
         if ($rootJob->isInterrupted()) {
             $this->jobProcessor->cancelAllActiveChildJobs($rootJob);
 
-            return;
+            return null;
         }
 
-        if (! $childJob->getStartedAt() || $childJob->getStatus() === Job::STATUS_FAILED_REDELIVERED) {
+        if ($this->isReadyForStart($childJob)) {
             $this->jobProcessor->startChildJob($childJob);
         }
 
-        $jobRunner = new JobRunner($this->jobProcessor, $rootJob);
+        $result = $this->callbackResult($runCallback, $childJob);
 
-        try {
-            $result = call_user_func($runCallback, $jobRunner, $childJob);
-        } catch (\Exception $e) {
-            $this->jobProcessor->failAndRedeliveryChildJob($childJob);
-
-            throw $e;
-        }
-
-        if (! $childJob->getStoppedAt()) {
+        if (!$childJob->getStoppedAt()) {
             $result
                 ? $this->jobProcessor->successChildJob($childJob)
                 : $this->jobProcessor->failChildJob($childJob);
-            ;
         }
 
         return $result;
@@ -105,27 +96,51 @@ class JobRunner
                 $this->jobProcessor->cancelChildJob($job);
             }
 
-            return;
+            return null;
         }
 
-        if (! $job->getStartedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED) {
+        if ($this->isReadyForStart($job)) {
             $this->jobProcessor->startChildJob($job);
         }
-        $jobRunner = new JobRunner($this->jobProcessor, $job->getRootJob());
 
+        $result = $this->callbackResult($runCallback, $job);
+
+        if (! $job->getStoppedAt()) {
+            $result
+                ? $this->jobProcessor->successChildJob($job)
+                : $this->jobProcessor->failChildJob($job);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Job $job
+     *
+     * @return bool
+     */
+    private function isReadyForStart(Job $job)
+    {
+        return !$job->getStartedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED;
+    }
+
+    /**
+     * @param \Closure $runCallback
+     * @param Job $job
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    private function callbackResult($runCallback, $job)
+    {
+        $jobRunner = new JobRunner($this->jobProcessor, $job->getRootJob());
         try {
             $result = call_user_func($runCallback, $jobRunner, $job);
         } catch (\Exception $e) {
             $this->jobProcessor->failAndRedeliveryChildJob($job);
 
             throw $e;
-        }
-
-        if (! $job->getStoppedAt()) {
-            $result
-                ? $this->jobProcessor->successChildJob($job)
-                : $this->jobProcessor->failChildJob($job);
-            ;
         }
 
         return $result;

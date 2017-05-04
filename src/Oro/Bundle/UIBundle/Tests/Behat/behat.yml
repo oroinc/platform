@@ -32,3 +32,6 @@ oro_behat_extension:
       options:
         mapping:
           Application URL: 'application_settings[oro_ui___application_url][value]'
+
+    Alert Error Message:
+      selector: '.alert-error .message'

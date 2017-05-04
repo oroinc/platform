@@ -38,12 +38,14 @@ class Form extends Element
                     $locator
                 );
             }
+
             if (isset($this->options['mapping'][$label]['element'])) {
-                $this->elementFactory->wrapElement(
+                $field = $this->elementFactory->wrapElement(
                     $this->options['mapping'][$label]['element'],
                     $field
                 );
             }
+
             $field->setValue($value);
         }
         if ($isEmbeddedForm) {

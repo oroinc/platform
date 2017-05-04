@@ -1,3 +1,5 @@
+@ticket-BAP-14181
+@automatically-ticket-tagged
 Feature: Unidirectional entity relations created via UI
   In order to create custom relation between entities
   As an Administrator

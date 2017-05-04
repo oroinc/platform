@@ -32,6 +32,9 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          * @return {Object}
          */
         unpackFromQueryString: function(query) {
+            if (query.charAt(0) === '?') {
+                query = query.slice(1);
+            }
             var setValue = function(root, path, value) {
                 if (path.length > 1) {
                     var dir = path.shift();
@@ -51,6 +54,9 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
             var data = {};
             for (var i = 0 ; i < nvp.length ; i++) {
                 var pair = nvp[i].split('=');
+                if (pair.length < 2) {
+                    continue;
+                }
                 var name = this.decodeUriComponent(pair[0]);
                 var value = this.decodeUriComponent(pair[1]);
 
