@@ -15,6 +15,11 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_workflow.cache.entities_with_workflow:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_workflow_entities_with_workflow' ] ]
+
     oro_workflow.cache.process_trigger:
         parent: oro_workflow.cache.trigger.abstract
         calls:
