@@ -261,6 +261,10 @@ WorkflowBundle
     - `getTransitionForm` - managed by processors
     - `getTransitionFormTemplate` - managed by processors
     - `processWorkflowData` - managed by processors
+- Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider`:
+    - changed constructor signature:
+        - removed `WorkflowRegistry $workflowRegistry`;
+        - added `Cache $entitiesWithWorkflowsCache`;
 - Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
 
 
