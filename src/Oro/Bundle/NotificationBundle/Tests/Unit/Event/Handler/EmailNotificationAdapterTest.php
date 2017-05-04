@@ -4,13 +4,17 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
+use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var EmailNotificationAdapter */
     private $adapter;
 
-    /** @var mixed */
+    /** @var EmailHolderStub */
     private $entity;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -24,7 +28,7 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entity = new \stdClass();
+        $this->entity = new EmailHolderStub();
         $this->emailNotification = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\EmailNotification')
             ->disableOriginalConstructor()
             ->getMock();
@@ -39,7 +43,8 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
             $this->entity,
             $this->emailNotification,
             $this->em,
-            $this->configProvider
+            $this->configProvider,
+            $this->getPropertyAccessor()
         );
     }
 
@@ -64,7 +69,7 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRecipientEmails()
     {
-        $emails = array("email");
+        $emails = ["email"];
         $recipientList = new RecipientList();
         $repo = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository')
             ->disableOriginalConstructor()
@@ -83,5 +88,52 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emails));
 
         $this->assertEquals($emails, $this->adapter->getRecipientEmails());
+    }
+
+    public function testGetRecipientEmailsFromAdditionalAssociations()
+    {
+        $expectedEmails = [
+            'test1@example.com',
+            'test2@example.com',
+            'test3@example.com',
+            'test4@example.com',
+        ];
+
+        $subHolder1 = new EmailHolderStub('test1@example.com');
+        $subHolder2 = new EmailHolderStub('test2@example.com');
+        $subHolder3 = new EmailHolderStub('test3@example.com');
+        $subHolder4 = new EmailHolderStub('test4@example.com');
+        $subHolder3->setHolder($subHolder4);
+
+        $this->entity->setHolder($subHolder1);
+        $this->entity->setHolders([
+            $subHolder2,
+            $subHolder3,
+        ]);
+
+        $recipientList = new RecipientList();
+        $recipientList->setAdditionalEmailAssociations([
+            'holder',
+            'holders',
+            'holders.holder',
+        ]);
+
+        $repo = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->emailNotification->expects($this->once())
+            ->method('getRecipientList')
+            ->will($this->returnValue($recipientList));
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->with('Oro\Bundle\NotificationBundle\Entity\RecipientList')
+            ->will($this->returnValue($repo));
+        $repo->expects($this->once())
+            ->method('getRecipientEmails')
+            ->with($this->identicalTo($recipientList), $this->identicalTo($this->entity))
+            ->will($this->returnValue([]));
+
+        $this->assertEquals($expectedEmails, $this->adapter->getRecipientEmails());
     }
 }

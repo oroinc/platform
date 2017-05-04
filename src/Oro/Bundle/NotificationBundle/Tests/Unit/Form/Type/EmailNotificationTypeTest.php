@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
@@ -17,7 +19,11 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $listener = $this->getMockBuilder('Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber')
+        $buildTemplateListener = $this->getMockBuilder(BuildTemplateFormSubscriber::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $additionalEmailsListener = $this->getMockBuilder(AdditionalEmailsSubscriber::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -41,7 +47,12 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$config]));
         $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMockForAbstractClass();
 
-        $this->type = new EmailNotificationType($listener, $this->configProvider, $router);
+        $this->type = new EmailNotificationType(
+            $buildTemplateListener,
+            $additionalEmailsListener,
+            $this->configProvider,
+            $router
+        );
     }
 
     public function testSetDefaultOptions()
@@ -68,9 +79,13 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->exactly(4))
             ->method('add');
 
-        $builder->expects($this->once())
+        $builder->expects($this->at(0))
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber'));
+            ->with($this->isInstanceOf(BuildTemplateFormSubscriber::class));
+
+        $builder->expects($this->at(1))
+            ->method('addEventSubscriber')
+            ->with($this->isInstanceOf(AdditionalEmailsSubscriber::class));
 
         $this->type->buildForm($builder, array());
     }

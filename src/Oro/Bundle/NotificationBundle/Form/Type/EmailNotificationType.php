@@ -9,9 +9,10 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 class EmailNotificationType extends AbstractType
 {
@@ -23,22 +24,30 @@ class EmailNotificationType extends AbstractType
     /**
      * @var BuildTemplateFormSubscriber
      */
-    protected $subscriber;
+    protected $buildTemplateSubscriber;
+
+    /**
+     * @var AdditionalEmailsSubscriber
+     */
+    protected $additionalEmailsSubscriber;
 
     /** @var RouterInterface */
     private $router;
 
     /**
-     * @param BuildTemplateFormSubscriber $subscriber
+     * @param BuildTemplateFormSubscriber $buildTemplateSubscriber
+     * @param AdditionalEmailsSubscriber $additionalEmailsSubscriber
      * @param ConfigProvider $ownershipConfigProvider
      * @param RouterInterface $router
      */
     public function __construct(
-        BuildTemplateFormSubscriber $subscriber,
+        BuildTemplateFormSubscriber $buildTemplateSubscriber,
+        AdditionalEmailsSubscriber $additionalEmailsSubscriber,
         ConfigProvider $ownershipConfigProvider,
         RouterInterface $router
     ) {
-        $this->subscriber = $subscriber;
+        $this->buildTemplateSubscriber = $buildTemplateSubscriber;
+        $this->additionalEmailsSubscriber = $additionalEmailsSubscriber;
         $this->router = $router;
 
         $this->ownershipEntities = [];
@@ -55,7 +64,8 @@ class EmailNotificationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber($this->subscriber);
+        $builder->addEventSubscriber($this->buildTemplateSubscriber);
+        $builder->addEventSubscriber($this->additionalEmailsSubscriber);
 
         $builder->add(
             'entityName',

@@ -6,7 +6,12 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\VarDumper\VarDumper;
+
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class RecipientListType extends AbstractType
 {
@@ -34,7 +39,6 @@ class RecipientListType extends AbstractType
             ]
         );
 
-        // groups
         $builder->add(
             'groups',
             'entity',
@@ -50,14 +54,12 @@ class RecipientListType extends AbstractType
             ]
         );
 
-        // custom email
         $builder->add(
             'email',
             'email',
             ['label' => 'oro.notification.emailnotification.email.label', 'required' => false]
         );
 
-        // owner
         $builder->add(
             'owner',
             'checkbox',

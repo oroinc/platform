@@ -2,21 +2,32 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationApiType;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class EmailNotificationApiTypeTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /**
      * @var EmailNotificationApiType
      */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $configProvider;
 
     protected function setUp()
     {
-        $listener = $this->getMockBuilder('Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber')
+        $buildTemplateListener = $this->getMockBuilder(BuildTemplateFormSubscriber::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $additionalEmailsListener = $this->getMockBuilder(AdditionalEmailsSubscriber::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -28,7 +39,13 @@ class EmailNotificationApiTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
         $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMockForAbstractClass();
 
-        $this->type = new EmailNotificationApiType($listener, $this->configProvider, $router);
+        $this->type = new EmailNotificationApiType(
+            $buildTemplateListener,
+            $additionalEmailsListener,
+            $this->configProvider,
+            $router,
+            $this->getPropertyAccessor()
+        );
     }
 
     public function testSetDefaultOptions()
@@ -54,9 +71,13 @@ class EmailNotificationApiTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->at(0))
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber'));
+            ->with($this->isInstanceOf(BuildTemplateFormSubscriber::class));
 
-        $builder->expects($this->at(5))
+        $builder->expects($this->at(1))
+            ->method('addEventSubscriber')
+            ->with($this->isInstanceOf(AdditionalEmailsSubscriber::class));
+
+        $builder->expects($this->at(6))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
