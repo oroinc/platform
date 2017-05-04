@@ -133,7 +133,6 @@ class EmailNotificationType extends AbstractType
                             'owner',
                             array_merge($recipientList->get('owner')->getConfig()->getOptions(), ['disabled' => true])
                         );
-
                     }
                 }
             }
