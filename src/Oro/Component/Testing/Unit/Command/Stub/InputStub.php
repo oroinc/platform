@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Tests\Unit\Stub;
+namespace Oro\Component\Testing\Unit\Command\Stub;
 
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;

@@ -1,15 +1,27 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Unit\Stub;
+namespace Oro\Component\Testing\Unit\Command\Stub;
 
 use Symfony\Component\Console\Output\Output;
 
-class MemoryOutput extends Output
+class OutputStub extends Output
 {
+    /**
+     * @var array
+     */
+    public $messages = [];
+
+    /**
+     * @var string
+     */
     private $output;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function doWrite($message, $newline)
     {
+        $this->messages[] = $message;
         $this->output .= $message;
 
         if ($newline) {
@@ -17,6 +29,9 @@ class MemoryOutput extends Output
         }
     }
 
+    /**
+     * @return string
+     */
     public function getOutput()
     {
         return $this->output;
