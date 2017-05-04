@@ -100,8 +100,10 @@ class PostponedRowsHandler
 
         if ($attempts > self::MAX_ATTEMPTS) {
             if (array_key_exists('postponedRows', $result) && !empty($result['postponedRows'])) {
-                $result['errors'][] = $this->translator->trans('oro.importexport.import.postponed_rows',
-                    ['%postponedRows%' => count($result['postponedRows'])]);
+                $result['errors'][] = $this->translator->trans(
+                    'oro.importexport.import.postponed_rows',
+                    ['%postponedRows%' => count($result['postponedRows'])]
+                );
                 $result['counts']['errors']++;
             }
             return;
