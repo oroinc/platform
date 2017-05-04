@@ -93,7 +93,7 @@ DataGridBundle
         - first argument of method `protected funtion onSuccess()` from `GridView $entity` to `AbstractGridView $entity`
         - first argument of method `protected funtion setDefaultGridView()` from `GridView $entity` to `AbstractGridView $entity`
         - first argument of method `protected funtion fixFilters()` from `GridView $entity` to `AbstractGridView $entity`
-- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used. 
+- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used.
 - Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export`, `setExportConnector` with `@oro_datagrid.importexport.export_connector`, `setExportProcessor` with `@oro_datagrid.importexport.processor.export` and `setWriterChain`  with `@oro_importexport.writer.writer_chain` were added. The constructor was removed, the parent class constructor is used.
 - Class `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher`
     - the signature of `getDatagridQuery` method was changed, added parameter `string $objectIdentifier = null`
@@ -310,3 +310,7 @@ SegmentBundle
     - method `run` now accept also a dynamic segment
 - Class `Oro/Bundle/SegmentBundle/Entity/Repository/SegmentSnapshotRepository`:
     - changed signature of method `removeBySegment`, added parameter `$entityIds` (array) with default empty array.
+
+FormBundle
+----------
+- Form types OroEncodedPlaceholderPasswordType, OroEncodedPasswordType acquired `browser_autocomplete` option with default value set to `false`, which means that password autocomplete is off by default.
