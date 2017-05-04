@@ -23,6 +23,13 @@ class OroNotificationBundle implements Migration
     private function addAdditionalEmailAssociationsField(Schema $schema)
     {
         $table = $schema->getTable('oro_notification_recip_list');
-        $table->addColumn('additional_email_associations', 'simple_array', ['comment' => '(DC2Type:simple_array)']);
+        $table->addColumn(
+            'additional_email_associations',
+            'simple_array',
+            [
+                'comment' => '(DC2Type:simple_array)',
+                'notnull' => false
+            ]
+        );
     }
 }

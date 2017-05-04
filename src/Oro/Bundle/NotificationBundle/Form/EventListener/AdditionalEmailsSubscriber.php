@@ -129,7 +129,8 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
      * @param array $currentPath
      * @param array $currentLabelPath
      */
-    private function collectEmailFieldsRecursive($entityName, &$choices, $currentPath = [], $currentLabelPath = []) {
+    private function collectEmailFieldsRecursive($entityName, &$choices, $currentPath = [], $currentLabelPath = [])
+    {
         foreach ($this->getEntityMetadata($entityName)->getAssociationMappings() as $fieldName => $mapping) {
             $fieldLabel = $this->getFieldLabel($entityName, $fieldName);
 
