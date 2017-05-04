@@ -37,12 +37,9 @@ class WorkflowVariableDataTransformerTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 
-        $transformer = new WorkflowVariableDataTransformer($managerRegistry);
-        if (isset($options['variable']) && $options['variable'] instanceof Variable) {
-            $transformer->setVariable($options['variable']);
-        }
+        $variable = isset($options['variable']) ? $options['variable'] : null;
 
-        return $transformer;
+        return new WorkflowVariableDataTransformer($managerRegistry, $variable);
     }
 
     public function testTransform()

@@ -18,7 +18,7 @@ class TopicPublisherTest extends \PHPUnit_Framework_TestCase
     {
         $this->socket = $this->createMock('Oro\Bundle\SyncBundle\Wamp\WebSocket');
 
-        $this->wamp = new TopicPublisher();
+        $this->wamp = new TopicPublisher('example.com', 1);
         /** @var  \ReflectionClass $reflection */
         $reflection = new \ReflectionClass('Oro\Bundle\SyncBundle\Wamp\TopicPublisher');
         $reflection_property = $reflection->getProperty('ws');
@@ -49,7 +49,7 @@ class TopicPublisherTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckFalse()
     {
-        $this->wamp = new TopicPublisher();
+        $this->wamp = new TopicPublisher('example.com', 1);
         $this->assertFalse($this->wamp->check());
     }
 }

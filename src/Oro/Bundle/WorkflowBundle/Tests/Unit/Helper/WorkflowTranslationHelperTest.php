@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -114,10 +115,15 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
     public function testSaveTranslation()
     {
         $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('en');
-        $this->manager
-            ->expects($this->exactly(2))
+        $this->manager->expects($this->exactly(2))
             ->method('saveTranslation')
-            ->with('test_key', 'test_value', 'en', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+            ->with(
+                'test_key',
+                'test_value',
+                'en',
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
+            );
         $this->helper->saveTranslation('test_key', 'test_value');
         $this->helper->saveTranslation('test_key', 'test_value');
     }
@@ -135,10 +141,26 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 'test_key',
                 'test_value',
                 Translator::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
             );
 
         $this->helper->saveTranslation('test_key', 'test_value');
+    }
+
+    public function testSaveTranslationAsSystem()
+    {
+        $this->translator->expects($this->once())->method('getLocale')->willReturn('en');
+        $this->manager->expects($this->once())
+            ->method('saveTranslation')
+            ->with(
+                'test_key',
+                'test_value',
+                'en',
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_SYSTEM
+            );
+        $this->helper->saveTranslationAsSystem('test_key', 'test_value');
     }
 
     /**

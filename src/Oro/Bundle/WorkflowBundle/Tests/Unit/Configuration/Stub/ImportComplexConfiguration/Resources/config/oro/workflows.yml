@@ -1,0 +1,7 @@
+imports:
+    - { workflow: change,  as: chained_result, replace: []}
+workflows:
+    chained_result:
+        attributes:
+            attribute2:
+                type: integer

@@ -28,3 +28,5 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
             - NotBlank:     { groups: [Imap, Smtp] }
             - Type:
                 type: string
+        folders:
+            - Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders: { groups: [CheckFolderSelection] }

@@ -119,12 +119,16 @@ class WorkflowTranslationHelper
      */
     public function saveTranslation($key, $value)
     {
-        $currentLocale = $this->translator->getLocale();
-        $this->saveValue($key, $value, $currentLocale);
+        $this->saveTranslationValue($key, $value);
+    }
 
-        if ($currentLocale !== Translator::DEFAULT_LOCALE && null === $this->findValue($key)) {
-            $this->saveValue($key, $value);
-        }
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    public function saveTranslationAsSystem($key, $value)
+    {
+        $this->saveTranslationValue($key, $value, Translation::SCOPE_SYSTEM);
     }
 
     public function flushTranslations()
@@ -146,16 +150,32 @@ class WorkflowTranslationHelper
     /**
      * @param string $key
      * @param string $value
-     * @param string $locale
+     * @param int $scope
      */
-    private function saveValue($key, $value, $locale = Translator::DEFAULT_LOCALE)
+    private function saveTranslationValue($key, $value, $scope = Translation::SCOPE_UI)
+    {
+        $currentLocale = $this->translator->getLocale();
+        $this->saveValue($key, $value, $currentLocale, $scope);
+
+        if ($currentLocale !== Translator::DEFAULT_LOCALE && null === $this->findValue($key)) {
+            $this->saveValue($key, $value, Translator::DEFAULT_LOCALE, $scope);
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     * @param int $scope
+     */
+    private function saveValue($key, $value, $locale = Translator::DEFAULT_LOCALE, $scope = Translation::SCOPE_UI)
     {
         $this->translationManager->saveTranslation(
             $key,
             $value,
             $locale,
             self::TRANSLATION_DOMAIN,
-            Translation::SCOPE_UI
+            $scope
         );
     }
 

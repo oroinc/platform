@@ -159,7 +159,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::WITH_GROUPS2, $crawler->html());
-        $this->assertContains('name="oro_workflow_replacement_select"', $crawler->html());
+        $this->assertContains('name="oro_workflow_replacement"', $crawler->html());
         $this->assertContains('Activate', $crawler->html());
         $this->assertContains('Cancel', $crawler->html());
         $this->assertContains('The following workflows will be deactivated', $crawler->html());

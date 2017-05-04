@@ -27,6 +27,10 @@ define(function(require) {
              *      [{name: 'id'}]    - will exclude all entries that has property "name" equals to "id"
              */
             exclude: [],
+            /*
+             * Format same as exclude option
+             */
+            include: [],
             fieldsLoaderSelector: ''
         },
 
@@ -220,6 +224,10 @@ define(function(require) {
 
             if (!_.isEmpty(this.options.exclude)) {
                 entityFields = Util.filterFields(entityFields, this.options.exclude);
+            }
+
+            if (!_.isEmpty(this.options.include)) {
+                entityFields = Util.filterFields(entityFields, this.options.include, true);
             }
 
             $.each(entityFields, function() {

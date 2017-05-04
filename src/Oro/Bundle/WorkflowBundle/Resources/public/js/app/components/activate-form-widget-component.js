@@ -18,11 +18,10 @@ define(function(require) {
             _wid: '',
             success: false,
             deactivated: null,
-            workflow: '',
             selectors: {
                 form: null
             },
-            buttonName: '',
+            buttonName: 'activate',
             error: null
         },
 

@@ -91,7 +91,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
         $em->expects($this->once())
             ->method('commit');
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($entity)
             ->will($this->returnValue($em));
@@ -137,7 +137,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception('Test flush exception'));
         $em->expects($this->once())
             ->method('rollback');
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($entity)
             ->will($this->returnValue($em));

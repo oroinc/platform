@@ -58,6 +58,7 @@ class LimitConsumptionTimeExtension extends AbstractExtension
             ));
 
             $context->setExecutionInterrupted(true);
+            $context->setInterruptedReason('The limit time has passed.');
         }
     }
 }

@@ -101,8 +101,8 @@ define(function(require) {
             return this.applyWidgetFunction('search', arguments);
         },
 
-        disable: function() {
-            return this.applyWidgetFunction('enable', arguments);
+        disable: function(disable) {
+            return this.applyWidgetFunction('enable', [!disable]);
         },
 
         disableKeyboard: function() {

@@ -1,0 +1,9 @@
+// @theme: blank;
+
+.grid-row {
+    .table-hover & {
+        @include element-state('hover') {
+            background: $datagrid-row-hover-background;
+        }
+    }
+}

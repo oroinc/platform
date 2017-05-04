@@ -18,9 +18,6 @@ class Topics
      * for sending error notification
      */
     const SEND_IMPORT_ERROR_NOTIFICATION = 'oro.importexport.send_import_error_notification';
-
-    /** @deprecated since 2.1, will be removed in 2.3, use CLI_IMPORT instead */
-    const IMPORT_CLI = 'oro.importexport.cli_import';
     /**
      * @deprecated (deprecated since 2.1 will be removed in 2.3, please use PRE_HTTP_IMPORT topic name instead.)
      */
@@ -29,12 +26,4 @@ class Topics
      * @deprecated (deprecated since 2.1 will be removed in 2.3, please use PRE_HTTP_IMPORT topic name instead.)
      */
     const IMPORT_HTTP_VALIDATION_PREPARING = 'oro.importexport.import_http_validation_preparing';
-    /**
-     * @deprecated (deprecated since 2.1 will be removed in 2.3, please use HTTP_IMPORT topic name instead.)
-     */
-    const IMPORT_HTTP_VALIDATION = 'oro.importexport.import_http_validation';
-    /**
-     * @deprecated (deprecated since 2.1 will be removed in 2.3, please use HTTP_IMPORT topic name instead.)
-     */
-    const IMPORT_HTTP = 'oro.importexport.import_http';
 }

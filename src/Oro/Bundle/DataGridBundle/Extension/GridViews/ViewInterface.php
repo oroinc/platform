@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 interface ViewInterface
@@ -20,6 +21,11 @@ interface ViewInterface
      * @return ViewInterface
      */
     public function setColumnsData(array $columnsData = []);
+
+    /**
+     * @return string
+     */
+    public function getName();
 
     /**
      * @param string $gridName

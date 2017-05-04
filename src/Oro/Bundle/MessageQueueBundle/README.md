@@ -128,17 +128,26 @@ limit error during message processing.
 
 We recommend to set the `--time-limit` option to 5-10 minutes if using the `DBAL` transport to avoid database connection issues 
 
+### Consumer interruption
 
-### Supervisord
-
-As you read before consumers can normally interrupt the message procession by many reasons:
+Consumers can normally interrupt the message procession by many reasons:
 
 * Out of memory (if the option is set)
 * Timeout (if the option is set)
 * Messages limit exceeded (if the option is set)
-* Forcefully by an event. For example if a cache was cleared or a schema was updated
-* If an exception was thrown during a message processing
+* Forcefully by an event:
+  * If a cache was cleared
+  * If a schema was updated
+  * If a maintenance mode was turned off
+  
+The normal interruption occurs only after a message was processed. If an event was fired during a message processing a 
+consumer completes the message processing and interrupts after the processing is done.
+  
+Also a consumer interrupts **if an exception was thrown during a message processing**. 
 
+### Supervisord
+
+As you read before consumers can normally interrupt the message procession by many reasons.
 In the all cases above the interrupted consumer should be re-run. So you must keep running 
 `oro:message-queue:consume` command and to do this best we advise you to delegate this responsibility 
 to [Supervisord](http://supervisord.org/). With next program configuration supervisord keeps running 

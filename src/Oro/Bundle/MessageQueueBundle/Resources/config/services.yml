@@ -1,6 +1,6 @@
 parameters:
+    oro_message_queue.maintance.idle_time: 5
     oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
-
 services:
     oro_message_queue.consumption.extensions:
         class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
@@ -41,7 +41,18 @@ services:
     oro_message_queue.command.consume_messages:
         class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
         tags:
-            - { name: 'console.command' }
+            - { name: console.command }
+
+    oro_message_queue.consumption.extension.maintance:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
+        public: false
+        arguments:
+            - '@oro_platform.maintenance'
+            - '%oro_message_queue.maintance.idle_time%'
+        calls:
+            - ['setFilePathServerLockFromConfig', ['%kernel.root_dir%/config/oro_env.conf']]
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
 
     oro_message_queue.listener.update_schema:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'

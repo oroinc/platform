@@ -4,19 +4,25 @@ namespace Oro\Bundle\PlatformBundle\Twig;
 
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Twig\SerializerExtension as BaseSerializerExtension;
-use Oro\Component\DependencyInjection\ServiceLink;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SerializerExtension extends BaseSerializerExtension
 {
-    /** @var ServiceLink */
-    protected $serializerLink;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param ServiceLink $serializerLink Link is used because of performance reasons
+     * @param ContainerInterface $container
      */
-    public function __construct(ServiceLink $serializerLink)
+    public function __construct(ContainerInterface $container)
     {
-        $this->serializerLink = $serializerLink;
+        $this->container = $container;
+    }
+
+    protected function getSerializer()
+    {
+        return $this->container->get('jms_serializer');
     }
 
     /**
@@ -25,7 +31,7 @@ class SerializerExtension extends BaseSerializerExtension
     public function serialize($object, $type = 'json', SerializationContext $context = null)
     {
         if (!$this->serializer) {
-            $this->serializer = $this->serializerLink->getService();
+            $this->serializer = $this->getSerializer();
         }
 
         return parent::serialize($object, $type, $context);

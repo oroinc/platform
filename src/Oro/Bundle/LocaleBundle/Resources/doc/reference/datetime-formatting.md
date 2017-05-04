@@ -226,6 +226,17 @@ and array of options as a second argument. Allowed options:
 {{ entity.lastLogin|oro_format_date({'locale': 'ru'}) }}
 {# 06.11.2013 #}
 ```
+To format date given from `Date` sql type, you can omit `timeZone` option,
+e.g.
+```
+value|oro_format_date`
+```
+
+To format the date part of `DateTime` sql type value, you have to specify timeZone directly,
+e.g.
+```
+value|oro_format_date({'timeZone': oro_timezone()})
+```
 
 #### oro_format_time
 
@@ -241,6 +252,15 @@ and array of options as a second argument. Allowed options:
 
 {{ entity.lastLogin|oro_format_time({'locale': 'ru'}) }}
 {# 19:44 #}
+```
+To format time given from `Time` sql type, you can omit `timeZone` option, e.g.
+```
+value|oro_format_time`
+```
+
+To format the time part of `DateTime` sql type value, you have to specify timeZone directly, e.g.
+```
+value|oro_format_time({'timeZone': oro_timezone()})
 ```
 
 #### oro_format_datetime
@@ -259,7 +279,15 @@ and array of options as a second argument. Allowed options:
 {{ entity.lastLogin|oro_format_datetime({'locale': 'ru'}) }}
 {# 06.11.2013 19:44 #}
 ```
+To format date and time given from `Date` or `Time` sql types, you can omit `timeZone` option, e.g.
+```
+value|oro_format_datetime`
+```
 
+To format the date and time of `DateTime` sql type value, you have to specify timeZone directly, e.g.
+```
+value|oro_format_datetime({'timeZone': oro_timezone()})
+```
 ### Format Converter functions
 
 Twig extension DateFormatExtension has following functions.

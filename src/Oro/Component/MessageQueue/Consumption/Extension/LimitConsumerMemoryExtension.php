@@ -64,6 +64,7 @@ class LimitConsumerMemoryExtension extends AbstractExtension
             ));
 
             $context->setExecutionInterrupted(true);
+            $context->setInterruptedReason('The memory limit reached.');
         }
     }
 }

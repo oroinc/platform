@@ -5,13 +5,18 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\ResponseTextException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+
 use Doctrine\Common\Inflector\Inflector;
+
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
+use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
@@ -23,6 +28,8 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
@@ -36,6 +43,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
@@ -98,7 +106,28 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        $driver->waitForAjax();
+        $start = microtime(true);
+        $result = $driver->waitForAjax();
+        $timeElapsedSecs = microtime(true) - $start;
+
+        if (!$result) {
+            var_dump(sprintf(
+                'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                $timeElapsedSecs
+            ));
+        }
+
+        // Check for unforeseen 500 errors
+        $error = $this->elementFactory->findElementContains(
+            'Alert Error Message',
+            'There was an error performing the requested operation. Please try again or contact us for assistance.'
+        );
+
+        if ($error->isIsset()) {
+            self::fail(
+                sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
+            );
+        }
     }
 
     /**
@@ -107,7 +136,7 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
-    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message')
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */
@@ -128,7 +157,7 @@ class OroMainContext extends MinkContext implements
 
                 return null;
             },
-            15
+            $timeLimit
         );
 
         self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
@@ -432,6 +461,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Given I click Websites in sidebar menu
+     *
+     * @Given /^(?:|I )click (?P<needle>[\w\s]+) in sidebar menu$/
+     */
+    public function iClickLinkInSidebarMenu($needle)
+    {
+        $sidebarMenu = $this->createElement('SidebarMenu');
+        self::assertTrue($sidebarMenu->isValid());
+        $sidebarMenu->clickLink($needle);
+    }
+
+    /**
      * Click on element on page
      * Example: When I click on "Help Icon"
      *
@@ -558,6 +599,20 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert modal window with given caption is visible
+     * Example: Then I should see "Changing Page URLs" modal window
+     *
+     * @Then /^(?:|I )should see "(?P<caption>(?:[^"]|\\")*)" modal window$/
+     */
+    public function iShouldSeeModalWindow($caption)
+    {
+        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
+        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+
+        self::assertElementContainsText('div.modal .modal-header', $caption);
+    }
+
+    /**
      * Click on button in modal window
      * Example: Given I click "Edit" in modal window
      * Example: When I click "Save and Close" in modal window
@@ -577,18 +632,6 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
-    }
-
-    /**
-     * Wait for ajax
-     *
-     * @Then /^(?:|I )have to wait for ajax$/
-     * @Then /^(?:|I )have to wait for ajax up to "(?P<timeInSec>(?:[^"]|\\")*)" seconds$/
-     */
-    public function iHaveToWaitForAjax($timeInSec = 60)
-    {
-        $timeInMs = $timeInSec * 1000;
-        $this->waitForAjax($timeInMs);
     }
 
     /**
@@ -781,7 +824,74 @@ class OroMainContext extends MinkContext implements
         foreach ($table->getRows() as $row) {
             list($field, $value) = $row;
             $this->inlineEditField($field, $value);
+            $this->waitForAjax();
         }
+    }
+
+    /**
+     * Inline grid field edit with click on empty space
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" with click on empty space$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" with click on empty space$/
+     */
+    public function inlineEditRecordInGridWithClickOnEmptySpace($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValue($field, $value);
+        $this->clickOnEmptySpace();
+        $this->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
+    }
+
+    /**
+     * Click on empty space
+     * Example: When I click on empty space
+     *
+     * @When /^(?:|I )click on empty space$/
+     */
+    public function clickOnEmptySpace()
+    {
+        $this->getPage()->find('css', '#container')->click();
+    }
+
+    /**
+     * Inline grid field edit by double click
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" by double click$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" by double click$/
+     */
+    public function inlineEditRecordInGridByDoubleclick($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueByDoubleClick($field, $value);
+    }
+
+    /**
+     * @param string $entityTitle
+     * @return \Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
+     */
+    protected function getGridRow($entityTitle = null)
+    {
+        /** @var Grid $grid */
+        $grid = $this->createElement('Grid');
+
+        if (null !== $entityTitle) {
+            $row = $grid->getRowByContent($entityTitle);
+        } else {
+            $rows = $grid->getRows();
+            self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.' .
+                PHP_EOL . 'You can specify row content for edit field in specific row.', count($rows)));
+
+            $row = array_shift($rows);
+        }
+
+        return $row;
     }
 
     /**
@@ -789,27 +899,46 @@ class OroMainContext extends MinkContext implements
      * Example: When I edit Status as "Open"
      * Example: Given I edit Probability as "30"
      *
-     * @When /^(?:|I )edit (?P<field>.+) as "(?P<value>.*)"$/
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)"$/
      * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)"$/
      */
     public function inlineEditField($field, $value, $entityTitle = null)
     {
-        /** @var Grid $grid */
-        $grid = $this->createElement('Grid');
+        $row = $this->getGridRow($entityTitle);
 
-        if (null === $entityTitle) {
-            $row = $grid->getRowByContent($entityTitle);
-        } else {
-            $rows = $grid->getRows();
-            self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.' .
-                PHP_EOL . 'You can specify row content for edit field in specific row.'));
-
-            $row = array_shift($rows);
-        }
-
-        $row->setCellValue($field, $value);
+        $row->setCellValueAndSave($field, $value);
         $this->iShouldSeeFlashMessage('Inline edits are being saved');
         $this->iShouldSeeFlashMessage('Record has been succesfully updated');
+    }
+
+    /**
+     * Inline edit field and don't save
+     * Example: When I edit Status as "Open" without saving
+     * Example: Given I edit Probability as "30" without saving
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" without saving$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" without saving$/
+     */
+    public function inlineEditFieldWithoutSaving($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValue($field, $value);
+    }
+
+    /**
+     * Inline edit field and cancel
+     * Example: When I edit Status as "Open" and cancel
+     * Example: Given I edit Probability as "30" and cancel
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" and cancel$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" and cancel$/
+     */
+    public function inlineEditFieldAndCancel($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueAndCancel($field, $value);
     }
 
     /**
@@ -916,8 +1045,12 @@ class OroMainContext extends MinkContext implements
      */
     public function assertElementOnPage($element)
     {
+        $isVisible = $this->spin(function (OroMainContext $context) use ($element) {
+            return $context->createElement($element)->isVisible();
+        });
+
         self::assertTrue(
-            $this->createElement($element)->isVisible(),
+            $isVisible,
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
     }
@@ -950,6 +1083,17 @@ class OroMainContext extends MinkContext implements
     protected function createOroForm()
     {
         return $this->createElement('OroForm');
+    }
+
+    /**
+     * @Given /^I restart message consumer$/
+     *
+     * @todo remove step from scenario and step implementation in scope of BAP-14637
+     */
+    public function iRestartMessageConsumer()
+    {
+        $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
+        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
     }
 
     /**
@@ -1038,6 +1182,68 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Unselect a value in the multiselect box
+     * Example: And unselect "Color" option from "Attributes"
+     * Example: When I unselect "Color" option from "Attributes"
+     *
+     * @When /^(?:|I )unselect "(?P<option>(?:[^"]|\\")*)" option from "(?P<select>(?:[^"]|\\")*)"$/
+     */
+    public function unselectOption($select, $option)
+    {
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        $field = $this->getSession()->getPage()->findField($select);
+
+        if (null === $field) {
+            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $select);
+        }
+
+        $selectOptionXpath = '//option[contains(.,"%s")]';
+        $selectOption = $field->find(
+            'xpath',
+            sprintf($selectOptionXpath, $option)
+        );
+
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $driver,
+                'select option',
+                'id|name|label|value|placeholder',
+                sprintf($selectOptionXpath, $option)
+            );
+        }
+
+        $optionValue = $selectOption->getValue();
+
+        $values = $field->getValue();
+        if ($values !== null && is_array($values)) {
+            foreach ($values as $key => $value) {
+                if ($value === $optionValue) {
+                    unset($values[$key]);
+                    break;
+                }
+            }
+
+            $field->setValue(array_values($values));
+        }
+    }
+
+    /**
+     * Confirm schema update and wait for success message
+     * Example: And I confirm schema update
+     *
+     * @Then /^(?:|I )confirm schema update$/
+     */
+    public function iConfirmSchemaUpdate()
+    {
+        $this->pressButton('Update schema');
+        $this->assertPageContainsText('Schema update confirmation');
+        $this->pressButton('Yes, Proceed');
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+    }
+
+    /**
      * Checks that element on page exists and visible
      *
      * @param string $selector
@@ -1048,5 +1254,65 @@ class OroMainContext extends MinkContext implements
         $element = $this->getPage()->findVisible('css', $selector);
 
         return !is_null($element);
+    }
+
+    /**
+     * Drag and Drop one element before another
+     * Example: When I drag and drop "Products" before "Clearance"
+     *
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" before "(?P<dropZoneName>[\w\s]+)"$/
+     * @param string $elementName
+     * @param string $dropZoneName
+     */
+    public function iDragAndDropElementBeforeAnotherOne($elementName, $dropZoneName)
+    {
+        $element = $this->createElement($elementName);
+        $dropZone = $this->createElement($dropZoneName);
+
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $webDriverSession = $driver->getWebDriverSession();
+
+        $source      = $webDriverSession->element('xpath', $element->getXpath());
+        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+        $webDriverSession->moveto(array(
+            'element' => $source->getID()
+        ));
+        $webDriverSession->buttondown();
+        $webDriverSession->moveto([
+            'element' => $destination->getID(),
+            'xoffset' => 1,
+            'yoffset' => 1,
+        ]);
+        $webDriverSession->buttonup();
+    }
+
+    /**
+     * This step is used for system configuration field
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And check Use Default for "Position" field
+     *
+     * @Given check Use Default for :label field
+     */
+    public function checkUseDefaultForField($label)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->checkUseDefaultCheckbox($label);
+    }
+
+    /**
+     * This step used for system configuration field
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And uncheck Use Default for "Position" field
+     *
+     * @Given uncheck Use Default for :label field
+     */
+    public function uncheckUseDefaultForField($label)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->uncheckUseDefaultCheckbox($label);
     }
 }

@@ -58,4 +58,26 @@ class ChannelRepositoryTest extends WebTestCase
 
         static::assertSame([$fooIntegration], $this->repository->findByType('foo'));
     }
+
+    public function testFindByTypeAndExclude()
+    {
+        $expectedIntegration = $this->getReference('oro_integration:bar_integration');
+        $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
+
+        static::assertContains(
+            $expectedIntegration,
+            $this->repository->findByTypeAndExclude('bar', [$excludedIntegration])
+        );
+    }
+
+    public function testFindByTypeAndExcludeById()
+    {
+        $expectedIntegration = $this->getReference('oro_integration:bar_integration');
+        $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
+
+        static::assertContains(
+            $expectedIntegration,
+            $this->repository->findByTypeAndExclude('bar', [$excludedIntegration->getId()])
+        );
+    }
 }

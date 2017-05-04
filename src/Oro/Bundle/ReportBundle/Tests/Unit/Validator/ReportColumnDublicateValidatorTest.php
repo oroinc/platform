@@ -73,8 +73,13 @@ class ReportColumnDublicateValidatorTest extends \PHPUnit_Framework_TestCase
                 ],
                 1 => [
                     'name' => 'Test',
-                    'func' => '',
-                    'label' => 'Test'
+                    'func' => ''
+                ],
+                2 => [
+                    'name' => 'Test',
+                    'func' => [
+                        'name' => 'test'
+                    ]
                 ]
             ]
         ]));

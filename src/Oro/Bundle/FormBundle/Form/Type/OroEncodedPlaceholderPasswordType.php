@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroEncodedPlaceholderPasswordType extends AbstractType
 {
@@ -63,6 +64,23 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
         }
 
         $view->vars['value'] = $this->getPlaceholder($password);
+
+        if (false === $options['browser_autocomplete']) {
+            // Use soft merge ("+" operator) to preserve 'autocomplete' value if it was already specified.
+            $view->vars['attr'] += ['autocomplete' => 'new-password'];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefaults(['browser_autocomplete' => false]);
+
+        $resolver->setAllowedTypes('browser_autocomplete', 'bool');
     }
 
     /**

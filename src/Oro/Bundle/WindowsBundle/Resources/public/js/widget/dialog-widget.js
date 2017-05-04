@@ -142,6 +142,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            $(window).off(this.eventNamespace());
             dialogManager.remove(this);
             if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({

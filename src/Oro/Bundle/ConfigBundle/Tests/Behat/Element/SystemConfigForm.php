@@ -9,16 +9,31 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
 class SystemConfigForm extends Form
 {
-
+    /**
+     * @param TableNode $table
+     */
     public function fill(TableNode $table)
     {
         foreach ($table->getRows() as list($label, $value)) {
             $value = self::normalizeValue($value);
-            $this->uncheckUseDefaultCheckbox($label);
+
+            if ($this->isUseDefaultCheckboxExists($label)) {
+                $this->uncheckUseDefaultCheckbox($label);
+            }
+
             $input = $this->getSettingControlByLabel($label);
 
             $input->setValue($value);
         }
+    }
+
+    /**
+     * @param string $label
+     * @throws ElementNotFoundException
+     */
+    public function checkUseDefaultCheckbox($label)
+    {
+        $this->getSettingControlByLabel($label, 'Use default')->check();
     }
 
     /**
@@ -39,11 +54,7 @@ class SystemConfigForm extends Form
      */
     private function getSettingControlByLabel($label, $inputLabel = null)
     {
-        $labelElement = $this->find('css', "label:contains('$label')");
-
-        self::assertNotNull($labelElement, "Label element for $label not found");
-
-        $container = $labelElement->getParent()->getParent();
+        $container = $this->getContainer($label);
 
         if ($inputLabel != null) {
             $useDefaultLabel = $container->find('css', "label:contains('$inputLabel')");
@@ -60,5 +71,30 @@ class SystemConfigForm extends Form
         self::assertNotNull($input, "Input element for $label not found");
 
         return $input;
+    }
+
+    /**
+     * @param string $label
+     * @return NodeElement
+     */
+    private function getContainer($label)
+    {
+        $labelElement = $this->find('css', "label:contains('$label')");
+
+        self::assertNotNull($labelElement, "Label element for $label not found");
+
+        return $labelElement->getParent()->getParent();
+    }
+
+    /**
+     * @param string $label
+     * @param string $name
+     * @return bool
+     */
+    private function isUseDefaultCheckboxExists($label, $name = 'Use default')
+    {
+        $container = $this->getContainer($label);
+
+        return $container->find('css', "label:contains('$name')") !== null;
     }
 }

@@ -4,11 +4,19 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Filter\EmailStringFilter;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -29,22 +37,34 @@ class EmailQueryFactory
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var FormFactoryInterface */
+    protected $formFactory;
+
+    /** @var FilterUtility */
+    protected $filterUtil;
+
     /**
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
      * @param MailboxManager            $mailboxManager
      * @param SecurityFacade            $securityFacade
+     * @param FormFactoryInterface      $formFactory
+     * @param FilterUtility             $filterUtil
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EntityNameResolver $entityNameResolver,
         MailboxManager $mailboxManager,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        FormFactoryInterface $formFactory,
+        FilterUtility $filterUtil
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->entityNameResolver        = $entityNameResolver;
         $this->mailboxManager            = $mailboxManager;
         $this->securityFacade            = $securityFacade;
+        $this->formFactory               = $formFactory;
+        $this->filterUtil                = $filterUtil;
     }
 
     /**
@@ -114,10 +134,15 @@ class EmailQueryFactory
      * )
      * OR (o3_.is_head = 1 AND o3_.thread_id is null)
      *
-     * @param QueryBuilder $qb
+     * @param QueryBuilder           $qb
+     * @param DatagridInterface|null $datagrid
+     * @param array                  $filters
      */
-    public function applyAclThreadsGrouping(QueryBuilder $qb)
-    {
+    public function applyAclThreadsGrouping(
+        QueryBuilder $qb,
+        $datagrid = null,
+        $filters = []
+    ) {
         $innerQb = $qb->getEntityManager()->createQueryBuilder();
         $innerQb
             ->select('MAX(u.id)')
@@ -131,15 +156,63 @@ class EmailQueryFactory
             )
             ->groupBy('m.thread');
 
-        $qb->andWhere(
-            $qb->expr()->orX(
-                $qb->expr()->in('eu.id', $innerQb->getDQL()),
-                $qb->expr()->andX(
-                    $qb->expr()->isNull('e.thread'),
-                    $qb->expr()->eq('e.head', 'TRUE')
+        $exprs = [
+            $qb->expr()->isNull('e.thread'),
+            $qb->expr()->eq('e.head', 'TRUE')
+        ];
+
+        $threadedExpressions = null;
+        $threadedExpressionsParameters = null;
+        if ($datagrid && $filters) {
+            list (
+                $threadedExpressions,
+                $threadedExpressionsParameters
+            ) = $this->prepareSearchFilters($datagrid, $filters, 'mm');
+        }
+
+        if ($threadedExpressions) {
+            $filterQb = $qb->getEntityManager()->createQueryBuilder();
+            $filterExpressions = call_user_func_array([$filterQb->expr(), 'andX'], $threadedExpressions);
+            $filterQb
+                ->select('IDENTITY(mm.thread)')
+                ->from('OroEmailBundle:EmailUser', 'uu')
+                ->innerJoin('OroEmailBundle:Email', 'mm', 'WITH', 'uu.email = mm.id')
+                ->where($filterExpressions);
+
+            list (
+                $notThreadedExpressions,
+                $notThreadedExpressionsParameters
+            ) = $this->prepareSearchFilters($datagrid, $filters, 'e');
+
+            $expression = call_user_func_array(
+                [$qb->expr(), 'andX'],
+                array_merge($exprs, $notThreadedExpressions)
+            );
+
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->andX(
+                        $qb->expr()->in('eu.id', $innerQb->getDQL()),
+                        $qb->expr()->in('e.thread', $filterQb->getDQL())
+                    ),
+                    $expression
                 )
-            )
-        );
+            );
+
+            /** @var Parameter[] $params */
+            $params = array_merge($threadedExpressionsParameters, $notThreadedExpressionsParameters);
+            foreach ($params as $param) {
+                $qb->setParameter($param->getName(), $param->getValue(), $param->getType());
+            }
+        } else {
+            $expression = call_user_func_array([$qb->expr(), 'andX'], $exprs);
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->in('eu.id', $innerQb->getDQL()),
+                    $expression
+                )
+            );
+        }
     }
 
     /**
@@ -186,6 +259,65 @@ class EmailQueryFactory
         }
 
         $qb->addSelect($selectExpression);
+    }
+
+    /**
+     * @param DatagridInterface $datagrid
+     * @param array             $filters
+     * @param string            $alias
+     *
+     * @return array
+     */
+    protected function prepareSearchFilters($datagrid, $filters, $alias = '')
+    {
+        $searchExpressions = null;
+        $searchExpressionsParameters = null;
+        $filterColumnsMap = [
+            'subject' => 'subject',
+            'from'    => 'fromName',
+        ];
+        $searchFilters = array_intersect_key(
+            $filters,
+            array_flip(array_keys($filterColumnsMap))
+        );
+
+        if ($searchFilters) {
+            /** @var OrmDatasource $ormDataSource */
+            $ormDataSource = $datagrid->getDatasource();
+            $queryBuilder = clone $ormDataSource->getQueryBuilder();
+
+            $parameters = $datagrid->getParameters();
+
+            $datagridConfig = $datagrid->getConfig();
+            $filterTypes = $datagridConfig->offsetGetByPath('[filters][columns]');
+
+            foreach ($searchFilters as $columnName => $filterData) {
+                $filterConfig = $filterTypes[$columnName];
+                $filterConfig['data_name'] = $alias
+                    ? sprintf('%s.%s', $alias, $filterColumnsMap[$columnName])
+                    : $filterConfig['data_name'];
+
+                $datasourceAdapter = new OrmFilterDatasourceAdapter($queryBuilder);
+                $mFilter = new EmailStringFilter($this->formFactory, $this->filterUtil);
+                $mFilter->init($columnName, $filterConfig);
+                $mFilter->apply($datasourceAdapter, $filterData);
+
+                $searchExpressions = $mFilter->getExpression();
+                $searchExpressionsParameters = $mFilter->getParameters();
+
+                unset($filters[$columnName]);
+                $parameters->set('_filter', $filters);
+            }
+        }
+
+        if (null !== $searchExpressions && !is_array($searchExpressions)) {
+            $searchExpressions = [$searchExpressions];
+        }
+
+        return [
+            $searchExpressions,
+            $searchExpressionsParameters
+        ];
     }
 
     /**

@@ -124,9 +124,7 @@ class View implements ViewInterface
     }
 
     /**
-     * Getter for name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {

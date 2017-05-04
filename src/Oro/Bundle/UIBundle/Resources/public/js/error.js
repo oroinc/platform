@@ -62,7 +62,7 @@ define([
         getErrorMessage: function(event, xhr, settings) {
             var errorMessage = true;
 
-            if (settings.errorHandlerMessage !== undefined) {
+            if (settings.errorHandlerMessage !== undefined && !this.isXHRStatus(xhr, 403)) {
                 errorMessage = settings.errorHandlerMessage;
                 if (_.isFunction(errorMessage)) {
                     errorMessage = errorMessage(event, xhr, settings);

@@ -9,7 +9,7 @@ use Gaufrette\Stream;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
-use Symfony\Component\HttpFoundation\File\File as SymfonyComponentFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileManager
 {
@@ -27,11 +27,11 @@ class FileManager
     /**
      * Saves the given file in a temporary directory and returns its name
      *
-     * @param SymfonyComponentFile $file
+     * @param UploadedFile $file
      *
      * @return string
      */
-    public function saveImportingFile(SymfonyComponentFile $file)
+    public function saveImportingFile(UploadedFile $file)
     {
         $tmpFileName = self::generateUniqueFileName($file->getClientOriginalExtension());
         $this->saveFileToStorage($file, $tmpFileName);
@@ -112,6 +112,14 @@ class FileManager
     public function writeFileToStorage($localFilePath, $fileName, $overwrite = false)
     {
         $this->filesystem->write($fileName, @file_get_contents($localFilePath, 'r'), $overwrite);
+    }
+
+    /**
+     * @return Filesystem
+     */
+    public function getFileSystem()
+    {
+        return $this->filesystem;
     }
 
     /**
@@ -196,5 +204,15 @@ class FileManager
         if ($file && $this->filesystem->has($file)) {
             $this->filesystem->delete($file);
         }
+    }
+
+    /**
+     * @param $fileName
+     *
+     * @return bool
+     */
+    public function isFileExist($fileName)
+    {
+        return $this->filesystem->has($fileName);
     }
 }

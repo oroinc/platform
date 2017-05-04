@@ -30,6 +30,11 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider finishViewAddOptionalGroupAttributeDataProvider
+     *
+     * @param FormView $view
+     * @param FormInterface $form
+     * @param array $options
+     * @param array $expectedAttributes
      */
     public function testFinishViewAddOptionalGroupAttribute(
         FormView $view,
@@ -39,7 +44,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
     ) {
         $this->constraintsProvider->expects($this->once())
             ->method('getFormConstraints')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
 
         $this->extension->finishView($view, $form, $options);
 
@@ -48,97 +53,102 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function finishViewAddOptionalGroupAttributeDataProvider()
     {
-        return array(
-            'not_optional_group_without_children' => array(
+        return [
+            'not_optional_group_without_children' => [
                 'view' => $this->createView(
-                    array(),
-                    array(),
+                    [],
+                    [],
                     $this->createView()
                 ),
                 'form' => $this->createForm(),
-                'options' => array(),
-                'expectedAttributes' => array()
-            ),
-            'not_optional_group_without_parent' => array(
+                'options' => [],
+                'expectedAttributes' => []
+            ],
+            'not_optional_group_without_parent' => [
                 'view' => $this->createView(
-                    array(),
-                    array($this->createView())
+                    [],
+                    [$this->createView()]
                 ),
                 'form' => $this->createForm(),
-                'options' => array(),
-                'expectedAttributes' => array()
-            ),
-            'not_optional_group_with_choices' => array(
+                'options' => [],
+                'expectedAttributes' => []
+            ],
+            'not_optional_group_with_choices' => [
                 'view' => $this->createView(
-                    array(),
-                    array($this->createView()),
+                    [],
+                    [$this->createView()],
                     $this->createView()
                 ),
                 'form' => $this->createForm(),
-                'options' => array(
-                    'choices' => array('1' => 'Yes', '0' => 'No')
-                ),
-                'expectedAttributes' => array()
-            ),
-            'not_optional_group_required' => array(
+                'options' => [
+                    'choices' => ['1' => 'Yes', '0' => 'No']
+                ],
+                'expectedAttributes' => []
+            ],
+            'not_optional_group_required' => [
                 'view' => $this->createView(
-                    array(),
-                    array($this->createView()),
+                    [],
+                    [$this->createView()],
                     $this->createView()
                 ),
                 'form' => $this->createForm(),
-                'options' => array(
+                'options' => [
                     'required' => true
-                ),
-                'expectedAttributes' => array()
-            ),
-            'not_optional_group_required_and_not_inherit_data' => array(
+                ],
+                'expectedAttributes' => []
+            ],
+            'not_optional_group_required_and_not_inherit_data' => [
                 'view' => $this->createView(
-                    array(),
-                    array($this->createView()),
+                    [],
+                    [$this->createView()],
                     $this->createView()
                 ),
                 'form' => $this->createForm(),
-                'options' => array(
+                'options' => [
                     'required' => true,
                     'inherit_data' => false
-                ),
-                'expectedAttributes' => array()
-            ),
-            'optional_group' => array(
+                ],
+                'expectedAttributes' => []
+            ],
+            'optional_group' => [
                 'view' => $this->createView(
-                    array(),
-                    array($this->createView()),
+                    [],
+                    [$this->createView()],
                     $this->createView()
                 ),
                 'form' => $this->createForm(),
-                'options' => array(
+                'options' => [
                     'required' => false
-                ),
-                'expectedAttributes' => array(
+                ],
+                'expectedAttributes' => [
                     'data-validation-optional-group' => null,
-                )
-            ),
-            'optional_group_required_but_inherit_data' => array(
+                ]
+            ],
+            'optional_group_required_but_inherit_data' => [
                 'view' => $this->createView(
-                    array(),
-                    array($this->createView()),
+                    [],
+                    [$this->createView()],
                     $this->createView()
                 ),
                 'form' => $this->createForm(),
-                'options' => array(
+                'options' => [
                     'required' => true,
                     'inherit_data' => true
-                ),
-                'expectedAttributes' => array(
+                ],
+                'expectedAttributes' => [
                     'data-validation-optional-group' => null,
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
     /**
      * @dataProvider finishViewAddDataValidationAttributeDataProvider
+     *
+     * @param FormView $view
+     * @param FormInterface $form
+     * @param array $expectedConstraints
+     * @param array $expectedAttributes
      */
     public function testFinishViewAddDataValidationAttribute(
         FormView $view,
@@ -150,7 +160,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFormConstraints')
             ->will($this->returnValue($expectedConstraints));
 
-        $this->extension->finishView($view, $form, array());
+        $this->extension->finishView($view, $form, []);
 
         $this->assertEquals($expectedAttributes, $view->vars['attr']);
     }
@@ -163,103 +173,134 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
     public function finishViewAddDataValidationAttributeDataProvider()
     {
         $constraintWithNestedData = new Constraints\NotNull();
-        $constraintWithNestedData->message = array(
+        $constraintWithNestedData->message = [
             'object' => new \stdClass(),
-            'array' => array(
+            'array' => [
                 'object' => new \stdClass(),
                 'integer' => 2,
-            ),
+            ],
             'integer' => 1,
-        );
+        ];
 
         $constraintWithCustomName = $this->createMock('Symfony\Component\Validator\Constraint');
         $constraintWithCustomName->foo = 1;
 
-        return array(
-            'set_nested_data' => array(
+        return [
+            'set_nested_data' => [
                 'view' => $this->createView(),
                 'form' => $this->createForm(),
-                'expectedConstraints' => array($constraintWithNestedData),
-                'expectedAttributes' => array(
+                'expectedConstraints' => [$constraintWithNestedData],
+                'expectedAttributes' => [
                     'data-validation' => '{"NotNull":{"message":{"array":{"integer":2},"integer":1},"payload":null}}'
-                )
-            ),
-            'set_custom_name' => array(
+                ]
+            ],
+            'set_custom_name' => [
                 'view' => $this->createView(),
                 'form' => $this->createForm(),
-                'expectedConstraints' => array($constraintWithCustomName),
-                'expectedAttributes' => array(
+                'expectedConstraints' => [$constraintWithCustomName],
+                'expectedAttributes' => [
                     'data-validation' => '{"' . get_class($constraintWithCustomName) . '":{"payload":null}}'
-                )
-            ),
-            'set_default' => array(
+                ]
+            ],
+            'set_default' => [
                 'view' => $this->createView(),
                 'form' => $this->createForm(),
-                'expectedConstraints' => array(new Constraints\NotBlank()),
-                'expectedAttributes' => array(
+                'expectedConstraints' => [new Constraints\NotBlank()],
+                'expectedAttributes' => [
                     'data-required'   => 1,
                     'data-validation' => '{"NotBlank":{"message":"This value should not be blank.","payload":null}}'
-                )
-            ),
-            'merge_with_array' => array(
+                ]
+            ],
+            'set_similar_constrains' => [
                 'view' => $this->createView(
-                    array(
-                        'attr' => array(
-                            'data-validation' => array(
-                                'NotNull' => array('NotNull' => array('message' => 'This value should not be null.'))
-                            )
-                        )
-                    )
+                    [
+                        'attr' => [
+                            'data-validation' => '{"NotNull":{"message":"This value should not be null."}}'
+                        ]
+                    ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => array(new Constraints\NotBlank()),
-                'expectedAttributes' => array(
+                'expectedConstraints' => [
+                    new Constraints\Regex([
+                        'pattern' => "/^[a-z]+[a-z]*$/i",
+                        'message' => "Value should start with a symbol and contain only alphabetic symbols"
+                    ]),
+                    new Constraints\Regex([
+                        'pattern' => "/^id$/i",
+                        'match' => false,
+                        'message' => "Value cannot be used as a field name."
+                    ]),
+                ],
+                'expectedAttributes' => [
+                    'data-validation' =>
+                        '{' .
+                        '"NotNull":{"message":"This value should not be null."},' .
+                        '"Regex":[{"message":"Value should start with a symbol and contain only alphabetic symbols",' .
+                        '"pattern":"\/^[a-z]+[a-z]*$\/i","htmlPattern":null,"match":true,"payload":null},' .
+                        '{"message":"Value cannot be used as a field name.",' .
+                        '"pattern":"\/^id$\/i","htmlPattern":null,"match":false,"payload":null}' .
+                        ']}',
+                ]
+            ],
+            'merge_with_array' => [
+                'view' => $this->createView(
+                    [
+                        'attr' => [
+                            'data-validation' => [
+                                'NotNull' => ['NotNull' => ['message' => 'This value should not be null.']]
+                            ]
+                        ]
+                    ]
+                ),
+                'form' => $this->createForm(),
+                'expectedConstraints' => [new Constraints\NotBlank()],
+                'expectedAttributes' => [
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"NotNull":{"message":"This value should not be null."}},' .
                         '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
                         '}',
                     'data-required'   => 1
-                )
-            ),
-            'merge_with_json_string' => array(
+                ]
+            ],
+            'merge_with_json_string' => [
                 'view' => $this->createView(
-                    array(
-                        'attr' => array(
+                    [
+                        'attr' => [
                             'data-validation' => '{"NotNull":{"message":"This value should not be null."}}'
-                        )
-                    )
+                        ]
+                    ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => array(new Constraints\NotBlank()),
-                'expectedAttributes' => array(
+                'expectedConstraints' => [new Constraints\NotBlank()],
+                'expectedAttributes' => [
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
                         '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
                         '}',
                     'data-required'   => 1
-                )
-            ),
-            'override_invalid_value' => array(
+                ]
+            ],
+            'override_invalid_value' => [
                 'view' => $this->createView(
-                    array(
-                        'attr' => array(
+                    [
+                        'attr' => [
                             'data-validation' => '{"NotNull":}',
-                        )
-                    )
+                        ]
+                    ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => array(
+                'expectedConstraints' => [
                     new Constraints\NotBlank()
-                ),
-                'expectedAttributes' => array(
+                ],
+                'expectedAttributes' => [
                     'data-validation' =>
                         '{"NotBlank":{"message":"This value should not be blank.","payload":null}}',
                     'data-required'   => 1
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
     /**
@@ -268,7 +309,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
      * @param FormView $parent
      * @return FormView
      */
-    protected function createView(array $vars = array(), array $children = array(), FormView $parent = null)
+    protected function createView(array $vars = [], array $children = [], FormView $parent = null)
     {
         $result = new FormView();
         $result->vars = array_merge_recursive($result->vars, $vars);

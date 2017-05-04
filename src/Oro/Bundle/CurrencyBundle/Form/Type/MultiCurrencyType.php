@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 
 class MultiCurrencyType extends PriceType
@@ -62,6 +63,8 @@ class MultiCurrencyType extends PriceType
                     'empty_value' => false
                 ]
             );
+
+        $builder->get('value')->addModelTransformer(new MoneyValueTransformer());
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,

@@ -667,11 +667,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllowedTransitions()
     {
-        $firstTransition = new Transition();
-        $firstTransition->setName('first_transition');
-
-        $secondTransition = new Transition();
-        $secondTransition->setName('second_transition');
+        $firstTransition = $this->getTransitionMock('first_transition');
+        $secondTransition = $this->getTransitionMock('second_transition');
 
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('test_step');

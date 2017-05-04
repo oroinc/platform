@@ -125,7 +125,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
 
         // run removing of empty outdated folders every N synchronizations
-        if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
+        if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN === 0) {
             $this->removeManager->cleanupOutdatedFolders($origin);
         }
     }
@@ -330,6 +330,17 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function entitiesToClear()
+    {
+        return array_merge(
+            parent::entitiesToClear(),
+            ['Oro\Bundle\ImapBundle\Entity\ImapEmail']
+        );
+    }
+
+    /**
      * Check allowing to save email by date
      *
      * @param EmailFolder $folder
@@ -341,8 +352,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function checkOnOldEmailForMailbox(EmailFolder $folder, Email $email, $mailbox)
     {
         /**
-         * @description Will select max of those dates because emails in folder `sent` could have no received date
-         *              or same date.
+         * Will select max of those dates because emails in folder "sent" could have no received date
+         * or same date.
          */
         $dateForCheck = max($email->getReceivedAt(), $email->getSentAt());
 
@@ -561,6 +572,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * The outdated folders are ignored
      *
      * @param EmailOrigin $origin
+     * @param bool        $sortByFailedCount
      *
      * @return ImapEmailFolder[]
      */

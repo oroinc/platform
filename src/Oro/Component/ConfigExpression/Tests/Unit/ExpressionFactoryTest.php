@@ -93,7 +93,7 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('test')
             ->will($this->returnValue($expr));
 
-        $this->assertSame(
+        $this->assertNotSame(
             $expr,
             $this->factory->create('test', $options)
         );
@@ -122,7 +122,7 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('test')
             ->will($this->returnValue($expr));
 
-        $this->assertSame(
+        $this->assertNotSame(
             $expr,
             $this->factory->create('test', $options)
         );

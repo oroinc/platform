@@ -4,6 +4,8 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LocaleBundle\Model\Calendar;
 
+use Symfony\Component\Intl\Util\IntlTestHelper;
+
 class CalendarTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -18,6 +20,8 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        IntlTestHelper::requireIntl($this);
+
         $this->calendar = new Calendar();
         $this->defaultLocale = \Locale::getDefault();
     }

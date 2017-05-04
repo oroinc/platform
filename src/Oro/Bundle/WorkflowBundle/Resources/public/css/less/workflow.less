@@ -125,7 +125,6 @@ table.grid {
       min-height: 1px;
       position: relative;
       margin-right: 4px;
-      text-transform: capitalize;
     }
   }
 }
@@ -445,6 +444,11 @@ table.grid {
   width: 2%;
   padding: 0 0 0 10px;
   text-align: right;
+  .workflow-transition-buttons {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+  }
 }
 
 .workflow-collapse {
@@ -513,6 +517,12 @@ table.grid {
       word-break: break-all;
     }
   }
+}
+
+.transition-example-container .transition-btn-example .btn {
+  max-width: 294px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* mobile version */

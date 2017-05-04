@@ -161,4 +161,12 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
             $time -= 0.25;
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getProcess()
+    {
+        return $this->process;
+    }
 }
