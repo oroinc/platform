@@ -58,8 +58,12 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
                 'attribute.attribute2.label' => 'workflow4.attribute2.label.value',
                 'transition.transition1.label' => 'workflow4.transition1.label.value',
                 'transition.transition1.warning_message' => 'workflow4.transition1.message.value',
+                'transition.transition1.button_label' => 'workflow4.transition1.button_label.value',
+                'transition.transition1.button_title' => 'workflow4.transition1.button_title.value',
                 'transition.transition2.label' => 'workflow4.transition2.label.value',
                 'transition.transition2.warning_message' => 'workflow4.transition2.message.value',
+                'transition.transition2.button_label' => 'workflow4.transition2.button_label.value',
+                'transition.transition2.button_title' => 'workflow4.transition2.button_title.value',
             ],
         ],
     ];
