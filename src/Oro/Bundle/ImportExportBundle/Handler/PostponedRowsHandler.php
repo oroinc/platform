@@ -77,6 +77,9 @@ class PostponedRowsHandler
         $writerContext = new Context(['filePath' => $filePath]);
         /** @var FileStreamWriter $writer */
         $writer = $this->writerChain->getWriter($extension);
+        if (!$writer instanceof FileStreamWriter) {
+            $writer = $this->writerChain->getWriter('csv');
+        }
         $writer->setImportExportContext($writerContext);
         $writer->write($rows);
         $writer->close();
