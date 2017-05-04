@@ -120,14 +120,14 @@ define(function(require) {
                 refreshAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
-                        className: 'btn',
+                        className: 'btn refresh-action',
                         iconClassName: 'fa-repeat'
                     }
                 },
                 resetAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
-                        className: 'btn',
+                        className: 'btn reset-action',
                         iconClassName: 'fa-refresh'
                     }
                 }

@@ -205,26 +205,14 @@ operations:
                 attribute: $.isDefaultLanguage
         actions:
             - '@call_service_method':
-                service: oro_translation.helper.language
-                method: downloadLanguageFile
-                method_parameters: [$.language_code]
-                attribute: $.fileDir
-            - '@run_action_group':
-                action_group: oro_translation_language_load_translations
-                parameters_mapping:
-                    code: $.language_code
-                    fileDir: $.fileDir
-                results:
-                    installed: $.installed
+                service: oro_translation.provider.external_translations
+                method: updateTranslations
+                method_parameters: [$.data]
+                attribute: $.installed
             - '@tree':
                 conditions:
                     '@equal': [$.installed, true]
                 actions:
-                    - '@run_action_group':
-                        action_group: oro_translation_language_update_build_date
-                        parameters_mapping:
-                            code: $.language_code
-                            date: '$.stat[lastBuildDate]'
                     - '@flash_message':
                         message: $.successMessage
                         type: 'success'
@@ -369,38 +357,6 @@ action_groups:
         actions:
             - '@assign_value': [$.data.enabled, $.value]
             - '@flush_entity': $.data
-
-    oro_translation_language_load_translations:
-        parameters:
-            code:
-                type: string
-            fileDir:
-                type: string
-        acl_resource: oro_translation_translation_update
-        conditions:
-            '@not_empty': [$.fileDir]
-        actions:
-            - '@call_service_method':
-                service: oro_translation.service_provider
-                method: loadTranslatesFromFile
-                method_parameters: [$.fileDir, $.code]
-                attribute: $.installed
-
-    oro_translation_language_update_build_date:
-        parameters:
-            code:
-                type: string
-            date:
-                type: datetime
-        acl_resource: oro_translation_translation_update
-        actions:
-            - '@find_entity':
-                class: 'Oro\Bundle\TranslationBundle\Entity\Language'
-                where:
-                    code: $.code
-                attribute: $.language
-            - '@assign_value': [$.language.installedBuildDate, $.date]
-            - '@flush_entity': $.language
 
     oro_translation_language_update_cache_message:
         acl_resource: oro_translation_translation_update

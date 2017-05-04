@@ -1,16 +1,17 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Entity;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="test_person")
+ * @ORM\Table(name="test_api_person")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({
- *     "employee" = "Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee"
+ *     "employee" = "Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee"
  * })
  */
 abstract class TestPerson implements TestFrameworkEntityInterface
@@ -35,7 +36,7 @@ abstract class TestPerson implements TestFrameworkEntityInterface
      * @var TestDepartment|null
      *
      * @ORM\ManyToOne(
-     *     targetEntity="Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment",
+     *     targetEntity="Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment",
      *     inversedBy="staff"
      * )
      * @ORM\JoinColumn(name="department_id", referencedColumnName="id"),

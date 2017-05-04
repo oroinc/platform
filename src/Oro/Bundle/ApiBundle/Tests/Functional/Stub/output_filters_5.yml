@@ -1,31 +1,31 @@
 data:
-  0:
-    type: users
-    id: "1"
+  -
+    type: 'users'
+    id: '1'
     attributes:
-      username: "TestUsername_7"
-  1:
-    type: users
-    id: "1"
+      username: 'TestUsername_7'
+  -
+    type: 'users'
+    id: '1'
     attributes:
-      username: "TestUsername_8"
-  2:
-    type: users
-    id: "1"
+      username: 'TestUsername_8'
+  -
+    type: 'users'
+    id: '1'
     attributes:
-      username: "TestUsername_9"
-  3:
-    type: users
-    id: "1"
+      username: 'TestUsername_9'
+  -
+    type: 'users'
+    id: '1'
     attributes:
-      username: "TestUsername_4"
-  4:
-    type: users
-    id: "1"
+      username: 'TestUsername_4'
+  -
+    type: 'users'
+    id: '1'
     attributes:
-      username: "TestUsername_5"
-  5:
-    type: users
-    id: "1"
+      username: 'TestUsername_5'
+  -
+    type: 'users'
+    id: '1'
     attributes:
-      username: "TestUsername_6"
+      username: 'TestUsername_6'

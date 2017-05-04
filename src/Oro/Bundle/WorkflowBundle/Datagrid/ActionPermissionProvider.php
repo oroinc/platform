@@ -39,7 +39,7 @@ class ActionPermissionProvider
             'clone'      => true,
             'deactivate' => $isFeatureEnabled && $isActiveWorkflow,
             'delete'     => !$isSystem,
-            'update'     => $isFeatureEnabled && !$isSystem,
+            'update'     => $isFeatureEnabled && !$isSystem && !$isActiveWorkflow,
             'view'       => true,
         );
     }
