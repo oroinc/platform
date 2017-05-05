@@ -8,6 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\EventListener\CreateListener;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -51,6 +52,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )

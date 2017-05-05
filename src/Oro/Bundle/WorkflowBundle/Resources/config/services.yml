@@ -375,6 +375,11 @@ services:
             - '@oro_translation.manager.translation'
             - '@oro_translation.helper.translation'
 
+    oro_workflow.translation.transition_translation_helper:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper'
+        arguments:
+            - '@translator.default'
+
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         arguments:
@@ -437,6 +442,13 @@ services:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 120 }
+
+    oro_workflow.event_listener.button_provider.process_buttons_static_translations:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\ProcessButtonsStaticTranslations'
+        arguments:
+            - '@oro_workflow.translation.transition_translation_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_action.button_provider.on_buttons_matched, method: processButtons }
 
     oro_workflow.translation.key_template_parameters_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'

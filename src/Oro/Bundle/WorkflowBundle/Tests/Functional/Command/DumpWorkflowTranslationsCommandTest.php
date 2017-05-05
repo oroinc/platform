@@ -65,10 +65,14 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
                                 'transition1' => [
                                     'label' => 'workflow4.transition1.label.value',
                                     'warning_message' => 'workflow4.transition1.message.value',
+                                    'button_label' => 'workflow4.transition1.button_label.value',
+                                    'button_title' => 'workflow4.transition1.button_title.value',
                                 ],
                                 'transition2' => [
                                     'label' => 'workflow4.transition2.label.value',
                                     'warning_message' => 'workflow4.transition2.message.value',
+                                    'button_label' => 'workflow4.transition2.button_label.value',
+                                    'button_title' => 'workflow4.transition2.button_title.value',
                                 ],
                             ],
                         ],

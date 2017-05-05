@@ -1,0 +1,7 @@
+services:
+   oro_currency.importexport.normalizer.multicurrency:
+       class: Oro\Bundle\CurrencyBundle\ImportExport\Serializer\Normalizer\MultiCurrencyNormalizer
+       arguments:
+           - '@oro_locale.formatter.number'
+       tags:
+           - { name: oro_importexport.normalizer }

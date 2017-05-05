@@ -37,6 +37,8 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             $this->transition,
             [
                 ['name', 'test'],
+                ['buttonLabel', 'test_button_label'],
+                ['buttonTitle', 'test_button_title'],
                 ['hidden', true, false],
                 ['start', true, false],
                 ['unavailableHidden', true],
@@ -387,6 +389,14 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->transition->hasForm());
 
         $this->transition->setFormOptions(['configuration' => ['key' => 'value']]);
+        $this->assertTrue($this->transition->hasForm());
+    }
+
+    public function testHasFormForPage()
+    {
+        $this->assertFalse($this->transition->hasForm()); // by default transition has form
+
+        $this->transition->setDisplayType('page');
         $this->assertTrue($this->transition->hasForm());
     }
 

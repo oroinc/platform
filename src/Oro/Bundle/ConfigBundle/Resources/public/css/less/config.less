@@ -1,5 +1,28 @@
 @import "oroui/css/less/mixins";
 
+.left-panel-container {
+  background-color: white;
+  & > .placeholder {
+    margin-left: 334px;
+    background-color: #f1f1f1;
+    border-left: 1px solid #e2e2e2;
+    & > * {
+      margin-left: -335px;
+      & > .left-panel {
+        float: left;
+        width: 334px;
+        border-top: 1px solid #f2f2f2;
+        margin: 0;
+      }
+      & > .content {
+        margin-left: 335px;
+        padding: 15px 15px 0;
+        .box-sizing(border-box);
+      }
+    }
+  }
+}
+
 .system-configuration-container {
   .controls.control-subgroup {
     width: auto;

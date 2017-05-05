@@ -10,6 +10,7 @@ ActionBundle
     - changed signature of method `protected function getRowConfigurationClosure(DatagridConfiguration $configuration, ButtonSearchContext $context)`
     - added second argument `ButtonSearchContext $context` to method `protected function applyActionsConfig()`
     - added second argument `ButtonSearchContext $context` to method `protected function processMassActionsConfig()`
+    - added dependency on `Symfony\Component\EventDispatcher\EventDispatcherInterface` that should be injected to service by `public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)`
 - Service `oro_action.datagrid.event_listener.button` now has name `oro_action.datagrid.action.button_provider` and registered through the tag `oro_datagrid.extension.action.provider`
 - Added `Oro\Bundle\ActionBundle\Model\AbstractGuesser`:
     - defined as abstract service `oro_action.abstract_guesser` with arguments `@form.registry, @doctrine, @oro_entity_config.provider.entity, @oro_entity_config.provider.form`
