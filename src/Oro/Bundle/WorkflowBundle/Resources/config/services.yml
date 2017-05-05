@@ -555,4 +555,3 @@ services:
         arguments:
             - '@oro_workflow.registry.system'
             - '@oro_workflow.helper.translation'
-

@@ -25,13 +25,14 @@ class WorkflowNotificationHandlerTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures([
-            LoadWorkflowEmailNotifications::class,
-        ]);
+        $this->loadFixtures([LoadWorkflowEmailNotifications::class]);
 
         $this->getWorkflowManager()->activateWorkflow(
             $this->getWorkflow()->getName()
         );
+
+        $this->notificationHandler = $this->createMock(WorkflowNotificationHandler::class);
+
         $this->replaceNotificationManager();
     }
 
@@ -86,8 +87,10 @@ class WorkflowNotificationHandlerTest extends WebTestCase
     {
         $testEntity = new WorkflowAwareEntity();
         $testEntity->setName('test_' . uniqid('test', true));
-        $this->getManager(WorkflowAwareEntity::class)->persist($testEntity);
-        $this->getManager(WorkflowAwareEntity::class)->flush($testEntity);
+
+        $manager = $this->getManager(WorkflowAwareEntity::class);
+        $manager->persist($testEntity);
+        $manager->flush($testEntity);
 
         return $testEntity;
     }
@@ -120,15 +123,12 @@ class WorkflowNotificationHandlerTest extends WebTestCase
 
     private function replaceNotificationManager()
     {
-        $notificationManager = new NotificationManager(
-            $this->client->getContainer()->get('doctrine.orm.entity_manager'),
-            EmailNotification::class
-        );
+        $manager = $this->getManager(EmailNotification::class);
 
-        $this->notificationHandler = $this->createMock(WorkflowNotificationHandler::class);
+        $notificationManager = new NotificationManager($manager, EmailNotification::class);
         $notificationManager->addHandler($this->notificationHandler);
 
-        $this->client->getContainer()->set('oro_notification.manager', $notificationManager);
+        $this->getContainer()->set('oro_notification.manager', $notificationManager);
     }
 
     /**

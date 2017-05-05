@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\TestFrameworkBundle\Model\WorkflowAwareEntityExtend;
 
 /**
  * @ORM\Table(name="test_workflow_aware_entity")
@@ -18,7 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Model\WorkflowAwareEntityExtend;
  *      routeDelete="oro_test_wfa_delete"
  * )
  */
-class WorkflowAwareEntity extends WorkflowAwareEntityExtend implements TestFrameworkEntityInterface
+class WorkflowAwareEntity implements TestFrameworkEntityInterface
 {
     /**
      * @var integer $id
