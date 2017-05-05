@@ -55,12 +55,9 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      */
     public function write(array $items)
     {
-        $this->createPHPExcelObject();
-
         $writeArray = [];
-
         // write a header if needed
-        if ($this->firstLineIsHeader) {
+        if ($this->firstLineIsHeader && ! $this->excelObj) {
             if (!$this->header && count($items) > 0) {
                 $this->header = array_keys($items[0]);
             }
@@ -69,6 +66,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
             }
         }
 
+        $this->createPHPExcelObject();
         $writeArray = array_merge($writeArray, $items);
         $sheet = $this->excelObj->getActiveSheet();
         $highestRow = $sheet->getHighestRow();
