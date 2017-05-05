@@ -4,22 +4,29 @@ namespace Oro\Bundle\WorkflowBundle\Processor\Tests\Unit\Transition\Layout;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutPageResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutPageDataStartTransitionProcessor;
+use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
 class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var TransitionTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $helper;
+
     /** @var LayoutPageDataStartTransitionProcessor */
     protected $processor;
 
     protected function setUp()
     {
-        $this->processor = new LayoutPageDataStartTransitionProcessor;
+        $this->helper = $this->createMock(TransitionTranslationHelper::class);
+
+        $this->processor = new LayoutPageDataStartTransitionProcessor($this->helper);
     }
 
     public function testResultData()
@@ -27,6 +34,10 @@ class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit_Framework_Test
         /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+
+        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->once())->method('getLabel')->willReturn('workflow.label');
 
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->createMock(Transition::class);
@@ -43,16 +54,19 @@ class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit_Framework_Test
         $context->setWorkflowItem($workflowItem);
         $context->setWorkflowName('workflowName');
         $context->setTransition($transition);
+        $context->setWorkflow($workflow);
         $context->setTransitionName('transitionName');
         $context->setRequest($request);
         $context->setForm($form);
         $context->setResultType(new LayoutPageResultType('route_name'));
 
+        $this->helper->expects($this->once())->method('processTransitionTranslations')->with($transition);
+
         $this->processor->process($context);
 
         $this->assertSame(
             [
-                'workflowName' => 'workflowName',
+                'workflowName' => 'workflow.label',
                 'transitionName' => 'transitionName',
                 'data' => [
                     'transitionFormView' => $formView,

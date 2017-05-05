@@ -31,8 +31,6 @@ class NullDriver implements DriverInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return NullMessage
      */
     public function createTransportMessage()
     {

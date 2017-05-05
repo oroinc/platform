@@ -29,6 +29,8 @@ services:
     # RESULT: form open (saved: false), layout page start transition data
     oro_workflow.start_transit.layout_page.result_data.processor:
         class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutPageDataStartTransitionProcessor
+        arguments:
+            - '@oro_workflow.translation.transition_translation_helper'
         tags:
             -
                 name: oro_workflow.processor
@@ -42,6 +44,8 @@ services:
     # RESULT: form open (saved: false), layout page regular transition data
     oro_workflow.transit.layout_page_data.transition.processor:
         class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutPageDataTransitionProcessor
+        arguments:
+            - '@oro_workflow.translation.transition_translation_helper'
         tags:
             -
                 name: oro_workflow.processor

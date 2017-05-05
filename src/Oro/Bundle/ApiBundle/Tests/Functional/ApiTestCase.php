@@ -316,4 +316,12 @@ abstract class ApiTestCase extends WebTestCase
     {
         return $headers->contains('Content-Type', 'application/json');
     }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getManager();
+    }
 }
