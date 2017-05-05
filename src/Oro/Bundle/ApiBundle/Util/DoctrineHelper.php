@@ -35,12 +35,12 @@ class DoctrineHelper extends BaseHelper
     /**
      * Gets the ORM metadata descriptor for target entity class of the given child association.
      *
-     * @param string   $entityClass
-     * @param string[] $associationPath
+     * @param string          $entityClass
+     * @param string[]|string $associationPath
      *
      * @return ClassMetadata|null
      */
-    public function findEntityMetadataByPath($entityClass, array $associationPath)
+    public function findEntityMetadataByPath($entityClass, $associationPath)
     {
         $manager = $this->registry->getManagerForClass($entityClass);
         if (null === $manager) {
@@ -49,6 +49,9 @@ class DoctrineHelper extends BaseHelper
 
         $metadata = $manager->getClassMetadata($entityClass);
         if (null !== $metadata) {
+            if (!is_array($associationPath)) {
+                $associationPath = explode('.', $associationPath);
+            }
             foreach ($associationPath as $associationName) {
                 if (!$metadata->hasAssociation($associationName)) {
                     $metadata = null;

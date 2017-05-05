@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ExpandedAssociationExtractor
 {
@@ -22,6 +23,47 @@ class ExpandedAssociationExtractor
         foreach ($fields as $fieldName => $field) {
             if (!$field->isExcluded() && $this->isExpandedAssociation($field)) {
                 $result[$fieldName] = $field;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns an array contains all fields requested to be expanded.
+     *
+     * @param EntityDefinitionConfig $config
+     * @param string[]               $pathsToExpand [path, ...]
+     *
+     * @return array [field name => [path, ...], ...]
+     */
+    public function getFirstLevelOfExpandedAssociations(EntityDefinitionConfig $config, array $pathsToExpand)
+    {
+        $result = [];
+        if (!empty($pathsToExpand)) {
+            foreach ($pathsToExpand as $path) {
+                $firstDelimiter = strpos($path, ConfigUtil::PATH_DELIMITER);
+                if (false !== $firstDelimiter) {
+                    $result[substr($path, 0, $firstDelimiter)][] = substr($path, $firstDelimiter + 1);
+                    continue;
+                }
+
+                $field = $config->getField($path);
+                if (null === $field) {
+                    continue;
+                }
+
+                $propertyPath = $field->getPropertyPath();
+                if (!$propertyPath) {
+                    continue;
+                }
+
+                $firstDelimiter = strpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+                if (false === $firstDelimiter) {
+                    continue;
+                }
+
+                $result[substr($propertyPath, 0, $firstDelimiter)][] = substr($propertyPath, $firstDelimiter + 1);
             }
         }
 
