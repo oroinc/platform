@@ -181,7 +181,7 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                     $array[$key] = null;
                 }
             }
-            if (in_array(strtolower($key), ['label', 'message'], true)) {
+            if (in_array(strtolower($key), ['label', 'message', 'button_label', 'button_title'], true)) {
                 unset($array[$key]);
             }
         }

@@ -7,6 +7,8 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionButtonLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionButtonTitleTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
@@ -65,6 +67,8 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
             foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionKey => &$transition) {
                 $context['transition_name'] = $this->resolveName($transition, $transitionKey);
                 yield $this->makeKey(TransitionLabelTemplate::class, $context) => $transition['label'];
+                yield $this->makeKey(TransitionButtonLabelTemplate::class, $context) => $transition['button_label'];
+                yield $this->makeKey(TransitionButtonTitleTemplate::class, $context) => $transition['button_title'];
                 yield $this->makeKey(TransitionWarningMessageTemplate::class, $context) => $transition['message'];
 
                 $attributeFields = $this->transitionAttributeFields($transition, $context);

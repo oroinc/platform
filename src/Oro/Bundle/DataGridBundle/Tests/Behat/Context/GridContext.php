@@ -617,10 +617,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And click view Charlie in grid
      * Example: When I click edit Call to Jennyfer in grid
      * Example: And I click delete Sign a contract with Charlie in grid
+     * Example: And I click "Delete Current User" on row "John" in grid
      *
      * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) "(?P<content>(.+))" in grid$/
-     * @Given /^(?:|I )click "(?P<action>(?:[^"]|\\")*)" on "(?P<content>(.+))" in grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid$/
      */
     public function clickActionInRow($content, $action)
     {
