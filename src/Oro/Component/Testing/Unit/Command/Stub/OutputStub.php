@@ -14,7 +14,7 @@ class OutputStub extends Output
     /**
      * @var string
      */
-    private $output;
+    private $output = '';
 
     /**
      * {@inheritdoc}

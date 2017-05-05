@@ -98,7 +98,7 @@ class InputStub implements InputInterface
      */
     public function getOptions()
     {
-        return $this-$this->options;
+        return $this->options;
     }
 
     /**
@@ -106,6 +106,11 @@ class InputStub implements InputInterface
      */
     public function getOption($name)
     {
+        if (isset($this->options[$name])) {
+            return $this->options[$name];
+        }
+
+        return null;
     }
 
     /**

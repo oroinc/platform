@@ -13,6 +13,7 @@ use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
@@ -99,6 +100,15 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->info(
                         "Suites that applicable for application.\n".
                         'This suites will be run with --applicable-suites key in console'
+                    )
+                    ->defaultValue([])
+                ->end()
+                ->arrayNode('suite_groups')
+                    ->prototype('scalar')->end()
+                    ->info(
+                        "Grouped suites\n".
+                        "This suites can be returned by --available-suites-group option with group name value.\n".
+                        'There is also special "'.AvailableSuitesGroupController::UNGROUPED_GROUP.'" group'
                     )
                     ->defaultValue([])
                 ->end()
