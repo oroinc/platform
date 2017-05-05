@@ -1,3 +1,4 @@
+@ticket-BAP-13725
 Feature: Unidirectional entity relations created via UI
   In order to create custom relation between entities
   As an Administrator

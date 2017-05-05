@@ -35,6 +35,14 @@ class Grid extends Table
         $massActionLink->click();
     }
 
+    public function clickViewList()
+    {
+        $list = $this->getViewList();
+
+        self::assertTrue($list->isValid(), 'Grid view list not found on the page');
+        $list->press();
+    }
+
     /**
      * @param int $number
      * @param int $cellNumber
@@ -144,29 +152,15 @@ class Grid extends Table
     public function clickActionLink($content, $action)
     {
         $row = $this->getRowByContent($content);
-        $link = $this->getActionLink($action, $row);
+        $link = $row->getActionLink($action);
         $link->click();
     }
 
     /**
-     * @param $action
-     * @param NodeElement $row
      * @return NodeElement
-     * @throws ElementNotFoundException
      */
-    public function getActionLink($action, NodeElement $row)
+    public function getViewList()
     {
-        if ($showMoreLink = $row->find('named', ['link', '...'])) {
-            $showMoreLink->mouseOver();
-            $link = $this->elementFactory
-                ->createElement('GridFloatingMenu')
-                ->find('named', ['link', ucfirst($action)]);
-        } else {
-            $link = $row->find('named', ['link', ucfirst($action)]);
-        }
-
-        self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $row->getText(), $action));
-
-        return $link;
+        return $this->getElement('GridViewList');
     }
 }

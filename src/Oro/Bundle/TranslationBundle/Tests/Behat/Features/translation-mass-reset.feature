@@ -1,3 +1,5 @@
+@ticket-BAP-14097
+@automatically-ticket-tagged
 Feature: Mass reset translations
   Scenario: Reset several translations
     Given I login as administrator

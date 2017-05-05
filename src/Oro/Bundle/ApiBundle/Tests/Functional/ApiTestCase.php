@@ -10,11 +10,11 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Parser;
 
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
-use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ApiTestCase extends WebTestCase
@@ -61,15 +61,17 @@ abstract class ApiTestCase extends WebTestCase
 
     /**
      * @param string $entityClass
+     * @param bool   $throwException
      *
      * @return string
      */
-    protected function getEntityType($entityClass)
+    protected function getEntityType($entityClass, $throwException = true)
     {
-        return $this->valueNormalizer->normalizeValue(
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
             $entityClass,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
+            $this->getRequestType(),
+            $throwException
         );
     }
 
@@ -313,5 +315,13 @@ abstract class ApiTestCase extends WebTestCase
     protected static function isApplicableContentType(ResponseHeaderBag $headers)
     {
         return $headers->contains('Content-Type', 'application/json');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getManager();
     }
 }

@@ -7,7 +7,6 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
@@ -37,20 +36,6 @@ class FeatureContext extends OroFeatureContext implements
     public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
     {
         $this->messageQueueIsolator = $messageQueueIsolator;
-    }
-
-    /**
-     * This step used for system configuration field
-     * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use Default for "Position" field
-     *
-     * @Given uncheck Use Default for :label field
-     */
-    public function uncheckUseDefaultForField($label)
-    {
-        /** @var SystemConfigForm $form */
-        $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label);
     }
 
     /**

@@ -19,6 +19,8 @@ define(function(require) {
 
         events: {
             'change [name=label]': 'updateExampleView',
+            'change [name=button_label]': 'updateExampleView',
+            'change [name=button_title]': 'updateExampleView',
             'change [name$="[transition_prototype_icon]"]': 'updateExampleView',
             'change [name=button_color]': 'updateExampleView',
             'change [name=display_type]': 'updateDestinationPageView'
@@ -29,9 +31,10 @@ define(function(require) {
             workflow: null,
             step_from: null,
             entity_select_el: null,
-            button_example_template: '<button type="button" class="btn <%- button_color %>">' +
+            button_example_template: '<button type="button" class="btn <%- button_color %>" ' +
+                'title="<%- button_title %>">' +
                 '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"/> <% } %>' +
-                '<%- label %></button>',
+                '<%- button_label %></button>',
             allowed_button_styles: [
                 {
                     'label': __('Gray button'),
@@ -103,9 +106,11 @@ define(function(require) {
 
         updateExampleView: function() {
             var formData = helper.getFormData(this.widget.form);
-            formData.transition_prototype_icon = formData.transition_prototype_icon ||
-                this._getFrontendOption('icon');
-            if (formData.transition_prototype_icon || formData.label) {
+            formData.transition_prototype_icon = formData.transition_prototype_icon || this._getFrontendOption('icon');
+            formData.button_label = formData.button_label || formData.label;
+            formData.button_title = formData.button_title || formData.button_label;
+
+            if (formData.transition_prototype_icon || formData.button_label || formData.button_title) {
                 this.$exampleBtnContainer.html(
                     this.button_example_template(formData)
                 );
@@ -118,6 +123,8 @@ define(function(require) {
                 this.model.set('name', helper.getNameByString(formData.label, 'transition_'));
             }
             this.model.set('label', formData.label);
+            this.model.set('button_label', formData.button_label);
+            this.model.set('button_title', formData.button_title);
             this.model.set('step_to', formData.step_to);
             this.model.set('display_type', formData.display_type);
             this.model.set('destination_page', formData.destination_page);

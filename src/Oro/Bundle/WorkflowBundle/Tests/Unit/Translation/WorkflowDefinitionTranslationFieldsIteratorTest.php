@@ -34,6 +34,8 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 'transitions' => [
                     'transition_1' => [
                         'label' => 'transition_1_label',
+                        'button_label' => 'transition_1_button_label',
+                        'button_title' => 'transition_1_button_title',
                         'message' => 'transition_1_message',
                         'form_options' => [
                             'attribute_fields' => [
@@ -92,7 +94,9 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                     'oro.workflow.test_workflow.step.step_1.label' => 'step_1_label',
                     'oro.workflow.test_workflow.step.step_2.label' => 'step_2_label',
                     'oro.workflow.test_workflow.attribute.attribute_1.label' => 'attribute_1_label',
-                    'oro.workflow.test_workflow.variable.var1.label' => 'my_var'
+                    'oro.workflow.test_workflow.variable.var1.label' => 'my_var',
+                    'oro.workflow.test_workflow.transition.transition_1.button_label' => 'transition_1_button_label',
+                    'oro.workflow.test_workflow.transition.transition_1.button_title' => 'transition_1_button_title'
                 ]
             ],
             'with lacks' => [
@@ -104,7 +108,9 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                     'oro.workflow.test_workflow.step.step_2.label' => null,
                     'oro.workflow.test_workflow.attribute.attribute_1.label' => null,
                     'oro.workflow.test_workflow.transition.transition_1.warning_message' => null,
-                    'oro.workflow.test_workflow.variable.var1.label' => null
+                    'oro.workflow.test_workflow.variable.var1.label' => null,
+                    'oro.workflow.test_workflow.transition.transition_1.button_label' => null,
+                    'oro.workflow.test_workflow.transition.transition_1.button_title' => null
                 ]
             ]
         ];
@@ -156,6 +162,8 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 'transitions' => [
                     'transition_1' => [
                         'label' => 'transition_1_label',
+                        'button_label' => 'transition_1_button_label',
+                        'button_title' => 'transition_1_button_title',
                         'message' => 'transition_1_message',
                         'form_options' => [
                             'attribute_fields' => [
@@ -201,6 +209,8 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 'transitions' => [
                     'transition_1' => [
                         'label' => '*modified*transition_1_label',
+                        'button_label' => '*modified*transition_1_button_label',
+                        'button_title' => '*modified*transition_1_button_title',
                         'message' => '*modified*transition_1_message',
                         'form_options' => [
                             'attribute_fields' => [
@@ -236,10 +246,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
             ]
         );
 
-        return [
-            'actual' => $caseNormalActual,
-            'expected' => $caseNormalExpected
-        ];
+        return ['actual' => $caseNormalActual, 'expected' => $caseNormalExpected];
     }
 
     /**
@@ -292,6 +299,8 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 'transitions' => [
                     'transition_1' => [
                         'label' => '*modified*',
+                        'button_label' => '*modified*',
+                        'button_title' => '*modified*',
                         'message' => '*modified*',
                         'form_options' => [
                             'attribute_fields' => [

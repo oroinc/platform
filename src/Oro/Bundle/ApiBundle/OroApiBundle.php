@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle;
 
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,5 +57,14 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(
             new ApiSecurityFirewallCompilerPass()
         );
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(
+                DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                    ['Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity'],
+                    [$this->getPath() . '/Tests/Functional/Environment/Entity']
+                )
+            );
+        }
     }
 }

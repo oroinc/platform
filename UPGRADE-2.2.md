@@ -10,6 +10,7 @@ ActionBundle
     - changed signature of method `protected function getRowConfigurationClosure(DatagridConfiguration $configuration, ButtonSearchContext $context)`
     - added second argument `ButtonSearchContext $context` to method `protected function applyActionsConfig()`
     - added second argument `ButtonSearchContext $context` to method `protected function processMassActionsConfig()`
+    - added dependency on `Symfony\Component\EventDispatcher\EventDispatcherInterface` that should be injected to service by `public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)`
 - Service `oro_action.datagrid.event_listener.button` now has name `oro_action.datagrid.action.button_provider` and registered through the tag `oro_datagrid.extension.action.provider`
 - Added `Oro\Bundle\ActionBundle\Model\AbstractGuesser`:
     - defined as abstract service `oro_action.abstract_guesser` with arguments `@form.registry, @doctrine, @oro_entity_config.provider.entity, @oro_entity_config.provider.form`
@@ -93,7 +94,7 @@ DataGridBundle
         - first argument of method `protected funtion onSuccess()` from `GridView $entity` to `AbstractGridView $entity`
         - first argument of method `protected funtion setDefaultGridView()` from `GridView $entity` to `AbstractGridView $entity`
         - first argument of method `protected funtion fixFilters()` from `GridView $entity` to `AbstractGridView $entity`
-- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used. 
+- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used.
 - Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export`, `setExportConnector` with `@oro_datagrid.importexport.export_connector`, `setExportProcessor` with `@oro_datagrid.importexport.processor.export` and `setWriterChain`  with `@oro_importexport.writer.writer_chain` were added. The constructor was removed, the parent class constructor is used.
 - Class `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher`
     - the signature of `getDatagridQuery` method was changed, added parameter `string $objectIdentifier = null`
@@ -242,6 +243,30 @@ WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler` (`oro_workflow.transition_assembler`):
     - changed constructor signature:
         - added `TransitionOptionsResolver $optionsResolver`;
+- Class `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionCustomFormHandler` and service `@oro_workflow.handler.transition.form.page_form` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler` and service `@oro_workflow.handler.transition.form` removed see replacements:
+  - `Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormProcessor`
+  - `Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormStartHandleProcessor`
+- Interface `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandlerInterface` removed
+- Class `Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper` and service `@oro_workflow.handler.transition_helper` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler` and service `@oro_workflow.handler.start_transition_handler` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\StartHandleProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` and service `@oro_workflow.handler.transition_handler` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionHandleProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper`:
+  - Constant `Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper::DEFAULT_TRANSITION_TEMPLATE` moved into `Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor::DEFAULT_TRANSITION_TEMPLATE`
+  - Constant `Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper::DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE` moved into `Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CustomFormTemplateResponseProcessor::DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE`
+  - Signature parameters **removed**:
+     - `Symfony\Component\Form\FormFactoryInterface` $formFactory
+     - `Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer` $workflowDataSerializer
+  - Removed methods:
+    - `getEntityManager` - unused
+    - `getTransitionForm` - managed by processors
+    - `getTransitionFormTemplate` - managed by processors
+    - `processWorkflowData` - managed by processors
+- Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider`:
+    - changed constructor signature:
+        - removed `WorkflowRegistry $workflowRegistry`;
+        - added `Cache $entitiesWithWorkflowsCache`;
+- Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
 
 
 PlatformBundle
@@ -281,3 +306,7 @@ TranslationBundle
 - Signature of class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` was changed:
     - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
     - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`
+
+FormBundle
+----------
+- Form types OroEncodedPlaceholderPasswordType, OroEncodedPasswordType acquired `browser_autocomplete` option with default value set to `false`, which means that password autocomplete is off by default.
