@@ -20,6 +20,7 @@ layout:
                             workflowName: '=data["workflowName"]'
                             transitionName: '=data["transitionName"]'
                             entityId: '=data["entityId"]'
+                            originalUrl: '=data["originalUrl"]'
                 form_fields:
                     blockType: form_fields
                     options:

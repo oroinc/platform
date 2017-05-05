@@ -30,6 +30,7 @@ class LayoutDialogDataStartTransitionProcessor implements ProcessorInterface
                     'transitionFormView' => $context->getForm()->createView(),
                     'entityId' => $context->getRequest()->get('entityId', 0),
                     'formRouteName' => $resultType->getFormRouteName(),
+                    'originalUrl' => null
                 ]
             ]
         );

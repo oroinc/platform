@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class AccessGranted extends Constraint implements ConstraintWithStatusCodeInterface
 {
-    public $message = 'You have no access to set this value.';
+    public $message = 'oro.api.form.no_access';
 
     /**
      * {@inheritdoc}

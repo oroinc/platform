@@ -63,6 +63,7 @@ class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit_Framework_Te
                     'transitionFormView' => $formView,
                     'entityId' => 42,
                     'formRouteName' => 'route_name',
+                    'originalUrl' => null
                 ]
             ],
             $context->getResult()

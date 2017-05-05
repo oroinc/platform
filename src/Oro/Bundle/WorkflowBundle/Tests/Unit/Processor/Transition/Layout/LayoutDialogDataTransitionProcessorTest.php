@@ -52,6 +52,7 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit_Framework_TestCas
                     'transitionFormView' => $formView,
                     'workflowItem' => $workflowItem,
                     'formRouteName' => 'route_name',
+                    'originalUrl' => null
                 ]
             ],
             $context->getResult()
