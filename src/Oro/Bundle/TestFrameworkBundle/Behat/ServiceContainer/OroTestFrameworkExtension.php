@@ -104,13 +104,10 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->defaultValue([])
                 ->end()
                 ->arrayNode('suite_groups')
-                    ->prototype('scalar')->end()
-                    ->info(
-                        "Grouped suites\n".
-                        "This suites can be returned by --available-suites-group option with group name value.\n".
-                        'There is also special "'.AvailableSuitesGroupController::UNGROUPED_GROUP.'" group'
-                    )
-                    ->defaultValue([])
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->prototype('scalar')->end()
+                    ->end()
                 ->end()
                 ->variableNode('shared_contexts')
                     ->info('Contexts that added to all autoload bundles suites')
@@ -144,6 +141,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
+        $container->setParameter('oro_test.suite_groups', $config['suite_groups']);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
