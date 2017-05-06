@@ -94,6 +94,8 @@ define([
                 this.showFlashError(message);
             } else if (this.isXHRStatus(context, 403)) {
                 this.showFlashError(_.__('oro.ui.forbidden_error'));
+            } else if (this.isXHRStatus(context, 413)) {
+                this.showFlashError(_.__('oro.ui.request_too_large_error'));
             } else {
                 this.showFlashError(defaults.message);
             }

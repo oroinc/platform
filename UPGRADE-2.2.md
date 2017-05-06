@@ -59,6 +59,27 @@ ApiBundle
 ---------
 - Added class `Oro\Bundle\ApiBundle\Processor\ApiFormBuilderSubscriberProcessor`
     - can be used to add subscribers to `FormContext`
+- Fixed handling of `property_path` option from `api.yml` for cases when the property path contains several fields, e.g. `customerAssociation.account`
+- Added method `findFieldByPath` to `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
+- Changed implementation of `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition` processor. All logic was moved to the following classes:
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteObjectDefinitionHelper`
+- Class `Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities`
+    - removed method `getAssociationData`
+    - removed method `updateRelatedFieldTargetEntity`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeMetadata`
+    - removed method `findFieldByPropertyPath`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper`
+    - changed signature of method `addNestedObjectAssociation`. Added new parameter `EntityDefinitionConfig $config`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory`
+    - changed signature of method `createAndAddAssociationMetadata`. Added new parameter `EntityDefinitionConfig $config`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadExtendedAssociation`
+    - changed signature of method `addTitles`. Old signature `addTitles(array $data, $parentEntityClass, $parentEntityId, EntityDefinitionFieldConfig $association, $titleFieldName)`. New signature `addTitles(array $data, $associationOwnerClass, $associationOwnerId, $associationType, $associationKind, $titleFieldName)`
+    - removed method `getAssociationTargets`
+- Changed implementation of `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation` and `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation` processors
+    - now they are extend new base processor `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadCustomAssociation`
 
 DataGridBundle
 --------------
