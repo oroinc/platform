@@ -166,9 +166,6 @@ operations:
         acl_resource: [TRANSLATE, $.data]
         frontend_options:
             template: 'OroTranslationBundle:Operation:loadLanguage.html.twig'
-            options:
-                height: 80
-                minHeight: 80
             title_parameters:
                 '%%language%%': $.languageName
         button_options:
