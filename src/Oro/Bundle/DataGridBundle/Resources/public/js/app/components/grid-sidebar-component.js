@@ -46,8 +46,9 @@ define(function(require) {
 
         /**
          * @param {Object} collection
+         * @param {Object} gridElement
          */
-        onGridLoadComplete: function(collection) {
+        onGridLoadComplete: function(collection, gridElement) {
             if (collection.inputName === this.options.widgetRouteParameters.gridName) {
                 this.gridCollection = collection;
 
@@ -58,8 +59,14 @@ define(function(require) {
                         self._patchGridCollectionUrl(self._getQueryParamsFromUrl(location.search));
                     }
                 );
+
+                var foundGrid = this.options._sourceElement
+                    .closest('[data-role="grid-sidebar-component-container"]')
+                    .find(gridElement);
+                if (foundGrid.length) {
+                    mediator.trigger('grid-sidebar:load:' + this.options.sidebarAlias);
+                }
             }
-            mediator.trigger('grid-sidebar:load:' + this.options.sidebarAlias);
         },
 
         /**
