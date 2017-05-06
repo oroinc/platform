@@ -11,6 +11,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Suites groups can be configured in behat.yml and should consist of name of the group and array of suites names
+ * This controller return list of suites by group name
+ * Also special Ungrouped group contains all suites that not included in any group
+ * It return only suites that have at list one executable (not skipped or incomplete) feature
+ */
 class AvailableSuitesGroupController implements Controller
 {
     const UNGROUPED_GROUP = 'Ungrouped';
@@ -98,6 +104,9 @@ class AvailableSuitesGroupController implements Controller
         return 0;
     }
 
+    /**
+     * Find ungrouped suites and set to Ungrouped group
+     */
     private function groupUngrouped()
     {
         $groupedSuites = array_unique(array_reduce($this->suiteGroups, 'array_merge', []));

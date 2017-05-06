@@ -58,6 +58,9 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
         $controller->execute($input, new OutputStub());
     }
 
+    /**
+     * @return array
+     */
     public function applicableSuitesProvider()
     {
         return [
@@ -75,6 +78,10 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @param array $availableSuites in format ['SuiteNameOne', 'SuiteNameTwo']
+     * @return array in format ['SuiteNameOne' => ['type' => null, 'settings' => []]]
+     */
     private function createFakeConfigurations(array $availableSuites)
     {
         return array_map(function () {
@@ -85,6 +92,10 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
         }, array_flip($availableSuites));
     }
 
+    /**
+     * @param SuiteRegistry $suiteRegistry
+     * @return array of suites names
+     */
     private function getRegisteredSuiteNames(SuiteRegistry $suiteRegistry)
     {
         return array_map(function (Suite $suite) {

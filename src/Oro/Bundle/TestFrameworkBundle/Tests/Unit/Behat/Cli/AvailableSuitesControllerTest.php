@@ -58,6 +58,9 @@ class AvailableSuitesControllerTest extends \PHPUnit_Framework_TestCase
         self::assertSame(0, $returnCode);
     }
 
+    /**
+     * @return array
+     */
     public function getSuitesWithSpecifications()
     {
         return [

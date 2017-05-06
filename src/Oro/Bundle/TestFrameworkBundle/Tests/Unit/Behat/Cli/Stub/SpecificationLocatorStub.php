@@ -10,8 +10,14 @@ use Symfony\Component\Finder\Tests\Iterator\Iterator;
 
 class SpecificationLocatorStub implements SpecificationLocator
 {
+    /**
+     * @var array
+     */
     protected $suiteNames;
 
+    /**
+     * @param array $suiteNames
+     */
     public function __construct(array $suiteNames)
     {
         $this->suiteNames = $suiteNames;
@@ -22,7 +28,7 @@ class SpecificationLocatorStub implements SpecificationLocator
      */
     public function getLocatorExamples()
     {
-        return 'Return iterators for specified in constructor. For unit tests only';
+        return 'Return iterators for suites specified in constructor. For unit tests only';
     }
 
     /**

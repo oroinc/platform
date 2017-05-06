@@ -60,6 +60,9 @@ class AvailableSuitesGroupControllerTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($expectedSuites, $output->messages);
     }
 
+    /**
+     * @return array
+     */
     public function suitesGroupProvider()
     {
         return [
