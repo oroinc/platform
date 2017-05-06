@@ -80,6 +80,20 @@ ApiBundle
     - removed method `getAssociationTargets`
 - Changed implementation of `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation` and `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation` processors
     - now they are extend new base processor `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadCustomAssociation`
+- Static class `\Oro\Bundle\ApiBundle\Form\FormUtil` was replaced with `Oro\Bundle\ApiBundle\Form\FormHelper` which is available as a service `oro_api.form_helper`
+- Class `Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType`
+    - added parameter `FormHelper $formHelper` to the constructor
+- Class `Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper)`
+- Class `Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory)`. New signature: `__construct(FormHelper $formHelper)`
+    - removed method `addFormFields`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory)`. New signature: `__construct(FormHelper $formHelper)`
 
 DataGridBundle
 --------------

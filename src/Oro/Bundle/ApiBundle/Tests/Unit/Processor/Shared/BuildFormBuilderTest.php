@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -25,7 +25,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
-        $this->processor = new BuildFormBuilder($this->formFactory);
+        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory));
     }
 
     /**
@@ -92,7 +92,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api', 'my_group'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -150,7 +150,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -230,7 +230,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -274,7 +274,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -319,7 +319,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -363,7 +363,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )

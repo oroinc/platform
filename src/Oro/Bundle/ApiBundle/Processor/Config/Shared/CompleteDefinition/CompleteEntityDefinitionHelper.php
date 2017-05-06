@@ -312,6 +312,11 @@ class CompleteEntityDefinitionHelper
                     $version,
                     $requestType
                 );
+                $formOptions = $field->getFormOptions();
+                if (null === $formOptions || !array_key_exists('mapped', $formOptions)) {
+                    $formOptions['mapped'] = false;
+                    $field->setFormOptions($formOptions);
+                }
             }
             $dependsOn = $field->getDependsOn();
             if (!empty($dependsOn)) {

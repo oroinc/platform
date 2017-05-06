@@ -4,11 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\EventListener\CreateListener;
-use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -18,9 +17,6 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $propertyAccessor;
-
     /** @var BuildFormBuilder */
     protected $processor;
 
@@ -29,9 +25,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         parent::setUp();
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-        $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
 
-        $this->processor = new BuildFormBuilder($this->formFactory, $this->propertyAccessor);
+        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory));
     }
 
     public function testProcess()
@@ -52,7 +47,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
