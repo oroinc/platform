@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
+use Oro\Bundle\EntityConfigBundle\AttributeFilter\AttributesMovingFilterInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
@@ -19,16 +20,25 @@ class AttributeFormViewListener
     private $attributeManager;
 
     /**
+     * @var AttributesMovingFilterInterface
+     */
+    private $attributeFormViewFilter;
+
+    /**
      * @var AttributeFamilyAwareInterface
      */
     private $entity;
 
     /**
      * @param AttributeManager $attributeManager
+     * @param AttributesMovingFilterInterface|null $filter
      */
-    public function __construct(AttributeManager $attributeManager)
-    {
+    public function __construct(
+        AttributeManager $attributeManager,
+        AttributesMovingFilterInterface $filter = null
+    ) {
         $this->attributeManager = $attributeManager;
+        $this->attributeFormViewFilter = $filter;
     }
 
     /**
@@ -131,18 +141,26 @@ class AttributeFormViewListener
 
             /** @var FieldConfigModel $attribute */
             foreach ($groupData['attributes'] as $attribute) {
-                if ($scrollData->hasNamedField($attribute->getFieldName())) {
-                    $scrollData->moveFieldToBlock($attribute->getFieldName(), $group->getCode());
+                $fieldName = $attribute->getFieldName();
+                if ($scrollData->hasNamedField($fieldName)) {
+                    if (!$this->attributeFormViewFilter ||
+                        !$this->attributeFormViewFilter->isRestrictedToMove($fieldName)
+                    ) {
+                        $scrollData->moveFieldToBlock($fieldName, $group->getCode());
+                    }
                     continue;
                 }
 
-                $html = $event->getEnvironment()->render('OroEntityConfigBundle:Attribute:attributeView.html.twig', [
-                    'entity' => $this->entity,
-                    'field' => $attribute
-                ]);
+                $html = $event->getEnvironment()->render(
+                    'OroEntityConfigBundle:Attribute:attributeView.html.twig',
+                    [
+                        'entity' => $this->entity,
+                        'field' => $attribute
+                    ]
+                );
 
                 $subblockId = $scrollData->addSubBlock($group->getCode());
-                $scrollData->addSubBlockData($group->getCode(), $subblockId, $html, $attribute->getFieldName());
+                $scrollData->addSubBlockData($group->getCode(), $subblockId, $html, $fieldName);
             }
         }
 
