@@ -12,7 +12,7 @@ The Oro Platform collects documentation for API resources from several sources:
 * A [Markdown](https://daringfireball.net/projects/markdown/) document. The detailed information you can find bellow in this document.
 * System-wide descriptions of entities and fields.
 
-The most priority source is the configuration file. The documentation provided there overrides all other sources. But as it is YAML file it is not the best way to write a big multi-line texts there. The more appropriate place for the documentation is a separate [Markdown](https://en.wikipedia.org/wiki/Markdown) file. To use such file you need to provide a link to it in the configuration file, e.g.:
+The most priority source is the configuration file. The documentation provided there overrides all other sources. But as it is YAML file it is not the best way to write a big multi-line texts there. The more appropriate place for the documentation is a separate [Markdown](https://daringfireball.net/projects/markdown/) file. To use such file you need to provide a link to it in the configuration file, e.g.:
 
 ```yaml
 api:
@@ -51,7 +51,7 @@ Please note that after changing a documentation you need to run `oro:api:doc:cac
 Documentation File Format
 -------------------------
 
-The documentation file is a [Markdown](https://en.wikipedia.org/wiki/Markdown) document that contains description about one or multiple API resources. Please note that the [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/) syntax is supported in the documentation file as well.
+The documentation file is a [Markdown](https://daringfireball.net/projects/markdown/) document that contains description about one or multiple API resources. Please note that the [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/) syntax is supported in the documentation file as well.
 
 The only requirement for such document is it should be written in particular format.
 
