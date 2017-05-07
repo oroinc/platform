@@ -76,6 +76,22 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @param string $entityType
+     * @param bool   $throwException
+     *
+     * @return string
+     */
+    protected function getEntityClass($entityType, $throwException = true)
+    {
+        return ValueNormalizerUtil::convertToEntityClass(
+            $this->valueNormalizer,
+            $entityType,
+            $this->getRequestType(),
+            $throwException
+        );
+    }
+
+    /**
      * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
     public function getEntities()
