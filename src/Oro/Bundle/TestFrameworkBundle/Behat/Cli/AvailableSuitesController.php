@@ -52,7 +52,7 @@ class AvailableSuitesController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false === $input->getOption('available-suites')) {
+        if (!$input->getOption('available-suites')) {
             return;
         }
 
