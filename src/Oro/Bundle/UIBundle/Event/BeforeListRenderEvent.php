@@ -42,12 +42,11 @@ class BeforeListRenderEvent extends Event
         ScrollData $scrollData,
         $entity,
         FormView $formView = null
-    )
-    {
+    ) {
         $this->environment = $environment;
-        $this->scrollData  = $scrollData;
-        $this->entity      = $entity;
-        $this->formView    = $formView;
+        $this->scrollData = $scrollData;
+        $this->entity = $entity;
+        $this->formView = $formView;
     }
 
     /**
