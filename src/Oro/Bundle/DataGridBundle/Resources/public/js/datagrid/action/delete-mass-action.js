@@ -3,11 +3,16 @@ define([
     'orotranslation/js/translator',
     'underscore',
     './mass-action',
-    'oroui/js/mediator'
-], function(DeleteConfirmation, __, _, MassAction, mediator) {
+    'oroui/js/mediator',
+    'oroui/js/tools',
+    'module'
+], function(DeleteConfirmation, __, _, MassAction, mediator, tools, module) {
     'use strict';
 
     var DeleteMassAction;
+    var config = _.defaults(module.config(), {
+        DeleteConfirmation: DeleteConfirmation
+    });
 
     /**
      * Delete mass action class.
@@ -18,7 +23,7 @@ define([
      */
     DeleteMassAction = MassAction.extend({
         /** @property {Function} */
-        confirmModalConstructor: DeleteConfirmation,
+        confirmModalConstructor: config.DeleteConfirmation,
 
         /** @property {Object} */
         defaultMessages: {
@@ -52,6 +57,13 @@ define([
          * @param options
          */
         initialize: function(options) {
+            if (_.isString(this.confirmModalConstructor)) {
+                tools.loadModule(this.confirmModalConstructor)
+                    .then(_.bind(function(confirmModalConstructor) {
+                        this.confirmModalConstructor = confirmModalConstructor;
+                    }, this));
+            }
+
             DeleteMassAction.__super__.initialize.apply(this, arguments);
             this.confirmMessage = __(this.defaultMessages.confirm_content);
             this.confirmation = false;
