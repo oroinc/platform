@@ -50,10 +50,7 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->adapter);
-        unset($this->entity);
-        unset($this->emailNotification);
-        unset($this->em);
+        unset($this->adapter, $this->entity, $this->emailNotification, $this->em);
     }
 
     public function testGetTemplate()
@@ -69,7 +66,7 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRecipientEmails()
     {
-        $emails = ["email"];
+        $emails = ['email'];
         $recipientList = new RecipientList();
         $repo = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository')
             ->disableOriginalConstructor()

@@ -87,6 +87,6 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf(AdditionalEmailsSubscriber::class));
 
-        $this->type->buildForm($builder, array());
+        $this->type->buildForm($builder, []);
     }
 }

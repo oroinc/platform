@@ -53,7 +53,7 @@ class EmailNotificationHandler implements EventHandlerInterface
         $entity = $event->getEntity();
 
         // convert notification rules to a list of EmailNotificationInterface
-        $notifications = array();
+        $notifications = [];
         foreach ($matchedNotifications as $notification) {
             $notifications[] = new EmailNotificationAdapter(
                 $entity,

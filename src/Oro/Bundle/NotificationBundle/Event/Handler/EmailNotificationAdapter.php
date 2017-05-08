@@ -98,8 +98,8 @@ class EmailNotificationAdapter implements EmailNotificationInterface
             $associationEntities = [$entity];
             foreach ($associationComponents as $associationComponent) {
                 $newEntities = [];
-                foreach ($associationEntities as $entity) {
-                    $subEntities = $this->propertyAccessor->getValue($entity, $associationComponent);
+                foreach ($associationEntities as $associationEntity) {
+                    $subEntities = $this->propertyAccessor->getValue($associationEntity, $associationComponent);
                     $subEntities = is_array($subEntities) || $subEntities instanceof \Traversable ?
                         $subEntities : [$subEntities];
                     if (!is_array($subEntities)) {

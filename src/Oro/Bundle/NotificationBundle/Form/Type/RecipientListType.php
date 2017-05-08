@@ -6,12 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\VarDumper\VarDumper;
-
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class RecipientListType extends AbstractType
 {
@@ -20,6 +15,9 @@ class RecipientListType extends AbstractType
      */
     protected $entityManager;
 
+    /**
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -73,10 +71,10 @@ class RecipientListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'           => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
                 'intention'            => 'recipientlist',
-            )
+            ]
         );
     }
 
