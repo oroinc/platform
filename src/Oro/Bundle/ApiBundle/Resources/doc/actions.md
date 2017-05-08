@@ -4,7 +4,7 @@ Actions
 Table of Contents
 -----------------
  - [Overview](#overview)
- - Existing actions
+ - Public actions
    - [**get** action](#get-action)
    - [**get_list** action](#get_list-action)
    - [**delete** action](#delete-action)
@@ -16,6 +16,7 @@ Table of Contents
    - [**update_relationship** action](#update_relationship-action)
    - [**add_relationship** action](#add_relationship-action)
    - [**delete_relationship** action](#delete_relationship-action)
+ - Auxiliary actions
    - [**customize_loaded_data** action](#customize_loaded_data-action)
    - [**customize_form_data** action](#customize_form_data-action)
    - [**get_config** action](#get_config-action)

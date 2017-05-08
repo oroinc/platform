@@ -57,8 +57,7 @@ A new string field `ownerDescription` with the database column `owner_descriptio
 
 ApiBundle
 ---------
-- Added class `Oro\Bundle\ApiBundle\Processor\ApiFormBuilderSubscriberProcessor`
-    - can be used to add subscribers to `FormContext`
+- Added class `Oro\Bundle\ApiBundle\Processor\Shared\AddFormEventSubscriber` that can be used to add an event subscriber to a form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`
 - Fixed handling of `property_path` option from `api.yml` for cases when the property path contains several fields, e.g. `customerAssociation.account`
 - Added method `findFieldByPath` to `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
 - Changed implementation of `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition` processor. All logic was moved to the following classes:

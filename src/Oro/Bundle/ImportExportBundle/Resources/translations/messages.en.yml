@@ -45,7 +45,7 @@ oro:
                 not_found_entity: Not found entity "%entity_name%"
                 access_denied_entity: Access denied to entity "%entity_name%"
                 access_denied_property_entity: Access denied to property %property_name% of entity "%entity_name%"
-
+            postponed_rows: "There were %postponedRows% rows that could not be proccessed."
         message:
             entities.label: "entities"
 

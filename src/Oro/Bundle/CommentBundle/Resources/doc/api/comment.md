@@ -153,6 +153,10 @@ The list of records that will be deleted, could be limited by filters.
 
 *This field is **required** and must remain defined.*
 
+### target
+
+A record that the comment was made on.
+
 ## SUBRESOURCES
 
 ### attachment
@@ -246,15 +250,15 @@ Example:
 
 #### get_subresource
 
-Retrieve the entity record that a specific comment was made on.
+Get full information about a record that the comment was made on.
 
 #### get_relationship
 
-Retrieve the ID of the entity record that a specific comment was made on.
+Get a record that the comment was made on.
 
 #### update_relationship
 
-Replace the entity record that a specific comment was made on.
+Replace a record that the comment was made on.
 
 {@request:json_api}
 Example:

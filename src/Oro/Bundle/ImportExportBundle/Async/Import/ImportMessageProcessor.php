@@ -6,6 +6,7 @@ use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -48,12 +49,18 @@ class ImportMessageProcessor implements MessageProcessorInterface
     protected $jobStorage;
 
     /**
-     * @param JobRunner $jobRunner
+     * @var PostponedRowsHandler
+     */
+    protected $postponedRowsHandler;
+
+    /**
+     * @param JobRunner                    $jobRunner
      * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param JobStorage $jobStorage
-     * @param LoggerInterface $logger
-     * @param FileManager $fileManager
-     * @param AbstractImportHandler $importHandler
+     * @param JobStorage                   $jobStorage
+     * @param LoggerInterface              $logger
+     * @param FileManager                  $fileManager
+     * @param AbstractImportHandler        $importHandler
+     * @param PostponedRowsHandler         $postponedRowsHandler
      */
     public function __construct(
         JobRunner $jobRunner,
@@ -61,7 +68,8 @@ class ImportMessageProcessor implements MessageProcessorInterface
         JobStorage $jobStorage,
         LoggerInterface $logger,
         FileManager $fileManager,
-        AbstractImportHandler $importHandler
+        AbstractImportHandler $importHandler,
+        PostponedRowsHandler $postponedRowsHandler
     ) {
         $this->importHandler = $importHandler;
         $this->jobRunner = $jobRunner;
@@ -69,6 +77,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
         $this->jobStorage = $jobStorage;
         $this->logger = $logger;
         $this->fileManager = $fileManager;
+        $this->postponedRowsHandler = $postponedRowsHandler;
     }
 
     /**
@@ -92,7 +101,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
         $result = $this->jobRunner->runDelayed(
             $body['jobId'],
             function (JobRunner $jobRunner, Job $job) use ($body) {
-                return $this->handleImport($body, $job);
+                return $this->handleImport($body, $job, $jobRunner);
             }
         );
 
@@ -126,11 +135,12 @@ class ImportMessageProcessor implements MessageProcessorInterface
     }
 
     /**
-     * @param array $body
-     * @param Job $job
+     * @param array     $body
+     * @param Job       $job
+     * @param JobRunner $jobRunner
      * @return bool
      */
-    protected function handleImport(array $body, Job $job)
+    protected function handleImport(array $body, Job $job, JobRunner $jobRunner)
     {
         $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
         $this->importHandler->setImportingFileName($filePath);
@@ -140,6 +150,14 @@ class ImportMessageProcessor implements MessageProcessorInterface
             $body['processorAlias'],
             $body['options']
         );
+
+        if (!empty($result['postponedRows'])) {
+            $fileName = $this
+                ->postponedRowsHandler->writeRowsToFile($result['postponedRows'], $body['fileName']);
+
+            $this->postponedRowsHandler->postpone($jobRunner, $job, $fileName, $body, $result);
+        }
+
         $this->saveJobResult($job, $result);
         $this->logger->info(
             $this->importExportResultSummarizer->getImportSummaryMessage(

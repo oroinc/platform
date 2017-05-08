@@ -141,6 +141,8 @@ The list of records that will be deleted, could be limited by filters.
 
 ### content
 
+The content of the file as a Base64 encoded string.
+
 #### create
 
 {@inheritdoc}
