@@ -11,11 +11,14 @@ use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Job\JobRunner;
 
 class PostponedRowsHandler
 {
     const MAX_ATTEMPTS = 5;
+
+    const DELAY_SECONDS = 30;
 
     /**
      * @var FileManager
@@ -116,13 +119,10 @@ class PostponedRowsHandler
             sprintf('%s:postponed:%s', $currentJob->getRootJob()->getName(), $attempts),
             function (JobRunner $jobRunner, Job $child) use ($body, $fileName, $attempts) {
                 $body['fileName'] = $fileName;
-                $this->messageProducer->send(
-                    Topics::HTTP_IMPORT,
-                    array_merge($body, [
-                        'jobId' => $child->getId(),
-                        'attempts' => $attempts,
-                    ])
-                );
+                $message = new Message();
+                $message->setDelay(static::DELAY_SECONDS);
+                $message->setBody(array_merge($body, ['jobId' => $child->getId(), 'attempts' => $attempts]));
+                $this->messageProducer->send(Topics::HTTP_IMPORT, $message);
             }
         );
     }

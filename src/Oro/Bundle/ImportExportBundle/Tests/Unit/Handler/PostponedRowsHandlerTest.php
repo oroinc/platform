@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
+use Oro\Component\MessageQueue\Client\Message;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -75,14 +76,18 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('findOrCreateChildJob')
             ->willReturn($this->currentJob);
 
-        $body = ['attempts' => 0];
+        $expectedMessage = new Message();
+        $expectedMessage->setBody(['jobId' => 1, 'attempts' => 1, 'fileName' => '']);
+        $expectedMessage->setDelay(PostponedRowsHandler::DELAY_SECONDS);
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
                 Topics::HTTP_IMPORT,
-                ['jobId' => 1, 'attempts' => 1, 'fileName' => '']
+                $expectedMessage
             );
+
         $result = [];
+        $body = ['attempts' => 0];
 
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
