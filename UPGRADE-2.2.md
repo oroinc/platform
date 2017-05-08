@@ -10,6 +10,7 @@ ActionBundle
     - changed signature of method `protected function getRowConfigurationClosure(DatagridConfiguration $configuration, ButtonSearchContext $context)`
     - added second argument `ButtonSearchContext $context` to method `protected function applyActionsConfig()`
     - added second argument `ButtonSearchContext $context` to method `protected function processMassActionsConfig()`
+    - added dependency on `Symfony\Component\EventDispatcher\EventDispatcherInterface` that should be injected to service by `public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)`
 - Service `oro_action.datagrid.event_listener.button` now has name `oro_action.datagrid.action.button_provider` and registered through the tag `oro_datagrid.extension.action.provider`
 - Added `Oro\Bundle\ActionBundle\Model\AbstractGuesser`:
     - defined as abstract service `oro_action.abstract_guesser` with arguments `@form.registry, @doctrine, @oro_entity_config.provider.entity, @oro_entity_config.provider.form`
@@ -56,8 +57,42 @@ A new string field `ownerDescription` with the database column `owner_descriptio
 
 ApiBundle
 ---------
-- Added class `Oro\Bundle\ApiBundle\Processor\ApiFormBuilderSubscriberProcessor`
-    - can be used to add subscribers to `FormContext`
+- Added class `Oro\Bundle\ApiBundle\Processor\Shared\AddFormEventSubscriber` that can be used to add an event subscriber to a form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`
+- Fixed handling of `property_path` option from `api.yml` for cases when the property path contains several fields, e.g. `customerAssociation.account`
+- Added method `findFieldByPath` to `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
+- Changed implementation of `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition` processor. All logic was moved to the following classes:
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteObjectDefinitionHelper`
+- Class `Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities`
+    - removed method `getAssociationData`
+    - removed method `updateRelatedFieldTargetEntity`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeMetadata`
+    - removed method `findFieldByPropertyPath`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper`
+    - changed signature of method `addNestedObjectAssociation`. Added new parameter `EntityDefinitionConfig $config`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory`
+    - changed signature of method `createAndAddAssociationMetadata`. Added new parameter `EntityDefinitionConfig $config`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadExtendedAssociation`
+    - changed signature of method `addTitles`. Old signature `addTitles(array $data, $parentEntityClass, $parentEntityId, EntityDefinitionFieldConfig $association, $titleFieldName)`. New signature `addTitles(array $data, $associationOwnerClass, $associationOwnerId, $associationType, $associationKind, $titleFieldName)`
+    - removed method `getAssociationTargets`
+- Changed implementation of `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation` and `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation` processors
+    - now they are extend new base processor `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadCustomAssociation`
+- Static class `\Oro\Bundle\ApiBundle\Form\FormUtil` was replaced with `Oro\Bundle\ApiBundle\Form\FormHelper` which is available as a service `oro_api.form_helper`
+- Class `Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType`
+    - added parameter `FormHelper $formHelper` to the constructor
+- Class `Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper)`
+- Class `Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory)`. New signature: `__construct(FormHelper $formHelper)`
+    - removed method `addFormFields`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory)`. New signature: `__construct(FormHelper $formHelper)`
 
 DataGridBundle
 --------------

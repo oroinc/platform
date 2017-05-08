@@ -8,7 +8,6 @@
 {% endif %}
 
 {% set transitionData = {
-    'transition-label': button.label|trans({},'workflows'),
     'message': transitionMessage|nl2br,
     'transition-condition-messages': button.buttonContext.errors,
     'enabled': button.buttonContext.enabled,

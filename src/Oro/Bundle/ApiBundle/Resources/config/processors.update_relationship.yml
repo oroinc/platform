@@ -76,7 +76,7 @@ services:
     oro_api.update_relationship.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder
         arguments:
-            - '@form.factory'
+            - '@oro_api.form_helper'
         tags:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: 100 }
 

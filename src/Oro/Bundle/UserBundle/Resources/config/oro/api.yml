@@ -30,6 +30,9 @@ api:
                 update:
                     exclude: false # set manually because this entity is marked as a dictionary
 
+        Extend\Entity\EV_Auth_Status:
+            documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
+
         Oro\Bundle\UserBundle\Entity\Email:
             # this entity does not have own Data API resource
             actions: false
@@ -40,8 +43,8 @@ api:
                     description: The unique identifier of a user.
             actions:
                 get:
-                    description:    Get current logged in user
-                    documentation:  Retrieve a record of the currently logged in user.
+                    description: Get current logged in user
+                    documentation: Retrieve a record of the currently logged in user.
                 get_list: false
                 create: false
                 update: false
@@ -52,17 +55,3 @@ api:
                 update_relationship: false
                 add_relationship: false
                 delete_relationship: false
-
-        Extend\Entity\EV_Auth_Status:
-            fields:
-                name:
-                    description:  A name of the authentication status ('Active,' 'Password reset,' or 'Locked').
-                default:
-                    description:  Whether an authentication status is set as default. A default authentication stauts is automatically assigned to a user on creation.
-                priority:
-                    description:  The order in which authentication statuses are ranked.
-            actions:
-                get:
-                    documentation:  Retrieve a specific authentication status record. The authentication status defines the actuality of the user’s password, whether it is active, expired, or locked.
-                get_list:
-                    documentation:  Retrieve a collection of authentication status records. The authentication status defines the actuality of the user’s password, whether it is active, expired, or locked.

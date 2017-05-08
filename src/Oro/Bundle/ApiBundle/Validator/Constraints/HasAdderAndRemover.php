@@ -10,8 +10,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class HasAdderAndRemover extends Constraint implements ConstraintWithStatusCodeInterface
 {
-    public $message = 'The "{{ class }}" class should have both "{{ adder }}" and "{{ remover }}" methods.';
-    public $severalPairsMessage = 'The "{{ class }}" class should have any of the following method pairs: %s.';
+    public $message = 'oro.api.form.no_adder_and_remover';
+    public $severalPairsMessage = 'oro.api.form.no_adder_and_remover_multiple';
 
     public $class;
     public $property;

@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -107,6 +108,7 @@ class ObjectMetadataFactory
     /**
      * @param EntityMetadata              $entityMetadata
      * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $config
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
      * @param string                      $targetAction
@@ -117,6 +119,7 @@ class ObjectMetadataFactory
     public function createAndAddAssociationMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
+        EntityDefinitionConfig $config,
         $fieldName,
         EntityDefinitionFieldConfig $field,
         $targetAction,
@@ -140,7 +143,11 @@ class ObjectMetadataFactory
             list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
             $this->setAssociationDataType($associationMetadata, $field);
             $associationMetadata->setAssociationType($associationType);
-            $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
+            $targets = $this->getExtendedAssociationTargets(
+                $this->getAssociationOwnerClass($entityClass, $config, $field),
+                $associationType,
+                $associationKind
+            );
             if (empty($targets)) {
                 $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
             } else {
@@ -154,6 +161,41 @@ class ObjectMetadataFactory
         }
 
         return $associationMetadata;
+    }
+
+    /**
+     * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $config
+     * @param EntityDefinitionFieldConfig $field
+     *
+     * @return null|string
+     */
+    protected function getAssociationOwnerClass(
+        $entityClass,
+        EntityDefinitionConfig $config,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $propertyPath = $field->getPropertyPath();
+        if (!$propertyPath) {
+            return $entityClass;
+        }
+
+        $lastDelimiter = strrpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+        if (false === $lastDelimiter) {
+            return $entityClass;
+        }
+
+        $ownerField = $config->findFieldByPath(substr($propertyPath, 0, $lastDelimiter), true);
+        if (null === $ownerField) {
+            return $entityClass;
+        }
+
+        $associationOwnerClass = $ownerField->getTargetClass();
+        if (!$associationOwnerClass) {
+            return $entityClass;
+        }
+
+        return $associationOwnerClass;
     }
 
     /**
