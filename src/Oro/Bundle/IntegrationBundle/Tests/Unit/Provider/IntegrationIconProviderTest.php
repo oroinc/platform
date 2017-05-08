@@ -7,6 +7,7 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +20,11 @@ class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
     private $typesRegistry;
 
     /**
+     * @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $typesRegistryLink;
+
+    /**
      * @var IntegrationIconProvider
      */
     private $provider;
@@ -29,7 +35,12 @@ class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->typesRegistry = $this->createMock(TypesRegistry::class);
-        $this->provider = new IntegrationIconProvider($this->typesRegistry);
+        $this->typesRegistryLink = $this->createMock(ServiceLink::class);
+        $this->typesRegistryLink
+            ->expects(self::once())
+            ->method('getService')
+            ->willReturn($this->typesRegistry);
+        $this->provider = new IntegrationIconProvider($this->typesRegistryLink);
     }
 
     /**

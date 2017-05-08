@@ -4,20 +4,21 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class IntegrationIconProvider implements IntegrationIconProviderInterface
 {
     /**
-     * @var TypesRegistry
+     * @var ServiceLink
      */
-    private $typesRegistry;
+    private $typesRegistryLink;
 
     /**
-     * @param TypesRegistry $typesRegistry
+     * @param ServiceLink $typesRegistryLink
      */
-    public function __construct(TypesRegistry $typesRegistry)
+    public function __construct(ServiceLink $typesRegistryLink)
     {
-        $this->typesRegistry = $typesRegistry;
+        $this->typesRegistryLink = $typesRegistryLink;
     }
 
     /**
@@ -25,7 +26,7 @@ class IntegrationIconProvider implements IntegrationIconProviderInterface
      */
     public function getIcon(Channel $channel)
     {
-        $types = $this->typesRegistry->getRegisteredChannelTypes();
+        $types = $this->getTypesRegistry()->getRegisteredChannelTypes();
         if (isset($types[$channel->getType()])) {
             $integration = $types[$channel->getType()];
             if ($integration instanceof IconAwareIntegrationInterface) {
@@ -34,5 +35,13 @@ class IntegrationIconProvider implements IntegrationIconProviderInterface
         }
 
         return null;
+    }
+
+    /**
+     * @return TypesRegistry
+     */
+    private function getTypesRegistry()
+    {
+        return $this->typesRegistryLink->getService();
     }
 }

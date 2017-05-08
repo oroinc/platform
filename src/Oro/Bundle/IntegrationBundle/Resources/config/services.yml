@@ -331,6 +331,6 @@ services:
     oro_integration.provider.integration_icon:
         class: 'Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider'
         arguments:
-            - '@oro_integration.manager.types_registry'
+            - '@oro_integration.manager.types_registry.link'
         public: false
         lazy: true
