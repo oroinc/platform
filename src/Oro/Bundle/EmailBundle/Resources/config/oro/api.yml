@@ -3,10 +3,11 @@ api:
 #        Oro\Bundle\EmailBundle\Entity\EmailTemplate: ~
 #        Oro\Bundle\EmailBundle\Entity\AutoResponseRule: ~
 #        Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition: ~
+
         Oro\Bundle\EmailBundle\Entity\Email:
+            documentation_resource: '@OroEmailBundle/Resources/doc/api/email.md'
             fields:
                 activityTargets:
-                    description: A records to which the Email record associated with
                     data_type: association:manyToMany:activity
             actions:
                 get: false
@@ -26,8 +27,6 @@ api:
                     target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
                     target_type: collection
                     actions:
-                        get_subresource:
-                            description: Get entities that might be associated with the email
                         get_relationship: false
                         update_relationship: false
                         add_relationship: false
@@ -35,20 +34,8 @@ api:
                     filters:
                         fields:
                             exclude-current-user:
-                                description: Indicates whether the current user should be excluded from the result.
                                 data_type: boolean
-                activityTargets:
-                    actions:
-                        get_subresource:
-                            documentation: Get full information about records to which the email associated
-                        get_relationship:
-                            documentation: Get records to which the email associated
-                        add_relationship:
-                            documentation: Associate records with the email
-                        update_relationship:
-                            documentation: Completely replace association between records and the email
-                        delete_relationship:
-                            documentation: Delete association between records and the email
+
 #        Oro\Bundle\EmailBundle\Entity\EmailAttachment: ~
 #        Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent: ~
 #        Oro\Bundle\EmailBundle\Entity\EmailBody: ~

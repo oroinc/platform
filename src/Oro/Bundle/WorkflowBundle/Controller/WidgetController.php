@@ -19,6 +19,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor;
+use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 
 /**
  * @Route("/workflowwidget")
@@ -51,10 +52,13 @@ class WidgetController extends Controller
             }
         );
 
+        /* @var $translationHelper TransitionTranslationHelper */
+        $translationHelper = $this->get('oro_workflow.translation.transition_translation_helper');
+
         return [
             'entityId' => $entityId,
             'workflows' => array_map(
-                function (Workflow $workflow) use ($entity) {
+                function (Workflow $workflow) use ($entity, $translationHelper) {
                     // extra case to show start transition (step name and disabled button)
                     // even if transitions performing is forbidden with ACL
                     $showDisabled = !$this->isWorkflowPermissionGranted(
@@ -63,8 +67,14 @@ class WidgetController extends Controller
                         $entity
                     );
 
-                    return $this->get('oro_workflow.workflow_data.provider')
+                    $workflowData = $this->get('oro_workflow.workflow_data.provider')
                         ->getWorkflowData($entity, $workflow, $showDisabled);
+
+                    foreach ($workflowData['transitionsData'] as $transitionData) {
+                        $translationHelper->processTransitionTranslations($transitionData['transition']);
+                    }
+
+                    return $workflowData;
                 },
                 $applicableWorkflows
             ),

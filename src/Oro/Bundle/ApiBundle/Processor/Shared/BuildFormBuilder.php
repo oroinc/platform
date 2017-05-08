@@ -3,14 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
-use Oro\Bundle\ApiBundle\Form\FormUtil;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
@@ -19,15 +17,15 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
  */
 class BuildFormBuilder implements ProcessorInterface
 {
-    /** @var FormFactoryInterface */
-    protected $formFactory;
+    /** @var FormHelper */
+    protected $formHelper;
 
     /**
-     * @param FormFactoryInterface $formFactory
+     * @param FormHelper $formHelper
      */
-    public function __construct(FormFactoryInterface $formFactory)
+    public function __construct(FormHelper $formHelper)
     {
-        $this->formFactory = $formFactory;
+        $this->formHelper = $formHelper;
     }
 
     /**
@@ -59,14 +57,14 @@ class BuildFormBuilder implements ProcessorInterface
         $config = $context->getConfig();
         $formType = $config->getFormType() ?: 'form';
 
-        $formBuilder = $this->formFactory->createNamedBuilder(
-            null,
+        $formBuilder = $this->formHelper->createFormBuilder(
             $formType,
             $context->getResult(),
             $this->getFormOptions($context, $config)
         );
+
         if ('form' === $formType) {
-            $this->addFormFields($formBuilder, $context->getMetadata(), $config);
+            $this->formHelper->addFormFields($formBuilder, $context->getMetadata(), $config);
         }
 
         return $formBuilder;
@@ -80,43 +78,15 @@ class BuildFormBuilder implements ProcessorInterface
      */
     protected function getFormOptions(FormContext $context, EntityDefinitionConfig $config)
     {
-        $options = array_merge(FormUtil::getFormDefaultOptions(), $config->getFormOptions() ?: []);
+        $options = $config->getFormOptions();
+        if (null === $options) {
+            $options = [];
+        }
         if (!array_key_exists('data_class', $options)) {
             $options['data_class'] = $context->getClassName();
         }
         $options[CustomizeFormDataExtension::API_CONTEXT] = $context;
 
         return $options;
-    }
-
-    /**
-     * @param FormBuilderInterface   $formBuilder
-     * @param EntityMetadata         $metadata
-     * @param EntityDefinitionConfig $config
-     */
-    protected function addFormFields(
-        FormBuilderInterface $formBuilder,
-        EntityMetadata $metadata,
-        EntityDefinitionConfig $config
-    ) {
-        $fields = $metadata->getFields();
-        foreach ($fields as $name => $field) {
-            $fieldConfig = $config->getField($name);
-            $formBuilder->add(
-                $name,
-                $fieldConfig->getFormType(),
-                FormUtil::getFormFieldOptions($field, $fieldConfig)
-            );
-        }
-        $associations = $metadata->getAssociations();
-        foreach ($associations as $name => $association) {
-            $fieldConfig = $config->getField($name);
-
-            $formBuilder->add(
-                $name,
-                $fieldConfig->getFormType(),
-                FormUtil::getFormFieldOptions($association, $fieldConfig)
-            );
-        }
     }
 }

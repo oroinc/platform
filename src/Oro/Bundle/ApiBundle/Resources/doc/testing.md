@@ -22,18 +22,19 @@ To be sure that your REST API resources work properly you can cover them by [fun
 | request | Sends any REST API request. |
 | cget | Sends GET request for a list of entities. See [get_list action](./actions.md#get_list-action). |
 | get | Sends GET request for a single entity. See [get action](./actions.md#get-action). |
-| post | Sends POST request for an entity resource. See [create action](./actions.md#create-action). |
-| patch | Sends PATCH request for a single entity. See [update action](./actions.md#update-action). |
+| post | Sends POST request for an entity resource. See [create action](./actions.md#create-action). If the second parameter is a file name, the file should be located in the `requests` directory near to PHP file contains the test. |
+| patch | Sends PATCH request for a single entity. See [update action](./actions.md#update-action). If the second parameter is a file name, the file should be located in the `requests` directory near to PHP file contains the test. |
 | delete | Sends DELETE request for a single entity. See [delete action](./actions.md#delete-action). |
 | cdelete | Sends DELETE request for a list of entities. See [delete_list action](./actions.md#delete_list-action). |
 | getSubresource | Sends GET request for a sub-resource of a single entity. See [get_subresource action](./actions.md#get_subresource-action). |
 | getRelationship | Sends GET request for a relationship of a single entity. See [get_relationship action](./actions.md#get_relationship-action). |
 | postRelationship | Sends POST request for a relationship of a single entity. See [add_relationship action](./actions.md#add_relationship-action). |
 | patchRelationship | Sends PATCH request for a relationship of a single entity. See [update_relationship action](./actions.md#update_relationship-action). |
-| assertResponseContains | Asserts the response content contains the the given data. If the first parameter is a file name, the file should be located in the "responses" directory near to PHP file contains the test. |
+| assertResponseContains | Asserts the response content contains the the given data. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
 | assertResponseCount | Asserts the response contains the given number of data items. |
 | assertResponseNotEmpty | Asserts the response data are not empty. |
-| dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file should be located in the "responses" directory near to PHP file contains the test. |
+| dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
+| getResourceId | Extracts JSON.API resource identifier from the response. For details see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
 
 Load Fixtures
 -------------
@@ -167,8 +168,8 @@ or you can hold yaml in ```.yml``` file:
 public function testCreateCustomer()
 {
     $this->post(
-        ['entity' => $this->getEntityType(Customer::class)],
-        __DIR__.'/requests/create_customer.yml'
+        ['entity' => 'customers'],
+        'create_customer.yml' // loads data from __DIR__ . '/requests/create_customer.yml'
     );
 }
 ```

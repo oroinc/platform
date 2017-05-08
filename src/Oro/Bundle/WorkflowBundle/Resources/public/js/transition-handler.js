@@ -73,8 +73,11 @@ define([
                 modalOptions = message;
             }
 
-            var confirmation = element.data('confirmation');
-            var placeholders = confirmation.message_parameters || {};
+            var confirmation = element.data('confirmation') || {};
+            var placeholders = {};
+            if (confirmation.message_parameters !== undefined) {
+                placeholders = confirmation.message_parameters;
+            }
             if (confirmation.title || '') {
                 modalOptions.title = __(confirmation.title, $.extend({}, placeholders));
             }

@@ -115,7 +115,8 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     'hasForm' => false,
                     'frontendOptions' => [
                         'message' => [
-                            'message' => 'message1',
+                            'title' => 'title1',
+                            'content' => 'message1',
                             'message_parameters' => ['param1' => 'value1']
                         ],
                     ]
@@ -128,8 +129,9 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'url' => 'generated-url',
                         'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
                         'message' => [
-                            'title' => '[trans]test label[/trans]',
+                            'title' => 'title1',
                             'content' => '[trans]message1[/trans]',
+                            'message_parameters' => ['param1' => 'value1']
                         ],
                     ],
                     'data' => [],
