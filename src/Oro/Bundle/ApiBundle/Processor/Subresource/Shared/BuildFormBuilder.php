@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 
 /**
@@ -16,15 +15,15 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
  */
 class BuildFormBuilder implements ProcessorInterface
 {
-    /** @var FormFactoryInterface */
-    protected $formFactory;
+    /** @var FormHelper */
+    protected $formHelper;
 
     /**
-     * @param FormFactoryInterface $formFactory
+     * @param FormHelper $formHelper
      */
-    public function __construct(FormFactoryInterface $formFactory)
+    public function __construct(FormHelper $formHelper)
     {
-        $this->formFactory = $formFactory;
+        $this->formHelper = $formHelper;
     }
 
     /**
@@ -53,24 +52,19 @@ class BuildFormBuilder implements ProcessorInterface
      */
     protected function getFormBuilder(ChangeRelationshipContext $context)
     {
-        $formBuilder = $this->formFactory->createNamedBuilder(
-            null,
+        $parentConfig = $context->getParentConfig();
+        $associationName = $context->getAssociationName();
+
+        $formBuilder = $this->formHelper->createFormBuilder(
             'form',
             $context->getParentEntity(),
-            array_merge(
-                FormUtil::getFormDefaultOptions(),
-                ['data_class' => $context->getParentClassName()]
-            )
+            ['data_class' => $context->getParentClassName()]
         );
-
-        $associationName = $context->getAssociationName();
-        $associationConfig = $context->getParentConfig()->getField($associationName);
-        $association = $context->getParentMetadata()->getAssociation($associationName);
-
-        $formBuilder->add(
+        $this->formHelper->addFormField(
+            $formBuilder,
             $associationName,
-            $associationConfig->getFormType(),
-            FormUtil::getFormFieldOptions($association, $associationConfig)
+            $parentConfig->getField($associationName),
+            $context->getParentMetadata()->getAssociation($associationName)
         );
 
         return $formBuilder;

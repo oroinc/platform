@@ -5,23 +5,14 @@ api:
             fields:
                 target:
                     data_type:    association:manyToOne
-                    description:  A record to which the attachment record belongs to.
             actions:
-                            create:
-                                fields:
-                                    target:
-                                        form_options:
-                                            constraints:
-                                                - NotNull: ~
- #           subresources:
- #               target:
- #                   actions:
- #                      get_subresource:
- #                          documentation: Get full information about a record to which the attachment belongs to.
- #                       get_relationship:
- #                           documentation: Get a record to which the attachment belongs to.
- #                       update_relationship:
- #                           documentation: Update a record to which the attachment belongs to.
+                create:
+                    fields:
+                        target:
+                            form_options:
+                                constraints:
+                                    - NotNull: ~
+
         Oro\Bundle\AttachmentBundle\Entity\File:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/file.md'
             fields:
@@ -30,7 +21,6 @@ api:
                 extension:
                     exclude: true
                 content:
-                    description: The content of the file as a string.
                     data_type: string
                     property_path: file
                     depends_on: [filename]

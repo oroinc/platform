@@ -44,7 +44,7 @@ class TranslationsDatagridLinksProvider
 
         $linksData = [
             WorkflowConfiguration::NODE_STEPS => ['label'],
-            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message']
+            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'button_label', 'button_title', 'message']
         ];
 
         foreach ($linksData as $node => $attributes) {

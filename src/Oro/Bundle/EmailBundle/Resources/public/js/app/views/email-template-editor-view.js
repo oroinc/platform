@@ -63,11 +63,12 @@ define(function(require) {
                     if (_.result(component.view, 'tinymceConnected') === true &&
                         !_.isNull(this.options.emailVariableView)
                     ) {
-                        $(component.view.tinymceInstance.getBody()).on(
+                        var tinymceInstance = component.view.tinymceInstance;
+                        $(tinymceInstance.getBody()).on(
                             'blur',
                             _.bind(
                                 function(e) {
-                                    this.options.emailVariableView.view._updateElementsMetaData(e);
+                                    $(tinymceInstance.targetElm).trigger(e);
                                 },
                                 this
                             )

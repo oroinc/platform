@@ -164,10 +164,6 @@ class ObjectNormalizer
         $entityClass = $this->getEntityClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
-                continue;
-            }
-
             $propertyPath = $field->getPropertyPath($fieldName);
             if ($this->isMetadataProperty($propertyPath)) {
                 $result[$propertyPath] = $this->getMetadataProperty($entityClass, $propertyPath);

@@ -19,6 +19,8 @@ Feature: Managing workflows
       | label           | Trans1  |
       | step_from       | (Start) |
       | step_to         | Step1   |
+      | button_label    | Label1  |
+      | button_title    | Title1  |
     And I press "Apply"
     Then I press "Add step"
     And I fill form with:
@@ -28,9 +30,11 @@ Feature: Managing workflows
     And I press "Apply"
     Then I press "Add transition"
     And I fill form with:
-      | label           | Trans1  |
+      | label           | Trans2  |
       | step_from       | Step1   |
       | step_to         | Step2   |
+      | button_label    | Label2  |
+      | button_title    | Title2  |
     And I press "Apply"
     When I save and close form
     And I go to System/ Workflows
@@ -84,10 +88,16 @@ Feature: Managing workflows
   Scenario: Workflow edit
     Given I go to System/ Workflows
     And I click Edit Test workflow in grid
-    And I fill form with:
+    When I press "Trans1"
+    Then "Workflow Transition Edit Info Form" must contains values:
+      | label           | Trans1  |
+      | button_label    | Label1  |
+      | button_title    | Title1  |
+    And I press "Cancel"
+    When I fill form with:
       | Name            | Glorious workflow  |
       | Related Entity  | Business Unit      |
-    When I save and close form
+    And I save and close form
     Then I should see "Could not save workflow. Please add at least one step and one transition." flash message
     Then I press "Add step"
     And I fill form with:
