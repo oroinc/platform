@@ -6,7 +6,7 @@ Feature: Notify assigned Sales Representatives
   Scenario: Create email template
     Given I login as administrator
     And go to System/ Emails/ Templates
-    And press "Create Email Tempate"
+    And press "Create Email Template"
     And fill form with:
       |Owner         |John Doe       |
       |Template Name |Test Template  |
