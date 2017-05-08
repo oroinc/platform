@@ -222,3 +222,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.clearfix-box() {
+  &:after {
+    display: block;
+    width: 100%;
+    content: '';
+    clear: both;
+  }
+}
+

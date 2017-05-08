@@ -81,7 +81,8 @@ class WidgetControllerTest extends WebTestCase
         $this->assertContains(
             $this->getTransitionLabel(
                 LoadWorkflowDefinitionsWithFormConfiguration::WFC_WORKFLOW_NAME,
-                LoadWorkflowDefinitionsWithFormConfiguration::WFC_START_TRANSITION
+                LoadWorkflowDefinitionsWithFormConfiguration::WFC_START_TRANSITION,
+                true
             ),
             $crawler->html()
         );
@@ -101,12 +102,18 @@ class WidgetControllerTest extends WebTestCase
     /**
      * @param string $workflowName
      * @param string $transitionName
+     * @param bool $useTransitionLabel
      *
      * @return string
      */
-    protected function getTransitionLabel($workflowName, $transitionName)
+    protected function getTransitionLabel($workflowName, $transitionName, $useTransitionLabel = false)
     {
-        return sprintf('%s.%s.transition.%s.label', WorkflowTemplate::KEY_PREFIX, $workflowName, $transitionName);
+        return sprintf(
+            $useTransitionLabel ? '%s.%s.transition.%s.label' : '%s.%s.transition.%s.button_label',
+            WorkflowTemplate::KEY_PREFIX,
+            $workflowName,
+            $transitionName
+        );
     }
 
     public function testStartTransitionFormAction()
@@ -298,7 +305,7 @@ class WidgetControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
-        $transitionButton = $crawler->selectLink('oro.workflow.test_active_flow1.transition.transition1.label');
+        $transitionButton = $crawler->selectLink('oro.workflow.test_active_flow1.transition.transition1.button_label');
         $this->assertCount(1, $transitionButton);
         $this->assertSame('javascript:void(0);', $transitionButton->attr('href'));
         $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());

@@ -4,7 +4,6 @@ define(function(require) {
     var EmailVariableView;
     var document = window.document;
     var $ = require('jquery');
-    require('tinymce/jquery.tinymce.min');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
@@ -75,24 +74,8 @@ define(function(require) {
             this.$el.html(this.template({variables: vars}));
             this._applyDraggable(this._getSectionContent(this.sections.system));
             this._renderEntityVariables();
-            this.initLayout().then(_.bind(this.afterLayoutInit, this));
 
             return this;
-        },
-
-        afterLayoutInit: function() {
-            _.each(this.fields, function(field) {
-                var $field = $(field);
-                if (!Boolean($field.data('wysiwygEnabled')) || !$field.attr('id')) {
-                    return;
-                }
-
-                var editor = $field.tinymce();
-                $(editor.getBody())
-                    .on('blur', function() {
-                        $field.trigger('blur');
-                    });
-            }, this);
         },
 
         /**

@@ -815,6 +815,40 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'excluded fields should be removed'                          => [
+                'config'       => [
+                    'fields' => [
+                        'name'    => ['exclude' => true],
+                        'contact' => [
+                            'fields' => [
+                                'id'        => null,
+                                'firstName' => ['exclude' => true],
+                                'lastName'  => null
+                            ]
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'      => 123,
+                        'name'    => 'Name',
+                        'contact' => [
+                            'id'        => 456,
+                            'firstName' => 'First Name',
+                            'lastName'  => 'Last Name',
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'      => 123,
+                        'contact' => [
+                            'id'       => 456,
+                            'lastName' => 'Last Name',
+                        ]
+                    ]
+                ]
+            ],
         ];
     }
 }

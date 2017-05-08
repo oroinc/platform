@@ -36,6 +36,7 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', false);
 
         $configExtensionRegistry = new ConfigExtensionRegistry(3);
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());

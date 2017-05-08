@@ -124,7 +124,6 @@ define(function(require) {
                 okText: __('Save'),
                 secondaryText: __('Discard'),
                 className: 'modal modal-primary',
-                okButtonClass: 'btn-primary btn-large',
                 cancelText: __('Cancel'),
                 template: require('tpl!oroui/templates/three-buttons-modal.html')
             });

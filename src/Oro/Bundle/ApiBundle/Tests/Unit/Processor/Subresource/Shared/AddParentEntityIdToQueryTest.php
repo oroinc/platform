@@ -89,8 +89,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product e'
-            . ' INNER JOIN e.owner parent_entity'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN e.owner parent_entity1'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -122,9 +122,9 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
-            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity'
-            . ' WITH e MEMBER OF parent_entity.users'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity1'
+            . ' WITH e MEMBER OF parent_entity1.users'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -156,8 +156,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product e'
-            . ' INNER JOIN e.owner parent_entity'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN e.owner parent_entity1'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -189,9 +189,9 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
-            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity'
-            . ' WITH e MEMBER OF parent_entity.users'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity1'
+            . ' WITH e MEMBER OF parent_entity1.users'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -222,8 +222,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
-            . ' INNER JOIN e.products parent_entity'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN e.products parent_entity1'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -254,9 +254,9 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
-            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity'
-            . ' WITH parent_entity.user = e'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity1'
+            . ' WITH parent_entity1.user = e'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -287,8 +287,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
-            . ' INNER JOIN e.products parent_entity'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN e.products parent_entity1'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -319,9 +319,9 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
-            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity'
-            . ' WITH parent_entity.user = e'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin parent_entity1'
+            . ' WITH parent_entity1.user = e'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -352,8 +352,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin e'
-            . ' INNER JOIN e.mailbox parent_entity'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN e.mailbox parent_entity1'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(
@@ -384,8 +384,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->assertEquals(
             'SELECT e'
             . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Origin e'
-            . ' INNER JOIN e.mailbox parent_entity'
-            . ' WHERE parent_entity = :parent_entity_id',
+            . ' INNER JOIN e.mailbox parent_entity1'
+            . ' WHERE parent_entity1 = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         $this->assertEquals(

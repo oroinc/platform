@@ -1,3 +1,5 @@
+@ticket-BAP-11233
+@automatically-ticket-tagged
 Feature: Manage dashboards
   In order when system  has several dashboards
   As an administrator

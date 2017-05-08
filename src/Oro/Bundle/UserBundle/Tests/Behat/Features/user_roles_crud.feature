@@ -1,3 +1,5 @@
+@ticket-BAP-13807
+@automatically-ticket-tagged
 Feature: Managing users roles
   In order to control user permissions
   As an Administrator

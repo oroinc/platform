@@ -6,12 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Provider\Event\OnButtonsMatched;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 
@@ -37,9 +40,11 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         $this->searchContext = $this->createMock(ButtonSearchContext::class);
 
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->buttonProvider = new ButtonProvider();
         $this->buttonProvider->setLogger($this->logger);
+        $this->buttonProvider->setEventDispatcher($this->eventDispatcher);
     }
 
     public function testMatch()
@@ -80,6 +85,20 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
             )->willReturn($button3);
 
         $collection->map($callable);
+    }
+
+    public function testMatchEvent()
+    {
+        $extension1 = $this->extension('one');
+        $extension1->expects($this->once())->method('find')->willReturn([]);
+        $extension2 = $this->extension('two');
+        $extension2->expects($this->once())->method('find')->willReturn([]);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(OnButtonsMatched::NAME, new OnButtonsMatched(new ButtonsCollection()));
+
+        $this->buttonProvider->match($this->searchContext);
     }
 
     /**

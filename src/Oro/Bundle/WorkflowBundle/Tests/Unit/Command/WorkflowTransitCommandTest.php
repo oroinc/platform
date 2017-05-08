@@ -12,7 +12,7 @@ use Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
+use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 
 class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,7 +36,7 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
     private $repo;
 
-    /** @var TestOutput */
+    /** @var OutputStub */
     private $output;
 
     protected function setUp()
@@ -69,7 +69,7 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
         $this->command->setContainer($this->container);
 
         $this->input = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
-        $this->output = new TestOutput();
+        $this->output = new OutputStub();
     }
 
     protected function tearDown()

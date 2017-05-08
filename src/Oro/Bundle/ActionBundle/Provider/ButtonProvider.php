@@ -7,10 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
+use Oro\Bundle\ActionBundle\Provider\Event\OnButtonsMatched;
 
 class ButtonProvider
 {
@@ -19,6 +22,9 @@ class ButtonProvider
 
     /** @var LoggerInterface */
     protected $logger;
+
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
 
     public function __construct()
     {
@@ -35,6 +41,14 @@ class ButtonProvider
         $this->logger = $logger;
 
         return $this;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -55,6 +69,10 @@ class ButtonProvider
 
         foreach ($this->extensions as $extension) {
             $collection->consume($extension, $searchContext);
+        }
+
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(OnButtonsMatched::NAME, new OnButtonsMatched($collection));
         }
 
         return $collection;

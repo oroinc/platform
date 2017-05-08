@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @method EntityDefinitionFieldConfig[] getFields()
@@ -194,6 +195,36 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function findFieldNameByPropertyPath($propertyPath)
     {
         return $this->doFindFieldNameByPropertyPath($propertyPath);
+    }
+
+    /**
+     * Finds the configuration of a child field by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     *
+     * @param string|string[] $path
+     * @param bool            $findByPropertyPath
+     *
+     * @return EntityDefinitionFieldConfig|null
+     */
+    public function findFieldByPath($path, $findByPropertyPath = false)
+    {
+        $targetConfig = $this;
+        if (!is_array($path)) {
+            $path = ConfigUtil::explodePropertyPath($path);
+        }
+        $pathCount = count($path);
+        for ($i = 0; $i < $pathCount - 1; $i++) {
+            $fieldConfig = $targetConfig->findField($path[$i], $findByPropertyPath);
+            if (null === $fieldConfig) {
+                return null;
+            }
+            $targetConfig = $fieldConfig->getTargetEntity();
+            if (null === $targetConfig) {
+                return null;
+            }
+        }
+
+        return $targetConfig->findField($path[$pathCount - 1], $findByPropertyPath);
     }
 
     /**

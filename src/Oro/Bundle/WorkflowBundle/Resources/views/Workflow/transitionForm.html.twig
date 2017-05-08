@@ -2,11 +2,14 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as macros %}
 
-{% set pageParams = transition.frontendOptions.page is defined ?transition.frontendOptions.page : null  %}
+{% set pageParams = transition.frontendOptions.page is defined ? transition.frontendOptions.page : null  %}
 {% if pageParams.title is defined %}
     {% set pageTitle = pageParams.title|trans %}
 {% else %}
-    {% set pageTitle = transition.label|trans({},'workflows') %}
+    {% set pageTitle = transition.buttonLabel|trans({},'workflows') %}
+    {% if pageTitle is empty or pageTitle == transition.buttonLabel %}
+        {% set pageTitle = transition.label|trans({},'workflows') %}
+    {% endif %}
 {% endif %}
 
 {% if pageParams.parent_label is defined %}

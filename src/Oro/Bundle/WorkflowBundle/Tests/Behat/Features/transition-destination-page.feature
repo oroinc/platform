@@ -1,3 +1,5 @@
+@ticket-BAP-13968
+@automatically-ticket-tagged
 @fixture-Workflow.yml
 Feature: Transition Destination Page for Workflow
   In order to specify where the user should be redirected after submitting workflow transition form (shown as a separate page)

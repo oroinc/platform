@@ -50,6 +50,16 @@ class LanguageHelper
 
     /**
      * @param Language $language
+     *
+     * @return bool
+     */
+    public function isTranslationsAvailable(Language $language)
+    {
+        return $this->isAvailableInstallTranslates($language) || $this->isAvailableUpdateTranslates($language);
+    }
+
+    /**
+     * @param Language $language
      * @return bool
      */
     public function isAvailableInstallTranslates(Language $language)

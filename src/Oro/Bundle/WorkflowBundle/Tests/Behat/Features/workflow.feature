@@ -8,8 +8,8 @@ Feature: Managing workflows
     Then I go to System/ Workflows
     And I press "Create Workflow"
     And I fill form with:
-      | Name            | Test workflow          |
-      | Related Entity  | Business Customer      |
+      | Name            | Test workflow |
+      | Related Entity  | User          |
     Then I press "Add step"
     And I fill form with:
       | label           | Step1  |
@@ -19,6 +19,8 @@ Feature: Managing workflows
       | label           | Trans1  |
       | step_from       | (Start) |
       | step_to         | Step1   |
+      | button_label    | Label1  |
+      | button_title    | Title1  |
     And I press "Apply"
     Then I press "Add step"
     And I fill form with:
@@ -28,46 +30,74 @@ Feature: Managing workflows
     And I press "Apply"
     Then I press "Add transition"
     And I fill form with:
-      | label           | Trans1  |
+      | label           | Trans2  |
       | step_from       | Step1   |
       | step_to         | Step2   |
+      | button_label    | Label2  |
+      | button_title    | Title2  |
     And I press "Apply"
     When I save and close form
     And I go to System/ Workflows
     Then I should see Test workflow in grid with following data:
-      | Related Entity  | Business Customer      |
-      | Active          | No                     |
-      | System          | No                     |
-      | Priority        | 0                      |
+      | Related Entity  | User |
+      | Active          | No   |
+      | System          | No   |
+      | Priority        | 0    |
 
   Scenario: Workflow activation from grid
     Given I sort grid by Related Entity
+    Then I should see following actions for Test Workflow in grid:
+      | Edit |
     And I click Activate Test workflow in grid
     And I press "Activate"
     Then I should see "Workflow activated" flash message
+    And I should not see following actions for Test Workflow in grid:
+      | Edit |
     And I should see Test workflow in grid with following data:
-      | Related Entity  | Business Customer      |
-      | Active          | Yes                    |
-      | System          | No                     |
-      | Priority        | 0                      |
+      | Related Entity  | User |
+      | Active          | Yes  |
+      | System          | No   |
+      | Priority        | 0    |
+
+  Scenario: Workflow deactivation from grid
+    Given I sort grid by Related Entity
+    When I click Deactivate Test workflow in grid
+    And I press "Yes, Deactivate"
+    Then I should see following actions for Test Workflow in grid:
+      | Edit |
+    And I should see Test workflow in grid with following data:
+      | Related Entity  | User |
+      | Active          | No   |
+      | System          | No   |
+      | Priority        | 0    |
+
+  Scenario: Workflow activation from entity view
+    Given I click View Test workflow in grid
+    Then I should see an "Entity Edit Button" element
+    And I press "Activate"
+    And I press "Activate"
+    Then I should see "Workflow activated" flash message
+    And I should not see an "Entity Edit Button" element
 
   Scenario: Workflow deactivation from entity view
-    Given I sort grid by Related Entity
-    And I click Deactivate Test workflow in grid
-    When I press "Yes, Deactivate"
-    And I go to System/ Workflows
-    Then I should see Test workflow in grid with following data:
-      | Related Entity  | Business Customer      |
-      | Active          | No                     |
-      | System          | No                     |
-      | Priority        | 0                      |
+    Given I press "Deactivate"
+    And I press "Yes, Deactivate"
+    Then I should see "Workflow deactivated" flash message
+    And I should see an "Entity Edit Button" element
 
   Scenario: Workflow edit
-    Given I click Edit Test workflow in grid
-    And I fill form with:
+    Given I go to System/ Workflows
+    And I click Edit Test workflow in grid
+    When I press "Trans1"
+    Then "Workflow Transition Edit Info Form" must contains values:
+      | label           | Trans1  |
+      | button_label    | Label1  |
+      | button_title    | Title1  |
+    And I press "Cancel"
+    When I fill form with:
       | Name            | Glorious workflow  |
       | Related Entity  | Business Unit      |
-    When I save and close form
+    And I save and close form
     Then I should see "Could not save workflow. Please add at least one step and one transition." flash message
     Then I press "Add step"
     And I fill form with:
@@ -99,7 +129,7 @@ Feature: Managing workflows
       | System          | No                         |
       | Priority        | 0                          |
 
-  Scenario: Deleting business customer
+  Scenario: Deleting workflow
     Given I sort grid by Related Entity
     And I click Delete Copy of Glorious workflow in grid
     When I confirm deletion

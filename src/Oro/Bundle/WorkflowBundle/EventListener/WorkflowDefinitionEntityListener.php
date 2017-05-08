@@ -34,14 +34,18 @@ class WorkflowDefinitionEntityListener
      */
     public function prePersist(WorkflowDefinition $definition)
     {
-        if ($definition->isActive() && $definition->hasExclusiveActiveGroups()) {
-            $workflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
-                $definition->getExclusiveActiveGroups()
-            );
+        if ($definition->isActive()) {
+            if ($definition->hasExclusiveActiveGroups()) {
+                $workflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
+                    $definition->getExclusiveActiveGroups()
+                );
 
-            if (count($workflows) !== 0) {
-                throw $this->generateException($definition, $workflows->getValues());
+                if (count($workflows) !== 0) {
+                    throw $this->generateException($definition, $workflows->getValues());
+                }
             }
+
+            $this->clearEntitiesCache();
         }
     }
 
@@ -52,7 +56,8 @@ class WorkflowDefinitionEntityListener
      */
     public function preUpdate(WorkflowDefinition $definition, PreUpdateEventArgs $event)
     {
-        if ($event->hasChangedField('active') && $event->getNewValue('active') === true) {
+        $isActivated = $event->hasChangedField('active') && $event->getNewValue('active') === true;
+        if ($isActivated) {
             $storedWorkflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
                 $definition->getExclusiveActiveGroups()
             );
@@ -64,6 +69,10 @@ class WorkflowDefinitionEntityListener
             if (!$conflictingWorkflows->isEmpty()) {
                 throw $this->generateException($definition, $conflictingWorkflows->getValues());
             }
+        }
+
+        if ($isActivated || $event->hasChangedField('relatedEntity')) {
+            $this->clearEntitiesCache();
         }
     }
 
@@ -77,6 +86,8 @@ class WorkflowDefinitionEntityListener
         if ($definition->isSystem()) {
             throw new WorkflowRemoveException($definition->getName());
         }
+
+        $this->clearEntitiesCache();
     }
 
     /**
@@ -119,5 +130,10 @@ class WorkflowDefinitionEntityListener
         }
 
         return $this->workflowRegistry;
+    }
+
+    private function clearEntitiesCache()
+    {
+        $this->container->get('oro_workflow.cache.entities_with_workflow')->deleteAll();
     }
 }

@@ -32,15 +32,15 @@ class TestDepartment implements TestFrameworkEntityInterface
      * @var TestDepartment|null
      *
      * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\TestFrameworkBundle\Entity\TestPerson",
+     *     targetEntity="Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee",
      *     mappedBy="department"
      * )
      */
-    protected $staff;
+    protected $employees;
 
     public function __construct()
     {
-        $this->staff  = new ArrayCollection();
+        $this->employees  = new ArrayCollection();
     }
 
     /**
@@ -76,48 +76,48 @@ class TestDepartment implements TestFrameworkEntityInterface
     }
 
     /**
-     * @return Collection|TestPerson[]
+     * @return Collection|TestEmployee[]
      */
-    public function getStaff()
+    public function getEmployees()
     {
-        return $this->staff;
+        return $this->employees;
     }
 
     /**
-     * @param Collection $staff
+     * @param Collection $employees
      *
      * @return self
      */
-    public function setStaff(Collection $staff)
+    public function setEmployees(Collection $employees)
     {
-        $this->staff = $staff;
+        $this->employees = $employees;
 
         return $this;
     }
 
     /**
-     * @param TestPerson $person
+     * @param TestEmployee $person
      *
      * @return self
      */
-    public function addStaff(TestPerson $person)
+    public function addEmployee(TestEmployee $person)
     {
-        if (!$this->staff->contains($person)) {
-            $this->staff->add($person);
+        if (!$this->employees->contains($person)) {
+            $this->employees->add($person);
         }
 
         return $this;
     }
 
     /**
-     * @param TestPerson $person
+     * @param TestEmployee $person
      *
      * @return self
      */
-    public function removeStaff(TestPerson $person)
+    public function removeEmployee(TestEmployee $person)
     {
-        if ($this->staff->contains($person)) {
-            $this->staff->removeElement($person);
+        if ($this->employees->contains($person)) {
+            $this->employees->removeElement($person);
         }
 
         return $this;
