@@ -27,16 +27,23 @@ class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, Messag
         ];
     }
 
-    /**
-     * @param BeforeStepTested $scope
-     */
-    public function beforeStep(BeforeStepTested $scope)
+    public function beforeStep()
     {
         $mqProcess = $this->messageQueueIsolator->getProcess();
 
-        if ($mqProcess->getStatus() == Process::STATUS_TERMINATED) {
-            $mqProcess->start();
+        if (null === $mqProcess) {
+            return;
         }
+
+        if ($mqProcess->getStatus() !== Process::STATUS_TERMINATED) {
+            return;
+        }
+
+        $mqProcess->start(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                echo 'MessageQueueConsumer ERR > '.$buffer;
+            }
+        });
     }
 
     /**

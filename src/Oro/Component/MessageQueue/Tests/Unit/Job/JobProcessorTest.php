@@ -564,25 +564,64 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $processor->interruptRootJob($rootJob);
     }
 
-    public function testInterruptRootJobShouldUpdateJobAndSetInterruptedTrue()
+    public function testInterruptRootJobShouldUpdateJobAndSetInterruptedTrueAndCancelNonRunnedChildren()
     {
         $rootJob = new Job();
         $rootJob->setId(123);
 
+        $childRunnedJob = new Job();
+        $childRunnedJob->setId(1234);
+        $childRunnedJob->setStatus(Job::STATUS_RUNNING);
+        $childRunnedJob->setRootJob($rootJob);
+
+        $childNewJob = new Job();
+        $childNewJob->setId(1235);
+        $childNewJob->setStatus(Job::STATUS_NEW);
+        $childNewJob->setRootJob($rootJob);
+
+        $childRedeliveredJob = new Job();
+        $childRedeliveredJob->setId(1236);
+        $childRedeliveredJob->setStatus(Job::STATUS_FAILED_REDELIVERED);
+        $childRedeliveredJob->setRootJob($rootJob);
+
+        $rootJob->setChildJobs([$childRunnedJob, $childNewJob, $childRedeliveredJob]);
+
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('saveJob')
             ->will($this->returnCallback(function (Job $job, $callback) {
                 $callback($job);
-            }))
-        ;
+            }));
+        $storage
+            ->expects($this->at(1))
+            ->method('saveJob')
+            ->with($childNewJob);
+        $storage
+            ->expects($this->at(3))
+            ->method('saveJob')
+            ->with($childRedeliveredJob);
+
+        $storage
+            ->expects($this->exactly(2))
+            ->method('findJobById')
+            ->will($this->returnCallback(function ($jobId) use ($childRunnedJob, $childNewJob, $childRedeliveredJob) {
+                $jobs = [
+                    $childNewJob->getId() => $childNewJob,
+                    $childRedeliveredJob->getId() => $childRedeliveredJob,
+                ];
+
+                return $jobs[$jobId];
+            }));
 
         $processor = new JobProcessor($storage, $this->createMessageProducerMock());
         $processor->interruptRootJob($rootJob);
 
         $this->assertTrue($rootJob->isInterrupted());
         $this->assertNull($rootJob->getStoppedAt());
+        $this->assertEquals(Job::STATUS_RUNNING, $childRunnedJob->getStatus());
+        $this->assertEquals(Job::STATUS_CANCELLED, $childNewJob->getStatus());
+        $this->assertEquals(Job::STATUS_CANCELLED, $childRedeliveredJob->getStatus());
     }
 
     public function testInterruptRootJobShouldUpdateJobAndSetInterruptedTrueAndStoppedTimeIfForceTrue()

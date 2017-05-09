@@ -4,11 +4,11 @@
         {% if isMobileVersion() %}
             <div class="filter-box oro-clearfix-width">
                 <div class="dropdown">
-                    <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-name="filters-dropdown">{{ 'Filter Results'|trans|e('html')|raw }}</a>
-                    <ul class="dropdown-menu">
+                    <a href="javascript:void(0);" class="btn btn--default btn--size-s dropdown-toggle" data-name="filters-dropdown">{{ 'Filter Results'|trans|e('html')|raw }}</a>
+                    <ul class="filter-box__dropdown dropdown-menu">
                         <li>
                             <div class="filter-container">
-                                <a class="reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
+                                <a class="btn btn--default btn--size-s reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
                                 <select data-action="add-filter-select" multiple>
                                     <% _.each(filters, function (filter, name) { %>
                                     <% if (filter.visible) { %>

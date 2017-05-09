@@ -8,7 +8,6 @@
 {% endif %}
 
 {% set transitionData = {
-    'transition-label': button.label|trans({},'workflows'),
     'message': transitionMessage|nl2br,
     'transition-condition-messages': button.buttonContext.errors,
     'enabled': button.buttonContext.enabled,
@@ -16,8 +15,12 @@
 } %}
 
 {% set transitionData = frontendOptions.data|default({})|merge(transitionData) %}
-{% if hasForm and showDialog %}
-    {% set transitionData = transitionData|merge({'dialog-url': path(dialogRoute, routeParams) }) %}
+{% if hasForm %}
+    {% if showDialog %}
+        {% set transitionData = transitionData|merge({'dialog-url': path(dialogRoute, routeParams) }) %}
+    {% else %}
+        {% set transitionData = transitionData|merge({'transition-url': path(dialogRoute, routeParams) }) %}
+    {% endif %}
 {% endif %}
 {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
     {{ workflowMacros.renderTransitionButton(

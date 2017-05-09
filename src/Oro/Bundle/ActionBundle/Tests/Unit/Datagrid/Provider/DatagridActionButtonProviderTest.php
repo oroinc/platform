@@ -429,6 +429,88 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testOnConfigureActionsWithFewDatagrids()
+    {
+        $config1 = DatagridConfiguration::create([
+            'name' => 'datagrid1',
+            ActionExtension::ACTION_CONFIGURATION_KEY => function () {
+                return [
+                    'action1' => ['actionKey1' => 'actionValue1'],
+                ];
+            },
+            'source' => [
+                'type' => OrmDatasource::TYPE,
+            ],
+        ]);
+
+        $buttonCollection1 = $this->createButtonsCollection(
+            [
+                'operation1' => $this->createOperationButton('operation1', true),
+                'operation2' => $this->createOperationButton('operation2', true),
+            ]
+        );
+
+        $config2 = DatagridConfiguration::create([
+            'name' => 'datagrid2',
+            ActionExtension::ACTION_CONFIGURATION_KEY => function () {
+                return [
+                    'action2' => ['actionKey2' => 'actionValue2'],
+                ];
+            },
+            'source' => [
+                'type' => OrmDatasource::TYPE,
+            ],
+        ]);
+
+        $buttonCollection2 = $this->createButtonsCollection(
+            [
+                'opearation3' => $this->createOperationButton('operation3', true),
+            ]
+        );
+
+        $this->buttonProvider->expects($this->at(0))->method('match')->willReturn($buttonCollection1);
+        $this->buttonProvider->expects($this->at(1))->method('match')->willReturn($buttonCollection2);
+
+        $this->provider->applyActions($config1);
+        $this->provider->applyActions($config2);
+
+
+        $callback1 = $config1->offsetGet('action_configuration');
+        $this->assertEquals(
+            [
+                'action1' => [
+                    'actionKey1' => 'actionValue1',
+                ],
+                'operation1' => [
+                    'option1' => 'value1',
+                    'option2' => 'value2',
+                    'key1' => 'value1',
+                ],
+                'operation2' => [
+                    'option1' => 'value1',
+                    'option2' => 'value2',
+                    'key1' => 'value1',
+                ],
+            ],
+            call_user_func($callback1, new ResultRecord(['id' => 1]), [])
+        );
+
+        $callback2 = $config2->offsetGet('action_configuration');
+        $this->assertEquals(
+            [
+                'action2' => [
+                    'actionKey2' => 'actionValue2',
+                ],
+                'operation3' => [
+                    'option1' => 'value1',
+                    'option2' => 'value2',
+                    'key1' => 'value1',
+                ],
+            ],
+            call_user_func($callback2, new ResultRecord(['id' => 1]), [])
+        );
+    }
+
     /**
      * @param string $label
      * @param array $data

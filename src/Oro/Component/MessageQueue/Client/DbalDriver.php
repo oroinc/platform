@@ -65,8 +65,6 @@ class DbalDriver implements DriverInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return DbalMessage
      */
     public function createTransportMessage()
     {

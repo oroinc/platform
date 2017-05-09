@@ -84,8 +84,7 @@ define([
                     okText: __('OK'),
                     cancelText: __('Cancel'),
                     content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
-                    className: 'modal modal-primary',
-                    okButtonClass: 'btn-primary btn-large'
+                    className: 'modal modal-primary'
                 });
 
             confirm.on('ok', _.bind(function() {

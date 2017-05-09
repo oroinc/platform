@@ -32,6 +32,13 @@ services:
         tags:
             - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_api.form_helper:
+        class: Oro\Bundle\ApiBundle\Form\FormHelper
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@service_container'
+
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
         arguments:
@@ -62,6 +69,8 @@ services:
 
     oro_api.form.type.compound_entity:
         class: Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType
+        arguments:
+            - '@oro_api.form_helper'
         tags:
             - { name: oro.api.form.type, alias: oro_api_compound_object }
 

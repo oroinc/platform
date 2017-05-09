@@ -82,6 +82,8 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
      */
     public function process($item)
     {
+        $this->context->setValue('rawItemData', $item);
+
         if ($this->dataConverter) {
             $item = $this->dataConverter->convertToImportFormat($item, false);
         }

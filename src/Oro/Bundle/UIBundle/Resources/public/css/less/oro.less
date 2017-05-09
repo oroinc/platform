@@ -165,17 +165,19 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
-        padding-top: 7px;
         width: 100%;
         word-wrap: break-word;
         padding-left: 5px; // to get nice hover background
-        box-sizing: border-box;
         &.html-property {
           overflow: auto;
         }
       }
       .control-label.wrap {
         width: 130px;
+
+        + .controls {
+          margin-left: 140px;
+        }
       }
       label.control-label {
         width: auto;
@@ -3340,13 +3342,6 @@ label .popover-content {
   .input-prepend .select2-container,
   .input-append .select2-container {
     width: 229px;
-  }
-}
-
-.control-group-justified {
-  .input-prepend .select2-container,
-  .input-append .select2-container {
-    width: 263px;
   }
 }
 

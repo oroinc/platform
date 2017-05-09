@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
@@ -26,6 +27,12 @@ class Transition
 
     /** @var string */
     protected $label;
+
+    /** @var string */
+    protected $buttonLabel;
+
+    /** @var string */
+    protected $buttonTitle;
 
     /** @var ExpressionInterface|null */
     protected $condition;
@@ -96,6 +103,17 @@ class Transition
     /** @var bool */
     protected $hasFormConfiguration = false;
 
+    /** @var TransitionOptionsResolver */
+    protected $optionsResolver;
+
+    /**
+     * @param TransitionOptionsResolver $optionsResolver
+     */
+    public function __construct(TransitionOptionsResolver $optionsResolver)
+    {
+        $this->optionsResolver = $optionsResolver;
+    }
+
     /**
      * Set label.
      *
@@ -116,6 +134,44 @@ class Transition
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * @param string $buttonLabel
+     *
+     * @return Transition
+     */
+    public function setButtonLabel($buttonLabel)
+    {
+        $this->buttonLabel = $buttonLabel;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButtonLabel()
+    {
+        return $this->buttonLabel;
+    }
+
+    /**
+     * @param string $buttonTitle
+     *
+     * @return Transition
+     */
+    public function setButtonTitle($buttonTitle)
+    {
+        $this->buttonTitle = $buttonTitle;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButtonTitle()
+    {
+        return $this->buttonTitle;
     }
 
     /**
@@ -300,11 +356,13 @@ class Transition
      */
     public function isAvailable(WorkflowItem $workflowItem, Collection $errors = null)
     {
-        if ($this->hasForm()) {
-            return $this->isPreConditionAllowed($workflowItem, $errors);
-        } else {
-            return $this->isAllowed($workflowItem, $errors);
-        }
+        $result = $this->hasForm()
+            ? $this->isPreConditionAllowed($workflowItem, $errors)
+            : $this->isAllowed($workflowItem, $errors);
+
+        $this->optionsResolver->resolveTransitionOptions($this, $workflowItem);
+
+        return $result;
     }
 
     /**
@@ -377,7 +435,7 @@ class Transition
     public function hasForm()
     {
         return (!empty($this->formOptions) && !empty($this->formOptions['attribute_fields']))
-            || $this->hasFormConfiguration();
+            || $this->hasFormConfiguration() || $this->getDisplayType() === 'page';
     }
 
     /**

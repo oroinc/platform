@@ -113,10 +113,14 @@
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
                             {% if form.vars.method != 'GET' %}
+                                {% set inputAction  = form.vars.default_input_action is defined
+                                    ? form.vars.default_input_action
+                                    : constant('Oro\\Bundle\\UIBundle\\Route\\Router::ACTION_SAVE_CLOSE')
+                                %}
                                 <input
                                         type="hidden"
                                         name="input_action"
-                                        value="{{ constant('Oro\\Bundle\\UIBundle\\Route\\Router::ACTION_SAVE_CLOSE') }}"
+                                        value="{{ inputAction }}"
                                         data-form-id="{{ form.vars.id }}"
                                 />
                             {% endif %}

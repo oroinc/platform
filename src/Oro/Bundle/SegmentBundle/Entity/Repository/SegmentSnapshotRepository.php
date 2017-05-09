@@ -42,15 +42,22 @@ class SegmentSnapshotRepository extends EntityRepository
 
     /**
      * @param Segment $segment
-     *
+     * @param array $entityIds
      * @return array
      */
-    public function removeBySegment(Segment $segment)
+    public function removeBySegment(Segment $segment, array $entityIds = [])
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->delete($this->getEntityName(), 'snp')
-            ->where('snp.segment = :segment')
+            ->where($qb->expr()->eq('snp.segment', ':segment'))
             ->setParameter('segment', $segment);
+
+        if ($entityIds) {
+            $entityIdentifierField = $this->getEntityReferenceField($segment);
+
+            $qb->andWhere($qb->expr()->in('snp.' . $entityIdentifierField, ':entityIds'))
+                ->setParameter('entityIds', $entityIds);
+        }
 
         return $qb->getQuery()->execute();
     }
@@ -157,13 +164,7 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {
-        $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
-        $idField        = $entityMetadata->getSingleIdentifierFieldName();
-        $idFieldType    = $entityMetadata->getTypeOfField($idField);
-        $fieldToSelect  = SegmentSnapshot::ENTITY_REF_FIELD;
-        if ($idFieldType == 'integer') {
-            $fieldToSelect = SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;
-        }
+        $fieldToSelect = $this->getEntityReferenceField($segment);
         $fieldToSelect = sprintf('snp.%s', $fieldToSelect);
 
         $qb = $this->createQueryBuilder('snp')
@@ -172,5 +173,22 @@ class SegmentSnapshotRepository extends EntityRepository
             ->setParameter('segment', $segment);
 
         return $qb;
+    }
+
+    /**
+     * @param Segment $segment
+     * @return string
+     */
+    private function getEntityReferenceField(Segment $segment)
+    {
+        $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
+        $idField        = $entityMetadata->getSingleIdentifierFieldName();
+        $idFieldType    = $entityMetadata->getTypeOfField($idField);
+
+        if ($idFieldType === 'integer') {
+            return SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;
+        }
+
+        return SegmentSnapshot::ENTITY_REF_FIELD;
     }
 }

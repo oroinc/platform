@@ -1,0 +1,25 @@
+workflows:
+    workflow_to_import:
+        entity: Some\Entity
+        start_step: step_a
+        steps:
+            step_a:
+                order: 10
+                is_final: false
+                allowed_transitions: ['a_to_b']
+            step_b:
+                allowed_transitions: ['b_to_z']
+            step_z:
+                allowed_transitions: []
+        attributes: []
+        transitions:
+            transition_one:
+                step_to: step_c
+                transition_definition: transition_one_definition
+                frontend_options:
+                    icon: bar
+                    message: hello
+        transition_definitions:
+            transition_one_definition: ~
+        applications: ['application_a']
+        force_autostart: false

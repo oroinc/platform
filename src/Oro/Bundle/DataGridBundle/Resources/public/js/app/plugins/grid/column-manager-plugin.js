@@ -27,7 +27,7 @@ define(function(require) {
             var options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
-                    componentConstructor: ColumnManagerComponent,
+                    componentConstructor: toolbarOptions.componentConstructor || ColumnManagerComponent,
                     columns: this.main.columns,
                     managedColumns: this.managedColumns,
                     addSorting: true
@@ -48,10 +48,15 @@ define(function(require) {
             var managedColumns = [];
 
             this.main.columns.each(function(column, i) {
+                var isManageable =  column.get('manageable') !== false;
+
                 // set initial order
-                column.set('order', i, {silent: true});
+                if (_.isUndefined(column.get('order')) || isManageable) {
+                    column.set('order', i, {silent: true});
+                }
+
                 // collect manageable columns
-                if (column.get('manageable') !== false) {
+                if (isManageable) {
                     managedColumns.push(column);
                 }
             });

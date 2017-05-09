@@ -2,23 +2,19 @@
 
 namespace Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
 {
     const FLUSH_BATCH_SIZE = 100;
-    const MAX_DELETE_RECORDS = 5000;
 
     /**
      * @var TranslationManager
@@ -31,31 +27,23 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
     private $translator;
 
     /**
-     * @var DoctrineHelper
+     * @var AclHelper
      */
-    private $doctrineHelper;
-
-    /**
-     * @var SecurityFacade
-     */
-    private $securityFacade;
+    private $aclHelper;
 
     /**
      * @param TranslationManager $translationManager
      * @param TranslatorInterface $translator
-     * @param DoctrineHelper $doctrineHelper
-     * @param SecurityFacade $securityFacade
+     * @param AclHelper $aclHelper
      */
     public function __construct(
         TranslationManager $translationManager,
         TranslatorInterface $translator,
-        DoctrineHelper $doctrineHelper,
-        SecurityFacade $securityFacade
+        AclHelper $aclHelper
     ) {
         $this->translationManager = $translationManager;
         $this->translator = $translator;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $securityFacade;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -63,45 +51,39 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
      */
     public function handle(MassActionHandlerArgs $args)
     {
-        $iteration = 0;
-        $entityName = Translation::class;
+        $datasource = $args->getDatagrid()->getDatasource();
 
-        /** @var QueryBuilder $qb */
-        $qb = $args->getDatagrid()->getDatasource()->getQueryBuilder();
-        $qb->setMaxResults(self::MAX_DELETE_RECORDS);
+        if (!$datasource instanceof OrmDatasource) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Expected "%s", "%s" given',
+                    OrmDatasource::class,
+                    get_class($datasource)
+                )
+            );
+        }
+
+        $qb = clone $datasource->getQueryBuilder();
 
         $this->removeEmptyValuesFromQB($qb);
+        $this->addRequiredParameters($qb);
 
-        $results = new IterableResult($qb);
-        $results->setBufferSize(self::FLUSH_BATCH_SIZE);
+        $this->aclHelper->apply($qb, 'TRANSLATE');
+
+        $results = $qb->getQuery()->iterate(null, Query::HYDRATE_SCALAR);
 
         // if huge amount data must be deleted
         set_time_limit(0);
 
-        /** @var EntityManager $manager */
-        $manager = $this->doctrineHelper->getEntityManagerForClass($entityName);
+        $iteration = 0;
         foreach ($results as $result) {
-            /** @var $result ResultRecordInterface */
-            $entity = $result->getRootEntity();
-            $identifierValue = $result->getValue('id');
+            $translationData = reset($result);
 
-            if (!$identifierValue) {
+            if ($translationData === false) {
                 continue;
             }
 
-            if (!$entity) {
-                // no entity in result record, it should be extracted from DB
-                $entity = $manager->getReference($entityName, $identifierValue);
-            }
-
-            if (!$entity) {
-                continue;
-            }
-
-            if (!$this->securityFacade->isGranted('TRANSLATE', $entity)) {
-                continue;
-            }
-            $this->processReset($entity);
+            $this->processReset($translationData);
             $iteration++;
 
             if ($iteration % self::FLUSH_BATCH_SIZE === 0) {
@@ -141,16 +123,21 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
     }
 
     /**
-     * @param Translation $translation
+     * @param array $translationData
      */
-    private function processReset(Translation $translation)
+    private function processReset(array $translationData)
     {
-        $translationKey = $translation->getTranslationKey();
-        $locale = $translation->getLanguage()->getCode();
-        $domain = $translationKey->getDomain();
-        $scope = $translation->getScope();
+        if ($translationData['id'] === null) {
+            return;
+        }
 
-        $this->translationManager->saveTranslation($translationKey->getKey(), null, $locale, $domain, $scope);
+        $this->translationManager->saveTranslation(
+            $translationData['key'],
+            null,
+            $translationData['code'],
+            $translationData['domain'],
+            $translationData['translation_scope']
+        );
     }
 
     /**
@@ -168,5 +155,13 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
         $values = array_filter($values);
 
         $valuesParameter->setValue($values);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     */
+    private function addRequiredParameters(QueryBuilder $qb)
+    {
+        $qb->addSelect('translation.scope as translation_scope');
     }
 }

@@ -9,6 +9,10 @@ oro_behat_extension:
       selector: 'a.edit-button'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Entity Delete Button:
+      selector: 'a.edit-remove'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     Flash Message:
       selector: '#flash-messages div.alert'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -19,6 +23,42 @@ oro_behat_extension:
     UiDialog:
       selector: 'div.ui-dialog'
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog
+
+    UiDialog Title:
+      selector: 'span.ui-dialog-title'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiDialog Content:
+      selector: 'div.ui-dialog-content'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiDialog okButton:
+      selector: 'div.ui-dialog-buttonpane button[type=submit]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiDialog cancelButton:
+      selector: 'div.ui-dialog-buttonpane button[type=reset]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow:
+      selector: 'div.modal'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow Title:
+      selector: 'div.modal-header h3, div.modal-dialog__body h2.page-title'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow Content:
+      selector: 'div.modal-body, div.modal-dialog__body'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow okButton:
+      selector: 'div.modal-footer a.ok, div.buttons-flex-container button.ok'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow cancelButton:
+      selector: 'div.modal-footer a.cancel, div.buttons-flex-container button.cancel'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ContextSelector:
       selector:
@@ -32,3 +72,6 @@ oro_behat_extension:
       options:
         mapping:
           Application URL: 'application_settings[oro_ui___application_url][value]'
+
+    Alert Error Message:
+      selector: '.alert-error .message'

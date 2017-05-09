@@ -1,15 +1,31 @@
 define([
+    'module',
     'underscore',
     'backbone',
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oroui/js/tools',
     'backbone-bootstrap-modal'
-], function(_, Backbone, __, mediator, tools) {
+], function(module, _, Backbone, __, mediator, tools) {
     'use strict';
 
     var Modal;
     var $ = Backbone.$;
+
+    var config = module.config();
+
+    config = $.extend(true, {
+        defaults: {
+            templateSelector: '',
+            okText: __('OK'),
+            cancelText: __('Cancel'),
+            okButtonClass: 'btn ok btn-primary',
+            cancelButtonClass: 'btn cancel',
+            handleClose: false,
+            allowCancel: true,
+            allowOk: true
+        }
+    }, config);
 
     /**
      * Implementation of Bootstrap Modal
@@ -24,11 +40,7 @@ define([
             'click [data-button-id]': 'onButtonClick'
         }),
 
-        defaults: {
-            okText: __('OK'),
-            cancelText: __('Cancel'),
-            handleClose: false
-        },
+        defaults: config.defaults,
 
         /** @property {String} */
         className: 'modal oro-modal-normal',
@@ -36,6 +48,10 @@ define([
         initialize: function(options) {
             options = options || {};
             _.defaults(options, this.defaults);
+
+            if (options.templateSelector) {
+                options.template = _.template($(options.templateSelector).html());
+            }
 
             if (options.handleClose) {
                 this.events = _.extend({}, this.events, {'click .close': _.bind(this.onClose, this)});

@@ -1,0 +1,32 @@
+// @theme: blank;
+
+.fade-in-down {
+    animation-name: fade-in-down;
+    animation-duration: $fade-in-down-duration;
+    animation-fill-mode: both;
+}
+
+// Remove -webkit- version after fix scss builder
+@-webkit-keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -100%, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -100%, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}

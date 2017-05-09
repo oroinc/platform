@@ -1,10 +1,45 @@
-Tesitng REST Api
+Testing REST Api
 ================
+
+Table of Contents
+-----------------
+   - [Overview](#overview)
+   - [Load Fixtures](#load-fixtures)
+   - [Alice references](#alice-references)
+   - [Yaml templates](#yaml-templates)
+   - [Assert expectations](#assert-expectations)
+   - [Yaml templates for request body](#yaml-templates-for-request-body)
+   - [Process single reference](#process-single-reference)
+   - [Dump response into Yaml template](#dump-response-into-yaml-template)
+
+Overview
+--------
+
+To be sure that your REST API resources work properly you can cover them by [functional tests](https://www.orocrm.com/documentation/current/book/functional-tests). To simplify creating the functional test for REST API resources conform [JSON.API specification](http://jsonapi.org/format/) the [RestJsonApiTestCase](../../Tests/Functional/RestJsonApiTestCase.php) test case was created. The following table contains the list of most useful methods of this class:
+
+| Method | Description |
+| --- | --- |
+| request | Sends any REST API request. |
+| cget | Sends GET request for a list of entities. See [get_list action](./actions.md#get_list-action). |
+| get | Sends GET request for a single entity. See [get action](./actions.md#get-action). |
+| post | Sends POST request for an entity resource. See [create action](./actions.md#create-action). If the second parameter is a file name, the file should be located in the `requests` directory near to PHP file contains the test. |
+| patch | Sends PATCH request for a single entity. See [update action](./actions.md#update-action). If the second parameter is a file name, the file should be located in the `requests` directory near to PHP file contains the test. |
+| delete | Sends DELETE request for a single entity. See [delete action](./actions.md#delete-action). |
+| cdelete | Sends DELETE request for a list of entities. See [delete_list action](./actions.md#delete_list-action). |
+| getSubresource | Sends GET request for a sub-resource of a single entity. See [get_subresource action](./actions.md#get_subresource-action). |
+| getRelationship | Sends GET request for a relationship of a single entity. See [get_relationship action](./actions.md#get_relationship-action). |
+| postRelationship | Sends POST request for a relationship of a single entity. See [add_relationship action](./actions.md#add_relationship-action). |
+| patchRelationship | Sends PATCH request for a relationship of a single entity. See [update_relationship action](./actions.md#update_relationship-action). |
+| assertResponseContains | Asserts the response content contains the the given data. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
+| assertResponseCount | Asserts the response contains the given number of data items. |
+| assertResponseNotEmpty | Asserts the response data are not empty. |
+| dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
+| getResourceId | Extracts JSON.API resource identifier from the response. For details see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
 
 Load Fixtures
 -------------
 
-You can use php and Alice fixtures as well:
+You can use [Doctrine and Alice fixtures](https://www.orocrm.com/documentation/current/book/functional-tests#loading-data-fixtures):
 
 ```php
 class InventoryLevelApiTest extends RestJsonApiTestCase
@@ -15,10 +50,12 @@ class InventoryLevelApiTest extends RestJsonApiTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->loadFixtures(['@OroInventoryBundle/Tests/Functional/DataFixtures/inventory_level.yml']);
+        $this->loadFixtures([__DIR__ . '/DataFixtures/inventory_level.yml']);
     }
 ```
+
 Fixture file:
+
 ```yml
 dependencies:
   - Oro\Bundle\WarehouseBundle\Tests\Functional\DataFixtures\LoadWarehouseAndInventoryLevels
@@ -30,13 +67,14 @@ Oro\Bundle\InventoryBundle\Entity\InventoryLevel:
     quantity: 10
 ```
 
-Use dependencies to other alice fixtures or php fixtures under ```dependencies``` key
-References will be shared between alice and doctrine fixtures
+The ```dependencies``` section can be used if a fixture depends to other Doctrine or Alice fixtures.
+References will be shared between Alice and Doctrine fixtures.
 
 Alice references
 ----------------
 
-In alice fixtures as well as in yml templates alice references can be used.
+In Alice fixtures as well as in yml templates the references can be used.
+
 ```
 @product-1
 ```
@@ -51,8 +89,8 @@ Yaml templates
 --------------
 
 Yaml template is a regular yaml. The only difference is that you can use references and faker in values
-All values will processing by Alice and replace to appropriate value.
-See Alice documentation - https://github.com/nelmio/alice/blob/master/doc/relations-handling.md#references
+All values will be processed by Alice and replaces with appropriate value.
+For details see [Alice documentation](https://github.com/nelmio/alice/blob/master/doc/relations-handling.md#references).
 
 Assert expectations
 -------------------
@@ -80,25 +118,24 @@ data:
                 data:
                     type: warehouses
                     id: '@warehouse.1->id'
-# there is long response
 ```
+
 In php test:
 
 ```php
-public function testCgetEntity()
+public function testGetList()
 {
-    $parameters = [
-        'include' => 'product,productUnitPrecision',
-        'filter' => [
-            'product.sku' => '@product-1->sku',
+    $response = $this->cget(
+        ['entity' => 'inventorylevels'],
+        [
+            'include' => 'product,productUnitPrecision',
+            'filter' => [
+                'product.sku' => '@product-1->sku',
+            ]
         ]
-    ];
-    $entityType = $this->getEntityType(InventoryLevel::class);
-    $response = $this->cget(['entity' => $entityType], $parameters);
-    $this->assertResponseContains(
-        '@OroWarehouseBundle/Tests/Functional/Api/responses/cget_filter_by_product.yml',
-        $response
     );
+
+    $this->assertResponseContains('cget_filter_by_product.yml', $response);
 }
 ```
 
@@ -106,22 +143,21 @@ Yaml templates for request body
 -------------------------------
 
 You can use array with references for request body:
+
 ```php
 public function testUpdateEntity()
 {
-    $entityType = $this->getEntityType(InventoryLevel::class);
-    $body = [
-        'data' => [
-            'type' => 'inventorylevels',
-            'id' => '<toString(@product-1->id)>',
-            'attributes' => [
-                'quantity' => '17'
-            ]
-        ],
-    ];
     $response = $this->patch(
-        ['entity' => $entityType, 'product.sku' => '@product-1->sku'],
-        $body
+        ['entity' => 'inventorylevels', 'product.sku' => '@product-1->sku'],
+        [
+            'data' => [
+                'type' => 'inventorylevels',
+                'id' => '<toString(@product-1->id)>',
+                'attributes' => [
+                    'quantity' => '17'
+                ]
+            ],
+        ]
     );
 }
 ```
@@ -132,8 +168,8 @@ or you can hold yaml in ```.yml``` file:
 public function testCreateCustomer()
 {
     $this->post(
-        ['entity' => $this->getEntityType(Customer::class)],
-        __DIR__.'/requests/create_customer.yml'
+        ['entity' => 'customers'],
+        'create_customer.yml' // loads data from __DIR__ . '/requests/create_customer.yml'
     );
 }
 ```
@@ -142,27 +178,30 @@ Process single reference
 ------------------------
 
 Sometimes you need a process a single reference e.g. for compare it with other value
+
 ```php
 self::processTemplateData('@inventory_level.product_unit_precision.product-1.liter->quantity')
 ```
-processTemplateData method can process string, array or yml file.
+
+The `processTemplateData` method can process string, array or yml file.
 
 
-Dump repsonse into Yaml template
+Dump response into Yaml template
 --------------------------------
 
 During development new tests for REST api you have ability to dump response into Yaml template
+
 ```php
-public function testCgetEntity()
+public function testGetList()
 {
-    $entityType = $this->getEntityType(Product::class);
-    $response = $this->get(
-        'oro_rest_api_cget',
-        ['entity' => $entityType],
+    $response = $this->cget(
+        ['entity' => 'products'],
         ['filter' => ['sku' => '@product-1->sku']]
     );
-    $this->dumpYmlTemplate(__DIR__.'/responses/test_cget_entity.yml', $response);
+    // dumps response content to __DIR__ . '/responses/' . 'test_cget_entity.yml'
+    $this->dumpYmlTemplate('test_cget_entity.yml', $response);
 }
 ```
-Use this for the first time and check references after that - there are can be some collision 
+
+Use this for the first time and check references after that - there are can be some collision
 with references that has same ids

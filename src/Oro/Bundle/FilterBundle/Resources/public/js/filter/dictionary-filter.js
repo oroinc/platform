@@ -298,7 +298,7 @@ define(function(require) {
             }
 
             if (this.templateTheme === '') {
-                config.width = 'resolve';
+                config.width = 'auto';
             }
 
             return config;

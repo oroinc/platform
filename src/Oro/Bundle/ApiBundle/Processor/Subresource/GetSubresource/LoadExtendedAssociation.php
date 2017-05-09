@@ -6,7 +6,7 @@ use Doctrine\DBAL\Types\Type;
 
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Component\EntitySerializer\EntitySerializer;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation as BaseLoadExtendedAssociation;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
@@ -44,51 +44,78 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
      */
     protected function loadData(SubresourceContext $context, $associationName, $isCollection)
     {
-        $data = parent::loadData($context, $associationName, $isCollection);
+        $parentEntityData = $this->loadParentEntityData($context);
+        $data = $this->getAssociationData($parentEntityData, $associationName, $isCollection);
 
-        if (!empty($data) && !$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
-            $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
-                LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
-                $context->getConfig()
-            );
-            if ($titlePropertyPath) {
-                if (!$isCollection) {
-                    $data = [$data];
-                }
-                $data = $this->addTitles(
-                    $data,
-                    $context->getParentClassName(),
-                    $context->getParentId(),
-                    $context->getParentConfig()->getField($associationName),
-                    $titlePropertyPath
+        if (!$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
+            if (!empty($data)) {
+                $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
+                    LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
+                    $context->getConfig()
                 );
-                if (!$isCollection) {
-                    $data = reset($data);
+                if ($titlePropertyPath) {
+                    $parentEntityConfig = $context->getParentConfig();
+                    list($dataType, $associationOwnerClass, $associationPath) =
+                        $this->getAssociationInfo(
+                            $context->getParentClassName(),
+                            $parentEntityConfig,
+                            $associationName
+                        );
+                    list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+                    $associationOwnerId = $this->getAssociationOwnerId(
+                        $parentEntityData,
+                        $parentEntityConfig,
+                        $associationPath
+                    );
+
+                    if (null !== $associationOwnerId) {
+                        if (!$isCollection) {
+                            $data = [$data];
+                        }
+                        $data = $this->addTitles(
+                            $data,
+                            $associationOwnerClass,
+                            $associationOwnerId,
+                            $associationType,
+                            $associationKind,
+                            $titlePropertyPath
+                        );
+                        if (!$isCollection) {
+                            $data = reset($data);
+                        }
+                    }
                 }
-                $context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
             }
+            $context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
         }
 
         return $data;
     }
 
     /**
-     * @param array                       $data
-     * @param string                      $parentEntityClass
-     * @param mixed                       $parentEntityId
-     * @param EntityDefinitionFieldConfig $association
-     * @param string                      $titleFieldName
+     * @param array       $data
+     * @param string      $associationOwnerClass
+     * @param mixed       $associationOwnerId
+     * @param string      $associationType
+     * @param string|null $associationKind
+     * @param string      $titleFieldName
      *
      * @return array
      */
     protected function addTitles(
         array $data,
-        $parentEntityClass,
-        $parentEntityId,
-        EntityDefinitionFieldConfig $association,
+        $associationOwnerClass,
+        $associationOwnerId,
+        $associationType,
+        $associationKind,
         $titleFieldName
     ) {
-        $associationTargets = $this->getAssociationTargets($parentEntityClass, $association);
+        $associationTargets = $this->associationManager->getAssociationTargets(
+            $associationOwnerClass,
+            null,
+            $associationType,
+            $associationKind
+        );
 
         $targets = [];
         $dataMap = [];
@@ -102,7 +129,7 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
             $dataMap[$this->buildEntityKey($entityClass, $entityId)] = $key;
         }
 
-        $titles = $this->getTitles($parentEntityClass, $parentEntityId, $targets);
+        $titles = $this->getTitles($associationOwnerClass, $associationOwnerId, $targets);
         foreach ($titles as $item) {
             $key = $dataMap[$this->buildEntityKey($item['entity'], $item['id'])];
             $data[$key][$titleFieldName] = $item['title'];
@@ -113,13 +140,16 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
 
     /**
      * @param string $associationOwnerClass
-     * @param string $ownerEntityId
-     * @param array  $targets
+     * @param mixed  $associationOwnerId
+     * @param array  $targets [target entity class => [target field name, [target id, ...]], ...]
      *
      * @return array [['entity' => entity class, 'id' => entity id, 'title' => entity title], ...]
      */
-    protected function getTitles($associationOwnerClass, $ownerEntityId, array $targets)
-    {
+    protected function getTitles(
+        $associationOwnerClass,
+        $associationOwnerId,
+        array $targets
+    ) {
         $qb = new UnionQueryBuilder($this->doctrineHelper->getEntityManagerForClass($associationOwnerClass));
         $qb
             ->addSelect('entityId', 'id', Type::INTEGER)
@@ -133,7 +163,7 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
                 $targetFieldName
             );
             $subQb
-                ->andWhere($subQb->expr()->eq('e.id', $ownerEntityId))
+                ->andWhere($subQb->expr()->eq('e.id', $associationOwnerId))
                 ->andWhere($subQb->expr()->in('target.id', $targetIds));
             $qb->addSubQuery($subQb->getQuery());
         }
@@ -142,23 +172,109 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
     }
 
     /**
-     * @param string                      $parentEntityClass
-     * @param EntityDefinitionFieldConfig $association
+     * @param mixed                  $parentEntityData
+     * @param EntityDefinitionConfig $parentEntityConfig
+     * @param string[]               $associationPath
      *
-     * @return array
+     * @return mixed|null
      */
-    protected function getAssociationTargets($parentEntityClass, EntityDefinitionFieldConfig $association)
-    {
-        list($associationType, $associationKind) = DataType::parseExtendedAssociation(
-            $association->getDataType()
-        );
+    protected function getAssociationOwnerId(
+        $parentEntityData,
+        EntityDefinitionConfig $parentEntityConfig,
+        array $associationPath
+    ) {
+        $associationOwnerId = null;
+        if (empty($associationPath)) {
+            $associationOwnerId = $this->getEntityId($parentEntityData, $parentEntityConfig);
+        } elseif (!empty($parentEntityData)) {
+            $currentConfig = $parentEntityConfig;
+            $currentData = $parentEntityData;
+            foreach ($associationPath as $fieldName) {
+                if (!is_array($currentData) || !array_key_exists($fieldName, $currentData)) {
+                    $currentConfig = null;
+                    $currentData = null;
+                    break;
+                }
+                $fieldConfig = $currentConfig->findField($fieldName, true);
+                if (null === $fieldConfig) {
+                    $currentData = null;
+                    $currentConfig = null;
+                    break;
+                }
+                $currentConfig = $fieldConfig->getTargetEntity();
+                if (null === $currentConfig) {
+                    $currentData = null;
+                    break;
+                }
+                $currentData = $currentData[$fieldName];
+            }
+            if (null !== $currentConfig) {
+                $associationOwnerId = $this->getEntityId($currentData, $currentConfig);
+            }
+        }
 
-        return $this->associationManager->getAssociationTargets(
-            $parentEntityClass,
-            null,
-            $associationType,
-            $associationKind
-        );
+        return $associationOwnerId;
+    }
+
+    /**
+     * @param mixed                  $data
+     * @param EntityDefinitionConfig $config
+     *
+     * @return mixed
+     */
+    protected function getEntityId($data, EntityDefinitionConfig $config)
+    {
+        $entityId = null;
+        $idFieldNames = $config->getIdentifierFieldNames();
+        if (1 === count($idFieldNames)) {
+            $idFieldName = reset($idFieldNames);
+            if (is_array($data) && array_key_exists($idFieldName, $data)) {
+                $entityId = $data[$idFieldName];
+            }
+        }
+
+        return $entityId;
+    }
+
+    /**
+     * @param string                 $parentEntityClass
+     * @param EntityDefinitionConfig $parentEntityConfig
+     * @param string                 $associationName
+     *
+     * @return array [data type, association owner class, association path]
+     */
+    protected function getAssociationInfo(
+        $parentEntityClass,
+        EntityDefinitionConfig $parentEntityConfig,
+        $associationName
+    ) {
+        $associationOwnerClass = null;
+        $associationPath = [];
+        $association = $parentEntityConfig->getField($associationName);
+        $dataType = $association->getDataType();
+        if ($dataType) {
+            $associationOwnerClass = $parentEntityClass;
+        } else {
+            $propertyPath = $association->getPropertyPath();
+            if ($propertyPath) {
+                $path = ConfigUtil::explodePropertyPath($propertyPath);
+                $targetFieldPath = array_slice($path, 0, -1);
+                $targetField = $parentEntityConfig->findFieldByPath($targetFieldPath, true);
+                if (null !== $targetField) {
+                    $targetConfig = $targetField->getTargetEntity();
+                    if (null !== $targetConfig) {
+                        $field = $targetConfig->findField($path[count($path) - 1]);
+                        if (null !== $field) {
+                            $dataType = $field->getDataType();
+                            $associationOwnerClass = $targetField->getTargetClass();
+                            $associationPath = $targetFieldPath;
+                        }
+                    }
+                }
+            }
+        }
+
+        return [$dataType, $associationOwnerClass, $associationPath];
     }
 
     /**

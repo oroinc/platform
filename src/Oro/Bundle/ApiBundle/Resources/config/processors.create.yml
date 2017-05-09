@@ -95,8 +95,7 @@ services:
     oro_api.create.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder
         arguments:
-            - '@form.factory'
-            - '@form.property_accessor'
+            - '@oro_api.form_helper'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
 

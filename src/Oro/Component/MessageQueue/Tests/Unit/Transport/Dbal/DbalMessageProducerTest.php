@@ -74,7 +74,7 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
     {
         $expectedMessage = [
             'body' => 'body',
-            'headers' => '{"hkey":"hvalue"}',
+            'headers' => '{"hkey":"hvalue","priority":123}',
             'properties' => '{"pkey":"pvalue"}',
             'priority' => 123,
             'queue' => 'queue-name',

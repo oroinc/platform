@@ -100,7 +100,6 @@ define(function(require) {
                 content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
                 okText: __('OK, got it.'),
                 className: 'modal modal-primary',
-                okButtonClass: 'btn-primary btn-large',
                 cancelText: __('Cancel')
             });
             var deferredConfirmation = $.Deferred();

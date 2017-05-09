@@ -98,6 +98,7 @@ class HttpImportHandler extends AbstractImportHandler
             'importInfo' => $importInfo,
             'errors'     => $errors,
             'counts'     => $counts,
+            'postponedRows' => $jobResult->getContext()->getPostponedRows(),
         ];
     }
 }

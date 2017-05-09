@@ -43,7 +43,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         $this->assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
     }
 
-    public function testFindEntityMetadataByPath()
+    public function testFindEntityMetadataByPathForAssociation()
     {
         $this->assertEquals(
             $this->getClassMetadata('Category'),
@@ -52,12 +52,31 @@ class DoctrineHelperTest extends OrmRelatedTestCase
                 ['category']
             )
         );
+    }
+
+    public function testFindEntityMetadataByPathForField()
+    {
         $this->assertNull(
             $this->doctrineHelper->findEntityMetadataByPath(
                 $this->getEntityClass('User'),
                 ['name']
             )
         );
+    }
+
+    public function testFindEntityMetadataByPathForStringPath()
+    {
+        $this->assertEquals(
+            $this->getClassMetadata('Category'),
+            $this->doctrineHelper->findEntityMetadataByPath(
+                $this->getEntityClass('User'),
+                'products.category'
+            )
+        );
+    }
+
+    public function testFindEntityMetadataByPathForArrayPath()
+    {
         $this->assertEquals(
             $this->getClassMetadata('Category'),
             $this->doctrineHelper->findEntityMetadataByPath(
@@ -65,6 +84,10 @@ class DoctrineHelperTest extends OrmRelatedTestCase
                 ['products', 'category']
             )
         );
+    }
+
+    public function testFindEntityMetadataByPathForDeepPath()
+    {
         $this->assertNull(
             $this->doctrineHelper->findEntityMetadataByPath(
                 $this->getEntityClass('User'),

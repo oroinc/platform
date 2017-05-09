@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Import;
 
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -111,6 +112,17 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->with(get_class($basicEntity));
 
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
+    }
+
+    public function testGetLoggedUser()
+    {
+        $loggedUser = new User();
+
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
+            ->willReturn($loggedUser);
+
+        $this->assertSame($loggedUser, $this->helper->getLoggedUser());
     }
 
     public function testImportEntity()

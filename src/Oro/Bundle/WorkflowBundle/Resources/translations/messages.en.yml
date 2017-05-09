@@ -170,6 +170,9 @@ oro:
 
         transition:
             start: "Start %workflow%"
+            form:
+                submit.label: Submit
+                cancel.label: Cancel
 
         workflowdefinition:
             entity_label:                 Workflow
@@ -202,7 +205,7 @@ oro:
                 required.tooltip:         "Check this box if you want to require the user to add some information to this entity field. Note that this requirement applies to the view form of transition only, and has no effect on entity attributes."
 
             transition:
-                name.tooltip:             "The name of the transition that will be displayed on its button."
+                name.tooltip:             "This is an user-interface name for the transition. If Button label is not provided, the name also appears on the transition button and as the title of the transition form."
                 step_from.tooltip:        "The workflow step, for which the transition button should appear on the entity page."
                 step_to.tooltip:          "The step to which the workflow will progress after the transition is performed."
                 display_type.tooltip:     "Transition attributes can appear in one of two available forms: In the popup window, which is a default transition behavior suitable for most cases, or on the separate page, which should be used with care and only for attribute-heavy transitions."
@@ -214,6 +217,8 @@ oro:
                 icon.tooltip:             "An icon that will appear on the transition button before the transition name."
                 button_color.tooltip:     "This control specifies the visual style of the transition button."
                 button_preview.tooltip:   "This is the live preview of the transition button as it will appear on the entity page."
+                button_label.tooltip:     "This text appears on the transition button and as the title of the transition form. If not provided, the value of the Name field is used."
+                button_title.tooltip:     "This message appears when a user moves the pointer over the transition button. Use it to provide transition description or any other additional information."
 
             step:
                 name.tooltip:             "The name of the step that will be displayed on the entity record."
@@ -300,10 +305,12 @@ oro:
 
         form:
             name.label: Name
+            button_label.label: Button label
+            button_title.label: Button title
             from_step.label: From step
             to_step.label: To step
             view_form.label: View form
-            destination_page.label: Destination Page
+            destination_page.label: Destination page
             warning_message.label: Warning message
             button_icon.label: Button icon
             button_style.label: Button style

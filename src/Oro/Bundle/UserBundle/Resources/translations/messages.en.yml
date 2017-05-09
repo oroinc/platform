@@ -294,12 +294,13 @@ oro:
             label:
                 label:           Label
                 description:     The name of the role in the system, on the program level.
-            owner.label:         Owner
+            users:
+                label:           Users
+                description:     Users the role is assigned to.
             has_role.label:      Has role
             extend_description:
                 label:           Description
                 description:     Short description of the user role record.
-            organization.label:  Organization
             actions:
                 edit:            Edit
 
