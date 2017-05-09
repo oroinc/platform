@@ -9,6 +9,10 @@ oro_behat_extension:
       selector: 'a.edit-button'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Entity Delete Button:
+      selector: 'a.edit-remove'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     Flash Message:
       selector: '#flash-messages div.alert'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

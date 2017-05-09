@@ -202,4 +202,146 @@ class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
             $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
         );
     }
+
+    public function testMergeActionFormOptions()
+    {
+        $config = [
+            'form_options' => [
+                'option1' => 'value1',
+                'option2' => 'value2'
+            ]
+        ];
+        $actionConfig = [
+            'form_options' => [
+                'option2' => 'another_value2',
+                'option3' => 'value3'
+            ]
+        ];
+
+        self::assertEquals(
+            [
+                'form_options' => [
+                    'option1' => 'value1',
+                    'option2' => 'another_value2',
+                    'option3' => 'value3'
+                ]
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFormOptionsWhenActionDoesNotHaveFormOptions()
+    {
+        $config = [
+            'form_options' => ['entity_option' => 'entity_value']
+        ];
+        $actionConfig = [];
+
+        self::assertEquals(
+            [
+                'form_options' => ['entity_option' => 'entity_value']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFormOptionsWhenEntityDoesNotHaveFormOptions()
+    {
+        $config = [];
+        $actionConfig = [
+            'form_options' => ['action_option' => 'action_value']
+        ];
+
+        self::assertEquals(
+            [
+                'form_options' => ['action_option' => 'action_value']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFormOptionsWhenFormTypeIsChanged()
+    {
+        $config = [
+            'form_options' => ['entity_option' => 'entity_value']
+        ];
+        $actionConfig = [
+            'form_type'    => 'other_form',
+            'form_options' => ['action_option' => 'action_value']
+        ];
+
+        self::assertEquals(
+            [
+                'form_type'    => 'other_form',
+                'form_options' => ['action_option' => 'action_value']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFormEventSubscribers()
+    {
+        $config = [
+            'form_event_subscriber' => ['entity_subscriber']
+        ];
+        $actionConfig = [
+            'form_event_subscriber' => ['action_subscriber']
+        ];
+
+        self::assertEquals(
+            [
+                'form_event_subscriber' => ['entity_subscriber', 'action_subscriber']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFormEventSubscribersWhenActionDoesNotHaveFormEventSubscribers()
+    {
+        $config = [
+            'form_event_subscriber' => ['entity_subscriber']
+        ];
+        $actionConfig = [];
+
+        self::assertEquals(
+            [
+                'form_event_subscriber' => ['entity_subscriber']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFormEventSubscribersWhenEntityDoesNotHaveFormEventSubscribers()
+    {
+        $config = [];
+        $actionConfig = [
+            'form_event_subscriber' => ['action_subscriber']
+        ];
+
+        self::assertEquals(
+            [
+                'form_event_subscriber' => ['action_subscriber']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFormEventSubscribersWhenFormTypeIsChanged()
+    {
+        $config = [
+            'form_event_subscriber' => ['entity_subscriber']
+        ];
+        $actionConfig = [
+            'form_type'             => 'other_form',
+            'form_event_subscriber' => ['action_subscriber']
+        ];
+
+        self::assertEquals(
+            [
+                'form_type'             => 'other_form',
+                'form_event_subscriber' => ['action_subscriber']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
 }

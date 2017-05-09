@@ -4,6 +4,7 @@
     position: relative;
 
     margin: $grid-views-offset;
+    padding: $offset-y-m 0;
 
     border-bottom: $grid-views-border-bottom;
 
@@ -11,7 +12,6 @@
 
     &__header {
         display: inline-block;
-        padding: $offset-y-m 0;
     }
 
     &__aditional {
@@ -21,8 +21,17 @@
     }
 
     &__dropdown {
+        display: block;
         width: $grid-views-dropdown-width;
+        // Emulate hidden state
+        height: 0;
         padding: 0;
+
+        // Emulate hidden state
+        overflow: hidden;
+
+        border-width: 0;
+        box-shadow: none;
     }
 
     &__title {
@@ -47,6 +56,8 @@
     &__title-text {
         vertical-align: middle;
 
+        word-break: break-all;
+
         [class^="fa-"],
         [class*=" fa-"] {
             color: get-color('additional', 'middle');
@@ -66,6 +77,8 @@
 
     &__edit-label {
         color: $grid-views-edit-label-color;
+
+        vertical-align: middle;
     }
 
     &__close {
@@ -97,12 +110,25 @@
     }
 
     &__actions {
+        padding-left: $offset-x-s;
+
         color: $grid-views-actions-color;
+
+        white-space: nowrap;
     }
 
     &__label {
         flex-basis: 55%;
         flex: 1;
+
+        word-break: break-all;
+    }
+
+    &__text-line {
+        max-height: ($base-font-size * $base-line-height) * 2; // two rows
+
+        font-size: $base-font-size;
+        line-height: $base-line-height;
     }
 
     &__footer {
@@ -133,6 +159,17 @@
 
     .custom-checkbox {
         padding-top: 4px;
+    }
+
+    &.open {
+        .grid-views__dropdown {
+            // Disable emulate hidden state
+            height: auto;
+            overflow: auto;
+
+            border-width: 1px;
+            box-shadow: $dropdown-box-shadow;
+        }
     }
 }
 

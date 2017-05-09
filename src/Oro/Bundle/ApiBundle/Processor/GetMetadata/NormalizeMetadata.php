@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
@@ -164,7 +163,7 @@ class NormalizeMetadata implements ProcessorInterface
                         $context
                     )
                 );
-                $targetFieldConfig = $this->findFieldByPropertyPath($config, $linkedPropertyPath);
+                $targetFieldConfig = $config->findFieldByPath($linkedPropertyPath, true);
                 if (null !== $targetFieldConfig) {
                     $associationMetadata->setCollapsed($targetFieldConfig->isCollapsed());
                     if ($targetFieldConfig->getDataType()) {
@@ -172,7 +171,8 @@ class NormalizeMetadata implements ProcessorInterface
                     }
                 }
                 $entityMetadata->addAssociation($associationMetadata);
-            } else {
+                $addedPropertyName = $linkedProperty;
+            } elseif ($classMetadata->hasField($linkedProperty)) {
                 $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
                     $classMetadata,
                     $linkedProperty
@@ -180,8 +180,28 @@ class NormalizeMetadata implements ProcessorInterface
                 $fieldMetadata->setName($propertyName);
                 $fieldMetadata->setPropertyPath($linkedProperty);
                 $entityMetadata->addField($fieldMetadata);
+                $addedPropertyName = $linkedProperty;
+            } else {
+                $targetEntityConfig = $config->getField($propertyPath[0])->getTargetEntity();
+                $targetEntityConfig->getField($linkedProperty)->setExcluded(false);
+                $targetEntityMetadata = $this->getMetadata(
+                    $classMetadata->name,
+                    $targetEntityConfig,
+                    $context
+                );
+                $targetEntityConfig->getField($linkedProperty)->setExcluded(true);
+                if ($targetEntityMetadata->hasAssociation($linkedProperty)) {
+                    $association = clone $targetEntityMetadata->getAssociation($linkedProperty);
+                    $association->setName($propertyName);
+                    $entityMetadata->addAssociation($association);
+                    $addedPropertyName = $propertyName;
+                } elseif ($targetEntityMetadata->hasField($linkedProperty)) {
+                    $field = clone $targetEntityMetadata->getField($linkedProperty);
+                    $field->setName($propertyName);
+                    $entityMetadata->addField($field);
+                    $addedPropertyName = $propertyName;
+                }
             }
-            $addedPropertyName = $linkedProperty;
         }
 
         return $addedPropertyName;
@@ -223,7 +243,7 @@ class NormalizeMetadata implements ProcessorInterface
     {
         $targetConfig = $config->getField($propertyName)->getTargetEntity();
         if (null === $targetConfig) {
-            $targetField = $this->findFieldByPropertyPath($config, $propertyPath);
+            $targetField = $config->findFieldByPath($propertyPath, true);
             if (null === $targetField) {
                 throw new RuntimeException(
                     sprintf(
@@ -244,30 +264,5 @@ class NormalizeMetadata implements ProcessorInterface
         }
 
         return $targetConfig;
-    }
-
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string[]               $propertyPath
-     *
-     * @return EntityDefinitionFieldConfig|null
-     */
-    protected function findFieldByPropertyPath(EntityDefinitionConfig $config, array $propertyPath)
-    {
-        $pathCount = count($propertyPath);
-
-        $targetConfig = $config;
-        for ($i = 0; $i < $pathCount - 1; $i++) {
-            $fieldConfig = $targetConfig->findField($propertyPath[$i], true);
-            if (null === $fieldConfig) {
-                return null;
-            }
-            $targetConfig = $fieldConfig->getTargetEntity();
-            if (null === $targetConfig) {
-                return null;
-            }
-        }
-
-        return $targetConfig->findField($propertyPath[$pathCount - 1], true);
     }
 }

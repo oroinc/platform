@@ -12,7 +12,8 @@ define(function(require) {
     require('jquery-ui');
 
     config = _.extend({
-        templateSelector: null
+        templateSelector: null,
+        fallbackSelector: '.column-manager-no-columns'
     }, config);
 
     ColumnManagerCollectionView = BaseCollectionView.extend({
@@ -23,7 +24,7 @@ define(function(require) {
 
         className: 'dropdown-menu',
         listSelector: 'tbody',
-        fallbackSelector: '.column-manager-no-columns',
+        fallbackSelector: config.fallbackSelector,
 
         events: {
             'click tbody tr [data-role=moveUp]': 'onMoveUp',

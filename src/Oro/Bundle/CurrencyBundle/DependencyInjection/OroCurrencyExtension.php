@@ -21,6 +21,7 @@ class OroCurrencyExtension extends Extension
         $loader->load('services.yml');
         $loader->load('form_types.yml');
         $loader->load('formatters.yml');
+        $loader->load('importexport.yml');
 
         $container->prependExtensionConfig($this->getAlias(), $config);
     }

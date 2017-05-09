@@ -2,8 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -16,6 +22,9 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formFactory;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $container;
+
     /** @var BuildFormBuilder */
     protected $processor;
 
@@ -23,9 +32,10 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->processor = new BuildFormBuilder($this->formFactory);
+        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory, $this->container));
     }
 
     /**
@@ -56,7 +66,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
     public function testProcessWhenFormBuilderAlreadyExists()
     {
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $this->context->setFormBuilder($formBuilder);
         $this->processor->process($this->context);
@@ -65,7 +75,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
     public function testProcessWhenFormAlreadyExists()
     {
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
@@ -77,7 +87,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $formType = 'test_form';
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
         $config->setFormType($formType);
@@ -92,7 +102,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api', 'my_group'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -113,7 +123,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1');
@@ -150,7 +160,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -211,7 +221,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1')
@@ -230,7 +240,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -256,7 +266,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1')
@@ -274,7 +284,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -300,7 +310,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
         $config->addField('association1')
@@ -319,7 +329,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -345,7 +355,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
         $config->addField('association1')
@@ -363,7 +373,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormUtil::EXTRA_FIELDS_MESSAGE,
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'api_context'          => $this->context
                 ]
             )
@@ -380,6 +390,88 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForCustomEventSubscriber()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $eventSubscriberServiceId = 'test_event_subscriber';
+        $eventSubscriber = $this->createMock(EventSubscriberInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->setFormEventSubscribers([$eventSubscriberServiceId]);
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with($eventSubscriberServiceId)
+            ->willReturn($eventSubscriber);
+
+        $formBuilder->expects($this->once())
+            ->method('addEventSubscriber')
+            ->with($this->identicalTo($eventSubscriber));
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForCustomEventSubscriberInjectedAsService()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $eventSubscriber = $this->createMock(EventSubscriberInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->setFormEventSubscribers([$eventSubscriber]);
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects($this->once())
+            ->method('addEventSubscriber')
+            ->with($this->identicalTo($eventSubscriber));
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata(new EntityMetadata());
         $this->context->setResult($data);
         $this->processor->process($this->context);
         $this->assertSame($formBuilder, $this->context->getFormBuilder());
