@@ -1379,6 +1379,50 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Expand node of JS Tree detected by given title
+     * Example: When I expand "Retail Supplies" in tree
+     *
+     * @When /^(?:|I )expand "(?P<nodeTitle>[\w\s]+)" in tree$/
+     * @param string $nodeTitle
+     */
+    public function iExpandNodeInTree($nodeTitle)
+    {
+        $page = $this->getSession()->getPage();
+        $nodeStateControl = $page->find(
+            'xpath',
+            '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-closed")]'
+            . '/i[contains(@class, "jstree-ocl")]'
+        );
+        if (null !== $nodeStateControl) {
+            $nodeStateControl->click();
+        }
+    }
+
+    /**
+     * Check that some JS Tree node located right after another one node
+     * Example: Then I see "By Brand" after "New Arrivals" in tree
+     *
+     * @Then /^(?:|I )should see "(?P<nodeTitle>[\w\s]+)" after "(?P<anotherNodeTitle>[\w\s]+)" in tree$/
+     * @param string $nodeTitle
+     * @param string $anotherNodeTitle
+     */
+    public function iSeeNodeAfterAnotherOneInTree($nodeTitle, $anotherNodeTitle)
+    {
+        $page = $this->getSession()->getPage();
+        $resultElement =  $page->find(
+            'xpath',
+            '//a[contains(., "' . $anotherNodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
+            . '/following-sibling::li[contains(@class, "jstree-node")]/a[contains(., "' . $nodeTitle . '")]'
+        );
+
+        self::assertNotNull($resultElement, sprintf(
+            'Node "%s" not found after "%s" in tree.',
+            $nodeTitle,
+            $anotherNodeTitle
+        ));
+    }
+
+    /**
      * This step is used for system configuration field
      * Go to System/Configuration and see the fields with default checkboxes
      * Example: And check Use Default for "Position" field
