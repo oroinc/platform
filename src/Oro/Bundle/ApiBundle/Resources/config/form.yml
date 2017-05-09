@@ -37,6 +37,7 @@ services:
         public: false
         arguments:
             - '@form.factory'
+            - '@service_container'
 
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser

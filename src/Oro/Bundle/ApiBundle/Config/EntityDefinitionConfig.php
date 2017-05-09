@@ -24,6 +24,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\FieldsetTrait;
     use Traits\MetaPropertyTrait;
     use Traits\FormTrait;
+    use Traits\FormEventSubscriberTrait;
     use Traits\StatusCodesTrait;
 
     /** a short, human-readable description of API resource */
@@ -61,6 +62,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** the form options that should be used for the entity */
     const FORM_OPTIONS = 'form_options';
+
+    /** event subscriber that should be used for the entity form */
+    const FORM_EVENT_SUBSCRIBER = 'form_event_subscriber';
 
     /** the names of identifier fields of the entity */
     const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';

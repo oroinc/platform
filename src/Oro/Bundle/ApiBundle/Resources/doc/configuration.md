@@ -189,6 +189,7 @@ The `entities` section describes a configuration of entities.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 * **form_type** *string* The form type that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default the `form` form type is used.
 * **form_options** *array* The form options that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+* **form_event_subscriber** The form event subscriber(s) that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. Also this event subscriber is used for [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action) and [delete_relationship](./actions.md#delete_relationship-action) actions, but only if the `form_type` option is not specified. For custom form types this event subscriber is not used. Can be specified as service name or array of service names. An event subscriber service should implement `Symfony\Component\EventDispatcher\EventSubscriberInterface` interface.
 
 By default the following form options are set:
 
@@ -220,6 +221,7 @@ api:
             form_type: acme_entity.api_form
             form_options:
                 validation_groups: ['Default', 'api', 'my_group']
+            form_event_subscriber: acme.api.form_listener.test_entity
 ```
 
 "fields" configuration section
@@ -230,7 +232,7 @@ This section describes entity fields' configuration.
 * **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
 * **description** *string* A human-readable description of the field or a link to the [documentation resource](./documentation.md). Used in auto generated documentation only.
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
-* **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name. If a data transformer is a static method of a class, the method should have the following signature: `function ($class, $property, $value, array $config, array $context) : mixed` and should return transformed value. If a data transformer is a service, it should implement either `Oro\Component\EntitySerializer\DataTransformerInterface` or `Symfony\Component\Form\DataTransformerInterface` interface.
+* **data_transformer** The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name. If a data transformer is a static method of a class, the method should have the following signature: `function ($class, $property, $value, array $config, array $context) : mixed` and should return transformed value. If a data transformer is a service, it should implement either `Oro\Component\EntitySerializer\DataTransformerInterface` or `Symfony\Component\Form\DataTransformerInterface` interface.
 * **collapse** *boolean* Indicates whether the entity should be collapsed. It is applicable for associations only. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by [get_relation_config](./actions.md#get_relation_config-action) processors to get identifier of the related entity.
 * **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
@@ -389,7 +391,8 @@ The `actions` configuration section allows to specify action-specific options. T
 * **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
 * **disable_meta_properties** *boolean* The flag indicates whether a requesting of additional meta properties is disabled. By default `false`.
 * **form_type** *string* The form type that should be used for the entity.
-* **form_options** *array* The form options that should be used for the entity.
+* **form_options** *array* The form options that should be used for the entity. Please note that these form options are merged with form options are defined on the entity level, but only in case if the `form_type` is not specified. If `form_type` is specified in an action configuration the action form options completely replace the form options are defined on the entity level.
+* **form_event_subscriber** The form event subscriber(s) that should be used for the entity. Can be specified as service name or array of service names. An event subscriber service should implement `Symfony\Component\EventDispatcher\EventSubscriberInterface` interface. Please note that these event subscribers are merged with event subscribers are defined on the entity level, but only in case if the `form_type` is not specified. If `form_type` is specified in an action configuration the action event subscribers completely replace the event subscribers are defined on the entity level.
 * **status_codes** *array* <a id="action-status_codes-configuration-section" />The possible response status codes for the action.
     * **exclude** *boolean* Indicates whether the status code should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
     * **description** *string* A human-readable description of the status code. Used in auto generated documentation only.
