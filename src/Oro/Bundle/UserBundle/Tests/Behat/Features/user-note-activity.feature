@@ -43,7 +43,7 @@ Scenario: Edit note in view page
   And fill "Note Form" with:
     | Message    | Very good actor      |
     | Attachment | note-attachment2.jpg |
-  When I press "Save"
+  When I save form
   Then I should see "Very good actor" note in activity list
   And I should see note-attachment2.jpg text in activity
 
