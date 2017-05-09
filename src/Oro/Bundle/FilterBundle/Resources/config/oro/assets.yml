@@ -1,4 +1,4 @@
 assets:
     css:
       'orofilter':
-          - 'bundles/orofilter/css/less/oro.filter.less'
+          - 'bundles/orofilter/css/less/main.less'

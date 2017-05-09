@@ -123,13 +123,13 @@ define(function(require) {
 
             if (this.enableFilters) {
                 this.columnFilterView = new ColumnFilterView({
-                    el: this.columnManagerView.$('.column-manager-filter').get(0),
+                    el: this.columnManagerView.$('[data-role="column-manager-filter"]').get(0),
                     model: this.columnFilterModel
                 });
             }
 
             this.columnManagerCollectionView = new ColumnManagerCollectionView({
-                el: this.columnManagerView.$('.column-manager-table').get(0),
+                el: this.columnManagerView.$('[data-role="column-manager-table"]').get(0),
                 collection: this.managedColumns,
                 filterModel: this.columnFilterModel,
                 addSorting: this.addSorting,

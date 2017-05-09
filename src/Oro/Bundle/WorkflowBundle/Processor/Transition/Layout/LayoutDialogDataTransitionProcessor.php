@@ -27,6 +27,7 @@ class LayoutDialogDataTransitionProcessor implements ProcessorInterface
                     'transitionFormView' => $context->getForm()->createView(),
                     'workflowItem' => $context->getWorkflowItem(),
                     'formRouteName' => $resultType->getFormRouteName(),
+                    'originalUrl' => null
                 ]
             ]
         );

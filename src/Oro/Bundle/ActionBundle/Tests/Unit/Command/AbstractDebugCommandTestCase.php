@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\ActionBundle\Tests\Unit\Command\Stub\OutputStub;
+use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;

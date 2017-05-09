@@ -6,6 +6,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 use Doctrine\Common\Inflector\Inflector;
 
@@ -21,6 +22,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 class ImportExportContext extends OroFeatureContext implements KernelAwareContext, OroPageObjectAware
@@ -38,6 +40,11 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     private $processorRegistry;
 
     /**
+     * @var OroMainContext
+     */
+    private $oroMainContext;
+
+    /**
      * @param EntityAliasResolver $aliasResolver
      * @param ProcessorRegistry $processorRegistry
      */
@@ -45,6 +52,15 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     {
         $this->aliasResolver = $aliasResolver;
         $this->processorRegistry = $processorRegistry;
+    }
+
+    /**
+     * @BeforeScenario
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+        $this->oroMainContext = $environment->getContext(OroMainContext::class);
     }
 
     /**
@@ -256,6 +272,9 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     public function iImportFile()
     {
         $this->tryImportFile();
+
+        $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
+        $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
         // todo: CRM-7599 Replace sleep to appropriate logic
         sleep(2);
     }

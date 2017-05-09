@@ -343,7 +343,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
         $expectedMessage = [
             'body' => 'body',
-            'headers' => '{"hkey":"hvalue"}',
+            'headers' => '{"hkey":"hvalue","priority":5}',
             'properties' => '{"pkey":"pvalue"}',
             'priority' => 5,
             'queue' => 'queue',
@@ -492,7 +492,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $dbalMessage = [
             'id' => 'id',
             'body' => 'body',
-            'headers' => '{"hkey":"hvalue"}',
+            'headers' => '{"hkey":"hvalue","priority":5}',
             'properties' => '{"pkey":"pvalue"}',
             'priority' => 5,
             'queue' => 'queue',
@@ -553,7 +553,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(DbalMessage::class, $result);
         $this->assertEquals('id', $result->getId());
         $this->assertEquals('body', $result->getBody());
-        $this->assertEquals(['hkey' => 'hvalue'], $result->getHeaders());
+        $this->assertEquals(['hkey' => 'hvalue', 'priority' => 5], $result->getHeaders());
         $this->assertEquals(['pkey' => 'pvalue'], $result->getProperties());
         $this->assertTrue($result->isRedelivered());
         $this->assertEquals(5, $result->getPriority());

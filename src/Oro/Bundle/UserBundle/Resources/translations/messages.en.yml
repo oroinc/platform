@@ -284,15 +284,6 @@ oro:
         role:
             entity_label:        Role
             entity_plural_label: Roles
-            entity_description:  User's role
-            id.label:     Id
-            role.label:   Role
-            label.label:  Label
-            owner.label:  Owner
-            users.label:  Users
-            has_role.label: Has role
-            extend_description.label: Description
-            organization.label: Organization
             entity_description:  A user role defines permissions for users to perform certain activity.
             id:
                 label:           Id
@@ -303,12 +294,13 @@ oro:
             label:
                 label:           Label
                 description:     The name of the role in the system, on the program level.
-            owner.label:         Owner
+            users:
+                label:           Users
+                description:     Users the role is assigned to.
             has_role.label:      Has role
             extend_description:
                 label:           Description
                 description:     Short description of the user role record.
-            organization.label:  Organization
             actions:
                 edit:            Edit
 

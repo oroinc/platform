@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -475,14 +474,6 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->getContainer()->get('doctrine')->getManager();
-    }
-
-    /**
      * @param ResponseHeaderBag $headers
      *
      * @return bool
@@ -493,11 +484,29 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
+     * Extracts JSON.API resource identifier from the response.
+     *
+     * @param Response $response
+     *
+     * @return string
+     */
+    protected function getResourceId(Response $response)
+    {
+        $content = json_decode($response->getContent(), true);
+        $this->assertInternalType('array', $content);
+        $this->assertArrayHasKey('data', $content);
+        $this->assertInternalType('array', $content['data']);
+        $this->assertArrayHasKey('id', $content['data']);
+
+        return $content['data']['id'];
+    }
+
+    /**
      * @param array $parameters
      *
      * @return string
      */
-    protected function extractEntityType(array $parameters)
+    private function extractEntityType(array $parameters)
     {
         if (empty($parameters['entity'])) {
             return 'unknown';
