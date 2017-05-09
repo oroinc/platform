@@ -84,6 +84,9 @@ class BeforeListRenderEvent extends Event
         return $this;
     }
 
+    /**
+     * @return object
+     */
     public function getEntity()
     {
         return $this->entity;
