@@ -1419,4 +1419,20 @@ class OroMainContext extends MinkContext implements
 
         static::assertEquals($pageTitle, $title->getHtml());
     }
+
+    /**
+     * Presses enter key for specified id|name|title|alt|value
+     * Example: When I focus on "Some" field and press Enter key
+     * Example: And I focus on "Some" field and press Enter key
+     *
+     * @When /^(?:|I )focus on "(?P<fieldName>[\w\s]*)" field and press Enter key$/
+     * @param string $fieldName
+     */
+    public function focusOnFieldAndPressEnterKey($fieldName)
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        $field->focus();
+        $field->keyDown(13);
+        $this->waitForAjax();
+    }
 }
