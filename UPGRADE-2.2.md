@@ -341,6 +341,15 @@ TranslationBundle
     - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
     - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`
 
+SegmentBundle
+-------------
+- Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
+    - changed signature of method `run`, added parameter `$entityIds` (array) with default empty array.
+    - method `bindParameters` is deprecated and will be removed. 
+    - method `run` now accept also a dynamic segment
+- Class `Oro/Bundle/SegmentBundle/Entity/Repository/SegmentSnapshotRepository`:
+    - changed signature of method `removeBySegment`, added parameter `$entityIds` (array) with default empty array.
+
 FormBundle
 ----------
 - Form types OroEncodedPlaceholderPasswordType, OroEncodedPasswordType acquired `browser_autocomplete` option with default value set to `false`, which means that password autocomplete is off by default.
