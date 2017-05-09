@@ -83,11 +83,11 @@ class OroMainContext extends MinkContext implements
     {
         $this->messageQueueIsolator->waitWhileProcessingMessages(30);
 
-        if (false === $this->getMink()->isSessionStarted('first_session')) {
+        $session = $this->getMink()->getSession();
+        if (false === $session->isStarted()) {
             return;
         }
 
-        $session = $this->getMink()->getSession('first_session');
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
 
@@ -192,6 +192,28 @@ class OroMainContext extends MinkContext implements
         self::assertTrue(
             $result,
             sprintf('The text "%s" was not found anywhere in the text of the current page.', $text)
+        );
+    }
+
+    /**
+     * Checks, that page contains element specified number of times
+     * Example: Then I should see 1 element "TextElement"
+     * Example: And I should see 3 elements "BlockElement"
+     *
+     * @Then /^(?:|I )should see (?P<number>\d+) elements? "(?P<elementName>(?:[^"]|\\")*)"$/
+     *
+     * @param int $number
+     * @param string $elementName
+     */
+    public function assertPageContainsNumElements($number, $elementName)
+    {
+        $element = $this->createElement($elementName);
+        $elements = $this->getSession()->getPage()->findAll('xpath', $element->getXpath());
+
+        static::assertCount(
+            (int)$number,
+            $elements,
+            sprintf('The element "%s" was not found "%d" time(s) in the current page.', $elementName, (int)$number)
         );
     }
 
@@ -312,12 +334,16 @@ class OroMainContext extends MinkContext implements
      * Assert that provided validation errors for given fields appeared
      * Example: Then I should see validation errors:
      *            | Subject         | This value should not be blank.  |
+     * Example: Then I should see "Some Form" validation errors:
+     *            | Subject         | This value should not be blank.  |
      *
      * @Then /^(?:|I )should see validation errors:$/
+     * @Then /^(?:|I )should see "(?P<formName>(?:[^"]|\\")*)" validation errors:$/
      */
-    public function iShouldSeeValidationErrors(TableNode $table)
+    public function iShouldSeeValidationErrors(TableNode $table, $formName = 'OroForm')
     {
-        $form = $this->createOroForm();
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
 
         foreach ($table->getRows() as $row) {
             list($label, $value) = $row;
@@ -1224,6 +1250,7 @@ class OroMainContext extends MinkContext implements
     public function switchToActorWindowSession($sessionAlias)
     {
         $this->sessionAliasProvider->switchSessionByAlias($this->getMink(), $sessionAlias);
+        $this->getSession()->resizeWindow(1920, 1080, 'current');
     }
 
     /**
@@ -1319,25 +1346,53 @@ class OroMainContext extends MinkContext implements
      */
     public function iDragAndDropElementBeforeAnotherOne($elementName, $dropZoneName)
     {
-        $element = $this->createElement($elementName);
-        $dropZone = $this->createElement($dropZoneName);
+        $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName, 1, 1);
+    }
 
+    /**
+     * Drag and Drop one element on another
+     * Example: When I drag and drop "Field Condition" on "Drop condition here"
+     *
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" on "(?P<dropZoneName>[\w\s]+)"$/
+     * @param string $elementName
+     * @param string $dropZoneName
+     */
+    public function iDragAndDropElementOnAnotherOne($elementName, $dropZoneName)
+    {
+        $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName);
+    }
+
+    /**
+     * @param string $elementName
+     * @param string $dropZoneName
+     * @param int $xOffset
+     * @param int $yOffset
+     */
+    public function dragAndDropElementToAnotherOne($elementName, $dropZoneName, $xOffset = null, $yOffset = null)
+    {
         /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
         $webDriverSession = $driver->getWebDriverSession();
 
-        $source      = $webDriverSession->element('xpath', $element->getXpath());
-        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+        $element = $this->createElement($elementName);
+        $source = $webDriverSession->element('xpath', $element->getXpath());
 
         $webDriverSession->moveto(array(
             'element' => $source->getID()
         ));
         $webDriverSession->buttondown();
-        $webDriverSession->moveto([
-            'element' => $destination->getID(),
-            'xoffset' => 1,
-            'yoffset' => 1,
-        ]);
+
+        $dropZone = $this->createElement($dropZoneName);
+        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+        $moveToOptions = ['element' => $destination->getID()];
+        if (!is_null($xOffset)) {
+            $moveToOptions['xoffset'] = $xOffset;
+        }
+        if (!is_null($yOffset)) {
+            $moveToOptions['yoffset'] = $xOffset;
+        }
+        $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
     }
 
@@ -1367,5 +1422,19 @@ class OroMainContext extends MinkContext implements
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
         $form->uncheckUseDefaultCheckbox($label);
+    }
+
+    /**
+     * @Then /^Page title equals to "(?P<pageTitle>[\w\s]+)"$/
+     *
+     * @param string $pageTitle
+     */
+    public function assertPageTitle($pageTitle)
+    {
+        $title = $this->getSession()->getPage()->find('css', 'title');
+
+        static::assertNotNull($title, 'Cannot find title element for the page');
+
+        static::assertEquals($pageTitle, $title->getHtml());
     }
 }

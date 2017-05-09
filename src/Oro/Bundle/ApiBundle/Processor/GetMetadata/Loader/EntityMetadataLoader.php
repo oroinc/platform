@@ -268,6 +268,7 @@ class EntityMetadataLoader
                         $this->objectMetadataFactory->createAndAddAssociationMetadata(
                             $entityMetadata,
                             $entityClass,
+                            $config,
                             $fieldName,
                             $field,
                             $targetAction

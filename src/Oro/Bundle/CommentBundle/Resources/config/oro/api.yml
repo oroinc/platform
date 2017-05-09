@@ -4,15 +4,5 @@ api:
             documentation_resource: '@OroCommentBundle/Resources/doc/api/comment.md'
             fields:
                 target:
-                    description: The entity record that the comment was made on.
                     data_type: association:manyToOne
-            subresources:
-                target:
-                    actions:
-                        get_subresource:
-                            documentation: Get full information about a record to which the comment belongs to.
-                        get_relationship:
-                            documentation: Get a record to which the comment belongs to.
-                        update_relationship:
-                            documentation: Update a record to which the comment belongs to.
 
