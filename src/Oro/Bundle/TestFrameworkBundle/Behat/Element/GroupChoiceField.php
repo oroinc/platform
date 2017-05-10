@@ -31,7 +31,6 @@ class GroupChoiceField extends Element
 
         foreach ($values as $label) {
             $choice = $this->getChoice($label);
-            self::assertNotNull($choice, sprintf('Can\'t find checkbox or radio button with "%s" label', $label));
 
             if ('checkbox' === strtolower($choice->getAttribute('type'))) {
                 $choice->check();
@@ -77,7 +76,7 @@ class GroupChoiceField extends Element
 
     /**
      * @param string $label
-     * @return NodeElement|null
+     * @return NodeElement
      */
     protected function getChoice($label)
     {
@@ -87,6 +86,9 @@ class GroupChoiceField extends Element
         );
         self::assertCount(1, $choices, sprintf('Too many results for "%s" label', $label));
 
-        return array_shift($choices);
+        $choice = array_shift($choices);
+        self::assertNotNull($choice, sprintf('Can\'t find checkbox or radio button with "%s" label', $label));
+
+        return $choice;
     }
 }
