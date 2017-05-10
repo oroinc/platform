@@ -5,8 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\TestFrameworkBundle\Entity\TestDefaultAndNull as TestRelatedEntity;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityForNestedObjects as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull as TestRelatedEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects as TestEntity;
 
 class LoadNestedAssociationData extends AbstractFixture
 {

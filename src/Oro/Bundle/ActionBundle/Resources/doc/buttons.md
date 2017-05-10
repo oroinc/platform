@@ -29,3 +29,8 @@ Additionally, if context of button search was not fully defined at `find` there 
 
 A [`ButtonInterface`](../../Button/ButtonInterface.php) implementation should gather all required data for rendering. Mostly from `ButtonSearchContext`.
 You might control button presentation (view) through the button template `ButtonInterface::getTemplate()` and its data (via `ButtonInterface::getTemplateData()`). 
+
+#### Button Match Event
+For logic injection purposes you can rely on event `oro_action.button_provider.on_buttons_matched` 
+witch is dispatched with general `@event_dispatcher` service and emits currently matched buttons collection wrapped 
+with [`OnButtonsMatched`](../../Provider/Event/OnButtonsMatched.php) event object.

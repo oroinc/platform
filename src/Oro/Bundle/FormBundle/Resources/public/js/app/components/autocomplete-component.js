@@ -165,6 +165,8 @@ define(function(require) {
                 height: this.$element[0].offsetHeight
             });
 
+            var $autocomplete = this.$holder.length ? this.$holder : this.$menu;
+
             if (this.$holder.length) {
                 this.$holder
                     .insertAfter(this.$element)
@@ -188,14 +190,13 @@ define(function(require) {
 
             var $window = $(window);
             var viewportBottom = $window.scrollTop() + $window.height();
-            var elementHeight = this.$element.outerHeight(false);
-            var resultsTop = this.$element.offset().top + elementHeight;
-            var resultsHeight = this.$menu.outerHeight(false);
-            var enoughBelow = resultsTop + resultsHeight <= viewportBottom;
+            var autocompleteHeight = $autocomplete.outerHeight(false);
+            var autocompleteTop = $autocomplete.offset().top;
+            var enoughBelow = autocompleteTop + autocompleteHeight <= viewportBottom;
+            var enoughAbove = this.$element.offset().top > autocompleteHeight;
 
-            if (!enoughBelow) {
-                var aboveTop = this.$menu.css('top').replace('px', '') - resultsHeight - elementHeight;
-                this.$menu.css('top', aboveTop + 'px');
+            if (!enoughBelow && enoughAbove) {
+                $autocomplete.css('top', -autocompleteHeight);
             }
 
             return this;

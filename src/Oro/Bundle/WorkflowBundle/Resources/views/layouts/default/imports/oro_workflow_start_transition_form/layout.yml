@@ -1,0 +1,48 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'layout.html.twig'
+        - '@addTree':
+            items:
+                transition_form_wrapper:
+                    blockType: container
+                form_warning_message:
+                    blockType: text
+                    options:
+                        text: '=data["translator"].getTrans(data["transition"].getMessage(),[],"workflows")'
+                        visible: '=((data["transition"].getMessage()!="")&&(data["translator"].getTrans(data["transition"].getMessage(),[],"workflows")!=data["transition"].getMessage()))'
+                form_start:
+                    blockType: form_start
+                    options:
+                        form: '=data["transitionFormView"]'
+                        form_route_name: '=data["formRouteName"]'
+                        form_route_parameters:
+                            workflowName: '=data["workflowName"]'
+                            transitionName: '=data["transitionName"]'
+                            entityId: '=data["entityId"]'
+                            originalUrl: '=data["originalUrl"]'
+                form_fields:
+                    blockType: form_fields
+                    options:
+                        form: '=data["transitionFormView"]'
+                form_end:
+                    blockType: form_end
+                    options:
+                        form: '=data["transitionFormView"]'
+                form_actions:
+                    blockType: container
+                form_actions_submit:
+                    blockType: button
+                    options:
+                        action: submit
+                        text: oro.workflow.transition.form.submit.label
+                        style: auto
+            tree:
+                transition_form_holder:
+                    transition_form_wrapper:
+                        form_warning_message: ~
+                        form_start: ~
+                        form_fields: ~
+                        form_actions:
+                            form_actions_submit: ~
+                        form_end: ~

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Context;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
 use Doctrine\Common\Collections\ArrayCollection;
 
 class StepExecutionProxyContext implements ContextInterface, BatchContextInterface
@@ -11,6 +12,11 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
      * @var StepExecution
      */
     protected $stepExecution;
+
+    /**
+     * @var array
+     */
+    private $postponedRows = [];
 
     public function __construct(StepExecution $stepExecution)
     {
@@ -41,6 +47,36 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
     public function getErrors()
     {
         return $this->stepExecution->getErrors();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRow(array $row)
+    {
+        $this->postponedRows[] = $row;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRows(array $rows)
+    {
+        foreach ($rows as $row) {
+            $this->addPostponedRow($row);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPostponedRows()
+    {
+        return $this->postponedRows;
     }
 
     /**

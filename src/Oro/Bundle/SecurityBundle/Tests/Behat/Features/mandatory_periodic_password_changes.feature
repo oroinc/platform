@@ -1,3 +1,5 @@
+@ticket-OEE-1187
+@automatically-ticket-tagged
 @not-automated
 Feature: Mandatory periodic password changes
   In order to increase login security level

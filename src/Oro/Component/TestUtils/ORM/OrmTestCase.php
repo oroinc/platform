@@ -169,8 +169,8 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $conn
-     * @param string                                   $sql
-     * @param array                                    $result
+     * @param string                                   $sql SQL that run in database
+     * @param array                                    $result data that will return after SQL execute
      * @param array                                    $params
      * @param array                                    $types
      */

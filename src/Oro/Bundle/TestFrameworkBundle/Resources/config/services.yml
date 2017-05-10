@@ -76,3 +76,10 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider
         tags:
             - { name: oro_integration.transport, type: aType, channel_type: aType }
+
+    oro_test.entity_alias_resolver:
+        class: 'Oro\Bundle\EntityBundle\ORM\EntityAliasResolver'
+        arguments:
+            - '@oro_entity.entity_alias_loader'
+            - '@oro_entity.entity_alias_cache'
+            - true

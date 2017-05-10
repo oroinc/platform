@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\CorrectConfiguration\CorrectConfigurationBundle;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\CorrectSplitConfiguration\CorrectSplitConfigurationBundle;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectSplitConfig\IncorrectSplitConfigBundle;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\EmptyConfiguration\EmptyConfigurationBundle;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectConfiguration\IncorrectConfigurationBundle;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfiguration\DuplicateConfigurationBundle;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -34,7 +35,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWorkflowDefinitionsIncorrectConfiguration()
     {
-        $bundles = array(new IncorrectConfigurationBundle());
+        $bundles = [new Stub\IncorrectConfiguration\IncorrectConfigurationBundle()];
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
         $configurationProvider->getWorkflowDefinitionConfiguration();
     }
@@ -45,7 +46,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWorkflowDefinitionsIncorrectSplitConfig()
     {
-        $bundles = array(new IncorrectSplitConfigBundle());
+        $bundles = [new Stub\IncorrectSplitConfig\IncorrectSplitConfigBundle()];
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
         $configurationProvider->getWorkflowDefinitionConfiguration();
     }
@@ -55,14 +56,20 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWorkflowDefinitionsDuplicateConfiguration()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new DuplicateConfigurationBundle());
+        $bundles = [
+            new Stub\CorrectConfiguration\CorrectConfigurationBundle(),
+            new Stub\DuplicateConfiguration\DuplicateConfigurationBundle()
+        ];
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
         $configurationProvider->getWorkflowDefinitionConfiguration();
     }
 
     public function testGetWorkflowDefinitions()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $bundles = [
+            new Stub\CorrectConfiguration\CorrectConfigurationBundle(),
+            new Stub\EmptyConfiguration\EmptyConfigurationBundle()
+        ];
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
 
         $this->assertEquals(
@@ -73,7 +80,10 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSplittedWorkflowDefinitions()
     {
-        $bundles = array(new CorrectSplitConfigurationBundle(), new EmptyConfigurationBundle());
+        $bundles = [
+            new Stub\CorrectSplitConfiguration\CorrectSplitConfigurationBundle(),
+            new Stub\EmptyConfiguration\EmptyConfigurationBundle()
+        ];
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
         $expectedConfiguration = $this->getExpectedWokflowConfiguration('CorrectConfiguration');
         $providedConfig = $configurationProvider->getWorkflowDefinitionConfiguration();
@@ -83,26 +93,32 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWorkflowDefinitionsFilterByDirectory()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $bundles = [
+            new Stub\CorrectConfiguration\CorrectConfigurationBundle(),
+            new Stub\EmptyConfiguration\EmptyConfigurationBundle()
+        ];
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
 
         $this->assertEquals(
             $this->getExpectedWokflowConfiguration('CorrectConfiguration'),
             $configurationProvider->getWorkflowDefinitionConfiguration(
-                array(__DIR__ . '/Stub/CorrectConfiguration')
+                [__DIR__ . '/Stub/CorrectConfiguration']
             )
         );
 
         $this->assertEmpty(
             $configurationProvider->getWorkflowDefinitionConfiguration(
-                array(__DIR__ . '/Stub/EmptyConfiguration')
+                [__DIR__ . '/Stub/EmptyConfiguration']
             )
         );
     }
 
     public function testGetWorkflowDefinitionsFilterByWorkflow()
     {
-        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $bundles = [
+            new Stub\CorrectConfiguration\CorrectConfigurationBundle(),
+            new Stub\EmptyConfiguration\EmptyConfigurationBundle()
+        ];
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
 
         $expectedWorkflows = $this->getExpectedWokflowConfiguration('CorrectConfiguration');
@@ -112,16 +128,127 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             $expectedWorkflows,
             $configurationProvider->getWorkflowDefinitionConfiguration(
                 null,
-                array('first_workflow')
+                ['first_workflow']
             )
         );
 
         $this->assertEmpty(
             $configurationProvider->getWorkflowDefinitionConfiguration(
                 null,
-                array('not_existing_workflow')
+                ['not_existing_workflow']
             )
         );
+    }
+
+    public function testImportConfigToReuse()
+    {
+        $bundles = [
+            new Stub\ImportConfiguration\ImportConfigurationBundle(),
+            new Stub\ImportReuseConfiguration\ImportReuseConfigurationBundle()
+        ];
+
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $configuration = $configurationProvider->getWorkflowDefinitionConfiguration(
+            null,
+            ['workflow_with_config_reuse']
+        );
+
+        $expected = $this->getExpectedWokflowConfiguration('ImportReuseConfiguration');
+
+        $this->assertEquals($expected, $configuration);
+    }
+
+    public function testImportSelfContainedConfig()
+    {
+        $bundles = [new Stub\ImportSelfConfiguration\ImportSelfConfigurationBundle];
+
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $configuration = $configurationProvider->getWorkflowDefinitionConfiguration();
+
+        $expected = $this->getExpectedWokflowConfiguration('ImportSelfConfiguration');
+
+        $this->assertEquals($expected, $configuration);
+    }
+
+    public function testImportComplexChainConfig()
+    {
+        $bundles = [
+            new Stub\ImportComplexConfiguration\ImportComplexConfigurationBundle,
+            new Stub\ImportSelfConfiguration\ImportSelfConfigurationBundle
+        ];
+
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $configuration = $configurationProvider->getWorkflowDefinitionConfiguration(
+            null,
+            ['chained_result']
+        );
+
+        $expected = $this->getExpectedWokflowConfiguration('ImportComplexConfiguration');
+
+        $this->assertEquals($expected, $configuration);
+    }
+
+    public function testImportWorkflowPartFromFile()
+    {
+        $bundles = [new Stub\ImportPartsFromFileConfiguration\ImportPartsFromFileConfigurationBundle];
+
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $configuration = $configurationProvider->getWorkflowDefinitionConfiguration(
+            null,
+            ['with_parts_from_file']
+        );
+
+        $expected = $this->getExpectedWokflowConfiguration('ImportPartsFromFileConfiguration');
+
+        $this->assertEquals($expected, $configuration);
+    }
+
+    public function testImportWrongConfiguration()
+    {
+        $bundles = [new Stub\ImportIncorrectOptions\ImportIncorrectOptionsBundle];
+
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $this->expectException(WorkflowConfigurationImportException::class);
+        $this->expectExceptionMessage(
+            '`workflow` type import directive options `as` and `replace` are required.' .
+            ' Given "- { workflow: some_workflow_to_import, as: recipient_workflow }'
+        );
+        $configurationProvider->getWorkflowDefinitionConfiguration();
+    }
+
+    public function testImportRecursionError()
+    {
+        $bundles = [new Stub\ImportRecursionErrorConfiguration\ImportRecursionErrorConfigurationBundle];
+
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageRegExp(
+            '/Recursion met\. File `([^`]+)` tries to import workflow `points_to_normal` ' .
+            'for `points_to_other` that imports it too in `([^`]+)`/'
+        );
+
+        $configurationProvider->getWorkflowDefinitionConfiguration(null, ['for_that']);
+    }
+
+    public function testImportUnknownWorkflowException()
+    {
+        $bundles = [new Stub\ImportUnknownWorkflow\ImportUnknownWorkflowBundle];
+
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $this->expectException(WorkflowConfigurationImportException::class);
+        $this->expectExceptionMessage(
+            'Error occurs while importing workflow for `for_that`. ' .
+            'Error: "Can not find workflow `not_exists` for import.`" in '
+        );
+
+        $configurationProvider->getWorkflowDefinitionConfiguration();
     }
 
     /**
@@ -132,6 +259,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/oro/workflows.php';
         $this->assertFileExists($fileName);
+
         return include $fileName;
     }
 }

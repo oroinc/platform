@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+
 class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
 {
-    /**
-     * FQCN of the entity being used for testing.
-     */
-    const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment';
-
     public function testCreate()
     {
-        $entityType = $this->getEntityType(self::ENTITY_CLASS);
+        $entityType = $this->getEntityType(TestDepartment::class);
 
         $data = [
             'data' => [
@@ -38,7 +35,7 @@ class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
      */
     public function testUpdate($id)
     {
-        $entityType = $this->getEntityType(self::ENTITY_CLASS);
+        $entityType = $this->getEntityType(TestDepartment::class);
 
         $data = [
             'data' => [

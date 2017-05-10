@@ -103,6 +103,8 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_TRANSITIONS => [
                         'trans1' => [
                             'label' => 'trans_label1',
+                            'button_label' => 'trans_button_label1',
+                            'button_title' => 'trans_button_title1',
                             'message' => 'trans_message1',
                             'form_options' => [
                                 'attribute_fields' => [
@@ -133,6 +135,8 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_TRANSITIONS => [
                         'trans1' => [
                             'label' => 'link_to_trans_label1',
+                            'button_label' => 'link_to_trans_button_label1',
+                            'button_title' => 'link_to_trans_button_title1',
                             'message' => 'link_to_trans_message1'
                         ]
                     ],

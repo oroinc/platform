@@ -75,3 +75,5 @@ features:
             - 'oro:cron:imap-sync'
             - 'oro:cron:ews-sync'
             - 'oro:cron:email-body-sync'
+        commands:
+            - 'oro:email:body-sync'
