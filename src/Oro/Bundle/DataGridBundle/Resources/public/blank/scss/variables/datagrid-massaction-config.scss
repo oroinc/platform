@@ -2,6 +2,7 @@
 
 $datagrid-massaction-toggle-offset-inner: 3px 5px !default;
 $datagrid-massaction-toggle-font-size: $base-font-size + 1px !default;
+$datagrid-massaction-toggle-font-weight: normal !default;
 $datagrid-massaction-toggle-background-color: lighten(get-color('additional', 'base'), 2%) !default;
 $datagrid-massaction-toggle-color: lighten(get-color('additional', 'dark'), 21%) !default;
 $datagrid-massaction-toggle-border: 1px solid get-color('additional', 'light') !default;
