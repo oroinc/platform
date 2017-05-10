@@ -131,6 +131,7 @@ oro_behat_extension:
     OroDataGridBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroFormBundle::FormContext
         - OroDataGridBundle::GridContext
       paths:
         - '@OroDataGridBundle/Tests/Behat/Features'

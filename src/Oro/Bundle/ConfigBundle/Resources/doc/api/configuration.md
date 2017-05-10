@@ -4,7 +4,7 @@
 
 ### get
 
-Retrieve a collection of configuration records. 
+Retrieve a specific configuration record.
 
 {@inheritdoc}
 
@@ -12,8 +12,18 @@ The structure of the application configuration. Has three levels (scopes): user,
 
 ### get_list
 
-Retrieve a specific configuration record.
+Retrieve a collection of configuration records.
 
 {@inheritdoc}
 
 The structure of the application configuration. Has three levels (scopes): user, organization, global.
+
+## FIELDS
+
+### id
+
+The path to a configuration section.
+
+### options
+
+The list of configuration options.

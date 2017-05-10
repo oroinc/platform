@@ -39,6 +39,8 @@ class NestedObjectMetadataHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testAddNestedObjectAssociation()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -57,6 +59,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction,
@@ -71,6 +74,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit_Framework_TestCase
         $result = $this->nestedObjectMetadataHelper->addNestedObjectAssociation(
             $entityMetadata,
             $entityClass,
+            $config,
             $fieldName,
             $field,
             $targetAction

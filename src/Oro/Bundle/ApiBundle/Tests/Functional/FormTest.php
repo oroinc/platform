@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -234,7 +234,7 @@ class FormTest extends WebTestCase
     protected function getRootForm(array $options = [])
     {
         $options['data_class'] = self::TEST_CLASS;
-        $options['extra_fields_message'] = FormUtil::EXTRA_FIELDS_MESSAGE;
+        $options['extra_fields_message'] = FormHelper::EXTRA_FIELDS_MESSAGE;
         $form = $this->getContainer()->get('form.factory')->create($this->getType(), null, $options);
 
         return $form;

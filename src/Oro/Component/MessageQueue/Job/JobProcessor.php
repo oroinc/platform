@@ -283,12 +283,33 @@ class JobProcessor
     }
 
     /**
+     * Cancels running for all child jobs that are not in run status.
+     *
+     * @param Job $job
+     */
+    public function cancelAllNotStartedChildJobs(Job $job)
+    {
+        if (!$job->isRoot() || !$job->getChildJobs()) {
+            return;
+        }
+
+        foreach ($job->getChildJobs() as $childJob) {
+            if (in_array(
+                $childJob->getStatus(),
+                [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED]
+            )) {
+                $this->cancelChildJob($childJob);
+            }
+        }
+    }
+
+    /**
      * @param Job  $job
      * @param bool $force
      */
     public function interruptRootJob(Job $job, $force = false)
     {
-        if (! $job->isRoot()) {
+        if (!$job->isRoot()) {
             throw new \LogicException(sprintf('Can interrupt only root jobs. id: "%s"', $job->getId()));
         }
 
@@ -306,6 +327,9 @@ class JobProcessor
             if ($force) {
                 $this->cancelAllActiveChildJobs($job);
                 $job->setStoppedAt(new \DateTime());
+            } else {
+                // we should mark all child jobs as canceled to speed-up the terminate process
+                $this->cancelAllNotStartedChildJobs($job);
             }
         });
     }

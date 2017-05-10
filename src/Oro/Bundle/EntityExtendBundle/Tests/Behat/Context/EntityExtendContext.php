@@ -12,19 +12,6 @@ class EntityExtendContext extends OroFeatureContext implements OroPageObjectAwar
     use PageObjectDictionary;
 
     /**
-     * @Then /^(?:|I )click update schema$/
-     */
-    public function iClickUpdateSchema()
-    {
-        $page = $this->getPage();
-
-        $page->clickLink('Update schema');
-        $this->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $this->waitForAjax(120000);
-    }
-
-    /**
      * @Then /^"([^"]*)" was set to "([^"]*)" and is not editable$/
      */
     public function wasSetToAndIsNotEditable($field, $isBidirectional)
