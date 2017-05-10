@@ -205,15 +205,18 @@ class Element extends NodeElement
         $time = $timeLimit;
 
         while ($time > 0) {
+            $start = microtime(true);
             try {
                 if ($result = $lambda($this)) {
                     return $result;
                 }
             } catch (\Exception $e) {
                 // do nothing
+            } catch (\Throwable $e) {
+                // do nothing
             }
             usleep(50000);
-            $time -= 0.05;
+            $time -= microtime(true) - $start;
         }
         return null;
     }

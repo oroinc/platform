@@ -332,6 +332,39 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
     }
 
+    public function testFormEventSubscribers()
+    {
+        $config = new ActionConfig();
+        $this->assertNull($config->getFormEventSubscribers());
+
+        $config->setFormEventSubscribers(['subscriber1']);
+        $this->assertEquals(['subscriber1'], $config->getFormEventSubscribers());
+        $this->assertEquals(['form_event_subscriber' => ['subscriber1']], $config->toArray());
+
+        $config->setFormEventSubscribers([]);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testSetNullToFormEventSubscribers()
+    {
+        $config = new ActionConfig();
+        $config->setFormEventSubscribers(['subscriber1']);
+
+        $config->setFormEventSubscribers(null);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    /**
+     * @expectedException \TypeError
+     */
+    public function testSetInvalidValueToFormEventSubscribers()
+    {
+        $config = new ActionConfig();
+        $config->setFormEventSubscribers('subscriber1');
+    }
+
     public function testFields()
     {
         $config = new ActionConfig();

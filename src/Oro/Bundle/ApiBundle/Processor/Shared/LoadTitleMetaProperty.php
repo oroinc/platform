@@ -153,11 +153,10 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         $titleFieldName
     ) {
         foreach ($expandedAssociations as $associationName => $association) {
-            $associationPropertyPath = $association->getPropertyPath($associationName);
-            if (!array_key_exists($associationPropertyPath, $data)) {
+            if (!array_key_exists($associationName, $data)) {
                 continue;
             }
-            $value = &$data[$associationPropertyPath];
+            $value = &$data[$associationName];
             if (!is_array($value) || empty($value)) {
                 continue;
             }
@@ -256,11 +255,10 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     protected function collectIdentifiersForAssociations(array &$map, array $item, array $expandedAssociations)
     {
         foreach ($expandedAssociations as $associationName => $association) {
-            $associationPropertyPath = $association->getPropertyPath($associationName);
-            if (!array_key_exists($associationPropertyPath, $item)) {
+            if (!array_key_exists($associationName, $item)) {
                 continue;
             }
-            $value = $item[$associationPropertyPath];
+            $value = $item[$associationName];
             if (!is_array($value) || empty($value)) {
                 continue;
             }

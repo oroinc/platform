@@ -12,6 +12,7 @@ define([
 
     var defaults = {
         container: '',
+        temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
         template: $.noop,
         insertMethod: 'appendTo',
@@ -21,11 +22,18 @@ define([
     var groupedMessages = {};
     var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
 
+    var resolveContainer = function(options) {
+        if ($(options.container).is(defaults.container) && $(defaults.temporaryContainer).length) {
+            options.container = defaults.temporaryContainer;
+        }
+    };
+
     /**
      * Same arguments as for Oro.NotificationMessage
      */
     function showMessage(type, message, options) {
         var opt = _.extend({}, defaults, options || {});
+        resolveContainer(opt);
         var $el = $(opt.template({
             type: type,
             message: message,
@@ -80,6 +88,7 @@ define([
                 var afterReloadQueue = [];
                 var args = Array.prototype.slice.call(arguments);
                 var actions = {close: $.noop};
+
                 if (afterReload && window.localStorage) {
                     afterReloadQueue = JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]');
                     afterReloadQueue.push(args);
@@ -149,6 +158,8 @@ define([
             setup: function(options) {
                 _.extend(defaults, options);
 
+                $(document).on('remove', defaults.temporaryContainer, this.removeTemporaryContainer);
+
                 if (window.localStorage) {
                     queue = queue.concat(JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]'));
                     localStorage.removeItem('oroAfterReloadMessages');
@@ -196,7 +207,12 @@ define([
              */
             clear: function(namespace, options) {
                 var opt = _.extend({}, defaults, options || {});
-                $(opt.container).find('[data-messenger-namespace=' + namespace + ']').remove();
+                $(opt.container).add(opt.temporaryContainer)
+                    .find('[data-messenger-namespace=' + namespace + ']').remove();
+            },
+
+            removeTemporaryContainer: function() {
+                $(defaults.container).append($(this).children());
             }
         };
 });

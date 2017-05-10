@@ -62,6 +62,14 @@ define([
             if (this.hasBeenOpened || this.options.refreshNotOpened) {
                 oldRefresh.call(this, init);
             }
+        },
+
+        getChecked: function() {
+            return this.menu.find('input').not('[type=search]').filter(':checked');
+        },
+
+        getUnchecked: function() {
+            return this.menu.find('input').not('[type=search]').not(':checked');
         }
     });
 

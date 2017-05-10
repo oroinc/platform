@@ -54,6 +54,7 @@ class EntityNestedObjectMetadataFactory
         $associationMetadata = $this->nestedObjectMetadataHelper->addNestedObjectAssociation(
             $entityMetadata,
             $entityClass,
+            $config,
             $fieldName,
             $field,
             $targetAction

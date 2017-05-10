@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
-use Oro\Bundle\ActionBundle\Tests\Unit\Command\Stub\OutputStub;
+use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 
 class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
 {

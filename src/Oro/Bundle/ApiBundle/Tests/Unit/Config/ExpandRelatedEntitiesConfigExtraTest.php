@@ -20,6 +20,14 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ExpandRelatedEntitiesConfigExtra::NAME, $this->extra->getName());
     }
 
+    public function testGetExpandedEntities()
+    {
+        $this->assertEquals(
+            ['products', 'categories'],
+            $this->extra->getExpandedEntities()
+        );
+    }
+
     public function testConfigureContext()
     {
         $context = new ConfigContext();
