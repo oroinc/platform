@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Test;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
 class FakeRestResponse implements RestResponseInterface
 {
@@ -146,7 +147,15 @@ class FakeRestResponse implements RestResponseInterface
      */
     public function json()
     {
-        return json_decode($this->body, true);
+        $data = json_decode((string) $this->body, true);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw RestException::createFromResponse(
+                $this,
+                'Unable to parse response body into JSON'
+            );
+        }
+
+        return $data === null ? array() : $data;
     }
 
     /**
