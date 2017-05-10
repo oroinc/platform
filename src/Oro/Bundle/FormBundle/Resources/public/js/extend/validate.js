@@ -367,7 +367,9 @@ define([
         },
         unhighlight: function(element) {
             var $el = $(element);
-            $el.closest('.controls').removeClass('validation-error')
+            $el.removeClass('error')
+                .closest('.controls')
+                .removeClass('validation-error')
                 .find('.error').removeClass('error');
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
