@@ -111,10 +111,13 @@ class OroMainContext extends MinkContext implements
         $timeElapsedSecs = microtime(true) - $start;
 
         if (!$result) {
-            var_dump(sprintf(
-                'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
-                $timeElapsedSecs
-            ));
+            fwrite(
+                STDOUT,
+                sprintf(
+                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                    $timeElapsedSecs
+                )
+            );
         }
 
         // Check for unforeseen 500 errors
@@ -242,7 +245,7 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @param \Closure $lambda
-     * @param int $timeLimit
+     * @param int $timeLimit in seconds
      * @return false|mixed Return false if closure throw error or return not true value.
      *                     Return value that return closure
      */
@@ -279,16 +282,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Close form error message
-     *
-     * @Then /^(?:|I )close error message$/
-     */
-    public function closeErrorMessage()
-    {
-        $this->createOroForm()->find('css', '.alert-error button.close')->press();
-    }
-
-    /**
      * Close UI dialog popup
      *
      * @Then /^(?:|I )close ui dialog$/
@@ -296,136 +289,6 @@ class OroMainContext extends MinkContext implements
     public function closeUiDialog()
     {
         $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
-    }
-
-    /**
-     * This is available for collection fields
-     * See Emails and Phones in Contact create page
-     * Example: And set "charlie@gmail.com" as primary email
-     * Example: And set "+1 415-731-9375" as primary phone
-     *
-     * @Given /^(?:|I )set "(?P<value>[^"]+)" as primary (?P<field>[^"]+)$/
-     */
-    public function setFieldWithValueAsPrimary($field, $value)
-    {
-        /** @var CollectionField $collection */
-        $collection = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($field)));
-        $collection->setFieldAsPrimary($value);
-    }
-
-    /**
-     * Fill form with data
-     * Example: And fill form with:
-     *            | Subject     | Simple text     |
-     *            | Users       | [Charlie, Pitt] |
-     *            | Date        | 2017-08-24      |
-     *
-     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" with:$/
-     * @When /^(?:|I )fill form with:$/
-     */
-    public function iFillFormWith(TableNode $table, $formName = "OroForm")
-    {
-        /** @var Form $form */
-        $form = $this->createElement($formName);
-        $form->fill($table);
-    }
-
-    /**
-     * Assert that provided validation errors for given fields appeared
-     * Example: Then I should see validation errors:
-     *            | Subject         | This value should not be blank.  |
-     * Example: Then I should see "Some Form" validation errors:
-     *            | Subject         | This value should not be blank.  |
-     *
-     * @Then /^(?:|I )should see validation errors:$/
-     * @Then /^(?:|I )should see "(?P<formName>(?:[^"]|\\")*)" validation errors:$/
-     */
-    public function iShouldSeeValidationErrors(TableNode $table, $formName = 'OroForm')
-    {
-        /** @var OroForm $form */
-        $form = $this->createElement($formName);
-
-        foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
-            $error = $form->getFieldValidationErrors($label);
-            self::assertEquals(
-                $value,
-                $error,
-                "Failed asserting that $label has error $value"
-            );
-        }
-    }
-
-    /**
-     * Assert form fields values
-     * Example: And "User Form" must contains values:
-     *            | Username          | charlie           |
-     *            | First Name        | Charlie           |
-     *            | Last Name         | Sheen             |
-     *            | Primary Email     | charlie@sheen.com |
-     *
-     * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
-     */
-    public function formMustContainsValues($formName, TableNode $table)
-    {
-        /** @var Form $form */
-        $form = $this->createElement($formName);
-        $form->assertFields($table);
-    }
-
-    /**
-     * Fill embed form
-     * Example: And I fill in address:
-     *            | Primary         | check         |
-     *            | Country         | United States |
-     *            | Street          | Selma Ave     |
-     *            | City            | Los Angeles   |
-     *
-     * @Given /^(?:|I )fill in (?P<fieldSetLabel>[^"]+):$/
-     */
-    public function iFillInFieldSet($fieldSetLabel, TableNode $table)
-    {
-        /** @var Form $fieldSet */
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
-        $fieldSet->fill($table);
-    }
-
-    /**
-     * Set collection field with set of values
-     * Example: And set Reminders with:
-     *            | Method        | Interval unit | Interval number |
-     *            | Email         | days          | 1               |
-     *            | Flash message | minutes       | 30              |
-     *
-     * @Given /^(?:|I )set (?P<field>[^"]+) with:$/
-     */
-    public function setCollectionFieldWith($field, TableNode $table)
-    {
-        /** @var Form $form */
-        $form = $this->createElement('OroForm');
-        $form->fillField($field, $table);
-    }
-
-    /**
-     * Add new embed form with data
-     * Example: And add new address with:
-     *            | Primary         | check               |
-     *            | Country         | Ukraine             |
-     *            | Street          | Myronosytska 57     |
-     *            | City            | Kharkiv             |
-     *            | Zip/Postal Code | 61000               |
-     *            | State           | Kharkivs'ka Oblast' |
-     *
-     * @Given /^(?:|I )add new (?P<fieldSetLabel>[^"]+) with:$/
-     */
-    public function addNewFieldSetWith($fieldSetLabel, TableNode $table)
-    {
-        /** @var Form $fieldSet */
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
-        $fieldSet->clickLink('Add');
-        $this->waitForAjax();
-        $form = $fieldSet->getLastSet();
-        $form->fill($table);
     }
 
     /**
@@ -779,32 +642,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Example: And press select entity button on Owner field
-     *
-     * @Given press select entity button on :field field
-     */
-    public function pressSelectEntityButton($field)
-    {
-        $this->createOroForm()->pressEntitySelectEntityButton($field);
-    }
-
-    /**
-     * @When /^(?:|I )save and close form$/
-     */
-    public function iSaveAndCloseForm()
-    {
-        $this->createOroForm()->saveAndClose();
-    }
-
-    /**
-     * @When /^(?:|I )(save|submit) form$/
-     */
-    public function iSaveForm()
-    {
-        $this->createOroForm()->save();
-    }
-
-    /**
      * @When updated date must be grater then created date
      */
     public function updatedDateMustBeGraterThenCreatedDate()
@@ -837,77 +674,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Find and assert field value
-     * It's valid for entity edit or entity view page
-     * Example: And Account Name field should has Good Company value
-     * Example: And Account Name field should has Good Company value
-     * Example: And Description field should has Our new partner value
-     *
-     * @When /^(?P<fieldName>[\w\s]*) field should has (?P<fieldValue>.+) value$/
-     */
-    public function fieldShouldHaveValue($fieldName, $fieldValue)
-    {
-        $page = $this->getSession()->getPage();
-        $labels = $page->findAll('css', 'label');
-
-        /** @var NodeElement $label */
-        foreach ($labels as $label) {
-            if (preg_match(sprintf('/%s/i', $fieldName), $label->getText())) {
-                if ($label->hasAttribute('for')) {
-                    return $this->getSession()
-                        ->getPage()
-                        ->find('css', '#' . $label->getAttribute('for'))
-                        ->getValue();
-                }
-
-                $value = $label->getParent()->find('css', 'div.control-label')->getText();
-                self::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
-
-                return;
-            }
-        }
-
-        self::fail(sprintf('Can\'t find field with "%s" label', $fieldName));
-    }
-
-    /**
-     * Mass inline grid field edit
-     * Accept table and pass it to inlineEditField
-     * Example: When I edit first record from grid:
-     *            | name      | editedName       |
-     *            | status    | Qualified        |
-     *
-     * @Then I edit first record from grid:
-     * @param TableNode $table
-     */
-    public function iEditFirstRecordFromGrid(TableNode $table)
-    {
-        foreach ($table->getRows() as $row) {
-            list($field, $value) = $row;
-            $this->inlineEditField($field, $value);
-            $this->waitForAjax();
-        }
-    }
-
-    /**
-     * Inline grid field edit with click on empty space
-     * Example: When I edit Status as "Open"
-     * Example: Given I edit Probability as "30"
-     *
-     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" with click on empty space$/
-     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" with click on empty space$/
-     */
-    public function inlineEditRecordInGridWithClickOnEmptySpace($field, $value, $entityTitle = null)
-    {
-        $row = $this->getGridRow($entityTitle);
-
-        $row->setCellValue($field, $value);
-        $this->clickOnEmptySpace();
-        $this->iShouldSeeFlashMessage('Inline edits are being saved');
-        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
-    }
-
-    /**
      * Click on empty space
      * Example: When I click on empty space
      *
@@ -916,90 +682,6 @@ class OroMainContext extends MinkContext implements
     public function clickOnEmptySpace()
     {
         $this->getPage()->find('css', '#container')->click();
-    }
-
-    /**
-     * Inline grid field edit by double click
-     * Example: When I edit Status as "Open"
-     * Example: Given I edit Probability as "30"
-     *
-     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" by double click$/
-     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" by double click$/
-     */
-    public function inlineEditRecordInGridByDoubleclick($field, $value, $entityTitle = null)
-    {
-        $row = $this->getGridRow($entityTitle);
-
-        $row->setCellValueByDoubleClick($field, $value);
-    }
-
-    /**
-     * @param string $entityTitle
-     * @return \Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
-     */
-    protected function getGridRow($entityTitle = null)
-    {
-        /** @var Grid $grid */
-        $grid = $this->createElement('Grid');
-
-        if (null !== $entityTitle) {
-            $row = $grid->getRowByContent($entityTitle);
-        } else {
-            $rows = $grid->getRows();
-            self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.' .
-                PHP_EOL . 'You can specify row content for edit field in specific row.', count($rows)));
-
-            $row = array_shift($rows);
-        }
-
-        return $row;
-    }
-
-    /**
-     * Inline edit field
-     * Example: When I edit Status as "Open"
-     * Example: Given I edit Probability as "30"
-     *
-     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)"$/
-     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)"$/
-     */
-    public function inlineEditField($field, $value, $entityTitle = null)
-    {
-        $row = $this->getGridRow($entityTitle);
-
-        $row->setCellValueAndSave($field, $value);
-        $this->iShouldSeeFlashMessage('Inline edits are being saved');
-        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
-    }
-
-    /**
-     * Inline edit field and don't save
-     * Example: When I edit Status as "Open" without saving
-     * Example: Given I edit Probability as "30" without saving
-     *
-     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" without saving$/
-     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" without saving$/
-     */
-    public function inlineEditFieldWithoutSaving($field, $value, $entityTitle = null)
-    {
-        $row = $this->getGridRow($entityTitle);
-
-        $row->setCellValue($field, $value);
-    }
-
-    /**
-     * Inline edit field and cancel
-     * Example: When I edit Status as "Open" and cancel
-     * Example: Given I edit Probability as "30" and cancel
-     *
-     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" and cancel$/
-     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" and cancel$/
-     */
-    public function inlineEditFieldAndCancel($field, $value, $entityTitle = null)
-    {
-        $row = $this->getGridRow($entityTitle);
-
-        $row->setCellValueAndCancel($field, $value);
     }
 
     /**
@@ -1062,43 +744,6 @@ class OroMainContext extends MinkContext implements
         $field = $this->fixStepArgument($field);
         $value = $this->fixStepArgument($value);
         $this->createOroForm()->fillField($field, $value);
-    }
-
-    /**
-     * Assert that field is required
-     * Example: Then Opportunity Name is a required field
-     * Example: Then Opportunity Name is a required field
-     *
-     * @Then /^(?P<label>[\w\s]+) is a required field$/
-     */
-    public function fieldIsRequired($label)
-    {
-        $labelElement = $this->getPage()->findElementContains('Label', $label);
-        self::assertTrue($labelElement->hasClass('required'));
-    }
-
-    /**
-     * Type value in field chapter by chapter. Imitate real user input from keyboard
-     * Example: And type "Common" in "search"
-     * Example: When I type "Create" in "Enter shortcut action"
-     *
-     * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
-     */
-    public function iTypeInFieldWith($locator, $value)
-    {
-        $locator = $this->fixStepArgument($locator);
-        $value = $this->fixStepArgument($value);
-        $field = $this->getPage()->find('named', ['field', $locator]);
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-
-        if (null === $field) {
-            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $locator);
-        }
-
-        self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
-
-        $driver->typeIntoInput($field->getXpath(), $value);
     }
 
     /**
@@ -1420,34 +1065,6 @@ class OroMainContext extends MinkContext implements
             $nodeTitle,
             $anotherNodeTitle
         ));
-    }
-
-    /**
-     * This step is used for system configuration field
-     * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And check Use Default for "Position" field
-     *
-     * @Given check Use Default for :label field
-     */
-    public function checkUseDefaultForField($label)
-    {
-        /** @var SystemConfigForm $form */
-        $form = $this->createElement('SystemConfigForm');
-        $form->checkUseDefaultCheckbox($label);
-    }
-
-    /**
-     * This step used for system configuration field
-     * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use Default for "Position" field
-     *
-     * @Given uncheck Use Default for :label field
-     */
-    public function uncheckUseDefaultForField($label)
-    {
-        /** @var SystemConfigForm $form */
-        $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label);
     }
 
     /**
