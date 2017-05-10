@@ -1,7 +1,9 @@
-// @theme: default;
+// @theme: blank;
 
 .buttons-equal {
     display: flex;
+
+    padding-top: $offset-y;
 
     .btn {
         flex-basis: 50%;
