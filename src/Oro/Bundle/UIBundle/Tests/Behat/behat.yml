@@ -53,11 +53,11 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow okButton:
-      selector: 'div.modal-footer a.ok, div.buttons-flex-container button.ok'
+      selector: 'div.modal-footer a.ok, div.buttons-equal button.ok'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow cancelButton:
-      selector: 'div.modal-footer a.cancel, div.buttons-flex-container button.cancel'
+      selector: 'div.modal-footer a.cancel, div.buttons-equal button.cancel'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ContextSelector:
