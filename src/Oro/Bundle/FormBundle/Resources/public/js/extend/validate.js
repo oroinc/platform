@@ -199,6 +199,10 @@ define([
 
     // updates place for message label before show message
     $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(func, element, message) {
+        if (!message) {
+            return;
+        }
+
         message = '<span><span>' + message + '</span></span>';
         var label = this.errorsFor(element);
         if (message && label.length) {
