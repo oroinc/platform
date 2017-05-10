@@ -108,6 +108,9 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         if (empty($config[EntityDefinitionConfig::FORM_OPTIONS])) {
             unset($config[EntityDefinitionConfig::FORM_OPTIONS]);
         }
+        if (empty($config[EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER])) {
+            unset($config[EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER]);
+        }
         if (empty($config[EntityDefinitionConfig::FIELDS])) {
             unset($config[EntityDefinitionConfig::FIELDS]);
         }
@@ -152,6 +155,21 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
+            ->end()
+            ->variableNode(EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER)
+                ->validate()
+                    ->always(function ($v) {
+                        if (is_string($v)) {
+                            return [$v];
+                        }
+                        if (is_array($v)) {
+                            return $v;
+                        }
+                        throw new \InvalidArgumentException(
+                            'The value must be a string or an array.'
+                        );
+                    })
+                ->end()
             ->end();
     }
 

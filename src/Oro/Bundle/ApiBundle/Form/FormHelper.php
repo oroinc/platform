@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -17,31 +18,47 @@ class FormHelper
     /** @var FormFactoryInterface */
     private $formFactory;
 
+    /** @var ContainerInterface */
+    private $container;
+
     /**
      * @param FormFactoryInterface $formFactory
+     * @param ContainerInterface   $container
      */
-    public function __construct(FormFactoryInterface $formFactory)
+    public function __construct(FormFactoryInterface $formFactory, ContainerInterface $container)
     {
         $this->formFactory = $formFactory;
+        $this->container = $container;
     }
 
     /**
      * Creates a form builder.
      *
-     * @param string $formType
-     * @param mixed  $data
-     * @param array  $options
+     * @param string     $formType
+     * @param mixed      $data
+     * @param array      $options
+     * @param array|null $eventSubscribers
      *
      * @return FormBuilderInterface
      */
-    public function createFormBuilder($formType, $data, array $options)
+    public function createFormBuilder($formType, $data, array $options, array $eventSubscribers = null)
     {
-        return $this->formFactory->createNamedBuilder(
+        $formBuilder = $this->formFactory->createNamedBuilder(
             null,
             $formType,
             $data,
             array_merge($this->getFormDefaultOptions(), $options)
         );
+        if (!empty($eventSubscribers)) {
+            foreach ($eventSubscribers as $eventSubscriber) {
+                if (is_string($eventSubscriber)) {
+                    $eventSubscriber = $this->container->get($eventSubscriber);
+                }
+                $formBuilder->addEventSubscriber($eventSubscriber);
+            }
+        }
+
+        return $formBuilder;
     }
 
     /**

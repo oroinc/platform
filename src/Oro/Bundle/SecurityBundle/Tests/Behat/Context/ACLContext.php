@@ -105,6 +105,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $this->loginAsAdmin();
+        $this->waitForAjax();
 
         $userRoleForm = $this->openRoleEditForm($role);
 
@@ -299,7 +300,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $page->clickLink('Update schema');
         $this->waitForAjax();
         $page->clickLink('Yes, Proceed');
-        $this->waitForAjax(120000);
+        $this->oroMainContext->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
     }
 
     /**

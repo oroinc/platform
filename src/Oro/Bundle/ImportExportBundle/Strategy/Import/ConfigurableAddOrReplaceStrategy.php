@@ -125,13 +125,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $searchContext);
         if ($existingEntity) {
-            if (!$this->strategyHelper->isGranted("EDIT", $existingEntity)) {
-                $error = $this->translator->trans(
-                    'oro.importexport.import.errors.access_denied_entity',
-                    ['%entity_name%' => $entityClass,]
-                );
-                $this->context->addError($error);
-
+            if (!$this->isPermissionGrantedForEntity('EDIT', $existingEntity, $entityClass)) {
                 return null;
             }
             $existingOid = spl_object_hash($existingEntity);
@@ -565,5 +559,26 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     protected function getObjectValue($entity, $fieldName)
     {
         return $this->fieldHelper->getObjectValue($entity, $fieldName);
+    }
+
+    /**
+     * @param string $permission
+     * @param object $entity
+     * @param string $entityClass
+     * @return null
+     */
+    protected function isPermissionGrantedForEntity($permission, $entity, $entityClass)
+    {
+        if (!$this->strategyHelper->isGranted($permission, $entity)) {
+            $error = $this->translator->trans(
+                'oro.importexport.import.errors.access_denied_entity',
+                ['%entity_name%' => $entityClass,]
+            );
+            $this->context->addError($error);
+
+            return false;
+        }
+
+        return true;
     }
 }

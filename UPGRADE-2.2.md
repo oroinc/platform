@@ -57,7 +57,7 @@ A new string field `ownerDescription` with the database column `owner_descriptio
 
 ApiBundle
 ---------
-- Added class `Oro\Bundle\ApiBundle\Processor\Shared\AddFormEventSubscriber` that can be used to add an event subscriber to a form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`
+- Added `form_event_subscriber` option to `Resources/config/oro/api.yml`. It can be used to add an event subscriber(s) to a form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`. For details see `/src/Oro/Bundle/ApiBundle/Resources/doc/configuration.md`
 - Fixed handling of `property_path` option from `api.yml` for cases when the property path contains several fields, e.g. `customerAssociation.account`
 - Added method `findFieldByPath` to `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
 - Changed implementation of `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition` processor. All logic was moved to the following classes:
@@ -340,6 +340,15 @@ TranslationBundle
 - Signature of class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` was changed:
     - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
     - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`
+
+SegmentBundle
+-------------
+- Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
+    - changed signature of method `run`, added parameter `$entityIds` (array) with default empty array.
+    - method `bindParameters` is deprecated and will be removed. 
+    - method `run` now accept also a dynamic segment
+- Class `Oro/Bundle/SegmentBundle/Entity/Repository/SegmentSnapshotRepository`:
+    - changed signature of method `removeBySegment`, added parameter `$entityIds` (array) with default empty array.
 
 FormBundle
 ----------

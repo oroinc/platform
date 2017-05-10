@@ -60,7 +60,8 @@ class BuildFormBuilder implements ProcessorInterface
         $formBuilder = $this->formHelper->createFormBuilder(
             $formType,
             $context->getResult(),
-            $this->getFormOptions($context, $config)
+            $this->getFormOptions($context, $config),
+            $config->getFormEventSubscribers()
         );
 
         if ('form' === $formType) {

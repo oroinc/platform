@@ -115,7 +115,7 @@ label.disabled {
 }
 
 // Bootstrap - Form
-label, input, button, select, textarea { font-size:13px;}
+label, input, button, select, textarea { font-size:13px; color:#777;}
 .form-horizontal .control-label {
   font-size:13px;
   text-align:left;
@@ -125,7 +125,6 @@ label, input, button, select, textarea { font-size:13px;}
     float: none;
     .oro-popover-content {
       line-height: 20px;
-      color: #777;
     }
   }
 }
@@ -138,17 +137,13 @@ label, input, button, select, textarea { font-size:13px;}
       float:left;
       width:160px;
       padding-top: 7px;
-      color: #777;
       font-weight: normal;
-      font-size: 13px;
       text-align:right;
     }
     .control-label.wrap {
       float:left;
       padding-top: 6px;
-      color: #777;
       font-weight: normal;
-      font-size: 13px;
       line-height: 20px;
       text-align: right;
       .tooltip-icon {
@@ -172,12 +167,13 @@ label, input, button, select, textarea { font-size:13px;}
           overflow: auto;
         }
       }
-      .control-label.wrap {
-        width: 130px;
-
-        + .controls {
+      .control-subgroup {
+        .controls {
           margin-left: 140px;
         }
+      }
+      .control-label.wrap {
+        width: 130px;
       }
       label.control-label {
         width: auto;
@@ -3342,13 +3338,6 @@ label .popover-content {
   .input-prepend .select2-container,
   .input-append .select2-container {
     width: 229px;
-  }
-}
-
-.control-group-justified {
-  .input-prepend .select2-container,
-  .input-append .select2-container {
-    width: 263px;
   }
 }
 

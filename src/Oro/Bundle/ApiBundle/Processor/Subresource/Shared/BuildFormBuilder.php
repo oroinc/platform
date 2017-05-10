@@ -55,10 +55,15 @@ class BuildFormBuilder implements ProcessorInterface
         $parentConfig = $context->getParentConfig();
         $associationName = $context->getAssociationName();
 
+        $formEventSubscribers = null;
+        if (!$parentConfig->getFormType()) {
+            $formEventSubscribers = $parentConfig->getFormEventSubscribers();
+        }
         $formBuilder = $this->formHelper->createFormBuilder(
             'form',
             $context->getParentEntity(),
-            ['data_class' => $context->getParentClassName()]
+            ['data_class' => $context->getParentClassName()],
+            $formEventSubscribers
         );
         $this->formHelper->addFormField(
             $formBuilder,
