@@ -59,7 +59,11 @@ class GroupChoiceField extends Element
      */
     protected function findChoices()
     {
-        $elements = $this->findAll('css', 'input[type=checkbox],input[type=radio]');
+        $radioElements = $this->findAll('css', 'input[type=radio]');
+        $checkboxElements = $this->findAll('css', 'input[type=checkbox]');
+
+        $elements = array_merge($radioElements, $checkboxElements);
+
         self::assertNotCount(0, $elements, 'Not found any checkboxes or radio buttons in GroupChoiceField');
         $choices = [];
 
