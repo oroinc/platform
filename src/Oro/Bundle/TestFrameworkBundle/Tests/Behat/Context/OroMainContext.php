@@ -743,6 +743,12 @@ class OroMainContext extends MinkContext implements
     {
         $field = $this->fixStepArgument($field);
         $value = $this->fixStepArgument($value);
+
+        if ($this->elementFactory->hasElement($field)) {
+            $this->elementFactory->createElement($field)->setValue($value);
+            return;
+        }
+
         $this->createOroForm()->fillField($field, $value);
     }
 
