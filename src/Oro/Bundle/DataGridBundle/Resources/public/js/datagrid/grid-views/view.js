@@ -704,7 +704,7 @@ define(function(require) {
         _createBaseViewModel: function(data) {
             return this._createViewModel(
                 {
-                    label: _.isUndefined(data.label) ? __('oro.datagrid.gridView.all') : data.label,
+                    label: _.isUndefined(data.label) ? this.defaultTitlePrefix : data.label,
                     is_default: _.isUndefined(data.is_default) ? false : data.is_default,
                     type: 'private',
                     grid_name: this.gridName,
@@ -895,7 +895,7 @@ define(function(require) {
 
             var title = currentView.label;
             if (currentView.value === this.DEFAULT_GRID_VIEW_ID) {
-                title = __('oro.datagrid.gridView.all');
+                title = this.defaultTitlePrefix;
             }
 
             return title + ' - ' + this.originalTitle;
