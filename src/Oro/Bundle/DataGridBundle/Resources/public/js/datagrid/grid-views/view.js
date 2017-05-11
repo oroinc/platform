@@ -75,7 +75,7 @@ define(function(require) {
         originalTitle: null,
 
         /** @property */
-        defaultTitlePrefix: __('oro.datagrid.gridView.all'),
+        defaultPrefix: __('oro.datagrid.gridView.all'),
 
         /** @property */
         route: 'oro_datagrid_api_rest_gridview_default',
@@ -454,7 +454,7 @@ define(function(require) {
 
             var defaultItem = _.findWhere(choices, {value: this.DEFAULT_GRID_VIEW_ID});
             if (defaultItem.label === this.DEFAULT_GRID_VIEW_ID) {
-                defaultItem.label = this.defaultTitlePrefix + (this.title || '');
+                defaultItem.label = this.defaultPrefix + (this.title || '');
             }
 
             return choices;
@@ -704,7 +704,7 @@ define(function(require) {
         _createBaseViewModel: function(data) {
             return this._createViewModel(
                 {
-                    label: _.isUndefined(data.label) ? this.defaultTitlePrefix : data.label,
+                    label: _.isUndefined(data.label) ? this.defaultPrefix : data.label,
                     is_default: _.isUndefined(data.is_default) ? false : data.is_default,
                     type: 'private',
                     grid_name: this.gridName,
@@ -895,7 +895,7 @@ define(function(require) {
 
             var title = currentView.label;
             if (currentView.value === this.DEFAULT_GRID_VIEW_ID) {
-                title = this.defaultTitlePrefix;
+                title = this.defaultPrefix;
             }
 
             return title + ' - ' + this.originalTitle;
