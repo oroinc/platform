@@ -3,9 +3,12 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class SegmentTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var Segment */
     protected $entity;
 
@@ -111,5 +114,11 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $segment->setType($segmentType);
 
         $this->assertTrue($segment->isDynamic());
+    }
+
+    public function testToString()
+    {
+        $segment = $this->getEntity(Segment::class, ['id' => 777]);
+        $this->assertSame('777', (string) $segment);
     }
 }
