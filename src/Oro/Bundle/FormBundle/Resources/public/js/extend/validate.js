@@ -199,6 +199,10 @@ define([
 
     // updates place for message label before show message
     $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(func, element, message) {
+        if (!message) {
+            return;
+        }
+
         message = '<span><span>' + message + '</span></span>';
         var label = this.errorsFor(element);
         if (message && label.length) {
@@ -363,7 +367,9 @@ define([
         },
         unhighlight: function(element) {
             var $el = $(element);
-            $el.closest('.controls').removeClass('validation-error')
+            $el.removeClass('error')
+                .closest('.controls')
+                .removeClass('validation-error')
                 .find('.error').removeClass('error');
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },

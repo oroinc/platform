@@ -159,19 +159,20 @@ class UiExtension extends \Twig_Extension
 
     /**
      * @param \Twig_Environment $environment
-     * @param                   $pageIdentifier
+     * @param string            $pageIdentifier
      * @param array             $data
+     * @param object            $entity
      * @param FormView          $formView
-     *
      * @return array
      */
     public function scrollDataBefore(
         \Twig_Environment $environment,
         $pageIdentifier,
         array $data,
+        $entity,
         FormView $formView = null
     ) {
-        $event = new BeforeListRenderEvent($environment, new ScrollData($data), $formView);
+        $event = new BeforeListRenderEvent($environment, new ScrollData($data), $entity, $formView);
         $this->getEventDispatcher()->dispatch('oro_ui.scroll_data.before.' . $pageIdentifier, $event);
 
         return $event->getScrollData()->getData();

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -17,6 +18,9 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formFactory;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $container;
+
     /** @var BuildFormBuilder */
     protected $processor;
 
@@ -25,8 +29,9 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         parent::setUp();
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory));
+        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory, $this->container));
     }
 
     public function testProcess()

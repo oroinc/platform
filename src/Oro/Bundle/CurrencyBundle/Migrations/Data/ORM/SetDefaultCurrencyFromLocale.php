@@ -11,6 +11,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Migrations\Data\ORM\LoadLocalizationData;
 
 class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -21,7 +22,9 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\LocaleBundle\Migrations\Data\ORM\LoadLocalizationData'];
+        return [
+            LoadLocalizationData::class
+        ];
     }
 
     /**

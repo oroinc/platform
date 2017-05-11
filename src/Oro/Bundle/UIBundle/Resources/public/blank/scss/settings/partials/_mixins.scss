@@ -224,4 +224,68 @@
     }
 }
 
+// Disable platform styles for input search
+@mixin disable-search-styles($input) {
+    #{$input}::-webkit-search-decoration,
+    #{$input}::-webkit-search-cancel-button,
+    #{$input}::-webkit-search-results-button,
+    #{$input}::-webkit-search-results-decoration {
+        display: none;
+    }
+}
+
 @import 'mixins-for-components';
+
+@mixin element-state($state) {
+    @if $state == 'active' {
+        &:active {
+            @content;
+        }
+    }
+
+    @else if $state == 'hover' {
+        &:hover {
+            @content;
+        }
+    }
+
+    @else if $state == 'visited' {
+        &:visited {
+            @content;
+        }
+    }
+
+    @else if $state == 'focus' {
+        &:focus {
+            @content;
+        }
+    }
+
+    @else if $state == 'warning' {
+        &--warning,
+        &.warning {
+            @content;
+        }
+    }
+
+    @else if $state == 'success' {
+        &--success,
+        &.success {
+            @content;
+        }
+    }
+
+    @else if $state == 'error' {
+        &--error,
+        &.error {
+            @content;
+        }
+    }
+
+    @else if $state == 'disabled' {
+        &.disabled,
+        &:disabled {
+            @content;
+        }
+    }
+}

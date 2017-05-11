@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
@@ -30,6 +31,14 @@ class CompoundObjectTypeTest extends TypeTestCase
         ];
     }
 
+    /**
+     * @return FormHelper
+     */
+    protected function getFormHelper()
+    {
+        return new FormHelper($this->factory, $this->createMock(ContainerInterface::class));
+    }
+
     public function testBuildFormForField()
     {
         $metadata = new EntityMetadata();
@@ -40,7 +49,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -64,7 +73,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -87,7 +96,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -110,7 +119,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -134,7 +143,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -158,7 +167,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -181,7 +190,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -206,7 +215,7 @@ class CompoundObjectTypeTest extends TypeTestCase
 
         $data = new Entity\User();
         $form = $this->factory->create(
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             $data,
             [
                 'data_class' => Entity\User::class,
@@ -238,7 +247,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
@@ -270,7 +279,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
@@ -302,7 +311,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
@@ -334,7 +343,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
@@ -367,7 +376,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
@@ -401,7 +410,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
@@ -435,7 +444,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
@@ -469,7 +478,7 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'price',
-            new CompoundObjectType(new FormHelper($this->factory)),
+            new CompoundObjectType($this->getFormHelper()),
             [
                 'data_class'   => Entity\ProductPrice::class,
                 'by_reference' => false,
