@@ -75,6 +75,9 @@ define(function(require) {
         originalTitle: null,
 
         /** @property */
+        defaultTitlePrefix: __('oro.datagrid.gridView.all'),
+
+        /** @property */
         route: 'oro_datagrid_api_rest_gridview_default',
 
         /** @property */
@@ -451,7 +454,7 @@ define(function(require) {
 
             var defaultItem = _.findWhere(choices, {value: this.DEFAULT_GRID_VIEW_ID});
             if (defaultItem.label === this.DEFAULT_GRID_VIEW_ID) {
-                defaultItem.label = __('oro.datagrid.gridView.all') + (this.title || '');
+                defaultItem.label = this.defaultTitlePrefix + (this.title || '');
             }
 
             return choices;
