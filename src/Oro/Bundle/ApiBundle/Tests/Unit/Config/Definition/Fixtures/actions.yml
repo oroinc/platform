@@ -546,6 +546,29 @@ entity_empty_form_options:
         actions:
             create: []
 
+entity_empty_form_event_subscriber:
+    config:
+        form_event_subscriber: []
+    expected: []
+
+entity_one_form_event_subscriber:
+    config:
+        form_event_subscriber: subscriber1
+    expected:
+        form_event_subscriber: [subscriber1]
+
+entity_several_form_event_subscriber:
+    config:
+        form_event_subscriber: [subscriber1, subscriber2]
+    expected:
+        form_event_subscriber: [subscriber1, subscriber2]
+
+entity_invalid_form_event_subscriber:
+    config:
+        form_event_subscriber: ~
+    expected: []
+    error: 'Invalid configuration for path "entity.form_event_subscriber": The value must be a string or an array.'
+
 entity_form:
     config:
         actions:

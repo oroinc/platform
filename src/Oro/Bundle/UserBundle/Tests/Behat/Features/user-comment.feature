@@ -15,8 +15,7 @@ Feature: User user comment
     And click Edit User in grid
     And select "Yes" from "Enable Comments"
     When I save and close form
-    And click update schema
-    Then I should see "Schema updated" flash message
+    Then click update schema
 
   Scenario: Add comment
     Given I go to System/User Management/Users

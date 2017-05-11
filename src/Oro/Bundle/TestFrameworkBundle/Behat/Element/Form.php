@@ -38,12 +38,14 @@ class Form extends Element
                     $locator
                 );
             }
+
             if (isset($this->options['mapping'][$label]['element'])) {
-                $this->elementFactory->wrapElement(
+                $field = $this->elementFactory->wrapElement(
                     $this->options['mapping'][$label]['element'],
                     $field
                 );
             }
+
             $field->setValue($value);
         }
         if ($isEmbeddedForm) {
@@ -298,9 +300,25 @@ class Form extends Element
     public function getFieldValidationErrors($fieldName)
     {
         $field = $this->findFieldByLabel($fieldName);
+        if (!$field && isset($this->options['mapping'][$fieldName])) {
+            $field = $this->findField($this->options['mapping'][$fieldName]);
+        }
         $fieldId = $field->getAttribute('id');
 
+        // This element doesn't count server side validation errors without "for" attribute
         $errorSpan = $this->find('css', "span.validation-failed[for='$fieldId']");
+
+        if (!$errorSpan) {
+            // Get next validation error span after element
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/following-sibling::span[@class="validation-failed"]'
+                )
+            );
+        }
 
         self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 

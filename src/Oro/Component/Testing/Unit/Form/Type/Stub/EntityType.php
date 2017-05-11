@@ -65,7 +65,8 @@ class EntityType extends AbstractType
             'choice_list' => $this->choiceList,
             'query_builder' => null,
             'create_enabled' => false,
-            'class' => null
+            'class' => null,
+            'property' => null
         ];
 
         if ($this->options) {

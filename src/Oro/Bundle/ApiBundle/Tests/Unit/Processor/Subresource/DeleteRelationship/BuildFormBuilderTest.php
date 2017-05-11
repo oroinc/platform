@@ -2,7 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\DeleteRelationship;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Form\DataMapper\RemoveRelationshipMapper;
+use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder;
@@ -17,6 +24,9 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     protected $formFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $container;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $propertyAccessor;
 
     /** @var BuildFormBuilder */
@@ -26,10 +36,14 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->propertyAccessor = $this->createMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
 
-        $this->processor = new BuildFormBuilder($this->formFactory, $this->propertyAccessor);
+        $this->processor = new BuildFormBuilder(
+            new FormHelper($this->formFactory, $this->container),
+            $this->propertyAccessor
+        );
 
         $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
         $this->context->setAssociationName(self::TEST_ASSOCIATION_NAME);
@@ -38,7 +52,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     public function testRemoveRelationshipMapperShouldBeSetForFormBuilder()
     {
         $parentEntity = new \stdClass();
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
@@ -52,7 +66,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
         $formBuilder->expects($this->once())
             ->method('setDataMapper')
-            ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Form\DataMapper\RemoveRelationshipMapper'));
+            ->with($this->isInstanceOf(RemoveRelationshipMapper::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);

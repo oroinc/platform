@@ -10,6 +10,7 @@ ActionBundle
     - changed signature of method `protected function getRowConfigurationClosure(DatagridConfiguration $configuration, ButtonSearchContext $context)`
     - added second argument `ButtonSearchContext $context` to method `protected function applyActionsConfig()`
     - added second argument `ButtonSearchContext $context` to method `protected function processMassActionsConfig()`
+    - added dependency on `Symfony\Component\EventDispatcher\EventDispatcherInterface` that should be injected to service by `public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)`
 - Service `oro_action.datagrid.event_listener.button` now has name `oro_action.datagrid.action.button_provider` and registered through the tag `oro_datagrid.extension.action.provider`
 - Added `Oro\Bundle\ActionBundle\Model\AbstractGuesser`:
     - defined as abstract service `oro_action.abstract_guesser` with arguments `@form.registry, @doctrine, @oro_entity_config.provider.entity, @oro_entity_config.provider.form`
@@ -56,8 +57,42 @@ A new string field `ownerDescription` with the database column `owner_descriptio
 
 ApiBundle
 ---------
-- Added class `Oro\Bundle\ApiBundle\Processor\ApiFormBuilderSubscriberProcessor`
-    - can be used to add subscribers to `FormContext`
+- Added `form_event_subscriber` option to `Resources/config/oro/api.yml`. It can be used to add an event subscriber(s) to a form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`. For details see `/src/Oro/Bundle/ApiBundle/Resources/doc/configuration.md`
+- Fixed handling of `property_path` option from `api.yml` for cases when the property path contains several fields, e.g. `customerAssociation.account`
+- Added method `findFieldByPath` to `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
+- Changed implementation of `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition` processor. All logic was moved to the following classes:
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper`
+    - `Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteObjectDefinitionHelper`
+- Class `Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities`
+    - removed method `getAssociationData`
+    - removed method `updateRelatedFieldTargetEntity`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeMetadata`
+    - removed method `findFieldByPropertyPath`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper`
+    - changed signature of method `addNestedObjectAssociation`. Added new parameter `EntityDefinitionConfig $config`
+- Class `Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory`
+    - changed signature of method `createAndAddAssociationMetadata`. Added new parameter `EntityDefinitionConfig $config`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadExtendedAssociation`
+    - changed signature of method `addTitles`. Old signature `addTitles(array $data, $parentEntityClass, $parentEntityId, EntityDefinitionFieldConfig $association, $titleFieldName)`. New signature `addTitles(array $data, $associationOwnerClass, $associationOwnerId, $associationType, $associationKind, $titleFieldName)`
+    - removed method `getAssociationTargets`
+- Changed implementation of `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation` and `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadNestedAssociation` processors
+    - now they are extend new base processor `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadCustomAssociation`
+- Static class `\Oro\Bundle\ApiBundle\Form\FormUtil` was replaced with `Oro\Bundle\ApiBundle\Form\FormHelper` which is available as a service `oro_api.form_helper`
+- Class `Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType`
+    - added parameter `FormHelper $formHelper` to the constructor
+- Class `Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper)`
+- Class `Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory)`. New signature: `__construct(FormHelper $formHelper)`
+    - removed method `addFormFields`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory, PropertyAccessorInterface $propertyAccessor)`. New signature: `__construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)`
+- Class `Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder`
+    - changed the constructor signature. Old signature: `__construct(FormFactoryInterface $formFactory)`. New signature: `__construct(FormHelper $formHelper)`
 
 DataGridBundle
 --------------
@@ -93,7 +128,7 @@ DataGridBundle
         - first argument of method `protected funtion onSuccess()` from `GridView $entity` to `AbstractGridView $entity`
         - first argument of method `protected funtion setDefaultGridView()` from `GridView $entity` to `AbstractGridView $entity`
         - first argument of method `protected funtion fixFilters()` from `GridView $entity` to `AbstractGridView $entity`
-- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used. 
+- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used.
 - Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export`, `setExportConnector` with `@oro_datagrid.importexport.export_connector`, `setExportProcessor` with `@oro_datagrid.importexport.processor.export` and `setWriterChain`  with `@oro_importexport.writer.writer_chain` were added. The constructor was removed, the parent class constructor is used.
 - Class `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher`
     - the signature of `getDatagridQuery` method was changed, added parameter `string $objectIdentifier = null`
@@ -261,6 +296,10 @@ WorkflowBundle
     - `getTransitionForm` - managed by processors
     - `getTransitionFormTemplate` - managed by processors
     - `processWorkflowData` - managed by processors
+- Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider`:
+    - changed constructor signature:
+        - removed `WorkflowRegistry $workflowRegistry`;
+        - added `Cache $entitiesWithWorkflowsCache`;
 - Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
 
 
@@ -305,3 +344,16 @@ TranslationBundle
 - Signature of class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` was changed:
     - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
     - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`
+
+SegmentBundle
+-------------
+- Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
+    - changed signature of method `run`, added parameter `$entityIds` (array) with default empty array.
+    - method `bindParameters` is deprecated and will be removed. 
+    - method `run` now accept also a dynamic segment
+- Class `Oro/Bundle/SegmentBundle/Entity/Repository/SegmentSnapshotRepository`:
+    - changed signature of method `removeBySegment`, added parameter `$entityIds` (array) with default empty array.
+
+FormBundle
+----------
+- Form types OroEncodedPlaceholderPasswordType, OroEncodedPasswordType acquired `browser_autocomplete` option with default value set to `false`, which means that password autocomplete is off by default.

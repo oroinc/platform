@@ -19,6 +19,7 @@ layout:
                         form_route_parameters:
                             workflowItemId: '=data["workflowItem"].getId()'
                             transitionName: '=data["transition"].getName()'
+                            originalUrl: '=data["originalUrl"]'
                 form_fields:
                     blockType: form_fields
                     options:

@@ -9,9 +9,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\InstallerBundle\Migration\UpdateTableFieldQuery;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class ReplaceNamespaces implements Migration, ConnectionAwareInterface
+class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedMigrationInterface
 {
     /** @var Connection */
     private $connection;
@@ -30,6 +31,9 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->resolveVersions();
+
+        $table = $schema->getTable('oro_audit');
+        $table->addUniqueIndex(['object_id', 'object_class', 'version'], 'idx_oro_audit_version');
 
         $queries->addQuery(new UpdateTableFieldQuery(
             'oro_audit',
@@ -57,21 +61,16 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface
 
             foreach ($rows as $row) {
                 if ($platform instanceof PostgreSqlPlatform) {
-                    $sql = 'UPDATE oro_audit SET version = 0 ' .
-                        'WHERE object_id = :object_id AND '.
-                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class;' .
-                        'SELECT setval(\'seq_temp_version\', 1);' .
-                        'UPDATE oro_audit SET version = nextval(\'seq_temp_version\') - 1 ' .
-                        'WHERE object_id = :object_id AND '.
-                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class;';
+                    $sql = 'SELECT setval(\'seq_temp_version\', 1);' .
+                        'UPDATE oro_audit SET version = nextval(\'seq_temp_version\') - 2 FROM (' .
+                        'SELECT id FROM oro_audit WHERE object_id = :object_id AND '.
+                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class ORDER BY id) AS q ' .
+                        'WHERE oro_audit.id = q.id;';
                 } else {
-                    $sql = 'UPDATE oro_audit SET version = 0 ' .
-                        'WHERE object_id = :object_id AND '.
-                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class;'.
-                        'SET @version = 0;'.
+                    $sql = 'SET @version = -1;'.
                         'UPDATE oro_audit SET version = @version:=@version+1 '.
                         'WHERE object_id = :object_id AND '.
-                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class;';
+                        'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class ORDER BY id ASC;';
                 }
 
                 $this->connection->executeUpdate(
@@ -91,5 +90,13 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface
         if ($platform instanceof PostgreSqlPlatform) {
             $this->connection->exec('DROP SEQUENCE seq_temp_version');
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 1;
     }
 }

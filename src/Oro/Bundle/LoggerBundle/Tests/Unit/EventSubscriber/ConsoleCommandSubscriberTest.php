@@ -5,8 +5,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\EventSubscriber;
 use Monolog\Logger;
 
 use Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber;
-use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\InputStub;
-
+use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;

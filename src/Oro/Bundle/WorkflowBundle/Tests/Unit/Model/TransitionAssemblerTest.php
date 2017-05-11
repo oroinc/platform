@@ -685,7 +685,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'acl_resource' => 'test_acl',
             'acl_message' => 'test acl message',
             'step_to' => 'target_step',
-            'schedule' => ['cron' => '1 * * * *', 'filter' => 'e.field < 1']
+            'schedule' => ['cron' => '1 * * * *', 'filter' => 'e.field < 1'],
+            'button_label' => 'button label',
+            'button_title' => 'button title'
         ];
         $transitionDefinition = self::$transitionDefinitions['full_definition'];
 
@@ -749,6 +751,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         /** @var Transition $actualTransition */
         $actualTransition = $transitions->get('test_transition');
+        $this->assertEquals('button label', $actualTransition->getButtonLabel());
+        $this->assertEquals('button title', $actualTransition->getButtonTitle());
         $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
         $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
 
@@ -971,7 +975,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'option1' => 'value1',
                     'message' => [
-                        'message' => 'warning message',
+                        'content' => 'warning message',
                         'message_parameters' => ['param1' => 'value1'],
                     ],
                 ],
@@ -993,7 +997,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'option1' => 'value1',
                     'message' => [
-                        'message' => 'warning message',
+                        'content' => 'warning message',
                         'message_parameters' => ['param1' => 'value1'],
                         'title' => 'message title',
                     ],

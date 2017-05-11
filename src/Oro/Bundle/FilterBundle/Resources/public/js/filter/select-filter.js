@@ -256,7 +256,8 @@ define([
                             }
                         }, this), 100);
                     }, this),
-                    appendTo: this.dropdownContainer
+                    appendTo: this.dropdownContainer,
+                    refreshNotOpened: this.templateTheme !== ''
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });

@@ -1,12 +1,12 @@
 data:
-  0:
-    type: "testdepartments"
-    id: auto
+  -
+    type: 'testapidepartments'
+    id: 'auto'
     attributes:
-      title: "TestDepartment"
+      title: 'TestDepartment'
     relationships:
       staff:
         data:
           -
-            type: "testemployees"
-            id: auto
+            type: 'testapiemployees'
+            id: 'auto'
