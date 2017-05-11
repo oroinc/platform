@@ -230,7 +230,7 @@
 
                 {% set data = data|merge({'dataBlocks': dataBlocks}) %}
             {% endif %}
-            {{ UI.scrollData(id, data) }}
+            {{ UI.scrollData(id, data, entity) }}
         {% endblock content_data %}
     </div>
 
