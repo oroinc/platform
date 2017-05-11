@@ -166,19 +166,27 @@ class PreExportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                     $body['parameters']
                 );
 
-                foreach ($this->splitOnBatch($exportingEntityIds) as $key => $batchData) {
-                    $jobRunner->createDelayed(
-                        sprintf('%s.chunk.%s', $jobUniqueName, ++$key),
-                        function (JobRunner $jobRunner, Job $child) use ($originBody, $batchData) {
-                            $originBody['parameters']['gridParameters']['_export']['ids'] = $batchData;
+                if (!empty($exportingEntityIds)) {
+                    foreach ($this->splitOnBatch($exportingEntityIds) as $key => $batchData) {
+                        $jobRunner->createDelayed(
+                            sprintf('%s.chunk.%s', $jobUniqueName, ++$key),
+                            function (JobRunner $jobRunner, Job $child) use ($originBody, $batchData) {
+                                $originBody['parameters']['gridParameters']['_export']['ids'] = $batchData;
 
-                            $this->producer->send(
-                                Topics::EXPORT,
-                                array_merge($originBody, ['jobId' => $child->getId()])
-                            );
-                        }
+                                $this->producer->send(
+                                    Topics::EXPORT,
+                                    array_merge($originBody, ['jobId' => $child->getId()])
+                                );
+                            }
+                        );
+                    }
+                } else {
+                    $this->producer->send(
+                        Topics::EXPORT,
+                        array_merge($originBody, ['jobId' => $job->getId()])
                     );
                 }
+
 
                 $this->addDependedJob($job->getRootJob(), $originBody);
 
