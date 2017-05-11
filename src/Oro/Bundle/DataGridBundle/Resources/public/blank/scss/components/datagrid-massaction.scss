@@ -51,14 +51,9 @@
     }
 
     &__dropdown-item {
-        display: block;
-        padding: $datagrid-massaction-dropdown-menu-action-offset-inner;
-
         text-decoration: none;
 
         color: $datagrid-massaction-dropdown-menu-action-color;
-
-        white-space: nowrap;
         
         @include element-state('hover') {
             text-decoration: none;
@@ -70,5 +65,13 @@
 
     .dropdown-menu__placeholder {
         display: none;
+    }
+
+    .action {
+        display: block;
+
+        padding: $datagrid-massaction-dropdown-menu-action-offset-inner;
+
+        white-space: nowrap;
     }
 }
