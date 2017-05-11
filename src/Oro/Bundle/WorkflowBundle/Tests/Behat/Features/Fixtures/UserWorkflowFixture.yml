@@ -1,0 +1,76 @@
+Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
+    first_user_workflow_definition:
+        name: 'first_user_workflow_definition'
+        label: 'oro.workflow.first_user_workflow_definition.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        active: true
+        entityAttributeName: 'entity'
+        configuration:
+            steps:
+                step1:
+                    label: 'step1'
+                    allowed_transitions: ['start_transition']
+            transitions:
+                start_transition:
+                    label: 'oro.workflow.first_user_workflow_definition.transition.start_transition.label'
+                    step_to: 'step1'
+                    transition_definition: 'start_transition_definition'
+                    is_start: true
+            transition_definitions:
+                start_transition_definition: ~
+
+    second_user_workflow_definition:
+        name: 'second_user_workflow_definition'
+        label: 'oro.workflow.second_user_workflow_definition.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        active: true
+        entityAttributeName: 'entity'
+        configuration:
+            steps:
+                step1:
+                    label: 'step1'
+                    allowed_transitions: ['start_transition']
+            transitions:
+                start_transition:
+                    label: 'oro.workflow.second_user_workflow_definition.transition.start_transition.label'
+                    step_to: 'step1'
+                    transition_definition: 'start_transition_definition'
+                    is_start: true
+            transition_definitions:
+                start_transition_definition: ~
+
+Oro\Bundle\TranslationBundle\Entity\TranslationKey:
+    first_workflow_label_key:
+        key: oro.workflow.first_user_workflow_definition.label
+        domain: workflows
+    second_workflow_label_key:
+        key: oro.workflow.second_user_workflow_definition.label
+        domain: workflows
+    first_workflow_transition_label_key:
+        key: oro.workflow.first_user_workflow_definition.transition.start_transition.label
+        domain: workflows
+    second_workflow_transition_label_key:
+        key: oro.workflow.second_user_workflow_definition.transition.start_transition.label
+        domain: workflows
+
+Oro\Bundle\TranslationBundle\Entity\Translation:
+    first_workflow_label:
+        translationKey: '@first_workflow_label_key'
+        value: 'First Workflow'
+        language: '@en_language'
+        scope: 1
+    second_workflow_label:
+        translationKey: '@second_workflow_label_key'
+        value: 'Second Workflow'
+        language: '@en_language'
+        scope: 1
+    first_workflow_transition_label:
+        translationKey: '@first_workflow_transition_label_key'
+        value: 'First Workflow Transition'
+        language: '@en_language'
+        scope: 1
+    second_workflow_transition_label:
+        translationKey: '@second_workflow_transition_label_key'
+        value: 'Second Workflow Transition'
+        language: '@en_language'
+        scope: 1

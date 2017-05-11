@@ -34,6 +34,13 @@ services:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: preRemove }
 
+    oro_workflow.listener.workflow_transition_record:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener'
+        arguments:
+            - '@event_dispatcher'
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+
     oro_workflow.listener.start_workflow:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener'
         arguments:

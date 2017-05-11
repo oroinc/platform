@@ -130,6 +130,11 @@ oro:
 
             show_step_in_grid.label: 'Workflow step in grid'
 
+
+        event:
+            notification:
+                workflow_transition: Workflow transition
+
         menu:
             process_definition_list.description:  Process management UI
             workflow_definition_list.description: Workflow management UI
@@ -198,6 +203,7 @@ oro:
             exclusive_record_groups.label: "Exclusive Record Groups"
             scopes.label:                 Workflow Scopes
             applications.label:           "Applications"
+            transition_name.label:        Transition Name
 
             attribute:
                 property_path.tooltip:    "This is the field of the workflow entity or its related entities that will be appear on the view form of the transition. Use these if you want user to add or edit some entity data in the transition."
@@ -323,3 +329,5 @@ oro:
             final.label: Final
             exclusive_active_groups.tooltip: "Only one of same exclusive active group workflows can be activated in the system at the same time"
             exclusive_record_groups.tooltip: "Only one workflow can be started for a related entity within a same exclusive record group"
+            choose_workflow: 'Choose a workflow...'
+            choose_transition: 'Choose a transition...'

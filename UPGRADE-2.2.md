@@ -224,7 +224,7 @@ IntegrationBundle
 
 
 NavigationBundle
---------------
+----------------
 - Methods in class `Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader` were removed:
     - `setRouter`
     - `setCache`
@@ -337,6 +337,10 @@ EmailBundle
 - template `Resources/views/AutoResponseRule/dialog/update.html.twig` was changed
 - template `Resources/views/Configuration/Mailbox/update.html.twig` was changed
 - template `EmailBundle/Resources/views/Form/fields.html.twig` was changed
+- Class `Oro\Bundle\EmailBundle\Provider\EmailRenderer`
+    - added eighth argument `Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry` to constructor
+- Class `Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber`
+    - use `Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface` as first argument instead of `Symfony\Component\Security\Core\SecurityContextInterface`
 
 TranslationBundle
 -----------------
