@@ -178,6 +178,7 @@ config:
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
         'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
+        'xregexp': 'bundles/npmassets/xregexp/xregexp-all.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'

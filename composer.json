@@ -108,6 +108,7 @@
         "bower-asset/numeral": "1.5.2",
         "bower-asset/jquery-form": "3.37.0",
         "npm-asset/requirejs": "2.3.*",
+        "npm-asset/xregexp": "3.2.*",
         "doctrine/annotations": "1.3.*",
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
