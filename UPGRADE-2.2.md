@@ -344,6 +344,11 @@ TranslationBundle
     - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
     - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`
 
+SecurityBundle
+--------------
+- Class `Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension`
+    - changed the constructor signature. Old signature: `__construct(SecurityFacade $securityFacade, DoctrineHelper $doctrineHelper, ConfigProvider $configProvider, LoggerInterface $logger)`. New signature: `__construct(FieldAclHelper $fieldAclHelper, LoggerInterface $logger)`
+
 SegmentBundle
 -------------
 - Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
