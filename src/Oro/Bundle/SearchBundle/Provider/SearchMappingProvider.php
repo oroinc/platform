@@ -245,4 +245,19 @@ class SearchMappingProvider
 
         return false;
     }
+
+    /**
+     * Return true if fields mapping exists for the given class name
+     *
+     * @param mixed $className
+     *
+     * @return bool
+     */
+    public function hasFieldsMapping($className)
+    {
+        $mappingConfig = $this->getMappingConfig();
+        return array_key_exists($className, $mappingConfig)
+            && isset($mappingConfig[$className]['fields'])
+            && !empty($mappingConfig[$className]['fields']);
+    }
 }

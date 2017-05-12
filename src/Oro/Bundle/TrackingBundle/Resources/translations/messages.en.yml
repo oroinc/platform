@@ -127,6 +127,7 @@ oro:
                 tracking_settings.title: 'Tracking settings'
             fields:
                 dynamic_tracking_enabled.label: 'Enable dynamic tracking'
+                precalculated_statistic_enabled.label: 'Enable tracking statistic aggregation'
                 log_rotate_interval:
                     label: 'Log Rotation Interval'
                     choices:
@@ -142,6 +143,9 @@ oro:
             dynamic_tracking_enabled: |
                 Enable realtime tracking information processing.
                 Note, this may have performance impact.
+            precalculated_statistic_enabled: |
+                Enable tracking visits information aggregation.
+                This will improve statistics calculation time, but may have impact on save time.
             log_rotate_interval: |
                 How often log files will be rotated.
                 This option is required only for non dynamic tracking.

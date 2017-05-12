@@ -192,4 +192,20 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userManager->updateUser($user);
     }
+
+    public function testGeneratePasswordWithCustomLength()
+    {
+        $password = $this->userManager->generatePassword(10);
+        $this->assertNotEmpty($password);
+        $this->assertRegExp('/\w+/', $password);
+        $this->assertLessThanOrEqual(10, strlen($password));
+    }
+
+    public function testGeneratePasswordWithDefaultLength()
+    {
+        $password = $this->userManager->generatePassword();
+        $this->assertNotEmpty($password);
+        $this->assertRegExp('/\w+/', $password);
+        $this->assertLessThanOrEqual(30, strlen($password));
+    }
 }

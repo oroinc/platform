@@ -43,10 +43,10 @@ define(function(require) {
 
         makeItemTemplate: function(propName, forSelection) {
             var labelTpl = '_.escape(' + propName + ')';
-            var newLabel = __('oro.form.add_new');
+            var newLabel = __('oro.form.new');
             if (forSelection) {
                 labelTpl = 'highlight(' + labelTpl + ')';
-                newLabel = __('oro.form.new');
+                newLabel = __('oro.form.add_new');
             }
             return '<%= ' + labelTpl + ' %><% if (id === null) { %>' +
                 '<span class="select2__result-entry-info"> (' + newLabel + ') </span><% } %>';

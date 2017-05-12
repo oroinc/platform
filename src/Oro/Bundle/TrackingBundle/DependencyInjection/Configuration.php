@@ -22,7 +22,8 @@ class Configuration implements ConfigurationInterface
                 'dynamic_tracking_enabled' => ['value' => false],
                 'log_rotate_interval'      => ['value' => 60],
                 'piwik_host'               => ['value' => null],
-                'piwik_token_auth'         => ['value' => null]
+                'piwik_token_auth'         => ['value' => null],
+                'precalculated_statistic_enabled' => ['value' => true],
             )
         );
 

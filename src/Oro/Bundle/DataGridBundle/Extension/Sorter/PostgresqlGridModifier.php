@@ -89,13 +89,30 @@ class PostgresqlGridModifier extends AbstractExtension
         if ($alias && $this->isAllowedAddingSorting($alias, $identifier, $queryBuilder)) {
             $field = $alias . '.' . $identifier;
             $orderBy = $queryBuilder->getDQLPart('orderBy');
-            if (!isset($orderBy[$field])) {
+            if (!$this->hasOrderByField($orderBy, $field)) {
                 if ($this->isDistinct($queryBuilder)) {
                     $this->ensureIdentifierSelected($queryBuilder, $field);
                 }
                 $queryBuilder->addOrderBy($field, 'ASC');
             }
         }
+    }
+
+    /**
+     * Check field already exists in orders part
+     *
+     * @param array $orderBy
+     * @param string $field
+     * @return bool
+     */
+    protected function hasOrderByField($orderBy, $field)
+    {
+        foreach ($orderBy as $order) {
+            if (preg_match(sprintf('/(^|\s)%s\s/i', $field), $order)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

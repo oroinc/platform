@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Twig;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -26,22 +29,28 @@ class DataGridExtension extends \Twig_Extension
     /** @var SecurityFacade $securityFacade */
     protected $securityFacade;
 
+    /** @var LoggerInterface|null */
+    protected $logger;
+
     /**
      * @param ManagerInterface      $manager
      * @param NameStrategyInterface $nameStrategy
      * @param RouterInterface       $router
      * @param SecurityFacade        $securityFacade
+     * @param LoggerInterface|null  $logger
      */
     public function __construct(
         ManagerInterface $manager,
         NameStrategyInterface $nameStrategy,
         RouterInterface $router,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        LoggerInterface $logger = null
     ) {
         $this->manager        = $manager;
         $this->nameStrategy   = $nameStrategy;
         $this->router         = $router;
         $this->securityFacade = $securityFacade;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -116,7 +125,17 @@ class DataGridExtension extends \Twig_Extension
      */
     public function getGridData(DatagridInterface $grid)
     {
-        return $grid->getData()->toArray();
+        try {
+            return $grid->getData()->toArray();
+        } catch (\Exception $e) {
+            $this->logger->error('Getting grid data failed.', ['exception' => $e]);
+
+            return [
+                "data" => [],
+                "metadata" => [],
+                "options" => []
+            ];
+        }
     }
 
     /**

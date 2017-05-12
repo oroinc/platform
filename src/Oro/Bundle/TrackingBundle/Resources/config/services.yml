@@ -3,6 +3,7 @@ parameters:
     oro_tracking.tracking_event.class:                   Oro\Bundle\TrackingBundle\Entity\TrackingEvent
     oro_tracking.tracking_data.class:                    Oro\Bundle\TrackingBundle\Entity\TrackingData
     oro_tracking.tracking_visit_event.class:             Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent
+    oro_tracking.tracking_visit.class:                   Oro\Bundle\TrackingBundle\Entity\TrackingVisit
     oro_tracking.form.type.tracking_website.class:       Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
     oro_tracking.form.handler.tracking_website.class:    Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler
     oro_tracking.tracking_website.manager.api.class:     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -91,6 +92,21 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
 
+    oro_tracking.listener.config_precalculate_listener:
+        class: Oro\Bundle\TrackingBundle\EventListener\ConfigPrecalculateListener
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
+
+    oro_tracking.tracking_event_entitylistener:
+        class: Oro\Bundle\TrackingBundle\EventListener\TrackingVisitEntityListener
+        arguments:
+            - '@oro_config.global'
+            - '@doctrine'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: '%oro_tracking.tracking_visit.class%', event: prePersist }
+
     oro_tracking.migration.extension.tracking_identifier:
         class: Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension
         tags:
@@ -152,3 +168,14 @@ services:
     #
     oro_tracking.provider.identifier_provider:
         class: %oro_tracking.provider.identifier_provider.class%
+
+    oro_tracking.migration.fill_unique_tracking_visits_query:
+        class: Oro\Bundle\TrackingBundle\Migration\FillUniqueTrackingVisitsQuery
+        public: false
+
+    oro_tracking.tools.unique_tracking_visit_dumper:
+        class: Oro\Bundle\TrackingBundle\Tools\UniqueTrackingVisitDumper
+        arguments:
+            - '@doctrine'
+            - '@logger'
+            - '@oro_tracking.migration.fill_unique_tracking_visits_query'
