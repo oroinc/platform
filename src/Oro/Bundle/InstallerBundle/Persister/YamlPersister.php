@@ -54,6 +54,11 @@ class YamlPersister
 
     public function dump(array $data)
     {
+        $fileData = Yaml::parse(file_get_contents($this->paramFile));
+        if (!is_array($fileData)) {
+            $fileData = [];
+        }
+
         $parameters = array();
 
         foreach ($data as $section) {
@@ -62,7 +67,7 @@ class YamlPersister
             }
         }
 
-        if (false === file_put_contents($this->paramFile, Yaml::dump(array('parameters' => $parameters)))) {
+        if (false === file_put_contents($this->paramFile, Yaml::dump(['parameters' => $parameters] + $fileData))) {
             throw new \RuntimeException(sprintf('Failed to write to %s.', $this->paramFile));
         }
     }

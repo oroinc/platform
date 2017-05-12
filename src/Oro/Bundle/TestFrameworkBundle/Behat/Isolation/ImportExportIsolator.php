@@ -8,43 +8,46 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolatorAwareInterface
+class ImportExportIsolator implements IsolatorInterface
 {
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    protected $messageQueueIsolator;
+    /** @var Filesystem */
+    protected $fs;
+
+    /** @var Finder */
+    protected $finder;
+
+    /** @var string */
+    protected $path;
 
     /**
-     * @var KernelInterface
+     * @param KernelInterface $kernel
      */
-    private $kernel;
-
     public function __construct(KernelInterface $kernel)
     {
-        $this->kernel = $kernel;
+        $this->fs = new Filesystem();
+        $this->finder = new Finder();
+        $this->path = $kernel->getRootDir().DIRECTORY_SEPARATOR.'import_export';
     }
 
     /** {@inheritdoc} */
     public function start(BeforeStartTestsEvent $event)
     {
-        $event->writeln('<info>Process messages before make db dump</info>');
-        $this->kernel->boot();
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
-        $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
-        $this->kernel->shutdown();
     }
 
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
+        $this->fs->remove($this->finder->files()->in($this->path));
     }
 
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
+        $this->fs->remove($this->finder->files()->in($this->path));
     }
 
     /** {@inheritdoc} */
@@ -55,39 +58,30 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsola
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        return true;
+        return $this->fs->exists($this->path);
     }
 
     /** {@inheritdoc} */
     public function restoreState(RestoreStateEvent $event)
     {
+        $this->fs->remove($this->finder->files()->in($this->path));
     }
 
     /** {@inheritdoc} */
     public function isOutdatedState()
     {
-        return false;
+        return (bool)$this->finder->files()->in($this->path)->count();
     }
 
     /** {@inheritdoc} */
     public function getName()
     {
-        return 'Inital Message Queue Isolator';
+        return 'Import and Export isolator';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function getTag()
     {
-        return 'inital_message_queue';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
-    {
-        $this->messageQueueIsolator = $messageQueueIsolator;
+        return 'import_export';
     }
 }
