@@ -81,6 +81,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function applyProvider()
@@ -174,6 +175,28 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     'where' => 'field-name IS NOT NULL',
                 ],
             ],
+            'IN' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_IN,
+                        'value' => '1, 3,a,5',
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name IN(1,3,5)',
+                ],
+            ],
+            'NOT IN' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_NOT_IN,
+                        'value' => '1, 6bc, 3, 5',
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name NOT IN(1,3,5)',
+                ],
+            ],
         ];
     }
 
@@ -241,9 +264,19 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
         $where = '';
 
         if ($parts['where']) {
+            $parameterValues = array_map(
+                function ($parameterValue) {
+                    if (is_array($parameterValue)) {
+                        $parameterValue = implode(',', $parameterValue);
+                    }
+                    return $parameterValue;
+                },
+                array_values($parameters)
+            );
+
             $where = str_replace(
                 array_keys($parameters),
-                array_values($parameters),
+                $parameterValues,
                 (string)$parts['where']
             );
         }

@@ -53,6 +53,9 @@ class NumberFilter extends AbstractFilter
         }
 
         $data['type'] = isset($data['type']) ? $data['type'] : null;
+        if ($this->isArrayComparison($data['type'])) {
+            return $this->getArrayValues($data);
+        }
 
         if (!is_numeric($data['value'])) {
             if (in_array($data['type'], [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
@@ -103,6 +106,10 @@ class NumberFilter extends AbstractFilter
                 }
 
                 return $ds->expr()->isNotNull($fieldName);
+            case NumberFilterType::TYPE_IN:
+                return $ds->expr()->in($fieldName, $parameterName, true);
+            case NumberFilterType::TYPE_NOT_IN:
+                return $ds->expr()->notIn($fieldName, $parameterName, true);
             default:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
         }
@@ -130,5 +137,40 @@ class NumberFilter extends AbstractFilter
         $metadata['formatterOptions'] = $formView->vars['formatter_options'];
 
         return $metadata;
+    }
+
+    /**
+     * @param string $comparisonType
+     * @return bool
+     */
+    protected function isArrayComparison($comparisonType): bool
+    {
+        return in_array($comparisonType, NumberFilterType::ARRAY_TYPES);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected function getArrayValues(array $data)
+    {
+        $data['value'] = array_filter(
+            array_map(
+                function ($value) {
+                    $value = trim($value);
+                    if (!is_numeric($value)) {
+                        return null;
+                    }
+
+                    return $value;
+                },
+                explode(NumberFilterType::ARRAY_SEPARATOR, $data['value'])
+            ),
+            function ($value) {
+                return $value !== null;
+            }
+        );
+
+        return $data;
     }
 }
