@@ -47,3 +47,9 @@ services:
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: export }
+
+    oro_datagrid.extension.action.type.trigger_event:
+        class: Oro\Bundle\DataGridBundle\Extension\Action\Actions\TriggerEventAction
+        scope: prototype
+        tags:
+            - { name:  oro_datagrid.extension.action.type, type: trigger-event }
