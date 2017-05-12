@@ -7,6 +7,7 @@ use Symfony\Component\Validator;
 
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\ApiBundle\Validator\Constraints\ConstraintWithStatusCodeInterface;
+use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 
 class ConstraintTextExtractor implements ConstraintTextExtractorInterface
 {
@@ -17,6 +18,8 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
     {
         if ($constraint instanceof ConstraintWithStatusCodeInterface) {
             return $constraint->getStatusCode();
+        } elseif ($constraint instanceof FieldAccessGranted) {
+            return Response::HTTP_FORBIDDEN;
         }
 
         return Response::HTTP_BAD_REQUEST;
