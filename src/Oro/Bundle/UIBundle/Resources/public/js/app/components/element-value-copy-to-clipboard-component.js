@@ -10,7 +10,7 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var messenger = require('oroui/js/messenger');
 
-    ElementValueCopyToClipboardComponent= BaseComponent.extend({
+    ElementValueCopyToClipboardComponent = BaseComponent.extend({
 
         options: {
             elementSelector: '',
