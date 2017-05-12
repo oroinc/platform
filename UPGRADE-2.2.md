@@ -301,6 +301,9 @@ WorkflowBundle
         - removed `WorkflowRegistry $workflowRegistry`;
         - added `Cache $entitiesWithWorkflowsCache`;
 - Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
+- Signature of method `protected function isStartAllowedByRecordGroups` changed:
+    - second argument changed from `array $recordGroups` to `Workflow $workflow`
+    - added third optional argument `array $workflowItems`
 
 
 PlatformBundle
