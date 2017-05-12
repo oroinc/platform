@@ -38,9 +38,9 @@ class FormSubmitLayoutRedirectProcessor implements ProcessorInterface
 
         $request = $context->getRequest();
 
-        yield $request->headers->get('referer');
-
         yield $request->get('originalUrl');
+
+        yield $request->headers->get('referer');
 
         yield '/';
     }

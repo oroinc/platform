@@ -11,11 +11,12 @@ class AliceToStringProcessor implements MethodInterface
 {
     private static $regex = '/^<toString\((?P<value>[^<]*)\)>$/';
 
-    /**
-     * @var Processor
-     */
+    /** @var Processor */
     protected $processor;
 
+    /**
+     * @param Processor $processor
+     */
     public function setProcessor(Processor $processor)
     {
         $this->processor = $processor;
@@ -28,8 +29,7 @@ class AliceToStringProcessor implements MethodInterface
     {
         return
             is_string($processable->getValue())
-            && $processable->valueMatches(static::$regex)
-            ;
+            && $processable->valueMatches(static::$regex);
     }
 
     /**
@@ -37,8 +37,26 @@ class AliceToStringProcessor implements MethodInterface
      */
     public function process(ProcessableInterface $processable, array $variables)
     {
-        $value = null !== ($processable->getMatch('value')) ? $processable->getMatch('value') : null;
+        $value = $processable->getMatch('value');
+        $value = $this->processor->process(new Processable($value), $variables);
+        if (null !== $value) {
+            $value = $this->convertValueToString($value);
+        }
 
-        return (string) $this->processor->process(new Processable($value), $variables);
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    protected function convertValueToString($value)
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('c');
+        }
+
+        return (string)$value;
     }
 }

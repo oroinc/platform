@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oronotification/js/app/components/email-notification-form-component': 'bundles/oronotification/js/app/components/email-notification-form-component.js'

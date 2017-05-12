@@ -22,20 +22,31 @@ class BeforeListRenderEvent extends Event
     protected $scrollData;
 
     /**
+     * @var object
+     */
+    protected $entity;
+
+    /**
      * @var FormView|null
      */
     protected $formView;
 
     /**
      * @param \Twig_Environment $environment
-     * @param ScrollData $scrollData
-     * @param FormView|null $formView
+     * @param ScrollData        $scrollData
+     * @param object            $entity
+     * @param FormView|null     $formView
      */
-    public function __construct(Twig_Environment $environment, ScrollData $scrollData, FormView $formView = null)
-    {
+    public function __construct(
+        Twig_Environment $environment,
+        ScrollData $scrollData,
+        $entity,
+        FormView $formView = null
+    ) {
         $this->environment = $environment;
-        $this->scrollData  = $scrollData;
-        $this->formView    = $formView;
+        $this->scrollData = $scrollData;
+        $this->entity = $entity;
+        $this->formView = $formView;
     }
 
     /**
@@ -71,5 +82,13 @@ class BeforeListRenderEvent extends Event
         $this->scrollData = $scrollData;
 
         return $this;
+    }
+
+    /**
+     * @return object
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 }

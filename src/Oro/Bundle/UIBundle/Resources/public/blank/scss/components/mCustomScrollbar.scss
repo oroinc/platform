@@ -1,0 +1,26 @@
+// @theme: blank;
+
+.mCSB_scrollTools {
+    z-index: $mCSB-scrollTools-z-index;
+}
+
+.mCSB_scrollTools.mCS-inset-dark {
+    .mCSB_dragger {
+        .mCSB_dragger_bar {
+            background-color: $mCSB-dragger-bar-background-color;
+        }
+        
+        &:hover {
+            .mCSB_dragger_bar {
+                background-color: $mCSB-dragger-bar-background-color-hover;
+            }
+        }
+
+        &:active,
+        &.mCSB_dragger_onDrag {
+            .mCSB_dragger_bar {
+                background-color: $mCSB-dragger-bar-background-color-active;
+            }
+        }
+    }
+}

@@ -42,4 +42,18 @@
     &__text {
         margin-left: $offset-x-s / 2;
     }
+
+    &.absolute {
+        position: relative;
+
+        .custom-checkbox__text {
+            display: inline-block;
+            margin-left: $checkbox-icon-min-width + 8px;
+        }
+
+       .custom-checkbox__icon {
+           position: absolute;
+           left: 0;
+       }
+    }
 }

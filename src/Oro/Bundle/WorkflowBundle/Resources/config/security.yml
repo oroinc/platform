@@ -17,6 +17,12 @@ services:
         tags:
             - { name: security.voter, priority: 500 }
 
+    oro_workflow.acl.voter.workflow_edit_voter:
+        class: 'Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter'
+        public: false
+        tags:
+            - { name: security.voter }
+
     oro_workflow.filter.privilege_workflow_filter:
         class: 'Oro\Bundle\WorkflowBundle\Acl\Filter\AclPrivilegeWorkflowFilter'
         public: false

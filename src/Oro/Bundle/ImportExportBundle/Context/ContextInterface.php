@@ -20,6 +20,21 @@ interface ContextInterface
     public function getErrors();
 
     /**
+     * @param array $row
+     */
+    public function addPostponedRow(array $row);
+
+    /**
+     * @param array $rows
+     */
+    public function addPostponedRows(array $rows);
+
+    /**
+     * @return array
+     */
+    public function getPostponedRows();
+
+    /**
      * @return array
      */
     public function getFailureExceptions();

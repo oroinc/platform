@@ -1,0 +1,38 @@
+// @theme: default;
+
+.validation-failed,
+.validation-error,
+.validation-passed {
+    @extend .notification;
+}
+
+.validation-failed,
+.validation-error {
+    @extend .notification--error;
+
+    @include fa-icon($fa-var-warning);
+
+    &:before {
+        display: inline-block;
+        margin-right: 6px;
+    }
+}
+
+.validation-passed {
+    @extend .notification--success;
+}
+
+.controls {
+    &.validation-error {
+        &:before {
+            content: none;
+        }
+    }
+}
+
+.input-widget-select {
+    &.error {
+        border: 1px solid get-color('ui', 'error-dark');
+        box-shadow: 0 1px 7px 0 rgba(223,96,96,.6);
+    }
+}

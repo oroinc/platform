@@ -91,8 +91,11 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
      */
     private function setFilterCondition($condition)
     {
-        $filterCondition = $this->getPage()->find('xpath', '(//span[contains(@class, "active-filter")])[last()]');
-        $filterCondition->find('css', 'a.dropdown-toggle')->click();
-        $filterCondition->clickLink($condition);
+        $this->getPage()
+            ->find('xpath', "(//a[contains(@class, 'dropdown-toggle')] | //div/div/button)[last()]")
+            ->click();
+        $this->getPage()
+            ->find('xpath', "(//span[contains(., '{$condition}')] | //li/a[contains(., '{$condition}')])[last()]")
+            ->click();
     }
 }

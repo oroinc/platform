@@ -34,8 +34,8 @@ Feature: Pin page
     Then I should be on User Index page
     And there is one record in grid
     And I should see Charlie Sheen in grid with following data:
-      | Email    | charlie@sheen.com |
-      | Username | charlie           |
+      | Primary Email | charlie@sheen.com |
+      | Username      | charlie           |
     And I unpin page
     And Users link must not be in pin holder
 

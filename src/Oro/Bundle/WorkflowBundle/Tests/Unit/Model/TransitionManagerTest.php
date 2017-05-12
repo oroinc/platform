@@ -3,16 +3,25 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\WorkflowBundle\Model\Step;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 
 class TransitionManagerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var TransitionManager */
+    protected $transitionManager;
+
+    protected function setUp()
+    {
+        $this->transitionManager = new TransitionManager();
+    }
+
     public function testGetTransitionsEmpty()
     {
-        $transitionsManager = new TransitionManager();
         $this->assertInstanceOf(
             'Doctrine\Common\Collections\ArrayCollection',
-            $transitionsManager->getTransitions()
+            $this->transitionManager->getTransitions()
         );
     }
 
@@ -20,10 +29,81 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $transition = $this->getTransitionMock('transition');
 
-        $transitionsManager = new TransitionManager();
-        $transitionsManager->setTransitions(array($transition));
+        $this->transitionManager->setTransitions([$transition]);
 
-        $this->assertEquals($transition, $transitionsManager->getTransition('transition'));
+        $this->assertEquals($transition, $this->transitionManager->getTransition('transition'));
+    }
+
+    /**
+     * @dataProvider getStartTransitionDataProvider
+     *
+     * @param string $name
+     * @param array $transitions
+     * @param Transition|null $expected
+     */
+    public function testGetStartTransition($name, array $transitions, Transition $expected = null)
+    {
+        $this->transitionManager->setTransitions($transitions);
+
+        $this->assertEquals($expected, $this->transitionManager->getStartTransition($name));
+    }
+
+    /**
+     * return \Generator
+     */
+    public function getStartTransitionDataProvider()
+    {
+        $transition = $this->getTransitionMock('test_transition');
+        $startTransition = $this->getTransitionMock('test_start_transition', true);
+        $defaultStartTransition = $this->getTransitionMock(TransitionManager::DEFAULT_START_TRANSITION_NAME, true);
+
+        yield 'invalid name' => [
+            'name' => 10,
+            'transitions' => [$transition, $startTransition, $defaultStartTransition],
+            'expected' => null
+        ];
+
+        yield 'empty name' => [
+            'name' => '',
+            'transitions' => [$transition, $startTransition],
+            'expected' => null
+        ];
+
+        yield 'empty name with default transition' => [
+            'name' => '',
+            'transitions' => [$transition, $startTransition, $defaultStartTransition],
+            'expected' => $defaultStartTransition
+        ];
+
+        yield 'invalid string name' => [
+            'name' => 'invalid_transition_name',
+            'transitions' => [$transition, $startTransition, $defaultStartTransition],
+            'expected' => $defaultStartTransition
+        ];
+
+        yield 'string name and not start transition' => [
+            'name' => 'test_transition',
+            'transitions' => [$transition, $startTransition, $defaultStartTransition],
+            'expected' => null
+        ];
+
+        yield 'string name and start transition' => [
+            'name' => 'test_start_transition',
+            'transitions' => [$transition, $startTransition, $defaultStartTransition],
+            'expected' => $startTransition
+        ];
+
+        yield 'string name and start transition' => [
+            'name' => 'test_start_transition',
+            'transitions' => [$transition, $startTransition, $defaultStartTransition],
+            'expected' => $startTransition
+        ];
+
+        yield 'string name and start transition' => [
+            'name' => 'test_start_transition',
+            'transitions' => [$transition, $startTransition, $defaultStartTransition],
+            'expected' => $startTransition
+        ];
     }
 
     public function testSetTransitions()
@@ -31,24 +111,28 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
         $transitionOne = $this->getTransitionMock('transition1');
         $transitionTwo = $this->getTransitionMock('transition2');
 
-        $transitionsManager = new TransitionManager();
-
-        $transitionsManager->setTransitions(array($transitionOne, $transitionTwo));
-        $transitions = $transitionsManager->getTransitions();
+        $this->transitionManager->setTransitions([$transitionOne, $transitionTwo]);
+        $transitions = $this->transitionManager->getTransitions();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
-        $expected = array('transition1' => $transitionOne, 'transition2' => $transitionTwo);
+        $expected = ['transition1' => $transitionOne, 'transition2' => $transitionTwo];
         $this->assertEquals($expected, $transitions->toArray());
 
         $transitionsCollection = new ArrayCollection(
-            array('transition1' => $transitionOne, 'transition2' => $transitionTwo)
+            ['transition1' => $transitionOne, 'transition2' => $transitionTwo]
         );
-        $transitionsManager->setTransitions($transitionsCollection);
-        $transitions = $transitionsManager->getTransitions();
+        $this->transitionManager->setTransitions($transitionsCollection);
+        $transitions = $this->transitionManager->getTransitions();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
-        $expected = array('transition1' => $transitionOne, 'transition2' => $transitionTwo);
+        $expected = ['transition1' => $transitionOne, 'transition2' => $transitionTwo];
         $this->assertEquals($expected, $transitions->toArray());
     }
 
+    /**
+     * @param string $name
+     * @param bool $isStart
+     * @param Step $step
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getTransitionMock($name, $isStart = false, $step = null)
     {
         $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
@@ -77,16 +161,15 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
         $allowedTransition = $this->getTransitionMock('test', false);
 
         $transitions = new ArrayCollection(
-            array(
+            [
                 $allowedStartTransition,
                 $allowedTransition
-            )
+            ]
         );
-        $expected = new ArrayCollection(array('test_start' => $allowedStartTransition));
+        $expected = new ArrayCollection(['test_start' => $allowedStartTransition]);
 
-        $transitionsManager = new TransitionManager();
-        $transitionsManager->setTransitions($transitions);
-        $this->assertEquals($expected, $transitionsManager->getStartTransitions());
+        $this->transitionManager->setTransitions($transitions);
+        $this->assertEquals($expected, $this->transitionManager->getStartTransitions());
     }
 
     /**
@@ -96,8 +179,7 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
     public function testExtractTransitionException()
     {
         $transition = new \stdClass();
-        $transitionsManager = new TransitionManager();
-        $transitionsManager->extractTransition($transition);
+        $this->transitionManager->extractTransition($transition);
     }
 
     /**
@@ -107,34 +189,31 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
     public function testExtractTransitionStringUnknown()
     {
         $transition = 'test';
-        $transitionsManager = new TransitionManager();
-        $transitionsManager->extractTransition($transition);
+        $this->transitionManager->extractTransition($transition);
     }
 
     public function testExtractTransition()
     {
         $transition = $this->getTransitionMock('test');
-        $transitionsManager = new TransitionManager();
-        $this->assertSame($transition, $transitionsManager->extractTransition($transition));
+        $this->assertSame($transition, $this->transitionManager->extractTransition($transition));
     }
 
     public function testExtractTransitionString()
     {
         $transitionName = 'test';
         $transition = $this->getTransitionMock($transitionName);
-        $transitionsManager = new TransitionManager(new ArrayCollection(array($transition)));
+        $this->transitionManager->setTransitions([$transition]);
 
-        $this->assertSame($transition, $transitionsManager->extractTransition($transitionName));
+        $this->assertSame($transition, $this->transitionManager->extractTransition($transitionName));
     }
 
     public function testGetDefaultStartTransition()
     {
-        $transitionsManager = new TransitionManager();
-        $this->assertNull($transitionsManager->getDefaultStartTransition());
+        $this->assertNull($this->transitionManager->getDefaultStartTransition());
 
         $transition = $this->getTransitionMock(TransitionManager::DEFAULT_START_TRANSITION_NAME);
 
-        $transitionsManager->setTransitions(new ArrayCollection(array($transition)));
-        $this->assertEquals($transition, $transitionsManager->getDefaultStartTransition());
+        $this->transitionManager->setTransitions(new ArrayCollection([$transition]));
+        $this->assertEquals($transition, $this->transitionManager->getDefaultStartTransition());
     }
 }

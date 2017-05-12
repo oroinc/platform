@@ -16,7 +16,7 @@ abstract class AbstractConfigurationProvider
     /**
      * @var array
      */
-    protected $kernelBundles = array();
+    protected $kernelBundles = [];
 
     /**
      * @param array $kernelBundles
@@ -48,6 +48,7 @@ abstract class AbstractConfigurationProvider
                             return true;
                         }
                     }
+
                     return false;
                 }
             );
@@ -62,7 +63,7 @@ abstract class AbstractConfigurationProvider
     protected function getConfigDirectories()
     {
         $configDirectory = str_replace('/', DIRECTORY_SEPARATOR, $this->configDirectory);
-        $configDirectories = array();
+        $configDirectories = [];
 
         foreach ($this->kernelBundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
@@ -85,22 +86,35 @@ abstract class AbstractConfigurationProvider
     protected function loadConfigFile(\SplFileInfo $file)
     {
         $realPathName = $file->getRealPath();
-        $configData = Yaml::parse(file_get_contents($realPathName)) ? : [];
+        $configData = Yaml::parse(file_get_contents($realPathName)) ?: [];
 
         if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
             $imports = $configData['imports'];
             unset($configData['imports']);
-            foreach ($imports as $importData) {
-                if (array_key_exists('resource', $importData)) {
-                    $resourceFile = new \SplFileInfo($file->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
-                    if ($resourceFile->isReadable()) {
-                        $includedData = $this->loadConfigFile($resourceFile);
-                        $configData = array_merge_recursive($configData, $includedData);
-                    } else {
-                        throw new InvalidConfigurationException(
-                            sprintf('Resource "%s" is unreadable', $resourceFile->getBasename())
-                        );
-                    }
+            $configData = $this->processImports($file, $imports, $configData);
+        }
+
+        return $configData;
+    }
+
+    /**
+     * @param \SplFileInfo $file
+     * @param array $imports
+     * @param array $configData
+     * @return array
+     */
+    protected function processImports(\SplFileInfo $file, array $imports, array $configData)
+    {
+        foreach ($imports as $importData) {
+            if (array_key_exists('resource', $importData)) {
+                $resourceFile = new \SplFileInfo($file->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
+                if ($resourceFile->isReadable()) {
+                    $includedData = $this->loadConfigFile($resourceFile);
+                    $configData = array_merge_recursive($configData, $includedData);
+                } else {
+                    throw new InvalidConfigurationException(
+                        sprintf('Resource "%s" is unreadable', $resourceFile->getBasename())
+                    );
                 }
             }
         }

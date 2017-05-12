@@ -1135,6 +1135,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $associationName,
                 self::identicalTo($field),
                 $targetAction

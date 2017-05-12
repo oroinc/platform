@@ -16,6 +16,15 @@ services:
         tags:
             - { name: cli.controller, priority: 700 }
 
+    cli.controller.available_suites_group:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController
+        arguments:
+            - '@suite.registry'
+            - '@specifications.finder'
+            - '%oro_test.suite_groups%'
+        tags:
+            - { name: cli.controller, priority: 710 }
+
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
         arguments:

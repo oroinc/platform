@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue as EnumEntity;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProviderInterface;
@@ -525,6 +526,42 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                         'property_path' => 'organization1',
                         'description'   => CompleteDescriptions::ORGANIZATION_DESCRIPTION
                     ]
+                ]
+
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testEnumField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'name'     => null,
+                'default'  => null,
+                'priority' => null,
+            ]
+        ];
+
+        $this->context->setClassName(EnumEntity::class);
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'name'     => [
+                        'description' => CompleteDescriptions::ENUM_NAME_DESCRIPTION
+                    ],
+                    'default'  => [
+                        'description' => CompleteDescriptions::ENUM_DEFAULT_DESCRIPTION
+                    ],
+                    'priority' => [
+                        'description' => CompleteDescriptions::ENUM_PRIORITY_DESCRIPTION
+                    ],
                 ]
 
             ],
