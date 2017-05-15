@@ -149,6 +149,16 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
             )
         );
 
+        $this->executeFixtures($output, $fixtures, $this->getTypeOfFixtures($input));
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param array           $fixtures
+     * @param string          $fixturesType
+     */
+    protected function executeFixtures(OutputInterface $output, $fixtures, $fixturesType)
+    {
         /** @var DataFixturesExecutorInterface $loader */
         $executor = $this->getContainer()->get('oro_migration.data_fixtures.executor');
         $executor->setLogger(
@@ -156,7 +166,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
             }
         );
-        $executor->execute($fixtures, $this->getTypeOfFixtures($input));
+        $executor->execute($fixtures, $fixturesType);
     }
 
     /**
