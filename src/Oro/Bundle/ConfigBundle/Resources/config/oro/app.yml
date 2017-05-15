@@ -6,3 +6,6 @@ doctrine:
                     OroConfigBundle:
                         mapping:   true
                         is_bundle: true
+                metadata_cache_driver:
+                    type: service
+                    id:   oro_config.cache.doctrine_metadata

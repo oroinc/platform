@@ -201,7 +201,7 @@ class FeatureContext extends OroFeatureContext implements
         $clicked = $menu->openAndClick($firstPage);
 
         $this->waitForAjax();
-        $this->messageQueueIsolator->waitWhileProcessingMessages(5);
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         $actualPage = $this->getLastPersistedPage($em);
 
@@ -221,7 +221,7 @@ class FeatureContext extends OroFeatureContext implements
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
-            $this->messageQueueIsolator->waitWhileProcessingMessages(5);
+            $this->messageQueueIsolator->waitWhileProcessingMessages();
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
             $actualTitle = $crawler->filter('head title')->first()->text();
 

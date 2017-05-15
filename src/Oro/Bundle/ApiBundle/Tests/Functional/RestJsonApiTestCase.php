@@ -181,10 +181,7 @@ class RestJsonApiTestCase extends ApiTestCase
     protected function post(array $routeParameters = [], $parameters = [])
     {
         $routeParameters = self::processTemplateData($routeParameters);
-        if (is_string($parameters) && $this->isRelativePath($parameters)) {
-            $parameters = $this->getTestResourcePath('requests', $parameters);
-        }
-        $parameters = self::processTemplateData($parameters);
+        $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'POST',
             $this->getUrl('oro_rest_api_post', $routeParameters),
@@ -238,10 +235,7 @@ class RestJsonApiTestCase extends ApiTestCase
     protected function patch(array $routeParameters = [], $parameters = [])
     {
         $routeParameters = self::processTemplateData($routeParameters);
-        if (is_string($parameters) && $this->isRelativePath($parameters)) {
-            $parameters = $this->getTestResourcePath('requests', $parameters);
-        }
-        $parameters = self::processTemplateData($parameters);
+        $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'PATCH',
             $this->getUrl(
@@ -380,10 +374,10 @@ class RestJsonApiTestCase extends ApiTestCase
      * @param int      $expectedCount
      * @param Response $response
      */
-    protected function assertResponseCount($expectedCount, Response $response)
+    protected static function assertResponseCount($expectedCount, Response $response)
     {
         $content = json_decode($response->getContent(), true);
-        $this->assertCount($expectedCount, $content['data']);
+        self::assertCount($expectedCount, $content['data']);
     }
 
     /**
@@ -391,10 +385,10 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param Response $response
      */
-    protected function assertResponseNotEmpty(Response $response)
+    protected static function assertResponseNotEmpty(Response $response)
     {
         $content = json_decode($response->getContent(), true);
-        $this->assertNotEmpty($content['data']);
+        self::assertNotEmpty($content['data']);
     }
 
     /**
@@ -484,6 +478,22 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
+     * Converts the given request to an array that can be sent to the server.
+     *
+     * @param array|string $request
+     *
+     * @return array
+     */
+    protected function getRequestData($request)
+    {
+        if (is_string($request) && $this->isRelativePath($request)) {
+            $request = $this->getTestResourcePath('requests', $request);
+        }
+
+        return self::processTemplateData($request);
+    }
+
+    /**
      * Extracts JSON.API resource identifier from the response.
      *
      * @param Response $response
@@ -493,12 +503,29 @@ class RestJsonApiTestCase extends ApiTestCase
     protected function getResourceId(Response $response)
     {
         $content = json_decode($response->getContent(), true);
-        $this->assertInternalType('array', $content);
-        $this->assertArrayHasKey('data', $content);
-        $this->assertInternalType('array', $content['data']);
-        $this->assertArrayHasKey('id', $content['data']);
+        self::assertInternalType('array', $content);
+        self::assertArrayHasKey('data', $content);
+        self::assertInternalType('array', $content['data']);
+        self::assertArrayHasKey('id', $content['data']);
 
         return $content['data']['id'];
+    }
+
+    /**
+     * Extracts the list of errors from JSON.API response.
+     *
+     * @param Response $response
+     *
+     * @return string
+     */
+    protected function getResponseErrors(Response $response)
+    {
+        $content = json_decode($response->getContent(), true);
+        self::assertInternalType('array', $content);
+        self::assertArrayHasKey('errors', $content);
+        self::assertInternalType('array', $content['errors']);
+
+        return $content['errors'];
     }
 
     /**

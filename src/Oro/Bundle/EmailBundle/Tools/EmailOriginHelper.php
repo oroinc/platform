@@ -139,6 +139,14 @@ class EmailOriginHelper
     }
 
     /**
+     * Removes the helper state.
+     */
+    public function clear()
+    {
+        $this->origins = [];
+    }
+
+    /**
      * Get first accessible email owner
      *
      * @param EmailOwnerInterface[] $emailOwners
