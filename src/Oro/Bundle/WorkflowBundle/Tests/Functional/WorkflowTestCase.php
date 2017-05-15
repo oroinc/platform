@@ -28,8 +28,7 @@ abstract class WorkflowTestCase extends WebTestCase
     public static function loadWorkflowFrom($directory)
     {
         self::setConfigLoadDirectory($directory);
-
-        return self::runCommand(LoadWorkflowDefinitionsCommand::NAME, ['--no-ansi'], true, true);
+        return self::runCommand(LoadWorkflowDefinitionsCommand::NAME, [], true, true);
     }
 
     /**

@@ -7,6 +7,8 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -161,6 +163,18 @@ class ImportExportControllerTest extends WebTestCase
         $tmpDirName = $this->getContainer()->getParameter('kernel.root_dir') . '/import_export';
         $fileDir = __DIR__ . '/Import/fixtures';
         $file = $fileDir . '/testLineEndings.csv';
+
+        $finder = new Finder();
+        $finder
+            ->files()
+            ->name('*.csv')
+            ->in($tmpDirName);
+
+        $fs = new Filesystem();
+        /** @var \SplFileInfo $file */
+        foreach ($finder as $importFile) {
+            $fs->remove($importFile->getPathname());
+        }
 
         $csvFile = new UploadedFile(
             $fileDir . '/testLineEndings.csv',

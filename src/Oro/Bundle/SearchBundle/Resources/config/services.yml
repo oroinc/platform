@@ -275,9 +275,11 @@ services:
         tags:
             - { name: form.type, alias: oro_search_type_string_filter }
 
-    oro_search.event_listener.reindex_demo_data:
-        class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataListener
+    oro_search.migration.demo_data_fixtures_listener.reindex:
+        class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener
         arguments:
-            - "@oro_search.search.engine.indexer"
+            - '@oro_platform.optional_listeners.manager'
+            - '@oro_search.search.engine.indexer'
         tags:
-            - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }

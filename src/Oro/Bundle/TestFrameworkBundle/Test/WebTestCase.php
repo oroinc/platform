@@ -459,6 +459,8 @@ abstract class WebTestCase extends BaseWebTestCase
         $application->setAutoExit(false);
         $application->setTerminalDimensions(120, 50);
 
+        $params['--no-ansi'] = true;
+
         $args = ['application', $name];
         foreach ($params as $k => $v) {
             if (is_bool($v)) {
