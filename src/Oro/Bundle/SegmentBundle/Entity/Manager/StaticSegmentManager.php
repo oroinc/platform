@@ -197,8 +197,13 @@ class StaticSegmentManager
         $types  = [];
         foreach ($parameters as $parameter) {
             /* @var $parameter Parameter */
-            $values[] = $parameter->getValue();
-            $types[]  = $parameter->getType();
+            $value = $parameter->getValue();
+            $type  = $parameter->getType();
+            if (\PDO::PARAM_STR === $type && $value instanceof Segment) {
+                $value = $value->getId();
+            }
+            $values[] = $value;
+            $types[]  = $type;
         }
         $typeOffset = array_key_exists(0, $types) ? -1 : 0;
         $bindIndex  = 1;
