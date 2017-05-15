@@ -9,24 +9,19 @@ define(function(require) {
     var widgetManager = require('oroui/js/widget-manager');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var layoutHelper = require('oroui/js/tools/layout-helper');
 
     GridSidebarComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
         options: {
-            container: '',
-            sidebar: '',
             sidebarAlias: '',
             widgetAlias: '',
-            widgetContainer: '',
             widgetRoute: 'oro_datagrid_widget',
             widgetRouteParameters: {
                 gridName: ''
             },
-            gridParam: 'grid',
-            fixSidebarHeight: false
+            gridParam: 'grid'
         },
 
         /**
@@ -39,11 +34,6 @@ define(function(require) {
         /**
          * @property {Object}
          */
-        $container: {},
-
-        /**
-         * @property {Object}
-         */
         gridCollection: {},
 
         /**
@@ -51,26 +41,14 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-
-            this.$container = options._sourceElement;
-            this.$widgetContainer = $(options.widgetContainer);
-
             mediator.on('grid-sidebar:change:' + this.options.sidebarAlias, this.onSidebarChange, this);
-
-            this.$container.find('.control-minimize').click(_.bind(this.minimize, this));
-            this.$container.find('.control-maximize').click(_.bind(this.maximize, this));
-
-            if (this.options.fixSidebarHeight) {
-                layoutHelper.setAvailableHeight('.' + this.options.sidebar);
-            }
-
-            this._maximizeOrMaximize(null);
         },
 
         /**
          * @param {Object} collection
+         * @param {Object} gridElement
          */
-        onGridLoadComplete: function(collection) {
+        onGridLoadComplete: function(collection, gridElement) {
             if (collection.inputName === this.options.widgetRouteParameters.gridName) {
                 this.gridCollection = collection;
 
@@ -81,6 +59,13 @@ define(function(require) {
                         self._patchGridCollectionUrl(self._getQueryParamsFromUrl(location.search));
                     }
                 );
+
+                var foundGrid = this.options._sourceElement
+                    .closest('[data-role="grid-sidebar-component-container"]')
+                    .find(gridElement);
+                if (foundGrid.length) {
+                    mediator.trigger('grid-sidebar:load:' + this.options.sidebarAlias);
+                }
             }
         },
 
@@ -93,28 +78,35 @@ define(function(require) {
                 this._getDatagridParams(),
                 data.params
             );
+            data = _.extend({reload: true, updateUrl: true}, data);
             var widgetParams = _.extend(
                 _.omit(this.options.widgetRouteParameters, this.options.gridParam),
                 params
             );
-            var self = this;
 
-            this._pushState(_.omit(params, _.isNull));
+            if (data.updateUrl) {
+                this._pushState(_.omit(params, _.isNull));
+            }
 
             this._patchGridCollectionUrl(params);
 
-            widgetManager.getWidgetInstanceByAlias(
-                this.options.widgetAlias,
-                function(widget) {
-                    widget.setUrl(routing.generate(self.options.widgetRoute, widgetParams));
-
-                    if (data.widgetReload) {
-                        widget.render();
-                    } else {
-                        mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName);
-                    }
+            if (_.has(this.gridCollection, 'state')) {
+                this.gridCollection.state.currentPage = 1;
+            }
+            if (data.reload) {
+                if (data.widgetReload) {
+                    var self = this;
+                    widgetManager.getWidgetInstanceByAlias(
+                        this.options.widgetAlias,
+                        function(widget) {
+                            widget.setUrl(routing.generate(self.options.widgetRoute, widgetParams));
+                            widget.render();
+                        }
+                    );
+                } else {
+                    mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName);
                 }
-            );
+            }
         },
 
         /**
@@ -149,40 +141,6 @@ define(function(require) {
             var paramsString = this._urlParamsToString(_.omit(params, ['saveState']));
             var current = mediator.execute('pageCache:getCurrent');
             mediator.execute('changeUrl', current.path + '?' + paramsString);
-        },
-
-        minimize: function() {
-            this._maximizeOrMaximize('off');
-        },
-
-        maximize: function() {
-            this._maximizeOrMaximize('on');
-        },
-
-        /**
-         * @private
-         * @param {String} state
-         */
-        _maximizeOrMaximize: function(state) {
-            var params = this._getQueryParamsFromUrl(location.search);
-
-            if (state === null) {
-                state = params.sidebar || 'on';
-            }
-
-            if (state === 'on') {
-                this.$container.addClass('grid-sidebar-maximized').removeClass('grid-sidebar-minimized');
-                this.$widgetContainer.addClass('grid-sidebar-maximized').removeClass('grid-sidebar-minimized');
-
-                delete params.sidebar;
-            } else {
-                this.$container.addClass('grid-sidebar-minimized').removeClass('grid-sidebar-maximized');
-                this.$widgetContainer.addClass('grid-sidebar-minimized').removeClass('grid-sidebar-maximized');
-
-                params.sidebar = state;
-            }
-
-            this._pushState(params);
         },
 
         /**
@@ -222,6 +180,9 @@ define(function(require) {
          */
         _getDatagridParams: function() {
             var params = {};
+            if (!_.has(this.gridCollection, 'options')) {
+                return params;
+            }
             params[this.gridCollection.options.gridName] = this.gridCollection.urlParams;
 
             return params;

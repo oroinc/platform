@@ -1,0 +1,20 @@
+imports:
+    - { workflow: points_to_normal, as: points_to_other, replace: []}
+    - { workflow: points_to_other, as: points_to_normal, replace: []}
+workflows:
+    points_to_other:
+        entity: TestEntity
+        steps:
+            step_a: ~
+        transitions:
+            trans1:
+                step_to: step_a
+                is_start: true
+    points_to_normal:
+        entity: TestEntity2
+        steps:
+            step_b: ~
+        transitions:
+            trans1:
+                step_to: step_b
+                is_start: true

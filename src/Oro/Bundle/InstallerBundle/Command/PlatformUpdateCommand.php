@@ -7,8 +7,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Component\PhpUtils\PhpIniUtil;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 
 class PlatformUpdateCommand extends AbstractCommand
 {
@@ -37,6 +39,12 @@ class PlatformUpdateCommand extends AbstractCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Determines whether translation data need to be loaded or not'
+            )
+            ->addOption(
+                'skip-download-translations',
+                null,
+                InputOption::VALUE_NONE,
+                'Determines whether translation data need to be downloaded or not'
             );
 
         parent::configure();
@@ -88,10 +96,7 @@ class PlatformUpdateCommand extends AbstractCommand
                 ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
             ;
 
-            if (!$input->getOption('skip-translations')) {
-                $commandExecutor
-                    ->runCommand('oro:translation:load', ['--process-isolation' => true]);
-            }
+            $this->processTranslations($input, $commandExecutor);
 
             if (!$input->getOption('skip-assets')) {
                 $commandExecutor
@@ -125,6 +130,22 @@ class PlatformUpdateCommand extends AbstractCommand
         $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
         if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
             $output->writeln('<comment>It\'s recommended at least 1Gb to be available for PHP CLI</comment>');
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param CommandExecutor $commandExecutor
+     */
+    protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor)
+    {
+        if (!$input->getOption('skip-translations')) {
+            if (!$input->getOption('skip-download-translations')) {
+                $commandExecutor
+                    ->runCommand(OroLanguageUpdateCommand::NAME, ['--process-isolation' => true, '--all' => true]);
+            }
+            $commandExecutor
+                ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
         }
     }
 }

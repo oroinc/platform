@@ -32,7 +32,9 @@ class MergeActionConfigHelper
             $actionFields = $actionConfig[ActionConfig::FIELDS];
             unset($actionConfig[ActionConfig::FIELDS]);
         }
-        $config = array_merge($config, $actionConfig);
+        if (!empty($actionConfig)) {
+            $config = $this->mergeActionConfigValues($config, $actionConfig);
+        }
         if (!empty($actionFields)) {
             $config[EntityDefinitionConfig::FIELDS] = !empty($config[EntityDefinitionConfig::FIELDS])
                 ? $this->mergeActionFields($config[EntityDefinitionConfig::FIELDS], $actionFields)
@@ -40,6 +42,31 @@ class MergeActionConfigHelper
         }
 
         return $config;
+    }
+
+    /**
+     * @param array $config
+     * @param array $actionConfig
+     *
+     * @return array
+     */
+    protected function mergeActionConfigValues(array $config, array $actionConfig)
+    {
+        // merge form options and event subscribers only if form type is not changed
+        if (empty($actionConfig[EntityDefinitionConfig::FORM_TYPE])) {
+            $mergeKeys = [
+                EntityDefinitionConfig::FORM_OPTIONS,
+                EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER
+            ];
+            foreach ($mergeKeys as $mergeKey) {
+                if (array_key_exists($mergeKey, $actionConfig) && array_key_exists($mergeKey, $config)) {
+                    $actionConfig[$mergeKey] = array_merge($config[$mergeKey], $actionConfig[$mergeKey]);
+                    unset($config[$mergeKey]);
+                }
+            }
+        }
+
+        return array_merge($config, $actionConfig);
     }
 
     /**

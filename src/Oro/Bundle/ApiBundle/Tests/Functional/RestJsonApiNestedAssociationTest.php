@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadNestedAssociationData;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestDefaultAndNull as TestRelatedEntity;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityForNestedObjects as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull as TestRelatedEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects as TestEntity;
 
 /**
  * @dbIsolationPerTest

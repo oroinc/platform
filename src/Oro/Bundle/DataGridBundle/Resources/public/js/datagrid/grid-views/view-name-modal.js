@@ -40,6 +40,7 @@ define([
 
         setNameError: function(error) {
             this.$('.validation-failed').remove();
+
             if (error) {
                 error = this.nameErrorTemplate({
                     error: error

@@ -1,0 +1,25 @@
+imports:
+    -
+        workflow: workflow_to_import
+        as: workflow_with_config_reuse
+        replace: ['steps.step_a.allowed_transitions', 'steps.step_b.allowed_transitions', 'applications']
+workflows:
+    workflow_with_config_reuse:
+        entity: Some\Another\Entity
+        steps:
+            step_a:
+                allowed_transitions: ['transition_one']
+            step_b:
+                order: 5
+                is_final: true
+                allowed_transitions: []
+            step_z:
+                order: 42
+        attributes:
+            attribute1:
+                type: string
+        transitions:
+            transition_one:
+                step_to: step_b
+                frontend_options:
+                    icon: foo

@@ -217,7 +217,7 @@ oro_behat_extension:
     $this->elementFactory->createElement('Login')
  ```
 
-2. ```selector``` this is how selenium driver can found element on the page. By default it use css selector, but it also can use xpath:
+2. ```selector``` this is how selenium driver can found element on the page. By default it use [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector), but it also can use xpath:
 
  ```yml
     selector:
@@ -228,6 +228,87 @@ oro_behat_extension:
 3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
 You can omnit class, if so ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` will use by default.
 4. ```options``` it's an array of extra options that will be set in options property of Element class
+5. For the forms you can, and obviously should, add mapping option.
+   It will increase test speed and map form more accurately.
+
+#### Form Mappings
+
+By default for mapping forms [named field selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#named-selectors) used, that search form by field by its id, name, label or placeholder.
+You free to use any of selectors for form mappings, as well as wrap element into concrete behat element
+
+behat.yml
+```yml
+oro_behat_extension:
+  elements:
+    Payment Method Config Type Field:
+      class: Oro\Bundle\PaymentBundle\Tests\Behat\Element\PaymentMethodConfigType
+      selector:
+        type: 'xpath'
+        locator: '//div[@id[starts-with(.,"uniform-oro_payment_methods_configs_rule_method")]]'
+    Payment Rule Form:
+      selector: "form[id^='oro_payment_methods_configs_rule']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Method:
+            type: 'xpath'
+            locator: '//div[@id[starts-with(.,"uniform-oro_payment_methods_configs_rule_method")]]'
+            element: Payment Method Config Type Field
+```
+Now you should implement Element ```setValue``` method
+
+```php
+<?php
+namespace Oro\Bundle\PaymentBundle\Tests\Behat\Element;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+class PaymentMethodConfigType extends Element
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function setValue($value)
+    {
+        $values = is_array($value) ? $value : [$value];
+        foreach ($values as $item) {
+            $parentField = $this->getParent()->getParent()->getParent()->getParent();
+            $field = $parentField->find('css', 'select');
+            self::assertNotNull($field, 'Select payment method field not found');
+            $field->setValue($item);
+            $parentField->clickLink('Add');
+            $this->getDriver()->waitForAjax();
+        }
+    }
+}
+```
+
+Now you can just use it in standard step:
+```gherkin
+Feature: Payment Rules CRUD
+  Scenario: Creating Payment Rule
+    Given I login as administrator
+    And I go to System/ Payment Rules
+    And I click "Create Payment Rule"
+    When I fill "Payment Rule Form" with:
+      | Method | PayPal |
+```
+
+#### Ebedded Form Mappings
+
+It's common happens that form appears in iframe.
+Behat can switch to iframe by it's id.
+For the appropriate filling the form in iframe you should to specify iframe id in form options:
+```yml
+oro_behat_extension:
+  elements:
+    Magento contact us form:
+      selector: 'div#page'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        embedded-id: embedded-form
+        mapping:
+          First name: 'oro_magento_contactus_contact_request[firstName]'
+          Last name: 'oro_magento_contactus_contact_request[lastName]'
+```
 
 #### Page element
 
