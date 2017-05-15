@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
-use Oro\Component\Testing\ResponseExtension;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -10,9 +9,11 @@ use FOS\RestBundle\Util\Codes;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Oro\Component\Testing\ResponseExtension;
 
 /**
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class EntityDataControllerTest extends WebTestCase
 {
@@ -20,7 +21,7 @@ class EntityDataControllerTest extends WebTestCase
 
     public function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
             'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData',
             'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadRoleData',
@@ -159,6 +160,40 @@ class EntityDataControllerTest extends WebTestCase
 
         $content = $this->getLastResponseJsonContent();
         $this->assertEquals('Validation Failed', $content['message']);
+    }
+
+
+    public function testShouldAllowChangeEntityDespiteOfNoRightsToAssign()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+        $role = static::getContainer()
+            ->get('doctrine')
+            ->getRepository('OroUserBundle:Role')
+            ->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
+
+        /** @var AclManager $aclManager */
+        $aclManager = static::getContainer()->get('oro_security.acl.manager');
+
+        $sid = $aclManager->getSid($role);
+        $oid = $aclManager->getOid('entity:Oro\Bundle\UserBundle\Entity\User');
+
+        $builder = $aclManager->getMaskBuilder($oid, 'ASSIGN');
+        $builder->remove('ASSIGN_GLOBAL');
+
+        $mask = $builder->get();
+        $aclManager->setPermission($sid, $oid, $mask);
+        $aclManager->flush();
+
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"firstName": "Test1"}'
+        );
+
+        $this->assertLastResponseStatus(Codes::HTTP_OK);
+
+        $this->refreshEntity($user);
+        $this->assertEquals('Test1', $user->getFirstName());
     }
 
     /**
