@@ -60,3 +60,11 @@ services:
 
     oro_importexport.writer.writer_chain:
         class: Oro\Bundle\ImportExportBundle\Writer\WriterChain
+
+    oro_importexport.cache_warmer:
+        class: 'Oro\Bundle\ImportExportBundle\Cache\ImportExportCacheWarmer'
+        public: false
+        arguments:
+          - '@kernel'
+        tags:
+          - { name: kernel.cache_warmer }
