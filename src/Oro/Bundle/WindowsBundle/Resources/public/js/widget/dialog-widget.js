@@ -489,7 +489,9 @@ define(function(require) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
             } else {
-                dialog.css('width', this.options.dialogOptions.width);
+                if (!this.options.dialogOptions.resizable) {
+                    dialog.css('width', this.options.dialogOptions.width);
+                }
             }
         },
 
