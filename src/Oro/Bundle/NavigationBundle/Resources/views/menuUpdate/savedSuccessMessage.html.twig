@@ -1,0 +1,6 @@
+{% set reloadLink -%}
+    <a href="#" onclick="window.location.reload(false);return false;">
+        {{- 'oro.navigation.menuupdate.reload_link.label'|trans -}}
+    </a>
+{%- endset %}
+{{ 'oro.navigation.menuupdate.saved_message'|trans({'%reload_link%': reloadLink})|raw }}

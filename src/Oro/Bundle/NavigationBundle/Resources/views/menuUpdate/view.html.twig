@@ -3,6 +3,11 @@
 {% import 'OroSyncBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% from _self import resetButton %}
+{% set reloadLink -%}
+    <a href="#" onclick="window.location.reload(false);return false;">
+        {{- 'oro.navigation.menuupdate.reload_link.label'|trans -}}
+    </a>
+{%- endset %}
 {% block content %}
 
     <div class="layout-content"{% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
@@ -16,7 +21,7 @@
                                 'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.root.name, context: context}),
                                 'menuKey': entity.root.name,
                                 'data': {
-                                    'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : entity.root.name }),
+                                    'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : entity.root.name, '%reload_link%': reloadLink}),
                                 }
                             }) }}
 
@@ -37,7 +42,7 @@
                             'dataMethod': 'POST',
                             'dataRedirect': app.request.uri,
                             'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: entity.name, parentKey: entity.name, 'isDivider': true}),
-                            'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')
+                            'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')|trans({'%reload_link%': reloadLink})
                             }) %}
 
                             {% set parameters = {
