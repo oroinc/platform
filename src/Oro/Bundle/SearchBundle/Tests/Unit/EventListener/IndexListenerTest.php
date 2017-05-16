@@ -52,9 +52,13 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->searchEngine = $this->createMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
+        $this->searchEngine = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\EngineInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->propertyAccessor = $this->createMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
+        $this->propertyAccessor = $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyAccessorInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     public function testOnFlush()
