@@ -17,14 +17,13 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            this.grid = options.grid;
-
             mediator.on('datagrid:frontend:execute:' + options.gridName, this.onFrontAction, this);
             mediator.on('datagrid:mass:frontend:execute:' + options.gridName, this.onFrontMassAction, this);
         },
 
         onFrontAction: function(action) {
             var triggerAction = action.configuration.triggerAction;
+            var collection = action.datagrid.collection;
 
             if (_.isUndefined(triggerAction)) {
                 return;
@@ -32,14 +31,14 @@ define([
 
             // at the moment we support only `excludeRow`
             if (triggerAction === 'excludeRow') {
-                this.grid.collection.trigger('excludeRow', action.model.get('id'));
-                this.grid.collection.trigger('remove', action.model);
+                collection.trigger('excludeRow', action.model.get('id'));
+                collection.trigger('remove', action.model, false);
             }
 
             // @todo uncomment in BB-9344
             // if (triggerAction === 'includeRow') {
-            //     this.grid.collection.trigger('includeRow', action.model.get('id'));
-            //     this.grid.collection.trigger('add', action.model);
+            //     collection.trigger('includeRow', action.model.get('id'));
+            //     collection.trigger('add', action.model);
             // }
         },
 
@@ -59,7 +58,6 @@ define([
                     collection.trigger('excludeRow', id);
                     collection.trigger('remove', collection.get(id), false);
                 });
-                collection.fetch({reset: true});
             }
         },
 
