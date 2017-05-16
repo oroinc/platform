@@ -987,7 +987,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Check column is not present in grid
      * Example: Then I shouldn't see Example column in grid
      *
-     * @Then /^(?:|I )shouldn't see (?P<columnName>(?:[^"]|\\")*) column in grid$/
+     * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
      * @param $columnName
      */
     public function iShouldNotSeeColumnInGrid($columnName)
@@ -1002,7 +1002,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Check column is present in grid
      * Example: Then I should see Example column in grid
      *
-     * @Then /^(?:|I )should see (?P<columnName>(?:[^"]|\\")*) column in grid$/
+     * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
      * @param $columnName
      */
     public function iShouldSeeColumnInGrid($columnName)
