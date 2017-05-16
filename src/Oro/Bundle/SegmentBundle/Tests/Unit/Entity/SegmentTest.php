@@ -115,10 +115,4 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($segment->isDynamic());
     }
-
-    public function testToString()
-    {
-        $segment = $this->getEntity(Segment::class, ['id' => 777]);
-        $this->assertSame('777', (string) $segment);
-    }
 }

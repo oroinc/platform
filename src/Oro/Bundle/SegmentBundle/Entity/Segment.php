@@ -450,13 +450,4 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
 
         return false;
     }
-
-    /**
-     * Needed in StaticManager for correct creating sql subquery
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->id;
-    }
 }
