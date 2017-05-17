@@ -192,6 +192,8 @@ class WorkflowTranslationHelperTest extends WebTestCase
             'oro.workflow.test_flow.label',
             'oro.workflow.test_flow.step.open.label',
             'oro.workflow.test_flow.transition.start_transition.label',
+            'oro.workflow.test_flow.transition.start_transition.button_label',
+            'oro.workflow.test_flow.transition.start_transition.button_title',
             'oro.workflow.test_flow.transition.start_transition.warning_message',
         ];
         $workflowDefinition = $this->getReference('workflow.' . LoadWorkflowDefinitions::NO_START_STEP);

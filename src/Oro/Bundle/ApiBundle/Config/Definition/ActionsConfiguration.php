@@ -116,6 +116,21 @@ class ActionsConfiguration extends AbstractConfigurationSection
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
+            ->end()
+            ->variableNode(ActionConfig::FORM_EVENT_SUBSCRIBER)
+                ->validate()
+                    ->always(function ($v) {
+                        if (is_string($v)) {
+                            return [$v];
+                        }
+                        if (is_array($v)) {
+                            return $v;
+                        }
+                        throw new \InvalidArgumentException(
+                            'The value must be a string or an array.'
+                        );
+                    })
+                ->end()
             ->end();
         $this->addStatusCodesNode($node);
         $fieldNode = $node
@@ -128,7 +143,11 @@ class ActionsConfiguration extends AbstractConfigurationSection
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $config
+     *
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function postProcessActionConfig(array $config)
     {
@@ -149,6 +168,9 @@ class ActionsConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[ActionConfig::FORM_OPTIONS])) {
             unset($config[ActionConfig::FORM_OPTIONS]);
+        }
+        if (empty($config[ActionConfig::FORM_EVENT_SUBSCRIBER])) {
+            unset($config[ActionConfig::FORM_EVENT_SUBSCRIBER]);
         }
         if (empty($config[ActionConfig::FIELDS])) {
             unset($config[ActionConfig::FIELDS]);

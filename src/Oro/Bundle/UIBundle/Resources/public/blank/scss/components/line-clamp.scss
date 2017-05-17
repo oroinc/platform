@@ -9,7 +9,11 @@
 
     &-polyfill {
         position: relative;
+
         display: inline-block;
+
+        overflow: hidden;
+
         &::after {
             position: absolute;
             top: 20px;

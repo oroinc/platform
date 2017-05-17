@@ -1,0 +1,64 @@
+// @theme: default;
+
+// Update styles in /default/scss/components/shopping-list-dropdown/shopping-list-dropdown.scss
+
+.custom-radio {
+    display: inline-block;
+
+    margin: 0;
+
+    line-height: 12px;
+
+    &__control,
+    input[type='radio'] {
+        display: none;
+    }
+
+    &__text {
+        display: inline-block;
+
+        vertical-align: middle;
+    }
+
+    &__control + &__text::before {
+        display: inline-block;
+
+        width: 13px;
+        height: 13px;
+        margin-right: 4px;
+
+        content: '';
+        vertical-align: middle;
+
+        border: 1px solid #cdcdcd;
+        border-radius: 50%;
+        background: #fff;
+    }
+
+    &__control:checked + &__text::before {
+        background: #3991c7;
+        box-shadow: inset 0 0 0 2px #ebebeb;
+    }
+
+    &--large {
+        line-height: 15px;
+    }
+
+    &--large &__control + &__text::before {
+        width: 16px;
+        height: 16px;
+    }
+
+    &.absolute {
+        position: relative;
+
+        .custom-radio__text {
+            margin-left: 25px;
+
+            &:before {
+                position: absolute;
+                left: 0;
+            }
+        }
+    }
+}

@@ -7,10 +7,10 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
-use Oro\Bundle\CalendarBundle\Tests\Behat\Element\ColorsAwareInterface;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\OroSimpleColorPickerField;
 use Oro\Bundle\SalesBundle\Tests\Behat\Element\QuotesGrid;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -169,24 +169,29 @@ class FeatureContext extends OroFeatureContext implements
      *
      * @see AllowedColorsMapping for full list of available color names
      *
-     * @Then /^I should see following available "(.+)" colors:$/
+     * @Then /^(?:|I )should see following available "(.+)" colors:$/
      */
-    public function iShouldSeeFollowingAvailableEventColors($target, TableNode $table)
+    public function iShouldSeeFollowingAvailableColors($target, TableNode $table)
     {
         if (!$this->elementFactory->hasElement($target)) {
             throw new \InvalidArgumentException(sprintf('Could not find element with "%s" name', $target));
         }
 
-        /** @var ColorsAwareInterface $form */
         $form = $this->elementFactory->createElement($target);
-        $actual = $form->getAvailableColors();
+        self::assertNotNull($form->isIsset(), sprintf('Element "%s" not found', $target));
+
+        /** @var OroSimpleColorPickerField $colorPicker */
+        $colorPicker = $form->getElement('Simple Color Picker Field');
+        self::assertNotNull($colorPicker->isIsset(), sprintf('"Color Picker" not found on "%s" element', $target));
+        $availableColors = $colorPicker->getAvailableColors();
 
         // parse provided color list to an array
         $expectedNames = $table->getRow(0);
-        $expectedNames = explode(', ', reset($expectedNames));
+        $expectedName = explode(',', reset($expectedNames));
+        $expectedNames = array_map('trim', $expectedName);
 
         foreach ($expectedNames as $expectedName) {
-            $currentActual = array_shift($actual);
+            $currentActual = array_shift($availableColors);
             $currentExpected = $this->getHexByColorName($expectedName);
             self::assertEquals(
                 $currentExpected,

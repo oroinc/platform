@@ -42,7 +42,7 @@ class EmailBodySyncCommandTest extends WebTestCase
         $this->disableEmailFeature();
         $result = $this->runCommand('oro:email:body-sync', ['--id=1']);
 
-        $this->assertContains('The email feature is disabled. The command will not run.', $result);
+        $this->assertContains('Feature for this command is disabled. Please enable it to run the command.', $result);
     }
 
     /**

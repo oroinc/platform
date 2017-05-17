@@ -1,3 +1,5 @@
+@ticket-BAP-14137
+@automatically-ticket-tagged
 @fixture-OroUserBundle:user.yml
 @fixture-OroOrganizationBundle:BusinessUnit.yml
 Feature: Adding attributes for workflow transition

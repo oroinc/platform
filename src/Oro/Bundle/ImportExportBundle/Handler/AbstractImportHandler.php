@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
+use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
@@ -32,7 +34,6 @@ abstract class AbstractImportHandler extends AbstractHandler
                 );
         }
     }
-
 
     /**
      * @param string $jobName

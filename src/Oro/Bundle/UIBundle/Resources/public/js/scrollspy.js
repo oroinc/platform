@@ -4,7 +4,6 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
     var scrollspy = {};
 
     scrollspy.init = function($container) {
@@ -20,24 +19,9 @@ define(function(require) {
 
         $('.scrollspy .responsive-section:nth-of-type(1) .scrollspy-title').css('display', 'none');
 
-        if (MutationObserver) {
-            var debounce = _.debounce(function(mutations) {
-                $container.find('[data-spy="scroll"]').scrollspy('refresh');
-            }, 50);
-            var observer = new MutationObserver(debounce);
-        }
-
         $container.find('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
             $spy.scrollspy($spy.data());
-            if (observer) {
-                observer.observe(this, {
-                    attributes: true,
-                    childList: true,
-                    subtree: true,
-                    characterData: true
-                });
-            }
         });
     };
 

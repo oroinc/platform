@@ -48,4 +48,9 @@ abstract class Page
     {
         return $this->elementFactory->createElement('MainMenu');
     }
+
+    protected function waitForAjax()
+    {
+        $this->elementFactory->getPage()->getSession()->getDriver()->waitForAjax();
+    }
 }
