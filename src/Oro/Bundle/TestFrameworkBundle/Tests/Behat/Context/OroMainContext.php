@@ -12,19 +12,13 @@ use Behat\Mink\Exception\ResponseTextException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-
-use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
-use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -1104,12 +1098,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Use this action only for debugging
+     *
      * This method should be used only for debug
      * @When /^I wait for action$/
      */
     public function iWait()
     {
-        fputs(STDOUT, "Press [RETURN] to continue...");
-        while (fgets(STDIN, 1024) == '') {}
+        fwrite(STDOUT, "Press [RETURN] to continue...");
+        fgets(STDIN, 1024);
     }
 }
