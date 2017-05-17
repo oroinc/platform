@@ -10,6 +10,14 @@
 
     background: get-color('additional', 'base');
 
+    @include clearfix();
+
+    &__dropdown {
+        padding: $offset-x-m;
+
+        width: 100%;
+    }
+
     .filter-list {
         @media (max-width: $screen-md) {
             float: none;
@@ -257,7 +265,6 @@
                 }
 
                 i {
-                    color: $base-font-size;
                     font-family: 'FontAwesome' !important;
                     font-style: normal;
                     font-size: 21px;
@@ -302,8 +309,8 @@
                 .datefilter {
                     display: block;
 
-                    input[type="text"] {
-                        padding-left: 39px;
+                    .datepicker-input {
+                        padding-left: 30px;
                     }
 
 
@@ -312,7 +319,7 @@
 
                         pointer-events: none;
 
-                        margin: 8px 0 0 12px;
+                        margin: $offset-y-m 0 0 12px;
 
                         color: get-color('additional', 'middle');
                     }
@@ -416,7 +423,7 @@
         justify-content: flex-start;
         align-items: center;
 
-        @media (max-width: $screen-md) {
+        @include breakpoint('tablet') {
             margin: 10px 0 0;
         }
     }
@@ -429,6 +436,8 @@
 
         background: get-color('additional', 'light');
         line-height: 20px;
+
+        clear: both;
 
         .reset-filter-button {
             top: 5px;
@@ -489,25 +498,26 @@
 
     .ui-multiselect {
         &.select-filter-widget {
-            position: absolute;
-            left: 15px;
-            top: 20px;
+            float: right;
 
-            margin: 0;
-            padding: 0;
+            border-width: 1px;
+            border-style: solid;
+            border-color: get-color('additional', 'light');
+            background-color: get-color('additional', 'ultra');
+            color: lighten(get-color('additional', 'dark'), 21%);
 
-            @media (max-width: $screen-md) {
-                position: static;
+            padding: 0 10px;
+            margin-bottom: $offset-x-s;
 
-                width: 100% !important;
-                margin: 0;
-            }
+            font-size: $base-font-size;
+            line-height: 30px;
 
-            a {
+            a,
+            .add-filter-button {
                 color: get-color('primary', 'dark');
                 font-weight: 400;
 
-                &:active, &:visited, &:focus {
+                @mixin hover-focus-active {
                     color: get-color('primary', 'dark');
                 }
             }

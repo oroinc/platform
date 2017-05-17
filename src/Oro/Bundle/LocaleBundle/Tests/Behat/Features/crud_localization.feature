@@ -1,8 +1,10 @@
+@ticket-BAP-14021
+@automatically-ticket-tagged
 @fixture-japanese-language.yml
-Feature: Language management
-  In order to manage available languages
+Feature: Localization Crud
+  In order to manage available localizations
   As Administrator
-  I need to add new Languages and download translations for them
+  I need to add new Localizations and enable Localizations at System Configuration
 
   Scenario: Check default localization
     Given I login as administrator

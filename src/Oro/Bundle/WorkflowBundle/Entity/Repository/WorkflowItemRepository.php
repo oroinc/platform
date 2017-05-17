@@ -192,6 +192,8 @@ class WorkflowItemRepository extends EntityRepository
                 ->setParameter('workflowNames', $workflowNames);
         }
 
+        $qb->addOrderBy($qb->expr()->asc('stepName'));
+
         $items = $qb->getQuery()->getArrayResult();
 
         $result = [];

@@ -64,6 +64,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction
@@ -118,6 +119,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction
@@ -193,6 +195,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction
@@ -269,6 +272,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction

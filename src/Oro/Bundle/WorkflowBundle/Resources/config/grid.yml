@@ -43,6 +43,14 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
 
+    oro_workflow.datagrid.listener.email_notification:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\EmailNotificationDatagridListener'
+        arguments:
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.email-notification-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.email-notification-grid, method: onResultAfter }
+
     oro_workflow.datagrid.extension.restrictions:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension'
         arguments:

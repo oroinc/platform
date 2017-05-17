@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @method EntityDefinitionFieldConfig[] getFields()
@@ -23,6 +24,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\FieldsetTrait;
     use Traits\MetaPropertyTrait;
     use Traits\FormTrait;
+    use Traits\FormEventSubscriberTrait;
     use Traits\StatusCodesTrait;
 
     /** a short, human-readable description of API resource */
@@ -60,6 +62,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** the form options that should be used for the entity */
     const FORM_OPTIONS = 'form_options';
+
+    /** event subscriber that should be used for the entity form */
+    const FORM_EVENT_SUBSCRIBER = 'form_event_subscriber';
 
     /** the names of identifier fields of the entity */
     const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';
@@ -194,6 +199,36 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function findFieldNameByPropertyPath($propertyPath)
     {
         return $this->doFindFieldNameByPropertyPath($propertyPath);
+    }
+
+    /**
+     * Finds the configuration of a child field by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     *
+     * @param string|string[] $path
+     * @param bool            $findByPropertyPath
+     *
+     * @return EntityDefinitionFieldConfig|null
+     */
+    public function findFieldByPath($path, $findByPropertyPath = false)
+    {
+        $targetConfig = $this;
+        if (!is_array($path)) {
+            $path = ConfigUtil::explodePropertyPath($path);
+        }
+        $pathCount = count($path);
+        for ($i = 0; $i < $pathCount - 1; $i++) {
+            $fieldConfig = $targetConfig->findField($path[$i], $findByPropertyPath);
+            if (null === $fieldConfig) {
+                return null;
+            }
+            $targetConfig = $fieldConfig->getTargetEntity();
+            if (null === $targetConfig) {
+                return null;
+            }
+        }
+
+        return $targetConfig->findField($path[$pathCount - 1], $findByPropertyPath);
     }
 
     /**

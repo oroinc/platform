@@ -1,0 +1,5 @@
+workflows:
+    part_with_attribute:
+        attributes:
+            attribute1:
+                type: object

@@ -1,6 +1,7 @@
 operations:
     oro_cache_invalidate:
         label: oro.cache.invalidate.label
+        page_reload: false
         button_options:
             icon: fa-clock-o
         frontend_options:

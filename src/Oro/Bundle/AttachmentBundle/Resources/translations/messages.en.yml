@@ -37,7 +37,9 @@ oro:
                 label:               Original file name
                 description:         The name of the file uploaded to the system.
             filepath.label:          File path
-            owner.label:             Owner
+            owner:
+                label:               Owner
+                description:         An user who is the owner of the file.
             extension.label:         Extension
 
             file.label:              File

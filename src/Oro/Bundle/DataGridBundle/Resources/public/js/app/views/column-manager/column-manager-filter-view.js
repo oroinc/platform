@@ -4,9 +4,16 @@ define(function(require) {
     var ColumnManagerFilterView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        templateSelector: null
+    }, config);
 
     ColumnManagerFilterView = BaseView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager-filter.html'),
+        templateSelector: config.templateSelector,
         autoRender: true,
         events: {
             'keyup [data-role="column-manager-search"]': 'onSearch',
@@ -33,7 +40,7 @@ define(function(require) {
             var search = this.model.get('search');
             var renderable = Boolean(this.model.get('renderable'));
             this.$('[data-role="column-manager-search"]').val(search);
-            this.$('.column-manager-search').toggleClass('empty', search.length === 0);
+            this.$('[datagrid-manager-search]').toggleClass('empty', search.length === 0);
             this.$('[data-role="column-manager-show-all"]').toggleClass('active', !renderable);
             this.$('[data-role="column-manager-show-selected"]').toggleClass('active', renderable);
         },

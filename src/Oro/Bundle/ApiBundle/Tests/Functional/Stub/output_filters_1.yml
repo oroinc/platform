@@ -1,34 +1,34 @@
 data:
-  0:
-    type: testemployees
-    id: "1"
+  -
+    type: 'testapiemployees'
+    id: '1'
     attributes:
-      name: "TestEmployee1"
+      name: 'TestEmployee1'
       position: 'developer'
     relationships:
       department:
         data:
-          type: 'testdepartments'
-          id: 1
-  1:
-    type: testemployees
-    id: "2"
+          type: 'testapidepartments'
+          id: '1'
+  -
+    type: 'testapiemployees'
+    id: '2'
     attributes:
-      name: "TestEmployee2"
+      name: 'TestEmployee2'
       position: 'developer'
     relationships:
       department:
         data:
-          type: 'testdepartments'
-          id: 1
-  2:
-    type: testemployees
-    id: "3"
+          type: 'testapidepartments'
+          id: '1'
+  -
+    type: 'testapiemployees'
+    id: '3'
     attributes:
-      name: "TestEmployee3"
+      name: 'TestEmployee3'
       position: 'developer'
     relationships:
       department:
         data:
-          type: 'testdepartments'
-          id: 1
+          type: 'testapidepartments'
+          id: '1'

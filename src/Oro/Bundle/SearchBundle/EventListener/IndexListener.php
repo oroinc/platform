@@ -213,17 +213,10 @@ class IndexListener implements OptionalListenerInterface
 
             foreach ($meta->getAssociationMappings() as $association) {
                 if (!empty($association['inversedBy']) && $association['type'] === ClassMetadataInfo::MANY_TO_ONE) {
-                    $targetClass = $association['targetEntity'];
-                    $changedIndexedFields = $this->getIntersectChangedIndexedFields(
-                        $targetClass,
-                        [$association['inversedBy']]
-                    );
-                    if (!$changedIndexedFields) {
-                        continue;
+                    $associationValue = $this->getAssociationValue($entity, $association);
+                    if ($associationValue !== false) {
+                        $entitiesToReindex[spl_object_hash($associationValue)] = $associationValue;
                     }
-
-                    $associationValue = $this->propertyAccessor->getValue($entity, $association['fieldName']);
-                    $entitiesToReindex[spl_object_hash($associationValue)] = $associationValue;
                 }
             }
         }
@@ -257,6 +250,26 @@ class IndexListener implements OptionalListenerInterface
         }
 
         $this->savedEntities = $this->deletedEntities = [];
+    }
+
+    /**
+     * @param object $entity
+     * @param array $association
+     *
+     * @return bool|mixed
+     */
+    protected function getAssociationValue($entity, array $association)
+    {
+        $targetClass = $association['targetEntity'];
+        $changedIndexedFields = $this->getIntersectChangedIndexedFields(
+            $targetClass,
+            [$association['inversedBy']]
+        );
+        if (!$changedIndexedFields) {
+            return false;
+        }
+
+        return $this->propertyAccessor->getValue($entity, $association['fieldName']);
     }
 
     /**

@@ -1,3 +1,4 @@
+@ticket-BAP-13725
 Feature: Unidirectional entity relations created via UI
   In order to create custom relation between entities
   As an Administrator
@@ -103,5 +104,4 @@ Feature: Unidirectional entity relations created via UI
       |Related entity detailed   |Name        |
     When I save and close form
     Then I should see "Field saved" flash message
-    When I click update schema
-    Then I should see "Schema updated" flash message
+    And I click update schema

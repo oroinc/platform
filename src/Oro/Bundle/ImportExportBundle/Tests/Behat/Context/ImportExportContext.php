@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
+use Gaufrette\File;
 use Guzzle\Http\Client;
 use Guzzle\Plugin\Cookie\Cookie;
 use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
@@ -16,6 +18,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 class ImportExportContext extends OroFeatureContext implements KernelAwareContext, OroPageObjectAware
@@ -33,6 +36,11 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     private $processorRegistry;
 
     /**
+     * @var OroMainContext
+     */
+    private $oroMainContext;
+
+    /**
      * @param EntityAliasResolver $aliasResolver
      * @param ProcessorRegistry $processorRegistry
      */
@@ -40,6 +48,15 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     {
         $this->aliasResolver = $aliasResolver;
         $this->processorRegistry = $processorRegistry;
+    }
+
+    /**
+     * @BeforeScenario
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+        $this->oroMainContext = $environment->getContext(OroMainContext::class);
     }
 
     /**
@@ -85,7 +102,10 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
             'oro_importexport_export_template',
             ['processorAlias' => array_shift($processors)]
         ));
-        $this->template = tempnam(sys_get_temp_dir(), 'opportunity_template_');
+        $this->template = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_template_'
+        );
 
         $cookies = $this->getSession()->getDriver()->getWebDriverSession()->getCookie()[0];
         $cookie = new Cookie();
@@ -221,7 +241,10 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      */
     public function iFillTemplateWithData(TableNode $table)
     {
-        $this->importFile = tempnam(sys_get_temp_dir(), 'opportunity_import_data_');
+        $this->importFile = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_data_'
+        );
         $fp = fopen($this->importFile, 'w');
         $csv = array_map('str_getcsv', file($this->template));
         $headers = array_shift($csv);
@@ -251,8 +274,11 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     public function iImportFile()
     {
         $this->tryImportFile();
+
+        $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
+        $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
         // todo: CRM-7599 Replace sleep to appropriate logic
-        sleep(5);
+        sleep(2);
     }
 
     /**
@@ -268,6 +294,35 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
         $this->createElement('ImportFileField')->attachFile($this->importFile);
         $page->pressButton('Submit');
         $this->waitForAjax();
+    }
+
+    /**
+     * @When /^I import exported file$/
+     */
+    public function iImportExportedFile()
+    {
+        // todo: CRM-7599 Replace sleep to appropriate logic
+        sleep(2);
+
+        // @todo replace with fetching file path from email: CRM-7599
+        // temporary solution: find the most recent file created in import_export dir
+        $fileManager = $this->getContainer()->get('oro_importexport.file.file_manager');
+        $files = $fileManager->getFilesByPeriod();
+
+        $exportFiles = array_filter($files, function (File $file) {
+            return preg_match('/export_\d{4}.*.csv/', $file->getName());
+        });
+
+        // sort by modification date
+        usort($exportFiles, function (File $a, File $b) {
+            return $b->getMtime() > $a->getMtime();
+        });
+
+        /** @var File $exportFile */
+        $exportFile = reset($exportFiles);
+        $path = $this->getContainer()->getParameter('kernel.root_dir') . DIRECTORY_SEPARATOR . 'import_export';
+        $this->importFile = $path . DIRECTORY_SEPARATOR . $exportFile->getName();
+        $this->tryImportFile();
     }
 
     /**

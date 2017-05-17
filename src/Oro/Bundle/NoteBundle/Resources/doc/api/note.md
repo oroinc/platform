@@ -135,6 +135,8 @@ The list of records that will be deleted, could be limited by filters.
 
 ### activityTargets
 
+A records to which the note record associated with.
+
 #### create
 
 {@inheritdoc}
@@ -258,3 +260,25 @@ Example:
 }
 ```
 {@/request}
+
+### activityTargets
+
+#### get_subresource
+
+Get full information about records to which the note associated.
+
+#### get_relationship
+
+Get records to which the note associated.
+
+#### add_relationship
+
+Associate records with the note.
+
+#### update_relationship
+
+Completely replace association between records and the note.
+
+#### delete_relationship
+
+Delete association between records and the note.

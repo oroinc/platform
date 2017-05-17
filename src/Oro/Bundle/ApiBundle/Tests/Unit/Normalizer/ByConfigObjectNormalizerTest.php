@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
-use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DataNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
@@ -26,7 +30,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->any())
@@ -38,7 +42,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $normalizers,
             new DoctrineHelper($doctrine),
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->createMock('Symfony\Component\DependencyInjection\ContainerInterface')),
+            new EntityDataTransformer($this->createMock(ContainerInterface::class)),
             new ConfigNormalizer(),
             new DataNormalizer()
         );
@@ -607,14 +611,14 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'id'       => 123,
                 'category' => [
                     'name'      => 'category_name',
-                    '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                    '__class__' => Entity\Category::class,
                 ],
                 'owner'    => [
                     'name'   => 'user_name',
                     'groups' => [
                         [
                             'id'        => 789,
-                            '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                            '__class__' => Entity\Group::class,
                         ]
                     ]
                 ]
@@ -731,14 +735,14 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'id'       => 123,
                 'category' => [
                     'name'      => 'category_name',
-                    '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                    '__class__' => Entity\Category::class,
                 ],
                 'owner'    => [
                     'name'   => 'user_name',
                     'groups' => [
                         [
                             'id'        => 789,
-                            '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                            '__class__' => Entity\Group::class,
                         ]
                     ]
                 ]
@@ -896,6 +900,30 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             $result
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The "exclusion_policy" must be "all". Object type: "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testNormalizeObjectForInvalidExclusionPolicyInRelationConfig()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'       => null,
+                'category' => [
+                    'exclusion_policy' => 'none'
+                ]
+            ]
+        ];
+
+        $this->objectNormalizer->normalizeObject(
+            $this->createProductObject(),
+            $this->createConfigObject($config)
         );
     }
 

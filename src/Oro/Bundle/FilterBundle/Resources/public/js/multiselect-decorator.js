@@ -35,6 +35,11 @@ define([
         },
 
         /**
+         * @property {Object}
+         */
+        multiselectFilterParameters: {},
+
+        /**
          * @property {Boolean}
          */
         contextSearch: true,
@@ -58,13 +63,17 @@ define([
             // initialize multiselect widget
             this.multiselect(options.parameters);
 
-            // initialize multiselect filter
             if (this.contextSearch) {
-                this.multiselectfilter({
+                var multiselectFilterDefaults = {
                     label: '',
                     placeholder: '',
                     autoReset: true
-                });
+                };
+
+                // initialize multiselect filter
+                this.multiselectfilter(
+                    _.extend(multiselectFilterDefaults, this.multiselectFilterParameters)
+                );
             }
         },
 
@@ -116,6 +125,11 @@ define([
             this._setDropdownDesign();
             this.getWidget().find('input[type="search"]').focus();
         },
+
+        /**
+         * Action on multiselect widget refresh
+         */
+        onRefresh: function() {},
 
         /**
          * Get minimum width of dropdown menu

@@ -99,24 +99,6 @@ class JobStorage
     }
 
     /**
-     * @param string $jobName
-     *
-     * @return Job
-     */
-    public function findRootJobByUniqueJobName($jobName)
-    {
-        $qb = $this->getEntityRepository()->createQueryBuilder('job');
-
-        return $qb
-            ->where('job.name = :jobName AND job.unique = :unique')
-            ->setParameters([
-                'jobName' => $jobName,
-                'unique' => true
-            ])
-            ->getQuery()->getOneOrNullResult();
-    }
-
-    /**
      * @param string  $name
      * @param Job     $rootJob
      *

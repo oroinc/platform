@@ -153,9 +153,10 @@ class ObjectNormalizer
         if (!$config->isExcludeAll()) {
             throw new RuntimeException(
                 sprintf(
-                    'The "%s" must be "%s".',
+                    'The "%s" must be "%s". Object type: "%s".',
                     EntityDefinitionConfig::EXCLUSION_POLICY,
-                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL
+                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL,
+                    ClassUtils::getClass($object)
                 )
             );
         }
@@ -164,10 +165,6 @@ class ObjectNormalizer
         $entityClass = $this->getEntityClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
-                continue;
-            }
-
             $propertyPath = $field->getPropertyPath($fieldName);
             if ($this->isMetadataProperty($propertyPath)) {
                 $result[$propertyPath] = $this->getMetadataProperty($entityClass, $propertyPath);

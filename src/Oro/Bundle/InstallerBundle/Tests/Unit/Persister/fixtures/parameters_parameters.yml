@@ -1,0 +1,4 @@
+parameters:
+  key: val
+imports:
+    - { resource: Tests/Behat/parameters.yml }
