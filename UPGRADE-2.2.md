@@ -301,6 +301,9 @@ WorkflowBundle
         - removed `WorkflowRegistry $workflowRegistry`;
         - added `Cache $entitiesWithWorkflowsCache`;
 - Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
+- Signature of method `protected function isStartAllowedByRecordGroups` changed:
+    - second argument changed from `array $recordGroups` to `Workflow $workflow`
+    - added third optional argument `array $workflowItems`
 
 
 PlatformBundle
@@ -340,6 +343,11 @@ TranslationBundle
 - Signature of class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` was changed:
     - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
     - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`
+
+SecurityBundle
+--------------
+- Class `Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension`
+    - changed the constructor signature. Old signature: `__construct(SecurityFacade $securityFacade, DoctrineHelper $doctrineHelper, ConfigProvider $configProvider, LoggerInterface $logger)`. New signature: `__construct(FieldAclHelper $fieldAclHelper, LoggerInterface $logger)`
 
 SegmentBundle
 -------------

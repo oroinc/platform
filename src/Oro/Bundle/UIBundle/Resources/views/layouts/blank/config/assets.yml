@@ -24,6 +24,7 @@ styles:
         - 'bundles/oroui/blank/scss/variables/copyright-config.scss'
         - 'bundles/oroui/blank/scss/variables/logo-config.scss'
         - 'bundles/oroui/blank/scss/variables/primary-menu-config.scss'
+        - 'bundles/oroui/blank/scss/variables/loader-mask-config.scss'
         - 'bundles/oroui/blank/scss/reset.scss'
         - 'bundles/oroui/blank/vendors/font-awesome/font-awesome.scss'
         - 'bundles/oroui/blank/scss/styles.scss'

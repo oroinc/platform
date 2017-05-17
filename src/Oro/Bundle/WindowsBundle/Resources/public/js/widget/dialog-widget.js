@@ -488,6 +488,8 @@ define(function(require) {
                 if (minWidth > containerEl.clientWidth - left) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
+            } else {
+                dialog.css('width', this.options.dialogOptions.width);
             }
         },
 
