@@ -97,7 +97,7 @@ define(function(require) {
                             widget.render();
                         });
                     }
-                    var reloadMessage =_.__('oro.navigation.menuupdate.reload_link.label');
+                    var reloadMessage = _.__('oro.navigation.menuupdate.reload_link.label');
                     var reloadLink = '<a href="#" onclick="window.location.reload(false);return false;">' +
                         reloadMessage + '</a>';
 
