@@ -8,6 +8,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * @group schema
+ */
 class ConfigTranslationTest extends WebTestCase
 {
     /** @var Translator */

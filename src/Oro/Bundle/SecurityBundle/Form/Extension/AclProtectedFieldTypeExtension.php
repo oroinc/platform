@@ -13,27 +13,16 @@ use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Validator\ConstraintViolation;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ConfigProvider */
-    protected $configProvider;
+    /** @var FieldAclHelper */
+    protected $fieldAclHelper;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -45,20 +34,12 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     protected $disabledFields = [];
 
     /**
-     * @param SecurityFacade  $securityFacade
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ConfigProvider  $configProvider
+     * @param FieldAclHelper  $fieldAclHelper
      * @param LoggerInterface $logger
      */
-    public function __construct(
-        SecurityFacade $securityFacade,
-        DoctrineHelper $doctrineHelper,
-        ConfigProvider $configProvider,
-        LoggerInterface $logger
-    ) {
-        $this->securityFacade = $securityFacade;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->configProvider = $configProvider;
+    public function __construct(FieldAclHelper $fieldAclHelper, LoggerInterface $logger)
+    {
+        $this->fieldAclHelper = $fieldAclHelper;
         $this->logger = $logger;
     }
 
@@ -128,28 +109,13 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     public function postSubmit(FormEvent $event)
     {
-        $entity = $event->getData();
-        $className = $event->getForm()->getConfig()->getDataClass();
-        if (!$entity instanceof $className) {
-            return;
-        }
         $form = $event->getForm();
-
-        $clearFormErrors = function (Form $form, $fieldName) {
-            $form->{$fieldName} = [];
-        };
-
-        foreach ($this->disabledFields as $field) {
-            /** @var Form $fieldInstance */
-            $fieldInstance = $form->get($field);
-            // Clear all other validation errors
-            if ($fieldInstance->getErrors()->count()) {
-                $clearClosure = \Closure::bind($clearFormErrors, $fieldInstance, 'Symfony\Component\Form\Form');
-                $clearClosure($fieldInstance, 'errors');
+        $entity = $event->getData();
+        $className = $form->getConfig()->getDataClass();
+        if ($entity instanceof $className) {
+            foreach ($this->disabledFields as $field) {
+                $this->fieldAclHelper->addFieldModificationDeniedFormError($form->get($field));
             }
-
-            // add Field ACL validation error
-            $fieldInstance->addError($this->getFieldForbiddenFormError());
         }
     }
 
@@ -167,8 +133,13 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         }
 
         $form = $event->getForm();
+        $entity = $this->getEntityByForm($form);
+        if (null === $entity) {
+            return;
+        }
+
         foreach ($form->all() as $childForm) {
-            if ($this->isFormGranted($this->getEntityByForm($form), $childForm)) {
+            if ($this->isFormGranted($entity, $childForm)) {
                 continue;
             }
 
@@ -206,22 +177,16 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     protected function isApplicable(array $options)
     {
-        $className = empty($options['data_class']) ? false : $options['data_class'];
-        if (!$className || !$this->doctrineHelper->isManageableEntityClass($className)) {
-            // apply extension only to forms that bound to entities
-            // cause there's no way to get object identifier for non-entity (can be any field, or even without it)
+        if (empty($options['data_class'])) {
             return false;
         }
 
-        if ($this->configProvider->hasConfig($className)) {
-            $securityConfig = $this->configProvider->getConfig($className);
-            $isFieldAclEnabled =
-                $securityConfig->get('field_acl_supported')
-                && $securityConfig->get('field_acl_enabled');
-            $this->showRestricted = $securityConfig->get('show_restricted_fields');
-        } else {
-            $isFieldAclEnabled = false;
-            $this->showRestricted = true;
+        $className = $options['data_class'];
+        $isFieldAclEnabled = $this->fieldAclHelper->isFieldAclEnabled($className);
+
+        $this->showRestricted = true;
+        if ($isFieldAclEnabled) {
+            $this->showRestricted = $this->fieldAclHelper->isRestrictedFieldsVisible($className);
         }
 
         return $isFieldAclEnabled;
@@ -237,16 +202,11 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     protected function isFormGranted($entity, FormInterface $form)
     {
-        if (!$entity) {
+        if (!is_object($entity)) {
             return true;
         }
 
-        $isNewEntity = is_null($this->doctrineHelper->getSingleEntityIdentifier($entity));
-
-        return $this->securityFacade->isGranted(
-            $isNewEntity ? 'CREATE' : 'EDIT',
-            new FieldVote($entity, $this->getPropertyByForm($form))
-        );
+        return $this->fieldAclHelper->isFieldModificationGranted($entity, $this->getPropertyByForm($form));
     }
 
     /**
@@ -257,32 +217,32 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     protected function isViewGranted($entity, FormInterface $form)
     {
-        if ($this->showRestricted && $entity) {
-            return $this->securityFacade->isGranted(
-                'VIEW',
-                new FieldVote($entity, $this->getPropertyByForm($form))
-            );
+        if (!$this->showRestricted || !is_object($entity)) {
+            return false;
         }
 
-        return false;
+        return $this->fieldAclHelper->isFieldViewGranted($entity, $this->getPropertyByForm($form));
     }
 
     /**
      * @param FormInterface $form
      *
-     * @return bool|object entity or fals
+     * @return object|null
      */
     protected function getEntityByForm(FormInterface $form)
     {
-        $isMapped  = $form->getConfig()->getMapped();
-        $className = $form->getConfig()->getDataClass();
-        $entity    = $form->getData();
+        $result = null;
 
-        if ($isMapped && $entity instanceof $className) {
-            return $entity;
-        } else {
-            return false;
+        $config = $form->getConfig();
+        if ($config->getMapped()) {
+            $data = $form->getData();
+            $className = $config->getDataClass();
+            if ($data instanceof $className) {
+                $result = $data;
+            }
         }
+
+        return $result;
     }
 
     /**
@@ -294,14 +254,21 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     protected function getPropertyByForm(FormInterface $form)
     {
-        $propertyPath = $form->getConfig()->getPropertyPath();
-        $isMapped  = $form->getConfig()->getMapped();
+        $result = $form->getName();
 
-        return $isMapped && $propertyPath && $propertyPath->getLength() == 1 ? (string)$propertyPath : $form->getName();
+        $config = $form->getConfig();
+        if ($config->getMapped()) {
+            $propertyPath = $config->getPropertyPath();
+            if (null !== $propertyPath && $propertyPath->getLength() === 1) {
+                $result = (string)$propertyPath;
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * in case if we have error in the non accessable fields - add validation error.
+     * in case if we have error in the non accessible fields - add validation error.
      *
      * @param array         $hiddenFieldsWithErrors
      * @param FormView      $view
@@ -315,7 +282,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             foreach ($viewErrors as $error) {
                 $errorsArray[] = $error;
             }
-            $errorsArray[] = $error = new FormError(
+            $errorsArray[] = new FormError(
                 sprintf(
                     'The form contains fields "%s" that are required or not valid but you have no access to them. '
                     . 'Please contact your administrator to solve this issue.',
@@ -326,7 +293,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             foreach ($hiddenFieldsWithErrors as $fieldName => $errorsString) {
                 $this->logger->error(
                     sprintf(
-                        'Non accessable field `%s` detected in form `%s`. Validation errors: %s',
+                        'Non accessible field `%s` detected in form `%s`. Validation errors: %s',
                         $fieldName,
                         $form->getName(),
                         $errorsString
@@ -334,29 +301,5 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 );
             }
         }
-    }
-
-    /**
-     * Get Form Error with FieldAccessGranted constraint
-     *
-     * @return FormError
-     */
-    protected function getFieldForbiddenFormError()
-    {
-        $constraint = new FieldAccessGranted();
-        $message = $constraint->message;
-        $violation = new ConstraintViolation(
-            $message,
-            $message,
-            [],
-            '',
-            '',
-            '',
-            null,
-            null,
-            $constraint
-        );
-
-        return new FormError($message, $message, [], null, $violation);
     }
 }

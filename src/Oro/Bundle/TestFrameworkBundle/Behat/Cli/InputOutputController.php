@@ -31,7 +31,7 @@ class InputOutputController implements Controller
                 null,
                 InputOption::VALUE_OPTIONAL,
                 '',
-                'database,cache,message-queue,doctrine'
+                'database,cache,message-queue,inital_message_queue,doctrine,import_export'
             );
     }
 

@@ -66,11 +66,20 @@ services:
             - [addProcessor, ['@oro_test.alice_reference_processor']]
             - [addProcessor, ['@oro_test.alice_to_string_processor']]
 
-    oro_test.config_cache:
-        decorates: oro_config.cache
+    oro_config.cache:
         parent: doctrine_cache.abstract.array
         calls:
             - [setNamespace, [ 'oro_config' ] ]
+
+    oro_embedded_form.csrf_token_cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_csrf_cache' ] ]
+
+    oro_security.wsse_nonce_cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_nonces_cache' ] ]
 
     oro_test.transport_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider

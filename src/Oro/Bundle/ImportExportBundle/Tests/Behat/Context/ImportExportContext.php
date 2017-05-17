@@ -102,7 +102,10 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
             'oro_importexport_export_template',
             ['processorAlias' => array_shift($processors)]
         ));
-        $this->template = tempnam(sys_get_temp_dir(), 'opportunity_template_');
+        $this->template = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_template_'
+        );
 
         $cookies = $this->getSession()->getDriver()->getWebDriverSession()->getCookie()[0];
         $cookie = new Cookie();
@@ -238,7 +241,10 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      */
     public function iFillTemplateWithData(TableNode $table)
     {
-        $this->importFile = tempnam(sys_get_temp_dir(), 'opportunity_import_data_');
+        $this->importFile = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_data_'
+        );
         $fp = fopen($this->importFile, 'w');
         $csv = array_map('str_getcsv', file($this->template));
         $headers = array_shift($csv);

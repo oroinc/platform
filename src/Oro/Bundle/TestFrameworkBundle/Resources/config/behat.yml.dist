@@ -24,7 +24,7 @@ default: &default
                     local:
                         directory: '%paths.base%/web/uploads/behat'
                         base_url: '%mink.base_url%/uploads/behat'
-                        auto_clear: true
+                        auto_clear: false
             shared_contexts:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext

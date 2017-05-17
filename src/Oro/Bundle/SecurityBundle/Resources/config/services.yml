@@ -720,12 +720,18 @@ services:
         tags:
             - { name: layout.data_provider, alias: current_user }
 
+    oro_security.form.field_acl_helper:
+        class: Oro\Bundle\SecurityBundle\Form\FieldAclHelper
+        public: false
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity.doctrine_helper'
+
     oro_security.form.extension.aclprotected_fields_type:
         class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
         arguments:
-            - '@oro_security.security_facade'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.provider.security'
+            - '@oro_security.form.field_acl_helper'
             - '@logger'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
