@@ -93,6 +93,9 @@ define(function(require) {
         /** @property */
         modal: null,
 
+        /** @property */
+        showErrorMessage: true,
+
         /**
          * Initializer.
          *
@@ -186,6 +189,10 @@ define(function(require) {
                 this.viewDirty = !this._isCurrentStateSynchronized();
                 this.render();
             }, this);
+
+            this.listenTo(mediator, this.gridName + ':grid-views-model:invalid', function(params) {
+                this.onGridViewsModelInvalid(params);
+            }, this);
         },
 
         /**
@@ -249,6 +256,7 @@ define(function(require) {
                 appearanceData: this.collection.state.appearanceData
             }, {
                 wait: true,
+                errorHandlerMessage: self.showErrorMessage,
                 success: function() {
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
@@ -263,7 +271,12 @@ define(function(require) {
                 var data = self.getInputData(modal.$el);
                 var model = self._createBaseViewModel(data);
 
-                self._onSaveAsModel(model);
+                if (model.isValid()) {
+                    self.lockModelOnOkCloses(modal, true);
+                    self._onSaveAsModel(model);
+                } else {
+                    self.lockModelOnOkCloses(modal, false);
+                }
             });
 
             modal.open();
@@ -298,6 +311,7 @@ define(function(require) {
                     self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                     mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
                 },
+                errorHandlerMessage: self.showErrorMessage,
                 error: function(model, response, options) {
                     self.onError(model, response, options);
                 }
@@ -387,7 +401,13 @@ define(function(require) {
                 var data = self.getInputData(modal.$el);
 
                 model.set(data);
-                self._onRenameSaveModel(model);
+
+                if (model.isValid()) {
+                    self.lockModelOnOkCloses(modal, true);
+                    self._onRenameSaveModel(model);
+                } else {
+                    self.lockModelOnOkCloses(modal, false);
+                }
             });
             modal.open();
             this.modal = modal;
@@ -417,7 +437,9 @@ define(function(require) {
                     }
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 },
+                errorHandlerMessage: self.showErrorMessage,
                 error: function(model, response, options) {
+                    model.set('label', model.previous('label'));
                     self.onError(model, response, options);
                 }
             });
@@ -428,6 +450,27 @@ define(function(require) {
                 this.modal.open();
             }
             this._showNameError(this.modal, response);
+        },
+
+        /**
+         * @param {array} errors
+         */
+        onGridViewsModelInvalid: function(errors) {
+            if (errors && _.isObject(this.modal)) {
+                this.modal.setNameError(_.first(errors));
+                this.modal.open();
+            }
+        },
+
+        /**
+         *
+         * @param {object} modal
+         * @param {boolean} lock
+         */
+        lockModelOnOkCloses: function(modal, lock) {
+            if (_.isObject(modal) && _.isObject(modal.options)) {
+                modal.options.okCloses = lock;
+            }
         },
 
         /**
@@ -714,7 +757,8 @@ define(function(require) {
                     appearanceType: this.collection.state.appearanceType,
                     appearanceData: this.collection.state.appearanceData,
                     editable: this.permissions.EDIT,
-                    deletable: this.permissions.DELETE
+                    deletable: this.permissions.DELETE,
+                    freezeName: this.defaultPrefix + (this.title || '')
                 }
             );
         },

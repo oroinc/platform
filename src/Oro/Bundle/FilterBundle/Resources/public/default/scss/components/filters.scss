@@ -423,7 +423,7 @@
         justify-content: flex-start;
         align-items: center;
 
-        @media (max-width: $screen-md) {
+        @include breakpoint('tablet') {
             margin: 10px 0 0;
         }
     }

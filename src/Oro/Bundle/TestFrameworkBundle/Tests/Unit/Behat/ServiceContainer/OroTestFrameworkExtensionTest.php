@@ -22,12 +22,13 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider processBundleAutoloadProvider
-     * @param $suiteConfig
-     * @param $bundles
+     * @param array $suiteConfig
+     * @param array $bundlesConfig
+     * @param array $expectedSuiteConfig
      */
-    public function testProcessBundleAutoload(array $suiteConfig, array $bundles, array $expectedSuiteConfig)
+    public function testProcessBundleAutoload(array $suiteConfig, array $bundlesConfig, array $expectedSuiteConfig)
     {
-        $containerBuilder = $this->getContainerBuilder($bundles);
+        $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
 
         $config = ['oro_test' => [
@@ -92,9 +93,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'kernel_bundles' => [
-                    'OroUserBundle',
-                    'OroUIBundle',
-                    'OroFormBundle'
+                    ['name' => 'OroUserBundle'],
+                    ['name' => 'OroUIBundle'],
+                    ['name' => 'OroFormBundle'],
                 ],
                 'expected_suite_config' => [
                     'OroUserBundle' => [
@@ -122,10 +123,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
                         'settings' => [],
                     ],
                 ],
-                'kernel_bundles' => [
-                    'OroUserBundle',
-                    'OroUIBundle',
-                    'OroFormBundle'
+                'kernel_bundles_config' => [
+                    ['name' => 'OroUserBundle'],
+                    ['name' => 'OroUIBundle'],
+                    ['name' => 'OroFormBundle'],
                 ],
                 'expected_suite_config' => [
                     'OroUserBundle' => [
@@ -145,36 +146,41 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
+            'Extended bundles auto configured' => [
+                'base_suite_config' => [],
+                'kernel_bundles_config' => [
+                    ['name' => 'OroBaseBundle', 'path' => '/var/www/OroBaseBundle'],
+                    ['name' => 'OroExtendBundle', 'parent' => 'OroBaseBundle', 'path' => '/var/www/OroExtendBundle'],
+                ],
+                'expected_suite_config' => [
+                    'OroBaseBundle' => [
+                        'type' => 'symfony_bundle',
+                        'settings' => [
+                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'paths' => ['/var/www/OroBaseBundle/Features'],
+                        ],
+                    ],
+                    'OroExtendBundle' => [
+                        'type' => 'symfony_bundle',
+                        'settings' => [
+                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'paths' => ['/var/www/OroExtendBundle/Features'],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
     /**
-     * @param array $names
-     * @return BundleInterface[]
-     */
-    protected function getBundlesFromNames(array $names)
-    {
-        $bundles = [];
-
-        foreach ($names as $name) {
-            $bundle = new TestBundle($name);
-
-            $bundles[$name] = $bundle;
-        }
-
-        return $bundles;
-    }
-
-    /**
-     * @param array $bundles
+     * @param array $bundlesConfig
      * @return ContainerBuilder
      */
-    private function getContainerBuilder(array $bundles)
+    private function getContainerBuilder(array $bundlesConfig)
     {
         $containerBuilder = new ContainerBuilder();
 
-        $kernel = new KernelStub();
-        $kernel->setBundleMap($this->getBundlesFromNames($bundles));
+        $kernel = new KernelStub($bundlesConfig);
         $kernel->getContainer()->set(
             'oro_entity.entity_alias_resolver',
             $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
