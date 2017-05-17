@@ -5,6 +5,7 @@ define([
     'use strict';
 
     var TriggerEventAction;
+    var mediator = require('oroui/js/mediator');
 
     /**
      * Trigger Event action. Trigger event from options.
@@ -25,11 +26,10 @@ define([
          * @inheritDoc
          */
         execute: function() {
-            this.datagrid.trigger(this.event_name, [this.model.id]);
-            // @TODO: BB-9443
-            // If there are no possibility to get datagrid instance in js component from BB-9443
-            // please add mediator for this script and change triggering to code below
-            // mediator.trigger(this.event_name, this.datagrid, [this.model.id]);
+            mediator.trigger(
+                this.event_name + ':' + this.datagrid.$el.closest(this.container).prop('id'),
+                [this.model.id]
+            );
         }
     });
 
