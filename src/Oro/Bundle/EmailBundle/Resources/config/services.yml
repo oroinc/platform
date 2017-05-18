@@ -1205,3 +1205,11 @@ services:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
         arguments:
             - '@oro_email.direct_mailer'
+
+    oro_email.listener.datagrid.user_email_grid_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
+        arguments:
+            - '@oro_email.datagrid_query_factory'
+        tags:
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
+          - { name: oro_featuretogle.feature, feature: email }

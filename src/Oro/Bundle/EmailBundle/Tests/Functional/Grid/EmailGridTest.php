@@ -54,7 +54,7 @@ class EmailGridTest extends AbstractDatagridTestCase
                     ],
                     'gridFilters' => [],
                     'assert' => [],
-                    'expectedResultCount' => 10,
+                    'expectedResultCount' => 9,
                 ],
             ],
             'Email grid filtered by from (admin)' => [
@@ -78,7 +78,7 @@ class EmailGridTest extends AbstractDatagridTestCase
                         'user-email-grid[_filter][to][value]' => 'simple_user@example.com',
                     ],
                     'assert' => [],
-                    'expectedResultCount' => 10,
+                    'expectedResultCount' => 9,
                 ],
             ],
         ];
