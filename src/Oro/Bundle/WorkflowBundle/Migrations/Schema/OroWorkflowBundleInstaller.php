@@ -4,6 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_13\CreateEntityRestrictionsTable;
@@ -11,14 +19,27 @@ use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_13\CreateEntityRestrictionsTa
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class OroWorkflowBundleInstaller implements Installation
+class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
+    /**
+     * @var ExtendExtension
+     */
+    protected $extendExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v2_2';
+        return 'v2_3';
     }
 
     /**
@@ -52,6 +73,8 @@ class OroWorkflowBundleInstaller implements Installation
         $this->addOroWorkflowScopesForeignKeys($schema);
 
         CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
+
+        $this->addWorkflowFieldsToEmailNotificationTable($schema);
     }
 
     /**
@@ -495,6 +518,63 @@ class OroWorkflowBundleInstaller implements Installation
             ['workflow_name'],
             ['name'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addWorkflowFieldsToEmailNotificationTable(Schema $schema)
+    {
+        $this->extendExtension->addManyToOneRelation(
+            $schema,
+            'oro_notification_email_notif',
+            'workflow_definition',
+            'oro_workflow_definition',
+            'name',
+            [
+                'entity' => ['label' => 'oro.workflow.workflowdefinition.entity_label'],
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'is_extend' => true,
+                    'nullable' => true
+                ],
+                'datagrid' => [
+                    'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                    'show_filter' => true,
+                    'order' => 30
+                ],
+                'form' => ['is_enabled' => false],
+                'view' => ['is_displayable' => false],
+                'merge' => ['display' => false],
+                'dataaudit' => ['auditable' => false]
+            ]
+        );
+
+        $table = $schema->getTable('oro_notification_email_notif');
+        $table->addColumn(
+            'workflow_transition_name',
+            'string',
+            [
+                OroOptions::KEY => [
+                    ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
+                    'entity' => ['label' => 'oro.workflow.workflowdefinition.transition_name.label'],
+                    'extend' => [
+                        'owner' => ExtendScope::OWNER_CUSTOM,
+                        'is_extend' => true,
+                        'length' => 255
+                    ],
+                    'datagrid' => [
+                        'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                        'show_filter' => true,
+                        'order' => 40
+                    ],
+                    'form' => ['is_enabled' => false],
+                    'view' => ['is_displayable' => false],
+                    'merge' => ['display' => false],
+                    'dataaudit' => ['auditable' => false]
+                ],
+            ]
         );
     }
 }

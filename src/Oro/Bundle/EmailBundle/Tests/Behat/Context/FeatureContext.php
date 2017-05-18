@@ -126,39 +126,4 @@ class FeatureContext extends OroFeatureContext implements
 
         $email->getElement('ReadUnreadIcon')->click();
     }
-
-    /**
-     * Assert that email form is sown at page
-     *
-     * @Then I should see an email form
-     */
-    public function iShouldSeeAnEmailForm()
-    {
-        self::assertTrue($this->createElement('EmailForm')->isValid());
-    }
-
-    /**
-     * Example: Then I should see an email form
-     *          And it must contains next values:
-     *            | From    | "John Doe" <admin@example.com>       |
-     *            | To      | "Charlie Sheen" <charlie@sheen.com>  |
-     *            | Subject | Re: Merry Christmas                  |
-     *
-     * @Then it must contains next values:
-     */
-    public function itMustContainsNextValues(TableNode $table)
-    {
-        /** @var Form $form */
-        $form = $this->createElement('EmailFormView');
-        $mapping = $form->getOption('mapping');
-        $page = $this->getPage();
-
-        foreach ($table->getRows() as $row) {
-            $field = $page->find('css', $mapping[$row[0]]);
-            self::assertNotNull($field);
-
-            $value = $field->getText() ? $field->getText() : $field->getValue();
-            self::assertEquals($row[1], $value);
-        }
-    }
 }

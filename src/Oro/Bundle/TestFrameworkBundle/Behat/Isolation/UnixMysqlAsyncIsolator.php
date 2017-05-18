@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
-use Symfony\Component\Console\Helper\QuestionHelper;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 
@@ -22,7 +17,7 @@ final class UnixMysqlAsyncIsolator extends AbstractDbOsRelatedIsolator implement
     {
         return
             $this->isApplicableOS()
-            && 'pdo_mysql' === $container->getParameter('database_driver');
+            && DatabaseDriverInterface::DRIVER_MYSQL === $container->getParameter('database_driver');
     }
 
     /** {@inheritdoc} */

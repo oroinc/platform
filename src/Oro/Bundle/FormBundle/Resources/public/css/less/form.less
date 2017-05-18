@@ -54,6 +54,15 @@
   .entities.list-group {
     width: 297px;
   }
+  .fallback-item, .float-holder {
+    td {
+      padding-top: 0;
+      padding-bottom: 0;
+      &:first-child, &.fallback-item-value {
+        padding-left: 0;
+      }
+    }
+  }
 }
 
 .expanded-text-field textarea, .expanded-text-field .mce-tinymce {

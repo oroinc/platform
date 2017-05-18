@@ -45,7 +45,7 @@ trait SearchExtensionTrait
         $query = new Query();
         $query->from($alias);
 
-        $requestCounts = 5;
+        $requestCounts = 10;
         do {
             /** @var Result $result */
             $result = $this->getContainer()->get($searchService)->search($query);

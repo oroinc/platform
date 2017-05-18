@@ -8,6 +8,7 @@ use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\ProductBundle\Migrations\Data\ORM\LoadProductDefaultAttributeFamilyData;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -62,6 +63,10 @@ class ReferenceRepositoryInitializer
             $this->getEntityManager()->getRepository(EmailAddressProxy::class)->findOneBy([])
         );
         $this->referenceRepository->set('defaultProductFamily', $this->getDefaultProductFamily());
+        $this->referenceRepository->set(
+            'en_language',
+            $this->getEntityManager()->getRepository(Language::class)->findOneBy(['code' => 'en'])
+        );
     }
 
     /**

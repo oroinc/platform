@@ -1,0 +1,15 @@
+workflows:
+    test_flow_mass_start:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults: { active: true }
+        start_step: open
+        steps:
+            open:
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
