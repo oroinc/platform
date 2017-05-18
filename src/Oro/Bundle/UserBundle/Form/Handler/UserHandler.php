@@ -80,6 +80,7 @@ class UserHandler extends AbstractUserHandler
      */
     public function process(User $user)
     {
+        $isUpdated = false;
         $this->form->setData($user);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
@@ -88,11 +89,18 @@ class UserHandler extends AbstractUserHandler
             if ($this->form->isValid()) {
                 $this->onSuccess($user);
 
-                return true;
+                $isUpdated = true;
             }
         }
 
-        return false;
+        // Reloads the user to reset its username. This is needed when the
+        // username or password have been changed to avoid issues with the
+        // security layer.
+        if ($user->getId()) {
+            $this->manager->reloadUser($user);
+        }
+
+        return $isUpdated;
     }
 
     /**
@@ -129,11 +137,6 @@ class UserHandler extends AbstractUserHandler
                 );
             }
         }
-
-        // Reloads the user to reset its username. This is needed when the
-        // username or password have been changed to avoid issues with the
-        // security layer.
-        $this->manager->reloadUser($user);
     }
 
     /**

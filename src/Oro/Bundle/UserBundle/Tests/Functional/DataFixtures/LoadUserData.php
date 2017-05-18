@@ -11,7 +11,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
     const SIMPLE_USER = 'simple_user';
+    const SIMPLE_USER_PASSWORD = 'simple_password';
     const SIMPLE_USER_2 = 'simple_user2';
+    const SIMPLE_USER_2_PASSWORD = 'simple_password2';
+
     /**
      * @var ContainerInterface
      */
@@ -35,7 +38,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user = $userManager->createUser();
         $user->setUsername(self::SIMPLE_USER)
-            ->setPlainPassword('simple_password')
+            ->setPlainPassword(self::SIMPLE_USER_PASSWORD)
             ->setEmail('simple_user@example.com')
             ->setFirstName('Elley')
             ->setLastName('Towards')
@@ -47,7 +50,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user2 = $userManager->createUser();
         $user2->setUsername(self::SIMPLE_USER_2)
-            ->setPlainPassword('simple_password2')
+            ->setPlainPassword(self::SIMPLE_USER_2_PASSWORD)
             ->setFirstName('Merry')
             ->setLastName('Backwards')
             ->setEmail('simple_user2@example.com')
