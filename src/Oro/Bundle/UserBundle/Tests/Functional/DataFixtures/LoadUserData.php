@@ -10,6 +10,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
+    const SIMPLE_USER = 'simple_user';
+    const SIMPLE_USER_PASSWORD = 'simple_password';
+
     /**
      * @var ContainerInterface
      */
@@ -32,8 +35,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
 
         $user = $userManager->createUser();
-        $user->setUsername('simple_user')
-            ->setPlainPassword('simple_password')
+        $user->setUsername(self::SIMPLE_USER)
+            ->setPlainPassword(self::SIMPLE_USER_PASSWORD)
             ->setEmail('simple_user@example.com')
             ->setFirstName('Elley')
             ->setLastName('Towards')
