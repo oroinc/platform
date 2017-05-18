@@ -44,8 +44,12 @@ class MainMenu extends Element
     public function hasLink($path)
     {
         try {
+            $items = explode('/', $path);
+            $linkLocator = trim(array_pop($items));
+
             $this->moveByMenuTree($path);
-            return true;
+
+            return null !== $this->findVisibleLink($linkLocator);
         } catch (\Exception $e) {
             return false;
         }

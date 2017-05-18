@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
@@ -280,6 +281,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     private function processBundleBehatConfigurations(ContainerBuilder $container)
     {
+        /** @var KernelInterface $kernel */
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
         $processor = new Processor();
         $configuration = new BehatBundleConfiguration($container);
@@ -334,7 +336,9 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $bundleSuite = $suiteGenerator->generateSuite($bundle->getName(), []);
+            // Add ! to the start of bundle name, because we need to get the real bundle not the inheritance
+            // See OroKernel->getBundle
+            $bundleSuite = $suiteGenerator->generateSuite('!'.$bundle->getName(), []);
 
             if (!$this->hasValidPaths($bundleSuite)) {
                 continue;
