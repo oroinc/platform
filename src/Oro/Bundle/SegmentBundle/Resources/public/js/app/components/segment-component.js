@@ -508,22 +508,25 @@ define(function(require) {
             $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function() {
                 sortingLabels[this.value] = $(this).text();
             });
-
-            this.on('validate-data', function(issues) {
-                if ($editor.itemsManagerEditor('hasChanges')) {
-                    issues.push({
-                        component: __('oro.segment.report_column_editor'),
-                        type: SegmentComponent.UNSAVED_CHANGES_ISSUE
-                    });
-                }
-                if (!collection.isValid()) {
-                    issues.push({
-                        component: __('oro.segment.report_column_editor'),
-                        type: SegmentComponent.INVALID_DATA_ISSUE
-                    });
-                }
-            });
-
+            
+            if($editor.find('select[name*=sorting]').length)
+            {
+                this.on('validate-data', function(issues) {
+                    if ($editor.itemsManagerEditor('hasChanges')) {
+                        issues.push({
+                            component: __('oro.segment.report_column_editor'),
+                            type: SegmentComponent.UNSAVED_CHANGES_ISSUE
+                        });
+                    }
+                    if (!collection.isValid()) {
+                        issues.push({
+                            component: __('oro.segment.report_column_editor'),
+                            type: SegmentComponent.INVALID_DATA_ISSUE
+                        });
+                    }
+                });
+            }
+            
             this.on('before-submit', function() {
                 collection.removeInvalidModels();
                 $editor.itemsManagerEditor('reset');
