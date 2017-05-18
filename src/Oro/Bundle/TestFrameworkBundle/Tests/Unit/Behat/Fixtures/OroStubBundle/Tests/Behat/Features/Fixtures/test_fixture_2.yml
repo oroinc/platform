@@ -1,0 +1,2 @@
+include:
+    - '@OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml'
