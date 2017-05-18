@@ -52,11 +52,11 @@
             >
         <tr class="fallback-item">
             <td class="fallback-item-label">{{ form.default.vars.label|trans }}</td>
-            <td class="fallback-item-value">
+            <td class="fallback-item-value fallback-item-value--first">
                 {{ form_widget(form.default) }}
                 {{ form_errors(form.default) }}
+                <span class="fallback-status"></span>
             </td>
-            <td class="fallback-status"></td>
         </tr>
         {% for localization in form.localizations %}
             <tr class="fallback-item" style="display: none;">
