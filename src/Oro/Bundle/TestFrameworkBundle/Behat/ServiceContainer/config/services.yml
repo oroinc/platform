@@ -137,8 +137,17 @@ services:
             - '@symfony2_extension.kernel'
             - '@oro_test.reference_repository'
 
+    oro_behat_extension.fixtures.yml_parser:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroYamlParser
+        arguments:
+            - '@oro_test.alice_loader'
+        calls:
+            - [setKernel, ['@symfony2_extension.kernel']]
+
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
+        calls:
+            - [addParser, ['@oro_behat_extension.fixtures.yml_parser']]
 
     oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler

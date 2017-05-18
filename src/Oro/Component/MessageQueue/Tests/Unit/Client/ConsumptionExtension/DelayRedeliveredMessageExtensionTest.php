@@ -197,6 +197,43 @@ class DelayRedeliveredMessageExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertSame(7, $properties[DelayRedeliveredMessageExtension::PROPERTY_REDELIVER_COUNT]);
     }
 
+    public function testShouldKillMessageWhichRedeliverCountHasBeenExceeded()
+    {
+        $originMessage = new NullMessage();
+        $originMessage->setRedelivered(true);
+        $originMessage->setProperties(
+            [
+                DelayRedeliveredMessageExtension::PROPERTY_REDELIVER_COUNT => 101,
+            ]
+        );
+
+        /** @var Message $delayedMessage */
+        $delayedMessage = null;
+
+        $driver = $this->createDriverMock();
+
+        $session = $this->createSessionMock();
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->once())
+            ->method('debug')
+            ->with('[DelayRedeliveredMessageExtension] Redeliver count limit reached - message has been killed.')
+        ;
+
+        $context = new Context($session);
+        $context->setQueueName('queue');
+        $context->setMessage($originMessage);
+        $context->setLogger($logger);
+
+        self::assertNull($context->getStatus());
+
+        $extension = new DelayRedeliveredMessageExtension($driver, 12345);
+        $extension->onPreReceived($context);
+
+        self::assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
      */

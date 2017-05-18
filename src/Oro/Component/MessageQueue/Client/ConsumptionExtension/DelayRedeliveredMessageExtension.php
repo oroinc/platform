@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 class DelayRedeliveredMessageExtension extends AbstractExtension
 {
     const PROPERTY_REDELIVER_COUNT = 'oro-redeliver-count';
-
+    const REDELIVER_COUNT_LIMIT = 100;
     /**
      * @var DriverInterface
      */
@@ -48,6 +48,15 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
             $properties[self::PROPERTY_REDELIVER_COUNT] = 1;
         } else {
             $properties[self::PROPERTY_REDELIVER_COUNT]++;
+        }
+
+        if ($properties[self::PROPERTY_REDELIVER_COUNT] > self::REDELIVER_COUNT_LIMIT) {
+            $context->setStatus(MessageProcessorInterface::REJECT);
+            $context->getLogger()->debug(
+                '[DelayRedeliveredMessageExtension] '.
+                'Redeliver count limit reached - message has been killed.'
+            );
+            return;
         }
 
         $delayedMessage = new Message();

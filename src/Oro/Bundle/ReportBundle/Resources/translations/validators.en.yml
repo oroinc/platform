@@ -1,0 +1,4 @@
+oro:
+    report:
+        dublicate:
+            columns: You are trying to add several copies of column(s) %columnName% to the report. Only one copy of the column may be added. Please, review the list of columns to remove duplicates.
