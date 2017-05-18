@@ -58,8 +58,8 @@ class FakeRestClientFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(
             RestResponseInterface::class,
-                $client->get('/baz'),
-                'Default response should be returned'
+            $client->get('/baz'),
+            'Default response should be returned'
         );
         $this->assertEquals(302, $client->get('/baz')->getStatusCode());
     }

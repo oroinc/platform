@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Test;
 
-
 use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse;
 
 class FakeRestResponseTest extends \PHPUnit_Framework_TestCase
