@@ -143,5 +143,6 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         $view->vars['formatter_options'] = array_merge($formatterOptions, $options['formatter_options']);
         $view->vars['array_separator'] = self::ARRAY_SEPARATOR;
         $view->vars['array_operators'] = self::ARRAY_TYPES;
+        $view->vars['data_type'] = $dataType;
     }
 }

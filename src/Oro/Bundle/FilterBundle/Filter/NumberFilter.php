@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
 class NumberFilter extends AbstractFilter
 {
@@ -72,9 +72,9 @@ class NumberFilter extends AbstractFilter
      * Build an expression used to filter data
      *
      * @param FilterDatasourceAdapterInterface $ds
-     * @param int                              $comparisonType
-     * @param string                           $fieldName
-     * @param string                           $parameterName
+     * @param int $comparisonType
+     * @param string $fieldName
+     * @param string $parameterName
      * @return string
      */
     protected function buildComparisonExpr(
@@ -117,7 +117,7 @@ class NumberFilter extends AbstractFilter
 
     /**
      * @param FilterDatasourceAdapterInterface $ds
-     * @param string                           $fieldName
+     * @param string $fieldName
      *
      * @return bool
      */
@@ -133,8 +133,11 @@ class NumberFilter extends AbstractFilter
     {
         $metadata = parent::getMetadata();
 
-        $formView                     = $this->getForm()->createView();
+        $formView = $this->getForm()->createView();
         $metadata['formatterOptions'] = $formView->vars['formatter_options'];
+        $metadata['arraySeparator'] = $formView->vars['array_separator'];
+        $metadata['arrayOperators'] = $formView->vars['array_operators'];
+        $metadata['dataType'] = $formView->vars['data_type'];
 
         return $metadata;
     }

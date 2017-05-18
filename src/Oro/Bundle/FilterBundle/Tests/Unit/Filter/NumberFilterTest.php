@@ -5,13 +5,13 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\NumberFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class NumberFilterTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,17 +36,24 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     protected $parameterName = 'parameter-name';
 
     /**
+     * @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $formFactory;
+
+    /**
+     * @var FilterUtility|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $filterUtility;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->filterUtility = $this->createMock(FilterUtility::class);
 
-        /* @var $filterUtility FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
-        $filterUtility = $this->createMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
-
-        $this->filter = new NumberFilter($formFactory, $filterUtility);
+        $this->filter = new NumberFilter($this->formFactory, $this->filterUtility);
         $this->filter->init($this->filterName, [
             FilterUtility::DATA_NAME_KEY => $this->dataName,
         ]);
@@ -72,8 +79,8 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider parseDataProvider
      *
-     * @param mixed  $inputData
-     * @param mixed  $expectedData
+     * @param mixed $inputData
+     * @param mixed $expectedData
      */
     public function testParseData($inputData, $expectedData)
     {
@@ -229,6 +236,48 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetMetadata()
+    {
+        $form = $this->createMock(FormInterface::class);
+        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        $view = $this->createMock(FormView::class);
+        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $typeView */
+        $typeView = $this->createMock(FormView::class);
+        $typeView->vars['choices'] = [];
+        $view->vars['formatter_options'] = ['decimals' => 0, 'grouping' => false];
+        $view->vars['array_separator'] = ',';
+        $view->vars['array_operators'] = [9, 10];
+        $view->vars['data_type'] = 'data_integer';
+        $view->children['type'] = $typeView;
+
+        $this->formFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($form);
+        $form->expects($this->any())
+            ->method('createView')
+            ->willReturn($view);
+        $this->filterUtility->expects($this->any())
+            ->method('getExcludeParams')
+            ->willReturn([]);
+
+        $expected = [
+            'name' => 'filter-name',
+            'label' => 'Filter-name',
+            'choices' => [],
+            'data_name' => 'field-name',
+            'options' => [],
+            'lazy' => false,
+            'formatterOptions' => [
+                'decimals' => 0,
+                'grouping' => false
+            ],
+            'arraySeparator' => ',',
+            'arrayOperators' => [9, 10],
+            'dataType' => 'data_integer'
+        ];
+        $this->assertEquals($expected, $this->filter->getMetadata());
+    }
+
     /**
      * @return OrmFilterDatasourceAdapter
      */
@@ -238,8 +287,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $em->expects($this->any())
             ->method('getExpressionBuilder')
-            ->willReturn(new Query\Expr())
-        ;
+            ->willReturn(new Query\Expr());
 
         return new OrmFilterDatasourceAdapter(new QueryBuilder($em));
     }
@@ -269,6 +317,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                     if (is_array($parameterValue)) {
                         $parameterValue = implode(',', $parameterValue);
                     }
+
                     return $parameterValue;
                 },
                 array_values($parameters)
