@@ -15,6 +15,7 @@ define(function(require) {
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
     var ToolbarMassActionPlugin = require('orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin');
@@ -400,7 +401,9 @@ define(function(require) {
             var massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
             if (!this.themeOptions.headerHide) {
-                if (this.metadata.enableFullScreenLayout) {
+                if (tools.isMobile() && !this.themeOptions.disableFloatingHeaderPlugin) {
+                    plugins.push(FloatingHeaderPlugin);
+                } else if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
             }
