@@ -97,7 +97,14 @@ define(function(require) {
                             widget.render();
                         });
                     }
-                    var message = _.__(self.successMessage, {nodeText: data.node.text});
+                    var reloadMessage = _.__('oro.navigation.menuupdate.reload_link.label');
+                    var reloadLink = '<a href="#" onclick="window.location.reload(false);return false;">' +
+                        reloadMessage + '</a>';
+
+                    var message = _.__(self.successMessage, {
+                        nodeText: data.node.text,
+                        'reload_link': reloadLink
+                    });
                     messenger.notificationFlashMessage('success', message);
                 },
                 errorHandlerMessage: false,
