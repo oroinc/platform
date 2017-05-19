@@ -431,6 +431,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I should see that "Header" does not contain "Some Text"
+     * @Then /^I should see that "(?P<elementName>[^"]*)" does not contain "(?P<text>[^"]*)"$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementNotContainsText($elementName, $text)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement($elementName);
+        self::assertNotContains(
+            $text,
+            $element->getText(),
+            sprintf('Element %s contains text %s', $elementName, $text)
+        );
+    }
+
+    /**
      * Assert that download link in attachment works properly
      * Example: And download link for "cat.jpg" attachment should work
      * Example: And download link for "note-attachment.jpg" attachment should work
