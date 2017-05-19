@@ -31,6 +31,13 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_datagrid.extension.array_pager:
+            class: 'Oro\Bundle\DataGridBundle\Extension\Pager\ArrayPagerExtension'
+            arguments:
+                - '@oro_datagrid.extension.pager.array.pager'
+            tags:
+                - { name: oro_datagrid.extension }
+
     oro_datagrid.extension.pager.orm.pager:
         arguments:
             - '@oro_security.acl_helper'
@@ -38,10 +45,18 @@ services:
             - '@oro_entity.query_hint_resolver'
         class: %oro_datagrid.extension.pager.orm.pager.class%
 
+    oro_datagrid.extension.pager.array.pager:
+            class: 'Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager'
+
     oro_datagrid.extension.orm_sorter:
         class: %oro_datagrid.extension.orm_sorter.class%
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.array_sorter:
+            class: 'Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension'
+            tags:
+                - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.inline_editing:
         class: %oro_datagrid.extension.inline_editing.class%
