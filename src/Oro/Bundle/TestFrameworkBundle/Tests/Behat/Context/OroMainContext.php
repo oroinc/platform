@@ -8,7 +8,6 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ResponseTextException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -81,8 +80,6 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
-        $this->messageQueueIsolator->waitWhileProcessingMessages(30);
-
         $session = $this->getMink()->getSession();
         if (false === $session->isStarted()) {
             return;
@@ -131,6 +128,8 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
+
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -823,7 +822,7 @@ class OroMainContext extends MinkContext implements
     public function iRestartMessageConsumer()
     {
         $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
+        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
     }
 
     /**

@@ -11,59 +11,53 @@ use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 
 class EmailNotificationHandler implements EventHandlerInterface
 {
-    /**
-     * @var EmailNotificationManager
-     */
+    /** @var EmailNotificationManager */
     protected $manager;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
     /** @var ConfigProvider */
     protected $configProvider;
 
     /**
-     * Constructor
-     *
      * @param EmailNotificationManager $manager
-     * @param EntityManager              $em
-     * @param ConfigProvider             $configProvider
+     * @param EntityManager $em
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         EmailNotificationManager $manager,
         EntityManager $em,
         ConfigProvider $configProvider
     ) {
-        $this->manager      = $manager;
-        $this->em             = $em;
+        $this->manager = $manager;
+        $this->em = $em;
         $this->configProvider = $configProvider;
     }
 
     /**
-     * Handle event
-     *
-     * @param NotificationEvent   $event
-     * @param EmailNotification[] $matchedNotifications
-     * @return mixed
+     * {@inheritdoc}
      */
     public function handle(NotificationEvent $event, $matchedNotifications)
     {
-        $entity = $event->getEntity();
-
         // convert notification rules to a list of EmailNotificationInterface
-        $notifications = array();
+        $notifications = [];
         foreach ($matchedNotifications as $notification) {
-            $notifications[] = new EmailNotificationAdapter(
-                $entity,
-                $notification,
-                $this->em,
-                $this->configProvider
-            );
+            $notifications[] = $this->getEmailNotificationAdapter($event, $notification);
         }
 
         // send notifications
-        $this->manager->process($entity, $notifications);
+        $this->manager->process($event->getEntity(), $notifications);
+    }
+
+    /**
+     * @param NotificationEvent $event
+     * @param EmailNotification $notification
+     *
+     * @return EmailNotificationAdapter
+     */
+    protected function getEmailNotificationAdapter(NotificationEvent $event, EmailNotification $notification)
+    {
+        return new EmailNotificationAdapter($event->getEntity(), $notification, $this->em, $this->configProvider);
     }
 }

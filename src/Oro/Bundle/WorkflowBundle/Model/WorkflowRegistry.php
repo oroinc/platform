@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
@@ -74,9 +73,9 @@ class WorkflowRegistry
         if (!$definition) {
             if ($exceptionOnNotFound) {
                 throw new WorkflowNotFoundException($name);
-            } else {
-                return null;
             }
+
+            return null;
         }
 
         return $this->getAssembledWorkflow($definition);
@@ -105,12 +104,30 @@ class WorkflowRegistry
      */
     public function hasActiveWorkflowsByEntityClass($entityClass)
     {
-        $class = ClassUtils::getRealClass($entityClass);
+        return $this->isWorkflowsArrayEmpty(
+            $this->getEntityRepository()->findActiveForRelatedEntity($entityClass)
+        );
+    }
 
-        $activeWorkflowDefinitions = $this->getEntityRepository()->findActiveForRelatedEntity($class);
+    /**
+     * @param string $entityClass
+     * @return bool
+     */
+    public function hasWorkflowsByEntityClass($entityClass)
+    {
+        return $this->isWorkflowsArrayEmpty(
+            $this->getEntityRepository()->findForRelatedEntity($entityClass)
+        );
+    }
 
+    /**
+     * @param array|WorkflowDefinition[] $workflowDefinitions
+     * @return bool
+     */
+    private function isWorkflowsArrayEmpty(array $workflowDefinitions)
+    {
         $items = $this->processDefinitionFilters(
-            $this->getNamedDefinitionsCollection($activeWorkflowDefinitions)
+            $this->getNamedDefinitionsCollection($workflowDefinitions)
         );
 
         return !$items->isEmpty();
@@ -125,10 +142,22 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        $class = ClassUtils::getRealClass($entityClass);
-
         return $this->getAssembledWorkflows(
-            $this->getEntityRepository()->findActiveForRelatedEntity($class)
+            $this->getEntityRepository()->findActiveForRelatedEntity($entityClass)
+        );
+    }
+
+    /**
+     * Get Workflows that applicable to entity class
+     *
+     * @param string $entityClass
+     * @return Workflow[]|Collection Named collection of Workflow instances
+     *                               with structure: ['workflowName' => Workflow $workflowInstance]
+     */
+    public function getWorkflowsByEntityClass($entityClass)
+    {
+        return $this->getAssembledWorkflows(
+            $this->getEntityRepository()->findForRelatedEntity($entityClass)
         );
     }
 

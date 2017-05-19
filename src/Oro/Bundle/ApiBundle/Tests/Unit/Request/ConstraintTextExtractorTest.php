@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints\Blank;
 
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
+use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 
 class ConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,6 +35,7 @@ class ConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
         return [
             [new Blank(), 400],
             [new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'test']), 501],
+            [new FieldAccessGranted(), 403],
         ];
     }
 

@@ -30,7 +30,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $workflows = $this->getWorkflowDefinitionRepository()->findAll();
 
-        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, ['--no-ansi']);
+        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME);
 
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');

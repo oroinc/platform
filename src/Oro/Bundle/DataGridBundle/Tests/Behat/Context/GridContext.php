@@ -647,8 +647,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
-
-        $this->checkItemsInFilter($filterItem, $filterItems);
+        $filterItem->checkItemsInFilter($filterItems);
     }
 
     /**
@@ -664,19 +663,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterLabel, true);
-
-        $this->checkItemsInFilter($filterItem, $filterItems);
-    }
-
-    /**
-     * @param MultipleChoice $filter
-     * @param string $filterItems
-     */
-    protected function checkItemsInFilter(MultipleChoice $filter, $filterItems)
-    {
-        $filterItems = array_map('trim', explode(',', $filterItems));
-
-        $filter->checkItems($filterItems);
+        $filterItem->checkItemsInFilter($filterItems);
     }
 
     /**
