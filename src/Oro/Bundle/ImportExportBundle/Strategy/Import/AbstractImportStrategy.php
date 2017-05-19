@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\Common\Util\ClassUtils;
@@ -48,6 +49,11 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
      */
     protected $context;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+    
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param ImportStrategyHelper $strategyHelper
@@ -198,5 +204,18 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
         if (!$entity instanceof $entityName) {
             throw new InvalidArgumentException(sprintf('Imported entity must be instance of %s', $entityName));
         }
+    }
+
+    /**
+     * @param ContainerInterface    $container
+     *
+     * @deprecated Method should not been used. Created only in purpose of Access Denied issues investigation.
+     * @todo Remove after the problem will be fixed, details in https://magecore.atlassian.net/browse/CRM-8268
+     */
+    public function temporaryDumperInit(
+        ContainerInterface $container
+    ) {
+        $this->container = $container;
+        $this->container->get('logger')->debug('Dumper ready');
     }
 }
