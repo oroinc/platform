@@ -12,7 +12,9 @@ use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 
 class ArrayPagerExtension extends AbstractPagerExtension
 {
-    /** @var ArrayPager */
+    /**
+     * @var ArrayPager
+     */
     protected $pager;
 
     /**
