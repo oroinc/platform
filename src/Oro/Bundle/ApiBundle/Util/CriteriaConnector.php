@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\QueryException;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
 
@@ -44,7 +44,7 @@ class CriteriaConnector
     public function applyCriteria(QueryBuilder $qb, Criteria $criteria)
     {
         $this->criteriaNormalizer->normalizeCriteria($criteria);
-        $this->placeholdersResolver->resolvePlaceholders($criteria, QueryUtils::getSingleRootAlias($qb));
+        $this->placeholdersResolver->resolvePlaceholders($criteria, QueryBuilderUtil::getSingleRootAlias($qb));
 
         $joins = $criteria->getJoins();
         if (!empty($joins)) {
