@@ -561,8 +561,8 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
-        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
-        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         try {
             $button = $this->fixStepArgument($button);
             $modalWindow->pressButton($button);
