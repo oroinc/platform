@@ -40,7 +40,8 @@ define([
             this.listenTo(options.grid.collection, {
                 'sync': this.selectRows,
                 'excludeRow': this._excludeRow,
-                'includeRow': this._includeRow
+                'includeRow': this._includeRow,
+                'setState': this.setState
             })
         },
 
@@ -114,6 +115,15 @@ define([
             this.set('included', included);
             this.set('excluded', excluded);
 
+            this._synchronizeState();
+        },
+
+        /**
+         * Sets included and excluded elements ids using provided arrays
+         */
+        setState: function (included, excluded) {
+            this.set('included', included);
+            this.set('excluded', excluded);
             this._synchronizeState();
         },
 

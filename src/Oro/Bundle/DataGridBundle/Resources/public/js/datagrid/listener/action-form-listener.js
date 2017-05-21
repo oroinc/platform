@@ -32,14 +32,8 @@ define([
             // at the moment we support only `excludeRow`
             if (triggerAction === 'excludeRow') {
                 collection.trigger('excludeRow', action.model.get('id'));
-                collection.trigger('remove', action.model, false);
+                collection.trigger('remove', action.model);
             }
-
-            // @todo uncomment in BB-9344
-            // if (triggerAction === 'includeRow') {
-            //     collection.trigger('includeRow', action.model.get('id'));
-            //     collection.trigger('add', action.model);
-            // }
         },
 
         onFrontMassAction: function(action) {
@@ -58,6 +52,7 @@ define([
                     collection.trigger('excludeRow', id);
                     collection.trigger('remove', collection.get(id), false);
                 });
+                collection.fetch({reset: true});
             }
         },
 
