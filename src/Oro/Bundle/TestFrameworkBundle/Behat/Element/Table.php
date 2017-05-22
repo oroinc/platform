@@ -55,4 +55,15 @@ class Table extends Element
             return $this->elementFactory->wrapElement(static::TABLE_ROW_ELEMENT, $element);
         }, $this->findAll('css', 'tbody tr'));
     }
+
+    /**
+     * @return TableHeader
+     */
+    public function getHeader()
+    {
+        return $this->elementFactory->wrapElement(
+            static::TABLE_HEADER_ELEMENT,
+            $this->find('css', 'thead tr')
+        );
+    }
 }

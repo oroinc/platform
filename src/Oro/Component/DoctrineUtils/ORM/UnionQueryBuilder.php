@@ -279,12 +279,12 @@ class UnionQueryBuilder
     private function getSelectStatement()
     {
         $select = [];
-        $mapping = QueryUtils::parseQuery(reset($this->subQueries))->getResultSetMapping();
+        $mapping = QueryUtil::parseQuery(reset($this->subQueries))->getResultSetMapping();
         foreach ($this->select as $item) {
             $select[] = sprintf(
                 '%s.%s AS %s',
                 $this->alias,
-                QueryUtils::getColumnNameByAlias($mapping, $item[0]),
+                ResultSetMappingUtil::getColumnNameByAlias($mapping, $item[0]),
                 $item[1]
             );
         }
@@ -297,7 +297,7 @@ class UnionQueryBuilder
      */
     private function getResultSetMapping()
     {
-        $rsm = QueryUtils::createResultSetMapping($this->em->getConnection()->getDatabasePlatform());
+        $rsm = ResultSetMappingUtil::createResultSetMapping($this->em->getConnection()->getDatabasePlatform());
         foreach ($this->select as $item) {
             $rsm->addScalarResult($item[1], $item[1], $item[2]);
         }
@@ -312,7 +312,7 @@ class UnionQueryBuilder
     {
         $subQueries = [];
         foreach ($this->subQueries as $subQuery) {
-            $subQueries[] = '(' . QueryUtils::getExecutableSql($subQuery) . ')';
+            $subQueries[] = '(' . QueryUtil::getExecutableSql($subQuery) . ')';
         }
 
         return '(' . implode($this->unionAll ? ' UNION ALL ' : ' UNION ', $subQueries) . ')';

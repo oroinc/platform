@@ -7,7 +7,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
+use Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class QueryFactory
@@ -133,9 +134,9 @@ class QueryFactory
     ) {
         $subQueryTemplate = $this->getRelatedItemsIdsQuery($associationMapping, [self::FAKE_ID], $config);
         $subQueryTemplate->setMaxResults($relatedRecordsLimit);
-        $parsedSubQuery = QueryUtils::parseQuery($subQueryTemplate);
+        $parsedSubQuery = QueryUtil::parseQuery($subQueryTemplate);
         // we should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
-        $subQuerySqlTemplate = '(' . QueryUtils::getExecutableSql($subQueryTemplate, $parsedSubQuery) . ')';
+        $subQuerySqlTemplate = '(' . QueryUtil::getExecutableSql($subQueryTemplate, $parsedSubQuery) . ')';
 
         // we should build subquery for each parent entity id because the limit of related records
         // should by applied for each parent entity individually
@@ -151,11 +152,11 @@ class QueryFactory
         $subQueryMapping = $parsedSubQuery->getResultSetMapping();
         $selectStmt = sprintf(
             'entity.%s AS entityId, entity.%s AS relatedEntityId',
-            QueryUtils::getColumnNameByAlias($subQueryMapping, 'entityId'),
-            QueryUtils::getColumnNameByAlias($subQueryMapping, 'relatedEntityId')
+            ResultSetMappingUtil::getColumnNameByAlias($subQueryMapping, 'entityId'),
+            ResultSetMappingUtil::getColumnNameByAlias($subQueryMapping, 'relatedEntityId')
         );
 
-        $rsm = QueryUtils::createResultSetMapping(
+        $rsm = ResultSetMappingUtil::createResultSetMapping(
             $subQueryTemplate->getEntityManager()->getConnection()->getDatabasePlatform()
         );
         $rsm

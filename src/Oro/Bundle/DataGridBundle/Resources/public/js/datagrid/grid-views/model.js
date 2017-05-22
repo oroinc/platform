@@ -116,12 +116,12 @@ define([
             var freezeName = this.get('freezeName').replace(/\s+/g, ' ');
             var errors = [];
 
-            if (attrs.label === _.trim(freezeName)) {
-                errors.push(__('oro.datagrid.gridview.unique'));
-            }
-
             if (_.trim(attrs.label) === '') {
                 errors.push(__('oro.datagrid.gridview.notBlank'));
+            }
+
+            if (_.trim(attrs.label) === _.trim(freezeName)) {
+                errors.push(__('oro.datagrid.gridview.unique'));
             }
 
             if (errors.length) {
