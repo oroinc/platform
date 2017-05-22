@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -14,6 +15,8 @@ use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
 
 class WorkflowRegistry
 {
+    const CACHE_TTL = 0;
+
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -25,6 +28,9 @@ class WorkflowRegistry
 
     /** @var WorkflowDefinitionFilters */
     protected $definitionFilters;
+
+    /** @var CacheProvider */
+    protected $cacheProvider;
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -39,6 +45,14 @@ class WorkflowRegistry
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
         $this->definitionFilters = $definitionFilters;
+    }
+
+    /**
+     * @param CacheProvider $cacheProvider
+     */
+    public function setCacheProvider(CacheProvider $cacheProvider)
+    {
+        $this->cacheProvider = $cacheProvider;
     }
 
     /**
@@ -104,9 +118,7 @@ class WorkflowRegistry
      */
     public function hasActiveWorkflowsByEntityClass($entityClass)
     {
-        return $this->isWorkflowsArrayEmpty(
-            $this->getEntityRepository()->findActiveForRelatedEntity($entityClass)
-        );
+        return $this->isWorkflowsArrayEmpty($this->getActiveWorkflowDefinitionsByRelatedEntityClass($entityClass));
     }
 
     /**
@@ -115,9 +127,7 @@ class WorkflowRegistry
      */
     public function hasWorkflowsByEntityClass($entityClass)
     {
-        return $this->isWorkflowsArrayEmpty(
-            $this->getEntityRepository()->findForRelatedEntity($entityClass)
-        );
+        return $this->isWorkflowsArrayEmpty($this->getWorkflowDefinitionsByRelatedEntityClass($entityClass));
     }
 
     /**
@@ -142,9 +152,7 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        return $this->getAssembledWorkflows(
-            $this->getEntityRepository()->findActiveForRelatedEntity($entityClass)
-        );
+        return $this->getAssembledWorkflows($this->getActiveWorkflowDefinitionsByRelatedEntityClass($entityClass));
     }
 
     /**
@@ -156,9 +164,7 @@ class WorkflowRegistry
      */
     public function getWorkflowsByEntityClass($entityClass)
     {
-        return $this->getAssembledWorkflows(
-            $this->getEntityRepository()->findForRelatedEntity($entityClass)
-        );
+        return $this->getAssembledWorkflows($this->getWorkflowDefinitionsByRelatedEntityClass($entityClass));
     }
 
     /**
@@ -173,7 +179,7 @@ class WorkflowRegistry
         $groupNames = array_map('strtolower', $groupNames);
 
         $definitions = array_filter(
-            $this->getEntityRepository()->findActive(),
+            $this->getActiveWorkflowDefinitions(),
             function (WorkflowDefinition $definition) use ($groupNames) {
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
@@ -192,7 +198,7 @@ class WorkflowRegistry
      */
     public function getActiveWorkflows()
     {
-        return $this->getAssembledWorkflows($this->getEntityRepository()->findActive());
+        return $this->getAssembledWorkflows($this->getActiveWorkflowDefinitions());
     }
 
     /**
@@ -293,5 +299,88 @@ class WorkflowRegistry
         }
 
         return $definition;
+    }
+
+    /**
+     * @return WorkflowDefinition[]
+     */
+    protected function getActiveWorkflowDefinitions()
+    {
+        $cacheId = 'active_workflow_definitions';
+        $definitions = $this->fetchCache($cacheId);
+
+        if (false === $definitions) {
+            $definitions = $this->getEntityRepository()->findActive();
+            $this->saveCache($cacheId, $definitions);
+        }
+
+        return $definitions;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return WorkflowDefinition[]
+     */
+    protected function getWorkflowDefinitionsByRelatedEntityClass($entityClass)
+    {
+        $cacheId = 'workflow_definitions_for_' . $entityClass;
+
+        $definitions = $this->fetchCache($cacheId);
+
+        if (false === $definitions) {
+            $definitions = $this->getEntityRepository()->findForRelatedEntity($entityClass);
+            $this->saveCache($cacheId, $definitions);
+        }
+
+        return $definitions;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return WorkflowDefinition[]
+     */
+    protected function getActiveWorkflowDefinitionsByRelatedEntityClass($entityClass)
+    {
+        $cacheId = 'active_workflow_definitions_for_' . $entityClass;
+
+        $definitions = $this->fetchCache($cacheId);
+
+        if (false === $definitions) {
+            $definitions = $this->getEntityRepository()->findActiveForRelatedEntity($entityClass);
+            $this->saveCache($cacheId, $definitions);
+        }
+
+        return $definitions;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return false|mixed
+     */
+    private function fetchCache($id)
+    {
+        if ($this->cacheProvider) {
+            return $this->cacheProvider->fetch($id);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $id
+     * @param mixed $data
+     *
+     * @return false|mixed
+     */
+    private function saveCache($id, $data)
+    {
+        if ($this->cacheProvider) {
+            return $this->cacheProvider->save($id, $data, self::CACHE_TTL);
+        }
+
+        return false;
     }
 }

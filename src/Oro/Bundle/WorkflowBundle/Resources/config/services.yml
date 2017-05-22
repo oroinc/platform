@@ -132,12 +132,26 @@ services:
         calls:
             - ['setType', ['system']]
 
+    oro_workflow.cache.workflow_registry:
+        public: false
+        class: Doctrine\Common\Cache\ArrayCache
+        calls:
+            - [ setNamespace, [ 'workflow_registry' ] ]
+
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.registry.definition_filters'
+        calls:
+            - ['setCacheProvider',['@oro_workflow.cache.workflow_registry']]
+
+    oro_workflow.cache.workflow_registry.system:
+        public: false
+        parent: oro_workflow.cache.workflow_registry
+        calls:
+            - [ setNamespace, [ 'workflow_registry.system' ] ]
 
     # use only for system calls, cli, background listeners, etc, when main definition filters aren't available
     oro_workflow.registry.system:
@@ -146,6 +160,8 @@ services:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.registry.definition_filters.system'
+        calls:
+            - ['setCacheProvider',['@oro_workflow.cache.workflow_registry.system']]
 
     oro_workflow.registry.workflow_manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry'
