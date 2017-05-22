@@ -116,12 +116,13 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @param \Closure $lambda
-     * @return false|mixed Return false if closure throw error or return not true value.
+     * @param int $timeLimit in seconds
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
-    public function spin(\Closure $lambda)
+    public function spin(\Closure $lambda, $timeLimit = 60)
     {
-        $time = 60;
+        $time = $timeLimit;
 
         while ($time > 0) {
             try {
@@ -136,7 +137,7 @@ class OroMainContext extends MinkContext implements
             $time -= 0.25;
         }
 
-        return false;
+        return null;
     }
 
     /**
