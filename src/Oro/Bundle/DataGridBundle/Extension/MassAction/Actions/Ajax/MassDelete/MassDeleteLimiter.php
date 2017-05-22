@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -102,7 +102,7 @@ class MassDeleteLimiter
     protected function cloneQuery($query)
     {
         if ($query instanceof Query) {
-            return QueryUtils::cloneQuery($query);
+            return QueryUtil::cloneQuery($query);
         }
 
         return clone $query;

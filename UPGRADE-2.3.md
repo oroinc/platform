@@ -1,6 +1,18 @@
 UPGRADE FROM 2.2 to 2.3
 =======================
 
+PhpUtils component
+------------------
+- Removed deprecated class `Oro\Component\PhpUtils\QueryUtil`. Use `Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil` instead
+
+DoctrineUtils component
+-----------------------
+- Class `Oro\Component\DoctrineUtils\ORM\QueryUtils` was marked as deprecated. Its methods were moved to 4 classes:
+    - `Oro\Component\DoctrineUtils\ORM\QueryUtil`
+    - `Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil`
+    - `Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil`
+    - `Oro\Component\DoctrineUtils\ORM\DqlUtil`
+
 MigrationBundle
 ---------------
 - Added event `oro_migration.data_fixtures.pre_load` that is raised before data fixtures are loaded

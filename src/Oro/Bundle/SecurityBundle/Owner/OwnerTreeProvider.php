@@ -11,7 +11,7 @@ use Doctrine\ORM\Query;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -151,10 +151,10 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      */
     protected function executeQuery(Connection $connection, Query $query)
     {
-        $parsedQuery = QueryUtils::parseQuery($query);
+        $parsedQuery = QueryUtil::parseQuery($query);
 
         return [
-            $connection->executeQuery(QueryUtils::getExecutableSql($query, $parsedQuery)),
+            $connection->executeQuery(QueryUtil::getExecutableSql($query, $parsedQuery)),
             array_flip($parsedQuery->getResultSetMapping()->scalarMappings)
         ];
     }
