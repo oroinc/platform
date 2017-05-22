@@ -14,7 +14,7 @@ use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
@@ -149,7 +149,7 @@ class AclHelper
 
             // We have access level check conditions. So mark query for acl walker.
             if (!$conditionStorage->isEmpty()) {
-                QueryUtils::addTreeWalker($query, self::ORO_ACL_WALKER);
+                QueryUtil::addTreeWalker($query, self::ORO_ACL_WALKER);
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
                 $query->setHint(AclWalker::ORO_ACL_FACTOR_BUILDER, $this->aclConditionFactorBuilder);
             }
