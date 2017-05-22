@@ -3,7 +3,11 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
 {% set formAction = app.request.uri %}
 {% set entityId = entity.id %}
-
+{% set reloadLink -%}
+    <a href="#" onclick="window.location.reload(false);return false;">
+        {{- 'oro.navigation.menuupdate.reload_link.label'|trans -}}
+    </a>
+{%- endset %}
 {% if entity.key %}
     {% set breadcrumbs = breadcrumbs|merge({'entityTitle': entity.isDivider ? 'oro.navigation.menuupdate.divider'|trans : entity.title|trans()}) %}
 {% else %}
@@ -31,7 +35,7 @@
                 {#Delete button #}
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
-                    'successMessage': deletedMessage|default('oro.navigation.menuupdate.deleted_message')|trans(),
+                    'successMessage': deletedMessage|default('oro.navigation.menuupdate.deleted_message')|trans({'%reload_link%': reloadLink}),
                     'dataUrl': path(routePrefix ~ 'ajax_delete', {context: context, menuName: menuName, key: app.request.get('key')}),
                     'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.menu, context: context}),
                     'aCss': 'no-hash remove-button',
@@ -51,7 +55,7 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path(routePrefix ~ 'ajax_hide', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': hiddenMessage|default('oro.navigation.menuupdate.hide_success_message')
+                            'successMessage': hiddenMessage|default('oro.navigation.menuupdate.hide_success_message')|trans({'%reload_link%': reloadLink})
                         }) }}
                     </div>
                 {% else %}
@@ -66,7 +70,7 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path(routePrefix ~ 'ajax_show', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': showedMessage|default('oro.navigation.menuupdate.show_success_message')
+                            'successMessage': showedMessage|default('oro.navigation.menuupdate.show_success_message')|trans({'%reload_link%': reloadLink})
                         }) }}
                     </div>
                 {% endif %}
@@ -88,7 +92,7 @@
                 'dataMethod': 'POST',
                 'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
                 'dataRedirect': app.request.uri,
-                'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')
+                'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')|trans({'%reload_link%': reloadLink})
             }) %}
 
             {% set parameters = {

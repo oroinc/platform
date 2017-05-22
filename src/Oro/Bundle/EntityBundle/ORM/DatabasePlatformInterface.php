@@ -6,6 +6,4 @@ interface DatabasePlatformInterface
 {
     const DATABASE_POSTGRESQL = 'postgresql';
     const DATABASE_MYSQL      = 'mysql';
-
-    const DATABASE_PLATFORM_POSTGRESQL = 'postgresql';
 }

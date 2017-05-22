@@ -26,7 +26,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getMockBuilder(NotificationEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $event->expects($this->once())
+        $event->expects($this->any())
             ->method('getEntity')
             ->will($this->returnValue($entity));
 

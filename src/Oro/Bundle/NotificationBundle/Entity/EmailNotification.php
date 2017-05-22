@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\NotificationBundle\Model\ExtendEmailNotification;
 
 /**
  * EmailNotification
@@ -35,7 +36,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  *      }
  * )
  */
-class EmailNotification
+class EmailNotification extends ExtendEmailNotification
 {
     /**
      * @var integer

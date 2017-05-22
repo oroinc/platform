@@ -63,8 +63,12 @@
     {% set title = transition.buttonTitle|trans({},'workflows') %}
     
     {% set frontendMessage = transition.frontendOptions.message %}
+    {% set transitionMessage = null %}
 
-    {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
+    {% if frontendMessage.content is defined %}
+        {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
+    {% endif %}
+
     {% if transitionMessage and transitionMessage != frontendMessage.content %}
         {# if no translation for message then do not show message #}
         {% set message = frontendMessage|merge({

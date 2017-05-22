@@ -5,31 +5,33 @@ namespace Oro\Bundle\NotificationBundle\Form\Type;
 use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 class EmailNotificationType extends AbstractType
 {
-    /**
-     * @var array
-     */
-    protected $ownershipEntities = [];
+    const NAME = 'emailnotification';
 
-    /**
-     * @var BuildTemplateFormSubscriber
-     */
+    /** @var BuildTemplateFormSubscriber */
     protected $buildTemplateSubscriber;
 
-    /**
-     * @var AdditionalEmailsSubscriber
-     */
+    /** @var AdditionalEmailsSubscriber */
     protected $additionalEmailsSubscriber;
+
+    /** @var ConfigProvider */
+    protected $ownershipConfigProvider;
 
     /** @var RouterInterface */
     private $router;
@@ -48,15 +50,8 @@ class EmailNotificationType extends AbstractType
     ) {
         $this->buildTemplateSubscriber = $buildTemplateSubscriber;
         $this->additionalEmailsSubscriber = $additionalEmailsSubscriber;
+        $this->ownershipConfigProvider = $ownershipConfigProvider;
         $this->router = $router;
-
-        $this->ownershipEntities = [];
-        foreach ($ownershipConfigProvider->getConfigs() as $config) {
-            $ownerType = $config->get('owner_type');
-            if (!empty($ownerType) && $ownerType != OwnershipType::OWNER_TYPE_NONE) {
-                $this->ownershipEntities[$config->getId()->getClassName()] = true;
-            }
-        }
     }
 
     /**
@@ -69,20 +64,20 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'entityName',
-            'oro_email_notification_entity_choice',
+            EmailNotificationEntityChoiceType::NAME,
             [
                 'label'       => 'oro.notification.emailnotification.entity_name.label',
                 'tooltip'     => 'oro.notification.emailnotification.entity_name.tooltip',
                 'required'    => true,
-                'attr'        => [
-                    'data-ownership-entities' => json_encode($this->ownershipEntities)
-                ],
                 'configs'     => [
                     'allowClear' => true
                 ],
                 'tooltip_parameters' => [
                     'url' => $this->router->generate('oro_email_emailtemplate_index')
                 ],
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
             ]
         );
 
@@ -94,12 +89,14 @@ class EmailNotificationType extends AbstractType
                 'class'         => 'OroNotificationBundle:Event',
                 'property'      => 'name',
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
-                        ->orderBy('c.name', 'ASC');
+                    return $er->createQueryBuilder('c')->orderBy('c.name', 'ASC');
                 },
                 'configs'       => [
                     'allowClear'  => true,
                     'placeholder' => 'oro.notification.form.choose_event',
+                ],
+                'attr' => [
+                    'autocomplete' => 'off'
                 ],
                 'empty_value'   => '',
                 'required'      => true
@@ -108,22 +105,59 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'template',
-            'oro_email_template_list',
+            'genemu_jqueryselect2_translatable_entity',
             [
-                'label'       => 'oro.notification.emailnotification.template.label',
-                'required'    => true,
-                'configs'     => [
-                    'allowClear' => true
+                'label' => 'oro.notification.emailnotification.template.label',
+                'class' => 'OroEmailBundle:EmailTemplate',
+                'configs' => [
+                    'allowClear' => true,
+                    'placeholder' => 'oro.email.form.choose_template',
                 ],
+                'empty_value' => '',
+                'required' => true
             ]
         );
 
         $builder->add(
             'recipientList',
-            'oro_notification_recipient_list',
+            RecipientListType::NAME,
             [
                 'label'    => 'oro.notification.emailnotification.recipient_list.label',
                 'required' => true,
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                if ($data instanceof EmailNotification) {
+                    $entityName = $data->getEntityName();
+                    $entities = $this->getOwnershipEntities();
+
+                    if ($entityName && !array_key_exists($entityName, $entities)) {
+                        $recipientList = $event->getForm()->get('recipientList');
+
+                        FormUtils::replaceField(
+                            $recipientList,
+                            'owner',
+                            array_merge($recipientList->get('owner')->getConfig()->getOptions(), ['disabled' => true])
+                        );
+                    }
+                }
+            }
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'data_class' => EmailNotification::class,
+                'intention' => self::NAME
             ]
         );
     }
@@ -131,13 +165,19 @@ class EmailNotificationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $resolver->setDefaults(
-            [
-                'data_class'           => 'Oro\Bundle\NotificationBundle\Entity\EmailNotification',
-                'intention'            => 'emailnotification',
-            ]
+        $view->vars['listenChangeElements'] = array_filter(
+            array_map(
+                function (FormView $view) {
+                    if ($view->vars['name'] === 'entityName') {
+                        return '#' . $view->vars['id'];
+                    }
+
+                    return null;
+                },
+                array_values($view->children)
+            )
         );
     }
 
@@ -154,6 +194,22 @@ class EmailNotificationType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'emailnotification';
+        return self::NAME;
+    }
+
+    /**
+     * @return array
+     */
+    private function getOwnershipEntities()
+    {
+        $ownershipEntities = [];
+        foreach ($this->ownershipConfigProvider->getConfigs() as $config) {
+            $ownerType = $config->get('owner_type');
+            if (!empty($ownerType) && $ownerType !== OwnershipType::OWNER_TYPE_NONE) {
+                $ownershipEntities[$config->getId()->getClassName()] = true;
+            }
+        }
+
+        return $ownershipEntities;
     }
 }

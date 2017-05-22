@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Artifacts;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\TokenGenerator;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LocalHandler implements ArtifactsHandlerInterface
@@ -23,16 +24,16 @@ class LocalHandler implements ArtifactsHandlerInterface
 
     public function __construct(array $config)
     {
-        $this->directory = $config['directory'];
+        $this->directory = rtrim($config['directory'], DIRECTORY_SEPARATOR);
         $this->baseUrl = trim($config['base_url'], " \t\n\r\0\x0B\\");
 
+        $filesystem = new Filesystem();
         if ($config['auto_clear']) {
-            $filesystem = new Filesystem();
             $filesystem->remove($this->directory);
         }
 
-        if (!file_exists($this->directory)) {
-            mkdir($this->directory, 0777, true);
+        if (!$filesystem->exists($this->directory)) {
+            $filesystem->mkdir($this->directory, 0777);
         }
     }
 
@@ -41,16 +42,12 @@ class LocalHandler implements ArtifactsHandlerInterface
      */
     public function save($file)
     {
-        $fileName = uniqid().'.png';
-        $screenshotName = sprintf(
-            '%s/%s',
-            $this->directory,
-            $fileName
-        );
+        $fileName = TokenGenerator::generateToken('image').'.png';
+        $screenshotName = $this->directory.DIRECTORY_SEPARATOR.$fileName;
 
         file_put_contents($screenshotName, $file);
 
-        return $this->baseUrl.'/'.$fileName;
+        return trim($this->baseUrl, '/').'/'.trim($fileName, '/');
     }
 
     /**

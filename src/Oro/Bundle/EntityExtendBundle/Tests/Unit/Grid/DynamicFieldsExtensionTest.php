@@ -146,6 +146,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
+                            'order' => 0
                         ],
                     ],
                     'sorters' => [

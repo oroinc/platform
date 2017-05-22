@@ -2,26 +2,13 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RecipientListType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @param EntityManager $entityManager
-     */
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+    const NAME = 'oro_notification_recipient_list';
 
     /**
      * {@inheritdoc}
@@ -37,6 +24,7 @@ class RecipientListType extends AbstractType
             ]
         );
 
+        // groups
         $builder->add(
             'groups',
             'entity',
@@ -52,28 +40,36 @@ class RecipientListType extends AbstractType
             ]
         );
 
+        // custom email
         $builder->add(
             'email',
             'email',
             ['label' => 'oro.notification.emailnotification.email.label', 'required' => false]
         );
 
+        // owner
         $builder->add(
             'owner',
             'checkbox',
-            ['label' => 'oro.notification.emailnotification.owner.label', 'required' => false]
+            [
+                'label' => 'oro.notification.emailnotification.owner.label',
+                'required' => false,
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
+            ]
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class'           => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
-                'intention'            => 'recipientlist',
+                'data_class' => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
+                'intention' => 'recipientlist',
             ]
         );
     }
@@ -91,6 +87,6 @@ class RecipientListType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'oro_notification_recipient_list';
+        return self::NAME;
     }
 }

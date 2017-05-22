@@ -153,9 +153,10 @@ class ObjectNormalizer
         if (!$config->isExcludeAll()) {
             throw new RuntimeException(
                 sprintf(
-                    'The "%s" must be "%s".',
+                    'The "%s" must be "%s". Object type: "%s".',
                     EntityDefinitionConfig::EXCLUSION_POLICY,
-                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL
+                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL,
+                    ClassUtils::getClass($object)
                 )
             );
         }

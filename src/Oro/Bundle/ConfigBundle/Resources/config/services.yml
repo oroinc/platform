@@ -138,3 +138,8 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
+
+    oro_config.cache.doctrine_metadata:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'doctrine_metadata_config' ] ]

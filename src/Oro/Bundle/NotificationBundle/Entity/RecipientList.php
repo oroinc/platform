@@ -83,10 +83,14 @@ class RecipientList
      * Setter for email
      *
      * @param string $email
+     *
+     * @return $this
      */
     public function setEmail($email)
     {
         $this->email = $email;
+
+        return $this;
     }
 
     /**
@@ -183,10 +187,14 @@ class RecipientList
      * Setter for owner field
      *
      * @param boolean $owner
+     *
+     * @return $this
      */
     public function setOwner($owner)
     {
         $this->owner = $owner;
+
+        return $this;
     }
 
     /**
