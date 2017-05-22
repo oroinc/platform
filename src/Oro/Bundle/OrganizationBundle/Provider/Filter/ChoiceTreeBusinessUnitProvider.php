@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Provider\Filter;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
@@ -60,7 +60,7 @@ class ChoiceTreeBusinessUnitProvider
             ->leftJoin('businessUnit.owner', 'o')
             ->orderBy('businessUnit.id', 'ASC');
         $this->addBusinessUnitName($qb);
-        QueryUtils::applyOptimizedIn($qb, 'businessUnit.id', $this->getBusinessUnitIds());
+        QueryBuilderUtil::applyOptimizedIn($qb, 'businessUnit.id', $this->getBusinessUnitIds());
 
         return $this->aclHelper->apply($qb)->getArrayResult();
     }

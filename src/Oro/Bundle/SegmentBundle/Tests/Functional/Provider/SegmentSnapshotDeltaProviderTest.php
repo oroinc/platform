@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Provider;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentDeltaData;
 use Oro\Bundle\SegmentBundle\Provider\SegmentSnapshotDeltaProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -30,6 +31,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         $segment = $this->getReference(LoadSegmentDeltaData::SEGMENT);
         $expectedEntityIds = [
             ['id' => $this->getReference(LoadSegmentDeltaData::SEGMENT_ADDED)->getId()],
+            ['id' => $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER)->getId()],
         ];
 
         $addedEntityIds = $this->provider->getAddedEntityIds($segment);
@@ -53,6 +55,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         $expectedEntityIds = [
             ['id' => $this->getReference(LoadSegmentDeltaData::SEGMENT_EXISTING)->getId()],
             ['id' => $this->getReference(LoadSegmentDeltaData::SEGMENT_ADDED)->getId()],
+            ['id' => $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER)->getId()],
         ];
 
         $removedEntityIds = $this->provider->getAllEntityIds($segment);

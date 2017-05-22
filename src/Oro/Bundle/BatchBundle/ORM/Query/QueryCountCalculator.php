@@ -6,7 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 
 /**
@@ -67,9 +67,9 @@ class QueryCountCalculator
             $result = $paginator->count();
         } else {
             if ($query instanceof Query) {
-                $parserResult      = QueryUtils::parseQuery($query);
+                $parserResult = QueryUtil::parseQuery($query);
                 $parameterMappings = $parserResult->getParameterMappings();
-                list($params, $types) = QueryUtils::processParameterMappings($query, $parameterMappings);
+                list($params, $types) = QueryUtil::processParameterMappings($query, $parameterMappings);
 
                 $statement = $query->getEntityManager()->getConnection()->executeQuery(
                     sprintf('SELECT COUNT(*) FROM (%s) AS e', $query->getSQL()),

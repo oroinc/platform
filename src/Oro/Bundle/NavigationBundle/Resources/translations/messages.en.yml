@@ -29,8 +29,9 @@ oro:
             menus: All Menus
             submenu: Submenu Item
             reset: Reset
+            reload_link.label: "reload"
             reset_confirm: Are you sure you want to reset menu "%menuKey%"?
-            reset_message: "Menu \"%menuKey%\" was successfully reset. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
+            reset_message: "Menu \"%menuKey%\" was successfully reset. Please %reload_link% the page to see the changes applied."
             reset_ok_text: Yes, Reset
             reset_title: Reset Confirmation
             entity_label: Menu Item
@@ -47,23 +48,23 @@ oro:
             active.label: Active
             priority.label: Priority
             acl_resource_id.label: ACL Resource Id
-            saved_message: "Menu item saved successfully. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
-            deleted_message: "Menu item successfully deleted. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
+            saved_message: "Menu item saved successfully. Please %reload_link% the page to see the changes applied."
+            deleted_message: "Menu item successfully deleted. Please %reload_link% the page to see the changes applied."
             select_existing_or_create_new: Select existing menu item or create new.
             roots_plural_label: Menus
             edit_menus: Edit Menus
             hide: Hide
             show: Show
             delete: Delete
-            hide_success_message: Menu item is hidden now.
-            show_success_message: Menu item is visible now.
+            hide_success_message: "Menu item is hidden now. Please %reload_link% the page to see the changes applied."
+            show_success_message: "Menu item is visible now. Please %reload_link% the page to see the changes applied."
             validation_error_message: Validation error. Please contact system administrator.
             divider: Divider
             custom.label: Is Custom
             divider.label: Is Divider
             icon.label: Icon
             descriptions.label: Description
-            divider_created: Divider created
+            divider_created: "Divider created. Please %reload_link% the page to see the changes applied."
         action:
             manage_menus:
                 label: Manage Menus
