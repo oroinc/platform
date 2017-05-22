@@ -21,6 +21,7 @@ Feature: Notify assigned Sales Representatives
     And press "Create Notification Rule"
     And fill form with:
       |Entity Name |Contact Request |
+    And fill form with:
       |Event Name  |Entity create   |
       |Template    |Test Template   |
       |Groups      |Administrators  |
