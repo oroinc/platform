@@ -971,6 +971,37 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check column is not present in grid
+     * Example: Then I shouldn't see Example column in grid
+     *
+     * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
+     * @param $columnName
+     */
+    public function iShouldNotSeeColumnInGrid($columnName)
+    {
+         self::assertFalse(
+             $this->getGrid()->getHeader()->hasColumn($columnName),
+             sprintf('"%s" column is in grid', $columnName)
+         );
+    }
+
+    /**
+     * Check column is present in grid
+     * Example: Then I should see Example column in grid
+     *
+     * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
+     * @param $columnName
+     */
+    public function iShouldSeeColumnInGrid($columnName)
+    {
+        self::assertTrue(
+            $this->getGrid()->getHeader()->hasColumn($columnName),
+            sprintf('"%s" column is not in grid', $columnName)
+        );
+    }
+
+
+    /**
      * Check visibility checkbox for specified column
      * Show this column in grid
      *

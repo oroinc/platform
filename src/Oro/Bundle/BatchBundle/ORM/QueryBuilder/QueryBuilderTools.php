@@ -5,7 +5,8 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\DqlUtil;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -64,7 +65,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function fixUnusedParameters(QueryBuilder $qb)
     {
-        QueryUtils::removeUnusedParameters($qb);
+        QueryBuilderUtil::removeUnusedParameters($qb);
     }
 
     /**
@@ -77,7 +78,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function dqlContainsParameter($dql, $parameterName)
     {
-        return QueryUtils::dqlContainsParameter($dql, $parameterName);
+        return DqlUtil::hasParameter($dql, $parameterName);
     }
 
     /**
