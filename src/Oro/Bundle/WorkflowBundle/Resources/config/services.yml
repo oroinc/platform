@@ -567,3 +567,11 @@ services:
         arguments:
             - '@oro_workflow.registry.system'
             - '@oro_workflow.helper.translation'
+
+    oro_workflow.migration.demo_data_fixtures_listener.event_trigger:
+        class: Oro\Bundle\WorkflowBundle\EventListener\EventTriggerDemoDataFixturesListener
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

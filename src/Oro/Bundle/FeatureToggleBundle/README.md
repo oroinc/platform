@@ -314,10 +314,9 @@ features:
 
 Using checker for commands
 --------------------------
-In case if we run commands as subcommands we can't skip it globally.
-To avoid running such commands you have to add implementation of FeatureCheckerAwareInterface
-to your parent command, add FeatureCheckerHolderTrait usage and use featureChecker that
-injected automatically direct to your command.
+Commands launched as subcommands cannot be skipped globally. To avoid running such commands, add an implementation of 
+FeatureCheckerAwareInterface to your parent command, import FeatureCheckerHolderTrait (via use FeatureCheckerHolderTrait;), and check the 
+feature status via featureChecker that is automatically injected into your command.
 
 ```php
 <?php
@@ -332,7 +331,7 @@ class LoadDataFixturesCommand implements FeatureCheckerAwareInterface
 
     use FeatureCheckerHolderTrait;
     
-    protected function execeute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $commands = [
             'oro:cron:analytic:calculate' => [],

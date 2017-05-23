@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType as SegmentTypeEntity;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -79,6 +80,7 @@ class SegmentFilterBuilderType extends AbstractType
         $resolver->setDefault('segment_name_template', 'Auto generated segment %s');
         $resolver->setDefault('add_name_field', false);
         $resolver->setDefault('name_field_required', false);
+        $resolver->setDefault('attr', ['data-role' => 'query-designer-container']);
         $resolver->setRequired('segment_entity');
 
         $resolver->setAllowedTypes('segment_entity', 'string');
@@ -110,6 +112,29 @@ class SegmentFilterBuilderType extends AbstractType
             function (Options $options, $value) {
                 if (!$value) {
                     $value = [$this->doctrineHelper->getSingleEntityIdentifierFieldName($options['segment_entity'])];
+                }
+
+                return $value;
+            }
+        );
+
+        $resolver->setNormalizer(
+            'constraints',
+            function (Options $options, $value) {
+                if ($options['required']) {
+                    $hasNotBlankFiltersConstraint = false;
+                    if ($value && !is_array($value)) {
+                        $value = [$value];
+                    }
+                    foreach ((array)$value as $constraint) {
+                        if ($constraint instanceof NotBlankFilters) {
+                            $hasNotBlankFiltersConstraint = true;
+                            break;
+                        }
+                    }
+                    if (!$hasNotBlankFiltersConstraint) {
+                        $value[] = new NotBlankFilters();
+                    }
                 }
 
                 return $value;
