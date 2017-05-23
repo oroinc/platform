@@ -14,6 +14,9 @@ class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameA
      */
     protected $entityName;
 
+    /** @var array fields to correct url encoded data */
+    protected $urlEncodeFields = ['name', 'title', 'userIdentifier', 'url', 'code'];
+
     /**
      * @param string $entityName
      */
@@ -66,6 +69,11 @@ class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameA
     protected function updateData(array $data)
     {
         $result          = [];
+        foreach ($data as $key => $value) {
+            if (in_array($key, $this->urlEncodeFields, true)) {
+                $data[$key] = urldecode($value);
+            }
+        }
         $result['data']  = json_encode($data);
 
         if (empty($data['name'])) {
