@@ -401,7 +401,7 @@ define(function(require) {
             var massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
             if (!this.themeOptions.headerHide) {
-                if (tools.isMobile() && !this.themeOptions.disableFloatingHeaderPlugin) {
+                if (this.metadata.enableFloatingHeaderPlugin) {
                     plugins.push(FloatingHeaderPlugin);
                 } else if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
