@@ -99,7 +99,7 @@ class OroMainContext extends MinkContext implements
         }
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
+        if (preg_match('/^(?:|I )should see .+(flash message|error message)$/', $scope->getStep()->getText())) {
             return;
         }
 
@@ -245,7 +245,7 @@ class OroMainContext extends MinkContext implements
     /**
      * @param \Closure $lambda
      * @param int $timeLimit in seconds
-     * @return false|mixed Return false if closure throw error or return not true value.
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     public function spin(\Closure $lambda, $timeLimit = 60)
@@ -265,7 +265,7 @@ class OroMainContext extends MinkContext implements
             $time -= 0.25;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -561,8 +561,8 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
-        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
-        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         try {
             $button = $this->fixStepArgument($button);
             $modalWindow->pressButton($button);

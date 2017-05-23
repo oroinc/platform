@@ -492,4 +492,16 @@ class FeatureContext extends OroFeatureContext implements
 
         self::assertSame($isLinkVisibleInUserMenuExpectation, $userMenu->hasLink($title));
     }
+
+    /**
+     * Example: And I click Dashboards in menu tree
+     *
+     * @Given /^(?:|I )click (?P<record>[\w\s]+) in menu tree$/
+     */
+    public function iClickLinkInMenuTree($record)
+    {
+        $menuTree = $this->createElement('MenuTree');
+        self::assertTrue($menuTree->isValid());
+        $menuTree->clickLink($record);
+    }
 }

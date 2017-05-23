@@ -12,7 +12,8 @@ Scenario: Add note to user entity
   And click Edit User in grid
   And I check "Notes"
   When I save and close form
-  Then click update schema
+  And click update schema
+  Then I should see Schema updated flash message
 
 Scenario: Add note
   Given the following user:

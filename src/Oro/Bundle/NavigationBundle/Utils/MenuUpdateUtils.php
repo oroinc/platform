@@ -75,13 +75,15 @@ class MenuUpdateUtils
      * @param MenuUpdateInterface $update
      * @param ItemInterface $menu
      * @param LocalizationHelper $localizationHelper
+     * @param array $options
      */
     public static function updateMenuItem(
         MenuUpdateInterface $update,
         ItemInterface $menu,
-        LocalizationHelper $localizationHelper
+        LocalizationHelper $localizationHelper,
+        array $options = []
     ) {
-        $item = self::findOrCreateMenuItem($update, $menu);
+        $item = self::findOrCreateMenuItem($update, $menu, $options);
         if ($item === null) {
             return;
         }
@@ -104,10 +106,14 @@ class MenuUpdateUtils
     /**
      * @param MenuUpdateInterface $update
      * @param ItemInterface $menu
+     * @param array $options
      * @return ItemInterface|null
      */
-    protected static function findOrCreateMenuItem(MenuUpdateInterface $update, ItemInterface $menu)
-    {
+    protected static function findOrCreateMenuItem(
+        MenuUpdateInterface $update,
+        ItemInterface $menu,
+        array $options = []
+    ) {
         $item = self::findMenuItem($menu, $update->getKey());
         if ($item === null && !$update->isCustom()) {
             return null;
@@ -117,12 +123,12 @@ class MenuUpdateUtils
         $parentItem = $parentItem === null ? $menu : $parentItem;
 
         if ($item === null) {
-            $item = $parentItem->addChild($update->getKey());
+            $item = $parentItem->addChild($update->getKey(), $options);
         }
 
         if ($item->getParent()->getName() !== $parentItem->getName()) {
             $item->getParent()->removeChild($item->getName());
-            $item = $parentItem->addChild($item);
+            $item = $parentItem->addChild($item, $options);
         }
         return $item;
     }

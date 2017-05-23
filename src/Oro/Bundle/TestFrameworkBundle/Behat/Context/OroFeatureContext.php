@@ -12,7 +12,7 @@ class OroFeatureContext extends RawMinkContext
     /**
      * @param \Closure $lambda
      * @param int $timeLimit in seconds
-     * @return false|mixed Return false if closure throw error or return not true value.
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     public function spin(\Closure $lambda, $timeLimit = 60)
@@ -30,7 +30,7 @@ class OroFeatureContext extends RawMinkContext
             usleep(250000);
             $time -= 0.25;
         }
-        return false;
+        return null;
     }
 
     /**
