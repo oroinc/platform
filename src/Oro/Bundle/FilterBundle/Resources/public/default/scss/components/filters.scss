@@ -100,7 +100,7 @@
 
         .filter-criteria {
             min-width: 340px !important;
-            margin-top: 0;
+            margin-top: 5px;
             padding: 20px;
 
             &:not([style]),
@@ -531,8 +531,6 @@
         padding: 20px 20px 10px;
 
         @media (max-width: $screen-md) {
-            left: 1.5rem !important;
-
             width: calc(100% - 30px) !important;
             min-width: 0 !important;
         }
