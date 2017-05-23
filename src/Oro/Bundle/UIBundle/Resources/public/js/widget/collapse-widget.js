@@ -7,6 +7,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         options: {
             trigger: '[data-collapse-trigger]',
             container: '[data-collapse-container]',
+            globalTrigger: null,
             hideSibling: false,
             storageKey: '',
             open: true,
@@ -41,6 +42,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$el.addClass('init');
 
             this._initEvents();
+            this._bindGlobalTrigger();
 
             this.$el.toggleClass(this.options.openClass, this.options.open);
             this.$el.toggleClass(
@@ -57,6 +59,34 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 mediator.trigger('scrollable-table:reload');
             } else {
                 this.$container.hide();
+            }
+        },
+
+        _bindGlobalTrigger: function() {
+            var self = this;
+            var globalTrigger = this.options.globalTrigger;
+            var triggerBind = $(globalTrigger).attr('data-event-bind');
+            var animationSpeed = this.options.animationSpeed;
+
+            if (globalTrigger) {
+                //Bind onClick event(toggle expanded class) only for the first instance
+                if (!triggerBind) {
+                    $(globalTrigger).on('click', function() {
+                        $(this).toggleClass('expanded');
+                    });
+                    $(globalTrigger).toggleClass('expanded');
+                    $(globalTrigger).attr('data-event-bind', true);
+                }
+                //Bind onClick event(animation for container) for each items
+                $(globalTrigger).on('click', function() {
+                    if (!$(this).hasClass('expanded')) {
+                        self.$container.slideUp(animationSpeed);
+                        self._setState(false);
+                    } else {
+                        self.$container.slideDown(animationSpeed);
+                        self._setState(true);
+                    }
+                });
             }
         },
 
