@@ -307,14 +307,25 @@ class OroTestFrameworkExtension implements TestworkExtension
                 $config
             );
 
-            $pages = array_merge($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
-            $elements = array_merge($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
+            $this->appendConfiguration($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
+            $this->appendConfiguration($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
             $suites = array_merge($suites, $processedConfiguration[self::SUITES_CONFIG_ROOT]);
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
         $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
         $container->setParameter('suite.configurations', $suites);
+    }
+
+    private function appendConfiguration(array &$baseConfig, array $config)
+    {
+        foreach ($config as $key => $value) {
+            if (array_key_exists($key, $baseConfig)) {
+                throw new \InvalidArgumentException(sprintf('Configuration with "%s" key is already defined', $key));
+            }
+
+            $baseConfig[$key] = $value;
+        }
     }
 
     /**
