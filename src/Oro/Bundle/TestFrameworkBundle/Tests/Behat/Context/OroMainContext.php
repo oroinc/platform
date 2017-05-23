@@ -1102,14 +1102,4 @@ class OroMainContext extends MinkContext implements
         $field->keyDown(13);
         $this->waitForAjax();
     }
-
-    /**
-     * This method should be used only for debug
-     * @When /^I wait for action$/
-     */
-    public function iWait()
-    {
-        fputs(STDOUT, "Press [RETURN] to continue...");
-        while (fgets(STDIN, 1024) == '') {}
-    }
 }
