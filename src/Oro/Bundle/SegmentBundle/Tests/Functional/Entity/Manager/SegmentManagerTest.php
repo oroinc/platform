@@ -16,6 +16,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SegmentManagerTest extends WebTestCase
 {
     /** @var SegmentManager */
@@ -58,6 +61,8 @@ class SegmentManagerTest extends WebTestCase
         $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
         /** @var Segment $staticSegmentWithFilter */
         $staticSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING);
+        /** @var Segment $staticSegmentWithSegmentFilter */
+        $staticSegmentWithSegmentFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
 
         $this->assertEquals(
             [
@@ -80,6 +85,11 @@ class SegmentManagerTest extends WebTestCase
                     [
                         'id'   => 'segment_' . $staticSegmentWithFilter->getId(),
                         'text' => $staticSegmentWithFilter->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id'   => 'segment_' . $staticSegmentWithSegmentFilter->getId(),
+                        'text' => $staticSegmentWithSegmentFilter->getName(),
                         'type' => 'segment',
                     ]
                 ],
@@ -200,6 +210,7 @@ class SegmentManagerTest extends WebTestCase
         $repository = $registry->getRepository(User::class);
 
         $qb = $repository->createQueryBuilder('u');
+        $qb->addOrderBy($qb->expr()->asc('u.id'));
         $resultBeforeFilter = $qb->getQuery()->getResult();
         $this->manager->filterBySegment($qb, $segment);
 
@@ -244,6 +255,7 @@ class SegmentManagerTest extends WebTestCase
         $repository = $registry->getRepository(User::class);
 
         $qb = $repository->createQueryBuilder('u');
+        $qb->addOrderBy($qb->expr()->asc('u.id'));
         $this->manager->filterBySegment($qb, $segment);
 
         $result = $qb->getQuery()->getResult();
