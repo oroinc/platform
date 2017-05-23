@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -16,6 +18,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 use Symfony\Component\DomCrawler\Crawler;
@@ -25,10 +28,25 @@ use Symfony\Component\DomCrawler\Crawler;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class GridContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
+
+    /**
+     * @var OroMainContext
+     */
+    private $oroMainContext;
+
+    /**
+     * @BeforeScenario
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+        $this->oroMainContext = $environment->getContext(OroMainContext::class);
+    }
 
     /**
      * @var int
@@ -41,6 +59,126 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iDonTSelectAnyRecordFromGrid()
     {
         // No need to do anything
+    }
+
+    /**
+     * Mass inline grid field edit
+     * Accept table and pass it to inlineEditField
+     * Example: When I edit first record from grid:
+     *            | name      | editedName       |
+     *            | status    | Qualified        |
+     *
+     * @Then I edit first record from grid:
+     * @param TableNode $table
+     */
+    public function iEditFirstRecordFromGrid(TableNode $table)
+    {
+        foreach ($table->getRows() as $row) {
+            list($field, $value) = $row;
+            $this->inlineEditField($field, $value);
+            $this->waitForAjax();
+        }
+    }
+
+    /**
+     * Inline grid field edit with click on empty space
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" with click on empty space$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" with click on empty space$/
+     */
+    public function inlineEditRecordInGridWithClickOnEmptySpace($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValue($field, $value);
+        // click any where on the page
+        $this->getPage()->find('css', '#container')->click();
+        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+    }
+
+    /**
+     * Inline grid field edit by double click
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" by double click$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" by double click$/
+     */
+    public function inlineEditRecordInGridByDoubleclick($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueByDoubleClick($field, $value);
+    }
+
+    /**
+     * @param string $entityTitle
+     * @return \Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
+     */
+    protected function getGridRow($entityTitle = null)
+    {
+        /** @var Grid $grid */
+        $grid = $this->createElement('Grid');
+
+        if (null !== $entityTitle) {
+            $row = $grid->getRowByContent($entityTitle);
+        } else {
+            $rows = $grid->getRows();
+            self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.' .
+                PHP_EOL . 'You can specify row content for edit field in specific row.', count($rows)));
+
+            $row = array_shift($rows);
+        }
+
+        return $row;
+    }
+
+    /**
+     * Inline edit field
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)"$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)"$/
+     */
+    public function inlineEditField($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueAndSave($field, $value);
+        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+    }
+
+    /**
+     * Inline edit field and don't save
+     * Example: When I edit Status as "Open" without saving
+     * Example: Given I edit Probability as "30" without saving
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" without saving$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" without saving$/
+     */
+    public function inlineEditFieldWithoutSaving($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValue($field, $value);
+    }
+
+    /**
+     * Inline edit field and cancel
+     * Example: When I edit Status as "Open" and cancel
+     * Example: Given I edit Probability as "30" and cancel
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" and cancel$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" and cancel$/
+     */
+    public function inlineEditFieldAndCancel($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueAndCancel($field, $value);
     }
 
     /**
@@ -509,8 +647,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
-
-        $this->checkItemsInFilter($filterItem, $filterItems);
+        $filterItem->checkItemsInFilter($filterItems);
     }
 
     /**
@@ -526,19 +663,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterLabel, true);
-
-        $this->checkItemsInFilter($filterItem, $filterItems);
-    }
-
-    /**
-     * @param MultipleChoice $filter
-     * @param string $filterItems
-     */
-    protected function checkItemsInFilter(MultipleChoice $filter, $filterItems)
-    {
-        $filterItems = array_map('trim', explode(',', $filterItems));
-
-        $filter->checkItems($filterItems);
+        $filterItem->checkItemsInFilter($filterItems);
     }
 
     /**
@@ -712,7 +837,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $this->getGrid()->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
-        $this->getSession()->getDriver()->waitForAjax();
+        $this->waitForAjax();
     }
 
     /**
@@ -846,6 +971,37 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check column is not present in grid
+     * Example: Then I shouldn't see Example column in grid
+     *
+     * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
+     * @param $columnName
+     */
+    public function iShouldNotSeeColumnInGrid($columnName)
+    {
+         self::assertFalse(
+             $this->getGrid()->getHeader()->hasColumn($columnName),
+             sprintf('"%s" column is in grid', $columnName)
+         );
+    }
+
+    /**
+     * Check column is present in grid
+     * Example: Then I should see Example column in grid
+     *
+     * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
+     * @param $columnName
+     */
+    public function iShouldSeeColumnInGrid($columnName)
+    {
+        self::assertTrue(
+            $this->getGrid()->getHeader()->hasColumn($columnName),
+            sprintf('"%s" column is not in grid', $columnName)
+        );
+    }
+
+
+    /**
      * Check visibility checkbox for specified column
      * Show this column in grid
      *
@@ -900,7 +1056,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function perPageAmountShouldBe($expectedAmount)
     {
-        $perPage = $this->elementFactory->createElement('GridToolBarTools')->getPerPageAmount();
+        /** @var GridToolBarTools $gridToolBarTools */
+        $gridToolBarTools = $this->elementFactory->createElement('GridToolBarTools');
+        $perPage = $gridToolBarTools->getPerPageAmount();
 
         self::assertNotNull($perPage, 'Grid per page control elements not found on current page');
         self::assertEquals($expectedAmount, $perPage);

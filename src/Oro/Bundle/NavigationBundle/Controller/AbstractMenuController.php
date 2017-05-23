@@ -350,6 +350,6 @@ abstract class AbstractMenuController extends Controller
      */
     protected function getSavedSuccessMessage()
     {
-        return $this->get('translator')->trans('oro.navigation.menuupdate.saved_message');
+        return $this->renderView('@OroNavigation/menuUpdate/savedSuccessMessage.html.twig');
     }
 }

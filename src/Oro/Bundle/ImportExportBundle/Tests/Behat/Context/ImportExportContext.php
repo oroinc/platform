@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-
 use Doctrine\Common\Inflector\Inflector;
-
 use Gaufrette\File;
-
 use Guzzle\Http\Client;
 use Guzzle\Plugin\Cookie\Cookie;
 use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
 use Guzzle\Plugin\Cookie\CookiePlugin;
-
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -106,7 +102,10 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
             'oro_importexport_export_template',
             ['processorAlias' => array_shift($processors)]
         ));
-        $this->template = tempnam(sys_get_temp_dir(), 'opportunity_template_');
+        $this->template = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_template_'
+        );
 
         $cookies = $this->getSession()->getDriver()->getWebDriverSession()->getCookie()[0];
         $cookie = new Cookie();
@@ -242,7 +241,10 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      */
     public function iFillTemplateWithData(TableNode $table)
     {
-        $this->importFile = tempnam(sys_get_temp_dir(), 'opportunity_import_data_');
+        $this->importFile = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_data_'
+        );
         $fp = fopen($this->importFile, 'w');
         $csv = array_map('str_getcsv', file($this->template));
         $headers = array_shift($csv);

@@ -17,6 +17,7 @@ class LoadSegmentData extends AbstractFixture
     const SEGMENT_DYNAMIC_WITH_FILTER = 'segment_dynamic_with_filter';
     const SEGMENT_STATIC = 'segment_static';
     const SEGMENT_STATIC_WITH_FILTER_AND_SORTING = 'segment_static_with_filter_and_sorting';
+    const SEGMENT_STATIC_WITH_SEGMENT_FILTER = 'segment_static_with_segment_filter';
 
     /** @var array */
     private static $segments = [
@@ -58,7 +59,7 @@ class LoadSegmentData extends AbstractFixture
                             'filter' => 'string',
                             'data' => [
                                 'value' => 'Some not existing name',
-                                'type' => 1,
+                                'type' => TextFilterType::TYPE_CONTAINS,
                             ]
                         ]
                     ]
@@ -110,6 +111,35 @@ class LoadSegmentData extends AbstractFixture
                 ]
             ]
         ],
+        self::SEGMENT_STATIC_WITH_SEGMENT_FILTER => [
+            'name' => 'Static Segment with Segment Filter applied',
+            'description' => 'Static Segment Description',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_STATIC,
+            'definition' => [
+                'columns' => [
+                    [
+                        'func' => null,
+                        'label' => 'Label',
+                        'name' => 'name',
+                        'sorting' => 'DESC'
+                    ]
+                ],
+                'filters' =>[
+                    [
+                        'columnName' => 'id',
+                        'criteria' => 'condition-segment',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'value' => null, //Will be set to static segment id
+                                'type' => null,
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
     ];
 
     /**
@@ -137,6 +167,20 @@ class LoadSegmentData extends AbstractFixture
             $manager->persist($entity);
         }
 
+        $manager->flush();
+        $this->applySegmentFilterToDefinition($manager);
+    }
+
+    /**
+     * @param ObjectManager $manager
+     */
+    private function applySegmentFilterToDefinition(ObjectManager $manager)
+    {
+        $staticSegment = $this->getReference(self::SEGMENT_STATIC);
+        $staticSegmentWithSegmentFilter = $this->getReference(self::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        $definition = self::$segments[self::SEGMENT_STATIC_WITH_SEGMENT_FILTER]['definition'];
+        $definition['filters'][0]['criterion']['data']['value'] = $staticSegment->getId();
+        $staticSegmentWithSegmentFilter->setDefinition(json_encode($definition));
         $manager->flush();
     }
 }

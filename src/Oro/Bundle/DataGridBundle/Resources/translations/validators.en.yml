@@ -2,3 +2,4 @@ oro:
     datagrid:
         gridview:
             unique: This name already exists.
+            notBlank: This value should not be blank.

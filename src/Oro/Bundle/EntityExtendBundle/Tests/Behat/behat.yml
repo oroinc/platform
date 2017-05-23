@@ -3,8 +3,10 @@ oro_behat_extension:
     OroEntityExtendBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
-        - Oro\Bundle\EntityExtendBundle\Tests\Behat\Context\EntityExtendContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroEntityExtendBundle::EntityExtendContext
+        - OroSecurityBundle::ACLContext
       paths:
         - '@OroEntityExtendBundle/Tests/Behat/Features'
   elements:
@@ -19,9 +21,6 @@ oro_behat_extension:
     Update Schema:
       selector: '.btn-danger[title="Update schema"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-
-    OptionCollection:
-      class: Oro\Bundle\EntityExtendBundle\Tests\Behat\Element\OptionCollection
 
     Target Entity:
       selector: 'select[data-name="field__target-entity"]'
