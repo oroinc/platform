@@ -188,7 +188,7 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     protected function canMakeNewAttempt(RestException $exception)
     {
         $response = $exception->getResponse();
-        if ($this->isNewAttemptAvailable($response)) {
+        if ($response instanceof RestResponseInterface && $this->isNewAttemptAvailable($response)) {
             $this->nextAttempt();
             return true;
         }

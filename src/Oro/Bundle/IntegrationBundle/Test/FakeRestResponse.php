@@ -149,9 +149,11 @@ class FakeRestResponse implements RestResponseInterface
     {
         $data = json_decode((string) $this->body, true);
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw RestException::createFromResponse(
-                $this,
-                'Unable to parse response body into JSON'
+            $exception = new \RuntimeException('Unable to parse response body into JSON: ' . json_last_error());
+            throw new RestException(
+                $exception->getMessage(),
+                $exception->getCode(),
+                $exception
             );
         }
 

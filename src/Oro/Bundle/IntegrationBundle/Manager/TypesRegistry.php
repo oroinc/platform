@@ -61,6 +61,25 @@ class TypesRegistry
     }
 
     /**
+     * @param string $typeName
+     *
+     * @return IntegrationInterface
+     */
+    public function getIntegrationByType($typeName)
+    {
+        if ($this->integrationTypes->containsKey($typeName)) {
+            return $this->integrationTypes->get($typeName);
+        } else {
+            throw new LogicException(
+                sprintf(
+                    'Integration type "%s" not found.',
+                    $typeName
+                )
+            );
+        }
+    }
+
+    /**
      * Collect available types for choice field
      *
      * @return array
