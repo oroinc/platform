@@ -4,7 +4,5 @@
 oro:
     navigation:
         menuupdate:
-            hide_success_message: "Menu item is hidden now. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
-            show_success_message: "Menu item is visible now. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
-            moved_success_message: "The menu has been updated. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
-            divider_created: "Divider created. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
+            reload_link.label: "reload"
+            moved_success_message: "The menu has been updated. Please {{ reload_link }} the page to see the changes applied."

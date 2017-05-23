@@ -116,6 +116,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
 
         _initConditionBuilder: function() {
             var $root = this.element;
+            $(this.element).addClass('ui-widget-oroquerydesigner-condition-builder');
             var sortableConnectWith = this.options.sortable.connectWith;
             if (!$root.is(sortableConnectWith)) {
                 $root = $root.find(sortableConnectWith);

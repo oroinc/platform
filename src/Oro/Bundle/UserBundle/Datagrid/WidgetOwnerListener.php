@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Datagrid;
 
 use Doctrine\ORM\Query;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -48,7 +48,7 @@ class WidgetOwnerListener
             $qb          = $dataSource->getQueryBuilder();
             $rootAliases = $qb->getRootAliases();
             $field       = sprintf('%s.%s', reset($rootAliases), $this->ownerField);
-            QueryUtils::applyOptimizedIn($qb, $field, $ids);
+            QueryBuilderUtil::applyOptimizedIn($qb, $field, $ids);
 
             /** @var Query $query */
             $query = $event->getQuery();

@@ -21,4 +21,4 @@ Feature: Shortcuts feature
     Given I follow "Shortcuts"
     When I type "Compose" in "Enter shortcut action"
     And click "Compose Email" in shortcuts search results
-    Then I should see an "EmailForm" element
+    Then I should see an "Email Form" element

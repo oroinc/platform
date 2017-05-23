@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -149,7 +149,7 @@ class DefaultProcessor implements BoardProcessorInterface
      */
     protected function prepareWhereExpression($qb, $property, $optionIds)
     {
-        $propertyExpr = QueryUtils::getSelectExprByAlias($qb, $property);
+        $propertyExpr = QueryBuilderUtil::getSelectExprByAlias($qb, $property);
         $expressions = [];
         foreach ($optionIds as $optionId) {
             if ($optionId === null) {
