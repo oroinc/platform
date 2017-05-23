@@ -3,11 +3,13 @@
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
@@ -251,11 +253,56 @@ class SegmentManager
 
             $identifier = $this->getIdentifierFieldName($segment->getEntity());
             if ($segment->isDynamic() && $segment->getRecordsLimit()) {
-                $idsResult = $queryBuilder->getQuery()->getArrayResult();
-                if (!$idsResult) {
+
+                $queryBuilder->setMaxResults($segment->getRecordsLimit());
+
+                $queryBuilder->resetDQLParts(['select']);
+                $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+                $queryBuilder->select($tableAlias . '.' . $identifier);
+                $subQuery = $queryBuilder->getQuery()->getDQL();
+                //$queryBuilder->setMaxResults(null);
+
+               /* $queryBuilder->resetDQLParts(['orderBy', 'select', 'where']);
+
+                $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+                //$queryBuilder->select($tableAlias . '.' . $identifier);
+                $queryBuilder->select($tableAlias);
+                $purifiedSelectDQL = $queryBuilder->getQuery()->getDQL();
+                $idsResult = $queryBuilder->getQuery()->getArrayResult();*/
+              // $queryBuilder->getQuery()->setDQL($originalSelectDQL);
+
+                //$subQuery .= ' ,ORO_LIMIT(10)';
+                /*$queryBuilder->join(
+                    'Oro\Bundle\ProductBundle\Entity\Product',
+                    'virtualRelation',
+                    'WITH',
+                    'virtualRelation = ORO_LIMIT(' . $subQuery . ')'
+                );*/
+                //$dql = $queryBuilder->getDQL();
+                //$results = $queryBuilder->getQuery()->getResult();
+                $externalQueryBuilder
+                    ->getEntityManager()
+                    ->getConfiguration()
+                    ->addCustomStringFunction(OroLimitFunction::NAME, OroLimitFunction::class);
+               /* $queryBuilder->getQuery()->setDQL($subQuery);
+                $sql = $queryBuilder->getQuery()->getSQL();
+                $dql = $queryBuilder->getQuery()->getSQL();
+                $results = $queryBuilder->getQuery()->getResult();*/
+               //return;
+                /*if (!$idsResult) {
                     return [0];
                 }
-                $subQuery = array_column($idsResult, $identifier);
+                $subQuery = array_column($idsResult, $identifier);*/
+
+                $externalQueryBuilder
+                    ->getEntityManager()
+                    ->getConfiguration()
+                    ->setDefaultQueryHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
+
+                $externalQueryBuilder
+                    ->getEntityManager()
+                    ->getConfiguration()
+                    ->setDefaultQueryHint('custom_hint', 'foo_bar');
             } else {
                 if ($segment->isDynamic()) {
                     $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
@@ -263,11 +310,12 @@ class SegmentManager
                     $queryBuilder->select($tableAlias . '.' . $identifier);
                 }
                 $subQuery = $queryBuilder->getDQL();
-                /** @var Parameter[] $params */
-                $params = $queryBuilder->getParameters();
-                foreach ($params as $param) {
-                    $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
-                }
+            }
+
+            /** @var Parameter[] $params */
+            $params = $queryBuilder->getParameters();
+            foreach ($params as $param) {
+                $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
 
             return $subQuery;
