@@ -22,9 +22,6 @@ oro_behat_extension:
       selector: '.btn-danger[title="Update schema"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    OptionCollection:
-      class: Oro\Bundle\EntityExtendBundle\Tests\Behat\Element\OptionCollection
-
     Target Entity:
       selector: 'select[data-name="field__target-entity"]'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
