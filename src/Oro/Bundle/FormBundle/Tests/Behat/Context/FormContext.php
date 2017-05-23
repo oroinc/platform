@@ -285,6 +285,28 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $form->uncheckUseDefaultCheckbox($label);
     }
 
+    /**
+     * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
+     */
+    public function iUncheckElement($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isIsset(), sprintf('Element "%s" not found', $elementName));
+
+        $element->uncheck();
+    }
+
+    /**
+     * @Given /^(?:|I )check "(?P<value>[^"]*)" element$/
+     */
+    public function iCheckElement($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isIsset(), sprintf('Element "%s" not found', $elementName));
+
+        $element->check();
+    }
+
     /**.
      * @return OroForm
      */

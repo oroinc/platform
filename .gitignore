@@ -8,3 +8,4 @@ composer.lock
 phpunit.xml
 *~
 node_modules
+/components

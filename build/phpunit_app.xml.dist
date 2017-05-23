@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
+        backupGlobals="false"
+        backupStaticAttributes="false"
+        bootstrap="vendor/autoload.php"
+        cacheTokens="true"
+        stopOnError="false"
+        stopOnFailure="false"
+        stopOnWarning="false"
+        stopOnIncomplete="false"
+        stopOnRisky="false"
+        stopOnSkipped="false"
+        failOnRisky="false"
+        failOnWarning="true"
+        beStrictAboutChangesToGlobalState="false"
+        beStrictAboutOutputDuringTests="false"
+        beStrictAboutResourceUsageDuringSmallTests="false"
+        beStrictAboutTestsThatDoNotTestAnything="false"
+        beStrictAboutTodoAnnotatedTests="false"
+        beStrictAboutCoversAnnotation="false"
+        checkForUnintentionallyCoveredCode="false"
+        enforceTimeLimit="false"
+        verbose="false">
+
+    <groups>
+        <exclude>
+            <group>dist</group>
+            <group>install</group>
+        </exclude>
+    </groups>
+    <testsuites>
+        <testsuite name="unit">
+            <directory>vendor/oro/*/Tests/Unit</directory>
+            <directory>vendor/oro/*/*/Tests/Unit</directory>
+            <directory>vendor/oro/*/*/*/Tests/Unit</directory>
+            <directory>vendor/oro/*/*/*/*/Tests/Unit</directory>
+            <directory>vendor/oro/*/*/*/*/*/Tests/Unit</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>vendor/oro/*/Tests/Functional</directory>
+            <directory>vendor/oro/*/*/Tests/Functional</directory>
+            <directory>vendor/oro/*/*/*/Tests/Functional</directory>
+            <directory>vendor/oro/*/*/*/*/Tests/Functional</directory>
+            <directory>vendor/oro/*/*/*/*/*/Tests/Functional</directory>
+        </testsuite>
+        <testsuite name="selenium">
+            <directory>vendor/oro/*/Tests/Selenium</directory>
+            <directory>vendor/oro/*/*/Tests/Selenium</directory>
+            <directory>vendor/oro/*/*/*/Tests/Selenium</directory>
+            <directory>vendor/oro/*/*/*/*/Tests/Selenium</directory>
+            <directory>vendor/oro/*/*/*/*/*/Tests/Selenium</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="SYMFONY_ENV" value="test"/>
+        <env name="SYMFONY_DEBUG" value="0"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="-1"/>
+        <server name="KERNEL_DIR" value="app/"/>
+        <const name="PHPUNIT_LOAD_LIMIT" value="1.2"/>
+        <const name="PHPUNIT_PAGE_LIMIT" value="0.5"/>
+        <const name="PHPUNIT_TESTSUITE_BROWSER_PATH_WINNT" value="C:\Dev\phantomjs-1.9.0-windows\phantomjs.exe"/>
+        <const name="PHPUNIT_TESTSUITE_BROWSER_PATH_LINUX" value="/usr/bin/phantomjs"/>
+        <!--<const name="PHPUNIT_TESTSUITE_BROWSER_PATH_LINUX" value="/usr/bin/google-chrome"/>-->
+        <!--<const name="PHPUNIT_TESTSUITE_BROWSER_PATH_LINUX" value="/usr/bin/firefox"/>-->
+        <const name="PHPUNIT_TESTSUITE" value="true"/>
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST" value="127.0.0.1"/>
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT" value="4444"/>
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER" value="phantomjs"/>
+        <!--<const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER" value="chrome"/>-->
+        <!--<const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER" value="firefox"/>-->
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL" value="http://localhost.com"/>
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE"
+               value="http://localhost.com/bundles/orotestframework/scripts/phpunit_coverage.php"/>
+        <const name="MAX_EXECUTION_TIME" value="240000"/>
+        <const name="TIME_OUT" value="5000"/>
+        <const name="viewportWIDTH" value="1900"/>
+        <const name="viewportHEIGHT" value="1080"/>
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PATH_LOGS" value="app/log"/>
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN" value="admin"/>
+        <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS" value="admin"/>
+    </php>
+    <listeners>
+        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener">
+            <arguments>
+                <array>
+                    <element key="slowThreshold">
+                        <integer>1000</integer>
+                    </element>
+                </array>
+            </arguments>
+        </listener>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+        <listener class="MyBuilder\PhpunitAccelerator\TestListener"/>
+    </listeners>
+    <filter>
+        <whitelist>
+            <directory>vendor/oro</directory>
+            <exclude>
+                <directory>vendor/oro/*/Command</directory>
+                <directory>vendor/oro/*/*/Command</directory>
+                <directory>vendor/oro/*/*/*/Command</directory>
+                <directory>vendor/oro/*/*/*/*/Command</directory>
+                <directory>vendor/oro/*/*/*/*/*/Command</directory>
+
+                <directory>vendor/oro/*/Controller</directory>
+                <directory>vendor/oro/*/*/Controller</directory>
+                <directory>vendor/oro/*/*/*/Controller</directory>
+                <directory>vendor/oro/*/*/*/*/Controller</directory>
+                <directory>vendor/oro/*/*/*/*/*/Controller</directory>
+
+                <directory>vendor/oro/*/Entity/Repository</directory>
+                <directory>vendor/oro/*/*/Entity/Repository</directory>
+                <directory>vendor/oro/*/*/*/Entity/Repository</directory>
+                <directory>vendor/oro/*/*/*/*/Entity/Repository</directory>
+                <directory>vendor/oro/*/*/*/*/*/Entity/Repository</directory>
+
+                <directory>vendor/oro/*/Migrations</directory>
+                <directory>vendor/oro/*/*/Migrations</directory>
+                <directory>vendor/oro/*/*/*/Migrations</directory>
+                <directory>vendor/oro/*/*/*/*/Migrations</directory>
+                <directory>vendor/oro/*/*/*/*/*/Migrations</directory>
+
+                <directory>vendor/oro/*/Tests</directory>
+                <directory>vendor/oro/*/*/Tests</directory>
+                <directory>vendor/oro/*/*/*/Tests</directory>
+                <directory>vendor/oro/*/*/*/*/Tests</directory>
+                <directory>vendor/oro/*/*/*/*/*/Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>

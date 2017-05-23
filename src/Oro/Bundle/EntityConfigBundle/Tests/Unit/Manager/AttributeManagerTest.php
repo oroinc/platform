@@ -20,6 +20,9 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\EntityTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AttributeManagerTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
@@ -568,5 +571,44 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     private function createAttributeGroupRelation($attributeId)
     {
         return $this->getEntity(AttributeGroupRelation::class, ['entityConfigFieldId' => $attributeId]);
+    }
+
+    public function testIsActive()
+    {
+        $config = $this->createMock(ConfigInterface::class);
+        $config
+            ->expects($this->exactly(2))
+            ->method('in')
+            ->with('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE])
+            ->willReturn(true);
+
+        $attributeFieldName = 'attributeFieldName';
+        $entityClassName = 'entityClassName';
+
+        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->with($entityClassName, $attributeFieldName)
+            ->willReturn($config);
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendConfigProvider);
+
+        /** @var FieldConfigModel $attribute */
+        $attribute = $this->getEntity(FieldConfigModel::class, [
+            'fieldName' => $attributeFieldName,
+            'entity' => $this->getEntity(EntityConfigModel::class, ['className' => $entityClassName])
+        ]);
+
+        $this->assertEquals(true, $this->manager->isActive($attribute));
+        // Check that configManager::getProvider() called once
+        $this->assertEquals(true, $this->manager->isActive($attribute));
     }
 }
