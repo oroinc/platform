@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
@@ -27,10 +27,10 @@ class OwnersWidgetProviderFilter implements WidgetProviderFilterInterface
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
         $owners = $this->ownerHelper->getOwnerIds($widgetOptions);
-        $alias = QueryUtils::getSingleRootAlias($queryBuilder, false);
+        $alias = QueryBuilderUtil::getSingleRootAlias($queryBuilder, false);
         if ($owners) {
             // check if options are for opportunity_by_status
-            QueryUtils::applyOptimizedIn($queryBuilder, $alias.'.owner', $owners);
+            QueryBuilderUtil::applyOptimizedIn($queryBuilder, $alias.'.owner', $owners);
         }
     }
 }

@@ -8,8 +8,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class EmailActivityEntityApiEntityManager extends ApiEntityManager
@@ -58,7 +58,7 @@ class EmailActivityEntityApiEntityManager extends ApiEntityManager
                     // @see Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager::getEmailContext
                     $qb->andWhere(
                         $qb->expr()->neq(
-                            QueryUtils::getSelectExprByAlias($qb, 'entityId'),
+                            QueryBuilderUtil::getSelectExprByAlias($qb, 'entityId'),
                             $currentUser->getId()
                         )
                     );

@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -149,7 +149,7 @@ class SetTotalCountHeader implements ProcessorInterface
     protected function cloneQuery($query)
     {
         if ($query instanceof Query) {
-            return QueryUtils::cloneQuery($query);
+            return QueryUtil::cloneQuery($query);
         }
 
         return clone $query;

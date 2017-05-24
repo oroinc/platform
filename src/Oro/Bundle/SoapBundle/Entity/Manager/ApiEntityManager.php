@@ -12,11 +12,11 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
@@ -389,7 +389,7 @@ class ApiEntityManager
      */
     protected function normalizeCriteria($criteria)
     {
-        return QueryUtils::normalizeCriteria($criteria);
+        return QueryBuilderUtil::normalizeCriteria($criteria);
     }
 
     /**
@@ -400,7 +400,7 @@ class ApiEntityManager
      */
     protected function applyJoins($qb, $joins)
     {
-        QueryUtils::applyJoins($qb, $joins);
+        QueryBuilderUtil::applyJoins($qb, $joins);
     }
 
     /**
@@ -424,7 +424,7 @@ class ApiEntityManager
      */
     protected function getOffset($page, $limit)
     {
-        return QueryUtils::getPageOffset($page, $limit);
+        return QueryBuilderUtil::getPageOffset($page, $limit);
     }
 
     /**
