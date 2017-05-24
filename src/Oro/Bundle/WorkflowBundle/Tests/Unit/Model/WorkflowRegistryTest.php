@@ -104,7 +104,8 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             $this->assembler,
             $this->filters,
             $this->filter,
-            $this->registry
+            $this->registry,
+            $this->definitionProvider
         );
     }
 

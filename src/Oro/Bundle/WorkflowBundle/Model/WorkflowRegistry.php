@@ -108,7 +108,9 @@ class WorkflowRegistry
      */
     public function hasActiveWorkflowsByEntityClass($entityClass)
     {
-        return $this->isWorkflowsArrayEmpty($this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass));
+        return $this->isWorkflowsArrayEmpty(
+            $this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass)
+        );
     }
 
     /**
