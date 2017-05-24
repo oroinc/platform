@@ -197,7 +197,7 @@ class Element extends NodeElement
     /**
      * @param \Closure $lambda
      * @param int $timeLimit
-     * @return null|mixed Return false if closure throw error or return not true value.
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     protected function spin(\Closure $lambda, $timeLimit = 60)
