@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -125,8 +127,25 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
             return self::REJECT;
         }
 
-        $files = $this->splitterCsvFileHelper->getSplitFiles($body['filePath']);
         $parentMessageId = $message->getMessageId();
+
+        try {
+            $files = $this->splitterCsvFileHelper->getSplitFiles($body['filePath']);
+        } catch (InvalidItemException $e) {
+            $this->producer->send(
+                Topics::SEND_IMPORT_NOTIFICATION,
+                [
+                    'filePath' => $body['filePath'],
+                    'originFileName' => $body['originFileName'],
+                    'userId' => $body['userId'],
+                    'subscribedTopic' => static::getSubscribedTopics(),
+                    'errorMessage' => $e->getMessage()
+                ]
+            );
+
+            return self::REJECT;
+        }
+
         $result = $this->jobRunner->runUnique(
             $parentMessageId,
             sprintf('%s:%s:%s', static::getMessageName(), $body['processorAlias'], $parentMessageId),

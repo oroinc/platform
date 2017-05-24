@@ -87,6 +87,16 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     {
         $body = JSON::decode($message->getBody());
 
+        if (isset($body['errorMessage'])) {
+            $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
+            $this->sendNotification(
+                'Error importing file ' . $body['originFileName'],
+                $user->getEmail(),
+                'The import resulted in the following error: ' . $body['errorMessage']
+            );
+            return self::REJECT;
+        }
+
         if (!isset($body['rootImportJobId'])) {
             $this->logger->critical('Invalid message', ['message' => $body]);
 
