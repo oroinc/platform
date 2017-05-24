@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -22,9 +20,6 @@ class WorkflowDefinitionEntityListener
     /** @var WorkflowRegistry */
     private $workflowRegistry;
 
-    /** @var array|CacheProvider[] */
-    protected $cacheProviders = [];
-
     /**
      * @param ContainerInterface $container
      */
@@ -34,21 +29,11 @@ class WorkflowDefinitionEntityListener
     }
 
     /**
-     * @param CacheProvider $cache
-     */
-    public function addCacheProvider(CacheProvider $cache)
-    {
-        $this->cacheProviders[] = $cache;
-    }
-
-    /**
      * @param WorkflowDefinition $definition
      * @throws WorkflowActivationException
      */
     public function prePersist(WorkflowDefinition $definition)
     {
-        $this->clearCache();
-
         if ($definition->isActive()) {
             if ($definition->hasExclusiveActiveGroups()) {
                 $workflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
@@ -71,8 +56,6 @@ class WorkflowDefinitionEntityListener
      */
     public function preUpdate(WorkflowDefinition $definition, PreUpdateEventArgs $event)
     {
-        $this->clearCache();
-
         $isActivated = $event->hasChangedField('active') && $event->getNewValue('active') === true;
         if ($isActivated) {
             $storedWorkflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
@@ -103,8 +86,6 @@ class WorkflowDefinitionEntityListener
         if ($definition->isSystem()) {
             throw new WorkflowRemoveException($definition->getName());
         }
-
-        $this->clearCache();
 
         $this->clearEntitiesCache();
     }
@@ -137,13 +118,6 @@ class WorkflowDefinitionEntityListener
             $definition->getName(),
             implode(', ', $conflicts)
         ));
-    }
-
-    private function clearCache()
-    {
-        foreach ($this->cacheProviders as $cacheProvider) {
-            $cacheProvider->deleteAll();
-        }
     }
 
     /**

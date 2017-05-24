@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -12,11 +11,10 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
+use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider;
 
 class WorkflowRegistry
 {
-    const CACHE_TTL = 0;
-
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -29,30 +27,22 @@ class WorkflowRegistry
     /** @var WorkflowDefinitionFilters */
     protected $definitionFilters;
 
-    /** @var CacheProvider */
-    protected $cacheProvider;
-
     /**
      * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
      * @param WorkflowDefinitionFilters $definitionFilters
+     * @param WorkflowDefinitionProvider $definitionProvider
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         WorkflowAssembler $workflowAssembler,
-        WorkflowDefinitionFilters $definitionFilters
+        WorkflowDefinitionFilters $definitionFilters,
+        WorkflowDefinitionProvider $definitionProvider
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
         $this->definitionFilters = $definitionFilters;
-    }
-
-    /**
-     * @param CacheProvider $cacheProvider
-     */
-    public function setCacheProvider(CacheProvider $cacheProvider)
-    {
-        $this->cacheProvider = $cacheProvider;
+        $this->definitionProvider = $definitionProvider;
     }
 
     /**
@@ -118,7 +108,7 @@ class WorkflowRegistry
      */
     public function hasActiveWorkflowsByEntityClass($entityClass)
     {
-        return $this->isWorkflowsArrayEmpty($this->getActiveWorkflowDefinitionsByRelatedEntityClass($entityClass));
+        return $this->isWorkflowsArrayEmpty($this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass));
     }
 
     /**
@@ -127,7 +117,7 @@ class WorkflowRegistry
      */
     public function hasWorkflowsByEntityClass($entityClass)
     {
-        return $this->isWorkflowsArrayEmpty($this->getWorkflowDefinitionsByRelatedEntityClass($entityClass));
+        return $this->isWorkflowsArrayEmpty($this->definitionProvider->getDefinitionsForRelatedEntity($entityClass));
     }
 
     /**
@@ -136,9 +126,7 @@ class WorkflowRegistry
      */
     private function isWorkflowsArrayEmpty(array $workflowDefinitions)
     {
-        $items = $this->processDefinitionFilters(
-            $this->getNamedDefinitionsCollection($workflowDefinitions)
-        );
+        $items = $this->processDefinitionFilters($this->getNamedDefinitionsCollection($workflowDefinitions));
 
         return !$items->isEmpty();
     }
@@ -152,7 +140,7 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        return $this->getAssembledWorkflows($this->getActiveWorkflowDefinitionsByRelatedEntityClass($entityClass));
+        return $this->getAssembledWorkflows($this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass));
     }
 
     /**
@@ -164,7 +152,7 @@ class WorkflowRegistry
      */
     public function getWorkflowsByEntityClass($entityClass)
     {
-        return $this->getAssembledWorkflows($this->getWorkflowDefinitionsByRelatedEntityClass($entityClass));
+        return $this->getAssembledWorkflows($this->definitionProvider->getDefinitionsForRelatedEntity($entityClass));
     }
 
     /**
@@ -179,7 +167,7 @@ class WorkflowRegistry
         $groupNames = array_map('strtolower', $groupNames);
 
         $definitions = array_filter(
-            $this->getActiveWorkflowDefinitions(),
+            $this->definitionProvider->getActiveDefinitions(),
             function (WorkflowDefinition $definition) use ($groupNames) {
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
@@ -198,7 +186,7 @@ class WorkflowRegistry
      */
     public function getActiveWorkflows()
     {
-        return $this->getAssembledWorkflows($this->getActiveWorkflowDefinitions());
+        return $this->getAssembledWorkflows($this->definitionProvider->getActiveDefinitions());
     }
 
     /**
@@ -299,88 +287,5 @@ class WorkflowRegistry
         }
 
         return $definition;
-    }
-
-    /**
-     * @return WorkflowDefinition[]
-     */
-    protected function getActiveWorkflowDefinitions()
-    {
-        $cacheId = 'active_workflow_definitions';
-        $definitions = $this->fetchCache($cacheId);
-
-        if (false === $definitions) {
-            $definitions = $this->getEntityRepository()->findActive();
-            $this->saveCache($cacheId, $definitions);
-        }
-
-        return $definitions;
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return WorkflowDefinition[]
-     */
-    protected function getWorkflowDefinitionsByRelatedEntityClass($entityClass)
-    {
-        $cacheId = 'workflow_definitions_for_' . $entityClass;
-
-        $definitions = $this->fetchCache($cacheId);
-
-        if (false === $definitions) {
-            $definitions = $this->getEntityRepository()->findForRelatedEntity($entityClass);
-            $this->saveCache($cacheId, $definitions);
-        }
-
-        return $definitions;
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return WorkflowDefinition[]
-     */
-    protected function getActiveWorkflowDefinitionsByRelatedEntityClass($entityClass)
-    {
-        $cacheId = 'active_workflow_definitions_for_' . $entityClass;
-
-        $definitions = $this->fetchCache($cacheId);
-
-        if (false === $definitions) {
-            $definitions = $this->getEntityRepository()->findActiveForRelatedEntity($entityClass);
-            $this->saveCache($cacheId, $definitions);
-        }
-
-        return $definitions;
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return false|mixed
-     */
-    private function fetchCache($id)
-    {
-        if ($this->cacheProvider) {
-            return $this->cacheProvider->fetch($id);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $id
-     * @param mixed $data
-     *
-     * @return false|mixed
-     */
-    private function saveCache($id, $data)
-    {
-        if ($this->cacheProvider) {
-            return $this->cacheProvider->save($id, $data, self::CACHE_TTL);
-        }
-
-        return false;
     }
 }

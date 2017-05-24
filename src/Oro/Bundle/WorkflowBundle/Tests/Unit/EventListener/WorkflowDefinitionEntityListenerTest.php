@@ -32,9 +32,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
     /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $cacheProvider;
-
     protected function setUp()
     {
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
@@ -50,8 +47,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ->getContainer($this);
 
         $this->listener = new WorkflowDefinitionEntityListener($this->container);
-        $this->cacheProvider = $this->createMock(CacheProvider::class);
-        $this->listener->addCacheProvider($this->cacheProvider);
     }
 
     public function testPrePersistNonActiveSkip()
@@ -65,8 +60,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->never())
             ->method('get')
             ->with('oro_workflow.cache.entities_with_workflow');
-
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
 
         $this->listener->prePersist($definitionMock);
     }
@@ -84,8 +77,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->entitiesWithWorkflowsCache->expects($this->once())
             ->method('deleteAll');
-
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
 
         $this->listener->prePersist($definitionMock);
     }
@@ -115,8 +106,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ' workflow `conflict_workflow` by exclusive_active_group `group1`.'
         );
 
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
-
         $this->listener->prePersist($definitionMock);
     }
 
@@ -143,8 +132,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ' workflow `conflict_workflow2` by exclusive_active_group `group2`.'
         );
 
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
-
         $this->listener->prePersist($definitionMock);
     }
 
@@ -163,7 +150,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->createWorkflow('workflow1', ['group1']);
 
         $this->entitiesWithWorkflowsCache->expects($this->once())->method('deleteAll');
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
 
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
@@ -190,7 +176,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(new ArrayCollection([$workflow]));
 
         $this->entitiesWithWorkflowsCache->expects($this->once())->method('deleteAll');
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
 
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
@@ -210,7 +195,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->createWorkflow('workflow1', ['group1']);
 
         $this->entitiesWithWorkflowsCache->expects($this->never())->method('deleteAll');
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
 
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
@@ -237,7 +221,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->entitiesWithWorkflowsCache->expects($this->never())->method('deleteAll');
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
 
         $this->listener->preUpdate($workflow->getDefinition(), $eventMock);
     }
@@ -253,13 +236,10 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $definitionMock->expects($this->once())->method('isSystem')->willReturn(true);
         $definitionMock->expects($this->once())->method('getName')->willReturn('workflow1');
 
-        $this->entitiesWithWorkflowsCache->expects($this->never())->method('deleteAll');
-        $this->cacheProvider->expects($this->never())->method('deleteAll');
-
         $this->listener->preRemove($definitionMock);
     }
 
-    public function testPreRemoveNonSystemWorkflow()
+    public function testPreRemoveSystemWorkflow()
     {
         /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $definitionMock */
         $definitionMock = $this->createMock(WorkflowDefinition::class);
@@ -267,7 +247,6 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $definitionMock->expects($this->never())->method('getName');
 
         $this->entitiesWithWorkflowsCache->expects($this->once())->method('deleteAll');
-        $this->cacheProvider->expects($this->once())->method('deleteAll');
 
         $this->listener->preRemove($definitionMock);
     }
