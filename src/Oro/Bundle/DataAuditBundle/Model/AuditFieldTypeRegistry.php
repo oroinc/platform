@@ -36,7 +36,8 @@ class AuditFieldTypeRegistry
         'array'      => 'array',
         'simple_array' => 'simplearray',
         'json_array'   => 'jsonarray',
-        'collection' => 'text'
+        'collection' => 'text',
+        'html'       => 'text',
     ];
 
     /**

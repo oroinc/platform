@@ -1,0 +1,4 @@
+doctrine:
+    dbal:
+        types:
+            html: Oro\Bundle\EntityExtendBundle\DBAL\Types\HTMLType
