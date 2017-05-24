@@ -136,7 +136,7 @@ var Translator = (function () {
             }
         }
 
-        return _standardRules[plural_position(number)] || undefined;
+        return _standardRules[plural_position(number)] || _standardRules[0];
     }
 
     /**
