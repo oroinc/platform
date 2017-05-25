@@ -139,4 +139,20 @@ class StaticSegmentManagerTest extends WebTestCase
         $this->assertSnapshotsCount(2);
         $this->assertNotNull($staticSegment->getLastRun());
     }
+
+    public function testRunWithSegmentFilter()
+    {
+
+        /** @var Segment $staticSegment */
+        $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+        $this->manager->run($staticSegment);
+
+        /** @var Segment $staticSegmentWithFilter */
+        $staticSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        $staticSegmentWithFilter->setRecordsLimit(7);
+
+        $this->manager->run($staticSegmentWithFilter);
+        $this->assertSnapshotsCount(57);
+        $this->assertNotNull($staticSegment->getLastRun());
+    }
 }
