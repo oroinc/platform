@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Extension;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
@@ -45,6 +49,9 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
     protected $optionsResolver;
 
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
+
     /**
      * {@inheritdoc}
      */
@@ -71,11 +78,14 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->optionsResolver = $this->createMock(OptionsResolver::class);
 
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->extension = new OperationButtonProviderExtension(
             $this->operationRegistry,
             $this->contextHelper,
             $this->routeProvider,
-            $this->optionsResolver
+            $this->optionsResolver,
+            $this->logger
         );
     }
 
@@ -204,6 +214,45 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testIsAvailableException()
+    {
+        $this->assertContextHelperCalled(1);
+
+        $button = $this->createOperationButton();
+        /** @var Operation|\PHPUnit_Framework_MockObject_MockObject $operation */
+        $operation = $button->getOperation();
+        $definition = $operation->getDefinition();
+        $definition->setFrontendOptions(['frontend' => 'not resolved'])->setButtonOptions(['button' => 'not resolved']);
+        $this->optionsResolver->expects($this->at(0))
+            ->method('resolveOptions')
+            ->with($this->anything(), $definition->getFrontendOptions())
+            ->willReturn(['frontend' => 'resolved']);
+        $this->optionsResolver->expects($this->at(1))
+            ->method('resolveOptions')
+            ->with($this->anything(), $definition->getButtonOptions())
+            ->willReturn(['button' => 'resolved']);
+
+        $message ='exception when check conditions';
+        $exception = new \Exception($message);
+
+        $operation->expects($this->any())
+            ->method('isAvailable')
+            ->willThrowException($exception);
+
+        $this->logger->expects($this->once())->method('error')->with(
+            sprintf('Checking conditions of operation "%s" failed.', $operation->getName()),
+            ['exception' => $exception]
+        );
+
+        $errors = new ArrayCollection();
+        $this->extension->isAvailable($button, $this->createButtonSearchContext(), $errors);
+        $this->assertCount(1, $errors);
+        $this->assertEquals(
+            $errors->first(),
+            sprintf('Checking conditions of operation "%s" failed: %s', $operation->getName(), $message)
+        );
+    }
+
+    public function testIsAvailableExceptionUnsupportedButton()
     {
         $this->assertContextHelperCalled(0);
 

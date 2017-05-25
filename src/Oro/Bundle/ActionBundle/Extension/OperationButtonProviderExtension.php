@@ -4,6 +4,8 @@ namespace Oro\Bundle\ActionBundle\Extension;
 
 use Doctrine\Common\Collections\Collection;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
@@ -34,6 +36,9 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     /** @var ButtonContext */
     private $baseButtonContext;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * @param OperationRegistry $operationRegistry
      * @param ContextHelper $contextHelper
@@ -44,12 +49,14 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         OperationRegistry $operationRegistry,
         ContextHelper $contextHelper,
         RouteProviderInterface $routeProvider,
-        OptionsResolver $optionsResolver
+        OptionsResolver $optionsResolver,
+        LoggerInterface $logger
     ) {
         $this->operationRegistry = $operationRegistry;
         $this->contextHelper = $contextHelper;
         $this->routeProvider = $routeProvider;
         $this->optionsResolver = $optionsResolver;
+        $this->logger = $logger;
     }
 
     /**
@@ -95,7 +102,24 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         }
 
         $actionData = $this->getActionData($buttonSearchContext);
-        $result = $button->getOperation()->isAvailable($actionData);
+        try {
+            $result = $button->getOperation()->isAvailable($actionData);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Checking conditions of operation "%s" failed.', $button->getOperation()->getName()),
+                ['exception' => $e]
+            );
+            if (isset($errors)) {
+                $errors->add(
+                    sprintf(
+                        'Checking conditions of operation "%s" failed: %s',
+                        $button->getOperation()->getName(),
+                        $e->getMessage()
+                    )
+                );
+            }
+            $result = false;
+        }
 
         $definition = $button->getOperation()->getDefinition();
         $definition->setFrontendOptions(

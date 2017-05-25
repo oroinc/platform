@@ -229,6 +229,7 @@ services:
             - '@oro_action.helper.context'
             - '@oro_action.provider.route'
             - '@oro_action.resolver.options_resolver'
+            - '@logger'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }
 
