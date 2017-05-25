@@ -58,9 +58,8 @@ class IntegrationTypeSelectType extends AbstractType
                     return $this->getChoiceAttributes($choice);
                 },
                 'configs'     => [
-                    'placeholder'             => 'oro.form.choose_value',
-                    'result_template_twig'    => 'OroIntegrationBundle:Autocomplete:type/result.html.twig',
-                    'selection_template_twig' => 'OroIntegrationBundle:Autocomplete:type/selection.html.twig',
+                    'placeholder' => 'oro.form.choose_value',
+                    'showIcon'    => true,
                 ]
             ]
         );

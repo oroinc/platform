@@ -7,15 +7,15 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         options: {
             trigger: '[data-collapse-trigger]',
             container: '[data-collapse-container]',
-            globalTrigger: null,
+            group: '',
             hideSibling: false,
             storageKey: '',
             open: true,
             forcedState: null,
             uid: '',
             openClass: 'expanded',
-            overflowClass: 'overflows',
-            toggleClassesOnly: false,
+            closeClass: '',
+            checkOverflow: false,
             animationSpeed: 250
         },
 
@@ -42,61 +42,18 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$el.addClass('init');
 
             this._initEvents();
-            this._bindGlobalTrigger();
 
-            this.$el.toggleClass(this.options.openClass, this.options.open);
-            this.$el.toggleClass(
-                this.options.overflowClass,
-                this.$container[0].scrollHeight > this.$container[0].clientHeight
-            );
-
-            if (this.options.toggleClassesOnly) {
-                return;
-            }
-
+            this._setState(this.options.open);
             if (this.options.open) {
-                this.$container.show();
                 mediator.trigger('scrollable-table:reload');
-            } else {
-                this.$container.hide();
-            }
-        },
-
-        _bindGlobalTrigger: function() {
-            var self = this;
-            var globalTrigger = this.options.globalTrigger;
-            var triggerBind = $(globalTrigger).attr('data-event-bind');
-            var animationSpeed = this.options.animationSpeed;
-
-            if (globalTrigger) {
-                //Bind onClick event(toggle expanded class) only for the first instance
-                if (!triggerBind) {
-                    $(globalTrigger).on('click', function() {
-                        $(this).toggleClass('expanded');
-                    });
-                    $(globalTrigger).toggleClass('expanded');
-                    $(globalTrigger).attr('data-event-bind', true);
-                }
-                //Bind onClick event(animation for container) for each items
-                $(globalTrigger).on('click', function() {
-                    if (!$(this).hasClass('expanded')) {
-                        self.$container.slideUp(animationSpeed);
-                        self._setState(false);
-                    } else {
-                        self.$container.slideDown(animationSpeed);
-                        self._setState(true);
-                    }
-                });
             }
         },
 
         _destroy: function() {
             this._off(this.$trigger, 'click');
             this.$el.removeClass('init');
-            if (!this.options.toggleClassesOnly) {
-                this.$container.css('display', '');
-                this._setState(true, true);
-            }
+            this._setState(true, true);
+            mediator.off(null, null, this);
             this._super();
         },
 
@@ -104,31 +61,72 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this._on(this.$trigger, {
                 'click': this._toggle
             });
+
+            var group = this.options.group;
+            if (group) {
+                mediator.on('collapse-group-widgets:' + group + ':setState', this._setState, this);
+                mediator.on('collapse-group-widgets:' + group + ':collectStates', this._collectStates, this);
+            }
+        },
+
+        _isOverflow: function() {
+            return this.$container[0].scrollHeight > this.$container[0].clientHeight;
         },
 
         _setState: function(isOpen, isDestroy) {
+            this.options.open = isOpen;
+
+            if (this.$container.is(':animated')) {
+                this.$container.finish();
+            }
+
+            if (this.options.checkOverflow) {
+                this.$el.removeClass(this.options.openClass)
+                    .removeClass(this.options.closeClass);
+                if (!this._isOverflow()) {
+                    //do nothing
+                    return;
+                }
+            }
+
+            this.$el.toggleClass(this.options.openClass, isOpen);
+            this.$el.toggleClass(this.options.closeClass, !isOpen);
+
+            if (this.options.animationSpeed) {
+                if (isOpen) {
+                    this.$container.slideDown(this.options.animationSpeed);
+                } else {
+                    this.$container.slideUp(this.options.animationSpeed);
+                }
+            }
+
+            if (this.options.hideSibling) {
+                this._hideSiblings(isOpen && !isDestroy);
+            }
+
             var params = {
                 isOpen: isOpen,
                 $el: this.$el,
                 $trigger: this.$trigger,
                 $container: this.$container
             };
-
-            this.$el.toggleClass(this.options.openClass, isOpen);
-            this.$el.toggleClass(
-                this.options.overflowClass,
-                this.$container[0].scrollHeight > this.$container[0].clientHeight
-            );
-
-            if (this.options.hideSibling) {
-                this._hideSiblings(isOpen && !isDestroy);
-            }
-
             this.$trigger.trigger('collapse:toggle', params);
             mediator.trigger('layout:adjustHeight');
 
+            if (this.options.group) {
+                mediator.trigger('collapse-group:' + this.options.group + ':setState', isOpen);
+            }
+
             if (this.options.storageKey) {
                 localStorage.setItem(this.options.storageKey + this.options.uid, isOpen);
+            }
+        },
+
+        _collectStates: function(states) {
+            if (this.options.open) {
+                states.expanded++;
+            } else {
+                states.collapsed++;
             }
         },
 
@@ -139,19 +137,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 event.preventDefault();
             }
 
-            var self = this;
-            if (!this.options.toggleClassesOnly) {
-                if (!this.$container.is(':animated')) {
-                    this.$container.slideToggle(this.options.animationSpeed, function() {
-                        self._setState($(this).is(':visible'));
-                    });
-                }
-
-                return false;
-            }
-
-            this.options.open = !this.options.open;
-            self._setState(this.options.open);
+            this._setState(!this.options.open);
         },
 
         _hideSiblings: function(isOpen) {

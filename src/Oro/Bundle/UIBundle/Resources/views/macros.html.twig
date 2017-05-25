@@ -144,15 +144,16 @@
 {% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName) %}
     {% if resource_granted('VIEW', entity, fieldName) %}
         {% set collapseView = {
-                component: 'oroui/js/app/components/jquery-widget-component',
                 widgetModule: 'oroui/js/widget/collapse-widget',
                 storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
                 uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
-                toggleClassesOnly: true,
+                animationSpeed: 0,
+                closeClass: 'overflows',
+                checkOverflow: true,
                 open: false
             } %}
         <div class="collapse-block"
-             data-page-component-module="oroui/js/app/components/viewport-component"
+             data-page-component-module="oroui/js/app/components/jquery-widget-component"
              data-page-component-options="{{ collapseView|json_encode }}">
             {{ _self.renderAttribute(title,
                 '<div class="control-label" data-collapse-container>' ~
