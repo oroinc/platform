@@ -40,12 +40,7 @@ class Form extends Element
                 );
             }
 
-            if (isset($this->options['mapping'][$label]['element'])) {
-                $field = $this->elementFactory->wrapElement(
-                    $this->options['mapping'][$label]['element'],
-                    $field
-                );
-            }
+            $field = $this->wrapField($label, $field);
 
             $field->setValue($value);
         }
@@ -57,13 +52,17 @@ class Form extends Element
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
+            list($label, $value) = $row;
+            $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
-            self::assertNotNull($field, "Field with '$locator' locator not found");
+            self::assertNotNull($field, "Field with not found");
 
-            $expectedValue = self::normalizeValue($row[1]);
+            $field = $this->wrapField($label, $field);
+            echo $field->getOuterHtml();
+
+            $expectedValue = self::normalizeValue($value);
             $fieldValue = self::normalizeValue($field->getValue());
-            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
+            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $label));
         }
     }
 
@@ -223,7 +222,15 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return array_map('trim', explode(',', trim($value, '[]')));
+            return self::normalizeValue(
+                array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        trim($value, '[]')
+                    )
+                )
+            );
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -232,7 +239,7 @@ class Form extends Element
 
         $value = self::checkAdditionalFunctions($value);
 
-        if (in_array($value, ['true', 'false', 'yes', 'no', 'on', 'off'])) {
+        if (in_array($value, ['true', 'false'])) {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
 
@@ -325,5 +332,22 @@ class Form extends Element
         self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
         return $errorSpan->getText();
+    }
+
+    /**
+     * @param $label
+     * @param NodeElement $field
+     * @return NodeElement
+     */
+    private function wrapField($label, NodeElement $field): NodeElement
+    {
+        if (isset($this->options['mapping'][$label]['element'])) {
+            $field = $this->elementFactory->wrapElement(
+                $this->options['mapping'][$label]['element'],
+                $field
+            );
+        }
+
+        return $field;
     }
 }
