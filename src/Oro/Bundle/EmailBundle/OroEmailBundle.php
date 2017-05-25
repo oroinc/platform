@@ -19,14 +19,16 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPa
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFolderLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\OverrideServiceSwiftMailer;
+
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
 
 class OroEmailBundle extends Bundle
 {
     const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
     const CACHED_ENTITIES_DIR_NAME = 'oro_entities';
+    const VARIABLE_PROCESSOR_TAG = 'oro_email.emailtemplate.variable_processor';
 
     /**
      * Constructor
@@ -64,6 +66,13 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new MailboxProcessPass());
         $container->addCompilerPass(new OverrideServiceSwiftMailer());
 
+        $container->addCompilerPass(
+            new TaggedServiceLinkRegistryCompilerPass(
+                self::VARIABLE_PROCESSOR_TAG,
+                'oro_email.emailtemplate.variable_processor'
+            )
+        );
+
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
             ->add(Topics::SEND_AUTO_RESPONSES, 'Send auto response for multiple emails')
@@ -74,8 +83,7 @@ class OroEmailBundle extends Bundle
             ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates multiple emails for email owner')
             ->add(Topics::SYNC_EMAIL_SEEN_FLAG, 'Synchronization email flags')
             ->add(Topics::PURGE_EMAIL_ATTACHMENTS, 'Purge email attachments')
-            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids')
-        ;
+            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids');
 
         $container->addCompilerPass($addTopicPass);
     }

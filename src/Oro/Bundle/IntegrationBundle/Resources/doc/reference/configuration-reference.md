@@ -1,10 +1,10 @@
-#Configuration reference
+# Configuration reference
 
 - [Channel type definition](#channel-type-definition)
 - [Transport definition](#transport-definition)
 - [Connector definition](#connector-definition)
 
-##Channel type definition
+## Channel type definition
 
 **Channel type** - type of application/service to connect.
 **Channel** - and instance of configured channel type with enabled connectors.
@@ -14,7 +14,7 @@ To define you own channel type developer should create class that will implement
 `Oro\Bundle\IntegrationBundle\Provider\ChannelInterface` and register it as service with `oro_integration.channel` tag
 that will contains `type` key, it's should be unique.
 
-####Example:
+#### Example:
 ``` yaml
     acme.demo_integration.provider.prestashop.channel:
         class: %acme.demo_integration.provider.prestashop.channel.class%
@@ -26,7 +26,7 @@ Integration type might also bring icon that will be shown in type selector. For 
 `Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface` and method `getIcon()` should return valid path to image
 for symfony assets helper.
 
-##Transport definition
+## Transport definition
 
 Responsibility of **transport** is communicate connector and channel, it should perform read/write operations to third
 party systems.
@@ -35,7 +35,7 @@ To define you own transport developer should create class that will implement
 tag that will contains `type` key, it's should be unique and `channel_type` key that shows for what channel type it
 could be used.
 
-####Example:
+#### Example:
 ``` yaml
     acme.demo_integration.provider.db_transport:
         class: %acme.demo_integration.provider.db_transport.class%
@@ -43,7 +43,7 @@ could be used.
             - { name: oro_integration.transport, type: db, channel_type: presta_shop }
 ```
 
-##Connector definition
+## Connector definition
 
 **Channel connector** is responsible to bring data in and define compatible channel types. Examples: Magento
 customers data connector, Magento catalog data connector.
@@ -53,7 +53,7 @@ To define you own connector developer should create class that will implement
 tag that will contains `type` key, it's should be unique for the channel and `channel_type` key that shows for what
 channel type it could be used.
 
-####Example:
+#### Example:
 ``` yaml
     acme.demo_integration.provider.prestashop_product.connector:
         class: %acme.demo_integration.provider.prestashop_product.connector.class%

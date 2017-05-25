@@ -100,7 +100,7 @@
 
         .filter-criteria {
             min-width: 340px !important;
-            margin-top: 0;
+            margin-top: 5px;
             padding: 20px;
 
             &:not([style]),
@@ -170,10 +170,9 @@
 
                     input[type=text] {
                         @include base-ui-element(
-                                        $use-base-style: true,
-                                        $padding: 8px 9px,
-                                        $line-height: 1.36
-
+                            $use-base-style: true,
+                            $padding: 8px 9px,
+                            $line-height: 1.36
                         );
 
                         display: block;
@@ -265,7 +264,6 @@
                 }
 
                 i {
-                    color: $base-font-size;
                     font-family: 'FontAwesome' !important;
                     font-style: normal;
                     font-size: 21px;
@@ -288,9 +286,9 @@
 
                 input[type="text"] {
                     @include base-ui-element(
-                                    $use-base-style: true,
-                                    $padding: 8px 9px,
-                                    $line-height: 1.36
+                        $use-base-style: true,
+                        $padding: 8px 9px,
+                        $line-height: 1.36
                     );
 
                     max-width: 140px;
@@ -310,8 +308,8 @@
                 .datefilter {
                     display: block;
 
-                    input[type="text"] {
-                        padding-left: 39px;
+                    .datepicker-input {
+                        padding-left: 30px;
                     }
 
 
@@ -320,7 +318,7 @@
 
                         pointer-events: none;
 
-                        margin: 8px 0 0 12px;
+                        margin: $offset-y-m 0 0 12px;
 
                         color: get-color('additional', 'middle');
                     }
@@ -424,7 +422,7 @@
         justify-content: flex-start;
         align-items: center;
 
-        @media (max-width: $screen-md) {
+        @include breakpoint('tablet') {
             margin: 10px 0 0;
         }
     }
@@ -532,8 +530,6 @@
         padding: 20px 20px 10px;
 
         @media (max-width: $screen-md) {
-            left: 1.5rem !important;
-
             width: calc(100% - 30px) !important;
             min-width: 0 !important;
         }
@@ -548,9 +544,9 @@
 
                 input[type="search"] {
                     @include base-ui-element(
-                                    $use-base-style: true,
-                                    $padding: 8px 9px,
-                                    $line-height: 1.36
+                        $use-base-style: true,
+                        $padding: 8px 9px,
+                        $line-height: 1.36
                     );
 
                     width: 100% !important;

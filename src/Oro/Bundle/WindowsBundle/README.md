@@ -20,7 +20,7 @@ Dependencies
 - [backbone.js](http://backbonejs.org)
 - [underscore.js](http://underscorejs.org)
 
-###Table of Contents
+### Table of Contents
 
 - [JavaScript windows components](./Resources/doc/javascript_window_components.md)
 - [Windows as Widget](./Resources/doc/windows_as_widget.md)

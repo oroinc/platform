@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 
@@ -17,11 +18,20 @@ class WorkflowDefinitionRepository extends EntityRepository
     public function findActiveForRelatedEntity($relatedEntity)
     {
         $criteria = [
-            'relatedEntity' => $relatedEntity,
+            'relatedEntity' => ClassUtils::getRealClass($relatedEntity),
             'active' => true,
         ];
 
         return $this->findBy($criteria, ['priority' => 'ASC']);
+    }
+
+    /**
+     * @param string $relatedEntity
+     * @return WorkflowDefinition[]
+     */
+    public function findForRelatedEntity($relatedEntity)
+    {
+        return $this->findBy(['relatedEntity' => ClassUtils::getRealClass($relatedEntity)], ['priority' => 'ASC']);
     }
 
     /**

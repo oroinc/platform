@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumTypeHelper extends ConfigTypeHelper
 {
+    const MULTI_ENUM = 'multiEnum';
     /**
      * Checks if the given entity/field has an enum code
      *

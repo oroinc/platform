@@ -7,10 +7,13 @@ use Symfony\Component\EventDispatcher\Event;
 class NotificationEvent extends Event
 {
     /**
-     * @var mixed
+     * @var object
      */
     protected $entity;
 
+    /**
+     * @param object $entity
+     */
     public function __construct($entity)
     {
         $this->entity = $entity;
@@ -19,7 +22,7 @@ class NotificationEvent extends Event
     /**
      * Set entity
      *
-     * @param $entity
+     * @param object $entity
      */
     public function setEntity($entity)
     {
@@ -29,7 +32,7 @@ class NotificationEvent extends Event
     /**
      * Get entity
      *
-     * @return mixed
+     * @return object
      */
     public function getEntity()
     {

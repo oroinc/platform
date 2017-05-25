@@ -26,8 +26,15 @@
     {% if addQueryParameters is not defined or addQueryParameters == true %}
         {% set formAction = oro_url_add_query(formAction) %}
     {% endif %}
-    <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
-          method="{{ form.vars.method }}" data-collect="true"
+    {% set formAttr = formAttr|default({})|merge({
+        'id': form.vars.id,
+        'name': form.vars.name,
+        'action': formAction,
+        'method': form.vars.method,
+        'data-collect': 'true'
+    }) %}
+    <form {{ UI.attributes(formAttr) }}
+          {{ form_enctype(form) }}
           {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         {% if isWidgetContext %}
             <div class="widget-actions">
@@ -219,7 +226,7 @@
 
                     {% set data = data|merge({'dataBlocks': dataBlocks}) %}
                 {% endif  %}
-                {{ UI.scrollData(id, data, form) }}
+                {{ UI.scrollData(id, data, entity, form) }}
             {% endblock content_data %}
         </div>
         {% block sync_content_tags %}

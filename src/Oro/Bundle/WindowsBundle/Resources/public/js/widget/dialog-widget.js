@@ -488,6 +488,10 @@ define(function(require) {
                 if (minWidth > containerEl.clientWidth - left) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
+            } else {
+                if (!this.widgetIsResizable()) {
+                    dialog.css('width', this.options.dialogOptions.width);
+                }
             }
         },
 
@@ -586,6 +590,9 @@ define(function(require) {
             this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
             });
+        },
+        widgetIsResizable: function() {
+            return this.options.dialogOptions.resizable;
         }
     });
 
