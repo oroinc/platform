@@ -142,7 +142,9 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        return $this->getAssembledWorkflows($this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass));
+        return $this->getAssembledWorkflows(
+            $this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass)
+        );
     }
 
     /**
