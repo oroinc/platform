@@ -9,14 +9,14 @@ class UnitTestGenerator extends AbstractTestGenerator
      */
     public function generate($className)
     {
+        $class = new \ReflectionClass($className);
         $fullTestNameSpace = $this->getNamespaceForTest($className, 'unit');
         $parts = explode('\\', $fullTestNameSpace);
         $testClassName = array_pop($parts);
         $partsOfOriginClass = explode('\\', $className);
         $testedClassName = array_pop($partsOfOriginClass);
         $nameSpace = implode('\\', $parts);
-        $testPath = $this->getTestPath($fullTestNameSpace);
-        $class = new \ReflectionClass($className);
+        $testPath = $this->getTestPath($fullTestNameSpace, $class->getFileName());
         $constructor = $class->getConstructor();
         $dependencies = $constructor ? $this->getDependencies($constructor) : [];
         $dependenciesData = $this->getDependenciesData($dependencies);
