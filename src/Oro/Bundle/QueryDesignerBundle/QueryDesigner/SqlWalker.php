@@ -5,7 +5,7 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 
 /**
- * @TODO: This walker should be removed according to logic #BAP-13404
+ * @TODO: This walker will be replaced according to logic #BAP-13404
  * Dynamicly applies limit to subquery which is "hooked" by SubQueryLimitHelper
  */
 class SqlWalker extends TranslationWalker

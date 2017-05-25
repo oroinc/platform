@@ -14,7 +14,6 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
 
-
 use Psr\Log\LoggerInterface;
 
 class SegmentManager
