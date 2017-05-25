@@ -92,7 +92,8 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             $this->sendNotification(
                 'Error importing file ' . $body['originFileName'],
                 $user->getEmail(),
-                'The import resulted in the following error: ' . $body['errorMessage']
+                'The import file could not be imported due to a fatal error. ' .
+                'Please check its integrity and try again!'
             );
             return self::REJECT;
         }

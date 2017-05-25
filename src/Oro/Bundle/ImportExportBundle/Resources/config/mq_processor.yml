@@ -97,3 +97,13 @@ services:
             - '@doctrine'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_importexport.async.send_import_error_info:
+        class: Oro\Bundle\ImportExportBundle\Async\SendImportErrorInfoMessageProcessor
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+            - '@oro_config.user'
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

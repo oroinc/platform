@@ -132,8 +132,13 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
         try {
             $files = $this->splitterCsvFileHelper->getSplitFiles($body['filePath']);
         } catch (InvalidItemException $e) {
+            $this->logger->warning(
+                sprintf('Import of file %s failed', $body['originFileName']),
+                ['message' => $message]
+            );
+
             $this->producer->send(
-                Topics::SEND_IMPORT_NOTIFICATION,
+                Topics::SEND_IMPORT_ERROR_INFO,
                 [
                     'filePath' => $body['filePath'],
                     'originFileName' => $body['originFileName'],

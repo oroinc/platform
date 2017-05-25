@@ -16,4 +16,5 @@ class Topics
     const IMPORT_HTTP_VALIDATION = 'oro.importexport.import_http_validation';
     const EXPORT = 'oro.importexport.export';
     const SEND_IMPORT_NOTIFICATION = 'oro.importexport.send_notification';
+    const SEND_IMPORT_ERROR_INFO = 'oro.importexport.send_error_info';
 }
