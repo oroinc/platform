@@ -50,7 +50,7 @@ Feature: Display settings manage
     When I go to System/Configuration
     And I click "Display settings"
     And I fill "System Config Form" with:
-      | Lock headers in grids | off |
+      | Lock headers in grids | false |
     And I save form
     And I go to Activities/Cases
     Then I see that grid header is sticky
@@ -62,7 +62,7 @@ Feature: Display settings manage
     When I go to System/Configuration
     And I click "Display settings"
     And I fill "System Config Form" with:
-      | Record Pagination | off |
+      | Record Pagination | false |
     And I save form
     And I go to Activities/Cases
     And click view 1 in grid
