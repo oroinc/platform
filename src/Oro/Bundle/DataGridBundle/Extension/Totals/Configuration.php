@@ -13,6 +13,7 @@ class Configuration implements ConfigurationInterface
     const TOTALS_LABEL_KEY     = 'label';
     const TOTALS_SQL_EXPRESSION_KEY = 'expr';
     const TOTALS_FORMATTER_KEY      = 'formatter';
+    const TOTALS_DIVISOR_KEY      = 'divisor';
 
     const TOTALS_PER_PAGE_ROW_KEY   = 'per_page';
     const TOTALS_HIDE_IF_ONE_PAGE_KEY = 'hide_if_one_page';
@@ -53,7 +54,10 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode(self::TOTALS_FORMATTER_KEY)
                                     ->defaultFalse()
                                     ->end()
-                            ->end()
+                                ->scalarNode(self::TOTALS_DIVISOR_KEY)
+                                    ->info('A divisor to divide the starting value by a number before rendering it.')
+                                    ->end()
+                             ->end()
                         ->end()
                     ->end()
                 ->end()
