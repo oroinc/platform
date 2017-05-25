@@ -4,9 +4,10 @@ namespace Oro\Bundle\DataGridBundle\Extension\Feature;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class FeatureExtension extends AbstractExtension
 {
@@ -48,6 +49,8 @@ class FeatureExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
+        /** @var OrmDatasource $datasource */
+
         $dataName = $config->offsetGetByPath('[features][entity_class_name_path]');
         if (!$dataName) {
             return;
@@ -60,7 +63,7 @@ class FeatureExtension extends AbstractExtension
             return;
         }
 
-        $excludedEntitiesParam = QueryUtils::generateParameterName('excluded_entities');
+        $excludedEntitiesParam = QueryBuilderUtil::generateParameterName('excluded_entities');
         $qb
             ->andWhere($qb->expr()->notIn($dataName, sprintf(':%s', $excludedEntitiesParam)))
             ->setParameter($excludedEntitiesParam, $excludedEntities);

@@ -63,36 +63,52 @@
 {% block content_data %}
     {% set id = 'emailnotificaton-edit' %}
 
-    {% set dataBlocks = [{
-            'title': 'General'|trans,
-            'class': 'active',
-            'subblocks': [{
-                'title': '',
-                'data': [
-                    form_row(form.entityName),
-                    form_row(form.event),
-                    form_row(form.template),
-                ]
-            }]
-        },
-        {
-            'title': 'oro.notification.emailnotification.recipient_list.label'|trans,
-            'class': '',
-            'subblocks': [{
-                'title': '',
-                'data': [
-                    UI.renderHtmlProperty('', '* ' ~ 'oro.notification.form.recipient_list.empty'|trans),
-                    form_widget(form.children.recipientList),
-                ]
-            }]
+    {% set recipientList = {
+        'title': 'oro.notification.emailnotification.recipient_list.label'|trans,
+        'class': '',
+        'subblocks': [{
+            'title': '',
+            'data': [
+                UI.renderHtmlProperty('', '* ' ~ 'oro.notification.form.recipient_list.empty'|trans),
+                form_widget(form.children.recipientList),
+            ]
         }]
-    %}
-    {% set data = {
-            'formErrors': form_errors(form)? form_errors(form) : null,
-            'dataBlocks': dataBlocks,
-            'hiddenData': form_rest(form)
-        }
-    %}
+    } %}
 
-    {{ parent() }}
+    {% set data = {
+        'formErrors': form_errors(form) ? form_errors(form) : null,
+        'dataBlocks': [
+            {
+                'title': 'General'|trans,
+                'class': 'active',
+                'subblocks': [{
+                    'title': '',
+                    'data': [
+                        form_widget(form)
+                    ]
+                }]
+            },
+            recipientList
+        ]
+    } %}
+
+    <div data-page-component-module="oronotification/js/app/components/email-notification-form-component"
+         data-page-component-options="{{ {
+             'selectors': {
+                 'form': '#' ~ form.vars.id,
+                 'listenChangeElements': form.vars.listenChangeElements
+             }
+         }|json_encode }}"
+    >
+        {{ parent() }}
+    </div>
 {% endblock content_data %}
+
+{% block content %}
+    <div data-page-component-module="oroui/js/app/components/view-component"
+          data-page-component-options="{{ {
+              view: 'oronotification/js/app/views/email-notification-form-view'
+          }|json_encode }}">
+        {{ parent() }}
+    </div>
+{% endblock %}

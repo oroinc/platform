@@ -647,8 +647,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
-
-        $this->checkItemsInFilter($filterItem, $filterItems);
+        $filterItem->checkItemsInFilter($filterItems);
     }
 
     /**
@@ -664,19 +663,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterLabel, true);
-
-        $this->checkItemsInFilter($filterItem, $filterItems);
-    }
-
-    /**
-     * @param MultipleChoice $filter
-     * @param string $filterItems
-     */
-    protected function checkItemsInFilter(MultipleChoice $filter, $filterItems)
-    {
-        $filterItems = array_map('trim', explode(',', $filterItems));
-
-        $filter->checkItems($filterItems);
+        $filterItem->checkItemsInFilter($filterItems);
     }
 
     /**
@@ -982,6 +969,37 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $this->iShouldSeeRecordInGrid($value);
         }
     }
+
+    /**
+     * Check column is not present in grid
+     * Example: Then I shouldn't see Example column in grid
+     *
+     * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
+     * @param $columnName
+     */
+    public function iShouldNotSeeColumnInGrid($columnName)
+    {
+         self::assertFalse(
+             $this->getGrid()->getHeader()->hasColumn($columnName),
+             sprintf('"%s" column is in grid', $columnName)
+         );
+    }
+
+    /**
+     * Check column is present in grid
+     * Example: Then I should see Example column in grid
+     *
+     * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
+     * @param $columnName
+     */
+    public function iShouldSeeColumnInGrid($columnName)
+    {
+        self::assertTrue(
+            $this->getGrid()->getHeader()->hasColumn($columnName),
+            sprintf('"%s" column is not in grid', $columnName)
+        );
+    }
+
 
     /**
      * Check visibility checkbox for specified column

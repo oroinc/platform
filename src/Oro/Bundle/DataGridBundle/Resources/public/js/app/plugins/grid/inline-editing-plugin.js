@@ -227,7 +227,7 @@ define(function(require) {
 
         isEditable: function(cell) {
             var columnMetadata = cell.column.get('metadata');
-            if (!columnMetadata || !cell.column.get('renderable')) {
+            if (!columnMetadata || !cell.model || !cell.column.get('renderable')) {
                 return false;
             }
             var fieldName = cell.column.get('name');

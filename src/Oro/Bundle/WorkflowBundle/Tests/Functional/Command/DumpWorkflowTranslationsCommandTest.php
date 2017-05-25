@@ -30,7 +30,7 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($provider, '/Tests/Functional/Command/DataFixtures/ValidDefinitions');
 
-        $this->runCommand('oro:workflow:definitions:load', ['--no-ansi']);
+        $this->runCommand('oro:workflow:definitions:load');
     }
 
     public function testExecute()

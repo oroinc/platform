@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -42,7 +42,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             return;
         }
 
-        if (null === QueryUtils::getSingleRootAlias($query, false)) {
+        if (null === QueryBuilderUtil::getSingleRootAlias($query, false)) {
             // only queries with one root entity is supported
             return;
         }
@@ -101,7 +101,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             $query->innerJoin('e.' . $joinFieldName, $joinAlias);
         } else {
             if (!$parentJoinAlias) {
-                $parentJoinAlias = QueryUtils::getSingleRootAlias($query);
+                $parentJoinAlias = QueryBuilderUtil::getSingleRootAlias($query);
             }
             if ($isCollection) {
                 // unidirectional "to-many" association

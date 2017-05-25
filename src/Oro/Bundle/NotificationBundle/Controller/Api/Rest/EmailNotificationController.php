@@ -6,11 +6,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
@@ -53,18 +51,18 @@ class EmailNotificationController extends RestController
     }
 
     /**
-     * @return FormInterface
+     * {@inheritdoc}
      */
     public function getForm()
     {
-        return $this->get('oro_notification.form.email_notification.api');
+        throw new \BadMethodCallException('Form is not available.');
     }
 
     /**
-     * @return ApiFormHandler
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {
-        return $this->get('oro_notification.form.handler.email_notification.api');
+        throw new \BadMethodCallException('FormHandler is not available.');
     }
 }

@@ -26,7 +26,7 @@ class WorkflowColumnListener
 
         $filters[self::COLUMN_NAME] =  [
             'label' => 'oro.workflow.translation.workflow.label',
-            'type' => 'workflow',
+            'type' => 'workflow_translation',
             'data_name' => 'translationKey',
         ];
 
