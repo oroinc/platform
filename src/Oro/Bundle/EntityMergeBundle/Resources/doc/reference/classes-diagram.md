@@ -1,4 +1,4 @@
-#Classes Diagram of Entity Merge bundle#
+# Classes Diagram of Entity Merge bundle#
 
 ### Table of Contents ###
 
