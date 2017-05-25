@@ -4,6 +4,8 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -84,6 +86,31 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertGetEntityRepositoryForClassIsCalled();
         $this->assertCacheReads(false);
         $this->assertRepositoryCalls($entity);
+
+        $result = $this->manager->getLocalization($entity->getId());
+
+        $this->assertEquals($entity, $result);
+    }
+
+    public function testGetLocalizationWithCache()
+    {
+        /** @var Localization $entity */
+        $entity = $this->getEntity(Localization::class, ['id' => 1]);
+
+        $this->assertCacheReads([1 => $entity]);
+
+        $uow = $this->createMock(UnitOfWork::class);
+        $uow->expects($this->once())
+            ->method('merge')
+            ->with($entity);
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->once())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManager')
+            ->with(Localization::class)
+            ->willReturn($entityManager);
 
         $result = $this->manager->getLocalization($entity->getId());
 
