@@ -10,7 +10,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\DqlUtil;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
@@ -381,11 +382,11 @@ abstract class AbstractFilter implements FilterInterface
                     $ds->generateParameterName($this->getName()),
                 ];
             },
-            QueryUtils::getDqlAliases($qb->getDQL())
+            DqlUtil::getAliases($qb->getDQL())
         );
 
         return [
-            QueryUtils::replaceDqlAliases($qb->getDQL(), $replacements),
+            DqlUtil::replaceAliases($qb->getDQL(), $replacements),
             array_combine(array_column($replacements, 0), array_column($replacements, 1))
         ];
     }
@@ -403,7 +404,7 @@ abstract class AbstractFilter implements FilterInterface
 
         list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
 
-        return QueryUtils::findJoinByAlias($ds->getQueryBuilder(), $alias);
+        return QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $alias);
     }
 
     /**
@@ -447,7 +448,7 @@ abstract class AbstractFilter implements FilterInterface
 
         $fields = [];
         foreach ($expressions as $expression) {
-            $fields[] = QueryUtils::getSelectExprByAlias($qb, $expression) ?: $expression;
+            $fields[] = QueryBuilderUtil::getSelectExprByAlias($qb, $expression) ?: $expression;
         }
 
         return $fields;
@@ -469,7 +470,7 @@ abstract class AbstractFilter implements FilterInterface
             }
         } else {
             $trimmedGroupByPart = trim($groupByPart);
-            $expr = QueryUtils::getSelectExprByAlias($qb, $groupByPart);
+            $expr = QueryBuilderUtil::getSelectExprByAlias($qb, $groupByPart);
             $expressions[] = $expr ?: $trimmedGroupByPart;
         }
 
@@ -490,6 +491,6 @@ abstract class AbstractFilter implements FilterInterface
         $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
         list($joinAlias) = explode('.', $fieldName);
 
-        return QueryUtils::isToOne($ds->getQueryBuilder(), $joinAlias);
+        return QueryBuilderUtil::isToOne($ds->getQueryBuilder(), $joinAlias);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace Oro\Bundle\TestFrameworkBundle\Test;
+
 // @codingStandardsIgnoreStart
 class TestListener implements \PHPUnit_Framework_TestListener
 {
@@ -75,7 +77,7 @@ class TestListener implements \PHPUnit_Framework_TestListener
     {
     }
 
-    public function addRiskyTest(\PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addRiskyTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
     }
 

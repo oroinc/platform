@@ -16,7 +16,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class AssociationManager
 {
@@ -208,7 +208,7 @@ class AssociationManager
         $orderBy = null,
         $callback = null
     ) {
-        $criteria = QueryUtils::normalizeCriteria($filters);
+        $criteria = QueryBuilderUtil::normalizeCriteria($filters);
 
         $qb = $this->getUnionQueryBuilder($associationOwnerClass)
             ->addSelect('id', 'ownerId', Type::INTEGER)
@@ -217,7 +217,7 @@ class AssociationManager
             ->addSelect('entityTitle', 'title');
         foreach ($associationTargets as $entityClass => $fieldName) {
             $subQb = $this->getAssociationSubQueryBuilder($associationOwnerClass, $entityClass, $fieldName);
-            QueryUtils::applyJoins($subQb, $joins);
+            QueryBuilderUtil::applyJoins($subQb, $joins);
             $subQb->addCriteria($criteria);
             if (null !== $callback && is_callable($callback)) {
                 call_user_func($callback, $subQb, $entityClass);
@@ -334,7 +334,7 @@ class AssociationManager
         $orderBy = null,
         $callback = null
     ) {
-        $criteria = QueryUtils::normalizeCriteria($filters);
+        $criteria = QueryBuilderUtil::normalizeCriteria($filters);
 
         $qb = $this->getUnionQueryBuilder($associationTargetClass)
             ->addSelect('entityId', 'id', Type::INTEGER)
@@ -343,7 +343,7 @@ class AssociationManager
         $targetIdFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($associationTargetClass);
         foreach ($associationOwners as $ownerClass => $fieldName) {
             $subQb = $this->getAssociationOwnersSubQueryBuilder($ownerClass, $fieldName, $targetIdFieldName);
-            QueryUtils::applyJoins($subQb, $joins);
+            QueryBuilderUtil::applyJoins($subQb, $joins);
             $subQb->addCriteria($criteria);
             if (null !== $callback && is_callable($callback)) {
                 call_user_func($callback, $subQb, $ownerClass);
@@ -419,7 +419,7 @@ class AssociationManager
         if (null !== $limit) {
             $qb->setMaxResults($limit);
             if (null !== $page) {
-                $qb->setFirstResult(QueryUtils::getPageOffset($page, $limit));
+                $qb->setFirstResult(QueryBuilderUtil::getPageOffset($page, $limit));
             }
         }
     }

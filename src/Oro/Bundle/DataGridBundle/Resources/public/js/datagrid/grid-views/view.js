@@ -400,7 +400,7 @@ define(function(require) {
             modal.on('ok', function() {
                 var data = self.getInputData(modal.$el);
 
-                model.set(data);
+                model.set(data, {silent: true});
 
                 if (model.isValid()) {
                     self.lockModelOnOkCloses(modal, true);
@@ -423,7 +423,7 @@ define(function(require) {
             model.save(
                 null, {
                 wait: true,
-                success: function() {
+                success: function(savedModel) {
                     var currentDefaultViewModel = self._getCurrentDefaultViewModel();
                     var isCurrentDefault = currentDefaultViewModel === model;
                     var isCurrentWasDefault = currentDefaultViewModel === undefined;
@@ -435,6 +435,11 @@ define(function(require) {
                         // views with 'default' property and it shall be set to system view.
                         self._getDefaultSystemViewModel().set({is_default: true});
                     }
+
+                    model.set({
+                        'label': savedModel.get('label')
+                    });
+
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 },
                 errorHandlerMessage: self.showErrorMessage,
