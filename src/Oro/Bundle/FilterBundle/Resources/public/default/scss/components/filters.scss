@@ -170,10 +170,9 @@
 
                     input[type=text] {
                         @include base-ui-element(
-                                        $use-base-style: true,
-                                        $padding: 8px 9px,
-                                        $line-height: 1.36
-
+                            $use-base-style: true,
+                            $padding: 8px 9px,
+                            $line-height: 1.36
                         );
 
                         display: block;
@@ -287,9 +286,9 @@
 
                 input[type="text"] {
                     @include base-ui-element(
-                                    $use-base-style: true,
-                                    $padding: 8px 9px,
-                                    $line-height: 1.36
+                        $use-base-style: true,
+                        $padding: 8px 9px,
+                        $line-height: 1.36
                     );
 
                     max-width: 140px;
@@ -547,9 +546,9 @@
 
                 input[type="search"] {
                     @include base-ui-element(
-                                    $use-base-style: true,
-                                    $padding: 8px 9px,
-                                    $line-height: 1.36
+                        $use-base-style: true,
+                        $padding: 8px 9px,
+                        $line-height: 1.36
                     );
 
                     width: 100% !important;
