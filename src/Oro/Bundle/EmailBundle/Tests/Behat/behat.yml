@@ -1,17 +1,18 @@
 oro_behat_extension:
   elements:
-    EmailForm:
-      selector: "form[id^='oro_email_email']"
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
-
-    EmailFormView:
+    Email Form:
       selector: "form[id^='oro_email_email']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
-          To: "div[id^='s2id_oro_email_email'] > ul > li.select2-search-choice > div"
-          From: "div[id^='s2id_oro_email_email_from'] > a > span.select2-chosen"
-          Subject: "input[id^='oro_email_email_subject']"
+          To:
+            type: 'named'
+            locator: ['field', 'To']
+            element: Select2Choices
+          From:
+            type: 'named'
+            locator: ['field', 'From']
+            element: Select2Offscreen
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'

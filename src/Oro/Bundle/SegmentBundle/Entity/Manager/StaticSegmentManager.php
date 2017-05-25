@@ -106,8 +106,14 @@ class StaticSegmentManager
             $values = [];
             $types = [];
             foreach ($originalQuery->getParameters() as $parameter) {
-                $values[] = $parameter->getValue();
-                $types[]  = $parameter->getType() == Type::TARRAY ? Connection::PARAM_STR_ARRAY : $parameter->getType();
+                /* @var $parameter Parameter */
+                $value = $parameter->getValue();
+                $type  = $parameter->getType() == Type::TARRAY ? Connection::PARAM_STR_ARRAY : $parameter->getType();
+                if (\PDO::PARAM_STR === $type && $value instanceof Segment) {
+                    $value = $value->getId();
+                }
+                $values[] = $value;
+                $types[]  = $type;
             }
 
             $this->em->getConnection()->executeQuery($dbQuery, $values, $types);
