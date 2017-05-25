@@ -4,20 +4,32 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 
+/**
+ * @TODO: This walker should be removed according to logic #BAP-13404
+ * Dynamicly applies limit to subquery which is "hooked" by SubQueryLimitHelper
+ */
 class SqlWalker extends TranslationWalker
 {
+    const WALKER_HOOK_LIMIT_KEY = 'walker_hook_for_limit';
+    const WALKER_HOOK_LIMIT_VALUE = 'walker_hook_limit_value';
+    const WALKER_HOOK_LIMIT_ID = 'walker_hook_limit_id';
+
     /**
      * {@inheritdoc}
      */
     public function walkSubselect($subselect)
     {
-        $hints = $this->getQuery()->getHints();
-        $query = $this->getQuery();
         $sql = parent::walkSubselect($subselect);
+        $hookIdentifier = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_KEY);
+        $limitValue = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_VALUE);
+        $identifierField = $this->getQuery()->getHint(self::WALKER_HOOK_LIMIT_ID);
 
-        //$sql = "SELECT customTable.id FROM ($sql LIMIT 2) customTable";
-        $sql = "SELECT customTable.id FROM ($sql LIMIT 2) customTable";
-       // $sql = "SELECT op2.id1 FROM oro_product op2	JOIN (SELECT op.id, op.sku FROM oro_product op WHERE op.sku LIKE '%1%' 	ORDER BY op.sku DESC LIMIT 2) as result_table ON result_table.id=op2.id";
+        if ($identifierField && $hookIdentifier && $limitValue && stripos($sql, $hookIdentifier) !== false) {
+            // Remove hook condition from sql
+            $sql = str_ireplace($hookIdentifier, '1<>0', $sql);
+            $sql = "SELECT customTableAlias.$identifierField FROM ($sql LIMIT $limitValue) customTableAlias";
+        }
+
         return $sql;
     }
 }

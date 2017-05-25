@@ -4,7 +4,9 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Manager;
 
 use Doctrine\ORM\EntityRepository;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
@@ -145,7 +147,20 @@ class SegmentManagerTest extends WebTestCase
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
         $dynamicSegment->setRecordsLimit(10);
-        $this->assertCount(10, $this->manager->getFilterSubQuery($dynamicSegment, $qb));
+        $dqlQuery = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
+        $this->assertContains(
+            'id FROM Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+            $dqlQuery
+        );
+
+        $mainQb = $repository->createQueryBuilder('mainQuery');
+        $mainQb->where(
+            $mainQb->expr()->in('mainQuery.id', $dqlQuery)
+        );
+
+        $entities = $mainQb->getQuery()->getArrayResult();
+
+        $this->assertCount(10, $entities);
     }
 
     public function testGetFilterSubQueryStatic()
@@ -162,21 +177,6 @@ class SegmentManagerTest extends WebTestCase
             sprintf('SELECT snp.integerEntityId FROM %s snp WHERE snp.segment = :segment', SegmentSnapshot::class),
             $this->manager->getFilterSubQuery($dynamicSegment, $qb)
         );
-    }
-
-    public function testGetFilterSubQueryDynamicWithLimitAndNoResults()
-    {
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var EntityRepository $repository */
-        $repository = $registry->getRepository(WorkflowAwareEntity::class);
-
-        $qb = $repository->createQueryBuilder('w');
-
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
-        $dynamicSegment->setRecordsLimit(10);
-        $result = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
-        $this->assertEquals([null], $result);
     }
 
     public function testGetSegmentQueryBuilder()
