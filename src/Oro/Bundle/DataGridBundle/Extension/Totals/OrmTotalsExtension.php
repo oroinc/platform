@@ -197,6 +197,12 @@ class OrmTotalsExtension extends AbstractExtension
             $column = [];
             if (isset($data[$field])) {
                 $totalValue = $data[$field];
+                if (isset($total[Configuration::TOTALS_DIVISOR_KEY])) {
+                    $divisor = (int) $total[Configuration::TOTALS_DIVISOR_KEY];
+                    if ($divisor != 0) {
+                        $totalValue = $totalValue / $divisor;
+                    }
+                }
                 if (isset($total[Configuration::TOTALS_FORMATTER_KEY])) {
                     $totalValue = $this->applyFrontendFormatting(
                         $totalValue,
