@@ -487,7 +487,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 'trace' => debug_backtrace()
             ];
 
-            $this->container->get('logger')->debug(
+            $this->container->get('logger')->critical(
                 'Access Denied in ConfigurableAddOrReplaceStrategy',
                 $errorContext
             );
