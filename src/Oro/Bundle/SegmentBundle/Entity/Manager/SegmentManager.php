@@ -272,8 +272,7 @@ class SegmentManager
                     );
                 }
 
-                $subQuery = $queryBuilder->getQuery()->getDQL();
-
+                $subQuery = $queryBuilder->getDQL();
             } else {
                 $subQuery = $queryBuilder->getDQL();
             }
