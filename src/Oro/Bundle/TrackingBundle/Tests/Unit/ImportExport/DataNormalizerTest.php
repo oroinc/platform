@@ -152,6 +152,29 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                         'userIdentifier' => 'userIdentifier',
                     ]
                 ]
+            ],
+            [
+                [
+                    'website'        => 'id1',
+                    'userIdentifier' => 'userIdentifier%20%3D',
+                    'title'          => 'title%20%3D',
+                ],
+                [
+                    'data'  => json_encode([
+                        'website'        => 'id1',
+                        'userIdentifier' => 'userIdentifier =',
+                        'title'          => 'title =',
+                    ]),
+                    'event' => [
+                        'website'        => [
+                            'identifier' => 'id1',
+                        ],
+                        'userIdentifier' => 'userIdentifier =',
+                        'title'          => 'title =',
+                        'name'           => 'visit',
+                        'value'          => 1,
+                    ]
+                ]
             ]
         ];
     }
