@@ -36,7 +36,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function clickLinkOnConfigurationSidebar($link)
     {
-        $sidebarConfigMenu = $this->getPage()->find('css', 'div.system-configuration-container div.left-panel');
+        $sidebarConfigMenu = $this->createElement('SidebarConfigMenu');
         $sidebarConfigMenu->clickLink($link);
     }
 
