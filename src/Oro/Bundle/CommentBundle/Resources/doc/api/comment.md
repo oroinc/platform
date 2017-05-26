@@ -1,4 +1,4 @@
-#Oro\Bundle\CommentBundle\Entity\Comment
+# Oro\Bundle\CommentBundle\Entity\Comment
 
 ## ACTIONS  
 

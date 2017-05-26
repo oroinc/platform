@@ -210,6 +210,7 @@ class SegmentManagerTest extends WebTestCase
         $repository = $registry->getRepository(User::class);
 
         $qb = $repository->createQueryBuilder('u');
+        $qb->addOrderBy($qb->expr()->asc('u.id'));
         $resultBeforeFilter = $qb->getQuery()->getResult();
         $this->manager->filterBySegment($qb, $segment);
 
@@ -254,6 +255,7 @@ class SegmentManagerTest extends WebTestCase
         $repository = $registry->getRepository(User::class);
 
         $qb = $repository->createQueryBuilder('u');
+        $qb->addOrderBy($qb->expr()->asc('u.id'));
         $this->manager->filterBySegment($qb, $segment);
 
         $result = $qb->getQuery()->getResult();

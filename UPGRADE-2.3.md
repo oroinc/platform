@@ -23,6 +23,10 @@ SearchBundle
 - Class `Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataListener` was replaced with `Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener`
 - Service `oro_search.event_listener.reindex_demo_data` was replaced with `oro_search.migration.demo_data_fixtures_listener.reindex`
 
+TestFrameworkBundle
+-------------------
+- Class `TestListener` namespace added, use `Oro\Bundle\TestFrameworkBundle\Test\TestListener` instead
+
 WorkflowBundle
 --------------
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
