@@ -60,7 +60,8 @@ define([
         options: {
             map: {},
             'allowToRemovePrimary': false,
-            'confirmRemove': false
+            'confirmRemove': false,
+            'addressDeleteUrl': null
         },
 
         initialize: function(options) {
@@ -108,7 +109,10 @@ define([
             if (this.model.get('primary') && !this.options.allowToRemovePrimary) {
                 mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
-                this.confirmClose(_.bind(this.model.destroy, this.model, {wait: true}));
+                this.confirmClose(_.bind(this.model.destroy, this.model, {
+                    url: this.options.addressDeleteUrl,
+                    wait: true
+                }));
             }
         },
 
