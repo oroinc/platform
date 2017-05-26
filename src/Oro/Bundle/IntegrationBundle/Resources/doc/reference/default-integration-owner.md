@@ -1,4 +1,4 @@
-#Default owner for integration related entities
+# Default owner for integration related entities
 
 There is possibility to define owner for related entities on integration level.
 Default user owner setting included to integration configuration and should be configured during integration creation.
@@ -6,7 +6,7 @@ Default user owner setting included to integration configuration and should be c
 Also _OroIntegrationBundle_ brings helper that could be used by import process to perform populating of integration owner.
 It's registered as service `oro_integration.helper.default_owner_helper` and could be easily used as dependency.
 
-####Usage example:
+#### Usage example:
 
 ```php
 
