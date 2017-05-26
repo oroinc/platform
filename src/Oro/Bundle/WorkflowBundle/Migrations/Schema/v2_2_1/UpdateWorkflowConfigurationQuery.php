@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_2;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_2_1;
 
 use Psr\Log\LoggerInterface;
 
@@ -21,7 +21,7 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->info('Update  workflow attributes and transition options');
+        $logger->info('Update cloned workflow transition configuration');
         $this->doExecute($logger, true);
 
         return $logger->getMessages();
