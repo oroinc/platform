@@ -17,29 +17,36 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block content %}
-    {% set saveButton = UI.saveAndStayButton({
-        'label': 'oro.config.actions.save_settings'|trans
-    }) %}
-    {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
-    {% set pageReload = attribute(form.vars.block_config, activeSubGroup).page_reload %}
-    {% set options = {
-        pageReload: pageReload,
-        el: '#' ~ form.vars.id,
-        isFormValid: form.vars.valid
-    } %}
-    <form
-        id="{{ form.vars.id }}"
-        name="{{ form.vars.name }}"
-        {{ form_enctype(form) }}
-        action="{{ formAction }}"
-        method="post"
-        data-collect="true"
-        data-page-component-module="oroconfig/js/form/config-form"
-        data-page-component-options="{{ options|json_encode }}"
-    >
-        {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
-        {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup, routeName, routeParameters) }}
-    </form>
-    {{ oro_form_js_validation(form) }}
-    {{ syncMacro.syncContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
+    {% if isDesktopVersion() %}
+        {% set saveButton = UI.saveAndStayButton({
+            'label': 'oro.config.actions.save_settings'|trans
+        }) %}
+        {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
+        {% set pageReload = attribute(form.vars.block_config, activeSubGroup).page_reload %}
+        {% set options = {
+            pageReload: pageReload,
+            el: '#' ~ form.vars.id,
+            isFormValid: form.vars.valid
+        } %}
+        <form
+            id="{{ form.vars.id }}"
+            name="{{ form.vars.name }}"
+            {{ form_enctype(form) }}
+            action="{{ formAction }}"
+            method="post"
+            data-collect="true"
+            data-page-component-module="oroconfig/js/form/config-form"
+            data-page-component-options="{{ options|json_encode }}"
+        >
+            {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
+            {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup, routeName, routeParameters) }}
+        </form>
+        {{ oro_form_js_validation(form) }}
+        {{ syncMacro.syncContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
+    {% else %}
+        {# Mobile view #}
+        <div class="no-data">
+            <span>{{ 'oro.config.system_configuration.desktop_only'|trans }}</span>
+        </div>
+    {% endif %}
 {% endblock content %}

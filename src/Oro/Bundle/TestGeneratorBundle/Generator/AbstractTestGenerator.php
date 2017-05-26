@@ -27,6 +27,18 @@ abstract class AbstractTestGenerator
     protected $phpVersion;
 
     /**
+     * @var array
+     */
+    protected $rootPathData;
+
+    /**
+     * @var null|array
+     */
+    protected static $availableApplications;
+
+    const PACKAGE_FOLDER_NAME = 'package';
+    
+    /**
      * @param \Twig_Environment $twig
      * @param KernelInterface $kernelInterface
      */
@@ -37,6 +49,7 @@ abstract class AbstractTestGenerator
         $this->twig = $twig;
         $this->kernel = $kernelInterface;
         $this->usedClasses = [];
+        $this->rootPathData =  explode(DIRECTORY_SEPARATOR, $this->kernel->getRootDir());
     }
 
     /**
@@ -90,7 +103,6 @@ abstract class AbstractTestGenerator
         return $data;
     }
 
-
     /**
      * @param \ReflectionClass $class
      * @return \ReflectionMethod[]
@@ -126,12 +138,7 @@ abstract class AbstractTestGenerator
                     $temp['fullClassName'] = '\\' . $dependency['class'];
                 }
                 $class = new \ReflectionClass($dependency['class']);
-                $constructor = $class->getConstructor();
-                if ($constructor && $constructor->getParameters()) {
-                    $temp['has_constructor'] = true;
-                } else {
-                    $temp['has_constructor'] = false;
-                }
+                $temp['has_constructor'] = $this->classConstructorCheck($class->getConstructor());
             } else {
                 $temp['class'] = '';
             }
@@ -191,23 +198,62 @@ abstract class AbstractTestGenerator
      * @param string $namespace
      * @return string
      */
-    protected function getTestPath($namespace)
+    protected function getTestPath($namespace, $classFileName)
     {
-        $root = $this->kernel->getRootDir();
-        $parts = explode(DIRECTORY_SEPARATOR, $root);
-        array_pop($parts);
+        $application = $this->getApplicationName($classFileName);
 
-        //for monolithic
-        if (strpos($root, DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR) !== false) {
-            $application = array_pop($parts);
-            array_pop($parts);
-            $parts[] = 'package';
-            $parts[] = $application;
+        $parts = [
+            $this->getRootPath(3),
+            self::PACKAGE_FOLDER_NAME,
+            $application,
+            'src',
+            str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . '.php'
+        ];
+
+        return implode(DIRECTORY_SEPARATOR, $parts);
+    }
+
+    /**
+     * @param $classFileName
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getApplicationName($classFileName)
+    {
+        $classFilePathData = explode(self::PACKAGE_FOLDER_NAME, $classFileName);
+        $classFilePathData = (explode(DIRECTORY_SEPARATOR, $classFilePathData[1]));
+        $actualApplicationName = $classFilePathData[1];
+        if (!$this->isInAvailableApplications($actualApplicationName)) {
+            throw new \Exception('Application '. $actualApplicationName. ' does not exist');
         }
-        $parts[] = 'src';
 
-        return implode(DIRECTORY_SEPARATOR, $parts)
-            . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . '.php';
+        return $actualApplicationName;
+    }
+
+    /**
+     * @param string $applicationName
+     * @return bool
+     */
+    protected function isInAvailableApplications($applicationName)
+    {
+        if (self::$availableApplications === null) {
+            $applicationsFolders = $this->getRootPath(3). DIRECTORY_SEPARATOR .
+            self::PACKAGE_FOLDER_NAME. DIRECTORY_SEPARATOR . '*';
+            self::$availableApplications = array_map('basename', glob($applicationsFolders, GLOB_ONLYDIR));
+        }
+        return in_array($applicationName, self::$availableApplications);
+    }
+
+    /**
+     * @param int $removedFolderLevels
+     * @return string
+     */
+    protected function getRootPath($removedFolderLevels = 0)
+    {
+        return implode(
+            DIRECTORY_SEPARATOR,
+            array_slice($this->rootPathData, 0, count($this->rootPathData) - $removedFolderLevels)
+        );
     }
 
     /**
@@ -256,12 +302,7 @@ abstract class AbstractTestGenerator
         $class = $param->getClass();
         if ($class) {
             $this->addClassToUses($class);
-            $constructor = $class->getConstructor();
-            if ($constructor && $constructor->getParameters()) {
-                $temp['has_constructor'] = true;
-            } else {
-                $temp['has_constructor'] = false;
-            }
+            $temp['has_constructor'] = $this->classConstructorCheck($class->getConstructor());
         }
         $fullClassName = $class ? $class->getName() : 'non_object';
         if (strpos($fullClassName, '\\')) {
@@ -286,12 +327,19 @@ abstract class AbstractTestGenerator
      */
     protected function addClassToUses($class)
     {
-        if ($class instanceof \ReflectionClass) {
-            if (!in_array($class->getName(), $this->usedClasses, true)) {
-                $this->usedClasses[] = $class->getName();
-            }
+        if ($class instanceof \ReflectionClass && !in_array($class->getName(), $this->usedClasses, true)) {
+            $this->usedClasses[] = $class->getName();
         } elseif ($class && !in_array($class, $this->usedClasses, true) && strpos($class, '\\') !== 0) {
             $this->usedClasses[] = $class;
         }
+    }
+
+    /**
+     * @param \ReflectionMethod|null $constructor
+     * @return bool
+     */
+    protected function classConstructorCheck(\ReflectionMethod $constructor = null)
+    {
+        return $constructor && $constructor->getParameters() ? true : false;
     }
 }
