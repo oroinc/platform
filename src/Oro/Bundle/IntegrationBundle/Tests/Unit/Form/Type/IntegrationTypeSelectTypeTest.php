@@ -58,7 +58,6 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
         unset($result['choice_attr']);
         $this->assertEquals(
             [
-                'empty_value' => '',
                 'choices'     => [
                     'oro.type1.label' => 'testType1',
                     'oro.type2.label' => 'testType2'
