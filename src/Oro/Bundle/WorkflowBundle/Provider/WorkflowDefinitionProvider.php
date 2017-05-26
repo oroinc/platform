@@ -10,8 +10,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class WorkflowDefinitionProvider
 {
-    const CACHE_TTL = 0;
-
     /** @var Registry */
     protected $doctrine;
 
@@ -110,7 +108,7 @@ class WorkflowDefinitionProvider
     private function saveCache($id, $data)
     {
         if ($this->cacheProvider) {
-            return $this->cacheProvider->save($id, $data, self::CACHE_TTL);
+            return $this->cacheProvider->save($id, $data);
         }
 
         return false;
