@@ -18,6 +18,7 @@ class FilterUtility
     const MIN_LENGTH_KEY    = 'min_length';
     const FORCE_LIKE_KEY    = 'force_like';
     const FORM_OPTIONS_KEY  = 'options';
+    const DIVISOR_KEY       = 'divisor';
     const TYPE_EMPTY        = 'filter_empty_option';
     const TYPE_NOT_EMPTY    = 'filter_not_empty_option';
 
