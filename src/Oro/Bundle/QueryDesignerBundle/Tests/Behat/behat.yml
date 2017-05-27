@@ -1,0 +1,4 @@
+oro_behat_extension:
+  elements:
+    Query Designer:
+        selector: "div[id$='-column-form']"
