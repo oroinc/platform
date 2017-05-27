@@ -2,64 +2,70 @@
 
 ## Content
 
-- [Before you start](#Before you start)
-- [Conventions](#Conventions)
-- [Getting Started](#Getting Started)
-  - [Configuring](#Configuring)
-    - [Application Configuration](#Application Configuration)
-    - [Behat Configuration](#Behat Configuration)
-  - [Installing](#Installing)
-    - [Install dev dependencies](#Install dev dependencies)
-    - [Application Initial State](#Application Initial State)
-    - [Install browser emulator](#Install browser emulator)
-  - [Running tests](#Running tests)
-    - [Run browser emulator](#Run browser emulator)
-    - [Run tests](#Run tests)
-- [Architecture](#Architecture)
-  - [DI Containers](#DI Containers)
-  - [Suites autoload](#Suites autoload)
-  - [Feature isolation](#Feature isolation)
-- [Page Object](#Page Object)
-  - [Elements](#Elements)
-  - [Form Mappings](#Form Mappings)
-  - [Ebedded Form Mappings](#Ebedded Form Mappings)
-  - [Page element](#Page element)
-- [Fixtures](#Fixtures)
-  - [Feature fixtures](#Feature fixtures)
-  - [Inline fixtures](#Inline fixtures)
-  - [Alice fixtures](#Alice fixtures)
-  - [Entity references](#Entity references)
-- [Write your first feature](#Write your first feature)
-- [Troubleshooting](#Troubleshooting)
-  - [Append snippets](#Append snippets)
-  - [Increase application performance](#Increase application performance)
-  - [Feature debugging](#Feature debugging)
-    - [Pause feature execution](#Pause feature execution)
-  - [How to find the right step](#How to find the right step)
-    - [Auto suggestion in PhpStorm](#Auto suggestion in PhpStorm)
-    - [Find right Context](#Find right Context)
-    - [Grep in console](#Grep in console)
-  - [Element not visible](#Element not visible)
+- [Before you start](#before-you-start)
+- [Conventions](#conventions)
+- [Getting Started](#cetting-started)
+  - [Configuring](#configuring)
+    - [Application Configuration](#application-configuration)
+    - [Behat Configuration](#behat-configuration)
+  - [Installing](#installing)
+    - [Install dev dependencies](#install-dev-dependencies)
+    - [Application Initial State](#application-initial-state)
+    - [Install browser emulator](#install-browser-emulator)
+  - [Running tests](#running-tests)
+    - [Run browser emulator](#run-browser-emulator)
+    - [Run tests](#run-tests)
+- [Architecture](#architecture)
+  - [DI Containers](#di-containers)
+  - [Suites autoload](#suites-autoload)
+  - [Feature isolation](#feature-isolation)
+- [Page Object](#page-object)
+  - [Elements](#elements)
+  - [Form Mappings](#form-mappings)
+  - [Ebedded Form Mappings](#ebedded-form-mappings)
+  - [Page element](#page-element)
+- [Fixtures](#fixtures)
+  - [Feature fixtures](#feature-fixtures)
+  - [Inline fixtures](#inline-fixtures)
+  - [Alice fixtures](#alice-fixtures)
+  - [Entity references](#entity-references)
+- [Write your first feature](#write-your-first-feature)
+- [Troubleshooting](#troubleshooting)
+  - [Append snippets](#append-snippets)
+  - [Increase application performance](#increase-application-performance)
+  - [Feature debugging](#feature-debugging)
+    - [Pause feature execution](#pause-feature-execution)
+  - [How to find the right step](#how-to-find-the-right-step)
+    - [Auto suggestion in PhpStorm](#auto-suggestion-in-phpstorm)
+    - [Find right Context](#find-right-context)
+    - [Grep in console](#grep-in-console)
+  - [Element not visible](#element-not-visible)
 
 ## Before you start
 
 ***Behavior-driven development (BDD)*** is a software development process that emerged from test-driven development (TDD).
 Behavior-driven development combines the general techniques and principles of TDD 
 with ideas from domain-driven design and object-oriented analysis and design to provide software development and management teams 
-with shared tools and a shared process to collaborate on software development. [Read more at Wiki](https://en.wikipedia.org/wiki/Behavior-driven_development)
+with shared tools and a shared process to collaborate on software development.
+[Read more at Wiki](https://en.wikipedia.org/wiki/Behavior-driven_development)
 
-***Behat*** is a Behavior Driven Development framework for PHP. [See more at behat documentation](http://docs.behat.org/en/v3.0/)
+***Behat*** is a Behavior Driven Development framework for PHP.
+[See more at behat documentation](http://docs.behat.org/en/v3.0/)
 
-***Mink*** is an open source browser controller/emulator for web applications, written in PHP. [Mink documentation](http://mink.behat.org/en/latest/)
+***Mink*** is an open source browser controller/emulator for web applications, written in PHP.
+[Mink documentation](http://mink.behat.org/en/latest/)
 
 
-***OroElementFactory*** create elements in contexts. See more about [page object pattern](http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
+***OroElementFactory*** create elements in contexts.
+See more about [page object pattern](http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
 
-***Symfony2 Extension*** provides integration with Symfony2. [See Symfony2 Extension documentation](https://github.com/Behat/Symfony2Extension/blob/master/doc/index.rst)
+***Symfony2 Extension*** provides integration with Symfony2.
+[See Symfony2 Extension documentation](https://github.com/Behat/Symfony2Extension/blob/master/doc/index.rst)
 
 ***@OroTestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension*** provides integration with Oro BAP based applications. 
 
-***Selenium2Driver*** Selenium2Driver provides a bridge for the Selenium2 (webdriver) tool. See [Driver Feature Support](http://mink.behat.org/en/latest/guides/drivers.html)
+***Selenium2Driver*** Selenium2Driver provides a bridge for the Selenium2 (webdriver) tool.
+See [Driver Feature Support](http://mink.behat.org/en/latest/guides/drivers.html)
 
 ***Selenium2*** browser automation tool with object oriented API. 
 
@@ -68,7 +74,7 @@ It has fast and native support for various web standards: DOM handling, CSS sele
 
 ## Conventions
 
-- We are not using selectors in scenarios e.g.
+- **We are not using selectors in scenarios** e.g.
 
   ```gherkin
       I fill in "oro_workflow_definition_form[label]" with "User Workflow Test"
@@ -95,7 +101,7 @@ It has fast and native support for various web standards: DOM handling, CSS sele
             Related Entity: 'oro_workflow_definition_form[related_entity]'
   ```
 
-- We have one bad thing in our behat extension - "scenario coupling".
+- **Scenario Coupling.**
   We know that it is a bad practice to have scenarios that are depends to each other.
 
   This has some pros:
@@ -107,15 +113,15 @@ It has fast and native support for various web standards: DOM handling, CSS sele
   and cons:
   - Debug behat ui features is hard.
     But debug last scenario in looong feature is even heavier when it depends on planty previous.
-    See [Feature debuging](#Feature debuging)
+    See [Feature debuging](#feature-debuging)
   - Bug localization - you don't sure why delete scenario was broken because of create scenario is broken or not.
     However who care about delete if create not working? ;)
-- Semantical yml fixtures.
+- **Semantical yml fixtures.**
   We are should use only that entities that bundle has.
   Any other entities should be included by import.
-- Elements should be named camelCase without spaces.
-  You can use it in feature with spaces after. e.g. element name OroProductForm and in step ```I fill "Oro Product From" with:```
-- We don't use Background step (see scenario coupling above) but you can use ```Scenario: Feature Background``` for these purposes
+- **Elements should be named camelCase without spaces.**
+  You can use it in feature with spaces after. e.g. element name ```OroProductForm``` and in step ```I fill "Oro Product From" with:```
+- **We are not using Background step** (see scenario coupling above) but you can use ```Scenario: Feature Background``` for these purposes
 
 ## Getting Started
 
@@ -130,8 +136,8 @@ If you don't have any mail server configured locally, you should set it to ```nu
 #### Behat Configuration
 
 Base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
-Every application can have its own behat.yml.dist in the root of application.
-However you create ```behat.yml``` in root of application, import base configuration and change it:
+Every application has its own behat.yml.dist in the root of application directory.
+Create your ```behat.yml```(it will be ignored by git), import base configuration and change it:
 
 ```yaml
 imports:
@@ -549,7 +555,6 @@ Fixtures should be located in ```{BundleName}/Tests/Behat/Features/Fixtures``` d
 For load fixture before feature add tag with fixture file name and ```@fixture-``` prefix e.g. ```@fixture-mass_action.yml```
 
 ```gherkin
-#package/crm/src/Oro/Bundle/CRMBundle/Tests/Behat/Features/mass_delete.feature
 @fixture-mass_action.yml
 Feature: Mass Delete records
 ```
@@ -557,7 +562,6 @@ Feature: Mass Delete records
 Also it is possible to load fixtures for other bundles using shortcut syntax ```@fixture-OroOrganizationBundle:BusinessUnit.yml```
 
 ```gherkin
-#package/platform/src/Oro/Bundle/WorkflowBundle/Tests/Behat/Features/workflow-with-attributes.feature
 @fixture-OroUserBundle:user.yml
 @fixture-OroOrganizationBundle:BusinessUnit.yml
 Feature: Adding attributes for workflow transition
@@ -570,7 +574,7 @@ include:
     - OroPricingBundle::Pricelists.yml
 ```
 
-**Moreover, you should always include fixtures from other bundles with entities that was declared within that bundle [see Conventions](#Conventions).**
+**Moreover, you should always include fixtures from other bundles with entities that was declared within that bundle [see Conventions](#conventions).**
 
 ### Entity references
 
@@ -681,15 +685,13 @@ Copy MySQL to tmpfs:
 
 ```bash
 sudo service mysql stop
-sudo cp -Rfp /var/lib/mysql /var/ramfs
+sudo cp -Rfp /var/lib/mysql /var/tmpfs
 ```
 
 We’ll need to tell AppArmor to let MySQL write to the new directory by creating an alias between the default directory and the new location.
-To do this, edit the AppArmor alias file ```/etc/apparmor.d/tunables/alias``` as root with your favorite editor
-At the bottom of the file, add the following alias rule:
 
-```ini
-alias /var/lib/mysql/ -> /var/tmpfs/mysql,
+```bash
+echo "alias /var/lib/mysql/ -> /var/tmpfs/mysql," | sudo tee -a /etc/apparmor.d/tunables/alias
 ```
 
 For the changes to take effect, restart AppArmor:
@@ -703,6 +705,11 @@ Now you can start mysql again:
 ```bash
 sudo service mysql start
 ```
+
+#### (optional) Create startup script
+
+After restart all your data will lost.
+However the all db structure will lost too. You should copy data dir manually every start, or create a startup script.
 
 ### Append snippets
 
@@ -738,6 +745,7 @@ Just try to type some of keywords, e.g. grid or form and find step that fit to y
 ![PhpStorm step suggestion](../images/phpstorm_step_suggestion.png)
 
 > If you don't have suggestion in storm, check for:
+>
 > 1. You have installed vendors at list for one application
 > 2. You have installed behat plugin for PhpStorm
 
@@ -773,4 +781,4 @@ bin/behat -dl -s AcmeDemoBundle | grep "grid"
 ## ToDo
 
 - Separate this README to multipage document
-- Wait for Ajax flow
+- Explain "wait for ajax" flow
