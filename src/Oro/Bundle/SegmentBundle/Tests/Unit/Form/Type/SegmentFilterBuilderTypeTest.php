@@ -4,12 +4,15 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -58,10 +61,15 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $translator = $this->createMock(Translator::class);
+
         return [
             new PreloadedExtension(
                 [],
-                []
+                [
+                    'form' => [new TooltipFormExtension($configProvider, $translator)],
+                ]
             ),
             $this->getValidatorExtension(false),
         ];
@@ -170,6 +178,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                     'segment_type' => SegmentType::TYPE_DYNAMIC,
                     'segment_columns' => ['id'],
                     'segment_name_template' => 'Auto generated segment %s',
+                    'segment_name_tooltip' => null,
                     'add_name_field' => false,
                     'name_field_required' => false,
                     'attr' => ['data-role' => 'query-designer-container']
@@ -180,6 +189,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                     'segment_entity' => '\stdClass',
                     'add_name_field' => true,
                     'name_field_required' => true,
+                    'segment_name_tooltip' => 'Some tooltip',
                 ],
                 'expected' => [
                     'segment_entity' => '\stdClass',
@@ -187,6 +197,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                     'segment_type' => SegmentType::TYPE_DYNAMIC,
                     'segment_columns' => ['id'],
                     'segment_name_template' => 'Auto generated segment %s',
+                    'segment_name_tooltip' => 'Some tooltip',
                     'add_name_field' => true,
                     'name_field_required' => true,
                     'attr' => ['data-role' => 'query-designer-container']
