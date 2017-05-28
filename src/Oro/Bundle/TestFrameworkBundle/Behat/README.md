@@ -289,6 +289,22 @@ Behat is a symfony console application with it's own container and services.
 Behat container can be configured through Extensions by behat.yml in the root of application.
 Application container can be used by inject Kernel in your Context by implementing ```KernelAwareContext``` and using ```KernelDictionary``` trait.
 
+```php
+use Behat\Symfony2Extension\Context\KernelAwareContext;
+use Behat\Symfony2Extension\Context\KernelDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+
+class FeatureContext extends OroFeatureContext implements KernelAwareContext
+{
+    use KernelDictionary;
+
+    public function useContainer()
+    {
+        $doctrine = $this->getContainer()->get('doctrine');
+    }
+}
+```
+
 ### Suites autoload
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
