@@ -78,7 +78,6 @@ class SegmentFilterBuilderType extends AbstractType
         $resolver->setDefault('segment_type', SegmentTypeEntity::TYPE_DYNAMIC);
         $resolver->setDefault('segment_columns', null);
         $resolver->setDefault('segment_name_template', 'Auto generated segment %s');
-        $resolver->setDefault('segment_name_tooltip', null);
         $resolver->setDefault('add_name_field', false);
         $resolver->setDefault('name_field_required', false);
         $resolver->setDefault('attr', ['data-role' => 'query-designer-container']);
@@ -180,8 +179,7 @@ class SegmentFilterBuilderType extends AbstractType
             $nameFieldOptions = [
                 'required' => $isNameRequired,
                 'mapped' => false,
-                'label' => 'oro.segment.segment_filter_builder.segment_name',
-                'tooltip' => $config->getOption('segment_name_tooltip')
+                'label' => 'oro.segment.segment_filter_builder.segment_name'
             ];
             if ($segment instanceof Segment) {
                 $nameFieldOptions['data'] = $segment->getName();
