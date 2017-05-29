@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -215,16 +216,63 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
         $this->userManager->reloadUser($user);
     }
 
-    public function testRefreshUser()
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     */
+    public function testRefreshUserNotFound()
     {
-        $user = $this->getUser();
-        $crit = ['username' => $user->getUsername()];
+        $user = $this->createMock(User::class);
+        $user->expects($this->any())
+            ->method('getId')
+            ->willReturn(42);
+
+        $this->om->expects($this->once())
+            ->method('refresh')
+            ->with($user)
+            ->willThrowException(new ORMInvalidArgumentException('Not managed'));
 
         $this->repository
             ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo($crit))
-            ->will($this->returnValue([]));
+            ->method('find')
+            ->with(42);
+
+        $this->userManager->refreshUser($user);
+    }
+
+    public function testRefreshUserManaged()
+    {
+        $user = $this->createMock(User::class);
+        $user->expects($this->any())
+            ->method('getId')
+            ->willReturn(42);
+
+        $this->om->expects($this->once())
+            ->method('refresh')
+            ->with($user);
+
+        $this->repository->expects($this->never())
+            ->method('find');
+
+        $this->userManager->refreshUser($user);
+    }
+
+    public function testRefreshManagedUser()
+    {
+        $user = $this->createMock(User::class);
+        $user->expects($this->any())
+            ->method('getId')
+            ->willReturn(42);
+
+        $this->om->expects($this->once())
+            ->method('refresh')
+            ->with($user)
+            ->willThrowException(new ORMInvalidArgumentException('Not managed'));
+
+        $this->repository
+            ->expects($this->once())
+            ->method('find')
+            ->with(42)
+            ->willReturn($user);
 
         $this->userManager->refreshUser($user);
     }
