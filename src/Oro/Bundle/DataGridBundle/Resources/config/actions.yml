@@ -6,6 +6,18 @@ parameters:
     oro_datagrid.extension.action.type.frontend.class:    Oro\Bundle\DataGridBundle\Extension\Action\Actions\FrontendAction
 
 services:
+    oro_datagrid.extension.action.factory:
+        class: Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory
+        public: false
+        arguments:
+            - '@service_container'
+
+    oro_datagrid.extension.action.metadata_factory:
+        class: Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory
+        public: false
+        arguments:
+            - '@translator'
+
     oro_datagrid.extension.action.type.navigate:
         class: %oro_datagrid.extension.action.type.navigate.class%
         scope: prototype

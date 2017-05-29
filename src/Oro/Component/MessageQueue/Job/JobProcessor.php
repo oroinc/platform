@@ -38,6 +38,19 @@ class JobProcessor
     }
 
     /**
+     * Finds root job by name and given statuses.
+     *
+     * @param string $jobName
+     * @param array  $statuses
+     *
+     * @return Job|null
+     */
+    public function findRootJobByJobNameAndStatuses($jobName, array $statuses)
+    {
+        return $this->jobStorage->findRootJobByJobNameAndStatuses($jobName, $statuses);
+    }
+
+    /**
      * @param string $ownerId
      * @param string $jobName
      * @param bool   $unique

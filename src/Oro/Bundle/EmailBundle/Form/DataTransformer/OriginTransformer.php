@@ -73,18 +73,18 @@ class OriginTransformer implements DataTransformerInterface
         if (!$value) {
             return null;
         }
-        $values =  explode('|', $value);
-        if (!array_key_exists(0, $values) || !$values[0]) {
+        list($id, $email) =  array_pad(explode('|', $value), 2, null);
+        if (!$id) {
             $origin = $this->findByOwner($this->securityFacade->getLoggedUser());
 
             if (!$origin) {
-                $origin = $this->createInternalOrigin($values[1]);
+                $origin = $this->createInternalOrigin($email);
             }
 
             return $origin;
         }
 
-        return $this->loadEntityById($value);
+        return $this->loadEntityById($id);
     }
 
     /**
@@ -97,8 +97,7 @@ class OriginTransformer implements DataTransformerInterface
      */
     protected function loadEntityById($id)
     {
-        $repository = $this->em->getRepository($this->className);
-        $result = $repository->find($id);
+        $result = $this->em->find($this->className, $id);
         if (!$result) {
             throw new TransformationFailedException(sprintf('The value "%s" does not exist or not unique.', $id));
         }

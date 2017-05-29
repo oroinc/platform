@@ -4,7 +4,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\EntityManager;
+
 use Nelmio\Alice\Instances\Collection as AliceCollection;
+
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\ProductBundle\Migrations\Data\ORM\LoadProductDefaultAttributeFamilyData;
@@ -13,6 +15,7 @@ use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
+
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class ReferenceRepositoryInitializer
