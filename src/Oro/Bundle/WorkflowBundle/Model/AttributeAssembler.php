@@ -95,6 +95,20 @@ class AttributeAssembler extends BaseAbstractAssembler
     {
         if (!empty($options['property_path'])) {
             $options = $this->guessOptions($options, $definition->getRelatedEntity(), $options['property_path']);
+            if (empty($options['type'])) {
+                throw new AssemblerException(
+                    sprintf(
+                        'Workflow "%s": Option "type" for attribute "%s" with property path "%s" can not be guessed',
+                        $this->translator->trans(
+                            $definition->getLabel(),
+                            [],
+                            WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                        ),
+                        $name,
+                        $options['property_path']
+                    )
+                );
+            }
         }
 
         $this->assertOptions($options, array('label', 'type'));

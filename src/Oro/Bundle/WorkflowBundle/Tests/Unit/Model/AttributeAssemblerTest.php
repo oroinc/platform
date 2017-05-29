@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
-use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Component\Action\Exception\AssemblerException;
 
 class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +20,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator = new StubTranslator();
     }
 
     /**
@@ -41,9 +45,9 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getWorkflowDefinition()
     {
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $definition = $this->createMock(WorkflowDefinition::class);
+        $definition->expects($this->any())->method('getLabel')->willReturn('test_workflow_label');
+
         return $definition;
     }
 
@@ -95,6 +99,12 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                 'Oro\Component\Action\Exception\AssemblerException',
                 'Option "class" cannot be used in attribute "name"'
             ),
+            'can_not_guess_type' => [
+                ['test_name' => ['property_path' => 'test.property']],
+                AssemblerException::class,
+                'Workflow "[trans]test_workflow_label[/trans]": Option "type" for attribute "test_name" ' .
+                'with property path "test.property" can not be guessed'
+            ],
             'missing_object_class' => array(
                 array('name' => array('label' => 'Label', 'type' => 'object', 'property_path' => null)),
                 'Oro\Component\Action\Exception\AssemblerException',
