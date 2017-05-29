@@ -158,8 +158,8 @@ class SegmentManagerTest extends WebTestCase
 
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
-        $this->assertEquals(
-            sprintf('SELECT snp.integerEntityId FROM %s snp WHERE snp.segment = :segment', SegmentSnapshot::class),
+        $this->assertContains(
+            'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
             $this->manager->getFilterSubQuery($dynamicSegment, $qb)
         );
     }

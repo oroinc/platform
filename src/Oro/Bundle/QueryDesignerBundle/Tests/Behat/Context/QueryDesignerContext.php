@@ -55,7 +55,7 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
      */
     private function clickLinkInColumnDesigner($link)
     {
-        $columnDesigner = $this->getPage()->find('css', 'div#oro_report-column-form');
+        $columnDesigner = $this->createElement('Query Designer');
         $columnDesigner->clickLink($link);
     }
 }

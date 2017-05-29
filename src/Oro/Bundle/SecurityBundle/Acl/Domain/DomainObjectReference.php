@@ -11,38 +11,32 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  */
 class DomainObjectReference implements ObjectIdentityInterface
 {
-    /**
-     * @var string Entity class name
-     */
+    /** @var string */
     protected $className;
 
-    /**
-     * @var int Entity id
-     */
+    /** @var int */
     protected $objectId;
 
-    /**
-     * @var int Owner id
-     */
+    /** @var int */
     protected $ownerId;
 
-    /**
-     * @var int Organization id
-     */
+    /** @var int|null */
     protected $organizationId;
 
     /**
-     * @param string $className
-     * @param int    $objectId
-     * @param int    $ownerId
-     * @param int    $organizationId
+     * @param string   $className      The class name of the referenced entity
+     * @param int      $objectId       The identifier of the referenced entity
+     * @param int      $ownerId        The identifier of an entity which owns the referenced entity
+     * @param int|null $organizationId The identifier of organization the referenced entity belongs
      */
-    public function __construct($className, $objectId, $ownerId, $organizationId)
+    public function __construct($className, $objectId, $ownerId, $organizationId = null)
     {
         $this->className = $className;
-        $this->ownerId = (int)$ownerId;
-        $this->organizationId = (int)$organizationId;
         $this->objectId = (int)$objectId;
+        $this->ownerId = (int)$ownerId;
+        if (null !== $organizationId) {
+            $this->organizationId = (int)$organizationId;
+        }
     }
 
     /**
@@ -50,7 +44,8 @@ class DomainObjectReference implements ObjectIdentityInterface
      */
     public function equals(ObjectIdentityInterface $identity)
     {
-        return $this->objectId == $identity->getIdentifier()
+        return
+            $this->objectId == $identity->getIdentifier()
             && $this->className === $identity->getType();
     }
 
@@ -79,7 +74,7 @@ class DomainObjectReference implements ObjectIdentityInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getOrganizationId()
     {
