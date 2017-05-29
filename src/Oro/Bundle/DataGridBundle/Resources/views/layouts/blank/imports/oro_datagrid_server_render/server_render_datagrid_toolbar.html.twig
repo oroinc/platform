@@ -1,6 +1,6 @@
 {% block __oro_datagrid_server_render__datagrid_toolbar_widget %}
     {% set attr = attr|merge({
-    class: attr.class|default('') ~ " grid-toolbar"
+        class: attr.class|default('') ~ " datagrid-toolbar"
     }) %}
     {% set toolbarPosition = attr['data-grid-toolbar'] %}
 
@@ -54,7 +54,7 @@
                class="btn btn--size-s btn--default oro-pagination__prev{% if currentPage <= 1 %} disabled{% endif %}"
                data-grid-pagination-trigger data-grid-pagination-direction="prev">
                 <i class="fa-angle-left"></i>
-                {{ "oro.datagrid.pagination.prev"|trans }}
+                <span class="oro-pagination__label">{{ "oro.datagrid.pagination.prev"|trans }}</span>
             </a>
 
             <input type="text" class="input input--size-s oro-pagination__input" value="{{ currentPage }}"
@@ -68,7 +68,7 @@
             <a href="{% if currentPage >= totalPages %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage + 1) }}{% endif %}"
                class="btn btn--size-s btn--default oro-pagination__next{% if currentPage >= totalPages %} disabled{% endif %}"
                data-grid-pagination-trigger data-grid-pagination-direction="next">
-                {{ "oro.datagrid.pagination.next"|trans }}
+                <span class="oro-pagination__label">{{ "oro.datagrid.pagination.next"|trans }}</span>
                 <i class="fa-angle-right"></i>
             </a>
         </div>
@@ -84,7 +84,7 @@
     {% if pageSize.hide == false and pageSize.items|length > 0 and toolbarPosition != 'bottom' %}
         <div{{ block('block_attributes') }}>
             <div class="page-size pull-right form-horizontal">
-                <span class="fs14 va-m_md hidden-xs">{{ "oro.datagrid.pagesize.labelShort"|trans }}: &nbsp;</span>
+                <span class="va-m_md hidden-xs">{{ "oro.datagrid.pagesize.labelShort"|trans }}: &nbsp;</span>
                 <div class="action-selectbox_custom_in-pager">
                     <select class="select select--size-s" name="action" data-grid-pagesize-selector>
                         {% for value in pageSize.items %}

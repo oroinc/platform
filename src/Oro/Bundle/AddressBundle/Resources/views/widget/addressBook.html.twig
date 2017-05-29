@@ -29,6 +29,16 @@
                             'id': address.get('id')
                         }
                     )
+                },
+                addressDeleteUrl: function() {
+                    var address = arguments[0];
+                    return routing.generate(
+                        '{{ addressDeleteRoute }}',
+                        {
+                            '{{ ownerParam }}': {{ entity.id|json_encode|raw }},
+                            'addressId': address.get('id')
+                        }
+                    )
                 }
             });
             widget.getAction('add_address', 'adopted', function(action) {

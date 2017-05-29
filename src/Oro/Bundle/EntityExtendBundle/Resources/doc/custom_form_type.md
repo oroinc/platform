@@ -32,7 +32,7 @@ class AcmeExtendGuesserPass implements CompilerPassInterface
 }
 ```
 
-###With custom guesser, that will have higher priority or will provide guess with highest confidence value.
+### With custom guesser, that will have higher priority or will provide guess with highest confidence value.
 
 ```php
 class CustomTypeGuesser implements FormTypeGuesserInterface
@@ -96,7 +96,7 @@ Here is some idea of what N should be, existing guessers have priorities:
 
 Select it according to what you need to achieve.
 
-###Using annotation to field or related entity (if extended field is a relation)
+### Using annotation to field or related entity (if extended field is a relation)
 
 ```php
 /*

@@ -4,7 +4,6 @@ define(function(require) {
     var EmailNotificationFormView;
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
     EmailNotificationFormView = BaseView.extend({
         elements: {
@@ -23,9 +22,6 @@ define(function(require) {
             var $entityName = $(this.elements.entityName);
             var $additionalEmailAssociations = $(this.elements.additionalEmailAssociations);
 
-            this.subview('loadingMask', new LoadingMaskView({container: $additionalEmailAssociations}));
-            this.subview('loadingMask').show();
-
             var data = {};
             data[$entityName.attr('name')] = $entityName.val();
 
@@ -37,7 +33,6 @@ define(function(require) {
                     $additionalEmailAssociations.replaceWith(
                         $(html).find(that.elements.additionalEmailAssociations)
                     );
-                    that.removeSubview('loadingMask');
                 }
             });
         }

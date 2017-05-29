@@ -78,7 +78,7 @@ Workflow Imports
 ----------------
 
 In case when you need to reuse existent workflow configurations or its parts you can use `workflow` import directive.
-#####Import Example: with replace
+##### Import Example: with replace
 ```YAML
 imports:
     - { workflow: flow_to_import, as: flow_to_recieve, replace: ['transitions.unneeded_transition_from_other_flow']}
@@ -106,7 +106,7 @@ The search of workflow configuration by default will be performed across all reg
  In case you need to load your part of configuration directly from file, you may use `resource` option for load.
 This approach might be helpful in several situations:
 
-#####Resource: Split Parts Reuse
+##### Resource: Split Parts Reuse
 ```YAML
 imports:
     - { resource: 'b2b_flow_lead/steps.yml', worklow: b2b_flow_lead, as: new_workflow, replace: [] }
@@ -121,7 +121,7 @@ For example (as granted above), you interested in steps only from another workfl
 So, now you can load them directly by using `resource` option together with workflow import options (`workflow`, `as`).
 And you will have all steps from `b2b_flow_lead` workflow loaded under your `new_workflow` configuration without any additions.
 
-#####Resource: Common Template Reuse
+##### Resource: Common Template Reuse
 In case you defining several workflows that are almost similar to each other, but have different use cases (for example: entities to apply for).
 You can use next approach:
 ```YAML

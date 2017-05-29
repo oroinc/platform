@@ -1,10 +1,10 @@
-#Reverse synchronization
+# Reverse synchronization
 
 For integration that requires synchronization in both sides there is possibility to declare export process on connector level.
 Your connector should implement `Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface` to expose job name
 that will make export.
 
-##Export job definition
+## Export job definition
 
 Definition of the export job is very similar to import. Basically it's additional job for `Akeneo\Bundle\BatchBundle`
 that should be added to `batch_job.yml`. Job might be declared with multiple steps, but good practice is to use one connector for one entity.
@@ -13,7 +13,7 @@ it takes `EntityReaderById::ID_FILTER` option from context object(`ContextInterf
 
 _Note: for now only non-composite identifiers are supported_
 
-####Example:
+#### Example:
 ``` yaml
     #batch_job.yml
     example_export:
@@ -33,7 +33,7 @@ _Note: for now only non-composite identifiers are supported_
 
 Processor and writer could be initialized in your bundle in service.yaml
 
-####Example:
+#### Example:
 ``` yaml
     YOUR_PROCESSOR:
         class: %YOUR_PROCESSOR.class%
