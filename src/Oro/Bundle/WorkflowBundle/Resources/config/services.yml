@@ -135,19 +135,17 @@ services:
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
-            - '@doctrine'
+            - '@oro_workflow.provider.workflow_definition'
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.registry.definition_filters'
-            - '@oro_workflow.provider.workflow_definition'
 
     # use only for system calls, cli, background listeners, etc, when main definition filters aren't available
     oro_workflow.registry.system:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
-            - '@doctrine'
+            - '@oro_workflow.provider.workflow_definition'
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.registry.definition_filters.system'
-            - '@oro_workflow.provider.workflow_definition'
 
     oro_workflow.registry.workflow_manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry'
@@ -578,12 +576,6 @@ services:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
 
-    oro_workflow.cache.provider.workflow_definition:
-        public: false
-        class: Doctrine\Common\Cache\ArrayCache
-        calls:
-            - [ setNamespace, [ 'workflow_definition' ] ]
-
     oro_workflow.provider.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider'
         arguments:
@@ -593,3 +585,5 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postPersist, method: invalidateCache }
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postUpdate, method: invalidateCache }
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postRemove, method: invalidateCache }
+            - { name: oro_workflow.changes.listener, event: oro.workflow.activated, method: invalidateCache }
+            - { name: oro_workflow.changes.listener, event: oro.workflow.deactivated, method: invalidateCache }

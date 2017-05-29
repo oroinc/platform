@@ -31,6 +31,10 @@ WorkflowBundle
 --------------
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
     - changed constructor signature:
-        - added `Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider $definitionProvider`;
+        - first argument replaced with `Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider $definitionProvider`;
+    - following protected methods were moved to `WorkflowDefinitionProvider`:
+        - `refreshWorkflowDefinition`
+        - `getEntityManager`
+        - `getEntityRepository`
 - Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
 - Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.

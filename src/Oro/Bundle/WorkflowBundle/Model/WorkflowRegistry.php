@@ -4,10 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
@@ -15,9 +12,6 @@ use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider;
 
 class WorkflowRegistry
 {
-    /** @var ManagerRegistry */
-    protected $managerRegistry;
-
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
@@ -28,21 +22,18 @@ class WorkflowRegistry
     protected $definitionFilters;
 
     /**
-     * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
      * @param WorkflowDefinitionFilters $definitionFilters
      * @param WorkflowDefinitionProvider $definitionProvider
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
+        WorkflowDefinitionProvider $definitionProvider,
         WorkflowAssembler $workflowAssembler,
-        WorkflowDefinitionFilters $definitionFilters,
-        WorkflowDefinitionProvider $definitionProvider
+        WorkflowDefinitionFilters $definitionFilters
     ) {
-        $this->managerRegistry = $managerRegistry;
+        $this->definitionProvider = $definitionProvider;
         $this->workflowAssembler = $workflowAssembler;
         $this->definitionFilters = $definitionFilters;
-        $this->definitionProvider = $definitionProvider;
     }
 
     /**
@@ -65,7 +56,7 @@ class WorkflowRegistry
         }
 
         if (!array_key_exists($name, $this->workflowByName)) {
-            $definition = $this->getEntityRepository()->find($name);
+            $definition = $this->definitionProvider->find($name);
         } else {
             $definition = $this->workflowByName[$name]->getDefinition();
         }
@@ -244,22 +235,6 @@ class WorkflowRegistry
     }
 
     /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->managerRegistry->getManagerForClass(WorkflowDefinition::class);
-    }
-
-    /**
-     * @return WorkflowDefinitionRepository
-     */
-    protected function getEntityRepository()
-    {
-        return $this->getEntityManager()->getRepository(WorkflowDefinition::class);
-    }
-
-    /**
      * Ensure that all database entities in workflow are still in Doctrine Unit of Work
      *
      * @param Workflow $workflow
@@ -268,28 +243,9 @@ class WorkflowRegistry
      */
     protected function refreshWorkflow(Workflow $workflow)
     {
-        $refreshedDefinition = $this->refreshWorkflowDefinition($workflow->getDefinition());
+        $refreshedDefinition = $this->definitionProvider->refreshWorkflowDefinition($workflow->getDefinition());
         $workflow->setDefinition($refreshedDefinition);
 
         return $workflow;
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return WorkflowDefinition
-     * @throws WorkflowNotFoundException
-     */
-    protected function refreshWorkflowDefinition(WorkflowDefinition $definition)
-    {
-        if (!$this->getEntityManager()->getUnitOfWork()->isInIdentityMap($definition)) {
-            $definitionName = $definition->getName();
-
-            $definition = $this->getEntityRepository()->find($definitionName);
-            if (!$definition) {
-                throw new WorkflowNotFoundException($definitionName);
-            }
-        }
-
-        return $definition;
     }
 }

@@ -2,32 +2,41 @@
 
 namespace Oro\Bundle\WorkflowBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
 class WorkflowDefinitionProvider
 {
-    /** @var Registry */
-    protected $doctrine;
+    /** @var ManagerRegistry */
+    protected $registry;
 
     /** @var CacheProvider */
     protected $cacheProvider;
 
+    /** @var ArrayCache */
+    protected $internalCache;
+
     /**
-     * @param Registry $doctrine
+     * @param ManagerRegistry $registry
      * @param CacheProvider $cacheProvider
      */
-    public function __construct(Registry $doctrine, CacheProvider $cacheProvider)
+    public function __construct(ManagerRegistry $registry, CacheProvider $cacheProvider)
     {
-        $this->doctrine = $doctrine;
+        $this->registry = $registry;
         $this->cacheProvider = $cacheProvider;
+        $this->internalCache = new ArrayCache();
     }
 
     public function invalidateCache()
     {
+        $this->internalCache->deleteAll();
         $this->cacheProvider->deleteAll();
     }
 
@@ -86,14 +95,45 @@ class WorkflowDefinitionProvider
     }
 
     /**
+     * @param WorkflowDefinition $definition
+     *
+     * @return WorkflowDefinition
+     *
+     * @throws WorkflowNotFoundException
+     */
+    public function refreshWorkflowDefinition(WorkflowDefinition $definition)
+    {
+        if (!$this->getEntityManager()->getUnitOfWork()->isInIdentityMap($definition)) {
+            $definitionName = $definition->getName();
+
+            $definition = $this->getEntityRepository()->find($definitionName);
+            if (!$definition) {
+                throw new WorkflowNotFoundException($definitionName);
+            }
+        }
+
+        return $definition;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return null|WorkflowDefinition|object
+     */
+    public function find($name)
+    {
+        return $this->getEntityRepository()->find($name);
+    }
+
+    /**
      * @param string $id
      *
      * @return false|WorkflowDefinition[]
      */
-    private function fetchCache($id)
+    protected function fetchCache($id)
     {
-        if ($this->cacheProvider) {
-            return $this->cacheProvider->fetch($id);
+        if ($this->cacheProvider->fetch('has_cached_values')) {
+            return $this->internalCache->fetch($id);
         }
 
         return false;
@@ -105,20 +145,25 @@ class WorkflowDefinitionProvider
      *
      * @return bool
      */
-    private function saveCache($id, $data)
+    protected function saveCache($id, $data)
     {
-        if ($this->cacheProvider) {
-            return $this->cacheProvider->save($id, $data);
-        }
+        $this->cacheProvider->save('has_cached_values', true);
+        return $this->internalCache->save($id, $data);
+    }
 
-        return false;
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->registry->getManagerForClass(WorkflowDefinition::class);
     }
 
     /**
      * @return WorkflowDefinitionRepository
      */
-    private function getEntityRepository()
+    protected function getEntityRepository()
     {
-        return $this->doctrine->getRepository(WorkflowDefinition::class);
+        return $this->registry->getRepository(WorkflowDefinition::class);
     }
 }

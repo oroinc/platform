@@ -4,7 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-use Oro\Bundle\EntityBundle\ORM\Registry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider;
@@ -18,8 +21,8 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
     protected $definition;
 
-    /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $managerRegistry;
 
     /** @var WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
@@ -33,9 +36,9 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->cache = $this->createMock(CacheProvider::class);
-        $this->doctrine = $this->createMock(Registry::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->repository = $this->createMock(WorkflowDefinitionRepository::class);
-        $this->provider = new WorkflowDefinitionProvider($this->doctrine, $this->cache);
+        $this->provider = new WorkflowDefinitionProvider($this->managerRegistry, $this->cache);
         $this->definition = $this->createMock(WorkflowDefinition::class);
     }
 
@@ -46,7 +49,7 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->cache,
-            $this->doctrine,
+            $this->managerRegistry,
             $this->repository,
             $this->provider,
             $this->definition
@@ -89,6 +92,76 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->invalidateCache();
     }
 
+    public function testFind()
+    {
+        $this->configureORM('find', null, 'test');
+        $this->provider->find('test');
+    }
+
+    /**
+     * @param bool $isFresh
+     *
+     * @dataProvider
+     */
+    public function testRefreshWorkflowDefinition($isFresh = true)
+    {
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
+        $entityManager = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
+        $uow->expects($this->once())
+            ->method('isInIdentityMap')
+            ->with($workflowDefinition)
+            ->willReturn($isFresh);
+        $entityManager->expects($this->once())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $this->managerRegistry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(WorkflowDefinition::class)
+            ->willReturn($entityManager);
+        if ($isFresh) {
+            $this->managerRegistry->expects($this->never())->method('getRepository');
+        } else {
+            $workflowDefinition->expects($this->once())->method('getName')->willReturn('test');
+            $this->configureORM('find', $workflowDefinition, 'test');
+        }
+        $this->provider->refreshWorkflowDefinition($workflowDefinition);
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function refreshWorkflowDefinitionDataProvider()
+    {
+        yield 'is_fresh' => ['isFresh' => true];
+        yield 'non_fresh' => ['isFresh' => false];
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
+     * @expectedExceptionMessage Workflow "test" not found
+     */
+    public function testRefreshWorkflowDefinitionWithException()
+    {
+        $workflowDefinition = $this->createMock(WorkflowDefinition::class);
+        $entityManager = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
+        $uow->expects($this->once())
+            ->method('isInIdentityMap')
+            ->with($workflowDefinition)
+            ->willReturn(false);
+        $entityManager->expects($this->once())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $this->managerRegistry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(WorkflowDefinition::class)
+            ->willReturn($entityManager);
+        $workflowDefinition->expects($this->once())->method('getName')->willReturn('test');
+        $this->configureORM('find', null, 'test');
+        $this->provider->refreshWorkflowDefinition($workflowDefinition);
+    }
+
     /**
      * @param mixed $result
      */
@@ -105,7 +178,7 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function configureORM($repositoryMethod, $repositoryResult, $repositoryMethodWith = null)
     {
-        $this->doctrine->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getRepository')
             ->with(WorkflowDefinition::class)
             ->willReturn($this->repository);
