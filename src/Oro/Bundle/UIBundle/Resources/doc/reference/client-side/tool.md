@@ -1,8 +1,8 @@
-#Ui  tool
+# Ui  tool
 
 UI tool provide different helpfull functions
 
-##isTouchDevice
+## isTouchDevice
 
 **Return:** Bool
 
