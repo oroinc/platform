@@ -511,7 +511,7 @@ services:
                 - image
                 - enum
                 - multiEnum
-                - html
+                - rich_text
             -
                 #BAP-5875
                 #- oneToOne
