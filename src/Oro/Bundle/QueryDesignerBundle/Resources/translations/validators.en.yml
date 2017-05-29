@@ -5,3 +5,5 @@ oro:
                 not_blank: "This condition should not be blank."
             conditions_group:
                 not_blank: "This group should not be blank."
+            filters:
+                not_blank: "Filters should not be blank."
