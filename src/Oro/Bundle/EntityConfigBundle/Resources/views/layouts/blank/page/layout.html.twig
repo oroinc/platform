@@ -58,7 +58,7 @@
 {% endblock %}
 
 {% block attribute_rich_text_widget %}
-    {{ value|oro_html_tag_trim(['script','style']) }}
+    {{ value|oro_html_tag_trim(['script','style', 'link']) }}
 {% endblock %}
 
 {% block attribute_boolean_widget %}
