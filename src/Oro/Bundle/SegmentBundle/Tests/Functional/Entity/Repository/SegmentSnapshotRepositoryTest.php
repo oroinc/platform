@@ -222,4 +222,17 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         return $queryBuilder->setMaxResults($count)->getQuery()->getResult();
     }
+
+    public function testGetIdentifiersSelectQueryBuilder()
+    {
+        /** @var SegmentSnapshotRepository $repository */
+        $repository = $this->getContainer()->get('doctrine')->getRepository('OroSegmentBundle:SegmentSnapshot');
+
+        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+
+        $this->assertContains(
+            'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
+            $repository->getIdentifiersSelectQueryBuilder($segment)->getDQL()
+        );
+    }
 }
