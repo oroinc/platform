@@ -103,7 +103,21 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         }
 
         $actionData = $this->getActionData($buttonSearchContext);
-        $result = $button->getOperation()->isAvailable($actionData);
+        try {
+            $result = $button->getOperation()->isAvailable($actionData);
+        } catch (\Exception $e) {
+            if (null !== $errors) {
+                $errors->add([
+                    'message' => sprintf(
+                        'Checking conditions of operation "%s" failed.',
+                        $button->getOperation()->getName()
+                    ),
+                    'parameters' => ['exception' => $e]
+                ]);
+            }
+
+            $result = false;
+        }
 
         $definition = $button->getOperation()->getDefinition();
         $definition->setFrontendOptions($this->resolveOptions($actionData, $definition->getFrontendOptions()))

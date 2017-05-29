@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Extension;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
@@ -203,6 +205,37 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testIsAvailableException()
+    {
+        $this->assertContextHelperCalled(1);
+
+        $button = $this->createOperationButton();
+        /** @var Operation|\PHPUnit_Framework_MockObject_MockObject $operation */
+        $operation = $button->getOperation();
+        $definition = $operation->getDefinition();
+        $definition->setFrontendOptions(['frontend' => 'not resolved'])->setButtonOptions(['button' => 'not resolved']);
+
+        $exception = new \Exception('exception when check conditions');
+
+        $operation->expects($this->any())
+            ->method('isAvailable')
+            ->willThrowException($exception);
+
+        $errors = new ArrayCollection();
+        $this->extension->isAvailable($button, $this->createButtonSearchContext(), $errors);
+        $this->assertCount(1, $errors);
+        $this->assertEquals(
+            $errors->first(),
+            [
+                'message' => sprintf(
+                    'Checking conditions of operation "%s" failed.',
+                    $operation->getName()
+                ),
+                'parameters' => ['exception' => $exception]
+            ]
+        );
+    }
+
+    public function testIsAvailableExceptionUnsupportedButton()
     {
         $this->assertContextHelperCalled(0);
 
