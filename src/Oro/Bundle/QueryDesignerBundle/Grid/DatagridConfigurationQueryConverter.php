@@ -143,6 +143,8 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 
     /**
      * {@inheritdoc}
+
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function addSelectColumn(
         $entityClassName,

@@ -92,6 +92,11 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @param null $route
+     *
+     * @return array
+     */
     public function getExpectedDefinition($route = null)
     {
         $definition = [
