@@ -88,7 +88,7 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
             }
             if (array_key_exists('pre_conditions', $definitionData)) {
                 $definitionData['preconditions'] = array_merge_recursive(
-                    $definitionData['post_actions'],
+                    $definitionData['pre_conditions'],
                     $definitionData['preconditions'] ?? []
                 );
                 unset($definitionData['pre_conditions']);
