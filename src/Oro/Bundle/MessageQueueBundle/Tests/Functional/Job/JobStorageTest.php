@@ -66,6 +66,17 @@ class JobStorageTest extends WebTestCase
         $this->assertSame($referenceJob, $resultJob);
     }
 
+    public function testShouldFindRootJobByJobNameAndStatuses()
+    {
+        /** @var Job $referenceJob */
+        $referenceJob = $this->getReference(LoadJobData::JOB_1);
+        $resultJob = $this->jobStorage->findRootJobByJobNameAndStatuses(
+            $referenceJob->getName(),
+            [$referenceJob->getStatus()]
+        );
+        $this->assertSame($referenceJob, $resultJob);
+    }
+
     public function testCouldCreateJobWithoutLock()
     {
         $rootJob = new Job();

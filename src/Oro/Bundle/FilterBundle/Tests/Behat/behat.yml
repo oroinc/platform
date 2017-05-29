@@ -8,6 +8,10 @@ oro_behat_extension:
         locator: "(//a[contains(@class, 'dropdown-toggle')] | //div/div/button)[last()]"
     RemoveCondition:
         selector: ".condition .close"
+    LastConditionItem:
+        selector:
+            type: 'xpath'
+            locator: "//div[contains(@id, '-condition-builder')]//a[contains(., 'Choose')][last()]"
   suites:
     OroFilterBundle:
       contexts:
