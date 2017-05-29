@@ -18,6 +18,7 @@ Each feature consists of one required option - the label. Out of the box feature
  - processes - list of process names
  - operations - list of operation names
  - api_resources - list of entity FQCNs
+ - commands - list of commands which depend on the feature. Running these commands is impossible or is not reasonable when the feature is disabled
  
 Example of features.yml configuration
 
@@ -101,7 +102,7 @@ Feature resource types are nodes of feature configuration (routes, workflows, co
 resources are their values. Resource is disabled if it is included into at least one disabled feature. 
 Resource state is resolved by `public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)` 
 
-####Layout updates
+#### Layout updates
 
  - Check feature state `=data['feature'].isFeatureEnabled('feature_name')`
  - Check resource state `=data['feature'].isResourceEnabled('acme_product_view', 'routes')`
@@ -119,7 +120,7 @@ layout:
                 visible: '=data["feature"].isFeatureEnabled("product_feature")'
 ```
 
-####Processes, workflows, operations
+#### Processes, workflows, operations
 
 In Processes, workflows and operations config expression may be used to check feature state
 
@@ -140,7 +141,7 @@ In Processes, workflows and operations config expression may be used to check fe
     scope_identifier: $.scopeId
 ```
 
-####Twig
+#### Twig
 
  - Check feature state `feature_enabled($featureName, $scopeIdentifier = null)`
  - Check resource state `feature_resource_enabled($resource, $resourceType, $scopeIdentifier = null)`
@@ -315,7 +316,7 @@ features:
 Using checker for commands
 --------------------------
 Commands launched as subcommands cannot be skipped globally. To avoid running such commands, add an implementation of 
-FeatureCheckerAwareInterface to your parent command, import FeatureCheckerHolderTrait (via use FeatureCheckerHolderTrait;), and check the 
+FeatureCheckerAwareInterface to your parent command, import FeatureCheckerHolderTrait (via `use FeatureCheckerHolderTrait;`), and check the 
 feature status via featureChecker that is automatically injected into your command.
 
 ```php

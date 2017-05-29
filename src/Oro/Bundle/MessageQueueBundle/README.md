@@ -40,7 +40,7 @@ oro_message_queue:
 
 we can configure one of the supported transports via parameters:
 
-###DBAL transport 
+### DBAL transport 
 
 ```yaml
 # app/config/parameters.yml

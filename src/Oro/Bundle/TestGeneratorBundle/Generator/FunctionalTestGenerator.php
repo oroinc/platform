@@ -16,8 +16,8 @@ class FunctionalTestGenerator extends AbstractTestGenerator
         $partsOfOriginClass = explode('\\', $className);
         $testedClassName = array_pop($partsOfOriginClass);
         $nameSpace = implode('\\', $parts);
-        $testPath = $this->getTestPath($fullTestNameSpace);
         $class = new \ReflectionClass($className);
+        $testPath = $this->getTestPath($fullTestNameSpace, $class->getFileName());
         $methodsData = $this->getMethodsData($class);
         $orderedUses = $this->getOrderedUses($this->usedClasses);
         $content = $this->twig->render(

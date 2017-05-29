@@ -52,7 +52,6 @@ class IntegrationTypeSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'empty_value' => '',
                 'choices'     => $this->getChoices(),
                 'choice_attr' => function ($choice) {
                     return $this->getChoiceAttributes($choice);

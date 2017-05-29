@@ -77,7 +77,8 @@ define([
             }
 
             if (!_.isUndefined(this.column.attributes.cell.prototype.className)) {
-                this.$el.addClass(this.column.attributes.cell.prototype.className);
+                var className = this.column.attributes.cell.prototype.className;
+                this.$el.addClass(_.isFunction(className) ? className.call(this) : className);
             }
 
             if (this.column.has('align')) {

@@ -3,7 +3,7 @@ OroDataAuditBundle
 
 The OroDataAuditBundle provides changelogs for your entities that are configurable on an entity and in the GUI. 
 
-###Entity Configuration
+### Entity Configuration
 
 DataAudit can only be enabled for Configurable entities. To add a property of an entity to the changelog,
 you simply have to enable the audit for the entity itself and specify some fields you want to be logged.
@@ -12,7 +12,7 @@ To achieve this, you should use the `@Config` and `@ConfigField` annotations for
 Audit can be enabled/disabled per an entire entity or for separate fields in UI `System->Entities->EntityManagement`
 (attribute `Auditable`).
 
-###Example of annotation configuration
+### Example of annotation configuration
 ```php
 // src/Acme/DemoBundle/Entity/Product.php
 namespace Acme\DemoBundle\Entity;

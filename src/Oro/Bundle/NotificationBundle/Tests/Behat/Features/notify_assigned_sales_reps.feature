@@ -21,8 +21,13 @@ Feature: Notify assigned Sales Representatives
     And press "Create Notification Rule"
     And fill form with:
       |Entity Name |Contact Request |
+    And I save and close form
+    Then I should see "This value should not be blank."
     And fill form with:
       |Event Name  |Entity create   |
+    And I save and close form
+    Then I should see "This value should not be blank."
+    And fill form with:
       |Template    |Test Template   |
       |Groups      |Administrators  |
     When I save and close form

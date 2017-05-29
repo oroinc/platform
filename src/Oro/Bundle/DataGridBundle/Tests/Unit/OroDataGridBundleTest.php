@@ -22,15 +22,13 @@ class OroDataGridBundleTest extends \PHPUnit_Framework_TestCase
         $passes = $container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses();
 
         $this->assertInternalType('array', $passes);
-        $this->assertCount(9, $passes);
+        $this->assertCount(7, $passes);
         $this->assertInstanceOf(CompilerPass\ConfigurationPass::class, $passes[0]);
         $this->assertInstanceOf(CompilerPass\FormattersPass::class, $passes[1]);
         $this->assertInstanceOf(CompilerPass\ActionsPass::class, $passes[2]);
-        $this->assertInstanceOf(CompilerPass\ActionProvidersPass::class, $passes[3]);
-        $this->assertInstanceOf(CompilerPass\MassActionsPass::class, $passes[4]);
-        $this->assertInstanceOf(CompilerPass\GuessPass::class, $passes[5]);
-        $this->assertInstanceOf(CompilerPass\InlineEditColumnOptionsGuesserPass::class, $passes[6]);
-        $this->assertInstanceOf(CompilerPass\SetDatagridEventListenersLazyPass::class, $passes[7]);
-        $this->assertInstanceOf(CompilerPass\BoardProcessorsPass::class, $passes[8]);
+        $this->assertInstanceOf(CompilerPass\GuessPass::class, $passes[3]);
+        $this->assertInstanceOf(CompilerPass\InlineEditColumnOptionsGuesserPass::class, $passes[4]);
+        $this->assertInstanceOf(CompilerPass\SetDatagridEventListenersLazyPass::class, $passes[5]);
+        $this->assertInstanceOf(CompilerPass\BoardProcessorsPass::class, $passes[6]);
     }
 }
