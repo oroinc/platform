@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\DBAL\Types;
 
 use Doctrine\DBAL\Types\TextType;
 
-class RichTextType extends TextType
+class HTMLEscapedType extends TextType
 {
-    const TYPE = 'rich_text';
+    const TYPE = 'html_escaped';
 
     /** {@inheritdoc} */
     public function getName()

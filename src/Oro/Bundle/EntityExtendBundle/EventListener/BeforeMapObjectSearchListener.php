@@ -31,7 +31,7 @@ class BeforeMapObjectSearchListener
         'float'                    => 'decimal',
         'decimal'                  => 'decimal',
         'boolean'                  => 'integer',
-        'rich_text'                => 'text',
+        'html_escaped'             => 'text',
         RelationType::ONE_TO_MANY  => Indexer::RELATION_ONE_TO_MANY,
         RelationType::MANY_TO_ONE  => Indexer::RELATION_MANY_TO_ONE,
         RelationType::MANY_TO_MANY => Indexer::RELATION_MANY_TO_MANY,

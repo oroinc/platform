@@ -1,4 +1,4 @@
 doctrine:
     dbal:
         types:
-            rich_text: Oro\Bundle\EntityExtendBundle\DBAL\Types\RichTextType
+            html_escaped: Oro\Bundle\EntityExtendBundle\DBAL\Types\HTMLEscapedType

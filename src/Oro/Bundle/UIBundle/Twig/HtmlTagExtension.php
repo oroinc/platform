@@ -74,7 +74,7 @@ class HtmlTagExtension extends \Twig_Extension
     public function htmlTagTrim($html, array $tags = [])
     {
         foreach ($tags as $tag) {
-            $pattern = '/(<' . $tag . '[^>]*>)((.|\s)*?)(<\/' . $tag . '>)/i';
+            $pattern = '/(<' . $tag . '[^>]*>)((.|\s)*?)(<\/' . $tag . '>)|(<' . $tag . '[^>]*>)/i';
             $html = preg_replace($pattern, '', $html);
         }
 

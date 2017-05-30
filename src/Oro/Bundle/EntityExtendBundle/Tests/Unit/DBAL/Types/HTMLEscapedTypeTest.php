@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Oro\Bundle\EntityExtendBundle\DBAL\Types\RichTextType;
+use Oro\Bundle\EntityExtendBundle\DBAL\Types\HTMLEscapedType;
 
-class RichTextTypeTest extends \PHPUnit_Framework_TestCase
+class HTMLEscapedTypeTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var RichTextType */
+    /** @var HTMLEscapedType */
     protected $type;
 
     /** @var AbstractPlatform */
@@ -17,7 +17,7 @@ class RichTextTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->type = $this
             ->getMockBuilder(
-                'Oro\Bundle\EntityExtendBundle\DBAL\Types\RichTextType'
+                'Oro\Bundle\EntityExtendBundle\DBAL\Types\HTMLEscapedType'
             )
             ->setMethods(null)
             ->disableOriginalConstructor()
@@ -65,7 +65,7 @@ class RichTextTypeTest extends \PHPUnit_Framework_TestCase
    h1 { 
     font-size: 120%; 
    }
-</style>
+</style><link rel="stylesheet" href="mystylesheet.css" onload="sheetLoaded()" onerror="sheetError()">
 EOF;
 
         return [
