@@ -1,6 +1,14 @@
 address_type:
     billing: Billing
     shipping: Shipping
+continent:
+    AF: Africa
+    AS: Asia
+    EU: Europe
+    NA: North America
+    SA: South America
+    OC: Oceania
+    AN: Antarctica
 country:
     AD: Andorra
     AE: 'United Arab Emirates'
