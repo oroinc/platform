@@ -12,6 +12,8 @@ use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCacheWarmerInterface
 {
@@ -38,6 +40,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
     /** @var string */
     protected $rootNode;
 
+    /** @var ParameterBagInterface */
+    protected $parameterBag;
+
     /**
      * @param ConfigurationDefinitionInterface $configurationDefinition
      * @param ConfigurationValidatorInterface $validator
@@ -60,6 +65,15 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
         $this->rawConfiguration = $rawConfiguration;
         $this->kernelBundles = array_values($kernelBundles);
         $this->rootNode = $rootNode;
+        $this->parameterBag = new ParameterBag();
+    }
+
+    /**
+     * @param ParameterBagInterface $parameterBag
+     */
+    public function setParameterBag(ParameterBagInterface $parameterBag)
+    {
+        $this->parameterBag = $parameterBag;
     }
 
     /**
@@ -158,6 +172,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
             }
         }
 
-        return $configs;
+        return $this->parameterBag->resolveValue($configs);
     }
 }
