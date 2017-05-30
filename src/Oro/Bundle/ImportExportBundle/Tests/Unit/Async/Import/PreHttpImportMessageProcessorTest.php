@@ -271,7 +271,8 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
                     'body' => [
                         'originFileName' => 'test.csv',
-                        'error' => 'test Error',
+                        'error' => 'The import file could not be imported due to a fatal error. ' .
+                                   'Please check its integrity and try again!',
                     ],
                     'contentType' => 'text/html',
                 ]

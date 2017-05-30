@@ -465,6 +465,7 @@ ImportExportBundle
 - Class `Oro\Bundle\ImportExportBundle\Splitter\SplitterCsvFiler` and its service `oro_importexport.splitter.csv` were removed. You can use `Oro\Bundle\ImportExportBundle\File\BatchFileManager` instead.
 - Class `Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService` was renamed to `ImportExportResultSummarizer`. It will be moved after add supporting templates in notification process.
 - Route `oro_importexport_import_error_log` with path `/import_export/import-error/{jobId}.log` was renamed to `oro_importexport_job_error_log` with path `/import_export/job-error-log/{jobId}.log`
+- Class `Oro\Bundle\ImportExportBundle\Async\SendImportErrorInfoMessageProcessor` was renamed and restructured into `SendImportErrorNotificationMessageProcessor`
 
 InstallerBundle
 ---------------

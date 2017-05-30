@@ -287,7 +287,8 @@ class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicS
             'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
             'body' => [
                 'originFileName' => $body['originFileName'],
-                'error' => $error,
+                'error' => 'The import file could not be imported due to a fatal error. ' .
+                           'Please check its integrity and try again!',
             ],
             'contentType' => 'text/html',
         ]);

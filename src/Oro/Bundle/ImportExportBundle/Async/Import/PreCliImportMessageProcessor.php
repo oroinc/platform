@@ -127,10 +127,7 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
             return self::REJECT;
         }
 
-        $body = array_replace_recursive([
-                'notifyEmail' => null,
-                'options' => []
-            ], $body);
+        $body = array_replace_recursive(['notifyEmail' => null, 'options' => []], $body);
 
         $format = pathinfo($body['originFileName'], PATHINFO_EXTENSION);
         $writer = $this->writerChain->getWriter($format);
@@ -228,7 +225,8 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
                 'template' => 'import_error',
                 'body' => [
                     'originFileName' => $body['originFileName'],
-                    'error' => $error,
+                    'error' => 'The import file could not be imported due to a fatal error. ' .
+                               'Please check its integrity and try again!',
                 ],
                 'contentType' => 'text/html',
             ]);
