@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -26,7 +26,7 @@ class Manager
     protected $entityManager;
 
     /**
-     * @var SecurityContextInterface
+     * @var TokenStorageInterface
      */
     protected $securityContext;
 
@@ -36,13 +36,13 @@ class Manager
      * @param Factory                  $factory
      * @param EntityManager            $entityManager
      * @param AclHelper                $aclHelper
-     * @param SecurityContextInterface $securityContext
+     * @param TokenStorageInterface $securityContext
      */
     public function __construct(
         Factory $factory,
         EntityManager $entityManager,
         AclHelper $aclHelper,
-        SecurityContextInterface $securityContext
+        TokenStorageInterface $securityContext
     ) {
         $this->factory         = $factory;
         $this->entityManager   = $entityManager;
