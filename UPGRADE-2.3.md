@@ -62,6 +62,10 @@ SecurityBundle
     - made `organizationId` optional
 - Added class `Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper`
 
+SegmentBundle
+-------------
+* The `Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager::__construct(EntityManager $em, SegmentQueryBuilderRegistry $builderRegistry)` method was changed to `Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager::__construct(EntityManager $em, SegmentQueryBuilderRegistry $builderRegistry, SubQueryLimitHelper $subQueryLimitHelper)`
+
 SearchBundle
 ------------
 - Class `Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataListener` was replaced with `Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener`

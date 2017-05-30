@@ -7,10 +7,13 @@ use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
+
 use Psr\Log\LoggerInterface;
 
 class SegmentManager
@@ -26,16 +29,22 @@ class SegmentManager
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var SubQueryLimitHelper */
+    protected $subqueryLimitHelper;
+
     /**
      * @param EntityManager $em
      * @param SegmentQueryBuilderRegistry $builderRegistry
+     * @param SubQueryLimitHelper $subQueryLimitHelper
      */
     public function __construct(
         EntityManager $em,
-        SegmentQueryBuilderRegistry $builderRegistry
+        SegmentQueryBuilderRegistry $builderRegistry,
+        SubQueryLimitHelper $subQueryLimitHelper
     ) {
         $this->em = $em;
         $this->builderRegistry = $builderRegistry;
+        $this->subqueryLimitHelper = $subQueryLimitHelper;
     }
 
     /**
@@ -247,27 +256,31 @@ class SegmentManager
         $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
         if ($segmentQueryBuilder !== null) {
             $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
-            $queryBuilder->setMaxResults($segment->getRecordsLimit());
 
-            $identifier = $this->getIdentifierFieldName($segment->getEntity());
-            if ($segment->isDynamic() && $segment->getRecordsLimit()) {
-                $idsResult = $queryBuilder->getQuery()->getArrayResult();
-                if (!$idsResult) {
-                    return [0];
+            if ($segment->isDynamic()) {
+                $identifier = $this->getIdentifierFieldName($segment->getEntity());
+                $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+                $tableIdentifier = $tableAlias . '.' . $identifier;
+                $queryBuilder->resetDQLParts(['select']);
+                $queryBuilder->select($tableIdentifier);
+
+                if ($segment->getRecordsLimit()) {
+                    $queryBuilder = $this->subqueryLimitHelper->setLimit(
+                        $queryBuilder,
+                        $segment->getRecordsLimit(),
+                        $identifier
+                    );
                 }
-                $subQuery = array_column($idsResult, $identifier);
-            } else {
-                if ($segment->isDynamic()) {
-                    $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
-                    $queryBuilder->resetDQLParts(['orderBy', 'select']);
-                    $queryBuilder->select($tableAlias . '.' . $identifier);
-                }
+
                 $subQuery = $queryBuilder->getDQL();
-                /** @var Parameter[] $params */
-                $params = $queryBuilder->getParameters();
-                foreach ($params as $param) {
-                    $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
-                }
+            } else {
+                $subQuery = $queryBuilder->getDQL();
+            }
+
+            /** @var Parameter[] $params */
+            $params = $queryBuilder->getParameters();
+            foreach ($params as $param) {
+                $externalQueryBuilder->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
 
             return $subQuery;
