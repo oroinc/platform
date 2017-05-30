@@ -35,7 +35,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
