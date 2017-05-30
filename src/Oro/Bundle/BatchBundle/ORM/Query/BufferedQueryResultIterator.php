@@ -147,6 +147,8 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
         $this->position = -1;
         $this->current = null;
 
+        unset($this->rows);
+
         $this->next();
     }
 
