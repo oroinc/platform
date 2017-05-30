@@ -33,11 +33,10 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
          * If migration is already completed it should not run again
          * ( for case of upgrade from 1.9)
          */
-        if ($schema->hasTable('oro_calendar_event_attendee')) {
-            return;
+        if (!$schema->hasTable('oro_calendar_event_attendee')) {
+            $this->createAttendee($schema);
         }
 
-        $this->createAttendee($schema);
         $this->createRecurrenceTable($schema);
 
         $this->addEnums($schema);
