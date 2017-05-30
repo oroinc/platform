@@ -88,6 +88,17 @@ class Country extends ExtendCountry implements Translatable
     protected $regions;
 
     /**
+     * @var Continent
+     *
+     * @ORM\ManyToOne(targetEntity="Continent", inversedBy="countries")
+     * @ORM\JoinColumn(name="continent_code", referencedColumnName="code")
+     * @JMS\Type("Oro\Bundle\AddressBundle\Entity\Continent")
+     * @JMS\SerializedName("continent")
+     * @JMS\Expose
+     */
+    protected $continent;
+
+    /**
      * @Gedmo\Locale
      */
     protected $locale;
@@ -246,5 +257,28 @@ class Country extends ExtendCountry implements Translatable
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * Set continent
+     *
+     * @param \Oro\Bundle\AddressBundle\Entity\Continent $continent
+     * @return Country
+     */
+    public function setContinent(\Oro\Bundle\AddressBundle\Entity\Continent $continent = null)
+    {
+        $this->continent = $continent;
+
+        return $this;
+    }
+
+    /**
+     * Get continent
+     *
+     * @return \Oro\Bundle\AddressBundle\Entity\Continent 
+     */
+    public function getContinent()
+    {
+        return $this->continent;
     }
 }
