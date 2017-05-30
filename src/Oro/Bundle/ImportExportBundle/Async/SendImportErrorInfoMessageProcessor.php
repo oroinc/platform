@@ -7,15 +7,19 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 
+/**
+ * @deprecated Renamed in 2.1 to SendImportErrorNotificationMessageProcessor
+ */
 class SendImportErrorInfoMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -58,6 +62,7 @@ class SendImportErrorInfoMessageProcessor implements MessageProcessorInterface, 
 
     /**
      * @var array
+     * @deprecated Should be removed
      */
     protected static $stopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED];
 
@@ -68,10 +73,32 @@ class SendImportErrorInfoMessageProcessor implements MessageProcessorInterface, 
     {
         $body = JSON::decode($message->getBody());
 
-        $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
+        if (! isset($body['file'], $body['error']) &&
+            ! (isset($body['userId']) || isset($body['notifyEmail']))
+        ) {
+            $this->logger->critical('Invalid message', ['message' => $body]);
+
+            return self::REJECT;
+        }
+
+        if (!isset($body['notifyEmail']) || !$body['notifyEmail']) {
+            $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
+            if (! $user instanceof User) {
+                $this->logger->error(
+                    sprintf('User not found. Id: %s', $body['userId']),
+                    ['message' => $message]
+                );
+
+                return self::REJECT;
+            }
+            $notifyEmail = $user->getEmail();
+        } else {
+            $notifyEmail = $body['notifyEmail'];
+        }
+
         $this->sendNotification(
-            'Error importing file ' . $body['originFileName'],
-            $user->getEmail(),
+            'Error importing file ' . $body['file'],
+            $notifyEmail,
             'The import file could not be imported due to a fatal error. ' .
             'Please check its integrity and try again!'
         );

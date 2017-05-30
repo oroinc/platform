@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -343,6 +346,92 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $this->assertInstanceOf(AbstractPreparingHttpImportMessageProcessor::class, $chunkHttpImportMessageProcessor);
         $this->assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
         $this->assertInstanceOf(TopicSubscriberInterface::class, $chunkHttpImportMessageProcessor);
+    }
+
+    public function testShouldRejectMessageAndSendErrorNotification()
+    {
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->once())
+            ->method('warning')
+            ->with('Import of file test.csv failed')
+        ;
+
+        $user = $this->getUser();
+
+        $userRepo = $this->createUserRepositoryMock();
+        $userRepo
+            ->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn($user);
+
+        $doctrine = $this->createDoctrineMock();
+        $doctrine
+            ->expects($this->once())
+            ->method('getRepository')
+            ->with(User::class)
+            ->will($this->returnValue($userRepo))
+        ;
+
+        $item = [];
+
+        $csvSplitter = $this->createSplitterCsvFileMock();
+        $csvSplitter
+            ->expects($this->once())
+            ->method('getSplitFiles')
+            ->with('test.csv')
+            ->willThrowException(new InvalidItemException('Error in structure', $item));
+
+        $producer = $this->createMessageProducerInterfaceMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+            ->with(
+                'oro.importexport.send_error_info',
+                [
+                    'filePath' => 'test.csv',
+                    'originFileName' => 'test.csv',
+                    'userId' => '1',
+                    'subscribedTopic' => [
+                        'oro.importexport.import_http_preparing'
+                    ],
+                    'errorMessage' => 'The import file could not be imported due to a fatal error. ' .
+                                      'Please check its integrity and try again!',
+                ]
+            );
+
+        $processor = new PreparingHttpImportMessageProcessor(
+            $this->createHttpImportHandlerMock(),
+            $this->createJobRunnerMock(),
+            $producer,
+            $logger,
+            $csvSplitter,
+            $doctrine,
+            $this->createDependentJobMock()
+        );
+
+        $message = $this->createMessageMock();
+        $message
+            ->expects($this->once())
+            ->method('getBody')
+            ->willReturn(
+                json_encode(
+                    [
+                        'filePath' => 'test.csv',
+                        'originFileName' => 'test.csv',
+                        'userId' => '1',
+                        'jobId' => '1',
+                        'jobName' => 'test',
+                        'processorAlias' => 'test',
+                        'options' => [],
+                    ]
+                )
+            )
+        ;
+
+        $result = $processor->process($message, $this->createSessionMock());
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testValidationImportProcessShouldReturnSubscribedTopics()

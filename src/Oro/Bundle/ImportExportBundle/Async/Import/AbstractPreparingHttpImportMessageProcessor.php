@@ -128,7 +128,6 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
         }
 
         $parentMessageId = $message->getMessageId();
-
         try {
             $files = $this->splitterCsvFileHelper->getSplitFiles($body['filePath']);
         } catch (InvalidItemException $e) {
@@ -144,7 +143,8 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                     'originFileName' => $body['originFileName'],
                     'userId' => $body['userId'],
                     'subscribedTopic' => static::getSubscribedTopics(),
-                    'errorMessage' => $e->getMessage()
+                    'errorMessage' => 'The import file could not be imported due to a fatal error. ' .
+                                      'Please check its integrity and try again!',
                 ]
             );
 
