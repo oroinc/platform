@@ -1,7 +1,7 @@
 Scroll Data Customization
 =========================
 
-###General Information
+### General Information
 
 To customize data rendered with macros `scrollData(...)` from `macros.html.twig` developer can use special event
 triggered in the very beginning of marcos processing. Event name has format `oro_ui.scroll_data.before.<dataTarget>`
@@ -13,7 +13,7 @@ object, data wrapped into `Oro\Bundle\UIBundle\View\ScrollData` object and optio
 completely replaced.
 
 
-###Scroll Data
+### Scroll Data
 
 Scroll data object provides several useful methods to add information to scroll data
 
@@ -23,7 +23,7 @@ block title is required
 - **addSubBlockData($blockId, $subBlockID, $html)** - adds HTML code to the existing subblock inside specified block 
 
 
-###Customization Example
+### Customization Example
 
 Lets look at an example of scroll data customization. Here is definition of listener used to customize scroll data:
 

@@ -40,6 +40,14 @@ function(_, Translator, module) {
         }
         var string = get.call(Translator, id, placeholders, number);
 
+        //#TODO remove those 2 conditions after updating lib/translator.js in scope of BAP-14788.
+        if (string === undefined) {
+            string = get.call(Translator, id, placeholders, 1);
+        }
+        if (string === undefined) {
+            string = id;
+        }
+
         var hasTranslation = checkTranslation(id);
 
         if (!config.debugTranslator) {

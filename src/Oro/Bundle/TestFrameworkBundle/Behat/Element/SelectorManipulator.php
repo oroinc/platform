@@ -31,6 +31,11 @@ class SelectorManipulator extends Manipulator
         return $selector;
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public function getContainsFromString($text)
     {
         return sprintf('contains("%s")', $text);
@@ -47,6 +52,22 @@ class SelectorManipulator extends Manipulator
         list($selectorType, $locator) = $this->parseSelector($selector);
 
         return $selectorsHandler->selectorToXpath($selectorType, $locator);
+    }
+
+    /**
+     * @param string $xpath
+     * @param string $text
+     * @param bool   $useChildren
+     *
+     * @return array
+     */
+    public function getContainsXPathSelector($xpath, $text, $useChildren = true)
+    {
+        return $this->getXPathSelector(
+            $xpath,
+            sprintf("contains(%s, '%s')", $this->getToLowerXPathExpr('.'), strtolower($text)),
+            $useChildren
+        );
     }
 
     /**
@@ -74,5 +95,48 @@ class SelectorManipulator extends Manipulator
         $locator = is_array($selector) ? $selector['locator'] : $selector;
 
         return [$selectorType, $locator];
+    }
+
+    /**
+     * @param string $expr
+     *
+     * @return string
+     */
+    protected function getToLowerXPathExpr($expr)
+    {
+        return sprintf(
+            "translate(%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')",
+            $expr
+        );
+    }
+
+    /**
+     * @param string $xpath
+     * @param string $xpathCondition
+     * @param bool   $useChildren
+     *
+     * @return array
+     */
+    protected function getXPathSelector($xpath, $xpathCondition, $useChildren = true)
+    {
+        $embedCondition = sprintf('text()[%s]', $xpathCondition);
+        if ($useChildren) {
+            $embedCondition = sprintf('node()[%s]', $embedCondition);
+        }
+
+        $length = strlen($xpath);
+        if ($xpath[$length - 1] === ']') {
+            $pos = strpos($xpath, '[');
+            $xpath = sprintf(
+                '%s[%s and (%s)]',
+                substr($xpath, 0, $pos),
+                substr($xpath, $pos + 1, $length - $pos - 2),
+                $embedCondition
+            );
+        } else {
+            $xpath .= sprintf('[%s]', $embedCondition);
+        }
+
+        return ['type' => 'xpath', 'locator' => $xpath];
     }
 }

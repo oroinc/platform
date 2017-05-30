@@ -3,6 +3,9 @@ config:
         'jquery.validate':
             deps:
                 - 'jquery'
+        'jquery.validate-additional-methods':
+            deps:
+                - 'jquery.validate'
         'tinymce/plugins/textcolor/plugin.min':
             deps:
                 - 'tinymce/tinymce.min'
@@ -40,6 +43,7 @@ config:
             'jquery.validate': 'jquery.validate'
     paths:
         'jquery.validate': 'bundles/bowerassets/jquery-validate/jquery.validate.js'
+        'jquery.validate-additional-methods': 'bundles/bowerassets/jquery-validate/additional-methods.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
         'oroform/js/validator/date': 'bundles/oroform/js/validator/date.js'
         'oroform/js/validator/datetime': 'bundles/oroform/js/validator/datetime.js'

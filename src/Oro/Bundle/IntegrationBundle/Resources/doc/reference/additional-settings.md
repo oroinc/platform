@@ -1,4 +1,4 @@
-#Additional setting for integration
+# Additional setting for integration
 
 Integration entity contains two additional serializable fields that allows developers to store platform specific
 settings there. Those fields are **synchronization settings** and **mapping settings**. They could be retrieved using

@@ -73,3 +73,10 @@ services:
 
     oro_security.owner.ownership_decision_maker.chain:
         class: %oro_security.owner.ownership_decision_maker.chain.class%
+
+    oro_security.owner.ownership_query_helper:
+        class: Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper
+        public: false
+        arguments:
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_entity.orm.entity_class_resolver'

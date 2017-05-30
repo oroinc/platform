@@ -29,10 +29,12 @@ class GridFilters extends Element
             }
         } else {
             $filterItem = $this->elementFactory->findElementContains($name, $text);
-            self::assertTrue($filterItem->isValid(), sprintf('Can\'t find filter with "%s" name', $text));
+            if (!$filterItem->isValid()) {
+                $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text);
+            }
         }
 
-        if (!$filterItem) {
+        if (null === $filterItem || !$filterItem->isValid()) {
             self::fail(sprintf('Can\'t find filter with "%s" name', $text));
         }
 

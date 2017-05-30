@@ -20,21 +20,23 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     public function iAddTheFollowingFilters(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($filter, $column, $type) = $row;
-            $this->addFilter($filter, $column, $type);
+            list($filter, $column, $condition) = array_pad($row, 3, null);
+            $this->addFilter($filter, $column, $condition);
         }
     }
 
     /**
-     * @param string $filter
-     * @param string $column
-     * @param string $condition
+     * @param string      $filter
+     * @param string      $column
+     * @param string|null $condition
      */
     private function addFilter($filter, $column, $condition)
     {
         $this->dragFilterToConditionBuilder($filter);
         $this->chooseFilterColumn($column);
-        $this->setFilterCondition($condition);
+        if ($condition) {
+            $this->setFilterCondition($condition);
+        }
     }
 
     /**
@@ -54,34 +56,25 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @param $column
+     * @param string $column
      */
     private function chooseFilterColumn($column)
     {
-        $this->clickLinkInFiltersZone('Choose a field');
+        $lastConditionItem = $this->createElement('Last condition item');
+        $lastConditionItem->click();
         $this->getPage()
             ->find(
                 'xpath',
                 "//div[@id='select2-drop']/div/input"
             )
             ->setValue($column);
+        $this->waitForAjax();
         $this->getPage()
             ->find(
                 'xpath',
                 "//div[@id='select2-drop']//div[contains(., '{$column}')]"
             )
             ->click();
-    }
-
-    /**
-     * @param string $link
-     *
-     * @throws \Behat\Mink\Exception\ElementNotFoundException
-     */
-    private function clickLinkInFiltersZone($link)
-    {
-        $filtersZone = $this->createElement('Filters condition builder');
-        $filtersZone->clickLink($link);
     }
 
     /**
