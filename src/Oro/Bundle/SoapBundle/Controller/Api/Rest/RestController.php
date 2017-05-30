@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\DBAL\Driver\PDOException;
 
 use FOS\RestBundle\Util\Codes;
 
@@ -109,6 +110,8 @@ abstract class RestController extends RestGetController implements
             $view = $this->view(null, Codes::HTTP_NOT_FOUND);
         } catch (ForbiddenException $forbiddenEx) {
             $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+        } catch (PDOException $ex) {
+            $view = $this->view(['reason' => $ex->getMessage()], Codes::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->buildResponse($view, self::ACTION_DELETE, ['id' => $id, 'success' => $isProcessed]);
