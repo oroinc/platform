@@ -33,6 +33,8 @@ services:
             - []
             - %kernel.bundles%
             - 'operations'
+        calls:
+            - [setParameterBag, ["@=service('kernel').getContainer().getParameterBag()"]]
         tags:
             - { name: oro.config_cache_warmer.provider, dumper: 'oro_action.config.dumper' }
 
@@ -45,6 +47,8 @@ services:
             - []
             - %kernel.bundles%
             - 'action_groups'
+        calls:
+            - [setParameterBag, ["@=service('kernel').getContainer().getParameterBag()"]]
         tags:
             - { name: oro.config_cache_warmer.provider, dumper: 'oro_action.config.dumper' }
 
