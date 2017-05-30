@@ -33,6 +33,7 @@ oro:
                 field:
                     items:
                         label: Label
+                        label.tooltip: To keep the attribute content unlabeled on the Front Store, prefix the label text with an underscore (e.g. _Video Review, _Img Front View, _Img Rare View).
                         description: Description
                         description.tooltip: When filled in, description will be used as a field tooltip on entity forms
             datagrid:
@@ -44,6 +45,7 @@ oro:
                         is_visible.mandatory: Yes as mandatory
                         is_visible.tooltip: Controls the availability of a field in the Grid Settings. "Yes and display" makes it available (shown by default), "Yes and do not display" the same but hidden by default and "Yes as mandatory" adds it permanently to all grid views
                         show_filter: Show grid filter
+                        order: Grid Order
             form:
                 field:
                     items:

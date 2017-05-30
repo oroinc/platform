@@ -8,13 +8,13 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
         - oro_entity_extend:UniqueExtendEntityField: {groups: UniqueField}
         - oro_entity_extend:DefaultRelationField: {groups: UniqueField}
         - oro_entity_extend:MultiEnumSnapshotField: {groups: UniqueField}
-        - oro_entity_extend:UniqueExtendEntityMethodName: {groups: DuplicateMethod}
+        - oro_entity_extend:UniqueExtendEntityMethodName: {groups: UniqueMethod}
     properties:
         fieldName:
             - NotBlank: ~
             - Regex:
                 pattern: "/^[a-z]+[a-z0-9_]*$/i"
-                message: "This value should contain only alphabetic symbols, underscore and numbers."
+                message: "This value should start with a symbol and contain only alphabetic symbols, underscore and numbers."
             - Regex:
                 pattern: "/^id$/i"
                 match:   false

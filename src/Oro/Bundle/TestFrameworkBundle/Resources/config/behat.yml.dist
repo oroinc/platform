@@ -19,11 +19,18 @@ default: &default
                 path_suffix: 'Tests/Behat/Features'
                 class_suffix: 'Tests\Behat\Context\FeatureContext'
         Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension:
+            artifacts:
+                handlers:
+                    local:
+                        directory: '%paths.base%/web/uploads/behat'
+                        base_url: '%mink.base_url%/uploads/behat'
+                        auto_clear: false
             shared_contexts:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
                 - OroActivityListBundle::ActivityContext
                 - OroDataGridBundle::GridContext
+                - OroFormBundle::FormContext
                 - OroSecurityBundle::ACLContext
                 - OroSearchBundle::SearchContext
                 - OroImportExportBundle::ImportExportContext:

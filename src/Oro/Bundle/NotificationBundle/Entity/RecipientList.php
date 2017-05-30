@@ -59,6 +59,12 @@ class RecipientList
      */
     protected $owner;
 
+    /**
+     * @var array
+     * @ORM\Column(name="additional_email_associations", type="simple_array", nullable=true)
+     */
+    protected $additionalEmailAssociations = [];
+
     public function __construct()
     {
         $this->groups = new ArrayCollection();
@@ -77,10 +83,14 @@ class RecipientList
      * Setter for email
      *
      * @param string $email
+     *
+     * @return $this
      */
     public function setEmail($email)
     {
         $this->email = $email;
+
+        return $this;
     }
 
     /**
@@ -177,10 +187,14 @@ class RecipientList
      * Setter for owner field
      *
      * @param boolean $owner
+     *
+     * @return $this
      */
     public function setOwner($owner)
     {
         $this->owner = $owner;
+
+        return $this;
     }
 
     /**
@@ -191,6 +205,22 @@ class RecipientList
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalEmailAssociations()
+    {
+        return $this->additionalEmailAssociations;
+    }
+
+    /**
+     * @param array $additionalEmailAssociations
+     */
+    public function setAdditionalEmailAssociations($additionalEmailAssociations)
+    {
+        $this->additionalEmailAssociations = $additionalEmailAssociations;
     }
 
     /**

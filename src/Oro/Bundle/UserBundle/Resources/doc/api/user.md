@@ -221,18 +221,6 @@ Data should contain full collection of email addresses of the business customer.
 
 *This field is **required** and must remain defined.*
 
-### password
-
-#### create
-
-{@inheritdoc}
-
-**Please note:**
-
-*The password must conform to the system security policy.*
-
-**The required field**
-
 ## SUBRESOURCES
 
 ### avatar
@@ -606,3 +594,20 @@ Example:
 }
 ```
 {@/request}
+
+
+# Extend\Entity\EV_Auth_Status
+
+## ACTIONS
+
+### get
+
+Retrieve a specific authentication status record.
+
+The authentication status defines the actuality of the user's password, whether it is active, expired, or locked.
+
+### get_list
+
+Retrieve a collection of authentication status records.
+
+The authentication status defines the actuality of the user's password, whether it is active, expired, or locked.

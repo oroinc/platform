@@ -362,6 +362,12 @@
         }) %}
     {% endif %}
 
+    {% if hreflang is defined %}
+        {% set attr = attr|merge({
+        hreflang: hreflang
+        }) %}
+    {% endif %}
+
     <link{{ block('block_attributes') }}/>
 {% endblock %}
 

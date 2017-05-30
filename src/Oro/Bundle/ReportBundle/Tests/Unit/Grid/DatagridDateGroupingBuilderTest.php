@@ -135,6 +135,12 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
             $this->config,
             $report
         );
+
+        // Shifting select array to match convention for calendar date as first select item
+        $expectedSelect = $expectedConfig['source']['query']['select'];
+        array_unshift($expectedSelect, array_pop($expectedSelect));
+        $expectedConfig['source']['query']['select'] = $expectedSelect ;
+
         $this->assertSame($this->config->toArray(), $expectedConfig);
     }
 

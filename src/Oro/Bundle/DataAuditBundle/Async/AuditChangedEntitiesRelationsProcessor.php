@@ -59,13 +59,16 @@ class AuditChangedEntitiesRelationsProcessor implements MessageProcessorInterfac
             $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
         }
 
+        $ownerDescription = isset($body['owner_description']) ? $body['owner_description'] : null;
+
         $this->entityChangesToAuditEntryConverter->convert(
             $body['collections_updated'],
             $transactionId,
             $loggedAt,
             $user,
             $organization,
-            $impersonation
+            $impersonation,
+            $ownerDescription
         );
         
         return self::ACK;

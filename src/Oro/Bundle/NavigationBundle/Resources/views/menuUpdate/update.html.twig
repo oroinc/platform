@@ -3,7 +3,11 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
 {% set formAction = app.request.uri %}
 {% set entityId = entity.id %}
-
+{% set reloadLink -%}
+    <a href="#" onclick="window.location.reload(false);return false;">
+        {{- 'oro.navigation.menuupdate.reload_link.label'|trans -}}
+    </a>
+{%- endset %}
 {% if entity.key %}
     {% set breadcrumbs = breadcrumbs|merge({'entityTitle': entity.isDivider ? 'oro.navigation.menuupdate.divider'|trans : entity.title|trans()}) %}
 {% else %}
@@ -31,7 +35,7 @@
                 {#Delete button #}
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
-                    'successMessage': deletedMessage|default('oro.navigation.menuupdate.deleted_message')|trans(),
+                    'successMessage': deletedMessage|default('oro.navigation.menuupdate.deleted_message')|trans({'%reload_link%': reloadLink}),
                     'dataUrl': path(routePrefix ~ 'ajax_delete', {context: context, menuName: menuName, key: app.request.get('key')}),
                     'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.menu, context: context}),
                     'aCss': 'no-hash remove-button',
@@ -51,7 +55,7 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path(routePrefix ~ 'ajax_hide', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': hiddenMessage|default('oro.navigation.menuupdate.hide_success_message')
+                            'successMessage': hiddenMessage|default('oro.navigation.menuupdate.hide_success_message')|trans({'%reload_link%': reloadLink})
                         }) }}
                     </div>
                 {% else %}
@@ -66,7 +70,7 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path(routePrefix ~ 'ajax_show', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': showedMessage|default('oro.navigation.menuupdate.show_success_message')
+                            'successMessage': showedMessage|default('oro.navigation.menuupdate.show_success_message')|trans({'%reload_link%': reloadLink})
                         }) }}
                     </div>
                 {% endif %}
@@ -88,7 +92,7 @@
                 'dataMethod': 'POST',
                 'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
                 'dataRedirect': app.request.uri,
-                'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')
+                'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')|trans({'%reload_link%': reloadLink})
             }) %}
 
             {% set parameters = {
@@ -151,62 +155,42 @@
         'dataBlocks': dataBlocks,
     } %}
 
-    {% set componentOptions = {
-    container: 'menuitem-container',
-    sidebar: 'menuitem-tree',
-    sidebarAlias: 'menuitem-sidebar',
-    widgetAlias: 'menuitem-data-widget',
-    widgetContainer: '.menuitem-data'
+    {% set twoColumnContent = parent() %}
+
+    {% set treeOptions = {
+        'view' : 'oronavigation/js/app/views/tree-manage-view',
+        'data' : tree,
+        'nodeId': entity.key,
+        'menu' : entity.menu,
+        'context' : context,
+        'updateAllowed' : true,
+        'onRootSelectRoute' : routePrefix ~ 'view',
+        'onSelectRoute' : routePrefix ~ 'update',
+        'onMoveRoute' : routePrefix ~ 'ajax_move',
+        'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
     } %}
 
-    <div class="left-panel-container tree-component-container"
-         data-page-component-module="orodatagrid/js/app/components/grid-sidebar-component"
-         data-page-component-options="{{ componentOptions|json_encode }}">
-        <div class="placeholder">
-            <div class="scrollable-container overflow-y clearfix">
-                <div class="left-panel clearfix">
-                    <div class="left-panel-header">
-                        <div class="left-panel-control left-panel-control-maximize">
-                            <i class="fa-forward control-maximize"></i>
-                        </div>
-                        <div class="left-panel-control left-panel-control-minimize">
-                            <i class="fa-backward control-minimize"></i>
-                        </div>
-                    </div>
-                    <div class="menu-item">
-                        {% set treeOptions = {
-                            'view' : 'oronavigation/js/app/views/tree-manage-view',
-                            'data' : tree,
-                            'nodeId': entity.key,
-                            'menu' : entity.menu,
-                            'context' : context,
-                            'updateAllowed' : true,
-                            'onRootSelectRoute' : routePrefix ~ 'view',
-                            'onSelectRoute' : routePrefix ~ 'update',
-                            'onMoveRoute' : routePrefix ~ 'ajax_move',
-                            'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
-                        } %}
-                        {{ UI.renderJsTree(
-                            {
-                                'label': 'oro.navigation.menu.menu_list_default.label'|trans,
-                                'treeOptions': treeOptions
-                            },
-                            {
-                                'move': {
-                                    'view': 'oroui/js/app/views/jstree/move-action-view',
-                                    'routeName': routePrefix ~ 'move',
-                                    'routeParams': {menuName: menuName, context: context}
-                                }
-                            }
-                        ) }}
-                    </div>
-                </div>
-                <div class="content ">
-                    <div class="system-content-wrapper">
-                        {{ parent() }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% embed "OroUIBundle::content_sidebar.html.twig" %}
+        {% block sidebar %}
+            {{ UI.renderJsTree(
+                {
+                    'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                    'treeOptions': treeOptions
+                },
+                {
+                    'move': {
+                        'view': 'oroui/js/app/views/jstree/move-action-view',
+                        'routeName': routePrefix ~ 'move',
+                        'routeParams': {menuName: menuName, context: context}
+                    }
+                }
+            ) }}
+        {% endblock sidebar %}
+
+        {% block content %}
+            {% autoescape %}
+                {{ twoColumnContent|raw}}
+            {% endautoescape %}
+        {% endblock content %}
+    {% endembed %}
 {% endblock content_data %}

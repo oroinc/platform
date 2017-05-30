@@ -7,10 +7,15 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
+use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 
+/**
+ * @dbIsolationPerTest
+ */
 class SegmentSnapshotRepositoryTest extends WebTestCase
 {
     /**
@@ -20,6 +25,48 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadSegmentSnapshotData::class]);
+    }
+
+    public function testRemoveBySegment()
+    {
+        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+
+        $registry = $this->getContainer()->get('doctrine');
+        $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
+
+        $this->assertNotEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
+
+        $segmentSnapshotRepository->removeBySegment($segment);
+
+        $this->assertEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
+    }
+
+    public function testRemoveBySegmentWitIds()
+    {
+        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+
+        $registry = $this->getContainer()->get('doctrine');
+        $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
+
+        /** @var SegmentSnapshot[] $segmentEntities */
+        $segmentEntities = $segmentSnapshotRepository->findBy(['segment' => $segment]);
+        $this->assertNotEmpty($segmentEntities);
+
+        $firstSnapshot = reset($segmentEntities);
+        $entityId = $firstSnapshot->getIntegerEntityId();
+        $segmentSnapshotRepository->removeBySegment($segment, [$entityId]);
+
+        $actualSegmentEntities = $segmentSnapshotRepository->findBy(['segment' => $segment]);
+
+        $this->assertNotEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
+        $this->assertEquals(1, (count($segmentEntities) - count($actualSegmentEntities)));
+        $actualEntityIds = array_map(
+            function (SegmentSnapshot $snapshot) {
+                return $snapshot->getIntegerEntityId();
+            },
+            $actualSegmentEntities
+        );
+        $this->assertNotContains($entityId, $actualEntityIds);
     }
 
     public function testRemoveByEntity()
@@ -174,5 +221,18 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         }
 
         return $queryBuilder->setMaxResults($count)->getQuery()->getResult();
+    }
+
+    public function testGetIdentifiersSelectQueryBuilder()
+    {
+        /** @var SegmentSnapshotRepository $repository */
+        $repository = $this->getContainer()->get('doctrine')->getRepository('OroSegmentBundle:SegmentSnapshot');
+
+        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+
+        $this->assertContains(
+            'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
+            $repository->getIdentifiersSelectQueryBuilder($segment)->getDQL()
+        );
     }
 }

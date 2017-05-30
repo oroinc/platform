@@ -61,6 +61,13 @@ class LocalizationManager
         $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey($id)) : false;
 
         if ($cache !== false && array_key_exists($id, $cache)) {
+            // todo should be removed in scope of https://magecore.atlassian.net/browse/BB-9641
+            // make doctrine know about entity from cache
+            $this->doctrineHelper
+                ->getEntityManager(Localization::class)
+                ->getUnitOfWork()
+                ->merge($cache[$id]);
+
             return $cache[$id];
         }
 

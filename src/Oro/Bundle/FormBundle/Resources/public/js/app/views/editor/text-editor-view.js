@@ -74,9 +74,10 @@ define(function(require) {
         inputType: 'text',
         events: {
             'change input[name=value]': 'onChange',
-            'keyup input[name=value]': 'onChange',
+            'keyup input[name=value]': 'onKeyUp',
             'mousedown': 'onMousedown',
             'click [data-action]': 'rethrowAction',
+            'click [type=submit]': 'onClickSubmit',
             'keydown input[name=value]': 'onGenericKeydown',
             'keydown': 'rethrowEvent',
             'keypress': 'rethrowEvent',
@@ -244,6 +245,12 @@ define(function(require) {
             }
         },
 
+        onClickSubmit: function() {
+            if (!this.isValid()) {
+                return false;
+            }
+        },
+
         /**
          * Handles mousedown event
          *
@@ -366,19 +373,28 @@ define(function(require) {
          * @returns {boolean}
          */
         isValid: function() {
-            return this.validator.form();
+            var isValid = this.validator.form();
+            return isValid;
+        },
+
+        onChange: function() {
+            this.updateSubmitButtonState();
+            this.trigger('change');
+        },
+
+        onKeyUp: function() {
+            this.updateSubmitButtonState();
         },
 
         /**
-         * Change handler. In this realization, it tracks a submit button disabled attribute
+         * Set a submit button disabled state relevant input value
          */
-        onChange: function() {
+        updateSubmitButtonState: function() {
             if (!this.isChanged()) {
                 this.$('[type=submit]').attr('disabled', 'disabled');
             } else {
                 this.$('[type=submit]').removeAttr('disabled');
             }
-            this.trigger('change');
         },
 
         /**

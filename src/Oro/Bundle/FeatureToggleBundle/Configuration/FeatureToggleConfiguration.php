@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -53,8 +54,6 @@ class FeatureToggleConfiguration implements ConfigurationInterface
     {
         $node
             ->scalarNode('toggle')
-                ->isRequired()
-                ->cannotBeEmpty()
             ->end()
             ->scalarNode('label')
                 ->isRequired()
@@ -78,9 +77,34 @@ class FeatureToggleConfiguration implements ConfigurationInterface
                 ->prototype('variable')
                 ->end()
             ->end()
+            ->arrayNode('commands')
+                ->prototype('variable')
+                ->end()
+            ->end()
             ->arrayNode('field_configs')
                 ->prototype('variable')
                 ->end()
+            ->end()
+            ->scalarNode('strategy')
+                ->validate()
+                    ->ifNotInArray(
+                        [
+                            FeatureChecker::STRATEGY_AFFIRMATIVE,
+                            FeatureChecker::STRATEGY_CONSENSUS,
+                            FeatureChecker::STRATEGY_UNANIMOUS
+                        ]
+                    )
+                    ->thenInvalid(
+                        'The "strategy" can be "'
+                        . FeatureChecker::STRATEGY_AFFIRMATIVE
+                        . '", "' . FeatureChecker::STRATEGY_CONSENSUS. '" or "'
+                        . FeatureChecker::STRATEGY_UNANIMOUS. '.'
+                    )
+                ->end()
+            ->end()
+            ->booleanNode('allow_if_all_abstain')
+            ->end()
+            ->booleanNode('allow_if_equal_granted_denied')
             ->end();
     }
 

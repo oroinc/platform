@@ -64,6 +64,7 @@ class OperationDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['label', 'test'],
                 ['substituteOperation', 'test_operation_name_to_substitute'],
                 ['enabled', false, true],
+                ['pageReload', false, true],
                 ['order', 77, 0],
                 ['frontendOptions', ['config1', 'config2'], []],
                 ['buttonOptions', ['config1', 'config2'], []],

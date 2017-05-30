@@ -297,10 +297,6 @@ services:
         arguments:
             - '%oro_locale.entity.localization.class%'
 
-    oro_locale.serializer.localization_array_serializer:
-        class: 'Oro\Bundle\LocaleBundle\Serializer\LocalizationArraySerializer'
-        public: false
-
     oro_locale.provider.localization_choices:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
         arguments:
@@ -314,14 +310,14 @@ services:
         public: false
         arguments:
             - '@oro_locale.cache'
-            - '@oro_locale.serializer.localization_array_serializer'
+            - '@jms_serializer'
 
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_config.global'
-            - '@oro_locale.decorator.localization_cache'
+            - '@oro.cache.memory_cache_chain'
 
     oro_locale.provider.current_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'

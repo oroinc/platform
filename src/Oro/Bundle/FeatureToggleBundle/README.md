@@ -7,8 +7,8 @@ How to define new feature
 -------------------------
 
 Features are defined with configuration files place in Resources/oro/features.yml.
-Each feature consists of required options: title and toggle. Out of the box feature may be configured with next sections:
- - title - feature title
+Each feature consists of one required option - the label. Out of the box feature may be configured with next sections:
+ - label - feature title
  - description - feature description
  - toggle - system configuration option key that will be used as feature toggle
  - dependencies - list of feature names that current feature depends on
@@ -18,13 +18,14 @@ Each feature consists of required options: title and toggle. Out of the box feat
  - processes - list of process names
  - operations - list of operation names
  - api_resources - list of entity FQCNs
+ - commands - list of commands which depend on the feature. Running these commands is impossible or is not reasonable when the feature is disabled
  
 Example of features.yml configuration
 
 ```yml
 features:
     acme:
-        title: acme.feature.label
+        label: acme.feature.label
         description: acme.feature.description
         toggle: acme.feature_enabled
         dependencies:
@@ -44,6 +45,8 @@ features:
             - acme_some_operation
         api_resources:
             - Acme\Bundle\Entity\Page
+        commands:
+            - oro:search:index
 ```
 
 Adding new options to feature configuration
@@ -99,7 +102,7 @@ Feature resource types are nodes of feature configuration (routes, workflows, co
 resources are their values. Resource is disabled if it is included into at least one disabled feature. 
 Resource state is resolved by `public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)` 
 
-####Layout updates
+#### Layout updates
 
  - Check feature state `=data['feature'].isFeatureEnabled('feature_name')`
  - Check resource state `=data['feature'].isResourceEnabled('acme_product_view', 'routes')`
@@ -117,7 +120,7 @@ layout:
                 visible: '=data["feature"].isFeatureEnabled("product_feature")'
 ```
 
-####Processes, workflows, operations
+#### Processes, workflows, operations
 
 In Processes, workflows and operations config expression may be used to check feature state
 
@@ -138,7 +141,7 @@ In Processes, workflows and operations config expression may be used to check fe
     scope_identifier: $.scopeId
 ```
 
-####Twig
+#### Twig
 
  - Check feature state `feature_enabled($featureName, $scopeIdentifier = null)`
  - Check resource state `feature_resource_enabled($resource, $resourceType, $scopeIdentifier = null)`
@@ -217,7 +220,7 @@ Feature state checking
 ----------------------
 
 Feature state is checked by feature voters. All voters are called each time you use the `isFeatureEnabled()` or `isResourceEnabled()` method on feature checker.
-Feature checker makes the decision based on configured strategy defined in system configuration, which can be: affirmative, consensus or unanimous.
+Feature checker makes the decision based on configured strategy defined in system configuration or per feature, which can be: affirmative, consensus or unanimous.
 
 By default `ConfigVoter` is registered to check features availability.
 It checks feature state based on value of toggle option, defined in features.yml configuration.
@@ -298,4 +301,51 @@ oro_featuretoggle:
     strategy: affirmative
     allow_if_all_abstain: true
     allow_if_equal_granted_denied: false
+```
+or in feature definition
+```yml
+features:
+    acme:
+        label: acme.feature.label
+        strategy: affirmative
+        allow_if_all_abstain: true
+        allow_if_equal_granted_denied: false
+```
+
+
+Using checker for commands
+--------------------------
+Commands launched as subcommands cannot be skipped globally. To avoid running such commands, add an implementation of 
+FeatureCheckerAwareInterface to your parent command, import FeatureCheckerHolderTrait (via `use FeatureCheckerHolderTrait;`), and check the 
+feature status via featureChecker that is automatically injected into your command.
+
+```php
+<?php
+
+namespace Acme\Bundle\FixtureBundle\Command;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerAwareInterface;
+
+class LoadDataFixturesCommand implements FeatureCheckerAwareInterface
+{
+
+    use FeatureCheckerHolderTrait;
+    
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $commands = [
+            'oro:cron:analytic:calculate' => [],
+            'oro:b2b:lifetime:recalculate'          => ['--force' => true]
+        ];
+    
+        foreach ($commands as $commandName => $options) {
+            if ($this->featureChecker->isResourceEnabled($commandName, 'commands')) {
+                $command = $this->getApplication()->find($commandName);
+                $input = new ArrayInput(array_merge(['command' => $commandName], $options));
+                $command->run($input, $output);
+            }
+        }
+    }
+}
 ```

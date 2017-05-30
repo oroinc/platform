@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DataNormalizer;
@@ -19,7 +23,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->any())
@@ -31,7 +35,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $normalizers,
             new DoctrineHelper($doctrine),
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->createMock('Symfony\Component\DependencyInjection\ContainerInterface')),
+            new EntityDataTransformer($this->createMock(ContainerInterface::class)),
             new ConfigNormalizer(),
             new DataNormalizer()
         );

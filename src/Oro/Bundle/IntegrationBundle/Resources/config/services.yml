@@ -310,6 +310,7 @@ services:
             - '@oro_integration.reverse_sync.processor'
             - '@oro_integration.manager.types_registry'
             - '@oro_message_queue.job.runner'
+            - '@security.token_storage'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -326,3 +327,10 @@ services:
 
     oro_integration.utils.edit_mode:
         class: 'Oro\Bundle\IntegrationBundle\Utils\EditModeUtils'
+
+    oro_integration.provider.integration_icon:
+        class: 'Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider'
+        arguments:
+            - '@oro_integration.manager.types_registry.link'
+        public: false
+        lazy: true

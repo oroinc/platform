@@ -82,6 +82,7 @@ class SignalExtension extends AbstractExtension
         if (false == $context->isExecutionInterrupted() && $this->interruptConsumption) {
             $this->logger->debug('[SignalExtension] Interrupt execution');
             $context->setExecutionInterrupted($this->interruptConsumption);
+            $context->setInterruptedReason('Interrupt execution.');
 
             $this->interruptConsumption = false;
         }

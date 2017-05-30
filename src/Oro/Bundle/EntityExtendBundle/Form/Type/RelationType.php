@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectional;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -71,6 +72,7 @@ class RelationType extends AbstractType
     {
         $form = $event->getForm();
         $data = $event->getData();
+
         if (!$data) {
             $data = $form->getParent()->getData();
         }
@@ -129,7 +131,8 @@ class RelationType extends AbstractType
         $resolver->setDefaults(
             [
                 'mapped' => false,
-                'label'  => false
+                'label'  => false,
+                'constraints' => [new NonExtendedEntityBidirectional()]
             ]
         );
     }
@@ -236,19 +239,17 @@ class RelationType extends AbstractType
         }
 
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
-            $form->add(
-                'bidirectional',
-                'genemu_jqueryselect2_choice',
-                [
-                    'choices' => ['No', 'Yes'],
-                    'empty_value' => false,
-                    'block' => 'general',
-                    'subblock' => 'properties',
-                    'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
-                    'read_only' => $readOnly,
-                    'data' => $this->getArrayValue($data, 'bidirectional'),
-                ]
-            );
+            $options = [
+                'choices' => ['No', 'Yes'],
+                'empty_value' => false,
+                'block' => 'general',
+                'subblock' => 'properties',
+                'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
+                'read_only' => $readOnly,
+                'data' => $this->getArrayValue($data, 'bidirectional')
+            ];
+
+            $form->add('bidirectional', 'genemu_jqueryselect2_choice', $options);
         }
     }
 }

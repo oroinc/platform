@@ -82,7 +82,7 @@ parameters:
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
     oro_email.emailfolder.datagrid_view_list.class:   Oro\Bundle\EmailBundle\Datagrid\EmailFolderViewList
-    oro_email.emailseen.datagrid_view_list.class:   Oro\Bundle\EmailBundle\Datagrid\EmailSeenViewList
+    oro_email.emailseen.datagrid_view_list.class:     Oro\Bundle\EmailBundle\Datagrid\EmailSeenViewList
 
     # Datagrid event listeners
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
@@ -424,6 +424,7 @@ services:
             - '@oro_email.mailer.processor'
             - '@oro_email.email_renderer'
             - '@logger'
+            - '@translator'
             - %locale%
 
     oro_email.link.autoresponserule_manager:
@@ -490,6 +491,7 @@ services:
             - %oro_email.cache.available_in_template_key%
             - '@oro_email.twig.email_sandbox'
             - '@translator'
+            - '@oro_email.emailtemplate.variable_processor'
         lazy: true
 
     oro_email.twig.email_security_policy:
@@ -522,6 +524,17 @@ services:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@oro_ui.formatter'
+        lazy: true
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }
+
+    oro_email.emailtemplate.variable_provider.entity_routes:
+        class: 'Oro\Bundle\EmailBundle\Provider\EntityRouteVariablesProvider'
+        arguments:
+            - '@translator'
+            - '@oro_entity_config.config_manager'
+            - '@oro_config.user'
         lazy: true
         public: false
         tags:
@@ -588,6 +601,8 @@ services:
             - '@oro_entity.entity_name_resolver'
             - '@oro_email.mailbox.manager'
             - '@oro_security.security_facade'
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
@@ -1019,6 +1034,12 @@ services:
         tags:
             - { name: oro_entity.name_provider, priority: 0 }
 
+    oro_email.email_body_entity_name_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }
+
     oro_email.link.mailbox_process_storage:
         tags:
             - { name: oro_service_link,  service: oro_email.mailbox.process_storage }
@@ -1212,3 +1233,36 @@ services:
         class: 'Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand'
         tags:
             - { name: console.command }
+
+    oro_email.listener.datagrid.user_email_grid_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
+        arguments:
+            - '@oro_email.datagrid_query_factory'
+        tags:
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
+          - { name: oro_featuretogle.feature, feature: email }
+
+    oro_email.emailtemplate.variable_processor:
+        class: 'Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry'
+        public: false
+
+    oro_email.emailtemplate.variable_processor.entity_routes:
+        class: 'Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor'
+        arguments:
+            - '@router'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_config.user'
+            - '@oro_entity_config.config_manager'
+        lazy: true
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_processor, alias: entity_routes }
+
+    oro_email.migration.demo_data_fixtures_listener.email_associations:
+        class: Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

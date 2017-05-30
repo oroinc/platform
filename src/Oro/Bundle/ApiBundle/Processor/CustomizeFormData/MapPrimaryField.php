@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
-use Symfony\Component\Form\FormError;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
 
 /**
@@ -135,9 +135,7 @@ class MapPrimaryField extends AbstractProcessor
         );
 
         if ($primaryValue && !$isKnownPrimaryValue) {
-            $primaryFieldForm->addError(
-                new FormError($this->unknownPrimaryValueValidationMessage)
-            );
+            FormUtil::addFormError($primaryFieldForm, $this->unknownPrimaryValueValidationMessage);
         }
     }
 

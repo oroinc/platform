@@ -7,6 +7,11 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 class TestContext implements ContextInterface
 {
     /**
+     * @var array
+     */
+    private $postponedRows = [];
+
+    /**
      * {@inheritdoc}
      */
     public function addError($message)
@@ -26,6 +31,36 @@ class TestContext implements ContextInterface
     public function getErrors()
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRow(array $row)
+    {
+        $this->postponedRows[] = $row;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRows(array $rows)
+    {
+        foreach ($rows as $row) {
+            $this->addPostponedRow($row);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPostponedRows()
+    {
+        return $this->postponedRows;
     }
 
     /**

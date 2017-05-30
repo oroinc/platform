@@ -154,17 +154,4 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
             $suggestions->findAll('css', 'li')
         );
     }
-
-    /**
-     * Records in table on current page must match the count.
-     * Example: Then records in grid should be 5
-     *
-     * @Then records in grid should be :count
-     */
-    public function recordsInGridShouldBe($count)
-    {
-        $gridRows = $this->getPage()->findAll('css', '.grid-container tbody tr');
-
-        self::assertCount((int) $count, $gridRows);
-    }
 }

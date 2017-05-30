@@ -7,7 +7,6 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class CliImportHandler extends AbstractImportHandler
 {
-
     /**
      * {@inheritdoc}
      */
@@ -78,7 +77,8 @@ class CliImportHandler extends AbstractImportHandler
             'counts'  => $counts,
             'errors'  => $errors,
             'message' => $message,
-            'importInfo' => $this->getImportInfo($counts, $entityName)
+            'importInfo' => $this->getImportInfo($counts, $entityName),
+            'postponedRows' => $jobResult->getContext()->getPostponedRows(),
         ];
     }
 

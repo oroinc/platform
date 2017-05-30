@@ -1,3 +1,5 @@
+@ticket-CRM-7605
+@automatically-ticket-tagged
 # Warning! This feature need a special install configuration
 # with clear cache and setted "installed" parameter to false in parameters.yml
 # with clear database

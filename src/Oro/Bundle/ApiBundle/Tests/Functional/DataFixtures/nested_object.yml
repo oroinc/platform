@@ -1,4 +1,4 @@
-Oro\Bundle\TestFrameworkBundle\Entity\TestEntityForNestedObjects:
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
     test_entity:
         firstName: 'first name'
         lastName: 'last name'

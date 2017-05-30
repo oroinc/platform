@@ -28,6 +28,8 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_segment.query_builder_registry'
+        calls:
+            - ['setLogger', ['@?logger']]
 
     oro_segment.segment_manager.api:
         class: %oro_segment.segment_manager.api.class%
@@ -92,6 +94,7 @@ services:
         class: %oro_segment.event_listener.doctrine_pre_remove.class%
         arguments:
             - '@oro_entity_config.config_manager'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: doctrine.event_listener, event: preRemove }
             - { name: doctrine.event_listener, event: postFlush }
@@ -124,3 +127,10 @@ services:
             - '@oro_segment.segment_manager'
         tags:
             - { name: layout.data_provider, alias: segment }
+
+    oro_segment.provider.segment_snapshot_delta_provider:
+        class: Oro\Bundle\SegmentBundle\Provider\SegmentSnapshotDeltaProvider
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@oro_segment.query.dynamic_segment.query_builder'

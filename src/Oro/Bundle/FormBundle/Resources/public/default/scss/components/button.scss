@@ -12,6 +12,11 @@
         box-shadow: $btn-shadow;
     }
 
+    &.active,
+    &.pressed {
+        box-shadow: $btn-shadow;
+    }
+
     &.caret {
         &:after {
             content: '';
@@ -47,7 +52,7 @@
     &--default {
         border-color: get-color('additional', 'light');
         background-color: get-color('additional', 'ultra');
-        color: get-color('additional', 'dark');
+        color: lighten(get-color('additional', 'dark'), 21%);
 
         @include element-state('hover') {
             border-color: darken(get-color('additional', 'light'), 3%);
@@ -57,10 +62,6 @@
 
         @include element-state('focus') {
             border-color: darken(get-color('additional', 'light'), 5%);
-        }
-
-        &.pressed {
-            box-shadow: $btn-shadow;
         }
     }
 
@@ -115,9 +116,47 @@
 
         @include element-state('focus') {
             background-color: transparent;
+            border-color: transparent;
         }
 
         @include element-state('active') {
+            box-shadow: none;
+        }
+
+        &.active,
+        &.pressed {
+            box-shadow: none;
+        }
+    }
+
+    &--plain {
+        padding: 0 3px;
+
+        line-height: 1;
+
+        border-color: transparent;
+        background-color: transparent;
+        color: get-color('additional', 'middle');
+
+        cursor: pointer;
+
+        @include element-state('hover') {
+            background-color: transparent;
+            border-color: transparent;
+            color: get-color('additional', 'light');
+        }
+
+        @include element-state('focus') {
+            background-color: transparent;
+            border-color: transparent;
+        }
+
+        @include element-state('active') {
+            box-shadow: none;
+        }
+
+        &.active,
+        &.pressed {
             box-shadow: none;
         }
     }
@@ -127,6 +166,15 @@
     }
 
     &--size {
+        &-xs {
+            padding: 3px 11px;
+
+            font-size: $base-font-size - 1;
+            line-height: 18px;
+
+            border-radius: 3px;
+        }
+
         &-s {
             padding: 0 10px;
 
@@ -135,6 +183,7 @@
 
             border-radius: 6px;
         }
+
         &-m {
             font-size: 17px;
             line-height: 38px;
@@ -146,7 +195,6 @@
             padding: 10px 15px;
             line-height: 54px;
         }
-
     }
 
     &--offset {

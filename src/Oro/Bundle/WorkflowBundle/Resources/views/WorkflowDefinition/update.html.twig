@@ -221,6 +221,25 @@
                                     </div>
                                 </div>
 
+                                <div class="control-group">
+                                    {{ _self.render_label("oro.workflow.form.button_label.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_label.tooltip") }}
+                                    <div class="controls">
+                                        <input type="text" name="button_label" value="<%- button_label %>">
+                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_label) { %>
+                                            {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.button_label %>', true) }}
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    {{ _self.render_label("oro.workflow.form.button_title.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_title.tooltip") }}
+                                    <div class="controls">
+                                        <input type="text" name="button_title" value="<%- button_title %>">
+                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_title) { %>
+                                            {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.button_title %>', true) }}
+                                        <% } %>
+                                    </div>
+                                </div>
+
                                 {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
 
                                 <% print('<sc' + 'ript>'); %>
@@ -556,7 +575,12 @@
                 <div class="workflow-flowchart-controls clearfix"></div>
                 <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
                     'module': 'oroui/js/app/components/view-component',
-                    'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                    'options': {
+                        'view': 'oroui/js/app/views/zoomable-area-view',
+                        'autozoom': true,
+                        'minZoom': 0.05,
+                        'maxZoom': 5
+                    }
                 }) }}><div class="workflow-flowchart clearfix"></div></div>
             </div>
         </div>

@@ -1,0 +1,5 @@
+oro_behat_extension:
+  elements:
+    TaxonomyForm:
+      selector: 'form[name="oro_tag_taxonomy_form"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form

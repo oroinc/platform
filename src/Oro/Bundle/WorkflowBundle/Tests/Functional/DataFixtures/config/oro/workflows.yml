@@ -246,3 +246,15 @@ workflows:
                 is_start: false
         transition_definitions:
             definition1: ~
+
+    test_workflow:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\Item
+        steps:
+            step: ~
+        transitions:
+            transition:
+                step_to: step
+                transition_definition: definition
+                is_start: true
+        transition_definitions:
+            definition: ~

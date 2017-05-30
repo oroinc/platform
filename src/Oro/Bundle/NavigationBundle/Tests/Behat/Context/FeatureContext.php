@@ -7,7 +7,6 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
@@ -16,6 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\DomCrawler\Crawler;
 
 class FeatureContext extends OroFeatureContext implements
@@ -36,20 +36,6 @@ class FeatureContext extends OroFeatureContext implements
     public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
     {
         $this->messageQueueIsolator = $messageQueueIsolator;
-    }
-
-    /**
-     * This step used for system configuration field
-     * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use Default for "Position" field
-     *
-     * @Given uncheck Use Default for :label field
-     */
-    public function uncheckUseDefaultForField($label)
-    {
-        /** @var SystemConfigForm $form */
-        $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label);
     }
 
     /**
@@ -215,7 +201,7 @@ class FeatureContext extends OroFeatureContext implements
         $clicked = $menu->openAndClick($firstPage);
 
         $this->waitForAjax();
-        $this->messageQueueIsolator->waitWhileProcessingMessages(5);
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         $actualPage = $this->getLastPersistedPage($em);
 
@@ -235,7 +221,7 @@ class FeatureContext extends OroFeatureContext implements
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
-            $this->messageQueueIsolator->waitWhileProcessingMessages(5);
+            $this->messageQueueIsolator->waitWhileProcessingMessages();
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
             $actualTitle = $crawler->filter('head title')->first()->text();
 
@@ -474,5 +460,48 @@ class FeatureContext extends OroFeatureContext implements
         self::assertTrue($item->isVisible());
 
         $item->find('css', 'a')->click();
+    }
+
+    /**
+     * Assert main menu item existing
+     *
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<path>[\/\w\s]+) in main menu$/
+     */
+    public function iShouldSeeOrNotInMainMenu($negotiation, $path)
+    {
+        $isMenuItemVisibleExpectation = empty(trim($negotiation));
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $hasLink = $mainMenu->hasLink($path);
+
+        self::assertSame($isMenuItemVisibleExpectation, $hasLink);
+    }
+
+    /**
+     * Asserts that link with provided title exists in user menu
+     *
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<title>[\w\s]+) in user menu$/
+     */
+    public function iShouldSeeOrNotInUserMenu($title, $negotiation = null)
+    {
+        $isLinkVisibleInUserMenuExpectation = empty(trim($negotiation));
+        /** @var UserMenu $userMenu */
+        $userMenu = $this->createElement('UserMenu');
+        self::assertTrue($userMenu->isValid());
+        $userMenu->open();
+
+        self::assertSame($isLinkVisibleInUserMenuExpectation, $userMenu->hasLink($title));
+    }
+
+    /**
+     * Example: And I click Dashboards in menu tree
+     *
+     * @Given /^(?:|I )click (?P<record>[\w\s]+) in menu tree$/
+     */
+    public function iClickLinkInMenuTree($record)
+    {
+        $menuTree = $this->createElement('MenuTree');
+        self::assertTrue($menuTree->isValid());
+        $menuTree->clickLink($record);
     }
 }

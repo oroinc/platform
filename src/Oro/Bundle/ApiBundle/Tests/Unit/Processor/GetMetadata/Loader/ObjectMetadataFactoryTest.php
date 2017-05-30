@@ -134,6 +134,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadata()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
@@ -154,6 +156,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -164,6 +167,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataForCollapsed()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
@@ -183,6 +188,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -193,6 +199,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataForCollection()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
@@ -212,6 +220,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -222,6 +231,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataWithCustomTargetClass()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
@@ -240,6 +251,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test',
@@ -251,6 +263,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataWithoutDataTypeAndWithoutTargetConfig()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
@@ -268,6 +282,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -278,6 +293,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataWithoutDataTypeAndWhenNoIdInTargetConfig()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
@@ -296,6 +313,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -306,6 +324,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataWithoutDataTypeAndCompositeTargetId()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
@@ -325,6 +345,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -335,6 +356,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataWithoutDataTypeWithMissingTargetIdField()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
@@ -354,6 +377,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -364,6 +388,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataWithoutDataTypeWhenTargetIdFieldHasDataType()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
@@ -384,6 +410,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -394,6 +421,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataForToOneExtendedAssociation()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToOne');
@@ -420,6 +449,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -430,6 +460,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataForToManyExtendedAssociation()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToMany');
@@ -457,6 +489,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'
@@ -467,6 +500,8 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadataForExtendedAssociationWithEmptyTargets()
     {
+        $config = new EntityDefinitionConfig();
+
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToOne');
@@ -494,6 +529,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
+            $config,
             'testField',
             $field,
             'test'

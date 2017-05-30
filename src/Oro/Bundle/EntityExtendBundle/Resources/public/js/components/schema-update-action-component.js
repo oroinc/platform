@@ -34,7 +34,6 @@ define(function(require) {
                     '<p>' + __('It may take few minutes...') + '</p>';
                 /** @type oro.Modal */
                 var confirmUpdate = new Modal({
-                    allowCancel: true,
                     className: 'modal modal-primary',
                     cancelText: __('Cancel'),
                     okText: __('Yes, Proceed'),

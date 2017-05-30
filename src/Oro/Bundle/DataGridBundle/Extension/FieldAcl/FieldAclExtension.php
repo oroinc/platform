@@ -2,66 +2,62 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\FieldAcl;
 
-use Doctrine\ORM\Query\Expr\Select;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr\From;
-
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 
 class FieldAclExtension extends AbstractExtension
 {
     const FIELD_ACL = 'field_acl';
 
-    const OWNER_FIELD_PLACEHOLDER = '%s_owner_id';
-    
-    const ORGANIZARION_FIELD_PLACEHOLDER = '%s_organization_id';
-
-    /** @var OwnershipMetadataProvider */
-    protected $ownershipMetadataProvider;
-
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
     /** @var AuthorizationCheckerInterface */
     protected $authChecker;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
-    /** @var array */
+    /** @var OwnershipQueryHelper */
+    protected $ownershipQueryHelper;
+
+    /** @var array [column name => [entity alias, field name], ...] */
     protected $fieldAclConfig = [];
 
-    /** @var array */
-    protected $queryAliases = [];
+    /**
+     * @var array [entity alias => [
+     *                      entity class,
+     *                      entity id field alias,
+     *                      organization id field alias,
+     *                      owner id field alias
+     *                  ],
+     *                  ...
+     *              ]
+     */
+    protected $ownershipFields = [];
 
     /**
-     * @param OwnershipMetadataProvider     $ownershipMetadataProvider
-     * @param EntityClassResolver           $entityClassResolver
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ConfigProvider                $configProvider
+     * @param ConfigManager                 $configManager
+     * @param OwnershipQueryHelper          $ownershipQueryHelper
      */
     public function __construct(
-        OwnershipMetadataProvider $ownershipMetadataProvider,
-        EntityClassResolver $entityClassResolver,
         AuthorizationCheckerInterface $authorizationChecker,
-        ConfigProvider $configProvider
+        ConfigManager $configManager,
+        OwnershipQueryHelper $ownershipQueryHelper
     ) {
-        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
-        $this->entityClassResolver = $entityClassResolver;
         $this->authChecker = $authorizationChecker;
-        $this->configProvider = $configProvider;
+        $this->configManager = $configManager;
+        $this->ownershipQueryHelper = $ownershipQueryHelper;
     }
 
     /**
@@ -77,17 +73,12 @@ class FieldAclExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $fieldAclConfig = $config->offsetGetByPath(Configuration::FIELDS_ACL);
-
         $validated = $this->validateConfiguration(
             new Configuration(),
-            ['fields_acl' => $fieldAclConfig]
+            ['fields_acl' => $config->offsetGetByPath(Configuration::FIELDS_ACL)]
         );
 
-        $config->offsetSetByPath(
-            Configuration::FIELDS_ACL,
-            $validated
-        );
+        $config->offsetSetByPath(Configuration::FIELDS_ACL, $validated);
     }
 
     /**
@@ -103,24 +94,19 @@ class FieldAclExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        if (count($this->fieldAclConfig) === 0 || count($this->queryAliases) === 0) {
+        if (empty($this->fieldAclConfig) || empty($this->ownershipFields)) {
             return;
         }
 
-        /** @var ResultRecord $record */
-        foreach ($result->getData() as $record) {
-            $entityReferences = [];
+        /** @var ResultRecord[] $records */
+        $records = $result->getData();
+        foreach ($records as $record) {
             foreach ($this->fieldAclConfig as $columnName => $fieldData) {
-                $alias = $fieldData[0];
-                if (!array_key_exists($alias, $entityReferences)) {
-                    $entityReferences[$alias] = new DomainObjectReference(
-                        $this->queryAliases[$alias],
-                        $record->getValue('id'),
-                        $record->getValue(sprintf(self::OWNER_FIELD_PLACEHOLDER, $alias)),
-                        $record->getValue(sprintf(self::ORGANIZARION_FIELD_PLACEHOLDER, $alias))
-                    );
-                }
-                if (!$this->authChecker->isGranted('VIEW', new FieldVote($entityReferences[$alias], $fieldData[1]))) {
+                list($entityAlias, $fieldName) = $fieldData;
+                $entityReference = $this->getEntityReference($record, $entityAlias);
+                if (null !== $entityReference
+                    && !$this->authChecker->isGranted('VIEW', new FieldVote($entityReference, $fieldName))
+                ) {
                     // set column value to null if user does not have an access to view this value
                     $record->setValue($columnName, null);
                 }
@@ -133,133 +119,85 @@ class FieldAclExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
+        /** @var OrmDatasource $datasource */
+
+        /** @var array $fieldAclConfig */
         $fieldAclConfig = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-        if (!is_array($fieldAclConfig) || count($fieldAclConfig) === 0) {
+        if (empty($fieldAclConfig)) {
             return;
         }
 
-        /** @var QueryBuilder $qb */
         $qb = $datasource->getQueryBuilder();
-        $this->collectEntityAliases($qb);
-        
-        // given datagrid have no entities with enabled Field ACL.
-        if (count($this->queryAliases) === 0) {
-            return;
-        }
+        $this->ownershipFields = $this->ownershipQueryHelper->addOwnershipFields(
+            $qb,
+            function ($entityClass, $entityAlias) {
+                return $this->isFieldAclEnabled($entityClass);
+            }
+        );
 
-        $select = $qb->getDQLPart('select');
-        // collect field ACL config
-        $aliases = [];
-        foreach ($fieldAclConfig as $columnName => $fieldData) {
-            if (isset($fieldData[PropertyInterface::DISABLED_KEY])
-                && $fieldData[PropertyInterface::DISABLED_KEY] === true
+        foreach ($fieldAclConfig as $columnName => $fieldConfig) {
+            if (array_key_exists(PropertyInterface::DISABLED_KEY, $fieldConfig)
+                && $fieldConfig[PropertyInterface::DISABLED_KEY]
             ) {
                 continue;
             }
 
-            if (array_key_exists(PropertyInterface::DATA_NAME_KEY, $fieldData)) {
-                list($alias, $fieldName) = explode('.', $fieldData[PropertyInterface::DATA_NAME_KEY]);
+            if (array_key_exists(PropertyInterface::DATA_NAME_KEY, $fieldConfig)) {
+                $fieldExpr = $fieldConfig[PropertyInterface::DATA_NAME_KEY];
             } else {
-                $fieldName = $columnName;
-                $alias = $this->tryToGetAliasFromSelectPart($select, $fieldName);
-                // if we can't find alias for column - skip this column
-                if ($alias === null) {
-                    continue;
-                }
+                $fieldExpr = QueryBuilderUtil::getSelectExprByAlias($qb, $columnName);
             }
 
-            // check if given entity should to do field ACL checks
-            if (array_key_exists($alias, $this->queryAliases)) {
-                $this->fieldAclConfig[$columnName] = [$alias, $fieldName];
-                if (!in_array($alias, $aliases, true)) {
-                    $aliases[] = $alias;
-                }
-            }
-        }
-
-        // add owner data to request
-        $this->addIdentitySelectsToQuery($qb, $aliases);
-    }
-
-    /**
-     * Collect query aliases with class names
-     *
-     * @param QueryBuilder $qb
-     */
-    protected function collectEntityAliases(QueryBuilder $qb)
-    {
-        $fromParts = $qb->getDQLPart('from');
-        /** @var From $fromPart */
-        foreach ($fromParts as $fromPart) {
-            $className = $this->entityClassResolver->getEntityClass($fromPart->getFrom());
-            // check if Field ACL enabled for given class
-            if ($this->configProvider->hasConfig($className)) {
-                $securityConfig = $this->configProvider->getConfig($className);
-                if ($securityConfig->get('field_acl_supported') && $securityConfig->get('field_acl_enabled')) {
-                    $this->queryAliases[$fromPart->getAlias()] = $className;
-                }
+            $parts = explode('.', $fieldExpr);
+            if (count($parts) === 2 && isset($this->ownershipFields[$parts[0]])) {
+                $this->fieldAclConfig[$columnName] = $parts;
             }
         }
     }
 
     /**
-     * Add owner fields to query by alias
+     * @param string $entityClass
      *
-     * @param QueryBuilder $qb
-     * @param array        $aliases
+     * @return bool
      */
-    protected function addIdentitySelectsToQuery(QueryBuilder $qb, array $aliases)
+    protected function isFieldAclEnabled($entityClass)
     {
-        foreach ($aliases as $alias) {
-            if (!array_key_exists($alias, $this->queryAliases)) {
-                continue;
-            }
-            $entityClassName = $this->queryAliases[$alias];
-            $metadata = $this->ownershipMetadataProvider->getMetadata($entityClassName);
-            $ownerField = $metadata->getOwnerFieldName();
-            if ($ownerField) {
-                $selectExpr = sprintf(
-                    'IDENTITY(%s.%s) as %s',
-                    $alias,
-                    $ownerField,
-                    sprintf(self::OWNER_FIELD_PLACEHOLDER, $alias)
-                );
-                $qb->addSelect($selectExpr);
-            }
-
-            $organizationField = $metadata->getGlobalOwnerFieldName();
-            if ($organizationField) {
-                $selectExpr = sprintf(
-                    'IDENTITY(%s.%s) as %s',
-                    $alias,
-                    $organizationField,
-                    sprintf(self::ORGANIZARION_FIELD_PLACEHOLDER, $alias)
-                );
-                $qb->addSelect($selectExpr);
-            }
+        $result = false;
+        if ($this->configManager->hasConfig($entityClass)) {
+            $entityConfig = $this->configManager->getEntityConfig('security', $entityClass);
+            $result =
+                $entityConfig->get('field_acl_supported')
+                && $entityConfig->get('field_acl_enabled');
         }
+
+        return $result;
     }
 
     /**
-     * @param array  $select
-     * @param string $columnName
+     * @param ResultRecord $record
+     * @param string       $entityAlias
      *
-     * @return null
+     * @return DomainObjectReference|null
      */
-    protected function tryToGetAliasFromSelectPart(array $select, $columnName)
+    protected function getEntityReference(ResultRecord $record, $entityAlias)
     {
-        foreach (array_keys($this->queryAliases) as $queryAlias) {
-            $testField = sprintf('%s.%s', $queryAlias, $columnName);
-            /** @var Select $selectExpr */
-            foreach ($select as $selectExpr) {
-                foreach ($selectExpr->getParts() as $part) {
-                    if ($part === $testField) {
-                        return $queryAlias;
-                    }
-                }
-            }
+        list(
+            $entityClass,
+            $entityIdFieldAlias,
+            $organizationIdFieldAlias,
+            $ownerIdFieldAlias
+            ) = $this->ownershipFields[$entityAlias];
+
+        $ownerId = $record->getValue($ownerIdFieldAlias);
+        if (null === $ownerId) {
+            return null;
         }
 
-        return null;
+        return new DomainObjectReference(
+            $entityClass,
+            $record->getValue($entityIdFieldAlias),
+            $ownerId,
+            $record->getValue($organizationIdFieldAlias)
+        );
     }
 }

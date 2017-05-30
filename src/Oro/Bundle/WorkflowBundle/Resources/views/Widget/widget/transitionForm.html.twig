@@ -35,8 +35,9 @@
         {% endblock transition_js %}
 
         {% block transition_form %}
-            {% set transitionMessage = transition.message|trans({},'workflows') %}
-            {% if transitionMessage == transition.message %}
+            {% set frontendMessage = transition.frontendOptions.message %}
+            {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
+            {% if transitionMessage == frontendMessage.content %}
                 {# if no translation for message then do not show message #}
                 {% set transitionMessage = '' %}
             {% endif %}

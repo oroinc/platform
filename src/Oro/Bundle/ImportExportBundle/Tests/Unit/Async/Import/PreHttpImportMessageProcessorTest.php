@@ -5,13 +5,13 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
@@ -58,8 +58,6 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $expectedSubscribedTopics = [
             Topics::PRE_HTTP_IMPORT,
-            Topics::IMPORT_HTTP_PREPARING,
-            Topics::IMPORT_HTTP_VALIDATION_PREPARING
         ];
         $this->assertEquals($expectedSubscribedTopics, PreHttpImportMessageProcessor::getSubscribedTopics());
     }
@@ -86,7 +84,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = $this->createMessageMock();
         $message
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getBody')
             ->willReturn('[]')
         ;
@@ -271,7 +269,8 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
                     'body' => [
                         'originFileName' => 'test.csv',
-                        'error' => 'test Error',
+                        'error' => 'The import file could not be imported due to a fatal error. ' .
+                                   'Please check its integrity and try again!',
                     ],
                     'contentType' => 'text/html',
                 ]

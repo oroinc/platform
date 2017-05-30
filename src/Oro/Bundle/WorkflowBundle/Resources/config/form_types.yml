@@ -9,6 +9,12 @@ services:
     oro_workflow.form.event_listener.required_attributes:
         class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener'
 
+    oro_workflow.form.event_listener.email_notification:
+        class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\EmailNotificationTypeListener'
+        arguments:
+            - '@oro_workflow.registry.system'
+        public: false
+
     oro_workflow.form.type.attributes:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType'
         arguments:
@@ -29,6 +35,14 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_transition }
 
+    oro_workflow.form.type.transition_select:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionSelectType'
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@translator'
+        tags:
+            - { name: form.type, alias: oro_workflow_transition_select }
+
     oro_workflow.form.type.workflow_step_select:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType'
         arguments:
@@ -45,6 +59,13 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_definition_select }
 
+    oro_workflow.form.type.definition_notification_select:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType'
+        arguments:
+            - '@oro_workflow.registry.system'
+        tags:
+            - { name: form.type, alias: oro_workflow_definition_notification_select }
+
     oro_workflow.form.type.workflow_select:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType'
         arguments:
@@ -53,23 +74,12 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_select }
 
-    oro_workflow.form.type.workflow_replacement_select:
-        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType'
-        tags:
-            - { name: form.type, alias: oro_workflow_replacement_select }
-
-    oro_wofkflow.form.autocomplete.wofkflow_replacement.search_handler:
-        class: 'Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler'
+    oro_workflow.form.type.workflow_replacement:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType'
         arguments:
-            - '%oro_workflow.entity.workflow_definition.class%'
-            - ['label']
-        calls:
-            - [initDoctrinePropertiesByManagerRegistry, ['@doctrine']]
-            - [setAclHelper, ['@oro_security.acl_helper']]
-            - [setWorkflowRegistry, ['@oro_workflow.registry']]
-            - [setTranslator, ['@translator']]
+            - '@oro_workflow.helper.workflow_deactivation'
         tags:
-            - { name: oro_form.autocomplete.search_handler, alias: oro_workflow_replacement, acl_resource: oro_workflow_definition_view }
+            - { name: form.type, alias: oro_workflow_replacement }
 
     oro_workflow.form.type.applicable_entities:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType'
@@ -99,15 +109,17 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
-    oro_workflow.form.transformer.variables:
-        class: 'Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer'
+    oro_workflow.form.extension.email_notification:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Extension\EmailNotificationTypeExtension'
         arguments:
-            - '@doctrine'
+            - '@oro_workflow.form.event_listener.email_notification'
+        tags:
+            - { name: form.type_extension, extended_type: 'Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType' }
 
     oro_workflow.form.type.variables:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType'
         arguments:
             - '@oro_workflow.variable_guesser'
-            - '@oro_workflow.form.transformer.variables'
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_workflow_variables }

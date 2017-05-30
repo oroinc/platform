@@ -59,7 +59,7 @@ class StringFilter extends AbstractFilter
     {
         $type = isset($data['type']) ? $data['type'] : null;
         if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])
-            && (!is_array($data) || !array_key_exists('value', $data) || empty($data['value']))
+            && (!is_array($data) || !array_key_exists('value', $data) || $data['value'] === '')
         ) {
             return false;
         }

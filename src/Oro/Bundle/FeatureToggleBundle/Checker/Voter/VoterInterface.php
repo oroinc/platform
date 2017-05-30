@@ -11,7 +11,7 @@ interface VoterInterface
     /**
      * @param string $feature
      * @param object|int|null $scopeIdentifier
-     * return int either FEATURE_ENABLED, FEATURE_ABSTAIN, or FEATURE_DISABLED
+     * @return int either FEATURE_ENABLED, FEATURE_ABSTAIN, or FEATURE_DISABLED
      */
     public function vote($feature, $scopeIdentifier = null);
 }

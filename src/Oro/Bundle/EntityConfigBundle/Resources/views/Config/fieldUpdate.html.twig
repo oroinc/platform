@@ -75,5 +75,16 @@
         'hiddenData': form_rest(form)
     }%}
 
+    {% if non_extended_entities_classes is defined
+        and form.extend.relation is defined
+        and field.type != constant('Oro\\Bundle\\EntityExtendBundle\\Extend\\RelationType::ONE_TO_MANY')
+    %}
+        {% set options = {
+            'nonExtendedEntitiesClassNames': non_extended_entities_classes
+        } %}
+        <div data-page-component-module="oroentityextend/js/bidirectional-only-for-extended-component"
+             data-page-component-options="{{ options|json_encode }}">
+        </div>
+    {% endif %}
     {{ parent() }}
 {% endblock content_data %}

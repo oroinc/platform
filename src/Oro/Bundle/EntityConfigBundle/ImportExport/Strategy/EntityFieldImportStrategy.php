@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;

@@ -15,7 +15,7 @@ use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
 
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Test\JobRunner;
@@ -225,52 +225,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         $tokenStorageStub
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->isInstanceOf(ConsoleToken::class))
-        ;
-
-        $syncProcessorRegistryStub = $this->createSyncProcessorRegistryStub($this->createSyncProcessorMock());
-
-        $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $tokenStorageStub,
-            $syncProcessorRegistryStub,
-            new JobRunner(),
-            $this->createLoggerMock()
-        );
-
-        $message = new NullMessage();
-        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
-        $message->setMessageId('someId');
-
-        $processor->process($message, new NullSession());
-    }
-
-    public function testShouldNotInitializeTokenStorageIfTokenAlreadySet()
-    {
-        $integration = new Integration();
-        $integration->setEnabled(true);
-        $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
-
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
-            ->method('find')
-            ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration)
-        ;
-
-        $registryStub = $this->createRegistryStub($entityManagerMock);
-
-        $tokenStorageStub = $this->createTokenStorageMock();
-        $tokenStorageStub
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn(new ConsoleToken())
-        ;
-        $tokenStorageStub
-            ->expects($this->never())
-            ->method('setToken')
+            ->with($this->isInstanceOf(OrganizationToken::class))
         ;
 
         $syncProcessorRegistryStub = $this->createSyncProcessorRegistryStub($this->createSyncProcessorMock());

@@ -74,7 +74,8 @@ define(function(require) {
                         text: 'access_level_label'
                     },
                     dropdownMenuOptions: {
-                        flipMode: true
+                        align: 'right',
+                        container: true
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);

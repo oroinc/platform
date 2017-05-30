@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
@@ -220,7 +221,24 @@ class BaseUserManager implements UserProviderInterface
             );
         }
 
-        return $this->loadUserByUsername($user->getUsername());
+        // Refresh user should revert entity back to it's initial state using non changed field
+        // Otherwise entity may be replaced with another as some field may be changed in memory
+        // Example: user changed username, change was rejected by validation but in memory value was changed
+        // Calling to refreshUser and using username as criteria will lead to user replacing with another user
+        // UoW has internal identity cache which will not actually reload user just by calling to findOneBy
+        try {
+            // Try to reload existing entity to revert it's state to initial
+            $this->reloadUser($user);
+        } catch (ORMInvalidArgumentException $e) {
+            // If entity is not managed and can not be reloaded - load it by ID from database
+            $user = $this->getRepository()->find($user->getId());
+        }
+
+        if (!$user instanceof UserInterface) {
+            throw new UsernameNotFoundException('User can not be loaded.');
+        }
+
+        return $user;
     }
 
     /**

@@ -100,7 +100,6 @@ define(function(require) {
                 content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
                 okText: __('OK, got it.'),
                 className: 'modal modal-primary',
-                okButtonClass: 'btn-primary btn-large',
                 cancelText: __('Cancel')
             });
             var deferredConfirmation = $.Deferred();
@@ -228,7 +227,7 @@ define(function(require) {
 
         isEditable: function(cell) {
             var columnMetadata = cell.column.get('metadata');
-            if (!columnMetadata || !cell.column.get('renderable')) {
+            if (!columnMetadata || !cell.model || !cell.column.get('renderable')) {
                 return false;
             }
             var fieldName = cell.column.get('name');

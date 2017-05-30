@@ -5,6 +5,7 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - [Configuration File](#configuration-file)
+   - [Workflow imports](#workflow-imports)
  - [Configuration Loading](#configuration-loading)
  - [Defining a Workflow](#defining-a-workflow)
    - [Example](#example)
@@ -73,6 +74,72 @@ workflows:
         start_step: new
 ```
 
+Workflow Imports
+----------------
+
+In case when you need to reuse existent workflow configurations or its parts you can use `workflow` import directive.
+##### Import Example: with replace
+```YAML
+imports:
+    - { workflow: flow_to_import, as: flow_to_recieve, replace: ['transitions.unneeded_transition_from_other_flow']}
+workflows:
+    flow_to_recieve: 
+        #...
+```
+
+Options (* - required):
+- `workflow`* (string) - a name of workflow to import
+- `as`* (string) - a name of workflow that should accept imported workflow config
+- `replace`* (list) - a list of node paths that should be replaced from imported workflow
+- `resource` (string) - an optional direct file path to load workflow to import from
+
+Above the example of import another workflow configuration (`flow_to_import`) into current one (`flow_to_recieve`).
+
+The workflow `flow_to_import` configuration would be found across all registered workflows and imported as is (raw configuration without normalization) under node 
+`workflows.flow_to_recieve` in the current configuration file. Then it replaces all nodes defined in `replace` option to clean all unnecessary segments.
+After that, `flow_to_recieve` from current config file will be recursively merged on top of imported one.
+And the described operation will be performed for each import directive.
+
+The search of workflow configuration by default will be performed across all registered bundles. 
+
+######Resource option with workflow import:
+ In case you need to load your part of configuration directly from file, you may use `resource` option for load.
+This approach might be helpful in several situations:
+
+##### Resource: Split Parts Reuse
+```YAML
+imports:
+    - { resource: 'b2b_flow_lead/steps.yml', worklow: b2b_flow_lead, as: new_workflow, replace: [] }
+workflows:
+    new_workflow:
+       transitions:
+            #...
+       #other options except steps
+```
+If you need to reuse part of workflow with split config by files and don\`t want to perform all other unnecessary nodes to be specified in `replace` option.
+For example (as granted above), you interested in steps only from another workflow config, and those steps are placed under `'b2b_flow_lead/steps.yml'` file.
+So, now you can load them directly by using `resource` option together with workflow import options (`workflow`, `as`).
+And you will have all steps from `b2b_flow_lead` workflow loaded under your `new_workflow` configuration without any additions.
+
+##### Resource: Common Template Reuse
+In case you defining several workflows that are almost similar to each other, but have different use cases (for example: entities to apply for).
+You can use next approach:
+```YAML
+imports:
+    - { resource: 'common_flow.yml', workflow: common_flow, as: flow_for_user, replace: [] }
+    - { resource: 'common_flow.yml', workflow: common_flow, as: flow_for_customer, replace: [] }
+workflows:
+    flow_for_user:
+        entity: User
+        
+    flow_for_customer:
+        entity: Customer
+        
+```
+Then you can create a file with a workflow which will serve as a template for other ones (`'common_flow.yml'`). 
+Then, by importing it, you can override its nodes for a particular case (different `entity` but common remaining configuration).
+ 
+
 Configuration Loading
 =====================
 
@@ -89,6 +156,7 @@ and "workflows" that define names of definitions required to load.
 Workflow configuration cannot be merged, it means that you cannot override workflow that is defined in other bundle.
 If you will declare a workflow and another bundle will declare it's own workflow with the same name the command will
 trigger exception and data won't be saved.
+If you want to reuse some already existent configuration you can use [import workflow feature](#workflow-imports).
 
 Translations File
 =================
@@ -352,6 +420,12 @@ Transition configuration has next options:
 * **label** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.label` 
     Label of transition, will to be shown in UI.
+* **button_label** (translation file field)
+    *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.button_label`
+    Used to define text of transition button. A `label` will be used if not defined. 
+* **button_title** (translation file field)
+    *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.button_title`
+    Used to define text of button hint (button hover). A `button_label` will be used if not defined.
 * **step_to**
     *string*
     Next step name. This is a reference to step that will be set to Workflow Item after transition is performed.
@@ -376,6 +450,10 @@ Transition configuration has next options:
 * **message** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message`
     Notification message, that will be shown at frontend before transition execution.
+    This field can be filled only in translation file.
+* **message_parameters**
+    *array*
+    List of parameters for translating value from option `message`.
 * **init_routes**
     *array*
     List of routes where will be displayed transition button. It's needed for start workflow from entities that not 
@@ -832,9 +910,6 @@ A single variable can be described with the following configuration:
     * **multiple**
         *boolean*
         Indicates whether several entities are supported. Allowed only when type is entity.
-    * **virtual**
-        *boolean*
-        Such attribute will not be saved in the database and available only on current transition. Default value is false.
     * **identifier**
         *string*
         Applies to entities only. Class identifier specifies the identity field which will be used to query for the desired entity, in case a default entity needs to be loaded upon workflow assembling.
@@ -873,7 +948,7 @@ Using a variable:
         '@and':
             ...
             - '@not':
-                - '@less_total_limit': [$entity, $.data.threshold]
+                - '@some_condition': [$entity, $.data.admin_user]
 ```
 
 Example Workflow Configuration

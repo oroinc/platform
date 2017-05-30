@@ -16,6 +16,15 @@ services:
         tags:
             - { name: cli.controller, priority: 700 }
 
+    cli.controller.available_suites_group:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController
+        arguments:
+            - '@suite.registry'
+            - '@specifications.finder'
+            - '%oro_test.suite_groups%'
+        tags:
+            - { name: cli.controller, priority: 710 }
+
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
         arguments:
@@ -26,13 +35,10 @@ services:
         tags:
             - { name: event_dispatcher.subscriber, priority: 0 }
 
-    oro_test.listener.runtime_subscriber:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\RunTimeSubscriber
-        arguments:
-            - '@mink'
-            - '@symfony2_extension.kernel'
+    oro_test.listener.messagequeue_run_check_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueRunCheckSubscriber
         tags:
-            - { name: event_dispatcher.subscriber, priority: 10 }
+            - { name: event_dispatcher.subscriber, priority: 20 }
             - { name: 'message_queue_isolator_aware' }
 
     oro_test.listener.step_duration_measure_subscriber:
@@ -159,10 +165,18 @@ services:
         arguments:
             - '@symfony2_extension.kernel'
 
+    oro_behat_extension.fixtures.yml_parser:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroYamlParser
+        arguments:
+            - '@oro_test.alice_loader'
+        calls:
+            - [setKernel, ['@symfony2_extension.kernel']]
+
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
         calls:
             - [addPopulator, ['@oro_behat_extension.fixtures.doctrine_entity_populator']]
+            - [addParser, ['@oro_behat_extension.fixtures.yml_parser']]
 
     oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler

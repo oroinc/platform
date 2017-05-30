@@ -75,6 +75,12 @@ services:
             - '@oro_entity_config.helper.entity_config'
             - '@router'
 
+    oro_action.resolver.options_resolver:
+        class: 'Oro\Bundle\ActionBundle\Resolver\OptionsResolver'
+        arguments:
+            - '@oro_action.options_assembler'
+            - '@oro_action.expression.context_accessor'
+
     oro_action.operation_registry:
         class: %oro_action.operation_registry.class%
         arguments:
@@ -212,6 +218,7 @@ services:
         lazy: true
         calls:
             - [setLogger, ['@logger']]
+            - [setEventDispatcher, ['@event_dispatcher']]
         tags:
             - { name: monolog.logger, channel: oro_action }
 
@@ -221,8 +228,7 @@ services:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
             - '@oro_action.provider.route'
-            - '@oro_action.options_assembler'
-            - '@oro_action.expression.context_accessor'
+            - '@oro_action.resolver.options_resolver'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }
 

@@ -18,6 +18,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
 /**
  * Adds human-readable descriptions for:
@@ -27,6 +28,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
  * * identifier field
  * * "createdAt" and "updatedAt" fields
  * * ownership fields such as "owner" and "organization".
+ * * fields for entities represent enumerations
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -41,6 +43,11 @@ class CompleteDescriptions implements ProcessorInterface
     const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record.';
     const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm, '
     . 'company or another organization to which the users belong.';
+
+    const ENUM_NAME_DESCRIPTION     = 'The human readable name of the option.';
+    const ENUM_DEFAULT_DESCRIPTION  = 'Determines if this option is selected by default for new records.';
+    const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked. '
+        . 'First appears the option with the higher number of the priority.';
 
     const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
     const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
@@ -375,6 +382,9 @@ class CompleteDescriptions implements ProcessorInterface
         $this->setDescriptionForCreatedAtField($definition);
         $this->setDescriptionForUpdatedAtField($definition);
         $this->setDescriptionsForOwnershipFields($definition, $entityClass);
+        if (is_a($entityClass, AbstractEnumValue::class, true)) {
+            $this->setDescriptionsForEnumFields($definition);
+        }
     }
 
     /**
@@ -572,6 +582,28 @@ class CompleteDescriptions implements ProcessorInterface
             $entityConfig,
             'organization_field_name',
             self::ORGANIZATION_DESCRIPTION
+        );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function setDescriptionsForEnumFields(EntityDefinitionConfig $definition)
+    {
+        $this->updateFieldDescription(
+            $definition,
+            'name',
+            self::ENUM_NAME_DESCRIPTION
+        );
+        $this->updateFieldDescription(
+            $definition,
+            'default',
+            self::ENUM_DEFAULT_DESCRIPTION
+        );
+        $this->updateFieldDescription(
+            $definition,
+            'priority',
+            self::ENUM_PRIORITY_DESCRIPTION
         );
     }
 

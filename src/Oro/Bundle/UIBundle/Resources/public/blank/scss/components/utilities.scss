@@ -1,24 +1,17 @@
 // @theme: blank;
 
 .hidden {
-    display: none;
-}
-
-.disabled-overlay {
-    display: none;
+    display: none !important; // override inline styles
 }
 
 .disabled {
-    .disabled-overlay {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
+    @include base-disabled-style();
 }
 
 .bold {
     font-weight: bold;
+}
+
+.no-scroll {
+    overflow: hidden;
 }

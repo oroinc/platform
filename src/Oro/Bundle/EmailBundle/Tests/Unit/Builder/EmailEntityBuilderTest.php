@@ -7,7 +7,6 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
@@ -199,5 +198,13 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetBatch()
     {
         $this->assertTrue($this->batch === $this->builder->getBatch());
+    }
+
+    public function testGetEmailAddressEntityClass()
+    {
+        $this->assertEquals(
+            'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy',
+            $this->builder->getEmailAddressEntityClass()
+        );
     }
 }

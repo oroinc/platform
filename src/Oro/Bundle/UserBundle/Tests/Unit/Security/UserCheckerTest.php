@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Security\UserChecker;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class UserCheckerTest extends \PHPUnit_Framework_TestCase
@@ -83,6 +84,22 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         $this->userChecker->checkPreAuth($user);
     }
 
+    /**
+     * @param UserInterface $user
+     * @param boolean       $exceptionThrown
+     *
+     * @dataProvider checkPostAuthProvider
+     */
+    public function testCheckPostAuth(UserInterface $user, $exceptionThrown)
+    {
+        if ($exceptionThrown) {
+            $this->expectException('Oro\Bundle\UserBundle\Exception\OrganizationException');
+            $this->expectExceptionMessage('');
+        }
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
     public function checkPreAuthProvider()
     {
         $data = [];
@@ -132,6 +149,38 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
             'user' => $user4,
             'getTokenCalls' => 1,
             'token' => 'not_null',
+            'exceptionThrown' => true,
+        ];
+
+        return $data;
+    }
+
+    public function checkPostAuthProvider()
+    {
+        $data = [];
+
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $data['invalid_user_class'] = [
+            'user' => $user,
+            'exceptionThrown' => false,
+        ];
+
+        $organization = new OrganizationStub();
+        $organization->setEnabled(true);
+        $user1 = new User();
+        $user1->addOrganization($organization);
+        $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $user1->setAuthStatus($authStatus);
+        $data['with_organization'] = [
+            'user' => $user1,
+            'exceptionThrown' => false,
+        ];
+
+        $user2 = new User();
+        $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $user2->setAuthStatus($authStatus);
+        $data['without_organization'] = [
+            'user' => $user2,
             'exceptionThrown' => true,
         ];
 

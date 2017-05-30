@@ -45,7 +45,8 @@ class TranslationControllerTest extends WebTestCase
 
         // Assert Domain filter choices
         foreach ($domains as $domain) {
-            $this->assertContains(sprintf('{"label":"%s","value":"%s"}', $domain, $domain), $crawler->html());
+            $json = sprintf('{"label":"%s","value":"%s"}', $domain, $domain);
+            $this->assertContains($json, $crawler->html(), 'JSON not found in page content');
         }
 
         $language = $this->registry->getRepository(Language::class)->findOneBy(['code' => LoadLanguages::LANGUAGE1]);

@@ -126,7 +126,13 @@ class BatchFileManager
             $this->reader->initializeByContext($contextReader);
             while ($item = $this->reader->read($contextReader)) {
                 if (! $contextWriter) {
-                    $contextWriter = new Context(['filePath' => $summaryFile, 'header' => $this->reader->getHeader()]);
+                    $contextWriter = new Context(
+                        [
+                            'filePath' => $summaryFile,
+                            'header' => $this->reader->getHeader(),
+                            'firstLineIsHeader' => true,
+                        ]
+                    );
                     $this->writer->setImportExportContext($contextWriter);
                 }
                 $this->writer->write([$item]);

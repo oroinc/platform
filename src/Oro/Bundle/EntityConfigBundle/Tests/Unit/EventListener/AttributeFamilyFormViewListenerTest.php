@@ -91,7 +91,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn($templateData);
 
-        $event = new BeforeListRenderEvent($this->environment, new ScrollData(), new FormView());
+        $event = new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass(), new FormView());
         $this->listener->onEdit($event);
 
         $this->assertEquals($expectedScrollData, $event->getScrollData()->getData());

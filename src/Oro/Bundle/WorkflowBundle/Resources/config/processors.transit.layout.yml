@@ -1,0 +1,83 @@
+services:
+    # RESPONSE: form submit (saved: true), layout dialog xhr response
+    oro_workflow.transit.result.form_submit.layout_dialog_xhr.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\FormSubmitLayoutAjaxResponseProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: true
+                state: ok
+                resultType: layout_dialog
+                priority: 30
+
+    # RESPONSE: form submit (saved: true) layout redirect
+    oro_workflow.transit.result.form_submit.layout_redirect.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\FormSubmitLayoutRedirectProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: true
+                state: ok
+                resultType: layout_dialog|layout_page
+                processed: false
+                priority: 20
+
+    # RESULT: form open (saved: false), layout page start transition data
+    oro_workflow.start_transit.layout_page.result_data.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutPageDataStartTransitionProcessor
+        arguments:
+            - '@oro_workflow.translation.transition_translation_helper'
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: false
+                isStart: true
+                sate: ok
+                resultType: layout_page
+
+    # RESULT: form open (saved: false), layout page regular transition data
+    oro_workflow.transit.layout_page_data.transition.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutPageDataTransitionProcessor
+        arguments:
+            - '@oro_workflow.translation.transition_translation_helper'
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: false
+                isStart: false
+                sate: ok
+                resultType: layout_page
+
+    # RESULT: form open (saved: false), layout dialog start transition data
+    oro_workflow.start_transit.result.data.layout_dialog.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutDialogDataStartTransitionProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: false
+                isStart: true
+                sate: ok
+                resultType: layout_dialog
+
+    # RESULT: form open (saved: false), layout dialog regular transition data
+    oro_workflow.transit.result.data.layout_dialog.processor:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutDialogDataTransitionProcessor
+        tags:
+            -
+                name: oro_workflow.processor
+                action: transit
+                group: result
+                saved: false
+                isStart: false
+                sate: ok
+                resultType: layout_dialog

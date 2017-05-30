@@ -146,6 +146,16 @@ class Element extends NodeElement
 
     /**
      * @param string $name
+     *
+     * @return Element[]
+     */
+    public function getElements($name)
+    {
+        return $this->elementFactory->findAllElements($name, $this);
+    }
+
+    /**
+     * @param string $name
      * @param string $text
      *
      * @return Element
@@ -187,7 +197,7 @@ class Element extends NodeElement
     /**
      * @param \Closure $lambda
      * @param int $timeLimit
-     * @return null|mixed Return false if closure throw error or return not true value.
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     protected function spin(\Closure $lambda, $timeLimit = 60)
@@ -195,15 +205,18 @@ class Element extends NodeElement
         $time = $timeLimit;
 
         while ($time > 0) {
+            $start = microtime(true);
             try {
                 if ($result = $lambda($this)) {
                     return $result;
                 }
             } catch (\Exception $e) {
                 // do nothing
+            } catch (\Throwable $e) {
+                // do nothing
             }
             usleep(50000);
-            $time -= 0.05;
+            $time -= microtime(true) - $start;
         }
         return null;
     }

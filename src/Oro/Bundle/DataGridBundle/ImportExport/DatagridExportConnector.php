@@ -198,5 +198,6 @@ class DatagridExportConnector implements
     {
         $this->sourceData = null;
         $this->gridDataSource = null;
+        $this->totalCount = null;
     }
 }

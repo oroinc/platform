@@ -2,13 +2,8 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Checker;
 
-interface FeatureToggleableInterface
+interface FeatureToggleableInterface extends FeatureCheckerAwareInterface
 {
-    /**
-     * @param FeatureChecker $checker
-     */
-    public function setFeatureChecker(FeatureChecker $checker);
-
     /**
      * @param string $feature
      */

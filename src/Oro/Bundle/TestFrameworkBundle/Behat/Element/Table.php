@@ -6,6 +6,7 @@ use Behat\Mink\Element\NodeElement;
 
 class Table extends Element
 {
+    const TABLE_HEADER_ELEMENT = 'TableHeader';
     const TABLE_ROW_ELEMENT = 'TableRow';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in table";
     const ERROR_NO_ROW_CONTENT = 'Table has no record with "%s" content';
@@ -53,5 +54,16 @@ class Table extends Element
         return array_map(function (NodeElement $element) {
             return $this->elementFactory->wrapElement(static::TABLE_ROW_ELEMENT, $element);
         }, $this->findAll('css', 'tbody tr'));
+    }
+
+    /**
+     * @return TableHeader
+     */
+    public function getHeader()
+    {
+        return $this->elementFactory->wrapElement(
+            static::TABLE_HEADER_ELEMENT,
+            $this->find('css', 'thead tr')
+        );
     }
 }

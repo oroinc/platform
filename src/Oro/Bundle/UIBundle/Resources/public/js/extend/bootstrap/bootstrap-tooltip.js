@@ -28,6 +28,12 @@ define(function(require) {
     });
 
     Tooltip.prototype.applyPlacement = function(offset, placement) {
+        var collision = 'flipfit';
+        if (typeof placement === 'object') {
+            collision = placement.collision || collision;
+            placement = placement.placement;
+        }
+
         var $tip = this.tip();
         var arrowDimension = ['left', 'right'].indexOf(placement) !== -1 ? 'width' : 'height';
         var arrowSize = 0;
@@ -67,7 +73,7 @@ define(function(require) {
 
         _.extend(position, {
             of: this.$element,
-            collision: 'flipfit',
+            collision: collision,
             using: _.bind(this.correctPlacement, this, placement, arrowSize)
         });
 

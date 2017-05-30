@@ -6,6 +6,8 @@ use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 
 class EmailNotificationEntityChoiceType extends EntityChoiceType
 {
+    const NAME = 'oro_email_notification_entity_choice';
+
     /**
      * {@inheritdoc}
      */
@@ -19,6 +21,6 @@ class EmailNotificationEntityChoiceType extends EntityChoiceType
      */
     public function getBlockPrefix()
     {
-        return 'oro_email_notification_entity_choice';
+        return self::NAME;
     }
 }

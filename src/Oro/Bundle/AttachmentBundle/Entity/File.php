@@ -370,4 +370,11 @@ class File extends ExtendFile implements FileExtensionInterface
     {
         return $this->owner;
     }
+
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+        }
+    }
 }

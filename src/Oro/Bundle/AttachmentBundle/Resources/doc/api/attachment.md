@@ -155,6 +155,8 @@ The list of records that will be deleted, could be limited by filters.
 
 ### target
 
+A record to which the attachment record belongs to.
+
 #### create
 
 {@inheritdoc}
@@ -254,15 +256,15 @@ Example:
 
 #### get_subresource
 
-Retrieve the entity record to which the attachment record belongs to.
+Get full information about a record to which the attachment belongs to.
 
 #### get_relationship
 
-Retrieve the ID of the entity record to which the attachment record belongs to.
+Get a record to which the attachment belongs to.
 
 #### update_relationship
 
-Replace the entity record that a specific attachment record belongs to.
+Replace a record to which the attachment belongs to.
 
 {@request:json_api}
 Example:

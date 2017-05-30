@@ -62,6 +62,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction
@@ -113,6 +114,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction
@@ -185,6 +187,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction
@@ -258,6 +261,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
+                self::identicalTo($config),
                 $fieldName,
                 self::identicalTo($field),
                 $targetAction

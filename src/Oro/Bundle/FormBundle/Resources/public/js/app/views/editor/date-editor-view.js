@@ -144,6 +144,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            this._isFocused = false;
             this.$('.hasDatepicker').off(this.eventNamespace());
             this.view.getDatePickerWidget().off(this.eventNamespace());
             this.view.dispose();

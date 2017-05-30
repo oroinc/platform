@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
@@ -18,42 +19,40 @@ use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class TransitionAssembler extends BaseAbstractAssembler
 {
-    /**
-     * @var FormOptionsAssembler
-     */
+    /** @var FormOptionsAssembler */
     protected $formOptionsAssembler;
 
-    /**
-     * @var ConditionFactory
-     */
+    /** @var ConditionFactory */
     protected $conditionFactory;
 
-    /**
-     * @var ActionFactoryInterface
-     */
+    /** @var ActionFactoryInterface */
     protected $actionFactory;
 
-    /**
-     * @var FormOptionsConfigurationAssembler
-     */
+    /** @var FormOptionsConfigurationAssembler */
     protected $formOptionsConfigurationAssembler;
+
+    /** @var TransitionOptionsResolver */
+    protected $optionsResolver;
 
     /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
      * @param ActionFactoryInterface $actionFactory
      * @param FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
+     * @param TransitionOptionsResolver $optionsResolver
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
         ActionFactoryInterface $actionFactory,
-        FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
+        FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler,
+        TransitionOptionsResolver $optionsResolver
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
         $this->actionFactory = $actionFactory;
         $this->formOptionsConfigurationAssembler = $formOptionsConfigurationAssembler;
+        $this->optionsResolver = $optionsResolver;
     }
 
     /**
@@ -167,17 +166,17 @@ class TransitionAssembler extends BaseAbstractAssembler
             throw new AssemblerException(sprintf('Step "%s" not found', $stepToName));
         }
 
-        $transition = new Transition();
+        $transition = new Transition($this->optionsResolver);
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
             ->setLabel($this->getOption($options, 'label'))
-            ->setMessage($this->getOption($options, 'message'))
+            ->setButtonLabel($this->getOption($options, 'button_label'))
+            ->setButtonTitle($this->getOption($options, 'button_title'))
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
-            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()))
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
@@ -188,6 +187,8 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
             ->setInitDatagrids($this->getOption($options, WorkflowConfiguration::NODE_INIT_DATAGRIDS, []))
             ->setInitContextAttribute($this->getOption($options, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE));
+
+        $this->processFrontendOptions($transition, $options);
 
         if (!empty($definition['preactions'])) {
             $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
@@ -220,6 +221,29 @@ class TransitionAssembler extends BaseAbstractAssembler
             $this->formOptionsConfigurationAssembler->assemble($options);
         }
         return $transition;
+    }
+
+    /**
+     * @param Transition $transition
+     * @param array $options
+     */
+    protected function processFrontendOptions(Transition $transition, array $options)
+    {
+        $frontendOptions = $this->getOption($options, 'frontend_options', []);
+
+        if ($this->getOption($options, 'message')) {
+            $frontendOptions['message'] = array_merge(
+                $this->getOption($frontendOptions, 'message', []),
+                [
+                    'content' => $this->getOption($options, 'message'),
+                    'message_parameters' => $this->getOption($options, 'message_parameters', []),
+                ]
+            );
+        }
+
+        $transition
+            ->setMessage($this->getOption($options, 'message'))
+            ->setFrontendOptions($frontendOptions);
     }
 
     /**

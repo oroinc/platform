@@ -24,6 +24,10 @@ oro_behat_extension:
       selector: 'tbody tr'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
+    GridRowAction:
+        selector: '.launchers-list a.action'
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     GridHeaderLink:
       selector: 'th a'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -80,8 +84,20 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
 
     GridToolbarActions:
-        selector: 'div.toolbar div.actions-panel'
-        class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolbarActions
+      selector: 'div.toolbar div.actions-panel'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolbarActions
+
+    GridToolbarActionRefresh:
+        selector: 'div.toolbar div.actions-panel .refresh-action'
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    GridToolbarActionReset:
+        selector: 'div.toolbar div.actions-panel .refresh-action'
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    GridToolBarTools:
+      selector: 'div.toolbar .grid-toolbar-tools'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools
 
     GridFloatingMenu:
       selector: '.dropdown-menu__floating'
@@ -99,6 +115,10 @@ oro_behat_extension:
       selector: 'div.modal'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    GridViewList:
+      selector: '.grid-views .btn-toolbar .btn-group.views-group, .grid-views .grid-views__header'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     GridViewOptions:
       selector: '.grid-views .btn-toolbar .btn-group.actions-group'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -111,6 +131,7 @@ oro_behat_extension:
     OroDataGridBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroFormBundle::FormContext
         - OroDataGridBundle::GridContext
       paths:
         - '@OroDataGridBundle/Tests/Behat/Features'

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
+use Knp\Menu\ItemInterface;
+
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
@@ -213,9 +215,21 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadByRoute()
     {
-        $route          = 'test_route';
-        $testTitle      = 'Test Title';
-        $breadcrumbs    = ['Parent Path'];
+        $route       = 'test_route';
+        $testTitle   = 'Test Title';
+        $parentLabel = 'Parent Label';
+        $menuItem    = $this->createMock(ItemInterface::class);
+        $menuItem
+            ->expects($this->once())
+            ->method('getExtra')
+            ->willReturn(['parent_route']);
+        $breadcrumbs = [
+            [
+                'label' => $parentLabel,
+                'uri'   => '/bar/foo',
+                'item'  => $menuItem
+            ]
+        ];
 
         $this->titleReaderRegistry
             ->expects($this->once())
@@ -226,12 +240,18 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->breadcrumbManager
             ->expects($this->once())
             ->method('getBreadcrumbLabels')
+            ->willReturn([$parentLabel]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbs')
             ->willReturn($breadcrumbs);
 
         $this->userConfigManager
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(4))
             ->method('get')
             ->willReturnMap([
+                ['oro_navigation.breadcrumb_menu', false, false, null, 'application_menu'],
                 ['oro_navigation.breadcrumb_menu', false, false, null, 'application_menu'],
                 ['oro_navigation.title_suffix', false, false, null, 'Suffix'],
                 ['oro_navigation.title_delimiter', false, false, null, '-'],
@@ -240,14 +260,26 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->titleService->setPrefix('-');
         $this->titleService->loadByRoute($route);
 
-        $this->assertEquals('Test Title - Parent Path - Suffix', $this->titleService->getTemplate());
+        $this->assertEquals($testTitle.' - '.$parentLabel.' - Suffix', $this->titleService->getTemplate());
         $this->assertEquals($testTitle, $this->titleService->getShortTemplate());
     }
 
     public function testLoadByRouteWhenTitleDoesNotExist()
     {
-        $route          = 'test_route';
-        $breadcrumbs    = ['Parent Path'];
+        $route       = 'test_route';
+        $parentLabel = 'Parent Label';
+        $menuItem    = $this->createMock(ItemInterface::class);
+        $menuItem
+            ->expects($this->once())
+            ->method('getExtra')
+            ->willReturn(['parent_route']);
+        $breadcrumbs = [
+            [
+                'label' => $parentLabel,
+                'uri'   => '/bar/foo',
+                'item'  => $menuItem
+            ]
+        ];
 
         $this->titleReaderRegistry
             ->expects($this->once())
@@ -258,12 +290,18 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->breadcrumbManager
             ->expects($this->exactly(2))
             ->method('getBreadcrumbLabels')
+            ->willReturn([$parentLabel]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbs')
             ->willReturn($breadcrumbs);
 
         $this->userConfigManager
-            ->expects($this->exactly(4))
+            ->expects($this->exactly(5))
             ->method('get')
             ->willReturnMap([
+                ['oro_navigation.breadcrumb_menu', false, false, null, 'application_menu'],
                 ['oro_navigation.breadcrumb_menu', false, false, null, 'application_menu'],
                 ['oro_navigation.title_suffix', false, false, null, 'Suffix'],
                 ['oro_navigation.title_delimiter', false, false, null, '-'],
@@ -273,16 +311,28 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->titleService->setPrefix('-');
         $this->titleService->loadByRoute($route);
 
-        $this->assertEquals('Parent Path - Suffix', $this->titleService->getTemplate());
-        $this->assertEquals('Parent Path', $this->titleService->getShortTemplate());
+        $this->assertEquals($parentLabel.' - Suffix', $this->titleService->getTemplate());
+        $this->assertEquals($parentLabel, $this->titleService->getShortTemplate());
     }
 
     public function testLoadByRouteWithMenuName()
     {
-        $route          = 'test_route';
-        $testTitle      = 'Test Title';
-        $menuName       = 'application_menu';
-        $breadcrumbs    = ['Parent Path'];
+        $route       = 'test_route';
+        $testTitle   = 'Test Title';
+        $menuName    = 'application_menu';
+        $parentLabel = 'Parent Label';
+        $menuItem    = $this->createMock(ItemInterface::class);
+        $menuItem
+            ->expects($this->once())
+            ->method('getExtra')
+            ->willReturn(['parent_route']);
+        $breadcrumbs = [
+            [
+                'label' => $parentLabel,
+                'uri'   => '/bar/foo',
+                'item'  => $menuItem
+            ]
+        ];
 
         $this->titleReaderRegistry
             ->expects($this->once())
@@ -293,6 +343,11 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->breadcrumbManager
             ->expects($this->once())
             ->method('getBreadcrumbLabels')
+            ->willReturn([$parentLabel]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbs')
             ->willReturn($breadcrumbs);
 
         $this->userConfigManager
@@ -306,8 +361,117 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->titleService->setPrefix('-');
         $this->titleService->loadByRoute($route, $menuName);
 
-        $this->assertEquals('Test Title - Parent Path - Suffix', $this->titleService->getTemplate());
+        $this->assertEquals($testTitle.' - '.$parentLabel.' - Suffix', $this->titleService->getTemplate());
         $this->assertEquals($testTitle, $this->titleService->getShortTemplate());
+    }
+
+    public function testLoadByRouteWithPageTitleInsteadFirstBreadcrumbItem()
+    {
+        $childRoute    = 'child_route';
+        $childTitle    = 'Child Title';
+        $newChildTitle = 'New child title';
+        $parentTitle   = 'Parent Title';
+        $childMenuItem = $this->createMock(ItemInterface::class);
+        $childMenuItem
+            ->expects($this->once())
+            ->method('getExtra')
+            ->willReturn([$childRoute]);
+        $parentMenuItem = $this->createMock(ItemInterface::class);
+        $breadcrumbs    = [
+            [
+                'label' => $childTitle,
+                'uri'   => '/bar/foo',
+                'item'  => $childMenuItem
+            ],
+            [
+                'label' => $parentTitle,
+                'uri'   => '/bar',
+                'item'  => $parentMenuItem
+            ]
+        ];
+
+        $this->titleReaderRegistry
+            ->expects($this->once())
+            ->method('getTitleByRoute')
+            ->with($childRoute)
+            ->willReturn($newChildTitle);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbLabels')
+            ->willReturn([$childTitle, $parentTitle]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbs')
+            ->willReturn($breadcrumbs);
+
+        $this->userConfigManager
+            ->expects($this->exactly(4))
+            ->method('get')
+            ->willReturnMap([
+                    ['oro_navigation.title_delimiter', false, false, null, '-']
+            ]);
+
+        $this->titleService->loadByRoute($childRoute);
+
+        $this->assertEquals($newChildTitle.' - '.$parentTitle, $this->titleService->getTemplate());
+        $this->assertEquals($newChildTitle, $this->titleService->getShortTemplate());
+    }
+
+    public function testLoadByRouteWithoutTitleAndWithBreadcrumbs()
+    {
+        $childRoute    = 'child_route';
+        $childTitle    = 'Child Title';
+        $parentTitle   = 'Parent Title';
+        $childMenuItem = $this->createMock(ItemInterface::class);
+        $childMenuItem
+            ->expects($this->once())
+            ->method('getExtra')
+            ->willReturn([$childRoute]);
+        $parentMenuItem = $this->createMock(ItemInterface::class);
+        $breadcrumbs    = [
+            [
+                'label' => $childTitle,
+                'uri'   => '/bar/foo',
+                'item'  => $childMenuItem
+            ],
+            [
+                'label' => $parentTitle,
+                'uri'   => '/bar',
+                'item'  => $parentMenuItem
+            ]
+        ];
+
+        $this->titleReaderRegistry
+            ->expects($this->once())
+            ->method('getTitleByRoute')
+            ->with($childRoute)
+            ->willReturn(null);
+
+        $this->breadcrumbManager
+            ->expects($this->exactly(2))
+            ->method('getBreadcrumbLabels')
+            ->willReturn([$childTitle, $parentTitle]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbs')
+            ->willReturn($breadcrumbs);
+
+        $this->userConfigManager
+            ->expects($this->exactly(5))
+            ->method('get')
+            ->willReturnMap([
+                    ['oro_navigation.breadcrumb_menu', false, false, null, 'application_menu'],
+                    ['oro_navigation.breadcrumb_menu', false, false, null, 'application_menu'],
+                    ['oro_navigation.title_delimiter', false, false, null, '-']
+            ]);
+
+        $this->titleService->loadByRoute($childRoute);
+
+        $this->assertEquals($childTitle.' - '.$parentTitle, $this->titleService->getTemplate());
+        $this->assertEquals($childTitle, $this->titleService->getShortTemplate());
     }
 
     public function testGetSerialized()
@@ -356,6 +520,32 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             '{"template":"test template","short_template":"test short template","params":{"localized_obj":"String"}}',
             $this->titleService->getSerialized()
+        );
+    }
+
+    public function testCreateTitle()
+    {
+        $route = 'test_route';
+        $testTitle = 'Test Title';
+        $menuName = 'application_menu';
+        $breadcrumbs = ['Parent Path'];
+
+        $this->userConfigManager
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['oro_navigation.title_suffix', false, false, null, 'Suffix'],
+                ['oro_navigation.title_delimiter', false, false, null, '-'],
+            ]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbLabels')
+            ->willReturn($breadcrumbs);
+
+        $this->assertEquals(
+            'Test Title - Parent Path - Suffix',
+            $this->titleService->createTitle($route, $testTitle, $menuName)
         );
     }
 }

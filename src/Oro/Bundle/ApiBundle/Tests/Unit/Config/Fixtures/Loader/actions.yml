@@ -180,6 +180,17 @@ entity_empty_form_options:
             form_options: []
     expected: []
 
+entity_empty_form_event_subscriber:
+    config:
+        form_event_subscriber: []
+    expected: []
+
+entity_form_event_subscriber:
+    config:
+        form_event_subscriber: [subscriber1, subscriber2]
+    expected:
+        form_event_subscriber: [subscriber1, subscriber2]
+
 entity_form:
     config:
         create:

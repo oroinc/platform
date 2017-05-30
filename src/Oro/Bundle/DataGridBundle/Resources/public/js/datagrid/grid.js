@@ -120,14 +120,14 @@ define(function(require) {
                 refreshAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
-                        className: 'btn',
+                        className: 'btn refresh-action',
                         iconClassName: 'fa-repeat'
                     }
                 },
                 resetAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
-                        className: 'btn',
+                        className: 'btn reset-action',
                         iconClassName: 'fa-refresh'
                     }
                 }
@@ -635,6 +635,7 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
+            var ComponentConstructor =  this.collection.options.modules.columnManagerComponentCustom || null;
             var toolbar;
             var sortActions = this.sortActions;
             var toolbarOptions = {
@@ -642,6 +643,7 @@ define(function(require) {
                 actions:      this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
                 columns:      this.columns,
+                componentConstructor: ComponentConstructor,
                 addToolbarAction: function(action) {
                     toolbarOptions.actions.push(action);
                     sortActions(toolbarOptions.actions);

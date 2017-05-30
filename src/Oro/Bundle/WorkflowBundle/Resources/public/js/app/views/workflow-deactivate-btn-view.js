@@ -38,6 +38,20 @@ define(function(require) {
         delegateEvents: function() {
             WorkflowDeactivateBtnView.__super__.delegateEvents.apply(this, arguments);
             this.$el.on('click' + this.eventNamespace(), this.options.selectors.button, $.proxy(this.onClick, this));
+            this.$el.on({
+                'deactivation_success': this.onDeactivationSuccess
+            }, this.options.selectors.button);
+        },
+
+        /**
+         * @param {jQuery.Event} e
+         * @param {Object} response
+         */
+        onDeactivationSuccess: function(e, response) {
+            mediator.once('page:afterChange', function() {
+                messenger.notificationFlashMessage('success', response.message);
+            });
+            mediator.execute('refreshPage');
         },
 
         /**
@@ -45,16 +59,7 @@ define(function(require) {
          */
         onClick: function(e) {
             e.preventDefault();
-
             var el = this.$el.find(this.options.selectors.button);
-
-            el.on('deactivation_success', function(e, response) {
-                mediator.once('page:afterChange', function() {
-                    messenger.notificationFlashMessage('success', response.message);
-                });
-                mediator.execute('refreshPage');
-            });
-
             deactivationHandler.call(el, el.prop('href'), el.data('label'));
         },
 
@@ -64,6 +69,7 @@ define(function(require) {
             }
 
             this.$el.off('click' + this.eventNamespace());
+            this.$el.off('deactivation_success');
 
             WorkflowDeactivateBtnView.__super__.dispose.apply(this, arguments);
         }

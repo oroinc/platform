@@ -29,9 +29,25 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.entity_connector'
+            - '@oro_workflow.cache.entity_aware'
         tags:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: preRemove }
+
+    oro_workflow.listener.workflow_transition_record:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener'
+        arguments:
+            - '@event_dispatcher'
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+
+    oro_workflow.listener.start_workflow:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener'
+        arguments:
+            - '@oro_workflow.registry.workflow_manager'
+            - '@oro_workflow.cache.entity_aware'
+        tags:
+            - { name: doctrine.event_listener,  event: postPersist }
             - { name: doctrine.event_listener, event: postFlush }
 
     oro_workflow.listener.event_trigger_collector:

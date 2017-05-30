@@ -143,3 +143,75 @@ Example:
 }
 ```
 {@/request}
+
+### users
+
+#### get_subresource
+
+Retrieve the records of users who are assigned to a specific user role record.
+
+#### get_relationship
+
+Retrieve the IDs of the users who are assigned to a specific user role record.
+
+#### add_relationship
+
+Assign the user records to a specific user role record.
+
+{@request:json_api}
+Example:
+
+`</api/userroles/1/relationships/users>`
+
+```JSON
+{
+  "data": [
+    {
+      "type": "users",
+      "id": "1"
+    },
+    {
+      "type": "users",
+      "id": "2"
+    },
+    {
+      "type": "users",
+      "id": "3"
+    }
+  ]
+}
+```
+{@/request}
+
+#### update_relationship
+
+Replace the user records that are assigned to a specific user role record.
+
+{@request:json_api}
+Example:
+
+`</api/userroles/1/relationships/users>`
+
+```JSON
+{
+  "data": [
+    {
+      "type": "users",
+      "id": "1"
+    },
+    {
+      "type": "users",
+      "id": "2"
+    },
+    {
+      "type": "users",
+      "id": "3"
+    }
+  ]
+}
+```
+{@/request}
+
+#### delete_relationship
+
+Remove user records from a specific user role record.

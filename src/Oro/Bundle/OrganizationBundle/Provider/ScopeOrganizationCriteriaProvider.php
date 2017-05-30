@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\OrganizationAwareUserInterface;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
 {
@@ -35,11 +33,8 @@ class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
             return [];
         }
 
-        $loggedUser = $token->getUser();
-        if ($loggedUser instanceof User) {
-            return [self::SCOPE_KEY => $loggedUser->getCurrentOrganization()];
-        } elseif ($loggedUser instanceof UserInterface && $loggedUser instanceof OrganizationAwareUserInterface) {
-            return [self::SCOPE_KEY => $loggedUser->getOrganization()];
+        if ($token instanceof OrganizationContextTokenInterface) {
+            return [self::SCOPE_KEY => $token->getOrganizationContext()];
         }
 
         return [];

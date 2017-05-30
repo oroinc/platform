@@ -1,7 +1,7 @@
 UPGRADE FROM 2.0 to 2.1
 ========================
 
-####General
+#### General
 - Changed minimum required php version to 7.0
 - Updated dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin to version 1.3.
 - Composer updated to version 1.4.
@@ -189,10 +189,11 @@ DataGridBundle
     - removed property `protected $datagridRouteHelper`
     - removed property `protected $requestStack`
     - removed property `protected $logger`
+- Added method `public function getName()::string` to interface `Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface`
 - Class `Oro\Bundle\DataGridBundle\Controller\GridController`
    - renamed method `filterMetadata` to `filterMetadataAction`
 - Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor`
-    - construction signature was changed now it takes next arguments: 
+    - construction signature was changed now it takes next arguments:
         - ExportHandler $exportHandler,
         - JobRunner $jobRunner,
         - DatagridExportConnector $exportConnector,
@@ -201,11 +202,10 @@ DataGridBundle
         - TokenStorageInterface $tokenStorage,
         - JobStorage $jobStorage,
         - LoggerInterface $logger
-- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` and its service `oro_datagrid.async.pre_export` were added.                
-- Class `Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher` and its service `oro_datagrid.importexport.export_id_fetcher` were added.   
+- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` and its service `oro_datagrid.async.pre_export` were added.
+- Class `Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher` and its service `oro_datagrid.importexport.export_id_fetcher` were added.
 - Class `Oro\Bundle\DataGridBundle\Handler\ExportHandler` (service `oro_datagrid.handler`) changed its service calls: it doesn't call `setRouter` and `setConfigManager` any more but calls `setFileManager` now.
 - Topic `oro.datagrid.export` doesn't start datagrid export any more. Use `oro.datagrid.pre_export` topic instead.
-
 
 DistributionBundle
 ------------------
@@ -264,6 +264,17 @@ EntityBundle
     - removed property `protected $entityRoutingHelper`
     - removed property `protected $entityNameResolver`
     - removed property `protected $entityAliasResolver`
+- Added class `Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener' that should be used for entities with single table inheritance.
+  Example:
+```yml
+oro_acme.my_entity.discriminator_map_listener:
+    class: 'Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener'
+    public: false
+    calls:
+        - [ addClass, ['oro_acme_entity', '%oro_acme.entity.acme_entity.class%'] ]
+    tags:
+        - { name: doctrine.event_listener, event: loadClassMetadata }
+```
 
 EntityConfigBundle
 ------------------
@@ -436,7 +447,7 @@ ImportExportBundle
         - BatchFileManager $batchFileManager
 - Class `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor`
     - changed the namespace from `Oro\Bundle\ImportExportBundle\Async` to `Oro\Bundle\ImportExportBundle\Async\Export`
-    - construction signature was changed now it takes next arguments:         
+    - construction signature was changed now it takes next arguments:
         - ExportHandler $exportHandler,
         - JobRunner $jobRunner,
         - DoctrineHelper $doctrineHelper,
@@ -450,7 +461,7 @@ ImportExportBundle
 - Class `Oro\Bundle\ImportExportBundle\File\FileManager` and its service `oro_importexport.file.file_manager` were added. We should use it instead of the `Oro\Bundle\ImportExportBundle\File\FileSystemOperator`
 - Class `Oro\Bundle\ImportExportBundle\File\FileSystemOperator` is deprecated now. Use `Oro\Bundle\ImportExportBundle\File\FileManager` instead.
 - Command `oro:cron:import-clean-up-storage` (class `Oro\Bundle\ImportExportBundle\Command\Cron\CleanupStorageCommand`) was added.
-- Command `oro:import:csv` (class `Oro\Bundle\ImportExportBundle\Command\ImportCommand`) was renamed to `oro:import:file`        
+- Command `oro:import:csv` (class `Oro\Bundle\ImportExportBundle\Command\ImportCommand`) was renamed to `oro:import:file`
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor` and its service `oro_importexport.async.abstract_preparing_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor` and its service `oro_importexport.async.preparing_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor` and its service `oro_importexport.async.preparing_http_import_validation` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
@@ -570,7 +581,7 @@ LocaleBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $formatter`
 - Class `Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider`
-    - changed `__constructor` signature: 
+    - changed `__constructor` signature:
         - the third argument changed from `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` to `Oro\Bundle\TranslationBundle\Provider\LanguageProvider`
 - The service `oro_translation.event_listener.language_change` was removed
 - The class `Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener` was removed
@@ -816,7 +827,7 @@ filters such as `contains` when generating routes
     - added method `public function addPackage(string $packageAlias, string $packageName, string $suffix = '')`
 - Updated service definition for `oro_translation.extension.transtation_packages_provider`
     - changed publicity to `false`
-    
+
 UIBundle
 --------
 - Removed the following parameters from DIC:

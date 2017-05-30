@@ -115,7 +115,7 @@ label.disabled {
 }
 
 // Bootstrap - Form
-label, input, button, select, textarea { font-size:13px;}
+label, input, button, select, textarea { font-size:13px; color:#777;}
 .form-horizontal .control-label {
   font-size:13px;
   text-align:left;
@@ -125,7 +125,6 @@ label, input, button, select, textarea { font-size:13px;}
     float: none;
     .oro-popover-content {
       line-height: 20px;
-      color: #777;
     }
   }
 }
@@ -138,17 +137,13 @@ label, input, button, select, textarea { font-size:13px;}
       float:left;
       width:160px;
       padding-top: 7px;
-      color: #777;
       font-weight: normal;
-      font-size: 13px;
       text-align:right;
     }
     .control-label.wrap {
       float:left;
       padding-top: 6px;
-      color: #777;
       font-weight: normal;
-      font-size: 13px;
       line-height: 20px;
       text-align: right;
       .tooltip-icon {
@@ -165,13 +160,16 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
-        padding-top: 7px;
         width: 100%;
         word-wrap: break-word;
         padding-left: 5px; // to get nice hover background
-        box-sizing: border-box;
         &.html-property {
           overflow: auto;
+        }
+      }
+      .control-subgroup {
+        .controls {
+          margin-left: 140px;
         }
       }
       .control-label.wrap {
@@ -2146,7 +2144,12 @@ label.required em,
 .form-horizontal .span6 .oro-multiselect-holder input[type="password"] {
   margin: 0 0 5px 0;
 }*/
-input, textarea, .uneditable-input { width:280px; }
+input,
+textarea,
+.uneditable-input {
+  width: @widthInput;
+}
+
 body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
@@ -2562,6 +2565,9 @@ label.radio.error {
   button {
     float: left;
     margin: 0 0 0 4px;
+  }
+  button.add-on {
+    float: none;
   }
 }
 .choice-filter {
@@ -3327,11 +3333,6 @@ label .popover-content {
     border-radius: 0 4px 4px 0;
     & > .btn {
       font-size: 14px;
-    }
-  }
-  &:not(.entity-create-enabled):not(.entity-create-multi-enabled) {
-    .input-append .select2-container {
-      width: 263px;
     }
   }
 }

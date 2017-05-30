@@ -21,6 +21,8 @@ oro:
             emailtemplate.saved.message: "Template saved"
             job_scheduled.message: "The job has been added to the queue"
             job_progress: Check progress
+        recent_emails_widget:
+            no_subject: "no subject"
         form:
             choose_template:                     ""
             add_signature:                       Add Signature
@@ -161,6 +163,11 @@ oro:
             variables:
                 system: 'System variables'
                 entity: 'Entity variables'
+                url:
+                    index.label: 'Entity Grid Page'
+                    view.label: 'Entity View Page'
+                    update.label: 'Entity Update Page'
+                    create.label: 'Entity Create Page'
 
             action:
                 preview: Preview
@@ -366,7 +373,7 @@ oro:
             name.label:          Name
             active.label:        Active
             status.label:        Status
-            conditions.label:    Conditions
+            conditions.label:    Satisfy
             template.label:      Response Template
             action:
                 add.label:    Add Rule

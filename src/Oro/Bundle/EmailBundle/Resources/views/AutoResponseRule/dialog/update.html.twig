@@ -1,4 +1,6 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+
 <div class="widget-content">
     {% if saved %}
         <script type="text/javascript">
@@ -19,10 +21,12 @@
             'layout': 'separate'
         } %}
         <div class="form-container" {{ UI.renderPageComponentAttributes(pageComponent) }}>
-            {% form_theme form 'OroEmailBundle:Form:autoresponseFields.html.twig' %}
             {{ form_start(
                 form,
                 {
+                    attr: {
+                        id: form.vars.id,
+                    },
                     action: path(
                         app.request.attributes.get('_route'),
                         app.request.attributes.get('_route_params')
@@ -30,7 +34,21 @@
                 }
             ) }}
                 <fieldset class="form form-horizontal">
-                    <div class="span8">
+                    <div>
+                        {{ form_row(form.active) }}
+                        {{ form_row(form.name) }}
+                        <div class="control-group">
+                            <label class="required control-label">
+                                {{ 'oro.email.autoresponserule.conditions.label'|trans }}
+                            </label>
+                            <div class="controls">
+                                {{ QD.query_designer_condition_builder({
+                                    'id': 'oro_email_autoresponserule-condition-builder',
+                                    'criteria_list_id': 'filter-criteria-list',
+                                    'entity_choice_id': 'oro_email_autoresponserule_entity',
+                                }) }}
+                            </div>
+                        </div>
                         {{ form_rest(form) }}
                     </div>
                     <div class="widget-actions form-actions" style="display: none;">
@@ -40,6 +58,17 @@
                     </div>
                 </fieldset>
             {{ form_end(form) }}
+            {{ oro_form_js_validation(form) }}
         </div>
+        <script>
+            require([
+                'oroemail/js/app/components/auto-response-rule-component',
+            ], function(AutoResponseRuleComponent) {
+                new AutoResponseRuleComponent({{ {
+                    data: data,
+                    metadata: metadata,
+                }|json_encode|raw }});
+            });
+        </script>
     {% endif %}
 </div>

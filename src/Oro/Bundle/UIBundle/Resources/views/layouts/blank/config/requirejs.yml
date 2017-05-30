@@ -30,10 +30,13 @@ config:
             'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
             'bootstrap': 'oroui/js/extend/bootstrap'
+            'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/jquery-ui':
             'jquery-ui': 'jquery-ui'
+        'oroui/js/jquery-ui-datepicker-l10n':
+            'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/extend/chaplin':
             'chaplin': 'chaplin'
         'oroui/js/extend/underscore':
@@ -77,6 +80,7 @@ config:
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
         'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
+        'xregexp': 'bundles/npmassets/xregexp/xregexp-all.js'
 
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
 
@@ -90,6 +94,9 @@ config:
         'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
         'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
 
+        'oroui/js/standart-confirmation': 'bundles/oroui/js/standart-confirmation.js'
+
+        'oroui/js/app/modules/widgets-module': 'bundles/oroui/js/app/modules/widgets-module.js'
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
@@ -99,6 +106,7 @@ config:
         - oroui/js/app/modules/layout-module
         - oroui/blank/js/app/modules/views-module
         - oroui/js/input-widget-manager
+        - oroui/js/app/modules/widgets-module
         - oroui/js/app/modules/viewport-module
 
 build:

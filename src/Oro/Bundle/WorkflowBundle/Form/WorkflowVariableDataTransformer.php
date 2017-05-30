@@ -13,34 +13,20 @@ use Oro\Bundle\WorkflowBundle\Model\Variable;
 
 class WorkflowVariableDataTransformer implements DataTransformerInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var Variable|null
-     */
-    private $variable;
+    /** @var Variable|null */
+    protected $variable;
 
     /**
      * @param ManagerRegistry $managerRegistry
+     * @param Variable $variable
      */
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(ManagerRegistry $managerRegistry, Variable $variable = null)
     {
         $this->managerRegistry = $managerRegistry;
-    }
-
-    /**
-     * @param Variable $variable
-     *
-     * @return $this
-     */
-    public function setVariable(Variable $variable)
-    {
         $this->variable = $variable;
-
-        return $this;
     }
 
     /**
@@ -68,7 +54,7 @@ class WorkflowVariableDataTransformer implements DataTransformerInterface
 
         $identifier = null;
         if ($this->variable instanceof Variable) {
-            $identifier = $this->variable->getOption('identifier', null);
+            $identifier = $this->variable->getOption('identifier');
         }
 
         if (!$identifier) {

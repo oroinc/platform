@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
@@ -32,9 +35,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
         $this->manager = $this->getMockBuilder(TranslationManager::class)->disableOriginalConstructor()->getMock();
 
-        $this->translationHelper = $this->getMockBuilder(TranslationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationHelper = $this->createMock(TranslationHelper::class);
 
         $this->helper = new WorkflowTranslationHelper($this->translator, $this->manager, $this->translationHelper);
     }
@@ -114,10 +115,15 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
     public function testSaveTranslation()
     {
         $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('en');
-        $this->manager
-            ->expects($this->exactly(2))
+        $this->manager->expects($this->exactly(2))
             ->method('saveTranslation')
-            ->with('test_key', 'test_value', 'en', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+            ->with(
+                'test_key',
+                'test_value',
+                'en',
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
+            );
         $this->helper->saveTranslation('test_key', 'test_value');
         $this->helper->saveTranslation('test_key', 'test_value');
     }
@@ -135,10 +141,26 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 'test_key',
                 'test_value',
                 Translator::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
             );
 
         $this->helper->saveTranslation('test_key', 'test_value');
+    }
+
+    public function testSaveTranslationAsSystem()
+    {
+        $this->translator->expects($this->once())->method('getLocale')->willReturn('en');
+        $this->manager->expects($this->once())
+            ->method('saveTranslation')
+            ->with(
+                'test_key',
+                'test_value',
+                'en',
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_SYSTEM
+            );
+        $this->helper->saveTranslationAsSystem('test_key', 'test_value');
     }
 
     /**
@@ -237,6 +259,57 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
     {
         yield 'string value' => ['expected' => 'string'];
         yield 'null value' => ['expected' => null];
+    }
+
+    public function testGenerateDefinitionTranslationKeys()
+    {
+        $definition = new WorkflowDefinition();
+        $definition->setLabel('test.definition')
+            ->setConfiguration(
+                [
+                    WorkflowConfiguration::NODE_STEPS => [
+                        ['label' => 'test.step']
+                    ],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        ['label' => 'test.attribute']
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
+                            'label' => 'test.transition',
+                            'button_label' => 'test.button.label',
+                            'button_title' => 'test.button.title',
+                            'message' => 'test.transition.message'
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            [
+                                'label' => 'test.variable',
+                                'options' => [
+                                    'form_options' => [
+                                        'tooltip' => 'test.variable.tooltip'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            );
+
+        $this->assertEquals(
+            [
+                'test.definition',
+                'test.step',
+                'test.attribute',
+                'test.transition',
+                'test.button.label',
+                'test.button.title',
+                'test.transition.message',
+                'test.variable',
+                'test.variable.tooltip'
+            ],
+            $this->helper->generateDefinitionTranslationKeys($definition)
+        );
     }
 
     /**

@@ -18,6 +18,7 @@ services:
             - '@oro_importexport.writer.writer_chain'
             - '@oro_importexport.reader.reader_chain'
             - '@oro_importexport.file.batch_file_manager'
+            - '@oro_importexport.file.file_manager'
 
     oro_importexport.handler.import.abstract:
         class: %oro_importexport.handler.import.abstract.class%
@@ -46,3 +47,12 @@ services:
 
     oro_importexport.handler.csv.file:
         class: %oro_importexport.handler.csv.file.class%
+
+    oro_importexport.handler.postpone:
+        class: Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler
+        public: false
+        arguments:
+            - '@oro_importexport.file.file_manager'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_importexport.writer.writer_chain'
+            - '@translator'

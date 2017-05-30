@@ -45,17 +45,17 @@ level:
     V043: MAJOR # Trait protected method parameter added
     V044: MAJOR # *New public constructor (does not match supertype)*
     V045: MAJOR # *New protected constructor (does not match supertype)*
-    V046: MINOR # Trait added
-    V047: MAJOR # Trait public method added
-    V048: MAJOR # Trait protected method added
-    V049: MAJOR # Trait public property added
-    V050: MAJOR # Trait protected property added
+    V046: PATCH # Trait added
+    V047: PATCH # Trait public method added
+    V048: PATCH # Trait protected method added
+    V049: PATCH # Trait public property added
+    V050: PATCH # Trait protected property added
     V052: PATCH # Trait public method implementation changed
     V053: PATCH # Trait protected method implementation changed
     V054: PATCH # Trait private method implementation changed
-    V055: MAJOR # Trait private property added
+    V055: PATCH # Trait private property added
     V056: MAJOR # Trait private property removed
-    V057: MAJOR # Trait private method added
+    V057: PATCH # Trait private method added
     V058: MAJOR # Trait private method removed
     V059: PATCH # Trait private method parameter added
     V060: PATCH # Class public method parameter name changed

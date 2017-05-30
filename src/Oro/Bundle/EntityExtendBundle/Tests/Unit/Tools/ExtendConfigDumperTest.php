@@ -8,8 +8,10 @@ use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -73,6 +75,10 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckConfigWhenAliasesExists()
     {
+        $fs = new Filesystem();
+        $fs->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
+        $fs->touch(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
+
         $this->configProvider->addEntityConfig(
             self::CLASS_NAMESPACE . '\Entity\TestEntity1',
             [
@@ -88,6 +94,8 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
 
         $this->dumper->checkConfig();
+
+        $fs->remove(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
     }
 
     public function testCheckConfig()

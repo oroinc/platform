@@ -426,6 +426,23 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($entityConfig, $this->configHelper->getEntityConfig($entityConfigModel, $scope));
     }
 
+    public function testGetNonExtendedEntitiesClasses()
+    {
+        $entitiesConfig = [
+            $this->getEntityConfig('extended_1', ['is_extend' => true]),
+            $this->getEntityConfig('extended_2', ['is_extend' => true]),
+            $this->getEntityConfig('not_extended_1', ['is_extend' => false]),
+            $this->getEntityConfig('not_extended_2', ['is_extend' => false]),
+        ];
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfigs')
+            ->willReturn($entitiesConfig);
+
+        $this->assertEquals(['not_extended_1', 'not_extended_2'], $this->configHelper->getNonExtendedEntitiesClasses());
+    }
+
     private function expectsGetClassNameAndFieldName()
     {
         $this->fieldConfigModel

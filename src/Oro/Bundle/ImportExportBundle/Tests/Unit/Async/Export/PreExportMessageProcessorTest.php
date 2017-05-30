@@ -1,269 +1,260 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testPreExportProcessCanBeConstructedWithRequiredAttributes()
-    {
-        new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerInterfaceMock(),
-            $this->createDoctrineHelperMock(),
-            $this->createTokenStorageInterfaceMock(),
-            $this->createLoggerInterfaceMock(),
-            $this->createDependentJobMock(),
-            100
-        );
-    }
-
-    public function testPreExportProcessShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
     }
 
-    public function testShouldLogErrorAndRejectMessageIfMessageWasInvalid()
+    public function invalidMessageBodyProvider()
     {
-        $logger = $this->createLoggerInterfaceMock();
+        return [
+            [
+                'loggerMessage' => '[PreExportMessageProcessor] ' .
+                    'Got invalid message: "{"processorAlias":"alias","securityToken":"token"}"',
+                'messageBody' => ['processorAlias' => 'alias', 'securityToken' => 'token'],
+            ],
+            [
+                'loggerMessage' => '[PreExportMessageProcessor] ' .
+                    'Got invalid message: "{"jobName":"name","securityToken":"token"}"',
+                'messageBody' => ['jobName' => 'name', 'securityToken' => 'token'],
+            ],
+            [
+                'loggerMessage' => '[PreExportMessageProcessor] ' .
+                    'Got invalid message: "{"jobName":"name","processorAlias":"alias"}"',
+                'messageBody' => ['jobName' => 'name', 'processorAlias' => 'alias'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidMessageBodyProvider
+     *
+     * @param string $loggerMessage
+     * @param array $messageBody
+     */
+    public function testShouldLogErrorAndRejectMessageIfMessageBodyInvalid($loggerMessage, array $messageBody)
+    {
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[PreExportMessageProcessor] Got invalid message: "[]"');
+            ->with($loggerMessage);
 
         $processor = new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
-            $this->createMessageProducerInterfaceMock(),
-            $this->createDoctrineHelperMock(),
-            $this->createTokenStorageInterfaceMock(),
-            $logger,
+            $this->createMessageProducerMock(),
+            $this->createTokenSerializerMock(),
+            $this->createTokenStorageMock(),
             $this->createDependentJobMock(),
+            $logger,
             100
         );
 
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->exactly(2))
-            ->method('getBody')
-            ->willReturn('[]')
-        ;
+        $message = new NullMessage();
+        $message->setBody(json_encode($messageBody));
 
         $result = $processor->process($message, $this->createSessionMock());
+
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldLogErrorAndRejectMessageIfTokenInvalid()
     {
-        $logger = $this->createLoggerInterfaceMock();
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
             ->with('[PreExportMessageProcessor] Cannot set security token');
 
         $processor = new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
-            $this->createMessageProducerInterfaceMock(),
-            $this->createDoctrineHelperMock(),
-            $this->createTokenStorageInterfaceMock(),
-            $logger,
+            $this->createMessageProducerMock(),
+            $this->createTokenSerializerMock(),
+            $this->createTokenStorageMock(),
             $this->createDependentJobMock(),
+            $logger,
             100
         );
-        $processor->setTokenSerializer($this->createTokenSerializerMock());
 
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->once())
-            ->method('getBody')
-            ->willReturn(json_encode([
-                'jobName' => 'test',
-                'processorAlias' => 'test',
-                'securityToken' => 'test',
-            ]));
+        $message = new NullMessage();
+        $message->setBody(json_encode([
+            'jobName' => 'test',
+            'processorAlias' => 'test',
+            'securityToken' => 'test',
+        ]));
 
         $result = $processor->process($message, $this->createSessionMock());
+
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testShouldCreateAndSendToProducerSubJobsAndCreateDependedJobAndACKMessage()
+    public function testShouldSetOrganizationAndACKMessage()
     {
-        $job = $this->getJob(1);
-        $childJob1 = $this->getJob(2, $job);
-        $childJob2 = $this->getJob(3, $job);
-        $childJob = $this->getJob(10, $job);
-        $user = new User();
-        $user->setId(1);
-        $user->setEmail('useremail@example.com');
+        $jobUniqueName = 'oro_importexport.pre_export.test.user_1';
+        $message = new NullMessage();
+        $message->setBody(json_encode([
+            'jobName' => 'test',
+            'processorAlias' => 'test',
+            'securityToken' => 'test',
+            'organizationId' => 22,
+        ]));
+        $message->setMessageId(123);
+
+        $job = $this->createJob(1);
+        $childJob = $this->createJob(10, $job);
 
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects($this->once())
             ->method('runUnique')
-            ->with(1, 'oro_importexport.pre_export.test.user_1')
-            ->will(
-                $this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
-                    return $callback($jobRunner, $childJob);
-                })
-            );
-
+            ->with($this->equalTo(123), $this->equalTo($jobUniqueName))
+            ->will($this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+                return $callback($jobRunner, $childJob);
+            }))
+        ;
         $jobRunner
-            ->expects($this->at(0))
-            ->method('createDelayed')
-            ->with('oro_importexport.pre_export.test.user_1.chunk.1')
-            ->will(
-                $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
-                    return $callback($jobRunner, $childJob1);
-                })
-            );
-
-        $jobRunner
-            ->expects($this->at(1))
-            ->method('createDelayed')
-            ->with('oro_importexport.pre_export.test.user_1.chunk.2')
-            ->will(
-                $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
-                    return $callback($jobRunner, $childJob2);
-                })
-            );
-
-        $exportHandler = $this->createExportHandlerMock();
-        $exportHandler
             ->expects($this->once())
-            ->method('getExportingEntityIds')
-            ->with('test', 'export', 'test', [])
-            ->willReturn([1,2,3,4]);
+            ->method('createDelayed')
+            ->with($jobUniqueName.'.chunk.1')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner, $childJob) {
+                return $callback($jobRunner, $childJob);
+            }))
+        ;
 
-        $dependentContext = $this->createDependentJobContextMock();
-        $dependentContext
+        $dependentJobContext = $this->createDependentJobContextMock();
+        $dependentJobContext
             ->expects($this->once())
             ->method('addDependentJob')
-            ->with(Topics::POST_EXPORT);
+        ;
 
         $dependentJob = $this->createDependentJobMock();
         $dependentJob
             ->expects($this->once())
             ->method('createDependentJobContext')
-            ->with($job)
-            ->willReturn($dependentContext);
-
+            ->with($this->equalTo($job))
+            ->willReturn($dependentJobContext)
+        ;
         $dependentJob
             ->expects($this->once())
             ->method('saveDependentJob')
-            ->with($dependentContext);
-
-        $messageProducer = $this->createMessageProducerInterfaceMock();
-        $messageProducer
-            ->expects($this->at(0))
-            ->method('send')
-            ->with(
-                Topics::EXPORT,
-                [
-                    'jobName' => 'test',
-                    'processorAlias' => 'test',
-                    'securityToken' => 'test',
-                    'outputFormat' => 'csv',
-                    'organizationId' => null,
-                    'exportType' => 'export',
-                    'options' => ['ids' => [1,2]],
-                    'jobId' => 2,
-                 ]
-            );
-
-        $messageProducer
-            ->expects($this->at(1))
-            ->method('send')
-            ->with(
-                Topics::EXPORT,
-                [
-                    'jobName' => 'test',
-                    'processorAlias' => 'test',
-                    'securityToken' => 'test',
-                    'outputFormat' => 'csv',
-                    'organizationId' => null,
-                    'exportType' => 'export',
-                    'options' => ['ids' => [3,4]],
-                    'jobId' => 3,
-                ]
-            );
-
-        $tokenInterface = $this->createTokenInterfaceMock();
-        $tokenInterface
-            ->expects($this->exactly(3))
-            ->method('getUser')
-            ->willReturn($user);
-        $tokenStorage = $this->createTokenStorageInterfaceMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($tokenInterface);
-        $tokenStorage
-            ->expects($this->exactly(3))
-            ->method('getToken')
-            ->willReturn($tokenInterface)
+            ->with($this->equalTo($dependentJobContext))
         ;
 
-        $processor = new PreExportMessageProcessor(
-            $exportHandler,
-            $jobRunner,
-            $messageProducer,
-            $this->createDoctrineHelperMock(),
-            $tokenStorage,
-            $this->createLoggerInterfaceMock(),
-            $dependentJob,
-            2
-        );
+        $user = $this->createUserStub();
+        $user
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn(1)
+        ;
+        $user
+            ->expects($this->once())
+            ->method('getEmail')
+        ;
 
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->once())
-            ->method('getBody')
-            ->willReturn(json_encode([
-                'jobName' => 'test',
-                'processorAlias' => 'test',
-                'securityToken' => 'test',
-            ]));
-        $message
-            ->expects($this->once())
-            ->method('getMessageId')
-            ->willReturn(1);
+        $token = $this->createTokenMock();
+        $token
+            ->expects($this->exactly(2))
+            ->method('getUser')
+            ->willReturn($user)
+        ;
 
         $tokenSerializer = $this->createTokenSerializerMock();
         $tokenSerializer
             ->expects($this->once())
             ->method('deserialize')
-            ->with('test')
-            ->willReturn($tokenInterface);
-        $processor->setTokenSerializer($tokenSerializer);
+            ->with($this->equalTo('test'))
+            ->willReturn($token)
+        ;
+
+        $tokenStorage = $this->createTokenStorageMock();
+        $tokenStorage
+            ->expects($this->once())
+            ->method('setToken')
+            ->with($this->equalTo($token))
+        ;
+        $tokenStorage
+            ->expects($this->exactly(2))
+            ->method('getToken')
+            ->willReturn($token)
+        ;
+
+        $processor = new PreExportMessageProcessor(
+            $jobRunner,
+            $this->createMessageProducerMock(),
+            $tokenSerializer,
+            $tokenStorage,
+            $dependentJob,
+            $this->createLoggerMock(),
+            100
+        );
+
+        $organization = $this->createOrganizationMock();
+
+        $organizationRepository = $this->createOrganizationRepositoryMock();
+        $organizationRepository
+            ->expects($this->once())
+            ->method('find')
+            ->with($this->equalTo(22))
+            ->willReturn($organization)
+        ;
+
+        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityRepository')
+            ->with($this->equalTo(Organization::class))
+            ->willReturn($organizationRepository)
+        ;
+        $processor->setDoctrineHelper($doctrineHelper);
+
+        $exportHandler = $this->createExportHandlerMock();
+        $exportHandler
+            ->expects($this->once())
+            ->method('getExportingEntityIds')
+            ->willReturn([])
+        ;
+        $processor->setExportHandler($exportHandler);
 
         $result = $processor->process($message, $this->createSessionMock());
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+
+        $this->assertEquals(PreExportMessageProcessor::ACK, $result);
     }
 
-    protected function getJob($id, $rootJob = null)
+    /**
+     * @param int $id
+     * @param Job $rootJob
+     *
+     * @return Job
+     */
+    private function createJob($id, $rootJob = null)
     {
         $job = new Job();
         $job->setId($id);
@@ -283,17 +274,9 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
-     */
-    private function createMessageMock()
-    {
-        return $this->createMock(MessageInterface::class);
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobService
      */
-    protected function createDependentJobMock()
+    private function createDependentJobMock()
     {
         return $this->createMock(DependentJobService::class);
     }
@@ -309,7 +292,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
      */
-    protected function createMessageProducerInterfaceMock()
+    private function createMessageProducerMock()
     {
         return $this->createMock(MessageProducerInterface::class);
     }
@@ -341,7 +324,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
      */
-    private function createLoggerInterfaceMock()
+    private function createLoggerMock()
     {
         return $this->createMock(LoggerInterface::class);
     }
@@ -349,7 +332,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
      */
-    private function createTokenStorageInterfaceMock()
+    private function createTokenStorageMock()
     {
         return $this->createMock(TokenStorageInterface::class);
     }
@@ -365,8 +348,35 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|TokenInterface
      */
-    private function createTokenInterfaceMock()
+    private function createTokenMock()
     {
         return $this->createMock(TokenInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Organization
+     */
+    private function createOrganizationMock()
+    {
+        return $this->createMock(Organization::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|OrganizationRepository
+     */
+    private function createOrganizationRepositoryMock()
+    {
+        return $this->createMock(OrganizationRepository::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|UserInterface
+     */
+    private function createUserStub()
+    {
+        return $this->createPartialMock(
+            UserInterface::class,
+            ['getId', 'getEmail', 'getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials']
+        );
     }
 }

@@ -1,4 +1,14 @@
 oro_behat_extension:
+  suites:
+    OroEntityExtendBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroEntityExtendBundle::EntityExtendContext
+        - OroSecurityBundle::ACLContext
+      paths:
+        - '@OroEntityExtendBundle/Tests/Behat/Features'
   elements:
     Create Entity:
       selector: '.btn-primary[title="Create entity"]'
@@ -11,3 +21,11 @@ oro_behat_extension:
     Update Schema:
       selector: '.btn-danger[title="Update schema"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Target Entity:
+      selector: 'select[data-name="field__target-entity"]'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
+
+    Bidirectional:
+      selector: 'select[data-name="field__bidirectional"]'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity

@@ -46,6 +46,8 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
                 }
 
                 $this->translationHelper->saveTranslation($translationKey, $value);
+            } elseif ($this->isNotRequiredField($translationKey)) {
+                $this->translationHelper->saveTranslationAsSystem($translationKey, '');
             }
         }
 
@@ -94,8 +96,8 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
         foreach ($workflowDefinitionFieldsIterator as $key => $keyValue) {
             $fieldTranslation = $this->translationHelper->findWorkflowTranslation($keyValue, $workflowName);
             if ($fieldTranslation === $key) {
-                //Skip `warning_messages` because they use it's own logic
-                if (preg_match('/^oro\.workflow\..+\.transition\..+\.warning_message$/', $fieldTranslation)) {
+                //Skip not required fields because they use it's own logic
+                if ($this->isNotRequiredField($fieldTranslation)) {
                     $fieldTranslation = '';
                 } else {
                     $fieldTranslation = $useKeyAsTranslation ? $key : '';
@@ -145,5 +147,14 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
         return $generator->generate(
             new TranslationKeySource(new WorkflowTemplate(), ['workflow_name' => $workflowName])
         );
+    }
+
+    /**
+     * @param string $field
+     * @return int
+     */
+    protected function isNotRequiredField($field)
+    {
+        return preg_match('/^oro\.workflow\..+\.transition\..+\.(warning_message|button_label|button_title)$/', $field);
     }
 }

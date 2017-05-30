@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
@@ -13,7 +14,6 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
@@ -446,10 +446,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string $name
      * @param array $params
      * @param bool $cleanUp strip new lines and multiple spaces, removes dependency on terminal columns
+     * @param bool $exceptionOnError
      *
      * @return string
      */
-    protected static function runCommand($name, array $params = [], $cleanUp = true)
+    protected static function runCommand($name, array $params = [], $cleanUp = true, $exceptionOnError = false)
     {
         /** @var KernelInterface $kernel */
         $kernel = self::getContainer()->get('kernel');
@@ -457,6 +458,8 @@ abstract class WebTestCase extends BaseWebTestCase
         $application = new Application($kernel);
         $application->setAutoExit(false);
         $application->setTerminalDimensions(120, 50);
+
+        $params['--no-ansi'] = true;
 
         $args = ['application', $name];
         foreach ($params as $k => $v) {
@@ -477,11 +480,15 @@ abstract class WebTestCase extends BaseWebTestCase
         $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'br+');
         $output = new StreamOutput($fp);
 
-        $application->run($input, $output);
+        $exitCode = $application->run($input, $output);
 
         rewind($fp);
 
         $content = stream_get_contents($fp);
+
+        if ($exceptionOnError && $exitCode !== 0) {
+            throw new \RuntimeException($content);
+        }
 
         if ($cleanUp) {
             $content = preg_replace(['/\s{2,}\n\s{2,}/', '/(\n|\s{2,})+/'], ['', ' '], $content);
@@ -521,10 +528,18 @@ abstract class WebTestCase extends BaseWebTestCase
             $loader->addFixture($fixture);
         }
 
-        $executor = new DataFixturesExecutor($container->get('doctrine')->getManager());
+        $executor = new DataFixturesExecutor($this->getDataFixtureExtecurotEntityManager());
         $executor->execute($loader->getFixtures(), true);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
+    }
+
+    /**
+     * @return EntityManagerInterface
+     */
+    protected function getDataFixtureExtecurotEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getManager();
     }
 
     /**
@@ -1032,5 +1047,37 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$soapClientInstance;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrentDir()
+    {
+        return dirname((new \ReflectionClass($this))->getFileName());
+    }
+
+    /**
+     * @param string $folderName
+     * @param string $fileName
+     *
+     * @return string
+     */
+    protected function getTestResourcePath($folderName, $fileName)
+    {
+        return $this->getCurrentDir() . DIRECTORY_SEPARATOR .  $folderName . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    protected function isRelativePath($path)
+    {
+        return
+            0 !== strpos($path, '/')
+            && 0 !== strpos($path, '@')
+            && false === strpos($path, ':');
     }
 }

@@ -4,6 +4,7 @@ oro_datagrid:
     not_found_hint %entityHint%:  "No %entityHint% were found to match your search. Try modifying your search criteria ..."
     label_add_filter: Manage filters
     label_loading_mask: "Loading . . ."
+    label_reset_button: "Reset Filter"
 oro:
     datagrid:
         gridview:
@@ -19,6 +20,7 @@ oro:
             organization.label: Organization
             sorters_data.label: Sorters
             type.label: Type
+            discr_type.label: Discriminator Type
             shared_by: %name% (Shared by %owner%)
             columns_data.label: Columns data
             appearance_type.label: Appearance type

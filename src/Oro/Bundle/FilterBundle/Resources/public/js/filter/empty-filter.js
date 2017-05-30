@@ -130,7 +130,7 @@ define([
             parentDiv.find('.dropdown-toggle').html(choiceName);
 
             this._handleEmptyFilter(type);
-
+            this.trigger('onClickChoiceValue', this);
             e.preventDefault();
         },
 
@@ -205,6 +205,22 @@ define([
 
             button.removeClass(this.updateSelectorEmptyClass);
             item.show();
+        },
+
+        _updateDOMValue: function() {
+            EmptyFilter.__super__._updateDOMValue.apply(this, arguments);
+            this._updateValueFieldVisibility();
+        },
+
+        _updateValueFieldVisibility: function() {
+            var type = this.$(this.criteriaValueSelectors.type).val();
+            var $field = this.$(this.criteriaValueSelectors.value);
+
+            if (this.isEmptyType(type)) {
+                $field.hide();
+            } else {
+                $field.show();
+            }
         },
 
         /**

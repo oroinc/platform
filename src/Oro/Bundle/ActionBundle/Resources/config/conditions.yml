@@ -88,6 +88,11 @@ services:
         tags:
             - { name: oro_action.condition, alias: has_value }
 
+    oro_action.expression.has_property:
+        class: Oro\Component\ConfigExpression\Condition\HasProperty
+        tags:
+            - { name: oro_action.condition, alias: has_property }
+
     oro_action.expression.in:
         class: Oro\Component\ConfigExpression\Condition\In
         tags:

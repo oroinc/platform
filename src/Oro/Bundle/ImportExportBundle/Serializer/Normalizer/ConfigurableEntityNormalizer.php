@@ -81,7 +81,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                     $value = $this->serializer->denormalize($value, $entityClass, $format, $context);
                 }
 
-                $this->fieldHelper->setObjectValue($result, $fieldName, $value);
+                $this->setObjectValue($result, $fieldName, $value);
             }
         }
 
@@ -130,7 +130,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                 continue;
             }
 
-            $fieldValue = $this->fieldHelper->getObjectValue($object, $fieldName);
+            $fieldValue = $this->getObjectValue($object, $fieldName);
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
 
@@ -270,5 +270,26 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         }
 
         return $result;
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     *
+     * @return mixed
+     */
+    protected function getObjectValue($object, $fieldName)
+    {
+        return $this->fieldHelper->getObjectValue($object, $fieldName);
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed $value
+     */
+    protected function setObjectValue($object, $fieldName, $value)
+    {
+        $this->fieldHelper->setObjectValue($object, $fieldName, $value);
     }
 }

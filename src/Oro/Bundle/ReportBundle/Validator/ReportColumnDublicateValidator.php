@@ -36,7 +36,7 @@ class ReportColumnDublicateValidator extends ConstraintValidator
         $useMap = [];
         $result = [];
         foreach ($columns as $key => $value) {
-            $key = $value['name'].$value['func'];
+            $key = is_array($value['func']) ? $value['name'].$value['func']['name'] : $value['name'].$value['func'];
             if (isset($useMap[$key])) {
                 $result[] = $value['label'];
             }

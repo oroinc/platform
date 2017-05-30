@@ -81,18 +81,29 @@ class VariableGuesser extends AbstractGuesser
         $entityClass = $variable->getOption('class');
         $formType = $variable->getOption('form_type');
 
-        $formOptions = $variable->getFormOptions('form_options');
-        if ($this->formConfigProvider->hasConfig($entityClass) && !$formType) {
-            $formConfig = $this->formConfigProvider->getConfig($entityClass);
-            $formType = $formConfig->get('form_type');
-            $formOptions = array_merge($formConfig->get('form_options', false, []), $formOptions);
-        }
+        $formOptions = $variable->getFormOptions();
         if (!$formType) {
-            $formType = 'entity';
-            $formOptions = [
-                'class' => $entityClass,
-                'multiple' => false,
-            ];
+            if ($this->formConfigProvider->hasConfig($entityClass)) {
+                $formConfig = $this->formConfigProvider->getConfig($entityClass);
+                $formType = $formConfig->get('form_type');
+
+                if (!$formType && !isset($formOptions['class'])) {
+                    $formOptions['class'] = $entityClass;
+                }
+
+                $identifier = $variable->getOption('identifier');
+                if (!$formType && $identifier) {
+                    $formOptions['choice_value'] = $identifier;
+                }
+
+                $formOptions = array_merge($formConfig->get('form_options', false, []), $formOptions);
+            } else {
+                $formType = 'entity';
+                $formOptions = array_merge($formOptions, [
+                    'class' => $entityClass,
+                    'multiple' => false
+                ]);
+            }
         }
 
         $formOptions = $this->setVariableFormOptions($variable, $formOptions);

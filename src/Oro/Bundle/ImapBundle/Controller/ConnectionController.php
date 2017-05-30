@@ -39,7 +39,11 @@ class ConnectionController extends Controller
             $data = $this->getDoctrine()->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
 
-        $form = $this->createForm('oro_imap_configuration', null, ['csrf_protection' => false,]);
+        $form = $this->createForm(
+            'oro_imap_configuration',
+            null,
+            ['csrf_protection' => false, 'skip_folders_validation' => true]
+        );
         $form->setData($data);
         $form->submit($request);
         /** @var UserEmailOrigin $origin */
@@ -75,29 +79,14 @@ class ConnectionController extends Controller
                     $organizationId = $request->get('organization');
                     $organization = $this->getOrganization($organizationId);
                     if ($entity === 'user') {
-                        $user = new User();
-                        $user->setImapConfiguration($origin);
-                        $user->setOrganization($organization);
-                        $userForm = $this->createForm('oro_user_emailsettings');
-                        $userForm->setData($user);
-
-                        $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
-                            'form' => $userForm->createView(),
-                        ]);
+                        $response['imap']['folders'] = $this->getFoldersViewForUserMailBox(
+                            $origin,
+                            $organization
+                        );
                     } elseif ($entity === 'mailbox') {
-                        $mailbox = new Mailbox();
-                        $mailbox->setOrigin($origin);
-                        if ($organization) {
-                            $mailbox->setOrganization($organization);
-                        }
-                        $mailboxForm = $this->createForm('oro_email_mailbox');
-                        $mailboxForm->setData($mailbox);
-
-                        $response['imap']['folders'] = $this->renderView(
-                            'OroImapBundle:Connection:checkMailbox.html.twig',
-                            [
-                                'form' => $mailboxForm->createView(),
-                            ]
+                        $response['imap']['folders'] = $this->getFoldersViewForSystemMailBox(
+                            $origin,
+                            $organization
                         );
                     }
                 } catch (\Exception $e) {
@@ -166,5 +155,48 @@ class ConnectionController extends Controller
         }
 
         return $this->getDoctrine()->getRepository('OroOrganizationBundle:Organization')->find($id);
+    }
+
+    /**
+     * @param $origin
+     * @param $organization
+     *
+     * @return mixed
+     */
+    protected function getFoldersViewForUserMailBox($origin, $organization)
+    {
+        $user = new User();
+        $user->setImapConfiguration($origin);
+        $user->setOrganization($organization);
+        $userForm = $this->createForm('oro_user_emailsettings');
+        $userForm->setData($user);
+
+        return $this->renderView('OroImapBundle:Connection:check.html.twig', [
+            'form' => $userForm->createView(),
+        ]);
+    }
+
+    /**
+     * @param $origin
+     * @param $organization
+     *
+     * @return mixed
+     */
+    protected function getFoldersViewForSystemMailBox($origin, $organization)
+    {
+        $mailbox = new Mailbox();
+        $mailbox->setOrigin($origin);
+        if ($organization) {
+            $mailbox->setOrganization($organization);
+        }
+        $mailboxForm = $this->createForm('oro_email_mailbox');
+        $mailboxForm->setData($mailbox);
+
+        return $this->renderView(
+            'OroImapBundle:Connection:checkMailbox.html.twig',
+            [
+                'form' => $mailboxForm->createView(),
+            ]
+        );
     }
 }
