@@ -99,6 +99,23 @@ class TransitionManager
     }
 
     /**
+     * @param string $transition
+     * @return TransitionManager|null
+     */
+    public function getStartTransition($transition)
+    {
+        if (is_string($transition)) {
+            $transition = $this->getTransition($transition);
+        }
+
+        if (!$transition) {
+            $transition = $this->getDefaultStartTransition();
+        }
+
+        return $transition instanceof Transition && $transition->isStart() ? $transition : null;
+    }
+
+    /**
      * Get start transitions
      *
      * @return Collection|Transition[]

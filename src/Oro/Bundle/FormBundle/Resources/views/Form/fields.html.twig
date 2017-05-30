@@ -576,7 +576,7 @@
                     module: 'oroform/js/app/components/select-create-inline-type-' ~ asyncNameSegment|default('') ~ 'component',
                     options: {
                         inputSelector: '#'~id,
-                        entityLabel: label|trans,
+                        entityLabel: label|trans({}, translation_domain),
                         urlParts: urlParts,
                         existingEntityGridId: form.vars.existing_entity_grid_id|default('id'),
                         createEnabled: form.vars.create_enabled|default(false)

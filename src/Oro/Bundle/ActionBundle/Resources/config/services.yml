@@ -218,6 +218,7 @@ services:
         lazy: true
         calls:
             - [setLogger, ['@logger']]
+            - [setEventDispatcher, ['@event_dispatcher']]
         tags:
             - { name: monolog.logger, channel: oro_action }
 

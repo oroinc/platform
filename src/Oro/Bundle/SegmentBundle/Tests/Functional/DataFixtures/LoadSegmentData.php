@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
@@ -101,8 +102,8 @@ class LoadSegmentData extends AbstractFixture
                         'criterion' => [
                             'filter' => 'string',
                             'data' => [
-                                'value' => 'entity',
-                                'type' => 1,
+                                'value' => '0',
+                                'type' => TextFilterType::TYPE_CONTAINS,
                             ]
                         ]
                     ]

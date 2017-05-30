@@ -1,0 +1,43 @@
+workflows:
+    test_flow_autostart_one:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults: { active: true }
+        start_step: open
+        steps:
+            open:
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
+    test_flow_autostart_two:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults: { active: true }
+        start_step: open
+        steps:
+            open:
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
+    test_flow_autostart_three_inactive:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults: { active: false }
+        start_step: open
+        steps:
+            open:
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition

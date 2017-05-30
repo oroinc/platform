@@ -100,8 +100,12 @@ class ImportCommand extends ContainerAwareCommand
                 'process' => $processor,
             ]
         );
-
+        
+        if ($email) {
             $output->writeln('Scheduled successfully. The result will be sent to the email');
+        } else {
+            $output->writeln('Scheduled successfully.');
+        }
     }
 
     /**

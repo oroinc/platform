@@ -165,6 +165,20 @@ entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.show_filter
+                order:
+                    options:
+                        value_type:         integer
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
+                    form:
+                        type:               integer
+                        options:
+                            block:          other
+                            label:          oro.entity.entity_config.datagrid.field.items.order
+                            required:       false
 
     form:
         entity:

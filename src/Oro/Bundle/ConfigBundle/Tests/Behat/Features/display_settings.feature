@@ -150,6 +150,7 @@ Feature: Display settings manage
     Then I should see following available "Event Form" colors:
       | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black |
     When I click My Calendar in user menu
+    And click "My Tasks Choose Color Menu"
     Then I should see following available "Calendar" colors:
       | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
 
@@ -164,13 +165,13 @@ Feature: Display settings manage
     Then I should see following available "TaxonomyForm" colors:
       | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
 
-    Scenario: Change reports settings
-      When I go to Reports & Segments/Calendar Events/Test Report
-      Then I should not see "Show SQL Query"
-      When I go to System/Configuration
-      And click "Display settings"
-      And fill "System Config Form" with:
-        | Display SQL in Reports and Segments | true |
-      And save form
-      And I go to Reports & Segments/Calendar Events/Test Report
-      Then I should see "Show SQL Query"
+  Scenario: Change reports settings
+    When I go to Reports & Segments/Calendar Events/Test Report
+    Then I should not see "Show SQL Query"
+    When I go to System/Configuration
+    And click "Display settings"
+    And fill "System Config Form" with:
+      | Display SQL in Reports and Segments | true |
+    And save form
+    And I go to Reports & Segments/Calendar Events/Test Report
+    Then I should see "Show SQL Query"

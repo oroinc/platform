@@ -148,7 +148,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             'active definition' => array(
                 'expected' => array(
                     'view' => true,
-                    'update' => true,
+                    'update' => false,
                     'clone'  => true,
                     'delete' => true,
                     'activate' => false,

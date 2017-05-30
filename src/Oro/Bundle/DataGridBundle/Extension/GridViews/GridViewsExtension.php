@@ -50,8 +50,8 @@ class GridViewsExtension extends AbstractExtension
     /** @var ServiceLink */
     protected $managerLink;
 
-    /** @var AbstractGridView|null|bool */
-    protected $defaultGridView = false;
+    /** @var array|AbstractGridView[] */
+    protected $defaultGridView = [];
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -197,14 +197,15 @@ class GridViewsExtension extends AbstractExtension
      */
     protected function getDefaultView($gridName)
     {
-        if ($this->defaultGridView === false) {
+        if (!array_key_exists($gridName, $this->defaultGridView)) {
             if (!$currentUser = $this->getCurrentUser()) {
                 return null;
             }
-            $this->defaultGridView = $this->managerLink->getService()->getDefaultView($currentUser, $gridName);
+            $this->defaultGridView[$gridName] = $this->managerLink->getService()
+                ->getDefaultView($currentUser, $gridName);
         }
 
-        return $this->defaultGridView;
+        return $this->defaultGridView[$gridName];
     }
 
     /**

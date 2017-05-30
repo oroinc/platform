@@ -1,8 +1,11 @@
-@import 'components/input';
-@import 'components/button';
-@import 'components/select';
-@import 'components/custom-checkbox';
-@import 'components/textarea';
-@import 'components/label';
-@import 'components/validation-failed';
-@import 'components/form-row';
+// @theme: blank;
+
+@import './components/input';
+@import './components/button';
+@import './components/buttons-equal';
+@import './components/select';
+@import './components/custom-checkbox';
+@import './components/textarea';
+@import './components/label';
+@import './components/validation-failed';
+@import './components/form-row';

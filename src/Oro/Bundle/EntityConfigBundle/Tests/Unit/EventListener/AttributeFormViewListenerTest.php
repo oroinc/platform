@@ -59,7 +59,7 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('getGroupsWithAttributes');
 
-        $this->listener->onEdit(new BeforeListRenderEvent($this->environment, new ScrollData()));
+        $this->listener->onEdit(new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass()));
     }
 
     public function testOnViewWithoutViewRenderEvent()
@@ -68,7 +68,7 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('getGroupsWithAttributes');
 
-        $this->listener->onViewList(new BeforeListRenderEvent($this->environment, new ScrollData()));
+        $this->listener->onViewList(new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass()));
     }
 
     /**
@@ -106,7 +106,7 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($groupsData);
 
         $scrollData = new ScrollData($scrollData);
-        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData, $formView);
+        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData, new \stdClass(), $formView);
         $this->listener->onEdit($listEvent);
 
         $this->assertEquals($expectedData, $listEvent->getScrollData()->getData());
@@ -158,7 +158,7 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($groupsData);
 
         $scrollData = new ScrollData($scrollData);
-        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData);
+        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData, new \stdClass());
         $this->listener->onViewList($listEvent);
 
         $this->assertEquals($expectedData, $listEvent->getScrollData()->getData());

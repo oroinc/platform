@@ -230,6 +230,14 @@ class ImportStrategyHelper
     }
 
     /**
+     * @return mixed|null
+     */
+    public function getLoggedUser()
+    {
+        return $this->securityFacade->getLoggedUser();
+    }
+
+    /**
      * Check if given class field is deleted
      *
      * @param string $className FQCN

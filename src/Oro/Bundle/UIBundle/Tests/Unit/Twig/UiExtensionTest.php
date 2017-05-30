@@ -87,12 +87,14 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
+        $entity = new \stdClass();
+
         $this->assertEquals(
             $alteredData->getData(),
             self::callTwigFunction(
                 $this->extension,
                 'oro_ui_scroll_data_before',
-                [$this->environment, $pageIdentifier, $data->getData(), $formView]
+                [$this->environment, $pageIdentifier, $data->getData(), $entity, $formView]
             )
         );
     }

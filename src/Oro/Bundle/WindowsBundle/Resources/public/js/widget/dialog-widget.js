@@ -15,19 +15,22 @@ define(function(require) {
     var dialogManager = new DialogManager();
     require('jquery.dialog.extended');
 
+    var config = _.extend({
+        type: 'dialog',
+        dialogOptions: null,
+        stateEnabled: true,
+        incrementalPosition: true,
+        preventModelRemoval: false,
+        messengerContainerClass: ''
+    }, require('module').config());
+
     /**
      * @export  oro/dialog-widget
      * @class   oro.DialogWidget
      * @extends oroui.widget.AbstractWidget
      */
     DialogWidget = AbstractWidget.extend({
-        options: _.extend({}, AbstractWidget.prototype.options, {
-            type: 'dialog',
-            dialogOptions: null,
-            stateEnabled: true,
-            incrementalPosition: true,
-            preventModelRemoval: false
-        }),
+        options: _.extend({}, AbstractWidget.prototype.options, config),
 
         // Windows manager global variables
         windowsPerRow: 10,
@@ -57,6 +60,8 @@ define(function(require) {
             'page:request mediator': 'onPageChange',
             'layout:reposition mediator': 'resetDialogPosition'
         },
+
+        $messengerContainer: null,
 
         /**
          * Initialize dialog
@@ -95,6 +100,22 @@ define(function(require) {
         onWidgetRender: function(content) {
             this._initAdjustHeight(content);
             this._setMaxSize();
+            this._addMessengerContainer();
+        },
+
+        /**
+         * Add temporary container for messages into dialog window
+         * @private
+         */
+        _addMessengerContainer: function() {
+            var containerClass = this.options.messengerContainerClass;
+            var $title = this.widget.dialog('instance').uiDialogTitlebar;
+
+            if (containerClass && !$title.find('.' + containerClass).length) {
+                this.$messengerContainer = $('<div/>').appendTo($title)
+                    .addClass(containerClass)
+                    .attr('data-role', 'messenger-temporary-container');
+            }
         },
 
         setTitle: function(title) {
@@ -142,6 +163,11 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+
+            if (this.$messengerContainer) {
+                this.$messengerContainer.trigger('remove').remove();
+            }
+
             $(window).off(this.eventNamespace());
             dialogManager.remove(this);
             if (this.model && !this.options.preventModelRemoval) {
@@ -462,6 +488,8 @@ define(function(require) {
                 if (minWidth > containerEl.clientWidth - left) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
+            } else {
+                dialog.css('width', this.options.dialogOptions.width);
             }
         },
 

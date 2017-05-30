@@ -28,6 +28,20 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     }
 
     /**
+     * Gets the list of related entities.
+     * Each item can be an association name or a path to a nested association.
+     * Example: ["comments", "comments.author"]
+     * Where "comments" is an association under a primary entity,
+     * "author" is an association under the "comments" entity.
+     *
+     * @return string[]
+     */
+    public function getExpandedEntities()
+    {
+        return $this->expandedEntities;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getName()
