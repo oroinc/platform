@@ -148,7 +148,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row = $this->getGridRow($entityTitle);
 
         $row->setCellValueAndSave($field, $value);
-        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
