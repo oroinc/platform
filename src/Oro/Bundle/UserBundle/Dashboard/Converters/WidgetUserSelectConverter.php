@@ -11,12 +11,16 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
 class WidgetUserSelectConverter extends WidgetEntitySelectConverter
 {
     /** @var OwnerHelper */
     protected $ownerHelper;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     public function __construct(
         OwnerHelper $ownerHelper,
@@ -57,6 +61,18 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
             $qb->expr()->in(sprintf('e.%s', $identityField), $value)
         );
 
-        return $this->aclHelper->apply($qb)->getResult();
+        $qb->leftJoin('e.organizations', 'org')
+            ->andWhere('org.id = :org')
+            ->setParameter('org', $this->securityFacade->getOrganizationId());
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param SecurityFacade $securityFacade
+     */
+    public function setSecurityFacade(SecurityFacade $securityFacade)
+    {
+        $this->securityFacade = $securityFacade;
     }
 }
