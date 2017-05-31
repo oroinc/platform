@@ -4,8 +4,10 @@ namespace Oro\Bundle\UserBundle\Autocomplete;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
+use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class WidgetUserSearchHandler extends UserSearchHandler
 {
@@ -14,6 +16,12 @@ class WidgetUserSearchHandler extends UserSearchHandler
 
     /** @var bool */
     protected $addCurrent = false;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var SearchCriteria */
+    protected $searchUserCriteria;
 
     /**
      * @param TranslatorInterface $translator
@@ -30,6 +38,22 @@ class WidgetUserSearchHandler extends UserSearchHandler
         parent::__construct($attachmentManager, $userEntityName, $properties);
 
         $this->translator = $translator;
+    }
+
+    /**
+     * @param SecurityFacade $securityFacade
+     */
+    public function setSecurityFacade(SecurityFacade $securityFacade)
+    {
+        $this->securityFacade = $securityFacade;
+    }
+
+    /**
+     * @param SearchCriteria $searchCriteria
+     */
+    public function setSearchUserCriteria(SearchCriteria $searchCriteria)
+    {
+        $this->searchUserCriteria = $searchCriteria;
     }
 
     /**
@@ -88,5 +112,36 @@ class WidgetUserSearchHandler extends UserSearchHandler
         }
 
         return parent::convertItem($item);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function searchEntities($search, $firstResult, $maxResults)
+    {
+        $queryBuilder = $this->getBasicQueryBuilder();
+        if ($search) {
+            $this->searchUserCriteria->addSearchCriteria($queryBuilder, $search);
+        }
+        $queryBuilder
+            ->setFirstResult($firstResult)
+            ->setMaxResults($maxResults);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getBasicQueryBuilder()
+    {
+        $queryBuilder = $this->entityRepository->createQueryBuilder('u');
+        $queryBuilder->leftJoin('u.organizations', 'org')
+            ->andWhere('org.id = :org')
+            ->andWhere('u.enabled = :enabled')
+            ->setParameter('org', $this->securityFacade->getOrganizationId())
+            ->setParameter('enabled', true);
+
+        return $queryBuilder;
     }
 }

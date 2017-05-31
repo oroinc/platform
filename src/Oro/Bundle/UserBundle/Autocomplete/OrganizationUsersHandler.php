@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Autocomplete;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 
 /**
  * This user search handler return users that was assigned to current organization and limit by search string
@@ -19,12 +20,23 @@ class OrganizationUsersHandler extends UserSearchHandler
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var SearchCriteria */
+    protected $searchUserCriteria;
+
     /**
      * @param SecurityFacade $securityFacade
      */
     public function setSecurityFacade(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
+    }
+
+    /**
+     * @param SearchCriteria $searchCriteria
+     */
+    public function setSearchUserCriteria(SearchCriteria $searchCriteria)
+    {
+        $this->searchUserCriteria = $searchCriteria;
     }
 
     /**
@@ -38,6 +50,19 @@ class OrganizationUsersHandler extends UserSearchHandler
         $queryBuilder->andWhere($queryBuilder->expr()->in('u.id', $entityIds));
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @deprecated since 2.3. Logic was moved into Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria.
+     *
+     * Adds a search criteria to the given query builder based on the given query string
+     *
+     * @param QueryBuilder $queryBuilder The query builder
+     * @param string       $search       The search string
+     */
+    protected function addSearchCriteria(QueryBuilder $queryBuilder, $search)
+    {
+        $this->searchUserCriteria->addSearchCriteria($queryBuilder, $search);
     }
 
     /**
@@ -74,42 +99,5 @@ class OrganizationUsersHandler extends UserSearchHandler
             ->setParameter('enabled', true);
 
         return $queryBuilder;
-    }
-
-    /**
-     * Adds a search criteria to the given query builder based on the given query string
-     *
-     * @param QueryBuilder $queryBuilder The query builder
-     * @param string       $search       The search string
-     */
-    protected function addSearchCriteria(QueryBuilder $queryBuilder, $search)
-    {
-        $queryBuilder
-            ->andWhere(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like(
-                        $queryBuilder->expr()->concat(
-                            'u.firstName',
-                            $queryBuilder->expr()->concat(
-                                $queryBuilder->expr()->literal(' '),
-                                'u.lastName'
-                            )
-                        ),
-                        ':search'
-                    ),
-                    $queryBuilder->expr()->like(
-                        $queryBuilder->expr()->concat(
-                            'u.lastName',
-                            $queryBuilder->expr()->concat(
-                                $queryBuilder->expr()->literal(' '),
-                                'u.firstName'
-                            )
-                        ),
-                        ':search'
-                    ),
-                    $queryBuilder->expr()->like('u.username', ':search')
-                )
-            )
-            ->setParameter('search', '%' . str_replace(' ', '%', $search) . '%');
     }
 }
