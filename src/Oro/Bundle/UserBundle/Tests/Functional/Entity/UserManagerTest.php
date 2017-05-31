@@ -13,6 +13,8 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
  */
 class UserManagerTest extends WebTestCase
 {
+    const SIMPLE_USER_2 = 'SIMPLE_USER_2';
+
     /**
      * {@inheritdoc}
      */
@@ -40,8 +42,8 @@ class UserManagerTest extends WebTestCase
 
         /** @var User $customerUser */
         $customerUser = $this->getReference(LoadUserData::SIMPLE_USER);
-        $customerUser->setUsername(LoadUserData::SIMPLE_USER_2);
-        $this->assertSame(LoadUserData::SIMPLE_USER_2, $loggedUser->getUsername(), 'username after change');
+        $customerUser->setUsername(self::SIMPLE_USER_2);
+        $this->assertSame(self::SIMPLE_USER_2, $loggedUser->getUsername(), 'username after change');
         $this->assertSame($originalId, $customerUser->getId());
         $this->assertSame($originalId, $loggedUser->getId());
 
@@ -67,7 +69,7 @@ class UserManagerTest extends WebTestCase
         $this->assertInstanceOf(User::class, $loggedUser);
         $this->assertSame(LoadUserData::SIMPLE_USER, $loggedUser->getUsername(), 'logged user username');
 
-        $loggedUser->setUsername(LoadUserData::SIMPLE_USER_2);
+        $loggedUser->setUsername(self::SIMPLE_USER_2);
         $em->detach($loggedUser);
 
         /** @var UserManager $userManager */
