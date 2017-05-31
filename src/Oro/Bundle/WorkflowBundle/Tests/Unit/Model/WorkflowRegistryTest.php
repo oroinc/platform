@@ -57,9 +57,9 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             });
 
         $this->registry = new WorkflowRegistry(
+            $this->definitionProvider,
             $this->assembler,
-            $this->filters,
-            $this->definitionProvider
+            $this->filters
         );
     }
 
