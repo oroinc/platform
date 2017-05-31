@@ -28,6 +28,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_segment.query_builder_registry'
+            - '@oro_query_designer.query_designer.subquery_limit_helper'
         calls:
             - ['setLogger', ['@?logger']]
 
