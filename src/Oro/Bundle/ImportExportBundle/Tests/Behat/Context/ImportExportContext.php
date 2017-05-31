@@ -125,7 +125,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     }
 
     /**
-     * This method compares data from the downloaded file
+     * This method strictly compares data from the downloaded file
      *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
      *
@@ -134,34 +134,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      */
     public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities)
     {
-        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
-        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
-
-        self::assertCount(1, $processors, sprintf(
-            'Too many processors ("%s") for export "%s" entity',
-            implode(', ', $processors),
-            $entity
-        ));
-
-        $processorName = array_shift($processors);
-        $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
-        $filePath = FileManager::generateTmpFilePath(
-            FileManager::generateFileName($processorName, 'csv')
-        );
-
-        $jobResult = $jobExecutor->executeJob(
-            'export',
-            'entity_export_to_csv',
-            [
-                'export' => [
-                    'processorAlias' => $processorName,
-                    'entityName' => $entityClass,
-                    'filePath' => $filePath,
-                ]
-            ]
-        );
-
-        static::assertTrue($jobResult->isSuccessful());
+        $filePath = $this->performExport($entity);
 
         try {
             $handler = fopen($filePath, 'rb');
@@ -189,6 +162,49 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
         }
 
         static::assertCount($i, $expectedEntities->getRows());
+    }
+
+    /**
+     * This method makes non-strict comparison of data from the downloaded file.
+     *
+     * Checks whether the listed columns (in any order) and corresponding data is present.
+     *
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains at least the following columns:$/
+     *
+     * @param string    $entity
+     * @param TableNode $expectedEntities
+     */
+    public function exportedFileContainsAtLeastFollowingColumns($entity, TableNode $expectedEntities)
+    {
+        $filePath = $this->performExport($entity);
+
+        try {
+            $exportedFile = new \SplFileObject($filePath, 'rb');
+            // Treat file as CSV, skip empty lines.
+            $exportedFile->setFlags(\SplFileObject::READ_CSV
+                | \SplFileObject::READ_AHEAD
+                | \SplFileObject::SKIP_EMPTY
+                | \SplFileObject::DROP_NEW_LINE);
+
+            $headers = $exportedFile->current();
+            $expectedHeaders = $expectedEntities->getRow(0);
+
+            foreach ($exportedFile as $line => $data) {
+                $entityDataFromCsv = array_combine($headers, array_values($data));
+                $expectedEntityData = array_combine($expectedHeaders, array_values($expectedEntities->getRow($line)));
+
+                // Ensure that at least expected data is present.
+                foreach ($expectedEntityData as $property => $value) {
+                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                }
+            }
+
+            static::assertCount($exportedFile->key(), $expectedEntities->getRows());
+        } finally {
+            // We have to release SplFileObject before trying to delete the underlying file.
+            $exportedFile = null;
+            unlink($filePath);
+        }
     }
 
     /**
@@ -354,5 +370,44 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
             $validationMessage,
             implode('", "', $existedErrors)
         ));
+    }
+
+    /**
+     * @param string $entity Entity class alias.
+     *
+     * @return string Filepath to exported file.
+     */
+    private function performExport($entity)
+    {
+        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
+        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+
+        self::assertCount(1, $processors, sprintf(
+            'Too many processors ("%s") for export "%s" entity',
+            implode(', ', $processors),
+            $entity
+        ));
+
+        $processorName = array_shift($processors);
+        $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
+        $filePath = FileManager::generateTmpFilePath(
+            FileManager::generateFileName($processorName, 'csv')
+        );
+
+        $jobResult = $jobExecutor->executeJob(
+            'export',
+            'entity_export_to_csv',
+            [
+                'export' => [
+                    'processorAlias' => $processorName,
+                    'entityName' => $entityClass,
+                    'filePath' => $filePath,
+                ]
+            ]
+        );
+
+        static::assertTrue($jobResult->isSuccessful());
+
+        return $filePath;
     }
 }

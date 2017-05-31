@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\ActionBundle\Model\AbstractGuesser;
@@ -10,6 +15,28 @@ use Oro\Bundle\ActionBundle\Model\AbstractGuesser;
 class VariableGuesser extends AbstractGuesser
 {
     const DEFAULT_CONSTRAINT_NAMESPACE = 'Symfony\\Component\\Validator\\Constraints\\';
+
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /**
+     * @param FormRegistry $formRegistry
+     * @param ManagerRegistry $managerRegistry
+     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $formConfigProvider
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(
+        FormRegistry $formRegistry,
+        ManagerRegistry $managerRegistry,
+        ConfigProvider $entityConfigProvider,
+        ConfigProvider $formConfigProvider,
+        TranslatorInterface $translator
+    ) {
+        parent::__construct($formRegistry, $managerRegistry, $entityConfigProvider, $formConfigProvider);
+
+        $this->translator = $translator;
+    }
 
     /**
      * @param Variable $variable
@@ -43,15 +70,31 @@ class VariableGuesser extends AbstractGuesser
      *
      * @return array
      */
-    protected function setVariableFormOptions(Variable $variable, $formOptions)
+    protected function setVariableFormOptions(Variable $variable, array $formOptions)
     {
         if (null !== $variable->getLabel()) {
-            $formOptions['label'] = $variable->getLabel();
+            $formOptions['label'] = $this->translator
+                ->trans($variable->getLabel(), [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
         }
+
         if (null !== $variable->getValue()) {
             $formOptions['data'] = $variable->getValue();
         }
 
+        if (isset($formOptions['tooltip'])) {
+            $formOptions['tooltip'] = $this->translator
+                ->trans($formOptions['tooltip'], [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        }
+
+        return $this->processFormConstraints($formOptions);
+    }
+
+    /**
+     * @param array $formOptions
+     * @return array
+     */
+    protected function processFormConstraints(array $formOptions)
+    {
         if (!isset($formOptions['constraints']) || !is_array($formOptions['constraints'])) {
             return $formOptions;
         }

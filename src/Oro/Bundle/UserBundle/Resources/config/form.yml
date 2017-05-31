@@ -336,6 +336,8 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\UserBundle\Entity\User'
+        calls:
+            - [setSecurityFacade, ['@oro_security.security_facade']]
         tags:
             - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_user_select' }
 

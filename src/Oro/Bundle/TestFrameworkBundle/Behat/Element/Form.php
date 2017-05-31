@@ -41,7 +41,6 @@ class Form extends Element
             }
 
             $field = $this->wrapField($label, $field);
-
             $field->setValue($value);
         }
         if ($isEmbeddedForm) {

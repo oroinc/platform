@@ -1059,9 +1059,7 @@ services:
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: %oro_email.autocomplete.mailbox_user_search_handler.class%
-        parent: oro_user.autocomplete.user.search_handler
-        calls:
-           - [setSecurityFacade, ['@oro_security.security_facade']]
+        parent: oro_user.autocomplete.user.organization_search_handler
 
     oro_email.listener.mailbox.authorization:
         class: %oro_email.listener.mailbox.authorization.class%
