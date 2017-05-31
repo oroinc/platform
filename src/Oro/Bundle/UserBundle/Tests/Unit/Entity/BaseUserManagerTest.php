@@ -258,7 +258,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRefreshManagedUser()
     {
-        $user = $this->getMock(User::class);
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $user->expects($this->any())
             ->method('getId')
             ->willReturn(42);
