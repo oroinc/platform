@@ -41,9 +41,9 @@ $theme-fonts: (
 );
 
 // Fonts families
-$base-font: map_get(map_get($theme-fonts, 'main'), 'family'),'Helvetica', Arial, sans-serif;
-$base-font-minor: map_get(map_get($theme-fonts, 'secondary'), 'family'),'Helvetica', Arial, sans-serif;
-$base-font-icon: map_get(map_get($theme-fonts, 'icon'), 'family');
+$base-font: get-font-name('main'),'Helvetica', Arial, sans-serif;
+$base-font-minor: get-font-name('secondary'),'Helvetica', Arial, sans-serif;
+$base-font-icon: get-font-name('icon');
 
 // Fonts sizes
 $base-font-size: 14px;
