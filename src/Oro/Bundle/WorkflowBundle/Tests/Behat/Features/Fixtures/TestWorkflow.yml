@@ -1,0 +1,232 @@
+Oro\Bundle\TranslationBundle\Entity\TranslationKey:
+    first_workflow_label_key:
+        key: oro.workflow.test_workflow.label
+        domain: workflows
+    first_workflow_start_step_label_key:
+        key: oro.workflow.test_workflow.step.step:starting_point.label
+        domain: workflows
+    first_workflow_first_step_label_key:
+        key: oro.workflow.test_workflow.step.first_step.label
+        domain: workflows
+    first_workflow_variable1_label_key:
+        key: oro.workflow.test_workflow.variable.test_variable.label
+        domain: workflows
+    first_workflow_variable2_label_key:
+        key: oro.workflow.test_workflow.variable.other_user_variable1.label
+        domain: workflows
+    first_workflow_variable3_label_key:
+        key: oro.workflow.test_workflow.variable.other_user_variable2.label
+        domain: workflows
+    first_workflow_attribute_label_key:
+        key: oro.workflow.test_workflow.attribute.other_user_attribute.label
+        domain: workflows
+    first_workflow_first_transition_attribute_label_key:
+        key: oro.workflow.test_workflow.transition.first_transition.attribute.other_user_attribute.label
+        domain: workflows
+    first_workflow_first_transition_label_key:
+        key: oro.workflow.test_workflow.transition.first_transition.label
+        domain: workflows
+    first_workflow_first_transition_button_label_key:
+        key: oro.workflow.test_workflow.transition.first_transition.button_label
+        domain: workflows
+    first_workflow_first_transition_button_title_key:
+        key: oro.workflow.test_workflow.transition.first_transition.button_title
+        domain: workflows
+    first_workflow_first_transition_message_key:
+        key: oro.workflow.test_workflow.transition.first_transition.warning_message
+        domain: workflows
+
+Oro\Bundle\TranslationBundle\Entity\Translation:
+    first_workflow_label:
+        translationKey: '@first_workflow_label_key'
+        value: 'Test Workflow'
+        language: '@en_language'
+        scope: 1
+    first_workflow_start_step_label:
+        translationKey: '@first_workflow_start_step_label_key'
+        value: '(Start)'
+        language: '@en_language'
+        scope: 1
+    first_workflow_first_step_label:
+        translationKey: '@first_workflow_first_step_label_key'
+        value: 'first step'
+        language: '@en_language'
+        scope: 1
+    first_workflow_variable1_label:
+        translationKey: '@first_workflow_variable1_label_key'
+        value: 'count'
+        language: '@en_language'
+        scope: 1
+    first_workflow_variable2_label:
+        translationKey: '@first_workflow_variable2_label_key'
+        value: 'user'
+        language: '@en_language'
+        scope: 1
+    first_workflow_variable3_label:
+        translationKey: '@first_workflow_variable3_label_key'
+        value: 'guest'
+        language: '@en_language'
+        scope: 1
+    first_workflow_attribute_label:
+        translationKey: '@first_workflow_attribute_label_key'
+        value: 'user'
+        language: '@en_language'
+        scope: 1
+    first_workflow_first_transition_attribute_label:
+        translationKey: '@first_workflow_first_transition_attribute_label_key'
+        value: 'user'
+        language: '@en_language'
+        scope: 1
+    first_workflow_first_transition_label:
+        translationKey: '@first_workflow_first_transition_label_key'
+        value: 'first transition'
+        language: '@en_language'
+        scope: 1
+    first_workflow_first_transition_button_label:
+        translationKey: '@first_workflow_first_transition_button_label_key'
+        value: 'first transition'
+        language: '@en_language'
+        scope: 1
+    first_workflow_first_transition_button_title:
+        translationKey: '@first_workflow_first_transition_button_title_key'
+        value: 'first transition'
+        language: '@en_language'
+        scope: 1
+    first_workflow_first_transition_message:
+        translationKey: '@first_workflow_first_transition_message_key'
+        value: 'start message - %fullName% - end message'
+        language: '@en_language'
+        scope: 1
+
+Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
+    test_workflow:
+        name: 'test_workflow'
+        label: 'oro.workflow.test_workflow.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        entityAttributeName: 'entity'
+        stepsDisplayOrdered: false
+        system: false
+        active: true
+        priority: 0
+        applications:
+            - default
+        configuration:
+            force_autostart: false
+            scopes: {  }
+            datagrids: {  }
+            disable_operations: {  }
+            entity_restrictions: {  }
+
+            steps:
+                step:starting_point:
+                    order: -1
+                    _is_start: true
+                    is_final: false
+                    allowed_transitions:
+                        - first_transition
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.test_workflow.step.step:starting_point.label'
+
+                first_step:
+                    order: 0
+                    is_final: true
+                    _is_start: false
+                    allowed_transitions: {  }
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.test_workflow.step.first_step.label'
+
+            variable_definitions:
+                variables:
+                    test_variable:
+                        type: float
+                        value: 100
+                        label: 'oro.workflow.test_workflow.variable.test_variable.label'
+                    other_user_variable1:
+                        type: entity
+                        value: null
+                        label: 'oro.workflow.test_workflow.variable.other_user_variable1.label'
+                        options:
+                            class: 'Oro\Bundle\UserBundle\Entity\User'
+                            identifier: 'id'
+                            form_options:
+                                required: true
+                                constraints:
+                                    NotBlank: null
+                    other_user_variable2:
+                        type: entity
+                        value: null
+                        label: 'oro.workflow.test_workflow.variable.other_user_variable2.label'
+                        options:
+                            class: 'Oro\Bundle\UserBundle\Entity\User'
+                            identifier: 'id'
+                            form_options:
+                                required: true
+                                constraints:
+                                    NotBlank: null
+
+            attributes:
+                other_user_attribute:
+                    type: entity
+                    options:
+                       class: 'Oro\Bundle\UserBundle\Entity\User'
+                    property_path: null
+                    label: 'oro.workflow.test_workflow.attribute.other_user_attribute.label'
+
+            transitions:
+                first_transition:
+                    display_type: dialog
+                    destination_page: ''
+                    step_to: first_step
+                    is_start: true
+                    form_options:
+                        attribute_fields:
+                            other_user_attribute:
+                                options:
+                                    label: 'oro.workflow.test_workflow.transition.first_transition.attribute.other_user_attribute.label'
+                        attribute_default_values:
+                            other_user_attribute: $other_user_variable1
+                    is_unavailable_hidden: true
+                    transition_definition: first_transition_definition
+                    frontend_options:
+                        icon: ''
+                        class: ''
+                    is_hidden: false
+                    acl_message: null
+                    form_type: oro_workflow_transition
+                    page_template: null
+                    dialog_template: null
+                    init_entities: {  }
+                    init_routes: {  }
+                    init_datagrids: {  }
+                    init_context_attribute: init_context
+                    message_parameters:
+                        '%fullName%': $other_user_variable.fullName
+                    triggers: {  }
+                    label: 'oro.workflow.test_workflow.transition.first_transition.label'
+                    button_label: 'oro.workflow.test_workflow.transition.first_transition.button_label'
+                    button_title: 'oro.workflow.test_workflow.transition.first_transition.button_title'
+                    message: 'oro.workflow.test_workflow.transition.first_transition.warning_message'
+
+            transition_definitions:
+                first_transition_definition:
+                    preactions: {  }
+                    preconditions: {  }
+                    conditions: {  }
+                    actions: {  }
+
+Oro\Bundle\WorkflowBundle\Entity\WorkflowStep:
+    test_workflow_step1:
+        name: step:starting_point
+        label: '(Start)'
+        stepOrder: -1
+        final: false
+        definition: '@test_workflow'
+
+    test_workflow_step2:
+        name: first_step
+        label: 'first step'
+        stepOrder: 0
+        final: true
+        definition: '@test_workflow'
