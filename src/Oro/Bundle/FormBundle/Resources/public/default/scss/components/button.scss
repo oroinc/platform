@@ -14,6 +14,11 @@
         box-shadow: $btn-shadow;
     }
 
+    &.active,
+    &.pressed {
+        box-shadow: $btn-shadow;
+    }
+
     &.caret {
         &:after {
             content: '';
@@ -59,10 +64,6 @@
 
         @include element-state('focus') {
             border-color: darken(get-color('additional', 'light'), 5%);
-        }
-
-        &.pressed {
-            box-shadow: $btn-shadow;
         }
     }
 
@@ -123,6 +124,11 @@
         @include element-state('active') {
             box-shadow: none;
         }
+
+        &.active,
+        &.pressed {
+            box-shadow: none;
+        }
     }
 
     &--plain {
@@ -148,6 +154,11 @@
         }
 
         @include element-state('active') {
+            box-shadow: none;
+        }
+
+        &.active,
+        &.pressed {
             box-shadow: none;
         }
     }

@@ -10,6 +10,7 @@ use Doctrine\Common\Inflector\Inflector;
 /**
  * Class Form
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @package Oro\Bundle\TestFrameworkBundle\Behat\Element
  */
 class Form extends Element
@@ -40,7 +41,6 @@ class Form extends Element
             }
 
             $field = $this->wrapField($label, $field);
-
             $field->setValue($value);
         }
         if ($isEmbeddedForm) {
@@ -130,6 +130,7 @@ class Form extends Element
      * {@inheritdoc}
      * @todo Move behat elements to Driver layer. BAP-11887.
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function findField($locator)
     {

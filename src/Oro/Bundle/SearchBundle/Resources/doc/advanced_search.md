@@ -178,7 +178,7 @@ integer count !in (1, 3, 5)
 decimal price !in (2.1, 55, 45.4)
 ```
 
-###Query brackets.
+### Query brackets.
 
 User can combine operators in search query with brackets.
 

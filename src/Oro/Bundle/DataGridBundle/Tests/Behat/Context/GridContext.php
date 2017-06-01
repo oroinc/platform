@@ -95,7 +95,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row->setCellValue($field, $value);
         // click any where on the page
         $this->getPage()->find('css', '#container')->click();
-        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -148,7 +148,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row = $this->getGridRow($entityTitle);
 
         $row->setCellValueAndSave($field, $value);
-        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -597,8 +597,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * String filter
-     * Example: When I filter First Name as Contains "Aadi"
+     * Filter grid by string filter
+     * Example: When I filter First Name as contains "Aadi"
      * Example: And filter Name as is equal to "User"
      *
      * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s\.\_\%]+))"$/
@@ -624,7 +624,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function appllyDateTimeFilter($filterName, $type, $start, $end)
+    public function applyDateTimeFilter($filterName, $type, $start, $end)
     {
         /** @var GridFilterDateTimeItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
@@ -817,6 +817,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )click (?P<action>[\w\s]*) on (?P<content>(?:[^"]|\\")*) in grid "(?P<grid>([\w\s]+))"$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid "(?P<grid>([\w\s]+))"$/
      *
      * @param string $content
      * @param string $action

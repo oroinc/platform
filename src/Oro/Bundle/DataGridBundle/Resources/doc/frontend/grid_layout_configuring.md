@@ -1,7 +1,7 @@
 Grid layout configuring
 ==============
 
-###Basic settings for layout grid:
+### Basic settings for layout grid:
 
 1. In `layouts/some_theme/layout.yml` specify:
 ```yaml
@@ -48,7 +48,7 @@ layout:
 
 This block is responsible for rendering grid toolbar, and it consists of different blocks like page_size, pagination, sorting, etc. which also customisable using layouts.
 
-###Layout grid configuring:
+### Layout grid configuring:
 
 Through layout directives like `visible` , `@move`, `@setOption`, etc. we can configure grid settings and params on layout level.
 
