@@ -14,12 +14,10 @@ use Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRole;
 
 class UserWithoutRoleValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    use EntityTrait;
-
     /**
      * @var UserWithoutRoleValidator
      */
-    protected $userWithoutRoleValidator;
+    protected $validator;
 
     /**
      * @var UserWithoutRole
@@ -36,8 +34,8 @@ class UserWithoutRoleValidatorTest extends \PHPUnit_Framework_TestCase
         $this->constraint = new UserWithoutRole();
         $this->context = $this->createMock(ExecutionContextInterface::class);
 
-        $this->userWithoutRoleValidator = new UserWithoutRoleValidator();
-        $this->userWithoutRoleValidator->initialize($this->context);
+        $this->validator = new UserWithoutRoleValidator();
+        $this->validator->initialize($this->context);
     }
 
     public function testEmptyUserCollection()
@@ -45,41 +43,30 @@ class UserWithoutRoleValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->userWithoutRoleValidator->validate(new ArrayCollection(), $this->constraint);
+        $this->validator->validate(new ArrayCollection(), $this->constraint);
     }
 
     public function testUserWithRole()
     {
-        $role = $this->getEntity(Role::class);
-        $user = $this->getEntity(User::class, ['roles' => [$role]]);
-
-        $userCollection = new ArrayCollection([$user]);
+        $user = new User();
+        $user->addRole(new Role());
 
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->userWithoutRoleValidator->validate($userCollection, $this->constraint);
+        $this->validator->validate(new ArrayCollection([$user]), $this->constraint);
     }
 
     public function testUserWithoutRoles()
     {
-        $user = $this->getEntity(User::class, ['firstName' => 'John', 'lastName' => 'Doe']);
-
-        $userCollection = new ArrayCollection([$user]);
+        $user = (new User())
+            ->setFirstName('John')
+            ->setLastName('Doe');
 
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with($this->constraint->message, ['{{ userName }}' => 'John Doe']);
 
-        $this->userWithoutRoleValidator->validate($userCollection, $this->constraint);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected instance of "Doctrine\Common\Collections\Collection", "NULL" given
-     */
-    public function testNotACollection()
-    {
-        $this->userWithoutRoleValidator->validate(null, $this->constraint);
+        $this->validator->validate(new ArrayCollection([$user]), $this->constraint);
     }
 }
