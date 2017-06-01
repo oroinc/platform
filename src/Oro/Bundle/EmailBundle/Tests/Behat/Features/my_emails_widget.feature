@@ -30,8 +30,8 @@ Feature: My emails widget
 
   Scenario: Click action link
     Given follow "Reply All"
-    Then I should see an email form
-    And it must contains next values:
-      | From    | "John Doe" <admin@example.com>       |
-      | To      | "Charlie Sheen" <charlie@sheen.com>  |
-      | Subject | Re: Merry Christmas                  |
+    Then I should see an "Email Form" element
+    And "Email Form" must contains values:
+      | From    | "John Doe" <admin@example.com>        |
+      | To      | ["Charlie Sheen" <charlie@sheen.com>] |
+      | Subject | Re: Merry Christmas                   |

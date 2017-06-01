@@ -12,12 +12,9 @@
     &__side,
     &__rightside {
         display: flex;
-        // 0px value for fix bug in IE11
-        flex: 1 0 0px;
+        flex: 1 0 200px;
         flex-wrap: wrap;
         align-items: center;
-
-        min-width: 200px;
     }
 
     &__rightside {
@@ -59,8 +56,6 @@
     }
 
     .page-size {
-        font-size: $base-font-size - 2px;
-
         flex-grow: 0;
     }
 
@@ -125,6 +120,10 @@
             flex-wrap: nowrap;
 
             min-width: 0;
+        }
+
+        &__rightside {
+            width: 100%;
         }
     }
 

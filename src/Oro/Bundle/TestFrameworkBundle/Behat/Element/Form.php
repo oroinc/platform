@@ -10,6 +10,7 @@ use Doctrine\Common\Inflector\Inflector;
 /**
  * Class Form
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @package Oro\Bundle\TestFrameworkBundle\Behat\Element
  */
 class Form extends Element
@@ -39,13 +40,7 @@ class Form extends Element
                 );
             }
 
-            if (isset($this->options['mapping'][$label]['element'])) {
-                $field = $this->elementFactory->wrapElement(
-                    $this->options['mapping'][$label]['element'],
-                    $field
-                );
-            }
-
+            $field = $this->wrapField($label, $field);
             $field->setValue($value);
         }
         if ($isEmbeddedForm) {
@@ -56,13 +51,17 @@ class Form extends Element
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
+            list($label, $value) = $row;
+            $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
-            self::assertNotNull($field, "Field with '$locator' locator not found");
+            self::assertNotNull($field, "Field with not found");
 
-            $expectedValue = self::normalizeValue($row[1]);
+            $field = $this->wrapField($label, $field);
+            echo $field->getOuterHtml();
+
+            $expectedValue = self::normalizeValue($value);
             $fieldValue = self::normalizeValue($field->getValue());
-            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
+            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $label));
         }
     }
 
@@ -131,6 +130,7 @@ class Form extends Element
      * {@inheritdoc}
      * @todo Move behat elements to Driver layer. BAP-11887.
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function findField($locator)
     {
@@ -323,5 +323,22 @@ class Form extends Element
         self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
         return $errorSpan->getText();
+    }
+
+    /**
+     * @param $label
+     * @param NodeElement $field
+     * @return NodeElement
+     */
+    private function wrapField($label, NodeElement $field): NodeElement
+    {
+        if (isset($this->options['mapping'][$label]['element'])) {
+            $field = $this->elementFactory->wrapElement(
+                $this->options['mapping'][$label]['element'],
+                $field
+            );
+        }
+
+        return $field;
     }
 }

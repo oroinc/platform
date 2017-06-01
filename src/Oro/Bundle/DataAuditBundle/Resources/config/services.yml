@@ -158,3 +158,11 @@ services:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_dataaudit.migration.demo_data_fixtures_listener:
+        class: Oro\Bundle\DataAuditBundle\EventListener\DemoDataFixturesListener
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

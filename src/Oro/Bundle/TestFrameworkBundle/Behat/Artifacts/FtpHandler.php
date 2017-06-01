@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Artifacts;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\TokenGenerator;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class FtpHandler implements ArtifactsHandlerInterface
@@ -56,12 +57,12 @@ class FtpHandler implements ArtifactsHandlerInterface
      */
     public function save($data)
     {
-        $fileName = uniqid().'.png';
-        $localFile = sys_get_temp_dir().'/'.$fileName;
+        $fileName = TokenGenerator::generateToken('image').'.png';
+        $localFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.$fileName;
         file_put_contents($localFile, $data);
 
         if (!$ftpConnection = $this->getFtpConnection()) {
-            echo "There is issue with ftp connection";
+            return "There is issue with ftp connection";
         }
 
         if (!ftp_put($ftpConnection, $fileName, $localFile, FTP_BINARY)) {
@@ -71,7 +72,7 @@ class FtpHandler implements ArtifactsHandlerInterface
         ftp_chmod($ftpConnection, 0644, $fileName);
         ftp_close($ftpConnection);
 
-        return $this->screenshotRemoteBaseUrl.'/'.$fileName;
+        return rtrim($this->screenshotRemoteBaseUrl, '/').'/'.trim($fileName, '/');
     }
 
     /**

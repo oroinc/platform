@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
@@ -216,7 +216,7 @@ class DoctrineHelper extends BaseHelper
      */
     public function applyEntityIdentifierRestriction(QueryBuilder $qb, $entityClass, $entityId)
     {
-        $rootAlias = QueryUtils::getSingleRootAlias($qb);
+        $rootAlias = QueryBuilderUtil::getSingleRootAlias($qb);
         $idFields = $this->getEntityIdentifierFieldNamesForClass($entityClass);
         if (count($idFields) === 1) {
             // single identifier

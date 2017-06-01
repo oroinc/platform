@@ -38,10 +38,14 @@ class TranslationKeyRepository extends EntityRepository
      */
     public function getTranslationKeysData()
     {
-        $translationKeysData = $this->createQueryBuilder('tk')
-            ->select('tk.id, tk.domain, tk.key')
+        $queryBuilder = $this->createQueryBuilder('tk');
+        $translationKeysData = $queryBuilder
+            ->select('tk.id, tk.key, tk.domain')
+            ->addOrderBy($queryBuilder->expr()->asc('tk.key'))
+            ->addOrderBy($queryBuilder->expr()->asc('tk.domain'))
             ->getQuery()
             ->getArrayResult();
+
         $translationKeys = [];
         foreach ($translationKeysData as $item) {
             $translationKeys[$item['domain']][$item['key']] = $item['id'];

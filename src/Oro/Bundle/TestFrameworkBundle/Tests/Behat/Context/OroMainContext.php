@@ -8,23 +8,16 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ResponseTextException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-
-use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
-use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -81,8 +74,6 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
-        $this->messageQueueIsolator->waitWhileProcessingMessages(30);
-
         $session = $this->getMink()->getSession();
         if (false === $session->isStarted()) {
             return;
@@ -102,7 +93,7 @@ class OroMainContext extends MinkContext implements
         }
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
+        if (preg_match('/^(?:|I )should see .+(flash message|error message)$/', $scope->getStep()->getText())) {
             return;
         }
 
@@ -131,6 +122,8 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
+
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -246,7 +239,7 @@ class OroMainContext extends MinkContext implements
     /**
      * @param \Closure $lambda
      * @param int $timeLimit in seconds
-     * @return false|mixed Return false if closure throw error or return not true value.
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     public function spin(\Closure $lambda, $timeLimit = 60)
@@ -266,7 +259,7 @@ class OroMainContext extends MinkContext implements
             $time -= 0.25;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -432,6 +425,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I should see that "Header" does not contain "Some Text"
+     * @Then /^I should see that "(?P<elementName>[^"]*)" does not contain "(?P<text>[^"]*)"$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementNotContainsText($elementName, $text)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement($elementName);
+        self::assertNotContains(
+            $text,
+            $element->getText(),
+            sprintf('Element %s contains text %s', $elementName, $text)
+        );
+    }
+
+    /**
      * Assert that download link in attachment works properly
      * Example: And download link for "cat.jpg" attachment should work
      * Example: And download link for "note-attachment.jpg" attachment should work
@@ -544,8 +555,8 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
-        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
-        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         try {
             $button = $this->fixStepArgument($button);
             $modalWindow->pressButton($button);
@@ -805,7 +816,7 @@ class OroMainContext extends MinkContext implements
     public function iRestartMessageConsumer()
     {
         $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
+        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
     }
 
     /**
@@ -1101,5 +1112,17 @@ class OroMainContext extends MinkContext implements
         $field->focus();
         $field->keyDown(13);
         $this->waitForAjax();
+    }
+
+    /**
+     * Use this action only for debugging
+     *
+     * This method should be used only for debug
+     * @When /^I wait for action$/
+     */
+    public function iWait()
+    {
+        fwrite(STDOUT, "Press [RETURN] to continue...");
+        fgets(STDIN, 1024);
     }
 }

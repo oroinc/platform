@@ -17,7 +17,6 @@ define(function(require) {
     };
 
     _.extend(ButtonManager.prototype, {
-
         /**
          * @type {Object}
          */

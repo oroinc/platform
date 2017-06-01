@@ -168,7 +168,7 @@ class EmailNotification extends ExtendEmailNotification
      *
      * @return EmailNotification
      */
-    public function setRecipientList(RecipientList $recipientList)
+    public function setRecipientList(RecipientList $recipientList = null)
     {
         $this->recipientList = $recipientList;
 

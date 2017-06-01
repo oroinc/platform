@@ -1059,9 +1059,7 @@ services:
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: %oro_email.autocomplete.mailbox_user_search_handler.class%
-        parent: oro_user.autocomplete.user.search_handler
-        calls:
-           - [setSecurityFacade, ['@oro_security.security_facade']]
+        parent: oro_user.autocomplete.user.organization_search_handler
 
     oro_email.listener.mailbox.authorization:
         class: %oro_email.listener.mailbox.authorization.class%
@@ -1234,6 +1232,13 @@ services:
         tags:
             - { name: console.command }
 
+    oro_email.listener.datagrid.user_email_grid_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
+        arguments:
+            - '@oro_email.datagrid_query_factory'
+        tags:
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
+          - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.emailtemplate.variable_processor:
         class: 'Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry'
@@ -1250,3 +1255,12 @@ services:
         public: false
         tags:
             - { name: oro_email.emailtemplate.variable_processor, alias: entity_routes }
+
+    oro_email.migration.demo_data_fixtures_listener.email_associations:
+        class: Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

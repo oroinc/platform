@@ -111,13 +111,16 @@ class WorkflowItemRepositoryTest extends WebTestCase
                     ->getWorkflowItem($entity, $workflowName);
 
                 if ($workflowItem) {
-                    $data = ['entityId' => $entity->getId(), 'stepName' => $workflowItem->getCurrentStep()->getLabel()];
+                    $data = [
+                        'entityId' => (string)$entity->getId(),
+                        'stepName' => $workflowItem->getCurrentStep()->getLabel(),
+                    ];
 
                     if ($withWorkflowName) {
                         $data['workflowName'] = $workflowItem->getDefinition()->getLabel();
                     }
 
-                    $expectedData[$entity->getId()][] = $data;
+                    $expectedData[(string)$entity->getId()][] = $data;
                 }
             }
         }
@@ -126,7 +129,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
             WorkflowAwareEntity::class,
             array_map(
                 function (WorkflowAwareEntity $entity) {
-                    return $entity->getId();
+                    return (string)$entity->getId();
                 },
                 $entities
             ),
