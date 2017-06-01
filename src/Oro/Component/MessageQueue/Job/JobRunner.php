@@ -111,7 +111,6 @@ class JobRunner
             $result
                 ? $this->jobProcessor->successChildJob($job)
                 : $this->jobProcessor->failChildJob($job);
-            ;
         }
 
         return $result;
