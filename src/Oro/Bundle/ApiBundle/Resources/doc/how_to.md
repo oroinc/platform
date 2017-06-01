@@ -24,6 +24,13 @@ oro_api:
     entities:
         Acme\Bundle\ProductBundle\Product: ~
 ```
+**Attention**: In version 2.0, use:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\ProductBundle\Product: ~
+```
 
 **Attention**: In version 2.0, use:
  
