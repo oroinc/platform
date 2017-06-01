@@ -25,9 +25,6 @@
             {% if required %}
                 {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
             {% endif %}
-            {% if errors|length > 0 %}
-                {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' validation-error')|trim}) %}
-            {% endif %}
             {% if label is empty %}
                 {% if label_format is not empty -%}
                     {% set label = label_format|replace({'%name%': name, '%id%': id}) %}
