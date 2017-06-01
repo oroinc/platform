@@ -54,6 +54,15 @@ services:
     oro_cron.async.command_runner_message_processor:
         class: Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor
         arguments:
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_cron.async.command_runner_processor:
+        class: Oro\Bundle\CronBundle\Async\CommandRunnerProcessor
+        arguments:
             - '@oro_cron.engine.command_runner'
             - '@oro_message_queue.job.runner'
             - '@logger'
