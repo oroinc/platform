@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Validator;
 
 use Doctrine\Common\Collections\Collection;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -17,91 +18,53 @@ class UserWithoutRoleValidator extends ConstraintValidator
     const ALIAS = 'oro_user.validator.user_without_role';
 
     /**
-     * @param mixed $value
+     * @param mixed $users
      * @param UserWithoutRole $constraint
-     * @throws \InvalidArgumentException
+     * @throws UnexpectedTypeException
      *
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($users, Constraint $constraint)
     {
-        if (!$value instanceof Collection) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected instance of "%s", "%s" given',
-                    Collection::class,
-                    is_object($value) ? get_class($value) : gettype($value)
-                )
-            );
+        if (!$users instanceof Collection) {
+            throw new UnexpectedTypeException($users, Collection::class);
         }
 
-        $users = $value->toArray();
-
-        if (!$users) {
+        if ($users->isEmpty()) {
             return;
         }
 
-        $result = true;
-        $affectedCustomerNames = [];
-        /** @var UserInterface|FirstNameInterface|LastNameInterface $user */
+        $invalidUserNames = [];
         foreach ($users as $user) {
-            $this->checkUserType($user);
-
-            if (!$user->getRoles()) {
-                $affectedCustomerNames[] = $this->getUserFullName($user);
-                $result = false;
+            if (!$this->isUserValid($user)) {
+                $invalidUserNames[] = $this->getUserFullName($user);
             }
         }
 
-        if ($result === false) {
-            $customerNames = implode(', ', $affectedCustomerNames);
-
+        if ($invalidUserNames) {
+            $customerNames = implode(', ', $invalidUserNames);
             $this->context->addViolation($constraint->message, ['{{ userName }}' => $customerNames]);
-        }
-    }
-
-    /**
-     * @param object $user
-     */
-    private function checkUserType($user)
-    {
-        if (!is_object($user)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected object, "%s" given',
-                    gettype($user)
-                )
-            );
-        }
-
-        $this->checkClassImplementation($user, UserInterface::class);
-        $this->checkClassImplementation($user, FirstNameInterface::class);
-        $this->checkClassImplementation($user, LastNameInterface::class);
-    }
-
-    /**
-     * @param object $user
-     * @param string $interface
-     */
-    private function checkClassImplementation($user, $interface)
-    {
-        if (!$user instanceof $interface) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Class %s has to implement %s',
-                    get_class($user),
-                    $interface
-                )
-            );
         }
     }
 
     /**
      * @param FirstNameInterface|LastNameInterface $user
      * @return string
+     * @throws UnexpectedTypeException
      */
     private function getUserFullName($user)
     {
+        if (!$user instanceof FirstNameInterface) {
+            throw new UnexpectedTypeException($user, FirstNameInterface::class);
+        }
+        if (!$user instanceof LastNameInterface) {
+            throw new UnexpectedTypeException($user, LastNameInterface::class);
+        }
         return sprintf('%s %s', $user->getFirstName(), $user->getLastName());
+    }
+
+    protected function isUserValid(UserInterface $user)
+    {
+        return (bool)$user->getRoles();
     }
 }

@@ -51,6 +51,13 @@ DataGridBundle
     - changed constructor signature from `__construct(ContainerInterface $container, SecurityFacade $securityFacade, TranslatorInterface $translator)` to `__construct(MassActionFactory $actionFactory, MassActionMetadataFactory $actionMetadataFactory, SecurityFacade $securityFacade)`
     - removed method `registerAction`. Use `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory::registerAction` instead
 
+CronBundle
+---------------
+- Class `Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor`
+    - removed property `$commandRunner`
+    - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
+- Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
+
 MigrationBundle
 ---------------
 - Added event `oro_migration.data_fixtures.pre_load` that is raised before data fixtures are loaded
