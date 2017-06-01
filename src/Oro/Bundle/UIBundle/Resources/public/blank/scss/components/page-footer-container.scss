@@ -1,0 +1,27 @@
+// @theme: blank;
+
+.page-footer-container {
+    display: flex;
+
+    &__base {
+        width: $page-footer-container-base-width;
+
+        flex: 0 0 auto;
+    }
+    &__side {
+        width: $page-footer-container-side-width;
+
+        flex: 0 0 auto;
+    }
+}
+
+@include breakpoint('tablet-small') {
+    .page-footer-container {
+        &__base {
+            width: $page-footer-container-base-tablet-small-width;
+        }
+        &__side {
+            width: $page-footer-container-side-tablet-small-width;
+        }
+    }
+}

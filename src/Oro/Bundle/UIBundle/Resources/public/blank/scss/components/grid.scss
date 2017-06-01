@@ -102,5 +102,11 @@
                 margin-right: auto;
             }
         }
+
+        @for $i from 1 through $grid-count {
+            &__column--ts-#{$i} {
+                width: (($i* 100%) / $grid-count);
+            }
+        }
     }
 }
