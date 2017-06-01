@@ -1,3 +1,5 @@
+// @theme default
+
 // Default
 $checkbox-icon-size: auto;
 $checkbox-icon-min-width: 15px;
@@ -5,6 +7,10 @@ $checkbox-icon-border: 1px solid transparent;
 $checkbox-icon-bg-color: transparent;
 $checkbox-icon-checked: $fa-var-check-square;
 $checkbox-icon-unchecked: $fa-var-square-o;
+
+// Absolute state
+
+$checkbox-icon-absolute-offset: $checkbox-icon-min-width + 8px;
 
 // Checked
 $checkbox-icon-bg-color-focus-state: transparent;

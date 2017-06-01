@@ -20,7 +20,7 @@
             'fixed': 100,
             'popup': 150,
             'hidden': -1
-    );
+    ) !default;
 
     $z-index: map-get($layers, $layer);
     @return $z-index;

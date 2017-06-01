@@ -1,4 +1,4 @@
-// @theme: blank;
+// @theme blank
 
 .buttons-equal {
     display: flex;
@@ -9,7 +9,7 @@
         flex-basis: 50%;
 
         &:first-child {
-            margin-right: 10px;
+            margin-right: $offset-x-m;
         }
     }
 }

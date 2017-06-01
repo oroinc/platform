@@ -1,15 +1,51 @@
+// @theme default;
 $charset: 'UTF-8';
 
-@include font-face('Lato', '#{$global-url}/orofrontend/default/fonts/lato/lato-regular-webfont', 400, normal);
-@include font-face('Lato', '#{$global-url}/orofrontend/default/fonts/lato/lato-bold-webfont', 700, normal);
-@include font-face('Roboto', '#{$global-url}/orofrontend/default/fonts/roboto/roboto-regular-webfont', 700, normal);
-@include font-face('custom-icon-font', '#{$global-url}/orofrontend/default/fonts/custom-font-icon/custom-font-icon', normal, normal);
+// List with theme fonts
+$theme-fonts: (
+    'main': (
+        'family': 'Lato',
+         'variants': (
+             (
+                 'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-regular-webfont',
+                 'weight': 400,
+                 'style': normal
+             ),
+             (
+              'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-bold-webfont',
+              'weight': 700,
+              'style': normal
+             )
+         ),
+    ),
+    'secondary': (
+        'family': 'Roboto',
+        'variants': (
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/roboto/roboto-regular-webfont',
+                'weight': 700,
+                'style': normal
+            )
+        )
+    ),
+    'icon': (
+        'family': 'custom-icon-font',
+        'variants': (
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/custom-font-icon/custom-font-icon',
+                'weight': normal,
+                'style': normal
+            )
+        )
+    )
+);
 
-$base-font: 'Lato','Helvetica', Arial, sans-serif;
-$base-font-minor: 'Roboto','Helvetica', Arial, sans-serif;
-$base-font-icon: 'custom-font-icon';
+// Fonts families
+$base-font: map_get(map_get($theme-fonts, 'main'), 'family'),'Helvetica', Arial, sans-serif;
+$base-font-minor: map_get(map_get($theme-fonts, 'secondary'), 'family'),'Helvetica', Arial, sans-serif;
+$base-font-icon: map_get(map_get($theme-fonts, 'icon'), 'family');
 
-// Font sizes
+// Fonts sizes
 $base-font-size: 14px;
 $base-font-size--large: 16px;
 $base-font-size--xs: 11px;
