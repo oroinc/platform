@@ -266,10 +266,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Then /^(?:|I )check (?P<content>\S+) record in grid$/
+     * @Then /^(?:|I )check (?P<content>\S+) record in "(?P<grid>[\w\s]+Grid)"$/
      */
-    public function checkRecordInGrid($content)
+    public function checkRecordInGrid($content, $grid = 'Grid')
     {
-        $this->getGrid()->checkRecord($content);
+        $this->getGrid($grid)->checkRecord($content);
     }
 
     /**
@@ -631,12 +632,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $value
      * @param string $grid
      */
-    //@codingStandardsIgnoreEnd
     public function applyStringFilter($filterName, $type, $value, $grid = 'Grid')
     {
         /** @var GridFilterStringItem $filterItem */
-        $filterItem = $this->getGridFilters($grid)
-            ->getFilterItem($grid . 'FilterStringItem', $filterName);
+        $filterItem = $this->getGridFilters($grid)->getFilterItem('GridFilterStringItem', $filterName);
 
         $filterItem->open();
         $filterItem->selectType($type);
