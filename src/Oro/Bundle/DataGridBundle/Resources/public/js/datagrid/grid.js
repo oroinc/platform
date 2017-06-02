@@ -1384,7 +1384,7 @@ define(function(require) {
                 );
             }
 
-            return nameParts.length == 2 ? nameParts[1] : null;
+            return nameParts.length === 2 ? nameParts[1] : null;
         }
     });
 
