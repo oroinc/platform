@@ -222,10 +222,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|I )click "(?P<title>(?:[^"]|\\")*)" link from mass action dropdown$/
      * @When /^(?:|I )click (?P<title>(?:[^"]|\\")*) mass action$/
+     * @When /^(?:|I )click (?P<title>(?:[^"]|\\")*) mass action in "(?P<grid>[\w\s]+)" grid$/
+     *
+     * @param string $title
+     * @param string $grid
      */
-    public function clickLinkFromMassActionDropdown($title)
+    public function clickLinkFromMassActionDropdown($title, $grid = 'Grid')
     {
-        $grid = $this->getGrid();
+        $grid = $this->getGrid($grid);
         $grid->clickMassActionLink($title);
     }
 
@@ -266,7 +270,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Then /^(?:|I )check (?P<content>\S+) record in grid$/
-     * @Then /^(?:|I )check (?P<content>\S+) record in "(?P<grid>[\w\s]+Grid)"$/
+     * @Then /^(?:|I )check (?P<content>\S+) record in "(?P<grid>[\w\s]+)" grid$/
+     *
+     * @param string $content
+     * @param string $grid
      */
     public function checkRecordInGrid($content, $grid = 'Grid')
     {
@@ -275,10 +282,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in grid$/
+     * @Then /^(?:|I )uncheck (?P<content>\S+) record in "(?P<grid>[\w\s]+)" grid$/
+     *
+     * @param string $content
+     * @param string $grid
      */
-    public function uncheckRecordInGrid($content)
+    public function uncheckRecordInGrid($content, $grid = 'Grid')
     {
-        $this->getGrid()->uncheckRecord($content);
+        $this->getGrid($grid)->uncheckRecord($content);
     }
 
     /**
@@ -408,24 +419,23 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Proceed backward oro grid pagination for specific grid.
+     *
+     * @When /^(?:|I )press previous page button in grid "(?P<grid>([\w\s]+))"$/
+     */
+    public function iPressPreviousPageButtonInGrid($grid = 'Grid')
+    {
+        $this->pressPaginationControlButton('Prev', $grid);
+    }
+
+    /**
      * Proceed forward oro grid pagination for specific grid.
      *
      * @When /^(?:|I )press next page button in grid "(?P<grid>([\w\s]+))"$/
      */
     public function iPressNextPageButtonInGrid($grid = 'Grid')
     {
-        $grid = $this->getGrid($grid);
-
-        $gridPaginatorContainer = $this->getSession()->getPage()->find(
-            'xpath',
-            sprintf(
-                '%s/ancestor::div[contains(concat(" ", normalize-space(@class), " "), " oro-datagrid ")]',
-                $grid->getXpath()
-            )
-        );
-
-        $gridPaginator = $this->elementFactory->createElement('GridPaginator', $gridPaginatorContainer);
-        $gridPaginator->clickLink('Next');
+        $this->pressPaginationControlButton('Next', $grid);
     }
 
     /**
@@ -632,6 +642,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $value
      * @param string $grid
      */
+    //@codingStandardsIgnoreEnd
     public function applyStringFilter($filterName, $type, $value, $grid = 'Grid')
     {
         /** @var GridFilterStringItem $filterItem */
@@ -723,21 +734,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @When /^(?:|I )check All Visible records in grid$/
+     * @When /^(?:|I )check All Visible records in "(?P<grid>([\w\s]+))" grid$/
+     *
+     * @param string $grid
      */
-    public function iCheckAllVisibleRecordsInGrid()
+    public function iCheckAllVisibleRecordsInGrid($grid = 'Grid')
     {
-        $this->getGrid()->massCheck('All visible');
+        $this->getGrid($grid)->massCheck('All visible');
     }
 
     /**
      * @When /^(?:|I )check all records in grid$/
+     * @When /^(?:|I )check all records in "(?P<grid>([\w\s]+))" grid$/
+     *
+     * @param string $grid
      */
-    public function iCheckAllRecordsInGrid()
+    public function iCheckAllRecordsInGrid($grid = 'Grid')
     {
-        if (!count($this->getGrid()->getRows())) {
+        if (!count($this->getGrid($grid)->getRows())) {
             self::fail('Grid has no records to check');
         }
-        $this->getGrid()->massCheck('All');
+        $this->getGrid($grid)->massCheck('All');
     }
 
     /**
@@ -1201,5 +1218,25 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     private function getGridColumnManager()
     {
         return $this->createElement('GridColumnManager');
+    }
+
+    /**
+     * @param string $lnk
+     * @param string $grid
+     */
+    private function pressPaginationControlButton($lnk, $grid = 'Grid')
+    {
+        $grid = $this->getGrid($grid);
+
+        $gridPaginatorContainer = $this->getSession()->getPage()->find(
+            'xpath',
+            sprintf(
+                '%s/ancestor::div[contains(concat(" ", normalize-space(@class), " "), " oro-datagrid ")]',
+                $grid->getXpath()
+            )
+        );
+
+        $gridPaginator = $this->elementFactory->createElement('GridPaginator', $gridPaginatorContainer);
+        $gridPaginator->clickLink($lnk);
     }
 }
