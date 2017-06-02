@@ -103,12 +103,12 @@ class Grid extends Table
      */
     public function getMassActionButton()
     {
-        $massActionsButton = $this->findButton('Mass Actions');
+        $massActionsButton = $this->elementFactory->createElement('MassActionButton', $this);
 
         if (!$massActionsButton || !$massActionsButton->isVisible()) {
             throw ElementNotVisible::factory(
                 ElementNotVisible::ELEMENT_NOT_VISIBLE,
-                'Mass Action dropdown is not prsent or not visible on page'
+                'Mass Action dropdown is not present or not visible on page'
             );
         }
 
@@ -130,7 +130,7 @@ class Grid extends Table
      */
     public function massCheck($title)
     {
-        $this->elementFactory->createElement('MassActionHeadCheckbox')->click();
+        $this->elementFactory->createElement('MassActionHeadCheckbox', $this)->click();
         $this->elementFactory->createElement('GridFloatingMenu')->clickLink($title);
     }
 
