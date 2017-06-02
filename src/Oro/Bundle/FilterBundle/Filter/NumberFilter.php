@@ -62,6 +62,8 @@ class NumberFilter extends AbstractFilter
             return false;
         }
 
+        $data['value'] = $this->applyDivisor($data['value']);
+
         return $data;
     }
 
@@ -130,5 +132,22 @@ class NumberFilter extends AbstractFilter
         $metadata['formatterOptions'] = $formView->vars['formatter_options'];
 
         return $metadata;
+    }
+
+    /**
+     * Apply configured divisor to a numeric raw value. For filtering this means to multiply the filter value.
+     *
+     * @param mixed $value
+     * @return float
+     */
+    protected function applyDivisor($value)
+    {
+        if (!is_numeric($value)) {
+            return $value;
+        }
+        if ($divisor = $this->getOr(FilterUtility::DIVISOR_KEY)) {
+            $value = $value * $divisor;
+        }
+        return $value;
     }
 }

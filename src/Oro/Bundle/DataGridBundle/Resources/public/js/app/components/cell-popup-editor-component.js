@@ -199,6 +199,7 @@ define(function(require) {
 
             var cell = this.options.cell;
             var serverUpdateData = this.getServerUpdateData();
+            this.applyDivisor(serverUpdateData, false);
             this.formState = this.view.getFormState();
             var modelUpdateData = this.view.getModelUpdateData();
             cell.$el.addClass('loading');
@@ -477,6 +478,7 @@ define(function(require) {
                         }, this)
                     ) {
                         var fields = response.hasOwnProperty('fields') ? response.fields : response;
+                        this.applyDivisor(fields, true);
                         var routeParamsRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
                         _.each(fields, function(item, i) {
                             var propName = routeParamsRenameMap.hasOwnProperty(i) ? routeParamsRenameMap[i] : i;
@@ -591,6 +593,19 @@ define(function(require) {
          */
         getServerUpdateData: function() {
             return this.view.getServerUpdateData();
+        },
+
+        applyDivisor: function(fields, toResponse) {
+            var metadata = this.options.cell.column.attributes.metadata;
+            var fieldName = metadata.name;
+            if (_.has(metadata, 'divisor')) {
+                if (!isNaN(fields[fieldName])) {
+                fields[fieldName] = toResponse ?
+           	        fields[fieldName] / metadata.divisor
+           	        : 
+           	        fields[fieldName] * metadata.divisor;
+                }
+            }
         }
     });
 
