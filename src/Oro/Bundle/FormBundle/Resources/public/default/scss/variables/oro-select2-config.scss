@@ -1,5 +1,25 @@
+// @theme: default;
+
 $oro-select2-arrow-height: 18px !default;
 $oro-select2-arrow-size: 5px !default;
 $oro-select2-size-l: 12px 11px !default;
 $oro-select2-size-m: 10px !default;
 $oro-select2-size-s: 8px !default;
+$oro-select2-input-inner-offset: 6px 8px !default;
+
+$oro-select2-arrow-height-border-radius: 5px !default;
+$oro-select2-drop-above-box-shadow: 0 -3px 5px rgba(0,0,0,0.15) !default;
+
+$oro-select2-input-border: 1px solid get-color(additional, 'light') !default;
+
+$oro-select2-input-focus-border: 1px solid get-color('ui', 'normal') !default;
+$oro-select2-input-focus-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+                                     0 0 8px rgba(102, 175, 233, 0.6) !default;
+
+$oro-select2-input-error-border: 1px solid get-color('ui', 'error-dark') !default;
+$oro-select2-input-error-box-shadow: 0 1px 7px 0 rgba(223,96,96,.6) !default;
+
+$oro-select2-input-warning-border: 1px solid get-color('secondary', 'dark') !default;
+$oro-select2-input-warning-box-shadow: 0 1px 7px 0 rgba(126,166,164,.35) !default;
+
+$oro-select2-input-success-border: 1px solid get-color('secondary', 'light') !default;
