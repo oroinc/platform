@@ -1,22 +1,22 @@
-// @theme default;
+// @theme: default;
 $charset: 'UTF-8';
 
 // List with theme fonts
 $theme-fonts: (
     'main': (
         'family': 'Lato',
-         'variants': (
-             (
-                 'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-regular-webfont',
-                 'weight': 400,
-                 'style': normal
-             ),
-             (
-              'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-bold-webfont',
-              'weight': 700,
-              'style': normal
-             )
-         ),
+        'variants': (
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-regular-webfont',
+                'weight': 400,
+                'style': normal
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-bold-webfont',
+                'weight': 700,
+                'style': normal
+            )
+        ),
     ),
     'secondary': (
         'family': 'Roboto',
