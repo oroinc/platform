@@ -1379,8 +1379,8 @@ define(function(require) {
             var nameParts = this.name.split(this.scopeDelimiter);
             if (nameParts.length > 2) {
                 throw new Error(
-                    'Grid name is invalid, it should not contain more than one occurrence of "'
-                    + this.scopeDelimiter + '"'
+                    'Grid name is invalid, it should not contain more than one occurrence of "' +
+                    this.scopeDelimiter + '"'
                 );
             }
 
