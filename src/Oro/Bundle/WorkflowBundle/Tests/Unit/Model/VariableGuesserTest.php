@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -36,11 +37,26 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->formConfigProvider = $this->createMock(ConfigProvider::class);
 
+        /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject $translator */
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($id, array $parameters, $domain) {
+                    $this->assertInternalType('string', $id);
+                    $this->assertEquals([], $parameters);
+                    $this->assertEquals('workflows', $domain);
+
+                    return $id . '_translated';
+                }
+            );
+
         $this->guesser = new VariableGuesser(
             $formRegistry,
             $managerRegistry,
             $entityConfigProvider,
-            $this->formConfigProvider
+            $this->formConfigProvider,
+            $translator
         );
         $this->guesser->addFormTypeMapping('string', 'Symfony\Component\Form\Extension\Core\Type\TextType');
 
@@ -92,7 +108,7 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
                     'formTestType',
                     [
                         'formOption' => 'optionValue',
-                        'label' => 'testLabel',
+                        'label' => 'testLabel_translated',
                         'data' => 'testValue',
                     ],
                     TypeGuess::VERY_HIGH_CONFIDENCE
@@ -123,7 +139,8 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
                             new NotBlank(),
                             new UserAuthenticationFieldsConstraint(),
                             new GreaterThan(10)
-                        ]
+                        ],
+                        'tooltip' => 'test_tooltip_translated'
                     ],
                     TypeGuess::VERY_HIGH_CONFIDENCE
                 ),
@@ -134,7 +151,8 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
                             'NotBlank' => null,
                             UserAuthenticationFieldsConstraint::class => null,
                             'GreaterThan' => 10,
-                        ]
+                        ],
+                        'tooltip' => 'test_tooltip'
                     ]
                 ]),
                 'formMapping' => [],
@@ -201,7 +219,13 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
         if (null === $value) {
             $this->assertEmpty($options);
         } else {
-            $formOption = ('label' !== $property) ? 'data' : $property;
+            if ($property === 'label') {
+                $value .= '_translated';
+                $formOption = $property;
+            } else {
+                $formOption = 'data';
+            }
+
             $this->assertEquals($value, $options[$formOption]);
         }
     }

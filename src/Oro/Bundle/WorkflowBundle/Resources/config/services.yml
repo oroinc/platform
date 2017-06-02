@@ -536,6 +536,8 @@ services:
     oro_workflow.variable_guesser:
             class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
             parent: oro_action.abstract_guesser
+            arguments:
+                - '@translator'
             calls:
                 # mapping from variable type to form parameters
                 # an additional array with form options can be added

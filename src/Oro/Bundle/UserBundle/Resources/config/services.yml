@@ -206,6 +206,9 @@ services:
             - '@oro_attachment.manager'
             - %oro_user.entity.class%
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+        calls:
+            - [setSecurityFacade, ['@oro_security.security_facade']]
+            - [setSearchUserCriteria, ['@oro_user.autocomplete.search_user_criteria']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_users, acl_resource: oro_user_user_view }
 
@@ -215,8 +218,12 @@ services:
         parent: oro_user.autocomplete.user.search_handler
         calls:
            - [setSecurityFacade,  ['@oro_security.security_facade']]
+           - [setSearchUserCriteria, ['@oro_user.autocomplete.search_user_criteria']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: organization_users, acl_resource: oro_user_user_view }
+
+    oro_user.autocomplete.search_user_criteria:
+        class: Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchUserCriteria
 
     oro_user.autocomplete.user.search_without_current_handler:
         class: %oro_user.autocomplete.user.search_without_current_handler.class%

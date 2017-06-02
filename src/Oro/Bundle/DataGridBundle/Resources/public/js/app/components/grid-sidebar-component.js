@@ -78,7 +78,7 @@ define(function(require) {
                 this._getDatagridParams(),
                 data.params
             );
-            data = _.extend({reload: true, updateUrl: true}, data);
+            data = _.extend({reload: true, updateUrl: true, ignoreVisibility: false}, data);
             var widgetParams = _.extend(
                 _.omit(this.options.widgetRouteParameters, this.options.gridParam),
                 params
@@ -104,7 +104,7 @@ define(function(require) {
                         }
                     );
                 } else {
-                    mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName);
+                    mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName, data.ignoreVisibility);
                 }
             }
         },
