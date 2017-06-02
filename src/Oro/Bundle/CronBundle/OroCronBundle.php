@@ -18,7 +18,8 @@ class OroCronBundle extends Bundle
         parent::build($container);
 
         $addTopicPass = AddTopicMetaPass::create()
-            ->add(Topics::RUN_COMMAND, 'Runs a symfony console command')
+            ->add(Topics::RUN_COMMAND, 'Creates a job to run console command')
+            ->add(Topics::RUN_COMMAND_DELAYED, 'Runs job with symfony console command')
         ;
 
         $container->addCompilerPass($addTopicPass);

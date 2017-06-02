@@ -95,7 +95,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row->setCellValue($field, $value);
         // click any where on the page
         $this->getPage()->find('css', '#container')->click();
-        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -148,7 +148,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row = $this->getGridRow($entityTitle);
 
         $row->setCellValueAndSave($field, $value);
-        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -404,6 +404,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iPressNextPageButton()
     {
         $this->getGridPaginator()->clickLink('Next');
+    }
+
+    /**
+     * Proceed forward oro grid pagination for specific grid.
+     *
+     * @When /^(?:|I )press next page button in grid "(?P<grid>([\w\s]+))"$/
+     */
+    public function iPressNextPageButtonInGrid($grid = 'Grid')
+    {
+        $grid = $this->getGrid($grid);
+
+        $gridPaginatorContainer = $this->getSession()->getPage()->find(
+            'xpath',
+            sprintf(
+                '%s/ancestor::div[contains(concat(" ", normalize-space(@class), " "), " oro-datagrid ")]',
+                $grid->getXpath()
+            )
+        );
+
+        $gridPaginator = $this->elementFactory->createElement('GridPaginator', $gridPaginatorContainer);
+        $gridPaginator->clickLink('Next');
     }
 
     /**
@@ -833,10 +854,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When click on Charlie in grid
      *
      * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid "(?P<grid>([\w\s]+))"$/
      */
-    public function clickOnRow($content)
+    public function clickOnRow($content, $grid = 'Grid')
     {
-        $this->getGrid()->getRowByContent($content)->click();
+        $this->getGrid($grid)->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
         $this->waitForAjax();
     }
@@ -1132,11 +1154,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @param string $element
      * @return GridPaginator
      */
-    private function getGridPaginator()
+    private function getGridPaginator($element = 'GridPaginator')
     {
-        return $this->elementFactory->createElement('GridPaginator');
+        return $this->elementFactory->createElement($element);
     }
 
     /**

@@ -81,6 +81,7 @@ class SegmentFilterBuilderType extends AbstractType
         $resolver->setDefault('add_name_field', false);
         $resolver->setDefault('name_field_required', false);
         $resolver->setDefault('attr', ['data-role' => 'query-designer-container']);
+        $resolver->setDefault('field_event_listeners', null);
         $resolver->setRequired('segment_entity');
 
         $resolver->setAllowedTypes('segment_entity', 'string');
@@ -89,6 +90,7 @@ class SegmentFilterBuilderType extends AbstractType
         $resolver->setAllowedTypes('add_name_field', 'bool');
         $resolver->setAllowedTypes('name_field_required', 'bool');
         $resolver->setAllowedTypes('segment_columns', ['array', 'null']);
+        $resolver->setAllowedTypes('field_event_listeners', ['array', 'null']);
         $resolver->setAllowedValues(
             'segment_type',
             [SegmentTypeEntity::TYPE_DYNAMIC, SegmentTypeEntity::TYPE_STATIC]
@@ -149,6 +151,14 @@ class SegmentFilterBuilderType extends AbstractType
     {
         $builder->add('definition', HiddenType::class, ['required' => false]);
         $builder->add('entity', HiddenType::class, ['required' => false, 'data' => $options['segment_entity']]);
+
+        if ($options['field_event_listeners']) {
+            foreach ($options['field_event_listeners'] as $field => $listeners) {
+                foreach ($listeners as $event => $listener) {
+                    $builder->get($field)->addEventListener($event, $listener);
+                }
+            }
+        }
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
