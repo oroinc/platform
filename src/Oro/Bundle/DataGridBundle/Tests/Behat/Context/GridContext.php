@@ -1140,6 +1140,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iShowFilterInGrid($filter, $gridName)
     {
         $grid = $this->getGrid($gridName);
+
+        $grid->getElement('GridFilersButton')->open();
         $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
         $filterButton->click();
 
@@ -1160,6 +1162,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iHideFilterInGrid($filter, $gridName)
     {
         $grid = $this->getGrid($gridName);
+
+        $grid->getElement('GridFilersButton')->open();
         $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
         $filterButton->click();
 
