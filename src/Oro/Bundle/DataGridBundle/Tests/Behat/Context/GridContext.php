@@ -624,8 +624,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I filter First Name as contains "Aadi"
      * Example: And filter Name as is equal to "User"
      *
-     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s\.\_\%]+))"$/
-     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s\.\_\%]+))" in "(?P<grid>([\w\s]+))" grid$/
+     * @When /^(?:|I )filter (?P<filterName>(?:[\w\s]+)) as (?P<type>(?:[\w\s]+)) "(?P<value>(?:[\w\s\.\_\%]+))"$/
+     * @When /^(?:|I )filter (?P<filterName>(?:[\w\s]+)) as (?P<type>(?:[\w\s]+)) "(?P<value>(?:[\w\s\.\_\%]+))" in "(?P<grid>(?:[\w\s]+))" grid$/
      *
      * @param string $filterName
      * @param string $type
