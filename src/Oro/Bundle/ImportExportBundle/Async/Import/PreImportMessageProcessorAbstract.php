@@ -178,7 +178,7 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
             return self::REJECT;
         }
 
-        $files = $this->getFiles($body);
+        $files = $this->getFiles($body, $message);
 
         if (!$files) {
             return self::REJECT;
