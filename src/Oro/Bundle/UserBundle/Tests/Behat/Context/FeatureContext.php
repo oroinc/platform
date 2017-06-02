@@ -46,6 +46,17 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Logout user
+     *
+     * @Given I am logged out
+     */
+    public function iAmLoggedOut($loginAndPassword = 'admin')
+    {
+        $uri = $this->getContainer()->get('router')->generate('oro_user_security_logout');
+        $this->visitPath($uri);
+    }
+
+    /**
      * Load "user.yml" alice fixture from UserBundle suite
      *
      * @Given (Charlie Sheen) (active) user exists in the system
