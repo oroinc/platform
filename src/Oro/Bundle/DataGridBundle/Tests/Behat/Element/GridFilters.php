@@ -30,7 +30,7 @@ class GridFilters extends Element
         } else {
             $filterItem = $this->elementFactory->findElementContains($name, $text, $this);
             if (!$filterItem->isValid()) {
-                $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text, $this);
+                $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text, true, $this);
             }
         }
 
