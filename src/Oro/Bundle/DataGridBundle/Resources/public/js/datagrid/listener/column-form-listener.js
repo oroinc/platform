@@ -42,7 +42,7 @@ define([
                 'excludeRow': this._excludeRow,
                 'includeRow': this._includeRow,
                 'setState': this.setState
-            })
+            });
         },
 
         /**
@@ -121,7 +121,7 @@ define([
         /**
          * Sets included and excluded elements ids using provided arrays
          */
-        setState: function (included, excluded) {
+        setState: function(included, excluded) {
             this.set('included', included);
             this.set('excluded', excluded);
             this._synchronizeState();

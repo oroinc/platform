@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
@@ -1126,6 +1127,21 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $refreshButton = $this->getGrid($gridName)->getElement('GridToolbarActionReset');
         $refreshButton->click();
+    }
+
+    /**
+     * @When /^I select following records in (?P<name>grid|[\s\w]+):$/
+     * @param TableNode $table
+     * @param string $name
+     */
+    public function iSelectFollowingRecordsInGrid(TableNode $table, $name = 'Grid')
+    {
+        $grid = $this->getGrid($name);
+
+        foreach ($table->getRows() as $index => $record) {
+            $grid->getRowByContent(reset($record))
+                ->checkMassActionCheckbox();
+        }
     }
 
     /**

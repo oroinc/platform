@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
@@ -720,10 +721,16 @@ class OroMainContext extends MinkContext implements
 
             /** @var NodeElement $labelElement */
             foreach ($labels as $labelElement) {
+                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
+
+                if ($controlLabel === null) {
+                    continue;
+                }
+
                 /** @var ControlGroup $controlLabel */
                 $controlLabel = $this->elementFactory->wrapElement(
                     'ControlGroup',
-                    $labelElement->getParent()->find('css', 'div.controls div.control-label')
+                    $controlLabel
                 );
 
                 if (true === $controlLabel->compareValues(Form::normalizeValue($value, $label))) {
@@ -791,7 +798,7 @@ class OroMainContext extends MinkContext implements
         $section = $this->fixStepArgument($section);
         $page = $this->getSession()->getPage();
 
-        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]/..')->getParent();
 
         if ($sectionContainer->hasButton($button)) {
             $sectionContainer->pressButton($button);
@@ -817,6 +824,15 @@ class OroMainContext extends MinkContext implements
     {
         $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
         $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
+    }
+
+    /**
+     * @Then /^"([^"]*)" button is disabled$/
+     */
+    public function buttonIsDisabled($button)
+    {
+        $button = $this->getSession()->getPage()->findButton($button);
+        self::assertTrue($button->hasClass('disabled'));
     }
 
     /**
