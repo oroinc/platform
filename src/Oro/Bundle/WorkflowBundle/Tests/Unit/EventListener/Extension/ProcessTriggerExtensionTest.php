@@ -571,6 +571,76 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         );
     }
 
+    public function testShouldSendQueuedJobOnlyAfterFlushFinished()
+    {
+        $entity = $this->getMainEntity();
+        $triggerConfig = [
+            'id'        => 123,
+            'event'     => EventTriggerInterface::EVENT_UPDATE,
+            'priority'  => 10,
+            'timeShift' => 60
+        ];
+        $changeSet = ['field' => ['old value', 'new value']];
+
+        $expectedMessage = new Message(['process_job_id' => $triggerConfig['id']], MessagePriority::HIGH);
+        $expectedMessage->setDelay($triggerConfig['timeShift']);
+
+        $expectedProcessData = $this->createProcessData([
+            'data'      => $entity,
+            'changeSet' => $changeSet
+        ]);
+
+        $trigger = $this->getCustomQueuedTrigger($triggerConfig);
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->willReturn(true);
+
+        $this->repository->expects($this->once())
+            ->method('findAllWithDefinitions')
+            ->with(true)
+            ->willReturn([$trigger]);
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($trigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(true);
+
+        /** @var ProcessJob $createdProcessJob */
+        $createdProcessJob = null;
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->isInstanceOf(ProcessJob::class))
+            ->willReturnCallback(function (ProcessJob $processJob) use (&$createdProcessJob) {
+                $createdProcessJob = $processJob;
+            });
+        $this->entityManager->expects($this->once())
+            ->method('flush')
+            ->willReturnCallback(function () use (&$createdProcessJob, $triggerConfig) {
+                // emulate triggering of postFlush event during the call of flush method in the process method
+                $this->extension->process($this->entityManager);
+                $idReflection = new \ReflectionProperty(ProcessJob::class, 'id');
+                $idReflection->setAccessible(true);
+                $idReflection->setValue($createdProcessJob, $triggerConfig['id']);
+            });
+
+        $this->logger->expects($this->once())
+            ->method('debug')
+            ->with(
+                'Process queued',
+                self::isInstanceOf(ProcessTrigger::class),
+                $expectedProcessData
+            );
+
+        $this->extension->schedule($entity, $trigger->getEvent(), $changeSet);
+        $this->extension->process($this->entityManager);
+
+        $this->assertAttributeEmpty('queuedJobs', $this->extension);
+
+        self::assertEquals($changeSet, $createdProcessJob->getData()->get('changeSet'));
+        self::assertMessagesCount(Topics::EXECUTE_PROCESS_JOB, 1);
+        self::assertMessageSent(Topics::EXECUTE_PROCESS_JOB, $expectedMessage);
+    }
+
     public function testProcessRemovedEntityHashes()
     {
         $entity = $this->getMainEntity();
