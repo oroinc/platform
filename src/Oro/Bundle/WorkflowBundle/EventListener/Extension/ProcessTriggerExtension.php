@@ -119,6 +119,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         // handle processes
         $hasQueuedOrHandledProcesses = false;
         $handledProcesses = [];
+        $queuedJobs = [];
         foreach ($this->scheduledProcesses as &$entityProcesses) {
             while ($entityProcess = array_shift($entityProcesses)) {
                 /** @var ProcessTrigger $trigger */
@@ -135,7 +136,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
                     $processJob = $this->queueProcess($trigger, $data);
                     $manager->persist($processJob);
 
-                    $this->queuedJobs[(int)$trigger->getTimeShift()][$trigger->getPriority()][] = $processJob;
+                    $queuedJobs[(int)$trigger->getTimeShift()][$trigger->getPriority()][] = $processJob;
                 } else {
                     $this->logger->debug('Process handled', $trigger, $data);
                     $this->handler->handleTrigger($trigger, $data);
@@ -169,6 +170,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
             $this->removedEntityHashes = [];
         }
 
+        $this->queuedJobs = $queuedJobs;
         $this->createJobs();
     }
 
