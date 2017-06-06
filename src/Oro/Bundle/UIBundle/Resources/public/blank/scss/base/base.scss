@@ -1,5 +1,7 @@
 // @theme: blank;
 
+@include use-font-face($theme-fonts);
+
 @if ($use-basic-styles) {
     html {
         font-size: $root-font-size;
@@ -24,3 +26,5 @@
         color: $body-color;
     }
 }
+
+

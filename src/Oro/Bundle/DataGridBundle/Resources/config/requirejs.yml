@@ -22,6 +22,7 @@ config:
         'oro/datagrid/action/row/importexport-action': 'bundles/orodatagrid/js/datagrid/action/row/importexport-action.js'
         'oro/datagrid/action/show-component-action': 'bundles/orodatagrid/js/datagrid/action/show-component-action.js'
         'oro/datagrid/action/select-data-appearance-action': 'bundles/orodatagrid/js/datagrid/action/select-data-appearance-action.js'
+        'oro/datagrid/action/trigger-event-action': 'bundles/orodatagrid/js/datagrid/action/trigger-event-action.js'
         'orodatagrid/js/datagrid/actions-panel': 'bundles/orodatagrid/js/datagrid/actions-panel.js'
         'orodatagrid/js/datagrid/column/action-column': 'bundles/orodatagrid/js/datagrid/column/action-column.js'
         'orodatagrid/js/datagrid/body': 'bundles/orodatagrid/js/datagrid/body.js'
