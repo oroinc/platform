@@ -94,6 +94,7 @@ class SegmentManager
         $segments = $queryBuilder
             ->setFirstResult($this->getOffset($page))
             ->setMaxResults(self::PER_PAGE + 1)
+            ->orderBy('segment.id')
             ->getQuery()
             ->getResult();
 
