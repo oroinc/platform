@@ -836,7 +836,7 @@ You can use some useful tricks to find right step for you.
 While typing in feature file some keywords, PhpStorm will suggest you implemented steps.
 Just try to type some of keywords, e.g. grid or form and find step that fit to your case
 
-![PhpStorm step suggestion](../images/phpstorm_step_suggestion.png)
+![PhpStorm step suggestion](./doc/images/phpstorm_step_suggestion.png)
 
 > If you don't have suggestion in storm, check for:
 >
@@ -848,8 +848,8 @@ Just try to type some of keywords, e.g. grid or form and find step that fit to y
 Every Context class should implement ```Behat\Behat\Context\Context``` interface.
 You can get the list of implemented contexts and find the right one by name.
 
-![Context implements interface](../images/context_implements_interface.png)
-![Find context file](../images/find_context.png)
+![Context implements interface](./doc/images/context_implements_interface.png)
+![Find context file](./doc/images/find_context.png)
 
 Usually the name of context is self explained, e.g. GridContext, FormContext, ACLContext etc.
 
@@ -862,13 +862,13 @@ Just type in your console:
 bin/behat -dl -s AcmeDemoBundle | grep "flash message"
 ```
 
-![Grep flash messages in console](../images/grep_flash_messages.png)
+![Grep flash messages in console](./doc/images/grep_flash_messages.png)
 
 ```bash
 bin/behat -dl -s AcmeDemoBundle | grep "grid"
 ```
 
-![Grep flash messages in console](../images/grep_grid.png)
+![Grep flash messages in console](./doc/images/grep_grid.png)
 
 > You still should have installed application for using behat command line interface
 
