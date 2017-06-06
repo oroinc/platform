@@ -13,6 +13,8 @@ use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -419,6 +421,41 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                 'generated segment name' => 'Segment custom name'
             ],
         ];
+    }
+
+    public function testEventListenersOptions()
+    {
+        $isCalled = false;
+        $entityClass = '\stdClass';
+        $options = [
+            'segment_entity' => $entityClass,
+            'segment_columns' => ['id'],
+            'add_name_field' => true,
+            'field_event_listeners' => [
+                'definition' => [
+                    FormEvents::PRE_SET_DATA => function (FormEvent $event) use (&$isCalled) {
+                        $isCalled = true;
+                    }
+                ]
+            ]
+        ];
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManagerForClass')
+            ->with($entityClass, false)
+            ->willReturn($em);
+
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityReference');
+        $this->tokenStorage->expects($this->never())
+            ->method('getToken');
+
+        $existingEntity = $this->getEntity(Segment::class, ['id' => 2]);
+
+        $this->factory->create($this->formType, $existingEntity, $options);
+
+        $this->assertTrue($isCalled);
     }
 
     /**

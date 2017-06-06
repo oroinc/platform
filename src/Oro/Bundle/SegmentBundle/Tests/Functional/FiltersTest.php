@@ -18,7 +18,7 @@ class FiltersTest extends WebTestCase
 {
     public function setUp()
     {
-        $this->initClient();
+        $this->initClient([], self::generateBasicAuthHeader());
     }
 
     /**
@@ -31,11 +31,14 @@ class FiltersTest extends WebTestCase
         $segment = $case->createSegment($em);
         $em->flush();
 
-        $gridName = Segment::GRID_PREFIX . $segment->getId();
-        $datagrid = $this->getDatagridManager()->getDatagrid($gridName);
-        $actualData = $datagrid->getData()->getData();
+        $response = $this->client->requestGrid(
+            ['gridName' => Segment::GRID_PREFIX . $segment->getId()],
+            [],
+            true
+        );
+        $result = self::getJsonResponseContent($response, 200);
 
-        $case->assert($this, $actualData);
+        $case->assert($this, $result['data']);
     }
 
     public function casesProvider()
@@ -52,7 +55,7 @@ class FiltersTest extends WebTestCase
      */
     protected function getEntityManager()
     {
-        return $this->getContainer()->get('doctrine')
+        return self::getContainer()->get('doctrine')
             ->getManagerForClass(Segment::class);
     }
 
@@ -61,6 +64,6 @@ class FiltersTest extends WebTestCase
      */
     protected function getDatagridManager()
     {
-        return $this->getContainer()->get('oro_datagrid.datagrid.manager');
+        return self::getContainer()->get('oro_datagrid.datagrid.manager');
     }
 }
