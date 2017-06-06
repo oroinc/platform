@@ -216,6 +216,6 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
         ContainerInterface $container
     ) {
         $this->container = $container;
-        $this->container->get('logger')->critical('Dumper ready');
+        $this->container->get('logger')->debug('Dumper ready');
     }
 }
