@@ -7,9 +7,17 @@ query_designer:
             applicable: [{type: string}, {type: text}, {type: ref-one}]
             type:       string
             query_type: [all]
-        number:
-            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}]
+        numberDecimal:
+            applicable: [{type: decimal}, {type: float}, {type: money}]
             type:       number
+            options:
+                data_type: data_decimal
+            query_type: [all]
+        number:
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}]
+            type:       number
+            options:
+                data_type: data_integer
             query_type: [all]
         date:
             applicable: [{type: date}]
