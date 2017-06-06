@@ -22,7 +22,7 @@
 - [Page Object](#page-object)
   - [Elements](#elements)
   - [Form Mappings](#form-mappings)
-  - [Ebedded Form Mappings](#ebedded-form-mappings)
+  - [Embedded Form Mappings](#ebedded-form-mappings)
   - [Page element](#page-element)
 - [Fixtures](#fixtures)
   - [Feature fixtures](#feature-fixtures)
@@ -44,8 +44,8 @@
 ## Before you start
 
 ***Behavior-driven development (BDD)*** is a software development process that emerged from test-driven development (TDD).
-Behavior-driven development combines the general techniques and principles of TDD 
-with ideas from domain-driven design and object-oriented analysis and design to provide software development and management teams 
+Behavior-driven development combines the general techniques and principles of TDD
+with ideas from domain-driven design and object-oriented analysis and design to provide software development and management teams
 with shared tools and a shared process to collaborate on software development.
 [Read more at Wiki](https://en.wikipedia.org/wiki/Behavior-driven_development)
 
@@ -62,14 +62,14 @@ See more about [page object pattern](http://www.seleniumhq.org/docs/06_test_desi
 ***Symfony2 Extension*** provides integration with Symfony2.
 [See Symfony2 Extension documentation](https://github.com/Behat/Symfony2Extension/blob/master/doc/index.rst)
 
-***@OroTestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension*** provides integration with Oro BAP based applications. 
+***@OroTestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension*** provides integration with Oro BAP based applications.
 
 ***Selenium2Driver*** Selenium2Driver provides a bridge for the Selenium2 (webdriver) tool.
 See [Driver Feature Support](http://mink.behat.org/en/latest/guides/drivers.html)
 
-***Selenium2*** browser automation tool with object oriented API. 
+***Selenium2*** browser automation tool with object oriented API.
 
-***PhantomJS*** is a headless WebKit scriptable with a JavaScript API. 
+***PhantomJS*** is a headless WebKit scriptable with a JavaScript API.
 It has fast and native support for various web standards: DOM handling, CSS selector, JSON, Canvas, and SVG.
 
 ## Conventions
@@ -99,6 +99,14 @@ It has fast and native support for various web standards: DOM handling, CSS sele
           mapping:
             Name: 'oro_workflow_definition_form[label]'
             Related Entity: 'oro_workflow_definition_form[related_entity]'
+  ```
+
+- **We are not using url for go to page**
+  You should instead use menu and links to get the right pages.
+  Instead of:
+
+  ```gherkin
+      And I go to ""
   ```
 
 - **Scenario Coupling.**
@@ -267,7 +275,7 @@ To look the all available feature steps:
 bin/behat -dl -s OroUserBundle
 ```
 
-or view steps with full description and examples: 
+or view steps with full description and examples:
 
 ```bash
 bin/behat -di -s OroUserBundle
@@ -385,7 +393,7 @@ oro_behat_extension:
 
 1. ```Login``` is an element name. It must be unique.
  Element can be created in context by ```OroElementFactory``` by it's name:
- 
+
  ```php
     $this->elementFactory->createElement('Login')
  ```
@@ -399,7 +407,7 @@ but it also can use xpath:
         type: xpath
         locator: //span[id='mySpan']/ancestor::form/
  ```
- 
+
 3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
 You can omit class, if so ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` will use by default.
 4. ```options``` it's an array of extra options that will be set in options property of Element class
@@ -609,15 +617,15 @@ Every bundle should hold its own features at ```{BundleName}/Tests/Behat/Feature
 Every feature it's a single file with ```.feature``` extension and some specific syntax
 (See more at [Cucumber doc reference](https://cucumber.io/docs/reference))
 
-A feature has three basic elements—the Feature: keyword, a name (on the same line) 
+A feature has three basic elements—the Feature: keyword, a name (on the same line)
 and an optional (but highly recommended) description that can span multiple lines.
 
 A scenario is a concrete example that illustrates a business rule. It consists of a list of steps.
-In addition to being a specification and documentation, a scenario is also a test. 
+In addition to being a specification and documentation, a scenario is also a test.
 As a whole, your scenarios are an executable specification of the system.
 
-A step typically starts with ***Given***, ***When*** or ***Then***. 
-If there are multiple Given or When steps underneath each other, you can use ***And*** or ***But***. 
+A step typically starts with ***Given***, ***When*** or ***Then***.
+If there are multiple Given or When steps underneath each other, you can use ***And*** or ***But***.
 Cucumber does not differentiate between the keywords, but choosing the right one is important for the readability of the scenario as a whole.
 
 Get look at login.feature in OroUserBundle - [UserBundle/Tests/Behat/Features/login.feature](../../../../UserBundle/Tests/Behat/Features/login.feature)
@@ -652,19 +660,19 @@ Scenario Outline: Fail login
 ```
 
 1. ```Feature: User login``` starts the feature and gives it a title.
-2. Behat does not parse the next 3 lines of text. (In order to... As an... I need to...). 
-  These lines simply provide context to the people reading your feature, 
+2. Behat does not parse the next 3 lines of text. (In order to... As an... I need to...).
+  These lines simply provide context to the people reading your feature,
   and describe the business value derived from the inclusion of the feature in your software.
-3. ```Scenario: Success login``` starts the scenario, 
+3. ```Scenario: Success login``` starts the scenario,
   and contains a description of the scenario.
-4. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context. 
-5. ```Scenario Outline: Fail login``` starts the next scenario. 
+4. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context.
+5. ```Scenario Outline: Fail login``` starts the next scenario.
   Scenario Outlines allow express examples through the use of a template with placeholders
-  The Scenario Outline steps provide a template which is never directly run. 
+  The Scenario Outline steps provide a template which is never directly run.
   A Scenario Outline is run once for each row in the Examples section beneath it (except for the first header row).
-  Think of a placeholder like a variable. 
-  It is replaced with a real value from the Examples: table row, 
-  where the text between the placeholder angle brackets matches that of the table column header. 
+  Think of a placeholder like a variable.
+  It is replaced with a real value from the Examples: table row,
+  where the text between the placeholder angle brackets matches that of the table column header.
 
 ## Troubleshooting
 
@@ -726,6 +734,76 @@ sudo service mysql start
 
 After restart all your data will lost.
 However the all db structure will lost too. You should copy data dir manually every start, or create a startup script.
+We will run the script via a systemd service.
+Therefore you need two files: the script and the .service file (unit configuration file).
+
+1. Create bash script in the home directory mysql_copy_tmpfs.sh:
+```bash
+#!/bin/bash
+cp -Rfp /var/lib/mysql /var/tmpfs
+```
+
+2. Unit file /etc/systemd/system/mysql_copy_tmpfs.service:
+```unit
+[Unit]
+Description=Copy mysql to tmpfs
+Before=mysql.service
+After=mount.target
+
+[Service]
+User=mysql
+Type=oneshot
+ExecStart=/bash/script/path/mysql_copy_tmpfs.sh
+
+[Install]
+WantedBy=multi-user.target
+
+```
+
+3. Once you're done with the files, enable the service:
+```bash
+systemctl enable mysql_copy_tmpfs.service
+```
+
+It should start automatically after rebooting the machine.
+For more details see systemd.service man page.
+
+### Couldn't generate random unique value for Oro\Bundle\UserBundle\Entity\User: username in 128 tries.
+
+Hot fix.
+Check your fixture.
+Remove  (unique) suffix in entity property in entity fixture. e.g.
+
+```yaml
+Oro\Bundle\UserBundle\Entity\User:
+    charlie:
+      firstName: Marge
+      lastName: Marge Simpson
+      username (unique): marge228
+```
+replace
+```yaml
+Oro\Bundle\UserBundle\Entity\User:
+    charlie:
+      firstName: Marge
+      lastName: Marge Simpson
+      username: marge228
+```
+
+
+Why it happens?
+Alice remember all the values for given entity property and try generate unique value, but value just one.
+This feature may be useful while using with Faker:
+
+replace
+```yaml
+Oro\Bundle\UserBundle\Entity\User:
+    charlie:
+      firstName (unique): <firstName()>
+      lastName: Marge Simpson
+      username: marge228
+```
+
 
 ### Append snippets
 
@@ -734,7 +812,7 @@ During the feature development you have next design stages:
   In this stage you should have clear understanding what business outcome you want to achieve.
 - Specifying the scenarios of using this feature. Concrete steps is steel not needed.
 - Get imagine of implementation and write down steps.
-  
+
 Some of steps will be already fully automated. We wish that all steps will be automated at once you wrote down them.
 But you may still have some steps that's not.
 If feature functionality is already implemented - it's the good time to write behat steps implementation.
@@ -745,7 +823,7 @@ The faster way to do so is run in console:
 bin/behat path/to/your.feature --dry-run --append-snippets --snippets-type=regex
 ```
 
-This is just run your feature without real execution (*--dry-run*) 
+This is just run your feature without real execution (*--dry-run*)
 and in the end of execution ask you to add undefined steps mock implementations to one of existing contexts
 
 ### How to find the right step
