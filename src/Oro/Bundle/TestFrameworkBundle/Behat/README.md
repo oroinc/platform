@@ -33,7 +33,6 @@
 - [Troubleshooting](#troubleshooting)
   - [Append snippets](#append-snippets)
   - [Increase application performance](#increase-application-performance)
-  - [Feature debugging](#feature-debugging)
     - [Pause feature execution](#pause-feature-execution)
   - [How to find the right step](#how-to-find-the-right-step)
     - [Auto suggestion in PhpStorm](#auto-suggestion-in-phpstorm)
@@ -884,3 +883,4 @@ bin/behat -dl -s AcmeDemoBundle | grep "grid"
 
 - Separate this README to multipage document
 - Explain "wait for ajax" flow
+- Feature debugging
