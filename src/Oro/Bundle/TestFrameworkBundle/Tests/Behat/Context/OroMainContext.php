@@ -131,6 +131,7 @@ class OroMainContext extends MinkContext implements
      * Example: Then I should see "The email was sent" flash message
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message$/
      */
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
