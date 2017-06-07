@@ -276,9 +276,12 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $messageData1 = $messageData;
         $messageData1['filePath'] = '1_test.csv';
         $messageData1['jobId'] = 2;
+        $messageData1['options']['batch_number'] = 1;
+
         $messageData2 = $messageData;
         $messageData2['filePath'] = '2_test.csv';
         $messageData2['jobId'] = 3;
+        $messageData2['options']['batch_number'] = 2;
 
         $producer = $this->createMessageProducerInterfaceMock();
         $producer

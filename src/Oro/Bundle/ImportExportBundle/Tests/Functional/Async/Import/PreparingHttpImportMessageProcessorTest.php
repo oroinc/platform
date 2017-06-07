@@ -41,7 +41,10 @@ class PreparingHttpImportMessageProcessorTest extends WebTestCase
             'userId' => '1',
             'jobName' => 'entity_import_from_csv',
             'processorAlias' => 'oro_test.add_or_replace',
-            'options' => [],
+            'options' => [
+                'batch_size' => 100,
+                'batch_number' => 1
+            ],
         ];
 
         $message = new NullMessage();

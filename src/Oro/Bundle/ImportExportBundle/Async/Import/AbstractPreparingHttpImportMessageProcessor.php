@@ -63,6 +63,11 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
     protected $dependentJob;
 
     /**
+     * @var integer
+     */
+    protected $batchSize;
+
+    /**
      * @param HttpImportHandler $httpImportHandler
      * @param JobRunner $jobRunner
      * @param MessageProducerInterface $producer
@@ -89,6 +94,13 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
         $this->dependentJob = $dependentJob;
     }
 
+    /**
+     * @param integer $batchSize
+     */
+    public function setBatchSize($batchSize)
+    {
+        $this->batchSize = $batchSize;
+    }
 
     /**
      * {@inheritdoc}
@@ -96,7 +108,6 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = JSON::decode($message->getBody());
-
         $body = array_replace_recursive([
                 'filePath' => null,
                 'originFileName' => null,
@@ -105,6 +116,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                 'processorAlias' => null,
                 'options' => [],
             ], $body);
+        $body = $this->prepareBatchSize($body);
 
         if (! $body['filePath'] || ! $body['processorAlias'] || ! $body['userId']) {
             $this
@@ -135,7 +147,6 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                 sprintf('Import of file %s failed', $body['originFileName']),
                 ['message' => $message]
             );
-
             $this->producer->send(
                 Topics::SEND_IMPORT_ERROR_INFO,
                 [
@@ -166,6 +177,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                         ),
                         function (JobRunner $jobRunner, Job $child) use ($body, $file, $key) {
                             $body['filePath'] = $file;
+                            $body['options']['batch_number'] = $key;
                             $this->producer->send(
                                 static::getTopicForChildJob(),
                                 array_merge($body, ['jobId' => $child->getId()])
@@ -191,5 +203,19 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
         );
 
         return $result ? self::ACK : self::REJECT;
+    }
+
+    /**
+     * @param array $body
+     *
+     * @return mixed
+     */
+    protected function prepareBatchSize($body)
+    {
+        if ($this->batchSize) {
+            $body['options']['batch_size'] = $this->batchSize;
+        }
+
+        return $body;
     }
 }

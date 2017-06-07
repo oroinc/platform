@@ -73,6 +73,8 @@ services:
             - '@oro_importexport.file.split_csv_file'
             - '@doctrine'
             - '@oro_message_queue.job.dependent_job_service'
+        calls:
+            - [setBatchSize, ['%oro_importexport.file.split_csv_file.size_of_batch%']]
 
     oro_importexport.async.preparing_http_import_validation:
         class: Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor
