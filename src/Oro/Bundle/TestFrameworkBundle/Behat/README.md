@@ -2,7 +2,7 @@
 
 ## Content
 
-- [Before you start](#before-you-start)
+- [Before you begin](#before-you-begin)
 - [Conventions](#conventions)
 - [Getting Started](#cetting-started)
   - [Configuring](#configuring)
@@ -41,23 +41,24 @@
     - [Grep in console](#grep-in-console)
   - [Element not visible](#element-not-visible)
 
-## Before you start
+## Before you begin
+
+The information below summarizes concepts and tools that are important for understanding and use of the test framework delivered in TestFrameworkBundle.
 
 ***Behavior-driven development (BDD)*** is a software development process that emerged from test-driven development (TDD).
-Behavior-driven development combines the general techniques and principles of TDD
+The Behavior-driven development combines the general techniques and principles of TDD
 with ideas from domain-driven design and object-oriented analysis and design to provide software development and management teams
 with shared tools and a shared process to collaborate on software development.
 [Read more at Wiki](https://en.wikipedia.org/wiki/Behavior-driven_development)
 
 ***Behat*** is a Behavior Driven Development framework for PHP.
-[See more at behat documentation](http://docs.behat.org/en/v3.0/)
+[See more in behat documentation](http://docs.behat.org/en/v3.0/)
 
-***Mink*** is an open source browser controller/emulator for web applications, written in PHP.
+***Mink*** is an open source browser controller/emulator for web applications, developed using PHP.
 [Mink documentation](http://mink.behat.org/en/latest/)
 
-
-***OroElementFactory*** create elements in contexts.
-See more about [page object pattern](http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
+***OroElementFactory*** creates elements in contexts.
+See more information about [page object pattern](http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
 
 ***Symfony2 Extension*** provides integration with Symfony2.
 [See Symfony2 Extension documentation](https://github.com/Behat/Symfony2Extension/blob/master/doc/index.rst)
@@ -69,22 +70,22 @@ See [Driver Feature Support](http://mink.behat.org/en/latest/guides/drivers.html
 
 ***Selenium2*** browser automation tool with object oriented API.
 
-***PhantomJS*** is a headless WebKit scriptable with a JavaScript API.
-It has fast and native support for various web standards: DOM handling, CSS selector, JSON, Canvas, and SVG.
+***PhantomJS*** is a headless WebKit scriptable with a JavaScript API that is fast and originally supports various web standards, like DOM handling, CSS selector, JSON, Canvas, and SVG.
 
 ## Conventions
 
-- **We are not using selectors in scenarios** e.g.
+This section summarizes limitations and agreements that are important for shared test maintenance and use. 
+
+- **Use form mapping instead of selectors in your scenarios** to keep them clear and understandable for people from both technical and nontechnical world.
+
+  **Don't**:
 
   ```gherkin
       I fill in "oro_workflow_definition_form[label]" with "User Workflow Test"
       I fill in "oro_workflow_definition_form[related_entity]" with "User"
   ```
-
-  Why we do so? Because it is not readable for end user.
-  Scenarios should be understandable for people from both worlds - technical and nontechnical
-  So, instead we are using form mapping:
-
+  **Do**:
+  
   ```gherkin
       And I fill "Workflow Edit Form" with:
         | Name                  | User Workflow Test |
@@ -101,44 +102,37 @@ It has fast and native support for various web standards: DOM handling, CSS sele
             Related Entity: 'oro_workflow_definition_form[related_entity]'
   ```
 
-- **We are not using url for go to page**
-  You should instead use menu and links to get the right pages.
-  Instead of:
+- **Use menu and links to get the right pages instead of the direct page url**. See [Page element](#page-element) for more information.
 
+  **Don't**:
   ```gherkin
       And I go to "/users"
   ```
-
-  Use:
+  
+  **Do**:
 
   ```gherkin
       And I open User Index page
   ```
+- **Use scenario coupling** to cover the feature with tests. We have taken this path because of the following benefits:
 
-  See [Page element](#page-element)
+  - Faster scenario execution due to the shared user session and smart data preparation. The login action in the initial scenario opens the session that is reusable by the following scenarios. Preliminary scenraios (e.g. create) prepare data for the following scenarios (e.g. delete).
+  - Feature level isolation boosts execution speed, especially in the slow test environments.
+  - Minimized routine development actions (e.g. you don't have to load fixtures for every scenario; instead, you reuse the available outcomes of the previous scenarios).
+  - Easily handle the application states that is difficult to emulate with data fixtures only (e.g. when adding new entity fields in the UI).
 
-- **Scenario Coupling.**
-  We know that it is a bad practice to have scenarios that are depends to each other.
+  By coupling scenarios, the ease of debugging and bug localization get sacrificed. It is difficult to debug UI features and the scenarios that happen after several preliminary scenarios. The longer the line, the harder it is to isolate the issue. See [Feature debugging](#feature-debugging) for more information. Once the issue occurs, you have to spend additional time to localize it and identify the root cause (e.g. the delete scenario may be malfunctioning vs the delete scenario may fail due to the issues in the preliminary scenario, for example, create). The good point is that the most critical actions/scenarios usually precede the less critical. Who cares about the delete if the create does not work in the first place? ;)
 
-  This has some pros:
-  - Features runs much faster. You don't need login (initialize user session) each time, before each scenario
-  - Isolation in feature level instead of scenario level isolation give a boost to speed, especially on slow test environments
-  - Development speed. Usually don't need to care about fixtures before each scenario.
-    Even more some of application state is difficult prepare with fixtures - think about adding new entity fields from UI
+- **Use semantical yml fixtures** - use only the entities that are in the bundle you are testing. Any other entities should be included via import. See [Alice fixtures](#alice-fixtures)
 
-  and cons:
-  - Debug behat ui features is hard.
-    But debug last scenario in looong feature is even heavier when it depends on planty previous.
-    See [Feature debuging](#feature-debuging)
-  - Bug localization - you don't sure why delete scenario was broken because of create scenario is broken or not.
-    However who care about delete if create not working? ;)
-- **Semantical yml fixtures.**
-  We are should use only that entities that bundle has.
-  Any other entities should be included by import.
-  See [Alice fixtures](#alice-fixtures)
-- **Elements should be named camelCase without spaces.**
-  You can use it in feature with spaces after. e.g. element name ```OroProductForm``` and in step ```I fill "Oro Product From" with:```
-- **We are not using Background step** (see scenario coupling above) but you can use ```Scenario: Feature Background``` for these purposes
+- **Name elements in camelCase style without spaces**
+  You can still refer to it using the camelCase style with spaces in the behat scenarios. For example, an element named ```OroProductForm``` may be mentioned in the step of the scenario as "Oro Product From":
+  
+  ```
+  I fill "Oro Product From" with:
+  ```
+
+- **Use ```Scenario: Feature Background``` instead of the Background step**
 
 ## Getting Started
 
