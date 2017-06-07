@@ -33,6 +33,7 @@
 - [Troubleshooting](#troubleshooting)
   - [Append snippets](#append-snippets)
   - [Increase application performance](#increase-application-performance)
+  - [Feature debugging](#feature-debugging)
     - [Pause feature execution](#pause-feature-execution)
   - [How to find the right step](#how-to-find-the-right-step)
     - [Auto suggestion in PhpStorm](#auto-suggestion-in-phpstorm)
@@ -287,11 +288,9 @@ bin/behat -s OroUserBundle
 
 ### DI Containers
 
-You may understand the difference with two containers - Application Container and Behat Container.
-Behat is a symfony console application with it's own container and services.
+Behat is a symfony console application with it's own container and services. Behat container may be configured through Extensions using *behat.yml* in the root of the application directory.
 
-Behat container can be configured through Extensions by behat.yml in the root of application.
-Application container can be used by inject Kernel in your Context by implementing ```KernelAwareContext``` and using ```KernelDictionary``` trait.
+Application container may be used by injected Kernel in your Context after you implement ```KernelAwareContext``` and use ```KernelDictionary``` trait.
 
 ```php
 use Behat\Symfony2Extension\Context\KernelAwareContext;
@@ -309,7 +308,7 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
 }
 ```
 
-Even more, you can inject application services in behat Context:
+Moreover, you can inject application services in behat Context:
 ```yml
 oro_behat_extension:
   suites:
@@ -321,17 +320,18 @@ oro_behat_extension:
 ```
 
 
-### Suites autoload
+### Autoload Suites
 
-For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
-During initialization, Extension will create test suite with bundle name if any ```Tests/Behat/Features``` directory exits.
+```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used for building testing suites.
+
+During initialization, extension creates test suite with a bundle name if any ```Tests/Behat/Features``` directory exits in a bundle.
 Thus, if bundle has no Features directory - no test suite would be created for it.
 
-If you need some specific feature steps for your bundle you should create ```AcmeDemoBundle\Tests\Behat\Context\FeatureContext``` class.
-This context will added to suite with other common contexts.
-The full list of common context configured in behat configuration file under ```shared_contexts``` see [behat.yml.dist](../../config/behat.yml.dist#L29-L39)
+If you need some specific feature steps for your bundle, create the ```AcmeDemoBundle\Tests\Behat\Context\FeatureContext``` class.
+This context is added to the suite with other common contexts.
+The complete list of common context is configured in the behat configuration file under the ```shared_contexts```. See [behat.yml.dist](../../config/behat.yml.dist#L29-L39).
 
-You can manually configure suite for bundle in application behat config:
+You can manually configure test suite for a bundle in the application behat configuration:
 
 ```yml
 default: &default
@@ -347,7 +347,7 @@ default: &default
         - 'vendor/Acme/DemoBundle/Tests/Behat/Features'
 ```
 
-Or in bundle behat configuration ```{BundleName}/Tests/Behat/behat.yml```:
+or in a bundle behat configuration ```{BundleName}/Tests/Behat/behat.yml```:
 
 ```yml
 oro_behat_extension:
@@ -361,7 +361,7 @@ oro_behat_extension:
         - '@AcmeDemoBundle/Tests/Behat/Features'
 ```
 
-Every bundle that has configured suite in configuration file will not be autoloaded by extension.
+Manually configured test suits are not autoloaded by the extension.
 
 
 ### Feature isolation
@@ -884,4 +884,3 @@ bin/behat -dl -s AcmeDemoBundle | grep "grid"
 
 - Separate this README to multipage document
 - Explain "wait for ajax" flow
-- Feature debugging
