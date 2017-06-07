@@ -106,8 +106,16 @@ It has fast and native support for various web standards: DOM handling, CSS sele
   Instead of:
 
   ```gherkin
-      And I go to ""
+      And I go to "/users"
   ```
+
+  Use:
+
+  ```gherkin
+      And I open User Index page
+  ```
+
+  See [Page element](#page-element)
 
 - **Scenario Coupling.**
   We know that it is a bad practice to have scenarios that are depends to each other.
@@ -127,6 +135,7 @@ It has fast and native support for various web standards: DOM handling, CSS sele
 - **Semantical yml fixtures.**
   We are should use only that entities that bundle has.
   Any other entities should be included by import.
+  See [Alice fixtures](#alice-fixtures)
 - **Elements should be named camelCase without spaces.**
   You can use it in feature with spaces after. e.g. element name ```OroProductForm``` and in step ```I fill "Oro Product From" with:```
 - **We are not using Background step** (see scenario coupling above) but you can use ```Scenario: Feature Background``` for these purposes
@@ -137,7 +146,7 @@ It has fast and native support for various web standards: DOM handling, CSS sele
 
 #### Application Configuration
 
-For now the basic prod configuration for application is enough.
+Basic prod configuration for application is enough.
 Take care about ```mailer_transport``` setting in parameters.yml.
 If you don't have any mail server configured locally, you should set it to ```null```.
 
@@ -182,7 +191,7 @@ composer install
 
 In ORO application for initial state we suppose application after install without fixtures.
 Every feature should depends on this state.
-And additional data can be create by scenarios or just [fixtures](#Feature fixtures)
+And additional data can be create by scenarios or just [fixtures](#fixtures)
 
 Install application without fixture in prod mode:
 
@@ -194,8 +203,8 @@ app/console oro:install  --drop-database --user-name=admin --user-email=admin@ex
 
 #### Install browser emulator
 
-For execute features you need browser emulator demon (Selenium2 or PhantomJs) runing.
-PhantomJs works faster but you can't view how it works in real browser (however you will have screenshot if something went wrong)
+For execute features you need browser emulator demon (Selenium2 or PhantomJs) running.
+PhantomJs works faster but you can't view how it works in real browser (however you will have screenshots if something went wrong)
 Selenium2 server run features in a real browser
 
 Install PhantomJs:
@@ -221,7 +230,7 @@ mkdir $HOME/selenium-server-standalone-3.4.0
 curl -L https://selenium-release.storage.googleapis.com/3.4/selenium-server-standalone-3.4.0.jar > $HOME/selenium-server-standalone-3.4.0/selenium.jar
 ```
 
-Download Chrome Driver and save in same directory as selenium http://chromedriver.storage.googleapis.com/index.html?path=2.29/
+Download Chrome Driver and save in bin directory as selenium http://chromedriver.storage.googleapis.com/index.html?path=2.29/
 
 ### Running tests
 
@@ -236,7 +245,7 @@ phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1
 Run Selenium2:
 
 ```bash
-java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1
+java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1
 ```
 
 > For run emulator in background add ampersand symbol (&) to the end of line:
@@ -245,7 +254,7 @@ java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriv
 > ```
 > and
 > ```bash
-> java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar > /dev/null 2>&1 &
+> java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar > /dev/null 2>&1 &
 > ```
 
 #### Run tests
@@ -291,7 +300,7 @@ Every bundle has its own test suite and can be run separately:
 
 ### DI Containers
 
-You may understands the difference with two containers - Application Container and Behat Container.
+You may understand the difference with two containers - Application Container and Behat Container.
 Behat is a symfony console application with it's own container and services.
 
 Behat container can be configured through Extensions by behat.yml in the root of application.
@@ -313,13 +322,25 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
 }
 ```
 
+Even more, you can inject application services in behat Context:
+```yml
+oro_behat_extension:
+  suites:
+    OroCustomerAccountBridgeBundle:
+      contexts:
+        - OroImportExportBundle::ImportExportContext:
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_importexport.processor.registry'
+```
+
+
 ### Suites autoload
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
 During initialization, Extension will create test suite with bundle name if any ```Tests/Behat/Features``` directory exits.
 Thus, if bundle has no Features directory - no test suite would be created for it.
 
-If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
+If you need some specific feature steps for your bundle you should create ```AcmeDemoBundle\Tests\Behat\Context\FeatureContext``` class.
 This context will added to suite with other common contexts.
 The full list of common context configured in behat configuration file under ```shared_contexts``` see [behat.yml.dist](../../config/behat.yml.dist#L29-L39)
 
@@ -377,7 +398,7 @@ In this case feature should run much faster, but you should care by yourself abo
 Elements is a service layer in behat tests. They wrap all difficult business logic.
 Take a minute to investigate base Mink [NodeElement](https://github.com/minkphp/Mink/blob/9ea1cebe3dc529ba3861d87c818f045362c40484/src/Element/NodeElement.php).
 It has many public methods, not all of that is applicable for any element.
-Every Bundle can have own number of elements. All elements must be discribed in ```{BundleName}/Tests/Behat/behat.yml``` in way:
+Every Bundle can have own number of elements. All elements must be discribed in ```{BundleName}/Tests/Behat/behat.yml``` in a way:
 
 ```yml
 oro_behat_extension:
@@ -391,7 +412,7 @@ oro_behat_extension:
           Password: '_password'
 ```
 
-1. ```Login``` is an element name. It must be unique.
+1. ```Login``` is an element name that MUST be unique.
  Element can be created in context by ```OroElementFactory``` by it's name:
 
  ```php
