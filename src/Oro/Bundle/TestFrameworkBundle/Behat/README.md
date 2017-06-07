@@ -1,4 +1,4 @@
-# Oro Behat Extension
+# OroBehatExtension
 
 ## Content
 
@@ -43,7 +43,7 @@
 
 ## Before you begin
 
-The information below summarizes concepts and tools that are important for understanding and use of the test framework delivered in TestFrameworkBundle.
+The information below summarizes concepts and tools that are important for understanding and use of the test framework delivered within OroBehatExtension.
 
 ***Behavior-driven development (BDD)*** is a software development process that emerged from test-driven development (TDD).
 The Behavior-driven development combines the general techniques and principles of TDD
