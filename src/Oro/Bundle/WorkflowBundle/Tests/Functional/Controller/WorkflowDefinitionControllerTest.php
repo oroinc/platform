@@ -22,11 +22,14 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions']);
-        $this->workflowManager = $this->client->getContainer()->get('oro_workflow.manager');
+        $this->workflowManager = $this->client->getContainer()->get('oro_workflow.manager.system');
     }
 
     public function testIndexAction()
     {
+        $response = $this->client->requestGrid(['gridName' => 'workflow-definitions-grid'], [], true);
+        $this->getJsonResponseContent($response, 200);
+
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_workflow_definition_index'),
@@ -38,6 +41,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $this->assertNotEmpty($crawler->html());
+        $this->assertContains('workflow-definitions-grid', $crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::WITH_START_STEP, $crawler->html());
         $this->assertContainGroups($crawler->html());
