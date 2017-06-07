@@ -2,17 +2,17 @@
 
 ## Content
 
-- [Before you begin](#before-you-begin)
+- [Before You Begin](#before-you-begin)
 - [Conventions](#conventions)
 - [Getting Started](#cetting-started)
-  - [Configuring](#configuring)
+  - [Configuration](#configuration)
     - [Application Configuration](#application-configuration)
     - [Behat Configuration](#behat-configuration)
-  - [Installing](#installing)
+  - [Installation](#installing)
     - [Install dev dependencies](#install-dev-dependencies)
     - [Application Initial State](#application-initial-state)
     - [Install browser emulator](#install-browser-emulator)
-  - [Running tests](#running-tests)
+  - [Test Execution](#test-execution)
     - [Run browser emulator](#run-browser-emulator)
     - [Run tests](#run-tests)
 - [Architecture](#architecture)
@@ -40,7 +40,7 @@
     - [Grep in console](#grep-in-console)
   - [Element not visible](#element-not-visible)
 
-## Before you begin
+## Before You Begin
 
 The information below summarizes concepts and tools that are important for understanding and use of the test framework delivered within OroBehatExtension.
 
@@ -113,7 +113,7 @@ This section summarizes limitations and agreements that are important for shared
   ```gherkin
       And I open User Index page
   ```
-- **Use scenario coupling** to cover the feature with tests. We have taken this path because of the following benefits:
+- **Avoid scenario redundancy** (e.g. repeating same sequence of steps, like login, in multiple scenarios). Cover the feature with the sequential scenarios where every following scenario reuses outcomes (the states and data) prepared by their predecessors. This path was chosen because of the following benefits:
 
   - Faster scenario execution due to the shared user session and smart data preparation. The login action in the initial scenario opens the session that is reusable by the following scenarios. Preliminary scenraios (e.g. create) prepare data for the following scenarios (e.g. delete).
   - Feature level isolation boosts execution speed, especially in the slow test environments.
@@ -122,10 +122,9 @@ This section summarizes limitations and agreements that are important for shared
 
   By coupling scenarios, the ease of debugging and bug localization get sacrificed. It is difficult to debug UI features and the scenarios that happen after several preliminary scenarios. The longer the line, the harder it is to isolate the issue. See [Feature debugging](#feature-debugging) for more information. Once the issue occurs, you have to spend additional time to localize it and identify the root cause (e.g. the delete scenario may be malfunctioning vs the delete scenario may fail due to the issues in the preliminary scenario, for example, create). The good point is that the most critical actions/scenarios usually precede the less critical. Who cares about the delete if the create does not work in the first place? ;)
 
-- **Use semantical yml fixtures** - use only the entities that are in the bundle you are testing. Any other entities should be included via import. See [Alice fixtures](#alice-fixtures)
+- **Use semantical yml fixtures**. Use only the entities that are in the bundle you are testing. Any other entities should be included via import. See [Alice fixtures](#alice-fixtures)
 
-- **Name elements in camelCase style without spaces**
-  You can still refer to it using the camelCase style with spaces in the behat scenarios. For example, an element named ```OroProductForm``` may be mentioned in the step of the scenario as "Oro Product From":
+- **Name elements in camelCase style without spaces**. You can still refer to it using the camelCase style with spaces in the behat scenarios. For example, an element named ```OroProductForm``` may be mentioned in the step of the scenario as "Oro Product From":
   
   ```
   I fill "Oro Product From" with:
@@ -135,19 +134,18 @@ This section summarizes limitations and agreements that are important for shared
 
 ## Getting Started
 
-### Configuring
+### Configuration
 
 #### Application Configuration
 
-Basic prod configuration for application is enough.
-Take care about ```mailer_transport``` setting in parameters.yml.
-If you don't have any mail server configured locally, you should set it to ```null```.
+Use default configuration for the application installed in production mode.
+If you don't have any mail server configured locally, set ```mailer_transport``` setting in *parameters.yml* to ```null```.
 
 #### Behat Configuration
 
 Base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
-Every application has its own behat.yml.dist in the root of application directory.
-Create your ```behat.yml```(it will be ignored by git), import base configuration and change it:
+Every application has its own behat.yml.dist file in the root of the application directory.
+Create your ```behat.yml```(it is ignored by git automatically and is never commited to the remote repository), import base configuration and change it to fit your environment:
 
 ```yaml
 imports:
@@ -168,13 +166,13 @@ selenium2:
 
 ```
 
-### Installing
+### Installation
 
 #### Install dev dependencies
 
-Remove ```composer.lock``` file if you install dependencies with ```--no-dev``` parameter before.
+If you installed dependencies with ```--no-dev``` parameter earlier, remove ```composer.lock``` file from the root of the application directory.
 
-Install dev dependencies:
+Install dev dependencies using the following command:
 
 ```bash
 composer install
@@ -182,11 +180,13 @@ composer install
 
 #### Application Initial State
 
-In ORO application for initial state we suppose application after install without fixtures.
-Every feature should depends on this state.
-And additional data can be create by scenarios or just [fixtures](#fixtures)
+In Oro application, initial state is the one application enters after installation without demo data.
 
-Install application without fixture in prod mode:
+Scenarios that test features should rely on this state and should create any data that is necessary for additional verifications.
+
+Data may be created by the steps of the sceario or as [fixtures](#fixtures).
+
+Install application without demo data in production mode using the following command:
 
 ```bash
 app/console oro:install  --drop-database --user-name=admin --user-email=admin@example.com \
@@ -194,13 +194,12 @@ app/console oro:install  --drop-database --user-name=admin --user-email=admin@ex
   --organization-name=ORO --env=prod --sample-data=n --timeout=3000
 ```
 
-#### Install browser emulator
+#### Install Browser for Test Automation
 
-For execute features you need browser emulator demon (Selenium2 or PhantomJs) running.
-PhantomJs works faster but you can't view how it works in real browser (however you will have screenshots if something went wrong)
-Selenium2 server run features in a real browser
+To execute scenarios that use Oro application features, run browser-automation server (Selenium Web Driver) or browser (PhantomJs).
+PhantomJs is more efficient but is headless and is not observable for a human. However, you can make screenshots when anything goes wrong. Selenium server runs feature tests in a real browser.
 
-Install PhantomJs:
+To install PhantomJs, run the following commands:
 
 ```bash
 mkdir $HOME/phantomjs
@@ -209,85 +208,80 @@ tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/phantomjs
 sudo ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
 ```
 
-This commands accomplishes a number of things:
+**Note:** These commands create a subdirector for phantomjs in your home directory, downloads phantomjs into directory that you just created, uncompress files, creates symbolic link.
 
-1. Created dir for phantomjs in your home directory
-2. Download phantomjs into directory that you just created
-3. Uncompress files
-4. Created symbolic link. Now you can use ```phantomjs``` in terminal.
+After the command execution is complete, you can use ```phantomjs``` in terminal.
 
-Install Selenium2
+To install Selenium Web Driver, use the following commands:
 
 ```bash
 mkdir $HOME/selenium-server-standalone-3.4.0
 curl -L https://selenium-release.storage.googleapis.com/3.4/selenium-server-standalone-3.4.0.jar > $HOME/selenium-server-standalone-3.4.0/selenium.jar
 ```
 
-Download Chrome Driver and save in bin directory as selenium http://chromedriver.storage.googleapis.com/index.html?path=2.29/
+Next, download Chrome Driver from http://chromedriver.storage.googleapis.com/index.html?path=2.29/ and save it into your bin directory as selenium.
 
-### Running tests
+### Test Execution
 
-#### Run browser emulator
+#### Prerequisites
 
 Run PhantomJs:
 
 ```bash
 phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1
-```
+``` 
+OR
 
-Run Selenium2:
+Run Standalone Selenium Server:
 
 ```bash
 java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1
 ```
 
-> For run emulator in background add ampersand symbol (&) to the end of line:
+> To run PhantomJs or Selenium server in background, append ampersand symbol (&) to the end of line, like in the following examples:
 > ```bash
 > phantomjs --webdriver=8643 > /dev/null 2>&1 &
-> ```
-> and
-> ```bash
+>
 > java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar > /dev/null 2>&1 &
 > ```
 
 #### Run tests
 
-Before you go, it is highly recommended discover behat arguments and options:
+Before you begin, it is highly recommended to make yourself familiar with behat arguments and options. Run ```bin/behat --help``` for detailed description.
 
-```bash
-bin/behat --help
-```
+When the Oro application is installed without demo data and is running, and the PhantomJs or Selenium Server is running, you can start runing the behat tests by feature from the root of application.
 
-If you already have installed application and running browser emulator you can try to run the first behat feature
-from the root of application with PhantomJs:
+You may use one of the following commands.
+
+Run feature test scenarios with PhantomJs:
 
 ```bash
 bin/behat vendor/oro/platform/src/Oro/Bundle/UserBundle/Tests/Behat/Features/login.feature -vvv
 ```
 
-Or with Selenium:
+Run feature test scenarios with Selenium:
 
 ```bash
 bin/behat vendor/oro/platform/src/Oro/Bundle/UserBundle/Tests/Behat/Features/login.feature -vvv -p selenium2
 ```
 
-To look the all available feature steps:
+Preview all available feature steps:
 
 ```bash
 bin/behat -dl -s OroUserBundle
 ```
 
-or view steps with full description and examples:
+View steps with full description and examples:
 
 ```bash
 bin/behat -di -s OroUserBundle
 ```
 
-Every bundle has its own test suite and can be run separately:
+Every bundle has its dedicated test suite that can be run separately:
 
- ```bash
- bin/behat -s OroUserBundle
- ```
+```bash
+bin/behat -s OroUserBundle
+```
 
 ## Architecture
 
