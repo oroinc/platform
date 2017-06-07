@@ -17,6 +17,6 @@ class UserWithoutRole extends Constraint
      */
     public function validatedBy()
     {
-        return UserWithoutRoleValidator::ALIAS;
+        return UserWithoutRoleValidator::class;
     }
 }

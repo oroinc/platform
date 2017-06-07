@@ -118,7 +118,7 @@ class GridViewApiHandler
             if (is_array($filter) && array_key_exists('type', $filter) && $filter['type'] == null) {
                 $filters[$name]['type'] = '';
             }
-            if (is_array($filter['value'])) {
+            if (is_array($filter) && is_array($filter['value'])) {
                 foreach ($filter['value'] as $k => $value) {
                     if (is_array($value)) {
                         $filters[$name]['value'][$k] = $value['value'];

@@ -51,6 +51,24 @@ DataGridBundle
     - changed constructor signature from `__construct(ContainerInterface $container, SecurityFacade $securityFacade, TranslatorInterface $translator)` to `__construct(MassActionFactory $actionFactory, MassActionMetadataFactory $actionMetadataFactory, SecurityFacade $securityFacade)`
     - removed method `registerAction`. Use `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory::registerAction` instead
 
+CronBundle
+---------------
+- Class `Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor`
+    - removed property `$commandRunner`
+    - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
+- Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
+
+IntegrationBundle
+-----------------
+- Class `Oro\Bundle\IntegrationBundle\Controller\IntegrationController`
+    - removed method `getSyncScheduler`
+    - removed method `getTypeRegistry`
+    - removed method `getLogger`
+- Removed translation label `oro.integration.sync_error_invalid_credentials`
+- Removed translation label `oro.integration.progress`
+- Updated translation label `oro.integration.sync_error`
+- Updated translation label `oro.integration.sync_error_integration_deactivated`
+
 MigrationBundle
 ---------------
 - Added event `oro_migration.data_fixtures.pre_load` that is raised before data fixtures are loaded
@@ -77,6 +95,9 @@ TestFrameworkBundle
 
 WorkflowBundle
 --------------
+- Class `Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension`
+    - removed property `$queuedJobs`
+    - changed signature of method `createJobs`. Added parameter `$queuedJobs`
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
     - changed constructor signature:
         - first argument replaced with `Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider $definitionProvider`;

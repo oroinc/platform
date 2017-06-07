@@ -140,11 +140,21 @@
                     mediator.execute('showLoading');
 
                     $.ajax(url, {
-                        success: function (res) {
-                            messenger.notificationMessage('success', res.message);
+                        success: function (response) {
+                            messenger.notificationMessage(
+                                response.successful ? 'success' : 'warning',
+                                response.message
+                            );
                         },
-                        errorHandlerMessage: __('oro.integration.error'),
-                        dataType: 'json'
+                        error: function(response) {
+                            messenger.notificationMessage(
+                                'error',
+                                response.responseJSON && response.responseJSON.message
+                                    ? response.responseJSON.message
+                                    : __('oro.integration.error')
+                            );
+                        },
+                        errorHandlerMessage: false
                     }).always(function () {
                         mediator.execute('hideLoading');
                     });
