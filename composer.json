@@ -127,6 +127,14 @@
         "phpmd/phpmd": "2.6.*",
         "sebastian/phpcpd": "2.0.*"
     },
+    "repositories": {
+        "oro": {
+            "type": "composer",
+            "url": "https://packagist.orocrm.com"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "extra": {
         "branch-alias": {
             "dev-master": "2.1.x-dev"
