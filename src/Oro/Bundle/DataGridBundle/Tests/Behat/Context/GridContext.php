@@ -6,6 +6,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
@@ -1151,6 +1152,50 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $refreshButton = $this->getGrid($gridName)->getElement('GridToolbarActionReset');
         $refreshButton->click();
+    }
+
+    /**
+     * Show specified filter for grid
+     *
+     * @Given /^(?:|I) show filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>([\w\s]+))" grid$/
+     *
+     * @param string $filter
+     * @param string $gridName
+     */
+    public function iShowFilterInGrid($filter, $gridName)
+    {
+        $grid = $this->getGrid($gridName);
+
+        $grid->getElement('GridFilersButton')->open();
+        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $filterButton->click();
+
+        /** @var FrontendGridFilterManager $filterManager */
+        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        $filterManager->checkColumnFilter($filter);
+        $filterManager->close();
+    }
+
+    /**
+     * Hide specified filter for grid
+     *
+     * @Given /^(?:|I) hide filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>([\w\s]+))" grid$/
+     *
+     * @param string $filter
+     * @param string $gridName
+     */
+    public function iHideFilterInGrid($filter, $gridName)
+    {
+        $grid = $this->getGrid($gridName);
+
+        $grid->getElement('GridFilersButton')->open();
+        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $filterButton->click();
+
+        /** @var FrontendGridFilterManager $filterManager */
+        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        $filterManager->uncheckColumnFilter($filter);
+        $filterManager->close();
     }
 
     /**
