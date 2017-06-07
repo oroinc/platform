@@ -10,84 +10,84 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item1@mail.com 123-456-100
+                record_string: "item1@mail.com 0123-456100"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item2@mail.com 200987654
+                record_string: "item2@mail.com 200987654"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item3@mail.com 123-456-300
+                record_string: "item3@mail.com 0123-456300"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item4@mail.com 400987654
+                record_string: "item4@mail.com 400987654"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item5@mail.com 123-456-500
+                record_string: "item5@mail.com 0123-456500"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item6@mail.com 600987654
+                record_string: "item6@mail.com 600987654"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item7@mail.com 123-456-700
+                record_string: "item7@mail.com 0123-456700"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item8@mail.com 800987654
+                record_string: "item8@mail.com 800987654"
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item9@mail.com 123-456-900
+                record_string: "item9@mail.com 0123-456900"
                 record_url: http://localhost%oro_default_prefix%search/
     soap:
          item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item1@mail.com 123-456-100
+                recordTitle: "item1@mail.com 0123-456100"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item2@mail.com 200987654
+                recordTitle: "item2@mail.com 200987654"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item3@mail.com 123-456-300
+                recordTitle: "item3@mail.com 0123-456300"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item4@mail.com 400987654
+                recordTitle: "item4@mail.com 400987654"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item5@mail.com 123-456-500
+                recordTitle: "item5@mail.com 0123-456500"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item6@mail.com 600987654
+                recordTitle: "item6@mail.com 600987654"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item7@mail.com 123-456-700
+                recordTitle: "item7@mail.com 0123-456700"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item8@mail.com 800987654
+                recordTitle: "item8@mail.com 800987654"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item9@mail.com 123-456-900
+                recordTitle: "item9@mail.com 0123-456900"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
