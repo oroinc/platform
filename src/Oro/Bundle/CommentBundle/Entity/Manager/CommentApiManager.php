@@ -14,6 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -48,6 +49,9 @@ class CommentApiManager extends ApiEntityManager
     /** @var AttachmentProvider */
     protected $attachmentProvider;
 
+    /** @var AttachmentManager */
+    protected $attachmentManager;
+
     /** @var aclHelper */
     protected $aclHelper;
 
@@ -61,6 +65,7 @@ class CommentApiManager extends ApiEntityManager
      * @param Pager                    $pager
      * @param EventDispatcherInterface $eventDispatcher
      * @param AttachmentProvider       $attachmentProvider
+     * @param AttachmentManager        $attachmentManager
      * @param AclHelper                $aclHelper
      * @param ConfigManager            $configManager
      */
@@ -71,6 +76,7 @@ class CommentApiManager extends ApiEntityManager
         Pager $pager,
         EventDispatcherInterface $eventDispatcher,
         AttachmentProvider $attachmentProvider,
+        AttachmentManager $attachmentManager,
         AclHelper $aclHelper,
         ConfigManager $configManager
     ) {
@@ -79,6 +85,7 @@ class CommentApiManager extends ApiEntityManager
         $this->entityNameResolver = $entityNameResolver;
         $this->pager              = $pager;
         $this->attachmentProvider = $attachmentProvider;
+        $this->attachmentManager  = $attachmentManager;
         $this->aclHelper          = $aclHelper;
         $this->configManager      = $configManager;
 
