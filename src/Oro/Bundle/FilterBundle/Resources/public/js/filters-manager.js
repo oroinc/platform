@@ -125,7 +125,6 @@ define(function(require) {
         initialize: function(options) {
             var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
             this.template = _.template($(this.templateSelector).html());
-
             this.filters = {};
 
             _.extend(this, _.pick(options, prop));
@@ -348,9 +347,10 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            this.$el.html(
-                this.template({filters: this.filters})
+            this.setElement(
+                $(this.template({filters: this.filters}))
             );
+
             this.dropdownContainer = this.$el.find('.filter-container');
             var $filterItems = this.dropdownContainer.find('.filter-items');
 
@@ -533,7 +533,7 @@ define(function(require) {
          */
         _onDropdownToggle: function(e) {
             e.preventDefault();
-            this.$('.filter-box > .dropdown').toggleClass('open');
+            this.$el.find('> .dropdown').toggleClass('open');
         },
 
         /**
