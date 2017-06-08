@@ -511,6 +511,7 @@ services:
                 - image
                 - enum
                 - multiEnum
+                - html_escaped
             -
                 #BAP-5875
                 #- oneToOne

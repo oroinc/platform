@@ -57,6 +57,10 @@
     {{ value|nl2br }}
 {% endblock %}
 
+{% block attribute_html_escaped_widget %}
+    {{ value|oro_html_tag_trim(['script','style', 'link']) }}
+{% endblock %}
+
 {% block attribute_boolean_widget %}
     {{ value ? 'Yes'|trans : 'No'|trans }}
 {% endblock %}
