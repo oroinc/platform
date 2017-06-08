@@ -751,8 +751,8 @@ define(function(require) {
                     launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
-                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
-                    if (this.$el.is(':visible')) {
+                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function(ignoreVisibility) {
+                    if (ignoreVisibility || this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
                 }, 100));

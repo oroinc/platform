@@ -82,7 +82,7 @@ class JobStorage
      * @param string $ownerId
      * @param string $jobName
      *
-     * @return Job
+     * @return Job|null
      */
     public function findRootJobByOwnerIdAndJobName($ownerId, $jobName)
     {
@@ -90,12 +90,41 @@ class JobStorage
 
         return $qb
             ->where('job.ownerId = :ownerId AND job.name = :jobName')
-            ->setParameters([
-                'ownerId' => $ownerId,
-                'jobName' => $jobName,
-            ])
-            ->getQuery()->getOneOrNullResult()
-        ;
+            ->andWhere('job.rootJob is NULL')
+            ->setParameters(
+                [
+                    'ownerId' => $ownerId,
+                    'jobName' => $jobName,
+                ]
+            )
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds root non interrupted job by name and given statuses.
+     *
+     * @param string $jobName
+     * @param array $statuses
+     *
+     * @return Job|null
+     */
+    public function findRootJobByJobNameAndStatuses($jobName, array $statuses)
+    {
+        $qb = $this->getEntityRepository()->createQueryBuilder('job');
+
+        return $qb
+            ->where('job.rootJob is NULL and job.name = :jobName and job.status in (:statuses)')
+            ->andWhere('job.interrupted != true')
+            ->setParameters(
+                [
+                    'jobName' => $jobName,
+                    'statuses' => $statuses
+                ]
+            )
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**

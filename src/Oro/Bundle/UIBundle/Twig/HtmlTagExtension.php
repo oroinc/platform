@@ -36,6 +36,7 @@ class HtmlTagExtension extends \Twig_Extension
             new \Twig_SimpleFilter('oro_tag_filter', [$this, 'tagFilter'], ['is_safe' => ['all']]),
             new \Twig_SimpleFilter('oro_html_purify', [$this, 'htmlPurify']),
             new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter('oro_html_tag_trim', [$this, 'htmlTagTrim'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -68,6 +69,16 @@ class HtmlTagExtension extends \Twig_Extension
     public function htmlSanitize($string)
     {
         return $this->getHtmlTagHelper()->sanitize($string);
+    }
+
+    public function htmlTagTrim($html, array $tags = [])
+    {
+        foreach ($tags as $tag) {
+            $pattern = '/(<' . $tag . '[^>]*>)((.|\s)*?)(<\/' . $tag . '>)|(<' . $tag . '[^>]*>)/i';
+            $html = preg_replace($pattern, '', $html);
+        }
+
+        return $html;
     }
 
     /**

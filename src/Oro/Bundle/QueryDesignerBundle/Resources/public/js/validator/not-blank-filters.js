@@ -19,8 +19,12 @@ define(['underscore', 'orotranslation/js/translator', 'jquery'
             }
 
             var filters = $conditionBuilder.conditionBuilder('getValue');
+            var isFiltersDefined = filters && _.isArray(filters) && filters.length > 0;
 
-            return filters && _.isArray(filters) && filters.length > 0;
+            var data = {result: isFiltersDefined};
+            $conditionBuilder.trigger('query-designer:validate:not-blank-filters', data);
+
+            return data.result;
         },
         function(param) {
             param = _.extend({}, defaultParam, param);

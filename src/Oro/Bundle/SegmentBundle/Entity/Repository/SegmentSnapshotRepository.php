@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class SegmentSnapshotRepository extends EntityRepository
 {
@@ -165,12 +166,14 @@ class SegmentSnapshotRepository extends EntityRepository
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {
         $fieldToSelect = $this->getEntityReferenceField($segment);
-        $fieldToSelect = sprintf('snp.%s', $fieldToSelect);
+        $tableName = QueryBuilderUtil::generateParameterName('snp');
+        $paramName = QueryBuilderUtil::generateParameterName('segment');
+        $fieldToSelect = sprintf('%s.%s', $tableName, $fieldToSelect);
 
-        $qb = $this->createQueryBuilder('snp')
-            ->select($fieldToSelect)
-            ->where('snp.segment = :segment')
-            ->setParameter('segment', $segment);
+        $qb = $this->createQueryBuilder($tableName);
+        $qb->select($fieldToSelect)
+            ->where($qb->expr()->eq($tableName . '.segment', ':' . $paramName))
+            ->setParameter($paramName, $segment);
 
         return $qb;
     }

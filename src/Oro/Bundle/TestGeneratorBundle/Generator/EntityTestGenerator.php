@@ -23,7 +23,7 @@ class EntityTestGenerator extends AbstractTestGenerator
         $partsOfOriginClass = explode('\\', $className);
         $testedClassName = array_pop($partsOfOriginClass);
         $nameSpace = implode('\\', $parts);
-        $testPath = $this->getTestPath($fullTestNameSpace);
+        $testPath = $this->getTestPath($fullTestNameSpace, $class->getFileName());
         $constructor = $class->getConstructor();
         $dependencies = $constructor ? $this->getDependencies($constructor) : [];
         $dependenciesData = $this->getDependenciesData($dependencies);

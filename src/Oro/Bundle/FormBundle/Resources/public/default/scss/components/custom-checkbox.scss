@@ -1,3 +1,5 @@
+// @theme: default;
+
 .custom-checkbox {
     &__input {
         &:focus {
@@ -57,7 +59,7 @@
 
         .custom-checkbox__text {
             display: inline-block;
-            margin-left: $checkbox-icon-min-width + 8px;
+            margin-left: $checkbox-icon-absolute-offset;
         }
 
        .custom-checkbox__icon {

@@ -6,6 +6,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
@@ -95,7 +96,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row->setCellValue($field, $value);
         // click any where on the page
         $this->getPage()->find('css', '#container')->click();
-        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -148,7 +149,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row = $this->getGridRow($entityTitle);
 
         $row->setCellValueAndSave($field, $value);
-        $this->oroMainContext->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -407,6 +408,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Proceed forward oro grid pagination for specific grid.
+     *
+     * @When /^(?:|I )press next page button in grid "(?P<grid>([\w\s]+))"$/
+     */
+    public function iPressNextPageButtonInGrid($grid = 'Grid')
+    {
+        $grid = $this->getGrid($grid);
+
+        $gridPaginatorContainer = $this->getSession()->getPage()->find(
+            'xpath',
+            sprintf(
+                '%s/ancestor::div[contains(concat(" ", normalize-space(@class), " "), " oro-datagrid ")]',
+                $grid->getXpath()
+            )
+        );
+
+        $gridPaginator = $this->elementFactory->createElement('GridPaginator', $gridPaginatorContainer);
+        $gridPaginator->clickLink('Next');
+    }
+
+    /**
      * Assert number of pages in oro grid
      * It depends on per page and row count values
      * Example: Then number of page should be 3
@@ -597,8 +619,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * String filter
-     * Example: When I filter First Name as Contains "Aadi"
+     * Filter grid by string filter
+     * Example: When I filter First Name as contains "Aadi"
      * Example: And filter Name as is equal to "User"
      *
      * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s\.\_\%]+))"$/
@@ -624,7 +646,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function appllyDateTimeFilter($filterName, $type, $start, $end)
+    public function applyDateTimeFilter($filterName, $type, $start, $end)
     {
         /** @var GridFilterDateTimeItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
@@ -817,6 +839,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )click (?P<action>[\w\s]*) on (?P<content>(?:[^"]|\\")*) in grid "(?P<grid>([\w\s]+))"$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid "(?P<grid>([\w\s]+))"$/
      *
      * @param string $content
      * @param string $action
@@ -832,10 +855,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When click on Charlie in grid
      *
      * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid "(?P<grid>([\w\s]+))"$/
      */
-    public function clickOnRow($content)
+    public function clickOnRow($content, $grid = 'Grid')
     {
-        $this->getGrid()->getRowByContent($content)->click();
+        $this->getGrid($grid)->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
         $this->waitForAjax();
     }
@@ -1106,6 +1130,50 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Show specified filter for grid
+     *
+     * @Given /^(?:|I) show filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>([\w\s]+))" grid$/
+     *
+     * @param string $filter
+     * @param string $gridName
+     */
+    public function iShowFilterInGrid($filter, $gridName)
+    {
+        $grid = $this->getGrid($gridName);
+
+        $grid->getElement('GridFilersButton')->open();
+        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $filterButton->click();
+
+        /** @var FrontendGridFilterManager $filterManager */
+        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        $filterManager->checkColumnFilter($filter);
+        $filterManager->close();
+    }
+
+    /**
+     * Hide specified filter for grid
+     *
+     * @Given /^(?:|I) hide filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>([\w\s]+))" grid$/
+     *
+     * @param string $filter
+     * @param string $gridName
+     */
+    public function iHideFilterInGrid($filter, $gridName)
+    {
+        $grid = $this->getGrid($gridName);
+
+        $grid->getElement('GridFilersButton')->open();
+        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $filterButton->click();
+
+        /** @var FrontendGridFilterManager $filterManager */
+        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        $filterManager->uncheckColumnFilter($filter);
+        $filterManager->close();
+    }
+
+    /**
      * @param string $stringNumber
      * @return int
      */
@@ -1131,11 +1199,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @param string $element
      * @return GridPaginator
      */
-    private function getGridPaginator()
+    private function getGridPaginator($element = 'GridPaginator')
     {
-        return $this->elementFactory->createElement('GridPaginator');
+        return $this->elementFactory->createElement($element);
     }
 
     /**
