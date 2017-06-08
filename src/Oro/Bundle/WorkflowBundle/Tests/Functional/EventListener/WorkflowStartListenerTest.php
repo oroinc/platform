@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
@@ -104,6 +105,8 @@ class WorkflowStartListenerTest extends WorkflowTestCase
     public function testMassStartWorkflow()
     {
         $this->assertWorkflowItemsCount(0);
+        $transitionRecords = $this->getEntityManager(WorkflowTransitionRecord::class)
+            ->getRepository(WorkflowTransitionRecord::class)->findAll();
 
         self::loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerMassAutoStart');
 
@@ -130,6 +133,6 @@ class WorkflowStartListenerTest extends WorkflowTestCase
         $this->assertWorkflowItemsCount(10, 'test_flow_autostart_two');
         $this->assertWorkflowItemsCount(10, 'test_flow_autostart_one');
         $this->assertWorkflowItemsCount(20);
-        $this->assertWorkflowTransitionRecordCount(20);
+        $this->assertWorkflowTransitionRecordCount(20 + count($transitionRecords));
     }
 }

@@ -98,3 +98,12 @@ WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension`
     - removed property `$queuedJobs`
     - changed signature of method `createJobs`. Added parameter `$queuedJobs`
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
+    - changed constructor signature:
+        - first argument replaced with `Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider $definitionProvider`;
+    - following protected methods were moved to `WorkflowDefinitionProvider`:
+        - `refreshWorkflowDefinition`
+        - `getEntityManager`
+        - `getEntityRepository`
+- Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
+- Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
