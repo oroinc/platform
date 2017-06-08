@@ -1,6 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
-{% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
+{% oro_title_set({params : {"%workflow_definition.label%": entity.label|trans([], 'workflows')} }) %}
 
 {% block stats %}
     <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
@@ -23,7 +23,7 @@
         'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
         'additional': [{
             'indexPath': path('oro_workflow_definition_view', {name: entity.name}),
-            'indexLabel': entity.label
+            'indexLabel': entity.label|trans([], 'workflows')
         }],
         'entityTitle': 'oro.workflow.workflowdefinition.configuration.label'|trans
     } %}

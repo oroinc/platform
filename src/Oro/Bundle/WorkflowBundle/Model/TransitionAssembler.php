@@ -76,7 +76,6 @@ class TransitionAssembler extends BaseAbstractAssembler
         );
 
         $definitions = $this->parseDefinitions($transitionDefinitionsConfiguration);
-        $variables = $this->parseVariableDefinitions($configuration);
 
         $transitions = new ArrayCollection();
         foreach ($transitionsConfiguration as $name => $options) {
@@ -89,7 +88,6 @@ class TransitionAssembler extends BaseAbstractAssembler
             }
 
             $definition = $definitions[$definitionName];
-            $definition = $this->assignVariableValues($definition, $variables);
 
             $transition = $this->assembleTransition($name, $options, $definition, $steps, $attributes);
             $transitions->set($name, $transition);
@@ -121,35 +119,6 @@ class TransitionAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param array $configuration
-     *
-     * @return array
-     */
-    protected function parseVariableDefinitions(array $configuration)
-    {
-        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
-        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
-
-        if (!isset($configuration[$definitionsNode][$variablesNode])) {
-            return [];
-        }
-
-        $variables = [];
-        foreach ($configuration[$definitionsNode][$variablesNode] as $name => $options) {
-            if (empty($options)) {
-                $options = [];
-            }
-
-            $variables[$name] = [
-                'type'  => $this->getOption($options, 'type'),
-                'value' => $this->getOption($options, 'value'),
-            ];
-        }
-
-        return $variables;
-    }
-
-    /**
      * @param string $name
      * @param array $options
      * @param array $definition
@@ -170,6 +139,8 @@ class TransitionAssembler extends BaseAbstractAssembler
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
             ->setLabel($this->getOption($options, 'label'))
+            ->setButtonLabel($this->getOption($options, 'button_label'))
+            ->setButtonTitle($this->getOption($options, 'button_title'))
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
@@ -233,7 +204,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             $frontendOptions['message'] = array_merge(
                 $this->getOption($frontendOptions, 'message', []),
                 [
-                    'message' => $this->getOption($options, 'message'),
+                    'content' => $this->getOption($options, 'message'),
                     'message_parameters' => $this->getOption($options, 'message_parameters', []),
                 ]
             );
@@ -334,37 +305,5 @@ class TransitionAssembler extends BaseAbstractAssembler
     {
         $formOptions = $this->getOption($options, 'form_options', array());
         return $this->formOptionsAssembler->assemble($formOptions, $attributes, 'transition', $transitionName);
-    }
-
-    /**
-     * @param array $definition
-     * @param array $variables
-     *
-     * @return array
-     */
-    protected function assignVariableValues($definition, $variables)
-    {
-        if (!$variables) {
-            return $definition;
-        }
-
-        $massAssignment = [];
-        foreach ($variables as $varName => $variable) {
-            $massAssignment[] = [
-                sprintf('$%s', $varName),
-                $variable['value']
-            ];
-        }
-        $assignValueActions = [
-            ['@assign_value' => $massAssignment]
-        ];
-
-        if (!empty($definition['preactions'])) {
-            $definition['preactions'] = array_merge($definition['preactions'], $assignValueActions);
-        } elseif ($variables) {
-            $definition['preactions'] = $assignValueActions;
-        }
-
-        return $definition;
     }
 }

@@ -5,17 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-
 use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\OutputStub;
+use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;

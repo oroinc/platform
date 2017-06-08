@@ -1,0 +1,71 @@
+// @theme: default;
+
+// Update styles in /default/scss/components/shopping-list-dropdown/shopping-list-dropdown.scss
+
+.custom-radio {
+    display: inline-block;
+
+    margin: 0;
+
+    line-height: $custom-radio-line-height;
+
+    &__control,
+    input[type='radio'] {
+        display: none;
+    }
+
+    &__control {
+        &:checked {
+            ~ .custom-radio__text {
+                &:before {
+                    background: $custom-radio-icon-checked-bg;
+                    box-shadow: $custom-radio-icon-checked-box-shadow;
+                }
+            }
+        }
+    }
+    &__text {
+        display: inline-block;
+
+        vertical-align: middle;
+
+        &:before {
+            display: inline-block;
+
+            width: $custom-radio-icon-size;
+            height: $custom-radio-icon-size;
+            margin: $custom-radio-icon-offset;
+
+            content: '';
+            vertical-align: middle;
+
+            border: $custom-radio-icon-border;
+            border-radius: 50%;
+            background: $custom-radio-icon-bg;
+        }
+    }
+
+    &--large {
+        line-height: $custom-radio-large-line-height;
+
+        .custom-radio__text {
+            &:before {
+                width: $custom-radio-large-icon-size;
+                height: $custom-radio-large-icon-size;;
+            }
+        }
+    }
+
+    &.absolute {
+        position: relative;
+
+        .custom-radio__text {
+            margin: $custom-radio-absolute-icon-offset;
+
+            &:before {
+                position: absolute;
+                left: 0;
+            }
+        }
+    }
+}

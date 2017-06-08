@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 
-use Michelf\Markdown;
+use Michelf\MarkdownExtra;
 
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
@@ -137,7 +137,7 @@ class MarkdownApiDocParser
      */
     protected function parseDocumentation($fileContent)
     {
-        $parser = new Markdown();
+        $parser = new MarkdownExtra();
         $html = $parser->transform($fileContent);
 
         $doc = new \DOMDocument();

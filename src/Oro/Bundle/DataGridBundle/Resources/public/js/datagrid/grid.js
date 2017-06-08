@@ -120,14 +120,14 @@ define(function(require) {
                 refreshAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
-                        className: 'btn',
+                        className: 'btn refresh-action',
                         iconClassName: 'fa-repeat'
                     }
                 },
                 resetAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
-                        className: 'btn',
+                        className: 'btn reset-action',
                         iconClassName: 'fa-refresh'
                     }
                 }
@@ -751,8 +751,8 @@ define(function(require) {
                     launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
-                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
-                    if (this.$el.is(':visible')) {
+                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function(ignoreVisibility) {
+                    if (ignoreVisibility || this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
                 }, 100));

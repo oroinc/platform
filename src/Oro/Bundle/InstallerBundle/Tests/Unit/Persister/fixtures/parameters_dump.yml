@@ -1,0 +1,44 @@
+parameters:
+    database_driver: pdo_mysql
+    database_host: database
+    database_port: 3306
+    database_name: oro_db
+    database_user: oro_db_user
+    database_password: oro_db_pass
+    mailer_transport: null
+    mailer_host: null
+    mailer_port: null
+    mailer_encryption: null
+    mailer_user: null
+    mailer_password: null
+    websocket_bind_address: 0.0.0.0
+    websocket_bind_port: 8080
+    websocket_frontend_host: null
+    websocket_frontend_port: 8080
+    websocket_backend_host: null
+    websocket_backend_port: 8080
+    search_engine_name: orm
+    search_engine_host: 127.0.0.1
+    search_engine_port: null
+    search_engine_index_name: oro_search
+    search_engine_username: null
+    search_engine_password: null
+    search_engine_ssl_verification: null
+    search_engine_ssl_cert: null
+    search_engine_ssl_cert_password: null
+    search_engine_ssl_key: null
+    search_engine_ssl_key_password: null
+    website_search_engine_index_name: oro_website_search
+    web_backend_prefix: /admin
+    session_handler: null
+    locale: en
+    secret: ThisTokenIsNotSoSecretChangeIt
+    installed: null
+    assets_version: '540e7031'
+    assets_version_strategy: time_hash
+    enterprise_licence: null
+    message_queue_transport: dbal
+    message_queue_transport_config: null
+    enable_price_sharding: false
+imports:
+    - { resource: ./../../vendor/oro/commerce/src/Oro/Bundle/AuthorizeNetBundle/Tests/Behat/parameters.yml }

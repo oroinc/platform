@@ -3,7 +3,7 @@ Mediator Handlers
 
 OroUIBundle declares some mediator handlers. It's preferable to use indirect method execution with `mediator.execute()` in all components which follows Chaplin architecture. 
 
-##Application
+## Application
 
 Handler Name | Description
 ------------ | -----------
@@ -15,7 +15,7 @@ Handler Name | Description
 
 See [`oroui/js/app/application`](../../public/js/app/application.js) module for details.
 
-##Page Controller
+## Page Controller
 
 Handler Name | Description
 ------------ | -----------
@@ -26,7 +26,7 @@ Handler Name | Description
 
 See [`oroui/js/app/controllers/page-controller`](../../public/js/app/controllers/page-controller.js) module for details
 
-##Messenger
+## Messenger
 
 Handler Name | Method
 ------------ | -----------
@@ -37,7 +37,7 @@ Handler Name | Method
 
 See [`oroui/js/messenger`](../../public/js/messenger.js) module for details
 
-##Widgets (Widget Manager)
+## Widgets (Widget Manager)
 
 Handler Name | Method | Description
 ------------ | ------ | -----------
@@ -46,21 +46,21 @@ Handler Name | Method | Description
 
 See [`oroui/js/widget-manager`](../../public/js/widget-manager.js) module for details
 
-##PageLoadingMaskView
+## PageLoadingMaskView
 
 Handler Name | Description
 ------------ | -----------
 `showLoading` | shows loading mask
 `hideLoading` | hides loading mask
 
-##Layout
+## Layout
 
 Handler Name | Description
 ------------ | -----------
 `layout:init` | initializes proper widgets and plugins in the container
 `layout:dispose` | removes some plugins and widgets from child elements of the container
 
-##DebugToolbarView
+## DebugToolbarView
 
 Handler Name | Description
 ------------ | -----------

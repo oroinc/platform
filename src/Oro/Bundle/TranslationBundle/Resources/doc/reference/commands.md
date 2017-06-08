@@ -8,6 +8,7 @@ Table of contents
 - [oro:translation:dump](#orotranslationdump)
 - [oro:translation:pack](#orotranslationpack)
 - [oro:translation:load](#orotranslationload)
+- [oro:language:update](#orolanguageupdate)
 
 Overview
 ----------
@@ -90,4 +91,27 @@ Params are:
 **Load translations for English and Russian with rebuilding translation cache:**
 ```bash
 app/console oro:translation:load --languages=en --languages=ru --rebuild-cache
+```
+
+oro:language:update
+--------------------
+Command  used to load translations data from CROWDIN service to DB.
+Params are:
+
+- `language` - exact language code to be installed/updated.
+
+- `all` - update/install all application's languages.
+
+**Load translations for Russian:**
+```bash
+app/console oro:language:update --language=ru_RU
+```
+**Load translations for all installed languages:**
+```bash
+app/console oro:language:update --all
+```
+
+**List all installed languages:**
+```bash
+app/console oro:language:update
 ```

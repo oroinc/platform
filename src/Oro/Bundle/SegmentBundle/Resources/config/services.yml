@@ -28,6 +28,9 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_segment.query_builder_registry'
+            - '@oro_query_designer.query_designer.subquery_limit_helper'
+        calls:
+            - ['setLogger', ['@?logger']]
 
     oro_segment.segment_manager.api:
         class: %oro_segment.segment_manager.api.class%
@@ -125,3 +128,10 @@ services:
             - '@oro_segment.segment_manager'
         tags:
             - { name: layout.data_provider, alias: segment }
+
+    oro_segment.provider.segment_snapshot_delta_provider:
+        class: Oro\Bundle\SegmentBundle\Provider\SegmentSnapshotDeltaProvider
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@oro_segment.query.dynamic_segment.query_builder'

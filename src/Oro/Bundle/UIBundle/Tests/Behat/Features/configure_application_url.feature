@@ -1,3 +1,5 @@
+@ticket-BAP-12990
+@automatically-ticket-tagged
 Feature: Configure application URL
   In order to configure application URL
   As a Site Administrator

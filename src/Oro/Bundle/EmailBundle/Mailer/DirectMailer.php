@@ -217,7 +217,7 @@ class DirectMailer extends \Swift_Mailer
             $logger = $this->getLogger();
 
             $logger->crit(sprintf("Mail message: %s", $message));
-            $logger->crit(sprintf("Mail recipients: %s", $failedRecipients));
+            $logger->crit(sprintf("Mail recipients: %s", implode(',', $failedRecipients)));
             $logger->crit(
                 sprintf("Error message: %s", $transportException->getMessage()),
                 ['exception' => $transportException]

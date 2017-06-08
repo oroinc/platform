@@ -154,15 +154,20 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
     public function testProcessForExcludedExtendedAssociation()
     {
         $data = [
-            'association1' => ['id' => 1]
+            'association1' => null,
+            'association2' => ['id' => 2]
         ];
         $config = new EntityDefinitionConfig();
         $association = $config->addField('association');
         $association->setDataType('association:manyToOne:kind');
         $association->setExcluded();
 
-        $this->associationManager->expects(self::never())
-            ->method('getAssociationTargets');
+        $this->associationManager->expects(self::once())
+            ->method('getAssociationTargets')
+            ->with('Test\Class', null, 'manyToOne', 'kind')
+            ->willReturn(
+                ['Test\Target1' => 'association1', 'Test\Target2' => 'association2']
+            );
 
         $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
@@ -170,7 +175,12 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $this->processor->process($this->context);
         $this->assertEquals(
             [
-                'association1' => ['id' => 1]
+                'association1' => null,
+                'association2' => ['id' => 2],
+                'association'  => [
+                    '__class__' => 'Test\Target2',
+                    'id'        => 2
+                ]
             ],
             $this->context->getResult()
         );

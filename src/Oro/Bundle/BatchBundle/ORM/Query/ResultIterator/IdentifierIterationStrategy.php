@@ -4,7 +4,7 @@ namespace Oro\Bundle\BatchBundle\ORM\Query\ResultIterator;
 
 use Doctrine\ORM\Query;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
 /**
  * Implements Iteration Strategy by modifying Query with Sql Walkers
@@ -24,7 +24,7 @@ class IdentifierIterationStrategy implements IdentityIterationStrategyInterface
 
         $query->setHydrationMode($identifierHydrationMode);
 
-        QueryUtils::addTreeWalker($query, SelectIdentifierWalker::class);
+        QueryUtil::addTreeWalker($query, SelectIdentifierWalker::class);
     }
 
     /**
@@ -32,7 +32,7 @@ class IdentifierIterationStrategy implements IdentityIterationStrategyInterface
      */
     public function initializeDataQuery(Query $query)
     {
-        QueryUtils::addTreeWalker($query, LimitIdentifierWalker::class);
+        QueryUtil::addTreeWalker($query, LimitIdentifierWalker::class);
 
         // limit and offset implemented with ids
         $query->setFirstResult(null);

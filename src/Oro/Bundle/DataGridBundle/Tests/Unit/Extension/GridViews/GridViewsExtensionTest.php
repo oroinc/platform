@@ -2,64 +2,61 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\GridViews;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
+    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $eventDispatcher;
 
+    /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
     protected $serviceLink;
+
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
 
     /** @var GridViewsExtension */
     private $gridViewsExtension;
 
     public function setUp()
     {
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->securityFacade = $this->createMock(SecurityFacade::class);
+        $this->securityFacade->expects($this->any())->method('isGranted')->willReturn(true);
 
-        $securityFacade
-            ->expects($this->any())
-            ->method('isGranted')
-            ->will($this->returnValue(true));
-
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getRepository')
-            ->willReturn($repo);
+            ->willReturn($this->createMock(EntityRepository::class));
 
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $aclHelper = $this->createMock(AclHelper::class);
 
-        $this->serviceLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $gridViewStub = new GridViewManagerStub();
-
-        $this->serviceLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($gridViewStub));
-
+        $this->serviceLink = $this->createMock(ServiceLink::class);
 
         $this->gridViewsExtension = new GridViewsExtension(
             $this->eventDispatcher,
-            $securityFacade,
+            $this->securityFacade,
             $translator,
             $registry,
             $aclHelper,
@@ -69,7 +66,6 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testVisitMetadataShouldAddGridViewsFromEvent()
     {
-        $this->gridViewsExtension->setParameters(new ParameterBag());
         $data   = MetadataObject::create([]);
         $config = DatagridConfiguration::create(
             [
@@ -96,6 +92,8 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             'gridName' => 'grid',
         ];
 
+        $this->serviceLink->expects($this->any())->method('getService')->willReturn(new GridViewManagerStub());
+
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
@@ -111,11 +109,56 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->assertFalse($data->offsetExists('gridViews'));
+        $this->gridViewsExtension->setParameters(new ParameterBag());
         $this->gridViewsExtension->visitMetadata($config, $data);
         $this->assertTrue($data->offsetExists('gridViews'));
         $this->assertEquals($expectedViews, $data->offsetGet('gridViews'));
     }
 
+    public function testVisitMetadataForCachedDefaultView()
+    {
+        $user = new User();
+        $grid1 = 'test_grid_1';
+        $grid2 = 'test_grid_2';
+        $view1 = $this->getEntity(GridView::class, ['id' => 'view1']);
+        $view2 = $this->getEntity(GridView::class, ['id' => 'view2']);
+
+        $this->securityFacade->expects($this->any())->method('getLoggedUser')->willReturn($user);
+
+        /** @var GridViewManager|\PHPUnit_Framework_MockObject_MockObject $gridViewManager */
+        $gridViewManager = $this->createMock(GridViewManager::class);
+        $gridViewManager->expects($this->any())
+            ->method('getDefaultView')
+            ->willReturnMap(
+                [
+                    [$user, $grid1, $view1],
+                    [$user, $grid2, $view2]
+                ]
+            );
+
+        $this->serviceLink->expects($this->any())->method('getService')->willReturn($gridViewManager);
+
+        $this->assertGridStateView($grid1, 'view1');
+
+        // check local cache of grid view
+        $this->assertGridStateView($grid2, 'view2');
+    }
+
+    /**
+     * @param string $grid
+     * @param string $expectedGridView
+     */
+    protected function assertGridStateView($grid, $expectedGridView = null)
+    {
+        $data = MetadataObject::create([]);
+        $config = DatagridConfiguration::create([DatagridConfiguration::NAME_KEY => $grid]);
+
+        $this->assertFalse($data->offsetExists('state'));
+        $this->gridViewsExtension->setParameters(new ParameterBag());
+        $this->gridViewsExtension->visitMetadata($config, $data);
+        $this->assertTrue($data->offsetExists('state'));
+        $this->assertEquals(['filters' => [], 'gridView' => $expectedGridView], $data->offsetGet('state'));
+    }
 
     /**
      * @param array $input

@@ -249,6 +249,7 @@ services:
             - [addExtendTypeMapping, ["percent", "oro_percent"]]
             - [addExtendTypeMapping, ["money", "oro_money"]]
             - [addExtendTypeMapping, ["boolean", "oro_choice"]]
+            - [addExtendTypeMapping, ["html_escaped", "textarea"]]
 
             - [addExtendTypeMapping, ["file", "oro_file"]]
             - [addExtendTypeMapping, ["image", "oro_image"]]

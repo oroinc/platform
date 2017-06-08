@@ -1,3 +1,5 @@
+@ticket-BAP-10956
+@automatically-ticket-tagged
 Feature: User Notes
   In order to have ability to manage notes
   As OroCRM sales rep
@@ -11,7 +13,7 @@ Scenario: Add note to user entity
   And I check "Notes"
   When I save and close form
   And click update schema
-  Then I should see "Schema updated" flash message
+  Then I should see Schema updated flash message
 
 Scenario: Add note
   Given the following user:

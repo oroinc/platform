@@ -1,14 +1,18 @@
 define([
     'jquery',
+    'underscore',
     'oroui/js/dropdown-mask',
     'jquery-ui',
     'jquery.multiselect'
-], function($, mask) {
+], function($, _, mask) {
     'use strict';
 
     var oldRefresh = $.ech.multiselect.prototype.refresh;
 
     $.widget('orofilter.multiselect', $.ech.multiselect, {
+        options: _.extend({}, $.ech.multiselect.prototype.options, {
+            refreshNotOpened: true
+        }),
 
         /**
          * Bind update position method after menu is opened
@@ -55,9 +59,17 @@ define([
         },
 
         refresh: function(init) {
-            if (this.hasBeenOpened) {
+            if (this.hasBeenOpened || this.options.refreshNotOpened) {
                 oldRefresh.call(this, init);
             }
+        },
+
+        getChecked: function() {
+            return this.menu.find('input').not('[type=search]').filter(':checked');
+        },
+
+        getUnchecked: function() {
+            return this.menu.find('input').not('[type=search]').not(':checked');
         }
     });
 

@@ -195,67 +195,46 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $status);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage some error
+     */
     public function testFinishJobOnException()
     {
+        $processJobId = 123;
         $processJob = new ProcessJob();
-
-        $entityManager = $this->createEntityManagerMock();
-        $entityManager
-            ->expects(self::never())
-            ->method('commit')
-        ;
-        $entityManager
-            ->expects(self::once())
-            ->method('rollback')
-        ;
-
-        $entityRepository = $this->createEntityRepositoryMock();
-        $entityRepository
-            ->expects(self::once())
-            ->method('find')
-            ->with('theProcessJobId')
-            ->willReturn($processJob)
-        ;
-
         $exception = new \Exception('unexpected');
 
+        $entityManager = $this->createEntityManagerMock();
+        $entityRepository = $this->createEntityRepositoryMock();
+        $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
         $processHandle = $this->createProcessHandlerMock();
-        $processHandle
-            ->expects(self::once())
+
+        $entityRepository->expects(self::once())
+            ->method('find')
+            ->with($processJobId)
+            ->willReturn($processJob);
+
+        $processHandle->expects(self::once())
             ->method('handleJob')
             ->with(self::identicalTo($processJob))
-            ->willThrowException(new \Exception('unexpected'))
-        ;
-
-        $processHandle
-            ->expects(self::once())
+            ->willThrowException(new \Exception('some error'));
+        $processHandle->expects(self::once())
             ->method('finishJob')
-            ->with(self::identicalTo($processJob))
-        ;
+            ->with(self::identicalTo($processJob));
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects(self::once())
-            ->method('critical')
-            ->with(
-                '[ExecuteProcessJobProcessor] Raised exception for job with id {process_job_id}',
-                [
-                    'process_job_id' => 'theProcessJobId',
-                    'exception' => $exception
-                ]
-            )
-        ;
-
-        $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
-
-        $processor = new ExecuteProcessJobProcessor($doctrineHelper, $processHandle, $logger);
+        $entityManager->expects(self::once())
+            ->method('beginTransaction');
+        $entityManager->expects(self::once())
+            ->method('rollback');
+        $entityManager->expects(self::never())
+            ->method('commit');
 
         $message = new NullMessage();
-        $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
+        $message->setBody(JSON::encode(['process_job_id' => $processJobId]));
 
-        $status = $processor->process($message, new NullSession());
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $status);
+        $processor = new ExecuteProcessJobProcessor($doctrineHelper, $processHandle, $this->createLoggerMock());
+        $processor->process($message, new NullSession());
     }
 
     /**

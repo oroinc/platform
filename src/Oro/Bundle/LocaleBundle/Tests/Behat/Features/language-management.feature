@@ -1,3 +1,5 @@
+@ticket-BAP-14163
+@automatically-ticket-tagged
 Feature: Language management
   In order to manage available languages
   As Administrator
@@ -17,27 +19,24 @@ Feature: Language management
       | Updates | Can be installed |
 
   Scenario: Enable Germany language
-    Given I login as administrator
-    When I go to System/Localization/Languages
-    And I click Enable "German (Germany)" in grid
+    Given I go to System/Localization/Languages
+    When I click Enable "German (Germany)" in grid
     Then I should see "Language has been enabled" flash message
     And I should see German in grid with following data:
       | Status  | Enabled          |
       | Updates | Can be installed |
 
   Scenario: Install translations for Germany language from Crowdin
-    Given I login as administrator
-    When I go to System/Localization/Languages
-    And I click Install "German (Germany)" in grid
+    Given I go to System/Localization/Languages
+    When I click Install "German (Germany)" in grid
     And I press "Install"
     And should see "German (Germany)" in grid with following data:
       | Status  | Enabled    |
       | Updates | Up to date |
 
   Scenario: Check installed translations for Germany language
-    Given I login as administrator
-    When I go to System/Localization/Translations
-    And I check "English" in Language filter
+    Given I go to System/Localization/Translations
+    When I check "English" in Language filter
     And I keep in mind number of records in list
     And I reset Language filter
     And I check "German (Germany)" in Language filter
@@ -46,9 +45,8 @@ Feature: Language management
     Then the number of records greater than or equal to 1
 
   Scenario: Create localization with German language
-    Given I login as administrator
-    When I go to System/Localization/Localizations
-    And I press "Create Localization"
+    Given I go to System/Localization/Localizations
+    When I press "Create Localization"
     And I fill "Localization Form" with:
       | Name       | German Localization Name  |
       | Title      | German Localization Title |

@@ -105,9 +105,10 @@ abstract class CustomizeDataContext extends ApiContext
                 $path = ConfigUtil::explodePropertyPath($propertyPath);
                 foreach ($path as $fieldName) {
                     $fieldConfig = $config->getField($fieldName);
-                    $config = null !== $fieldConfig && !$fieldConfig->isExcluded()
-                        ? $fieldConfig->getTargetEntity()
-                        : null;
+                    $config = null;
+                    if (null !== $fieldConfig) {
+                        $config = $fieldConfig->getTargetEntity();
+                    }
                     if (null === $config) {
                         break;
                     }

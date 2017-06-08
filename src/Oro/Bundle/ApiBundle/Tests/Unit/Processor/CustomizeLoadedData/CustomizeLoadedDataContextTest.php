@@ -102,6 +102,9 @@ class CustomizeLoadedDataContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('field1.field11');
-        $this->assertNull($this->context->getConfig());
+        $this->assertSame(
+            $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
+            $this->context->getConfig()
+        );
     }
 }

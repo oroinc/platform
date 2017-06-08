@@ -491,6 +491,7 @@ services:
             - %oro_email.cache.available_in_template_key%
             - '@oro_email.twig.email_sandbox'
             - '@translator'
+            - '@oro_email.emailtemplate.variable_processor'
         lazy: true
 
     oro_email.twig.email_security_policy:
@@ -523,6 +524,17 @@ services:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@oro_ui.formatter'
+        lazy: true
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }
+
+    oro_email.emailtemplate.variable_provider.entity_routes:
+        class: 'Oro\Bundle\EmailBundle\Provider\EntityRouteVariablesProvider'
+        arguments:
+            - '@translator'
+            - '@oro_entity_config.config_manager'
+            - '@oro_config.user'
         lazy: true
         public: false
         tags:
@@ -1047,9 +1059,7 @@ services:
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: %oro_email.autocomplete.mailbox_user_search_handler.class%
-        parent: oro_user.autocomplete.user.search_handler
-        calls:
-           - [setSecurityFacade, ['@oro_security.security_facade']]
+        parent: oro_user.autocomplete.user.organization_search_handler
 
     oro_email.listener.mailbox.authorization:
         class: %oro_email.listener.mailbox.authorization.class%
@@ -1221,3 +1231,36 @@ services:
         class: 'Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand'
         tags:
             - { name: console.command }
+
+    oro_email.listener.datagrid.user_email_grid_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
+        arguments:
+            - '@oro_email.datagrid_query_factory'
+        tags:
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
+          - { name: oro_featuretogle.feature, feature: email }
+
+    oro_email.emailtemplate.variable_processor:
+        class: 'Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry'
+        public: false
+
+    oro_email.emailtemplate.variable_processor.entity_routes:
+        class: 'Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor'
+        arguments:
+            - '@router'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_config.user'
+            - '@oro_entity_config.config_manager'
+        lazy: true
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_processor, alias: entity_routes }
+
+    oro_email.migration.demo_data_fixtures_listener.email_associations:
+        class: Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

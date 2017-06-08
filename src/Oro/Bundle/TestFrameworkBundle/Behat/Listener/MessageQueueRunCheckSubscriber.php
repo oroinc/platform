@@ -3,12 +3,11 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
-use Behat\Mink\Mink;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\Process;
 
 class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, MessageQueueIsolatorAwareInterface
 {
@@ -16,6 +15,11 @@ class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, Messag
      * @var MessageQueueIsolatorInterface
      */
     protected $messageQueueIsolator;
+
+    /**
+     * @var KernelInterface
+     */
+    protected $kernel;
 
     /**
      * {@inheritdoc}
@@ -31,19 +35,11 @@ class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, Messag
     {
         $mqProcess = $this->messageQueueIsolator->getProcess();
 
-        if (null === $mqProcess) {
+        if (!$mqProcess || $mqProcess->isRunning()) {
             return;
         }
 
-        if ($mqProcess->getStatus() !== Process::STATUS_TERMINATED) {
-            return;
-        }
-
-        $mqProcess->start(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                echo 'MessageQueueConsumer ERR > '.$buffer;
-            }
-        });
+        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
     }
 
     /**
@@ -52,5 +48,13 @@ class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, Messag
     public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
     {
         $this->messageQueueIsolator = $messageQueueIsolator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setKernel(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
     }
 }

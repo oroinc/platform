@@ -11,8 +11,8 @@ class OroFeatureContext extends RawMinkContext
 
     /**
      * @param \Closure $lambda
-     * @param int $timeLimit
-     * @return false|mixed Return false if closure throw error or return not true value.
+     * @param int $timeLimit in seconds
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     public function spin(\Closure $lambda, $timeLimit = 60)
@@ -30,7 +30,7 @@ class OroFeatureContext extends RawMinkContext
             usleep(250000);
             $time -= 0.25;
         }
-        return false;
+        return null;
     }
 
     /**
@@ -47,6 +47,18 @@ class OroFeatureContext extends RawMinkContext
     protected function getDriver()
     {
         return $this->getSession()->getDriver();
+    }
+
+    /**
+     * Returns fixed step argument (with \\" replaced back to ")
+     *
+     * @param string $argument
+     *
+     * @return string
+     */
+    protected function fixStepArgument($argument)
+    {
+        return str_replace('\\"', '"', $argument);
     }
 
     /**

@@ -1,3 +1,5 @@
+@ticket-BB-6429
+@automatically-ticket-tagged
 @skip
 Feature: User configuration
   In order to have ability to change configuration on user level

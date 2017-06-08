@@ -20,7 +20,7 @@ class TableHeader extends Element
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            if (false !== stripos($th->textContent, $headerText)) {
+            if (strtolower($th->textContent) === strtolower($headerText)) {
                 return $i;
             }
 
@@ -28,5 +28,24 @@ class TableHeader extends Element
         }
 
         self::fail(sprintf('Can\'t find link with "%s" header', $headerText));
+    }
+
+    /**
+     * Checks if table header has such column name
+     *
+     * @param $columnName
+     * @return bool
+     */
+    public function hasColumn($columnName)
+    {
+        $crawler = new Crawler($this->getHtml());
+
+        /** @var \DOMElement $th */
+        foreach ($crawler->filter('th') as $th) {
+            if (strtolower($th->textContent) === strtolower($columnName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

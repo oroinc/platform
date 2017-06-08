@@ -11,8 +11,12 @@ define(function(require) {
     var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
     var module = require('module');
     var persistentStorage = require('oroui/js/persistent-storage');
-    var moduleConfigs = module.config();
+    var config = module.config();
     var cachedFilters = {};
+
+    config = _.extend({
+        FiltersManager: FiltersManager
+    }, config);
 
     var methods = {
         /**
@@ -37,6 +41,10 @@ define(function(require) {
                 var type = filter.type;
                 modules[type] = mapFilterModuleName(type);
             });
+
+            if (_.isString(config.FiltersManager)) {
+                modules.FiltersManager = config.FiltersManager;
+            }
             return modules;
         },
 
@@ -44,6 +52,8 @@ define(function(require) {
             if (!this.collection || !this.modules) {
                 return;
             }
+
+            FiltersManager = this.modules.FiltersManager || FiltersManager;
 
             var filtersList;
             var $filterContainer;
@@ -56,7 +66,6 @@ define(function(require) {
             }
 
             options.collection = this.collection;
-            options.el = $('<div/>').prependTo($filterContainer);
             if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
                 options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
             } else {
@@ -66,8 +75,11 @@ define(function(require) {
                     options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo($filterContainer);
                 }
             }
+
             filtersList = new FiltersManager(options);
             filtersList.render();
+            filtersList.$el.prependTo($filterContainer);
+
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
@@ -194,7 +206,7 @@ define(function(require) {
             if (!_.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
-            if (_.result(moduleConfigs, 'enableToggleFilters') === false) {
+            if (_.result(config, 'enableToggleFilters') === false) {
                 options.enableToggleFilters = false;
             }
             if (options.enableToggleFilters) {

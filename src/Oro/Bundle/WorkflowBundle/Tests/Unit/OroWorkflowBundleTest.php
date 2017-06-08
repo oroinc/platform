@@ -76,10 +76,18 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $containerBuilder->expects($this->at(7))
+            ->method('addCompilerPass')
+            ->with(
+                $this->isInstanceOf(
+                    Compiler\EventsCompilerPass::class
+                )
+            );
+
         $addTopicMetaPass = AddTopicMetaPass::create();
         $addTopicMetaPass->add(Topics::EXECUTE_PROCESS_JOB);
 
-        $containerBuilder->expects($this->at(7))->method('addCompilerPass')->with($addTopicMetaPass);
+        $containerBuilder->expects($this->at(8))->method('addCompilerPass')->with($addTopicMetaPass);
 
         $bundle = new OroWorkflowBundle();
         $bundle->build($containerBuilder);

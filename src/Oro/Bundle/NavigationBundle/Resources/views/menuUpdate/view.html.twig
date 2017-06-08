@@ -3,14 +3,12 @@
 {% import 'OroSyncBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% from _self import resetButton %}
+{% set reloadLink -%}
+    <a href="#" onclick="window.location.reload(false);return false;">
+        {{- 'oro.navigation.menuupdate.reload_link.label'|trans -}}
+    </a>
+{%- endset %}
 {% block content %}
-    {% set componentOptions = {
-        container: 'left-panel-container',
-        sidebar: 'left-panel',
-        sidebarAlias: 'menuitem-sidebar',
-        widgetAlias: 'menuitem-widget',
-        widgetContainer: '.content'
-    } %}
 
     <div class="layout-content"{% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         <div class="container-fluid page-title">
@@ -23,7 +21,7 @@
                                 'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.root.name, context: context}),
                                 'menuKey': entity.root.name,
                                 'data': {
-                                    'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : entity.root.name }),
+                                    'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : entity.root.name, '%reload_link%': reloadLink}),
                                 }
                             }) }}
 
@@ -44,7 +42,7 @@
                             'dataMethod': 'POST',
                             'dataRedirect': app.request.uri,
                             'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: entity.name, parentKey: entity.name, 'isDivider': true}),
-                            'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')
+                            'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')|trans({'%reload_link%': reloadLink})
                             }) %}
 
                             {% set parameters = {
@@ -75,59 +73,44 @@
             </div>
         </div>
 
-        <div class="layout-content scrollable-container">
+        <div class="clearfix">
             {% block content_data %}
-                <div class="left-panel-container tree-component-container"
-                     data-page-component-module="orodatagrid/js/app/components/grid-sidebar-component"
-                     data-page-component-options="{{ componentOptions|json_encode }}">
-                    <div class="placeholder">
-                        <div class="scrollable-container">
-                            <div class="left-panel scrollable-container">
-                                <div class="left-panel-header">
-                                    <div class="left-panel-control left-panel-control-maximize">
-                                        <i class="fa-forward control-maximize"></i>
-                                    </div>
-                                    <div class="left-panel-control left-panel-control-minimize">
-                                        <i class="fa-backward control-minimize"></i>
-                                    </div>
-                                </div>
-                                <div class="menu-item">
-                                    {% set treeOptions = {
-                                        'data' : tree,
-                                        'menu' : entity.root.name,
-                                        'nodeId': entity.root.name,
-                                        'context' : context,
-                                        'updateAllowed' : true,
-                                        'view' : 'oronavigation/js/app/views/tree-manage-view',
-                                        'onRootSelectRoute' : routePrefix ~ 'view',
-                                        'onSelectRoute' : routePrefix ~ 'update',
-                                        'onMoveRoute' : routePrefix ~ 'ajax_move',
-                                        'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
-                                    } %}
+                {% set treeOptions = {
+                    'data' : tree,
+                    'menu' : entity.root.name,
+                    'nodeId': entity.root.name,
+                    'context' : context,
+                    'updateAllowed' : true,
+                    'view' : 'oronavigation/js/app/views/tree-manage-view',
+                    'onRootSelectRoute' : routePrefix ~ 'view',
+                    'onSelectRoute' : routePrefix ~ 'update',
+                    'onMoveRoute' : routePrefix ~ 'ajax_move',
+                    'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
+                } %}
 
-                                    {{ UI.renderJsTree(
-                                        {
-                                            'label': 'oro.navigation.menu.menu_list_default.label'|trans,
-                                            'treeOptions': treeOptions
-                                        },
-                                        {
-                                            'move': {
-                                                'view': 'oroui/js/app/views/jstree/move-action-view',
-                                                'routeName': routePrefix ~ 'move',
-                                                'routeParams': {menuName: entity.root.name, context: context}
-                                            }
-                                        }
-                                    ) }}
-                                </div>
-                            </div>
-                            <div class="content categories-content">
-                                <div class="text-center">
-                                    {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
-                                </div>
-                            </div>
+                {% embed "OroUIBundle::content_sidebar.html.twig" %}
+                    {% block sidebar %}
+                        {{ UI.renderJsTree(
+                            {
+                                'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                                'treeOptions': treeOptions
+                            },
+                            {
+                                'move': {
+                                    'view': 'oroui/js/app/views/jstree/move-action-view',
+                                    'routeName': routePrefix ~ 'move',
+                                    'routeParams': {menuName: entity.root.name, context: context}
+                                }
+                            }
+                        ) }}
+                    {% endblock sidebar %}
+
+                    {% block content %}
+                        <div class="tree-empty-content scrollable-container">
+                            {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
                         </div>
-                    </div>
-                </div>
+                    {% endblock content %}
+                {% endembed %}
             {% endblock content_data %}
         </div>
     </div>

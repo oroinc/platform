@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityForNestedObjects as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects as TestEntity;
 
 /**
  * @dbIsolationPerTest

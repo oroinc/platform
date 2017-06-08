@@ -40,6 +40,7 @@ define([
             'addressListUrl': null,
             'addressCreateUrl': null,
             'addressUpdateUrl': null,
+            'addressDeleteUrl': null,
             'mapView': Googlemaps,
             'addressMapOptions': {},
             'allowToRemovePrimary': false,
@@ -195,7 +196,8 @@ define([
                     template: this.options.template,
                     allowToRemovePrimary: this.options.allowToRemovePrimary,
                     confirmRemove: this.options.confirmRemove,
-                    confirmRemoveComponent: this.options.confirmRemoveComponent
+                    confirmRemoveComponent: this.options.confirmRemoveComponent,
+                    addressDeleteUrl: this._getUrl('addressDeleteUrl', address)
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);

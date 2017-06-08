@@ -66,13 +66,29 @@ services:
             - [addProcessor, ['@oro_test.alice_reference_processor']]
             - [addProcessor, ['@oro_test.alice_to_string_processor']]
 
-    oro_test.config_cache:
-        decorates: oro_config.cache
+    oro_config.cache:
         parent: doctrine_cache.abstract.array
         calls:
             - [setNamespace, [ 'oro_config' ] ]
+
+    oro_embedded_form.csrf_token_cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_csrf_cache' ] ]
+
+    oro_security.wsse_nonce_cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_nonces_cache' ] ]
 
     oro_test.transport_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider
         tags:
             - { name: oro_integration.transport, type: aType, channel_type: aType }
+
+    oro_test.entity_alias_resolver:
+        class: 'Oro\Bundle\EntityBundle\ORM\EntityAliasResolver'
+        arguments:
+            - '@oro_entity.entity_alias_loader'
+            - '@oro_entity.entity_alias_cache'
+            - true

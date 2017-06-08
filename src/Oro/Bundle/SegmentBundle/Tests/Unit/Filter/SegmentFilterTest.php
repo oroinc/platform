@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -33,6 +32,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
@@ -67,6 +67,9 @@ class SegmentFilterTest extends OrmTestCase
 
     /** @var SegmentFilter */
     protected $filter;
+
+    /** @var SubQueryLimitHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $subqueryLimitHelper;
 
     protected function setUp()
     {
@@ -146,8 +149,9 @@ class SegmentFilterTest extends OrmTestCase
         $segmentQueryBuilderRegistry = new SegmentQueryBuilderRegistry();
         $segmentQueryBuilderRegistry->addQueryBuilder('static', $this->staticSegmentQueryBuilder);
         $segmentQueryBuilderRegistry->addQueryBuilder('dynamic', $this->dynamicSegmentQueryBuilder);
+        $this->subqueryLimitHelper = $this->createMock(SubQueryLimitHelper::class);
 
-        $segmentManager = new SegmentManager($this->em, $segmentQueryBuilderRegistry);
+        $segmentManager = new SegmentManager($this->em, $segmentQueryBuilderRegistry, $this->subqueryLimitHelper);
 
         $this->filter = new SegmentFilter(
             $this->formFactory,
@@ -178,6 +182,9 @@ class SegmentFilterTest extends OrmTestCase
         $classMetaData->expects($this->any())
             ->method('getIdentifierFieldNames')
             ->will($this->returnValue(['id']));
+        $classMetaData->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('id'));
         $classMetaData->expects($this->any())
             ->method('getTypeOfField')
             ->will($this->returnValue('integer'));
@@ -377,40 +384,24 @@ class SegmentFilterTest extends OrmTestCase
         return $em;
     }
 
-    public function testDynamicApply()
+    public function testDynamicApplyWithoutLimit()
     {
         $dynamicSegment = (new Segment())
             ->setType(new SegmentType(SegmentType::TYPE_DYNAMIC))
-            ->setEntity(CmsUser::class)
-            ->setRecordsLimit(20);
+            ->setEntity(CmsUser::class);
 
         $filterData = ['value' => $dynamicSegment];
-        $em         = $this->getEM();
 
+        $em = $this->getEM();
         $qb = $em->createQueryBuilder()
             ->select(['t1.name'])
             ->from('OroSegmentBundle:CmsUser', 't1');
 
-        $queryBuilderMock = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $queryMock = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getEntityManager', 'getArrayResult'])
-            ->getMockForAbstractClass();
-
-        $queryBuilderMock->expects($this->once())
-            ->method('getQuery')
-            ->willReturn($queryMock);
-
-        $queryBuilderMock->expects($this->once())
-            ->method('getEntityManager')
-            ->willReturn($em);
-
-        $queryMock->expects($this->once())
-            ->method('getArrayResult')
-            ->willReturn([['id' => 1], ['id' => 2]]);
+        $queryBuilder = new QueryBuilder($em);
+        $queryBuilder->select(['ts1.id'])
+            ->from('OroSegmentBundle:SegmentSnapshot', 'ts1')
+            ->andWhere('ts1.segmentId = :segment')
+            ->setParameter('segment', self::TEST_PARAM_VALUE);
 
         $ds = new OrmFilterDatasourceAdapter($qb);
 
@@ -418,13 +409,72 @@ class SegmentFilterTest extends OrmTestCase
             ->expects(static::once())
             ->method('getQueryBuilder')
             ->with($dynamicSegment)
-            ->willReturn($queryBuilderMock);
+            ->will(static::returnValue($queryBuilder));
 
         $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
         $this->filter->apply($ds, $filterData);
 
-        $expectedResult = 'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE t1.id IN(1, 2)';
+        $expectedResult = [
+            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
+            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :segment)'
+        ];
+        $expectedResult = implode(' ', $expectedResult);
 
-        $this->assertSame($expectedResult, $ds->getQueryBuilder()->getDQL());
+        static::assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
+
+        $params = $ds->getQueryBuilder()->getParameters();
+
+        static::assertCount(1, $params, 'Should pass params to main query builder');
+        static::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
+    }
+
+    public function testDynamicApplyWithLimit()
+    {
+        $dynamicSegment = (new Segment())
+            ->setType(new SegmentType(SegmentType::TYPE_DYNAMIC))
+            ->setEntity(CmsUser::class)
+            ->setRecordsLimit(10);
+
+        $filterData = ['value' => $dynamicSegment];
+
+        $em = $this->getEM();
+        $qb = $em->createQueryBuilder()
+            ->select(['t1.name'])
+            ->from('OroSegmentBundle:CmsUser', 't1');
+
+        $queryBuilder = new QueryBuilder($em);
+        $queryBuilder->select(['ts1.id'])
+            ->from('OroSegmentBundle:SegmentSnapshot', 'ts1')
+            ->andWhere('ts1.segmentId = :segment')
+            ->setParameter('segment', self::TEST_PARAM_VALUE);
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+
+        $this->dynamicSegmentQueryBuilder
+            ->expects(static::once())
+            ->method('getQueryBuilder')
+            ->with($dynamicSegment)
+            ->will(static::returnValue($queryBuilder));
+
+        $this->subqueryLimitHelper->expects($this->once())
+            ->method('setLimit')
+            ->with($queryBuilder, 10, 'id')
+            ->willReturn($queryBuilder);
+
+        $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
+        $this->filter->apply($ds, $filterData);
+
+        $expectedResult = [
+            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
+            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :segment)'
+        ];
+        $expectedResult = implode(' ', $expectedResult);
+
+        static::assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
+
+        $params = $ds->getQueryBuilder()->getParameters();
+
+        static::assertCount(1, $params, 'Should pass params to main query builder');
+        static::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
     }
 }

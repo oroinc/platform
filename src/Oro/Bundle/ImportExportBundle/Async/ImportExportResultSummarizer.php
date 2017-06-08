@@ -99,7 +99,7 @@ class ImportExportResultSummarizer
         $job = $job->isRoot() ? $job : $job->getRootJob();
         foreach ($job->getChildJobs() as $childrenJob) {
             $childrenJobData = $childrenJob->getData();
-            if (empty($childrenJobData)) {
+            if (empty($childrenJobData) || !array_key_exists('errorLogFile', $childrenJobData)) {
                 continue;
             }
             $fileName = $childrenJobData['errorLogFile'];
@@ -172,7 +172,7 @@ class ImportExportResultSummarizer
                 $totalDataImportJob['error_entries'] : 0;
         }
 
-            $data['hasError'] = !!$data['errors'];
+        $data['hasError'] = !!$data['errors'];
 
         return $data;
     }

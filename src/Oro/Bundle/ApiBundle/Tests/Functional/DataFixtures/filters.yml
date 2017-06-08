@@ -1,7 +1,7 @@
-Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment:
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
     TestDepartment{1..3}:
         name: TestDepartment<current()>
-Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee:
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
     TestEmployee{1..30}:
         name: TestEmployee<current()>
         # $this->valueForCurrent is a workaround because $current works only in v3.x

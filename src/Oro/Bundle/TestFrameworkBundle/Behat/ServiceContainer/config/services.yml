@@ -16,6 +16,15 @@ services:
         tags:
             - { name: cli.controller, priority: 700 }
 
+    cli.controller.available_suites_group:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController
+        arguments:
+            - '@suite.registry'
+            - '@specifications.finder'
+            - '%oro_test.suite_groups%'
+        tags:
+            - { name: cli.controller, priority: 710 }
+
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
         arguments:
@@ -156,10 +165,18 @@ services:
         arguments:
             - '@symfony2_extension.kernel'
 
+    oro_behat_extension.fixtures.yml_parser:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroYamlParser
+        arguments:
+            - '@oro_test.alice_loader'
+        calls:
+            - [setKernel, ['@symfony2_extension.kernel']]
+
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
         calls:
             - [addPopulator, ['@oro_behat_extension.fixtures.doctrine_entity_populator']]
+            - [addParser, ['@oro_behat_extension.fixtures.yml_parser']]
 
     oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler

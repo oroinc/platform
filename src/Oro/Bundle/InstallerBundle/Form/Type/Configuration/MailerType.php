@@ -23,9 +23,8 @@ class MailerType extends AbstractType
                         'smtp'      => 'SMTP',
                         'sendmail'  => 'sendmail',
                     ),
-                    'constraints'   => array(
-                        new Assert\NotBlank(),
-                    ),
+                    'required' => false,
+                    'placeholder' => 'None',
                     'client_validation' => false,
                 )
             )

@@ -40,4 +40,11 @@ oro_behat_extension:
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
 
     Simple Color Picker Field:
+      selector: 'span.simplecolorpicker'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroSimpleColorPickerField
+
+    Select2Offscreen:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Offscreen
+
+    Select2Choices:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Choices

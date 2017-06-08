@@ -7,8 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -41,38 +42,85 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             return;
         }
 
-        $rootAlias = QueryUtils::getSingleRootAlias($query, false);
-        if (!$rootAlias) {
+        if (null === QueryBuilderUtil::getSingleRootAlias($query, false)) {
             // only queries with one root entity is supported
             return;
         }
 
-        $associationName = $this->getAssociationName($context);
-        $parentClassName = $context->getParentClassName();
+        $path = ConfigUtil::explodePropertyPath($this->getAssociationName($context));
+        $pathLength = count($path);
+        $parentJoinAlias = 'e';
+        for ($i = 1; $i <= $pathLength; $i++) {
+            $fieldName = $path[$pathLength - $i];
+            $joinAlias = sprintf('parent_entity%d', $i);
+            $parentPath = array_slice($path, 0, -$i);
+            if (empty($parentPath)) {
+                $parentClassName = $context->getParentClassName();
+                $isCollection = $context->isCollection();
+            } else {
+                $parentFieldConfig = $context->getParentConfig()->findFieldByPath($parentPath, true);
+                $parentClassName = $parentFieldConfig->getTargetClass();
+                $isCollection = $parentFieldConfig->getTargetEntity()
+                    ->findField($fieldName, true)
+                    ->isCollectionValuedAssociation();
+            }
+            $this->addJoinToParentEntity(
+                $query,
+                $parentClassName,
+                $fieldName,
+                $isCollection,
+                $joinAlias,
+                $parentJoinAlias
+            );
+            $parentJoinAlias = $joinAlias;
+        }
+        $query
+            ->andWhere(sprintf('%s = :parent_entity_id', $parentJoinAlias))
+            ->setParameter('parent_entity_id', $context->getParentId());
+    }
+
+    /**
+     * @param QueryBuilder $query
+     * @param string       $parentClassName
+     * @param string       $associationName
+     * @param bool         $isCollection
+     * @param string       $joinAlias
+     * @param string|null  $parentJoinAlias
+     */
+    protected function addJoinToParentEntity(
+        QueryBuilder $query,
+        $parentClassName,
+        $associationName,
+        $isCollection,
+        $joinAlias,
+        $parentJoinAlias = null
+    ) {
         $joinFieldName = $this->getJoinFieldName($parentClassName, $associationName);
         if ($joinFieldName) {
             // bidirectional association
-            $query->innerJoin('e.' . $joinFieldName, 'parent_entity');
-        } elseif ($context->isCollection()) {
-            // unidirectional "to-many" association
-            $query->innerJoin(
-                $parentClassName,
-                'parent_entity',
-                Join::WITH,
-                sprintf('%s MEMBER OF parent_entity.%s', $rootAlias, $associationName)
-            );
+            $query->innerJoin('e.' . $joinFieldName, $joinAlias);
         } else {
-            // unidirectional "to-one" association
-            $query->innerJoin(
-                $parentClassName,
-                'parent_entity',
-                Join::WITH,
-                sprintf('parent_entity.%s = %s', $associationName, $rootAlias)
-            );
+            if (!$parentJoinAlias) {
+                $parentJoinAlias = QueryBuilderUtil::getSingleRootAlias($query);
+            }
+            if ($isCollection) {
+                // unidirectional "to-many" association
+                $query->innerJoin(
+                    $parentClassName,
+                    $joinAlias,
+                    Join::WITH,
+                    sprintf('%s MEMBER OF %s.%s', $parentJoinAlias, $joinAlias, $associationName)
+                );
+            } else {
+                // unidirectional "to-one" association
+                $query->innerJoin(
+                    $parentClassName,
+                    $joinAlias,
+                    Join::WITH,
+                    sprintf('%s.%s = %s', $joinAlias, $associationName, $parentJoinAlias)
+                );
+            }
         }
-        $query
-            ->andWhere('parent_entity = :parent_entity_id')
-            ->setParameter('parent_entity_id', $context->getParentId());
     }
 
     /**

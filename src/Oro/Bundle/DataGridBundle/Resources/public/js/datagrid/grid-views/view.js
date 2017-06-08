@@ -75,6 +75,9 @@ define(function(require) {
         originalTitle: null,
 
         /** @property */
+        defaultPrefix: __('oro.datagrid.gridView.all'),
+
+        /** @property */
         route: 'oro_datagrid_api_rest_gridview_default',
 
         /** @property */
@@ -89,6 +92,9 @@ define(function(require) {
 
         /** @property */
         modal: null,
+
+        /** @property */
+        showErrorMessage: true,
 
         /**
          * Initializer.
@@ -183,6 +189,10 @@ define(function(require) {
                 this.viewDirty = !this._isCurrentStateSynchronized();
                 this.render();
             }, this);
+
+            this.listenTo(mediator, this.gridName + ':grid-views-model:invalid', function(params) {
+                this.onGridViewsModelInvalid(params);
+            }, this);
         },
 
         /**
@@ -246,6 +256,7 @@ define(function(require) {
                 appearanceData: this.collection.state.appearanceData
             }, {
                 wait: true,
+                errorHandlerMessage: self.showErrorMessage,
                 success: function() {
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
@@ -260,7 +271,12 @@ define(function(require) {
                 var data = self.getInputData(modal.$el);
                 var model = self._createBaseViewModel(data);
 
-                self._onSaveAsModel(model);
+                if (model.isValid()) {
+                    self.lockModelOnOkCloses(modal, true);
+                    self._onSaveAsModel(model);
+                } else {
+                    self.lockModelOnOkCloses(modal, false);
+                }
             });
 
             modal.open();
@@ -295,6 +311,7 @@ define(function(require) {
                     self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                     mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
                 },
+                errorHandlerMessage: self.showErrorMessage,
                 error: function(model, response, options) {
                     self.onError(model, response, options);
                 }
@@ -383,8 +400,14 @@ define(function(require) {
             modal.on('ok', function() {
                 var data = self.getInputData(modal.$el);
 
-                model.set(data);
-                self._onRenameSaveModel(model);
+                model.set(data, {silent: true});
+
+                if (model.isValid()) {
+                    self.lockModelOnOkCloses(modal, true);
+                    self._onRenameSaveModel(model);
+                } else {
+                    self.lockModelOnOkCloses(modal, false);
+                }
             });
             modal.open();
             this.modal = modal;
@@ -400,7 +423,7 @@ define(function(require) {
             model.save(
                 null, {
                 wait: true,
-                success: function() {
+                success: function(savedModel) {
                     var currentDefaultViewModel = self._getCurrentDefaultViewModel();
                     var isCurrentDefault = currentDefaultViewModel === model;
                     var isCurrentWasDefault = currentDefaultViewModel === undefined;
@@ -412,9 +435,16 @@ define(function(require) {
                         // views with 'default' property and it shall be set to system view.
                         self._getDefaultSystemViewModel().set({is_default: true});
                     }
+
+                    model.set({
+                        'label': savedModel.get('label')
+                    });
+
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 },
+                errorHandlerMessage: self.showErrorMessage,
                 error: function(model, response, options) {
+                    model.set('label', model.previous('label'));
                     self.onError(model, response, options);
                 }
             });
@@ -425,6 +455,27 @@ define(function(require) {
                 this.modal.open();
             }
             this._showNameError(this.modal, response);
+        },
+
+        /**
+         * @param {array} errors
+         */
+        onGridViewsModelInvalid: function(errors) {
+            if (errors && _.isObject(this.modal)) {
+                this.modal.setNameError(_.first(errors));
+                this.modal.open();
+            }
+        },
+
+        /**
+         *
+         * @param {object} modal
+         * @param {boolean} lock
+         */
+        lockModelOnOkCloses: function(modal, lock) {
+            if (_.isObject(modal) && _.isObject(modal.options)) {
+                modal.options.okCloses = lock;
+            }
         },
 
         /**
@@ -451,7 +502,7 @@ define(function(require) {
 
             var defaultItem = _.findWhere(choices, {value: this.DEFAULT_GRID_VIEW_ID});
             if (defaultItem.label === this.DEFAULT_GRID_VIEW_ID) {
-                defaultItem.label = __('oro.datagrid.gridView.all') + (this.title || '');
+                defaultItem.label = this.defaultPrefix + (this.title || '');
             }
 
             return choices;
@@ -701,7 +752,7 @@ define(function(require) {
         _createBaseViewModel: function(data) {
             return this._createViewModel(
                 {
-                    label: _.isUndefined(data.label) ? __('oro.datagrid.gridView.all') : data.label,
+                    label: _.isUndefined(data.label) ? this.defaultPrefix : data.label,
                     is_default: _.isUndefined(data.is_default) ? false : data.is_default,
                     type: 'private',
                     grid_name: this.gridName,
@@ -711,7 +762,8 @@ define(function(require) {
                     appearanceType: this.collection.state.appearanceType,
                     appearanceData: this.collection.state.appearanceData,
                     editable: this.permissions.EDIT,
-                    deletable: this.permissions.DELETE
+                    deletable: this.permissions.DELETE,
+                    freezeName: this.defaultPrefix + (this.title || '')
                 }
             );
         },
@@ -892,7 +944,7 @@ define(function(require) {
 
             var title = currentView.label;
             if (currentView.value === this.DEFAULT_GRID_VIEW_ID) {
-                title = __('oro.datagrid.gridView.all');
+                title = this.defaultPrefix;
             }
 
             return title + ' - ' + this.originalTitle;

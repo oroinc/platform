@@ -1,4 +1,4 @@
-#OroIntegrationBundle Documentation
+# OroIntegrationBundle Documentation
 
 - [Configuration Reference](./reference/configuration-reference.md)
 - [Additional setting for integration](./reference/additional-settings.md)

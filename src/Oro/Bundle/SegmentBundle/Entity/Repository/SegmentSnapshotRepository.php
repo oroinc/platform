@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class SegmentSnapshotRepository extends EntityRepository
 {
@@ -42,15 +43,22 @@ class SegmentSnapshotRepository extends EntityRepository
 
     /**
      * @param Segment $segment
-     *
+     * @param array $entityIds
      * @return array
      */
-    public function removeBySegment(Segment $segment)
+    public function removeBySegment(Segment $segment, array $entityIds = [])
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->delete($this->getEntityName(), 'snp')
-            ->where('snp.segment = :segment')
+            ->where($qb->expr()->eq('snp.segment', ':segment'))
             ->setParameter('segment', $segment);
+
+        if ($entityIds) {
+            $entityIdentifierField = $this->getEntityReferenceField($segment);
+
+            $qb->andWhere($qb->expr()->in('snp.' . $entityIdentifierField, ':entityIds'))
+                ->setParameter('entityIds', $entityIds);
+        }
 
         return $qb->getQuery()->execute();
     }
@@ -157,20 +165,33 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {
+        $fieldToSelect = $this->getEntityReferenceField($segment);
+        $tableName = QueryBuilderUtil::generateParameterName('snp');
+        $paramName = QueryBuilderUtil::generateParameterName('segment');
+        $fieldToSelect = sprintf('%s.%s', $tableName, $fieldToSelect);
+
+        $qb = $this->createQueryBuilder($tableName);
+        $qb->select($fieldToSelect)
+            ->where($qb->expr()->eq($tableName . '.segment', ':' . $paramName))
+            ->setParameter($paramName, $segment);
+
+        return $qb;
+    }
+
+    /**
+     * @param Segment $segment
+     * @return string
+     */
+    private function getEntityReferenceField(Segment $segment)
+    {
         $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
         $idField        = $entityMetadata->getSingleIdentifierFieldName();
         $idFieldType    = $entityMetadata->getTypeOfField($idField);
-        $fieldToSelect  = SegmentSnapshot::ENTITY_REF_FIELD;
-        if ($idFieldType == 'integer') {
-            $fieldToSelect = SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;
+
+        if ($idFieldType === 'integer') {
+            return SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;
         }
-        $fieldToSelect = sprintf('snp.%s', $fieldToSelect);
 
-        $qb = $this->createQueryBuilder('snp')
-            ->select($fieldToSelect)
-            ->where('snp.segment = :segment')
-            ->setParameter('segment', $segment);
-
-        return $qb;
+        return SegmentSnapshot::ENTITY_REF_FIELD;
     }
 }

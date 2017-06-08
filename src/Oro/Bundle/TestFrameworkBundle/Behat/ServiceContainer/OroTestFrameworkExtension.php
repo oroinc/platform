@@ -13,6 +13,7 @@ use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
@@ -26,6 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
@@ -102,6 +104,12 @@ class OroTestFrameworkExtension implements TestworkExtension
                     )
                     ->defaultValue([])
                 ->end()
+                ->arrayNode('suite_groups')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->prototype('scalar')->end()
+                    ->end()
+                ->end()
                 ->variableNode('shared_contexts')
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
@@ -134,6 +142,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
+        $container->setParameter('oro_test.suite_groups', $config['suite_groups']);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
@@ -272,6 +281,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     private function processBundleBehatConfigurations(ContainerBuilder $container)
     {
+        /** @var KernelInterface $kernel */
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
         $processor = new Processor();
         $configuration = new BehatBundleConfiguration($container);
@@ -297,14 +307,25 @@ class OroTestFrameworkExtension implements TestworkExtension
                 $config
             );
 
-            $pages = array_merge($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
-            $elements = array_merge($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
+            $this->appendConfiguration($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
+            $this->appendConfiguration($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
             $suites = array_merge($suites, $processedConfiguration[self::SUITES_CONFIG_ROOT]);
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
         $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
         $container->setParameter('suite.configurations', $suites);
+    }
+
+    private function appendConfiguration(array &$baseConfig, array $config)
+    {
+        foreach ($config as $key => $value) {
+            if (array_key_exists($key, $baseConfig)) {
+                throw new \InvalidArgumentException(sprintf('Configuration with "%s" key is already defined', $key));
+            }
+
+            $baseConfig[$key] = $value;
+        }
     }
 
     /**
@@ -326,7 +347,9 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $bundleSuite = $suiteGenerator->generateSuite($bundle->getName(), []);
+            // Add ! to the start of bundle name, because we need to get the real bundle not the inheritance
+            // See OroKernel->getBundle
+            $bundleSuite = $suiteGenerator->generateSuite('!'.$bundle->getName(), []);
 
             if (!$this->hasValidPaths($bundleSuite)) {
                 continue;

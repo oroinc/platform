@@ -43,7 +43,9 @@ class DataNormalizer
     {
         $fields = $config->getFields();
         foreach ($fields as $field => $fieldConfig) {
-            if (!$fieldConfig->isExcluded()) {
+            if ($fieldConfig->isExcluded()) {
+                unset($row[$field]);
+            } else {
                 $propertyPath = $this->getPropertyPath($field, $fieldConfig);
                 if ($propertyPath) {
                     $path = ConfigUtil::explodePropertyPath($propertyPath);

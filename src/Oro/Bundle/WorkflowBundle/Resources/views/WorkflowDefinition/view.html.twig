@@ -315,14 +315,14 @@
 
     {% set dataBlocks = [
         {
-            'title': 'General Information'|trans,
+            'title': 'oro.workflow.block.title.general_information'|trans,
             'class': 'active',
             'subblocks': [
                 {'data' : [workflowDefinitionInfo] },
             ]
         },
         {
-            'title': 'Configuration'|trans,
+            'title': 'oro.workflow.block.title.steps_and_transitions'|trans,
             'subblocks': [
                 {
                     'data':  [workflowStepsAndTransitions]

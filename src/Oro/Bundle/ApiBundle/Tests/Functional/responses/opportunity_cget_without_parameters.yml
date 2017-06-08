@@ -1,0 +1,87 @@
+data:
+    -
+        type: opportunities
+        id: '@opportunity1->id'
+        attributes:
+            lastContactedDate: null
+            lastContactedDateIn: null
+            lastContactedDateOut: null
+            timesContacted: null
+            timesContactedIn: null
+            timesContactedOut: null
+            name: 'Opportunity 1'
+            closeDate: null
+            probability: null
+            budgetAmountCurrency: null
+            budgetAmountValue: null
+            closeRevenueCurrency: null
+            closeRevenueValue: null
+            customerNeed: null
+            proposedSolution: null
+            createdAt: '2017-04-26T14:01:48Z'
+            updatedAt: '2017-04-26T14:01:48Z'
+            notes: null
+        relationships:
+            closeReason:
+                data: null
+            contact:
+                data: null
+            lead:
+                data: null
+            owner:
+                data:
+                    type: users
+                    id: '@organization->id'
+            organization:
+                data:
+                    type: organizations
+                    id: '@organization->id'
+            status:
+                data: null
+            account:
+                data: null
+            customer:
+                data: null
+    -
+        type: opportunities
+        id: '@opportunity2->id'
+        attributes:
+            lastContactedDate: null
+            lastContactedDateIn: null
+            lastContactedDateOut: null
+            timesContacted: null
+            timesContactedIn: null
+            timesContactedOut: null
+            name: 'Opportunity 2'
+            closeDate: null
+            probability: null
+            budgetAmountCurrency: null
+            budgetAmountValue: null
+            closeRevenueCurrency: null
+            closeRevenueValue: null
+            customerNeed: null
+            proposedSolution: null
+            createdAt: '2017-04-26T14:01:48Z'
+            updatedAt: '2017-04-26T14:01:48Z'
+            notes: null
+        relationships:
+            closeReason:
+                data: null
+            contact:
+                data: null
+            lead:
+                data: null
+            owner:
+                data:
+                    type: users
+                    id: '@organization->id'
+            organization:
+                data:
+                    type: organizations
+                    id: '@organization->id'
+            status:
+                data: null
+            account:
+                data: null
+            customer:
+                data: null

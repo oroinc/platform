@@ -1,3 +1,5 @@
+@ticket-BAP-13139
+@automatically-ticket-tagged
 @fixture-OroUserBundle:user.yml
 @fixture-LanguageFixture.yml
 Feature: Applying language settings in system configuration
@@ -12,9 +14,10 @@ Feature: Applying language settings in system configuration
     When I login as "charlie" user
     And I click My Configuration in user menu
     And I click "Language settings"
+    And I uncheck "Use Organization"
     And I fill "Language Settings System Config Form" with:
-      | Use Default Language | true   |
       | Default Language     | German |
+      | Use Default Language | true   |
     And I save form
     Then I should see "German"
 
@@ -28,5 +31,4 @@ Feature: Applying language settings in system configuration
     When I login as "charlie" user
     And I click My Configuration in user menu
     And I click "Language settings"
-
-    And I should see "English"
+    Then I should see "English"

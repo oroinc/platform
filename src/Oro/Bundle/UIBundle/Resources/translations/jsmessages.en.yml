@@ -64,6 +64,11 @@ oro:
         leave_page_save_data_or_discard_title: "Navigation confirmation"
         leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
         error: "There was an error performing the requested operation. Please try again or contact us for assistance."
+        request_too_large_error: >
+            The information you are submitting does not fit the doorway on the server side.
+            This may happen due to the extremely high-resolution images in your data.
+            Please replace the attached information to reduce the total data size,
+            or talk to your admin to extend the doorway by updating HTTP server configuration.
         page_header:
             button:
                 more: "More"
@@ -108,6 +113,13 @@ oro:
             load_more: "Loading more results..."
         widget_form_component:
             save_flash_success: Saved successfully
+
+        element_value:
+            messages:
+                copied: Copied to clipboard
+                copy_not_successful: Copy command was not successful
+                copy_not_supported: Your browser does not support copy command. Please press Ctrl/Cmd+C to copy
+
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

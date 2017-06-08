@@ -37,9 +37,9 @@ class LoadNestedAssociation extends BaseLoadNestedAssociation
     /**
      * {@inheritdoc}
      */
-    protected function loadData(SubresourceContext $context, $associationName)
+    protected function loadData(SubresourceContext $context, $associationName, $isCollection)
     {
-        $data = parent::loadData($context, $associationName);
+        $data = parent::loadData($context, $associationName, $isCollection);
 
         if (!empty($data) && !$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
             $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(

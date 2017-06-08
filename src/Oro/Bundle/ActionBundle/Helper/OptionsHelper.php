@@ -87,10 +87,8 @@ class OptionsHelper
                 ]
             );
         } elseif (null !== ($message = $this->getMessage($button, $frontendOptions))) {
-            $options['message'] = [
-                'title' => $this->getTitle($button, $frontendOptions),
-                'content' => $message,
-            ];
+            $this->addOption($options, $frontendOptions, 'message');
+            $options['message']['content'] = $message;
         }
 
         $this->addOption($options, $frontendOptions, 'confirmation');
@@ -119,19 +117,19 @@ class OptionsHelper
      */
     protected function getMessage(ButtonInterface $button, array $frontendOptions)
     {
-        if (empty($frontendOptions['message']['message'])) {
+        if (empty($frontendOptions['message']['content'])) {
             return;
         }
 
         $messageOptions = $frontendOptions['message'];
 
         $message = $this->translator->trans(
-            $messageOptions['message'],
+            $messageOptions['content'],
             isset($messageOptions['message_parameters']) ? $messageOptions['message_parameters'] : [],
             $button->getTranslationDomain()
         );
 
-        return $message !== $messageOptions['message'] ? $message : null;
+        return $message !== $messageOptions['content'] ? $message : null;
     }
 
     /**

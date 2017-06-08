@@ -59,8 +59,29 @@
         }) %}
     {% endif %}
 
-    {% set label = transition.label|trans({},'workflows') %}
+    {% set label = transition.buttonLabel|trans({},'workflows') %}
+    {% set title = transition.buttonTitle|trans({},'workflows') %}
+    
+    {% set frontendMessage = transition.frontendOptions.message %}
+    {% set transitionMessage = null %}
 
+    {% if frontendMessage.content is defined %}
+        {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
+    {% endif %}
+
+    {% if transitionMessage and transitionMessage != frontendMessage.content %}
+        {# if no translation for message then do not show message #}
+        {% set message = frontendMessage|merge({
+            content: transitionMessage|nl2br,
+            title: frontendMessage.title|default(title),
+        }) %}
+    {% endif %}
+    
+    {% set data = data|merge({
+        message: (message|default({}))|json_encode,
+        'transition-label': label
+    }) %}
+    
     {% set class %}
         {{ aClass }}
         icons-holder-text
@@ -77,7 +98,7 @@
         'path': 'javascript:void(0);',
         'id': 'transition-%s-%s'|format(workflow.name, transition.name),
         'iCss': iCss,
-        'title': label,
+        'title': title,
         'class': class,
         'data': data,
         'label': label,
