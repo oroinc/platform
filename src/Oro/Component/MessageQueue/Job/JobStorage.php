@@ -89,6 +89,7 @@ class JobStorage
 
         return $qb
             ->where('job.ownerId = :ownerId AND job.name = :jobName')
+            ->andWhere('job.rootJob is NULL')
             ->setParameters(
                 [
                     'ownerId' => $ownerId,
@@ -100,7 +101,7 @@ class JobStorage
     }
 
     /**
-     * Finds root job by name and given statuses.
+     * Finds root non interrupted job by name and given statuses.
      *
      * @param string $jobName
      * @param array $statuses
@@ -112,13 +113,15 @@ class JobStorage
         $qb = $this->getEntityRepository()->createQueryBuilder('job');
 
         return $qb
-            ->where('job.ownerId is not null and job.name = :jobName and job.status in (:statuses)')
+            ->where('job.rootJob is NULL and job.name = :jobName and job.status in (:statuses)')
+            ->andWhere('job.interrupted != true')
             ->setParameters(
                 [
                     'jobName' => $jobName,
                     'statuses' => $statuses
                 ]
             )
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }
