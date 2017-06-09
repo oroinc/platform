@@ -109,3 +109,6 @@ services:
         class: 'Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalsCollectionType'
         tags:
             - { name: form.type, alias: oro_cron_schedule_intervals_collection }
+
+    oro_cron.service.schedule_interval_checker:
+        class: Oro\Bundle\CronBundle\Service\ScheduleIntervalChecker
