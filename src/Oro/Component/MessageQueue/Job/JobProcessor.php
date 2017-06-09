@@ -38,7 +38,7 @@ class JobProcessor
     }
 
     /**
-     * Finds root job by name and given statuses.
+     * Finds root non interrupted job by name and given statuses.
      *
      * @param string $jobName
      * @param array  $statuses
