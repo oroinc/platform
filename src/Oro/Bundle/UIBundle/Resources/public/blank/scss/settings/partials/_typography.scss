@@ -1,7 +1,12 @@
 // @theme: blank;
 
+// In blank theme has not use custom fonts.
+// This variable update in child's themes.
+$theme-fonts: () !default;
+
 $base-font: Arial, sans-serif !default;
-$icon-font: 'FontAwesome' !default; // include in assets
+// include in assets
+$icon-font: 'FontAwesome' !default;
 
 $root-font-size: 10px !default;
 $base-font-size: 14px !default;

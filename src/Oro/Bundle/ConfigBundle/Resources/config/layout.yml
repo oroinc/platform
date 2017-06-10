@@ -1,0 +1,8 @@
+services:
+
+    oro_config.layout.data_provider.system_config_provider:
+        class: 'Oro\Bundle\ConfigBundle\Layout\DataProvider\SystemConfigProvider'
+        arguments:
+            - '@oro_config.manager'
+        tags:
+            - { name: layout.data_provider, alias: system_config_provider }
