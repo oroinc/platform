@@ -38,6 +38,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processElements($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
+        $this->replaceSessionListener($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -128,6 +129,16 @@ class OroTestFrameworkExtension implements TestworkExtension
             0,
             $dumpers
         );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function replaceSessionListener(ContainerBuilder $container)
+    {
+        $container
+            ->getDefinition('mink.listener.sessions')
+            ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
     }
 
     private function processSuiteAwareSubscriber(ContainerBuilder $container)

@@ -17,16 +17,6 @@ services:
         tags:
             - { name: cli.controller, priority: 700 }
 
-    mink.listener.sessions:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
-        arguments:
-            - '@mink'
-            - '%mink.default_session%'
-            - '%mink.javascript_session%'
-            - '%mink.available_javascript_sessions%'
-        tags:
-            - { name: event_dispatcher.subscriber, priority: 0 }
-
     oro_test.listener.runtime_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\RunTimeSubscriber
         arguments:
