@@ -68,6 +68,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processSuiteAwareSubscriber($container);
         $this->processClassResolvers($container);
         $this->processArtifactHandlers($container);
+        $this->replaceSessionListener($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -211,6 +212,16 @@ class OroTestFrameworkExtension implements TestworkExtension
             $prettySubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
             $progressSubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function replaceSessionListener(ContainerBuilder $container)
+    {
+        $container
+            ->getDefinition('mink.listener.sessions')
+            ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
     }
 
     /**
