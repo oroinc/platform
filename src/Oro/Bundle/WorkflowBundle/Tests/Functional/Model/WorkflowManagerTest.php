@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
@@ -67,6 +68,8 @@ class WorkflowManagerTest extends WorkflowTestCase
     public function testMassStartWorkflowWithRollback()
     {
         $startArgumentList = $this->getStartArgumentList();
+        $transitionRecords = $this->getEntityManager(WorkflowTransitionRecord::class)
+            ->getRepository(WorkflowTransitionRecord::class)->findAll();
 
         $listenerMock = $this->createMock(StubEventListener::class);
 
@@ -81,7 +84,7 @@ class WorkflowManagerTest extends WorkflowTestCase
         $this->getSystemWorkflowManager()->massStartWorkflow($startArgumentList);
 
         $this->assertWorkflowItemsCount(0);
-        $this->assertWorkflowTransitionRecordCount(0);
+        $this->assertWorkflowTransitionRecordCount(0 + count($transitionRecords));
     }
 
     /**
