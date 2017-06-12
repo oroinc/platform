@@ -80,14 +80,22 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             true,
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
-        $dictionary = $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name');
-        $this->assertContains('t_test_rel', $dictionary['select']['expr']);
-        $this->assertEquals('dictionary', $dictionary['select']['return_type']);
-        $this->assertEquals('Acme\TestBundle\Entity\Dictionary1', $dictionary['select']['related_entity_name']);
-        $this->assertEquals('acme.test.testentity.test_rel.label', $dictionary['select']['label']);
-
-        $this->assertEquals('entity.testRel', $dictionary['join']['left'][0]['join']);
-        $this->assertContains('t_test_rel', $dictionary['join']['left'][0]['alias']);
+        $this->assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.name',
+                    'label' => 'acme.test.testentity.test_rel.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary1'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name')
+        );
     }
 
     public function testDictionaryWithTwoExplicitlyDeclaredVirtualFields()
@@ -124,25 +132,39 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
 
-        $dictionary = $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_id');
-        $this->assertContains('t_test_rel', $dictionary['select']['expr']);
-        $this->assertContains('id', $dictionary['select']['expr']);
-        $this->assertEquals('dictionary', $dictionary['select']['return_type']);
-        $this->assertEquals('Acme\TestBundle\Entity\Dictionary2', $dictionary['select']['related_entity_name']);
-        $this->assertEquals('acme.test.testentity.test_rel_id.label', $dictionary['select']['label']);
+        $this->assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.id',
+                    'label' => 'acme.test.testentity.test_rel_id.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_id')
+        );
 
-        $this->assertEquals('entity.testRel', $dictionary['join']['left'][0]['join']);
-        $this->assertContains('t_test_rel', $dictionary['join']['left'][0]['alias']);
-
-        $dictionary = $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name');
-        $this->assertContains('t_test_rel', $dictionary['select']['expr']);
-        $this->assertContains('name', $dictionary['select']['expr']);
-        $this->assertEquals('dictionary', $dictionary['select']['return_type']);
-        $this->assertEquals('Acme\TestBundle\Entity\Dictionary2', $dictionary['select']['related_entity_name']);
-        $this->assertEquals('acme.test.testentity.test_rel_name.label', $dictionary['select']['label']);
-
-        $this->assertEquals('entity.testRel', $dictionary['join']['left'][0]['join']);
-        $this->assertContains('t_test_rel', $dictionary['join']['left'][0]['alias']);
+        $this->assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.name',
+                    'label' => 'acme.test.testentity.test_rel_name.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name')
+        );
     }
 
     public function testDictionaryWithOneVirtualField()
@@ -175,14 +197,22 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
 
-        $dictionary = $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name');
-        $this->assertContains('t_test_rel', $dictionary['select']['expr']);
-        $this->assertEquals('dictionary', $dictionary['select']['return_type']);
-        $this->assertEquals('Acme\TestBundle\Entity\Dictionary3', $dictionary['select']['related_entity_name']);
-        $this->assertEquals('acme.test.testentity.test_rel.label', $dictionary['select']['label']);
-
-        $this->assertEquals('entity.testRel', $dictionary['join']['left'][0]['join']);
-        $this->assertContains('t_test_rel', $dictionary['join']['left'][0]['alias']);
+        $this->assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.name',
+                    'label' => 'acme.test.testentity.test_rel.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary3'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name')
+        );
     }
 
     public function testDictionaryWithSeveralVirtualFields()
@@ -223,25 +253,39 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->provider->isVirtualField($entityClassName, 'test_rel_label')
         );
 
-        $dictionary = $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_code');
-        $this->assertContains('t_test_rel', $dictionary['select']['expr']);
-        $this->assertContains('code', $dictionary['select']['expr']);
-        $this->assertEquals('dictionary', $dictionary['select']['return_type']);
-        $this->assertEquals('Acme\TestBundle\Entity\Dictionary4', $dictionary['select']['related_entity_name']);
-        $this->assertEquals('acme.test.testentity.test_rel_code.label', $dictionary['select']['label']);
+        $this->assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.code',
+                    'label' => 'acme.test.testentity.test_rel_code.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_code')
+        );
 
-        $this->assertEquals('entity.testRel', $dictionary['join']['left'][0]['join']);
-        $this->assertContains('t_test_rel', $dictionary['join']['left'][0]['alias']);
-
-        $dictionary = $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_label');
-        $this->assertContains('t_test_rel', $dictionary['select']['expr']);
-        $this->assertContains('label', $dictionary['select']['expr']);
-        $this->assertEquals('dictionary', $dictionary['select']['return_type']);
-        $this->assertEquals('Acme\TestBundle\Entity\Dictionary4', $dictionary['select']['related_entity_name']);
-        $this->assertEquals('acme.test.testentity.test_rel_label.label', $dictionary['select']['label']);
-
-        $this->assertEquals('entity.testRel', $dictionary['join']['left'][0]['join']);
-        $this->assertContains('t_test_rel', $dictionary['join']['left'][0]['alias']);
+        $this->assertEquals(
+            [
+                'select' => [
+                    'expr' => 'target.label',
+                    'label' => 'acme.test.testentity.test_rel_label.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4'
+                ],
+                'join' => [
+                    'left' => [
+                        ['join' => 'entity.testRel', 'alias' => 'target']
+                    ]
+                ]
+            ],
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_label')
+        );
     }
 
     /**

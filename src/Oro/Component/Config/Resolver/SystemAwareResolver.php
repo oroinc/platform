@@ -4,21 +4,23 @@ namespace Oro\Component\Config\Resolver;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
 {
     const PARENT_NODE = 'parent_node';
     const NODE_KEY    = 'node_key';
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $context;
+
+    /** @var PropertyAccessorInterface|null */
+    protected $propertyAccessor;
 
     /**
      * @param ContainerInterface $container
@@ -121,9 +123,14 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
 
             if ($this->startsWith($item, '$') && $this->endsWith($item, '$')) {
                 $name = substr($item, 1, -1);
-                $item = (isset($this->context[$name]) || array_key_exists($name, $this->context))
-                    ? $this->context[$name]
-                    : null;
+                $dot = strpos($name, '.');
+                $objectName = $dot ? substr($name, 0, $dot) : $name;
+                $item = $this->getContextValue($objectName);
+
+                if ($dot) {
+                    $propertyPath = substr($name, $dot + 1);
+                    $item = $this->getPropertyAccessor()->getValue($item, $propertyPath);
+                }
             } elseif ($this->startsWith($item, '%') && $this->endsWith($item, '%')) {
                 $name = substr($item, 1, -1);
                 $item = $this->getParameter($name);
@@ -133,6 +140,18 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    protected function getContextValue($name)
+    {
+        return (isset($this->context[$name]) || array_key_exists($name, $this->context))
+            ? $this->context[$name]
+            : null;
     }
 
     /**
@@ -280,5 +299,17 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         }
 
         return $val;
+    }
+
+    /**
+     * @return PropertyAccessorInterface
+     */
+    protected function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = new PropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

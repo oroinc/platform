@@ -7,6 +7,7 @@ use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
@@ -61,13 +62,10 @@ class ConfigModelManager
     public function checkDatabase()
     {
         if ($this->dbCheck === null) {
-            $this->dbCheck = false;
-            try {
-                $conn = $this->getEntityManager()->getConnection();
-                $conn->connect();
-                $this->dbCheck = $conn->getSchemaManager()->tablesExist($this->requiredTables);
-            } catch (\PDOException $e) {
-            }
+            $this->dbCheck = SafeDatabaseChecker::tablesExist(
+                $this->getEntityManager()->getConnection(),
+                $this->requiredTables
+            );
         }
 
         return $this->dbCheck;

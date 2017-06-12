@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 
 abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, OwnerTreeProviderInterface
@@ -142,22 +143,11 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
     protected function checkDatabase()
     {
         $className = $this->getOwnershipMetadataProvider()->getBasicLevelClass();
-        $em = $this->getManagerForClass($className);
-        $tableName = $em->getClassMetadata($className)->getTableName();
-        $result = false;
-        try {
-            $conn = $em->getConnection();
 
-            if (!$conn->isConnected()) {
-                $em->getConnection()->connect();
-            }
-
-            $result = $conn->isConnected()
-                && (bool)array_intersect([$tableName], $em->getConnection()->getSchemaManager()->listTableNames());
-        } catch (\PDOException $e) {
-        }
-
-        return $result;
+        return SafeDatabaseChecker::tablesExist(
+            $this->getManagerForClass($className)->getConnection(),
+            SafeDatabaseChecker::getTableName($this->getContainer()->get('doctrine'), $className)
+        );
     }
 
     /**

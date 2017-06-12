@@ -2285,7 +2285,7 @@ div.selector span {
   text-overflow: ellipsis;
   position: relative;
   &:after {
-    margin:2px 2px 0 0;
+    margin: 3px 3px 0 0;
     display:inline-block;
     font:15px 'FontAwesome';
     content: "\f0dd";
@@ -2296,15 +2296,17 @@ div.selector span {
 
 div.selector select {
   position: absolute;
-  top: 0px;
-  left: -2px;
+  top: 0;
+  left: 0;
   opacity: 0;
   z-index: 1;
   padding: 0 5px;
+  width: auto;
+  box-sizing: border-box;
 }
 
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
-.controls select {width: 282px;}
+.controls select {width: 279px;}
 .controls .selector select {width: 100%;}
 /* end uniformjs customization */
 
@@ -2489,9 +2491,6 @@ div.uploader.focus,
   vertical-align: middle;
 }
 /* validation-error */
-label.validation-error {
-  color: #C81717 !important;
-}
 .validation-error {
   .error {
     border: 1px solid #e9322d;

@@ -11,12 +11,17 @@ class WidgetOptionsLoadEvent extends Event
     /** @var array */
     protected $widgetOptions;
 
+    /** @var string|null */
+    protected $type;
+
     /**
      * @param array $widgetOptions
+     * @param string|null $type
      */
-    public function __construct(array $widgetOptions)
+    public function __construct(array $widgetOptions, $type = null)
     {
         $this->widgetOptions = $widgetOptions;
+        $this->type = $type;
     }
 
     /**
@@ -33,5 +38,13 @@ class WidgetOptionsLoadEvent extends Event
     public function setWidgetOptions(array $widgetOptions)
     {
         $this->widgetOptions = $widgetOptions;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getWidgetType()
+    {
+        return $this->type;
     }
 }

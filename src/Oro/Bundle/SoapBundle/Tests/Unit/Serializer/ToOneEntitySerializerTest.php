@@ -289,6 +289,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             $qb,
             [
                 'fields' => [
+                    'category' => null,
                     'owner' => [
                         'fields' => [
                             'category' => ['fields' => 'label']

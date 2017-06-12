@@ -289,10 +289,9 @@ services:
             - @session.flash_bag
             - @translator
 
-    oro_email.listener.datagrid.context.user:
-        class: %oro_email.listener.datagrid.context.class%
+    oro_user.validator.user_authentication_fields:
+        class: Oro\Bundle\UserBundle\Validator\UserAuthenticationFieldsValidator
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@oro_user.manager'
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-for-context-grid, method: onBuildAfter }
-
+            - { name: validator.constraint_validator, alias: oro_user.validator.user_authentication_fields }

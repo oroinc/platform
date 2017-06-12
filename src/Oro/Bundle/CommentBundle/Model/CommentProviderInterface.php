@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\CommentBundle\Model;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
 interface CommentProviderInterface
 {
     /**
-     * Returns true if entity has comment option true
+     * Checks whether a given entity can have comments
      *
-     * @param string        $entityName
-     * @param ConfigManager $configManager
+     * @param string $entityClass
      *
      * @return bool
      */
-    public function hasComments(ConfigManager $configManager, $entityName);
+    public function isCommentsEnabled($entityClass);
 }

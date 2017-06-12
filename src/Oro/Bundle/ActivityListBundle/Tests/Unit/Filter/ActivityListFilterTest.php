@@ -11,7 +11,7 @@ class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
 
     protected $formFactory;
     protected $filterUtility;
-    protected $activityManager;
+    protected $activityAssociationHelper;
     protected $activityListChaingProvider;
     protected $activityListFilterHelper;
     protected $entityRouterHelper;
@@ -36,7 +36,8 @@ class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
         $this->filterUtility = $this->getMockBuilder('Oro\Bundle\FilterBundle\Filter\FilterUtility')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
+        $this->activityAssociationHelper = $this
+            ->getMockBuilder('Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->activityListChaingProvider =
@@ -65,7 +66,7 @@ class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
         $this->activityListFilter = new ActivityListFilter(
             $this->formFactory,
             $this->filterUtility,
-            $this->activityManager,
+            $this->activityAssociationHelper,
             $this->activityListChaingProvider,
             $this->activityListFilterHelper,
             $this->entityRouterHelper,
@@ -150,9 +151,9 @@ class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
             ->with('OroActivityListBundle:ActivityList')
             ->will($this->returnValue($activityListRepository));
 
-        $this->activityManager->expects($this->once())
-            ->method('getActivityAssociations')
-            ->will($this->returnValue([]));
+        $this->activityAssociationHelper->expects($this->once())
+            ->method('hasActivityAssociations')
+            ->will($this->returnValue(false));
 
         $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
             ->disableOriginalConstructor()

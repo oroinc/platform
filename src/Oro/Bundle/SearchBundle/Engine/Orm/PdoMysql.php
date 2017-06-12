@@ -80,7 +80,7 @@ class PdoMysql extends BaseDriver
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
 
-        return $whereExpr;
+        return '(' . $whereExpr . ')';
     }
 
     /**
@@ -170,7 +170,6 @@ class PdoMysql extends BaseDriver
     ) {
         $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
-        $fieldValue     = $searchCondition['fieldValue'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
 
@@ -212,7 +211,6 @@ class PdoMysql extends BaseDriver
     ) {
         $joinAlias  = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName  = $searchCondition['fieldName'];
-        $fieldValue = $searchCondition['fieldValue'];
 
         $result = $qb->expr()->orX();
         foreach (array_values($words) as $key => $value) {
@@ -223,7 +221,7 @@ class PdoMysql extends BaseDriver
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
             $fieldParameter = 'field' . $index;
             $result         = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
-            $qb->setParameter($fieldParameter, $fieldValue);
+            $qb->setParameter($fieldParameter, $fieldName);
         }
 
         return (string)$result;

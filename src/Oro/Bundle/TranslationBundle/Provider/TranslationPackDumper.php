@@ -16,6 +16,8 @@ use Symfony\Component\Translation\Extractor\ExtractorInterface;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
+use Oro\Bundle\TranslationBundle\Utils\TranslationDumpHelper;
+
 class TranslationPackDumper implements LoggerAwareInterface
 {
     /** @var TranslationWriter */
@@ -39,19 +41,24 @@ class TranslationPackDumper implements LoggerAwareInterface
     /** @var MessageCatalogue[] Translations loaded from yaml files, existing */
     protected $loadedTranslations = [];
 
+    /** @var  TranslationDumpHelper */
+    protected $helper;
+
     /**
-     * @param TranslationWriter  $writer
-     * @param ExtractorInterface $extractor
-     * @param TranslationLoader  $loader
-     * @param Filesystem         $filesystem
-     * @param array              $bundles
+     * @param TranslationWriter     $writer
+     * @param ExtractorInterface    $extractor
+     * @param TranslationLoader     $loader
+     * @param Filesystem            $filesystem
+     * @param array                 $bundles
+     * @param TranslationDumpHelper $helper
      */
     public function __construct(
         TranslationWriter $writer,
         ExtractorInterface $extractor,
         TranslationLoader $loader,
         Filesystem $filesystem,
-        array $bundles
+        array $bundles,
+        TranslationDumpHelper $helper
     ) {
         $this->writer     = $writer;
         $this->extractor  = $extractor;
@@ -59,6 +66,7 @@ class TranslationPackDumper implements LoggerAwareInterface
         $this->filesystem = $filesystem;
         $this->bundles    = $bundles;
         $this->logger     = new NullLogger();
+        $this->helper     = $helper;
     }
 
     /**
@@ -70,17 +78,17 @@ class TranslationPackDumper implements LoggerAwareInterface
     }
 
     /**
-     * @param string $langPackDir       language pack dir in temp folder
-     * @param string $projectNamespace  e.g. Oro, OroCRM, etc
+     * @param string $systemPath        system path for get language temp folder
      * @param string $outputFormat      xml, yml, etc
      * @param string $locale            en, en_US, fr, etc
      */
-    public function dump($langPackDir, $projectNamespace, $outputFormat, $locale)
+    public function dump($systemPath, $outputFormat, $locale)
     {
         $this->preloadExistingTranslations($locale);
         foreach ($this->bundles as $bundle) {
             // skip bundles from other projects
-            if ($projectNamespace != $this->getBundlePrefix($bundle->getNamespace())) {
+            $namespace = $this->getBundlePrefix($bundle->getNamespace());
+            if (!preg_match('/^Oro.+/', $namespace)) {
                 continue;
             }
 
@@ -95,7 +103,10 @@ class TranslationPackDumper implements LoggerAwareInterface
             $messageCatalogue = $operation->getResult();
 
             $isEmptyCatalogue = $this->validateAndFilter($messageCatalogue);
+            $messageCatalogue = $this->helper->removeDuplicate($bundle->getName(), $messageCatalogue);
             if (!$isEmptyCatalogue) {
+                $langPackDir = $this->helper->getLangPackDir($systemPath, $namespace);
+
                 $translationsDir = $langPackDir . DIRECTORY_SEPARATOR .
                     $bundle->getName() . DIRECTORY_SEPARATOR . 'translations';
                 $this->filesystem->mkdir($translationsDir);

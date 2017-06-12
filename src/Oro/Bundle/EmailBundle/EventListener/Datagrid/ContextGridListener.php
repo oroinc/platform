@@ -54,7 +54,7 @@ class ContextGridListener
                 }
 
                 if ($targetIds) {
-                    $queryBuilder->andWhere($queryBuilder->expr()->notIn("$alias.id", $targetIds));
+                    $queryBuilder->andWhere($queryBuilder->expr()->notIn(sprintf('%s.id', $alias), $targetIds));
                 }
             }
         }

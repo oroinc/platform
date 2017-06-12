@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener;
 
@@ -15,12 +16,18 @@ class EntityRelationGridListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityRelationGridListener */
     protected $listener;
 
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
     protected function setUp()
     {
         $this->cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->listener = new EntityRelationGridListener($this->cm);
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->listener = new EntityRelationGridListener($this->cm, $this->doctrineHelper);
     }
 
     protected function tearDown()

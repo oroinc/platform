@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByOriginFilter;
@@ -21,6 +20,12 @@ class UpdateConfigCommand extends ContainerAwareCommand
         $this
             ->setName('oro:entity-extend:update-config')
             ->setDescription('Prepare entity config')
+            ->addOption(
+                'update-custom',
+                null,
+                InputOption::VALUE_NONE,
+                'Applies user changes that require schema update if specified'
+            )
             ->addOption(
                 'skip-origin',
                 null,
@@ -43,7 +48,7 @@ class UpdateConfigCommand extends ContainerAwareCommand
         $output->writeln($this->getDescription());
 
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->updateConfig($this->getFilter($input));
+        $dumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
     }
 
     /**
@@ -57,7 +62,7 @@ class UpdateConfigCommand extends ContainerAwareCommand
 
         $initialStatePath = $input->getOption('initial-state-path');
         if (!empty($initialStatePath)) {
-            $initialStates = Yaml::parse(file_get_contents($initialStatePath));
+            $initialStates = unserialize(file_get_contents($initialStatePath));
             if (!empty($initialStates)) {
                 $filter = new ByInitialStateFilter($initialStates);
             }

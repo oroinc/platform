@@ -41,16 +41,17 @@ class SegmentExtension extends Twig_Extension
 
     /**
      * @param array $widgetOptions
+     * @param string|null $type
      *
      * @return array
      */
-    public function updateSegmentWidgetOptions(array $widgetOptions)
+    public function updateSegmentWidgetOptions(array $widgetOptions, $type = null)
     {
         if (!$this->dispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
             return $widgetOptions;
         }
 
-        $event = new WidgetOptionsLoadEvent($widgetOptions);
+        $event = new WidgetOptionsLoadEvent($widgetOptions, $type);
         $this->dispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
 
         return $event->getWidgetOptions();

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
@@ -133,7 +132,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function addJoinStatement($joinType, $join, $joinAlias, $joinConditionType, $joinCondition)
     {
-        if (Join::LEFT_JOIN === $joinType) {
+        if (self::LEFT_JOIN === $joinType) {
             $this->qb->leftJoin($join, $joinAlias, $joinConditionType, $joinCondition);
         } else {
             $this->qb->innerJoin($join, $joinAlias, $joinConditionType, $joinCondition);

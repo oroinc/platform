@@ -126,9 +126,9 @@ class JobManager
      * @param string      $name
      * @param null|string $args
      *
-     * @return bool
+     * @return mixed
      */
-    public function hasJobInQueue($name, $args = null)
+    public function getJobsInQueueCount($name, $args = null)
     {
         $qb = $this->em->getRepository('JMSJobQueueBundle:Job')
             ->createQueryBuilder('j');
@@ -144,6 +144,17 @@ class JobManager
             $qb->setParameter('args', $args);
         }
 
-        return $qb->getQuery()->getSingleScalarResult() > 0;
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string      $name
+     * @param null|string $args
+     *
+     * @return bool
+     */
+    public function hasJobInQueue($name, $args = null)
+    {
+        return $this->getJobsInQueueCount($name, $args) > 0;
     }
 }

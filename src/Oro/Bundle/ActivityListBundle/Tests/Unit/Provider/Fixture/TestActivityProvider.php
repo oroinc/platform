@@ -13,14 +13,16 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     const ACTIVITY_CLASS_NAME = 'Test\Entity';
     const ACL_CLASS = 'Test\Entity';
 
+    const SUPPORTED_TARGET_CLASS_NAME = 'Acme\DemoBundle\Entity\CorrectEntity';
+
     protected $targets;
 
     /**
      * {@inheritdoc}
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
+    public function isApplicableTarget($entityClass, $accessible = true)
     {
-        if ($configId->getClassName() === 'Acme\\DemoBundle\\Entity\\CorrectEntity') {
+        if ($entityClass === self::SUPPORTED_TARGET_CLASS_NAME) {
             return true;
         }
 
@@ -121,7 +123,7 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     /**
      * {@inheritdoc}
      */
-    public function hasComments(ConfigManager $configManager, $entity)
+    public function isCommentsEnabled($entityClass)
     {
         return true;
     }

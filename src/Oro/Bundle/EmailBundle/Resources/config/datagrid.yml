@@ -100,18 +100,10 @@ datagrid:
                             join: eu.mailboxOwner
                             alias: mb
                         -
-                            join: e.thread
-                            alias: thread
-                        -
                             join: e.recipients
                             alias: r_to
                             conditionType: WITH
                             condition: r_to.type = 'to'
-                        -
-                            join: e.recipients
-                            alias: r_cc_bcc
-                            conditionType: WITH
-                            condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
                         -
                             join: eu.folders
                             alias: f

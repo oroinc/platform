@@ -357,6 +357,18 @@ table.table {
     border-top: 1px solid #eaeaea
 }
 
+.button-set .status-box {
+    color: #C81717;
+    margin: 7px 0 0 10px;
+    float: left;
+}
+.button-set .status-box {
+    color: #C81717;
+    margin: 7px 0 0 10px;
+    float: left;
+    line-height: 22px;
+}
+
 .pull-right {
     float: right
 }

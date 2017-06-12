@@ -80,6 +80,7 @@ services:
             - @oro_translation.guzzle_oro_client
         calls:
             - [ setApiKey, [ %oro_translation.api.oro_service.key% ] ]
+            - [ setLogger, [ @logger ] ]
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.dynamic_translation.metadata.cache.class%
@@ -170,3 +171,6 @@ services:
             - @oro_translation.database_translation.metadata.cache
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_translation.utils.translation_dump_helper:
+        class: Oro\Bundle\TranslationBundle\Utils\TranslationDumpHelper

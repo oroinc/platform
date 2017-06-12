@@ -49,6 +49,7 @@ Redo: Redo
 
 oro:
     ui:
+        delete_confirm_cascade: Are you sure you want to delete this {{ entity_label }} with other entities related to it?
         widget_loading_failed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
         unexpected_error: Unexpected error occurred. Please contact system administrator.
@@ -74,3 +75,8 @@ oro:
             hrs: hrs
         components:
             initialization_error: 'Error occurred during layout update. Please contact system administrator.'
+        select2:
+            input_too_short: "{1}Please enter {{ number }} more character|[2,Inf[Please enter {{ number }} more characters"
+            input_too_long: "{1}Please delete {{ number }} character|[2,Inf[Please delete {{ number }} characters"
+            selection_too_big: "{1}You can only select {{ limit }} item|[2,Inf[You can only select {{ limit }} items"
+            load_more: "Loading more results..."

@@ -267,7 +267,7 @@ class MultiEnumFilterTest extends OrmTestCase
             . 'SELECT null_filter_test'
             . ' FROM Stub:TestEntity null_filter_test'
             . ' LEFT JOIN null_filter_test.values null_filter_test_rel'
-            . ' WHERE null_filter_test_rel IS NULL)',
+            . " WHERE COALESCE(null_filter_test_rel, ':null:') = ':null:')",
             $result
         );
     }
@@ -298,7 +298,7 @@ class MultiEnumFilterTest extends OrmTestCase
             . 'SELECT null_filter_test'
             . ' FROM Stub:TestEntity null_filter_test'
             . ' LEFT JOIN null_filter_test.values null_filter_test_rel'
-            . ' WHERE null_filter_test_rel IS NOT NULL)',
+            . " WHERE COALESCE(null_filter_test_rel, ':null:') <> ':null:')",
             $result
         );
     }

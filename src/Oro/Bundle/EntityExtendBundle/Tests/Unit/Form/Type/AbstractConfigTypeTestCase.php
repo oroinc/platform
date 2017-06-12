@@ -117,7 +117,29 @@ class AbstractConfigTypeTestCase extends TypeTestCase
             ->method('getProvider')
             ->will($this->returnValueMap($configProvidersMap));
 
+        $form = $this->factory->createNamed($formName, $formType, $oldVal, $options);
+
         $expectedExtendConfig = new Config($extendConfigId);
+        $schemaUpdateRequired = call_user_func(
+            $form->getConfig()->getOption('schema_update_required'),
+            $newVal,
+            $oldVal
+        );
+        if ($schemaUpdateRequired) {
+            $expectedExtendConfig->set('pending_changes', [
+                'test' => [
+                    $formName => [
+                        $oldVal,
+                        is_array($newVal) && $oldVal !== null
+                            ? array_merge(
+                                $this->testConfigProvider->getConfig('Test\Entity')->get('immutable', false, []),
+                                $newVal
+                            )
+                            : $newVal
+                    ],
+                ],
+            ]);
+        }
         if ($isSetStateExpected) {
             $expectedExtendConfig->set('state', ExtendScope::STATE_UPDATE);
             $this->configManager->expects($this->once())
@@ -125,7 +147,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
                 ->with($expectedExtendConfig);
         } else {
             $expectedExtendConfig->set('state', $state);
-            $this->configManager->expects($this->never())
+            $this->configManager->expects($this->exactly($schemaUpdateRequired ? 1 : 0))
                 ->method('persist');
         }
 
@@ -137,7 +159,6 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         $this->configManager->expects($this->never())
             ->method('flush');
 
-        $form = $this->factory->createNamed($formName, $formType, $oldVal, $options);
         $form->submit($newVal);
 
         $this->assertTrue($form->isSynchronized(), 'Expected that a form is synchronized');

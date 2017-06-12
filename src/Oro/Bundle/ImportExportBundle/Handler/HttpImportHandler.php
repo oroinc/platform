@@ -111,10 +111,13 @@ class HttpImportHandler extends AbstractImportHandler
         }
 
         $jobResult = $this->executeJob($jobName, $processorAlias, $inputFormat, $options, $inputFilePrefix);
-
+        $counts = $this->getValidationCounts($jobResult);
+        $importInfo = '';
+        
         if ($jobResult->isSuccessful()) {
             $this->removeImportingFile($inputFormat, $inputFilePrefix);
             $message = $this->translator->trans('oro.importexport.import.success');
+            $importInfo = $this->getImportInfo($counts);
         } else {
             $message = $this->translator->trans('oro.importexport.import.error');
         }
@@ -128,9 +131,10 @@ class HttpImportHandler extends AbstractImportHandler
         }
 
         return [
-            'success'   => $jobResult->isSuccessful(),
-            'message'   => $message,
-            'errorsUrl' => $errorsUrl,
+            'success'    => $jobResult->isSuccessful(),
+            'message'    => $message,
+            'importInfo' => $importInfo,
+            'errorsUrl'  => $errorsUrl,
         ];
     }
 
@@ -186,5 +190,32 @@ class HttpImportHandler extends AbstractImportHandler
     protected function getImportFileSessionKey($inputFilePrefix, $inputFormat)
     {
         return sprintf('oro_importexport_import_%s_%s', $inputFilePrefix, $inputFormat);
+    }
+
+    /**
+     * @param $counts
+     * @return string
+     */
+    protected function getImportInfo($counts)
+    {
+        $add = 0;
+        $update = 0;
+
+        if (isset($counts['add'])) {
+            $add += $counts['add'];
+        }
+        if (isset($counts['update'])) {
+            $update += $counts['update'];
+        }
+        if (isset($counts['replace'])) {
+            $update += $counts['replace'];
+        }
+
+        $importInfo = $this->translator->trans(
+            'oro.importexport.import.alert',
+            ['%added%' => $add, '%updated%' => $update]
+        );
+
+        return $importInfo;
     }
 }

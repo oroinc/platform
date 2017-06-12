@@ -13,6 +13,7 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class EntityReader extends IteratorBasedReader
 {
@@ -25,6 +26,11 @@ class EntityReader extends IteratorBasedReader
      * @var OwnershipMetadataProvider
      */
     protected $ownershipMetadata;
+
+    /**
+     * @var AclHelper
+     */
+    protected $aclHelper;
 
     /**
      * @param ContextRegistry           $contextRegistry
@@ -101,8 +107,17 @@ class EntityReader extends IteratorBasedReader
         }
 
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
+        $query = $this->applyAcl($queryBuilder);
 
-        $this->setSourceQueryBuilder($queryBuilder);
+        $this->setSourceQuery($query);
+    }
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -121,5 +136,19 @@ class EntityReader extends IteratorBasedReader
                     ->setParameter('organization', $organization);
             }
         }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return Query
+     */
+    protected function applyAcl(QueryBuilder $queryBuilder)
+    {
+        if ($this->aclHelper) {
+            return $this->aclHelper->apply($queryBuilder);
+        }
+
+        return $queryBuilder->getQuery();
     }
 }

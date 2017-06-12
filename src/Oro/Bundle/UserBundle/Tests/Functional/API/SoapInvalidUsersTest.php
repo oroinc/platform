@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
+ * @group soap
  */
 class SoapInvalidUsersTest extends WebTestCase
 {

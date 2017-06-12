@@ -206,7 +206,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
                 'expectedData'       => ['Test\Entity3']
             ],
             'with immutable'                                 => [
-                'newVal'             => ['Test\Entity4', 'Test\Entity5'],
+                'newVal'             => ['Test\Entity5', 'Test\Entity4'],
                 'oldVal'             => ['Test\Entity3', 'Test\Entity5'],
                 'state'              => ExtendScope::STATE_ACTIVE,
                 'isSetStateExpected' => true,

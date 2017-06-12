@@ -20,7 +20,14 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class OroEntityExtendBundle extends Bundle
 {
-    const CACHE_GENERATION_TIMEOUT = 300;
+    /**
+     * We have to use infinite timeout because this command is executed in background
+     * and we do not have a way to manage this timeout from a caller command.
+     * As result it is possible that parent command will fail if this command is interrupted
+     * by the timeout.
+     * E.g. this can occur when oro:install executes cache:clear.
+     */
+    const CACHE_GENERATION_TIMEOUT = null;
     const CACHE_CHECKOUT_INTERVAL = 1;
     const CACHE_CHECKOUT_ATTEMPTS = 120;
 

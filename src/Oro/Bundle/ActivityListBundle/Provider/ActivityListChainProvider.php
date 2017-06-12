@@ -19,8 +19,6 @@ use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
- * Class ActivityListChainProvider
- * @package Oro\Bundle\ActivityListBundle\Provider
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -41,7 +39,7 @@ class ActivityListChainProvider
     /** @var EntityRoutingHelper */
     protected $routingHelper;
 
-    /** @var string[] */
+    /** @var array */
     protected $targetClasses;
 
     /** @var string[] */
@@ -89,9 +87,9 @@ class ActivityListChainProvider
     }
 
     /**
-     * Get array providers
+     * Get all registered providers
      *
-     * @return \Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface[]
+     * @return ActivityListProviderInterface[] [activity class => provider, ...]
      */
     public function getProviders()
     {
@@ -101,27 +99,44 @@ class ActivityListChainProvider
     /**
      * Get array with all target classes (entities where activity can be assigned to)
      *
+     * @param bool $accessible Whether only targets are ready to be used in a business logic should be returned.
+     *                         It means that an association with the target entity should exist
+     *                         and should not be marked as deleted.
+     *
      * @return string[]
      */
-    public function getTargetEntityClasses()
+    public function getTargetEntityClasses($accessible = true)
     {
-        if (null === $this->targetClasses) {
-            $this->targetClasses = [];
+        if (null === $this->targetClasses || !isset($this->targetClasses[$accessible])) {
+            $targetClasses = [];
             /** @var ConfigIdInterface[] $configIds */
-            $configIds = $this->configManager->getIds('entity', null, false);
+            $configIds = $this->configManager->getIds('entity');
             foreach ($configIds as $configId) {
+                $entityClass = $configId->getClassName();
                 foreach ($this->providers as $provider) {
-                    if ($provider->isApplicableTarget($configId, $this->configManager)
-                        && !in_array($configId->getClassName(), $this->targetClasses, true)
-                    ) {
-                        $this->targetClasses[] = $configId->getClassName();
-                        continue;
+                    if ($provider->isApplicableTarget($entityClass, $accessible)) {
+                        $targetClasses[] = $entityClass;
+                        break;
                     }
                 }
             }
+            $this->targetClasses[$accessible] = $targetClasses;
         }
 
-        return $this->targetClasses;
+        return $this->targetClasses[$accessible];
+    }
+
+    /**
+     * @param string $targetClassName
+     * @param string $activityClassName
+     *
+     * @return bool
+     */
+    public function isApplicableTarget($targetClassName, $activityClassName)
+    {
+        return
+            isset($this->providers[$activityClassName])
+            && $this->providers[$activityClassName]->isApplicableTarget($targetClassName);
     }
 
     /**
@@ -283,7 +298,7 @@ class ActivityListChainProvider
             $hasComment = false;
 
             if ($provider instanceof CommentProviderInterface) {
-                $hasComment = $provider->hasComments($this->configManager, $provider->getActivityClass());
+                $hasComment = $provider->isCommentsEnabled($provider->getActivityClass());
             }
             $template = $provider->getTemplate();
             if ($provider instanceof ActivityListGroupProviderInterface &&

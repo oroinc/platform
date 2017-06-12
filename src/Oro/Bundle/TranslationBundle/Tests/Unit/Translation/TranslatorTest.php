@@ -298,7 +298,18 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $container     = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $doctrine      = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $em            = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $connection    = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
+            ->disableOriginalConstructor()
+            ->setMethods(['tablesExist'])
+            ->getMockForAbstractClass();
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
         $repository    = $this
             ->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
             ->disableOriginalConstructor()
@@ -315,6 +326,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setLocale($locale);
         $translator->setDatabaseMetadataCache($databaseCache);
 
+        $translationTable = 'translation_table';
+
         $container
             ->expects($this->any())
             ->method('hasParameter')
@@ -329,14 +342,44 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('get')
             ->with('doctrine')
-            ->willReturn($em);
-        $em
+            ->willReturn($doctrine);
+        $doctrine
             ->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(Translation::ENTITY_NAME)
+            ->willReturn($em);
+        $doctrine
+            ->expects($this->once())
             ->method('getRepository')
             ->with(Translation::ENTITY_NAME)
             ->willReturn($repository);
+        $em
+            ->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $em
+            ->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(Translation::ENTITY_NAME)
+            ->willReturn($classMetadata);
+        $connection
+            ->expects($this->once())
+            ->method('connect');
+        $connection
+            ->expects($this->once())
+            ->method('getSchemaManager')
+            ->willReturn($schemaManager);
+        $schemaManager
+            ->expects($this->once())
+            ->method('tablesExist')
+            ->with($translationTable)
+            ->willReturn(true);
+        $classMetadata
+            ->expects($this->once())
+            ->method('getTableName')
+            ->willReturn($translationTable);
         $repository
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('findAvailableDomainsForLocales')
             ->willReturn($translate);
 

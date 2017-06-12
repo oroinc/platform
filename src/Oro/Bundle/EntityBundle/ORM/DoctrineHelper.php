@@ -15,6 +15,9 @@ use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
+    /** @var ManagerRegistry */
+    protected $registry;
+
     /**
      * @param ManagerRegistry $registry
      */
@@ -236,6 +239,26 @@ class DoctrineHelper
     }
 
     /**
+     * Gets the EntityManager associated with the given class.
+     *
+     * @param string $entityClass    The real class name of an entity
+     * @param bool   $throwException Whether to throw exception in case the entity is not manageable
+     *
+     * @return EntityManager|null
+     *
+     * @throws Exception\NotManageableEntityException if the EntityManager was not found and $throwException is TRUE
+     */
+    public function getEntityManagerForClass($entityClass, $throwException = true)
+    {
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (null === $manager && $throwException) {
+            throw new Exception\NotManageableEntityException($entityClass);
+        }
+
+        return $manager;
+    }
+
+    /**
      * @param string|object $entityOrClass
      * @return EntityRepository
      */
@@ -245,6 +268,20 @@ class DoctrineHelper
         $entityManager = $this->getEntityManager($entityClass);
 
         return $entityManager->getRepository($entityClass);
+    }
+
+    /**
+     * Gets the repository for the given entity class.
+     *
+     * @param string $entityClass The real class name of an entity
+     *
+     * @return EntityRepository
+     */
+    public function getEntityRepositoryForClass($entityClass)
+    {
+        return $this
+            ->getEntityManagerForClass($entityClass)
+            ->getRepository($entityClass);
     }
 
     /**

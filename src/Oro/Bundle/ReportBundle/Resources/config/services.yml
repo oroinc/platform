@@ -4,6 +4,7 @@ parameters:
     oro_report.listener.navigation_listener.class:     Oro\Bundle\ReportBundle\EventListener\NavigationListener
     oro_report.report_manager.class:                   Oro\Bundle\ReportBundle\Entity\Manager\ReportManager
     oro_report.grid.base_configuration_builder.class:  Oro\Bundle\ReportBundle\Grid\BaseReportConfigurationBuilder
+    oro_report.listener.segment_subscriber.class:      Oro\Bundle\ReportBundle\EventListener\SegmentSubscriber
 
     oro_report.grid.datagrid_configuration_builder.class: Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder
 services:
@@ -42,3 +43,8 @@ services:
     oro_report.grid.datagrid_configuration_builder:
         class: %oro_report.grid.datagrid_configuration_builder.class%
         parent: oro_report.grid.base_configuration_builder
+
+    oro_report.listener.segment_subscriber:
+        class: %oro_report.listener.segment_subscriber.class%
+        tags:
+            - { name: kernel.event_subscriber }

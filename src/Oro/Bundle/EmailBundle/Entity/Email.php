@@ -83,7 +83,9 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
-     * @ORM\Column(name="subject", type="string", length=500)
+     * Max length is 998 see RFC 2822, section 2.1.1 (https://tools.ietf.org/html/rfc2822#section-2.1.1)
+     *
+     * @ORM\Column(name="subject", type="string", length=998)
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
@@ -229,6 +231,12 @@ class Email extends ExtendEmail
      * @ORM\Column(type="text", nullable=true)
      */
     protected $acceptLanguageHeader;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="body_synced", type="boolean", nullable=true, options={"default"=false})
+     */
+    protected $bodySynced;
 
     public function __construct()
     {
@@ -824,5 +832,25 @@ class Email extends ExtendEmail
     public function __toString()
     {
         return (string)$this->getSubject();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBodySynced()
+    {
+        return $this->bodySynced;
+    }
+
+    /**
+     * @param $bodySynced
+     *
+     * @return Email
+     */
+    public function setBodySynced($bodySynced)
+    {
+        $this->bodySynced = $bodySynced;
+
+        return $this;
     }
 }

@@ -80,7 +80,7 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
     protected function getTargetEntityConfigs()
     {
         if (null === $this->targetEntityConfigs) {
-            $targetEntityClasses       = $this->listProvider->getTargetEntityClasses();
+            $targetEntityClasses       = $this->listProvider->getTargetEntityClasses(false);
             $this->targetEntityConfigs = [];
 
             $configs = $this->configManager->getProvider('extend')->getConfigs();

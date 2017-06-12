@@ -456,6 +456,90 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider someProvider
+     */
+    public function testSome(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertSame($expectedResult, ArrayUtil::some($callback, $array));
+    }
+
+    public function someProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item === 1;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 0;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 4;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 5;
+                },
+                [0, 1, 2, 3, 4],
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dropWhileProvider
+     */
+    public function testDropWhile(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::dropWhile($callback, $array));
+    }
+
+    public function dropWhileProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item !== 2;
+                },
+                [],
+                [],
+            ],
+            [
+                function ($item) {
+                    return $item !== 2;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            [
+                function ($item) {
+                    return $item !== 0;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [0, 1, 2, 3, 4, 5],
+            ],
+            [
+                function ($item) {
+                    return $item !== 6;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [],
+            ],
+        ];
+    }
+
+    /**
      * @param object $obj
      *
      * @return mixed

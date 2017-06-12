@@ -3,11 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Proxy;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnClearEventArgs;
-use Doctrine\ORM\EntityNotFoundException;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -137,16 +135,9 @@ class RefreshContextListener
         if (!$entityId) {
             return null;
         }
-
-        if ($entity instanceof Proxy && !$entity->__isInitialized()) {
-            // We cannot use $entity->__load(); because of bug BAP-7851
-            return $em->find($entityClass, $entityId);
-        }
-
-        try {
-            return $em->merge($entity);
-        } catch (EntityNotFoundException $e) {
-            return null;
-        }
+        // using find instead of merge to prevent unexpected entity updates,
+        // properties of an old entity which are objects(instances of \DateTime i.e.)
+        // are not equal === with properties of a new entity
+        return $em->find($entityClass, $entityId);
     }
 }

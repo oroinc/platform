@@ -13796,6 +13796,24 @@ US:
     iso2Code: US
     iso3Code: USA
     regions:
+        US-AA:
+            combinedCode: US-AA
+            code: AA
+        US-AP:
+            combinedCode: US-AP
+            code: AP
+        US-AF:
+            combinedCode: US-AF
+            code: AF
+        US-AC:
+            combinedCode: US-AC
+            code: AC
+        US-AE:
+            combinedCode: US-AE
+            code: AE
+        US-AM:
+            combinedCode: US-AM
+            code: AM
         US-AK:
             combinedCode: US-AK
             code: AK

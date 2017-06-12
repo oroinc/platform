@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -30,6 +31,9 @@ class ExtendConfigDumper
     /** @var string */
     protected $cacheDir;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var ConfigProvider */
     protected $configProvider;
 
@@ -49,6 +53,7 @@ class ExtendConfigDumper
     protected $sortedExtensions;
 
     /**
+     * @param ConfigManager                   $configManager
      * @param ConfigProvider                  $configProvider
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      * @param FieldTypeHelper                 $fieldTypeHelper
@@ -56,12 +61,14 @@ class ExtendConfigDumper
      * @param string                          $cacheDir
      */
     public function __construct(
+        ConfigManager $configManager,
         ConfigProvider $configProvider,
         ExtendDbIdentifierNameGenerator $nameGenerator,
         FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         $cacheDir
     ) {
+        $this->configManager   = $configManager;
         $this->configProvider  = $configProvider;
         $this->nameGenerator   = $nameGenerator;
         $this->fieldTypeHelper = $fieldTypeHelper;
@@ -106,11 +113,16 @@ class ExtendConfigDumper
      * Update config.
      *
      * @param callable|null $filter function (ConfigInterface $config) : bool
+     * @param bool $updateCustom
      */
-    public function updateConfig($filter = null)
+    public function updateConfig($filter = null, $updateCustom = false)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
+
+        if ($updateCustom) {
+            $this->updatePendingConfigs();
+        }
 
         $extensions = $this->getExtensions();
 
@@ -295,6 +307,9 @@ class ExtendConfigDumper
         if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
             $fieldConfig->set('is_deleted', true);
         } else {
+            if ($fieldConfig->is('state', ExtendScope::STATE_RESTORE)) {
+                $fieldConfig->set('is_deleted', false);
+            }
             $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
         }
         if ($fieldConfig->is('is_extend')) {
@@ -303,6 +318,7 @@ class ExtendConfigDumper
             $fieldName     = $fieldConfigId->getFieldName();
             $fieldType     = $fieldConfigId->getFieldType();
             $isDeleted     = $fieldConfig->is('is_deleted');
+            $columnName    = $fieldConfig->get('column_name', false, $fieldName);
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']), true)) {
@@ -325,7 +341,7 @@ class ExtendConfigDumper
                 }
 
                 $doctrine[$entityName]['fields'][$fieldName] = [
-                    'column'    => $fieldName,
+                    'column'    => $columnName,
                     'type'      => $fieldType,
                     'nullable'  => true,
                     'length'    => $fieldConfig->get('length'),
@@ -506,6 +522,37 @@ class ExtendConfigDumper
 
         if ($hasChanges) {
             $this->configProvider->flush();
+        }
+    }
+
+    /**
+     * Updates pending configs
+     */
+    protected function updatePendingConfigs()
+    {
+        $pendingChanges = [];
+
+        $configs = $this->configManager->getProvider('extend')->getConfigs();
+        foreach ($configs as $config) {
+            $configPendingChanges = $config->get('pending_changes');
+            if (!$configPendingChanges) {
+                continue;
+            }
+
+            $pendingChanges[$config->getId()->getClassName()] = $configPendingChanges;
+            $config->remove('pending_changes');
+            $this->configManager->persist($config);
+        }
+
+        foreach ($pendingChanges as $className => $changes) {
+            foreach ($changes as $scope => $values) {
+                $provider = $this->configManager->getProvider($scope);
+                $config = $provider->getConfig($className);
+                foreach ($values as $code => $value) {
+                    $config->set($code, ExtendHelper::updatedPendingValue($config->get($code), $value));
+                }
+                $this->configManager->persist($config);
+            }
         }
     }
 }

@@ -14,6 +14,9 @@ oro:
             full.label:     "Export Fields"
             header.label:   "Column Name"
             identity.label: "Use as Identity Field"
+            identity.only_when_not_empty: "Only when not empty"
+            identity.always: "Always"
+            identity.tooltip: "If set to \"Only when not empty\", the field may be omitted in the identity when it has no value."
             order.label:    "Column Position"
             
         import:
@@ -21,6 +24,7 @@ oro:
             error %number%: "Error in row #%number%."
             label:          Import
             success:        "File was successfully imported."
+            alert:          "%added% entities were added, %updated% entities were updated"
             entity:         Import %entityName%
             tempate:        Download Data Template
             file:           File

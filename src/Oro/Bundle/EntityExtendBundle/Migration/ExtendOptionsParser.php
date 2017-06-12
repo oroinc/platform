@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class ExtendOptionsParser
@@ -12,16 +13,22 @@ class ExtendOptionsParser
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
      * @param FieldTypeHelper      $fieldTypeHelper
+     * @param ConfigManager        $configManager
      */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
-        FieldTypeHelper $fieldTypeHelper
+        FieldTypeHelper $fieldTypeHelper,
+        ConfigManager $configManager
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
         $this->fieldTypeHelper      = $fieldTypeHelper;
+        $this->configManager        = $configManager;
     }
 
     /**
@@ -32,7 +39,7 @@ class ExtendOptionsParser
      */
     public function parseOptions(array $options)
     {
-        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper, $this->fieldTypeHelper);
+        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper, $this->fieldTypeHelper, $this->configManager);
 
         $objectKeys = array_filter(
             array_keys($options),

@@ -73,7 +73,13 @@ app/console oro:translation:pack --dump OroCRM
 ```
 
 **Upload translation pack:**
-Note: you must call dump command before using this one, otherwise system won't have anything to upload or will upload earlier generated files if there were left.
+Note: you must call dump command before using this one, otherwise system won't have anything to upload or will upload earlier generated files if there were left. This command with "-m update" option without "--force" option does't replace data on crowdin only add strings. 
 ```bash
 app/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --upload OroCRM
+```
+**Upload and replace translation pack on crowdin:**
+The flag "force" tell that you want to replaced all crowdin translation with local translation
+Note: the --force option works only with "-m update" option
+```bash
+app/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --upload OroCRM -m update --force
 ```

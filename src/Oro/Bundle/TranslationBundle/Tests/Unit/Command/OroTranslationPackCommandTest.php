@@ -82,10 +82,9 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             'error if project not specified'        => array(
                 array('--dump' => true),
                 array(
-                    'dump'   => 0,
+                    'dump'   => 1,
                     'upload' => 0
-                ),
-                '\RuntimeException'
+                )
             ),
             'dump action should perform'            => array(
                 array('--dump' => true, 'project' => 'SomeProject'),

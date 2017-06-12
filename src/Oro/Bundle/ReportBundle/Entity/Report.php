@@ -8,8 +8,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
+use Oro\Bundle\ReportBundle\Model\ExtendReport;
 
 /**
  * @ORM\Entity()
@@ -40,7 +40,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
  *      }
  * )
  */
-class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
+class Report extends ExtendReport implements GridQueryDesignerInterface
 {
     const GRID_PREFIX = 'oro_report_table_';
 

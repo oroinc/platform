@@ -53,7 +53,7 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $resource      = new OrmTranslationResource($locale, $metadataCache);
 
-        $translationTable = 'translation_able';
+        $translationTable = 'translation_table';
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
@@ -77,7 +77,7 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($schemaManager);
         $schemaManager->expects($this->once())
             ->method('tablesExist')
-            ->with([$translationTable])
+            ->with($translationTable)
             ->willReturn(false);
 
         /** @var MessageCatalogue $result */
@@ -127,7 +127,7 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
 
         $values = [$value1, $value2, $value3];
 
-        $translationTable = 'translation_able';
+        $translationTable = 'translation_table';
 
         $repo = $this
             ->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
@@ -164,7 +164,7 @@ class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($schemaManager);
         $schemaManager->expects($this->once())
             ->method('tablesExist')
-            ->with([$translationTable])
+            ->with($translationTable)
             ->willReturn(true);
 
         /** @var MessageCatalogue $result */

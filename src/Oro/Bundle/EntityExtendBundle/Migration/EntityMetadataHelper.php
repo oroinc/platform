@@ -14,9 +14,9 @@ class EntityMetadataHelper
     protected $doctrine;
 
     /**
-     * @var string[] {table name} => {class name}
+     * @var array {table name} => [{class name}, ...]
      */
-    protected $tableToClassMap;
+    protected $tableToClassesMap;
 
     /**
      * @var string[] {class name} => {table name}
@@ -32,6 +32,8 @@ class EntityMetadataHelper
     }
 
     /**
+     * @deprecated Use getEntityClassesByTableNames instead
+     *
      * Gets an entity full class name by entity table name
      *
      * @param string $tableName
@@ -39,11 +41,29 @@ class EntityMetadataHelper
      */
     public function getEntityClassByTableName($tableName)
     {
+        $classes = $this->getEntityClassesByTableName($tableName);
+        if (count($classes) > 1) {
+            throw new \RuntimeException(sprintf(
+                'Table "%s" has more than 1 class. Use "getEntityClassesByTableNames" method instead.',
+                $tableName
+            ));
+        }
+
+        return reset($classes) ?: null;
+    }
+
+    /**
+     * @param string $tableName
+     *
+     * @return string[]
+     */
+    public function getEntityClassesByTableName($tableName)
+    {
         $this->ensureNameMapsLoaded();
 
-        return isset($this->tableToClassMap[$tableName])
-            ? $this->tableToClassMap[$tableName]
-            : null;
+        return isset($this->tableToClassesMap[$tableName])
+            ? $this->tableToClassesMap[$tableName]
+            : [];
     }
 
     /**
@@ -70,8 +90,8 @@ class EntityMetadataHelper
      */
     public function getFieldNameByColumnName($tableName, $columnName)
     {
-        $className = $this->getEntityClassByTableName($tableName);
-        if ($className) {
+        $classNames = $this->getEntityClassesByTableName($tableName);
+        foreach ($classNames as $className) {
             $manager = $this->doctrine->getManagerForClass($className);
             if ($manager instanceof EntityManager) {
                 return $manager->getClassMetadata($className)->getFieldName($columnName);
@@ -93,7 +113,7 @@ class EntityMetadataHelper
     {
         $this->ensureNameMapsLoaded();
 
-        $this->tableToClassMap[$tableName] = $className;
+        $this->tableToClassesMap[$tableName][] = $className;
         $this->classToTableMap[$className] = $tableName;
     }
 
@@ -102,7 +122,7 @@ class EntityMetadataHelper
      */
     protected function ensureNameMapsLoaded()
     {
-        if (null === $this->tableToClassMap) {
+        if (null === $this->tableToClassesMap) {
             $this->loadNameMaps();
         }
     }
@@ -112,7 +132,7 @@ class EntityMetadataHelper
      */
     protected function loadNameMaps()
     {
-        $this->tableToClassMap  = [];
+        $this->tableToClassesMap  = [];
         $this->classToTableMap  = [];
         $names = array_keys($this->doctrine->getManagers());
         foreach ($names as $name) {
@@ -123,7 +143,7 @@ class EntityMetadataHelper
                     $tableName = $metadata->getTableName();
                     if (!empty($tableName)) {
                         $className = $metadata->getName();
-                        $this->tableToClassMap[$tableName] = $className;
+                        $this->tableToClassesMap[$tableName][] = $className;
                         $this->classToTableMap[$className] = $tableName;
                     }
                 }

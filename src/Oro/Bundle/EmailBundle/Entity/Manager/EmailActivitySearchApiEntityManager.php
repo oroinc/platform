@@ -17,11 +17,18 @@ use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
 {
     /** @var EntityNameResolver  */
     protected $entityNameResolver;
+
+    /** @var ConfigManager */
+    protected $entityConfigManager;
+
+    /** @var bool */
+    private $skipCustomEntity;
 
     /**
      * @param string             $class
@@ -35,11 +42,13 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
         ObjectManager $om,
         ActivityManager $activityManager,
         SearchIndexer $searchIndexer,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        ConfigManager $entityConfigManager
     ) {
         parent::__construct($om, $activityManager, $searchIndexer);
         $this->setClass($class);
         $this->entityNameResolver = $entityNameResolver;
+        $this->entityConfigManager = $entityConfigManager;
     }
 
     /**
@@ -47,6 +56,10 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
+        if (!empty($criteria['skip_custom_entity'])) {
+            $this->skipCustomEntity = $criteria['skip_custom_entity'];
+        }
+
         $searchQueryBuilder = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
 
         if (!empty($criteria['emails'])) {
@@ -57,17 +70,53 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
     }
 
     /**
+     * Get search aliases for specified entity class(es). By default returns all search aliases
+     * for all entities which can be associated with an activity this manager id work with.
+     *
+     * @param string[] $entities
+     *
+     * @return string[]
+     */
+    protected function getSearchAliases(array $entities)
+    {
+        if (empty($entities)) {
+            $entities = array_flip($this->activityManager->getActivityTargets($this->class));
+        }
+
+        if ($this->skipCustomEntity) {
+            foreach ($entities as $key => $entitie) {
+                if ($this->entityConfigManager->hasConfig($entitie)) {
+                    $config = $this->entityConfigManager->getEntityConfig('extend', $entitie);
+
+                    if ($config->get('owner') !== 'System') {
+                        unset($entities[$key]);
+                    }
+                }
+            }
+        }
+
+        $aliases = [];
+        foreach ($entities as $targetEntityClass) {
+            $alias = $this->searchIndexer->getEntityAlias($targetEntityClass);
+            if (null !== $alias) {
+                $aliases[] = $alias;
+            }
+        }
+
+        return $aliases;
+    }
+
+    /**
      * @param SearchQueryBuilder $searchQueryBuilder
      * @param string[]           $emails
      */
     protected function prepareSearchEmailCriteria(SearchQueryBuilder $searchQueryBuilder, $emails = [])
     {
         $searchCriteria = $searchQueryBuilder->getCriteria();
-        foreach ($emails as $email) {
-            $searchCriteria->orWhere(
-                $searchCriteria->expr()->contains('email', $email)
-            );
-        }
+        $emailString = implode(' ', $emails);
+        $searchCriteria->andWhere(
+            $searchCriteria->expr()->contains('email', $emailString)
+        );
     }
 
     /**

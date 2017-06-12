@@ -62,7 +62,7 @@
                     {% if email.emailBody and email.emailBody.hasAttachments %}
                         <i class="icon-paper-clip email-has-attachment"></i>
                     {% endif %}
-                    {{ EA.date_smart_format(email.sentAt|oro_format_datetime) }}<br />
+                    {{ EA.date_smart_format(email.sentAt) }}<br />
                 </div>
             </div>
             <div class="email-participants">

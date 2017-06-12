@@ -39,6 +39,76 @@ in search results;
 can be used to override default entity search configuration (see section [Entity Configuration](#entity-configuration)).
 
 
+Configuration Merging
+=====================
+
+All configurations merge in the boot bundles order. Application collects configurations of all nodes with the same
+name and merge their to one configuration.
+Merging uses simple rules:
+
+* if node value is scalar - value will be replaced
+* if node value is array:
+    * by default value will be replaced
+    * for node 'fields' this array will be appended by values from the second configuration.
+
+After this step application knows about all entity search configurations from search.yml files and have only one 
+configuration for each entity.
+
+Example
+-------
+
+Acme\Bundle\DemoBundle\Resources\config\search.yml:
+
+```yml
+Acme\Bundle\DemoBundle\Entity\Tag:
+    alias:                          acme_tag
+    title_fields:                   [name]
+    search_template:                DemoBundle:Search:result.html.twig
+    route:
+        name:                       acme_tag_search
+        parameters:
+            id:                     id
+    fields:
+        -
+            name:                   name
+            target_type:            text
+            target_fields:          [name]
+```
+
+AcmeCRM\Bundle\DemoBundle\Resources\config\search.yml:
+
+```yml
+Acme\Bundle\DemoBundle\Entity\Tag:
+    alias:                          acme_tag
+    title_fields:                   [subject]
+    fields:
+        -
+            name:                   subject
+            target_type:            text
+            target_fields:          [subject]
+```
+
+Result:
+
+```yml
+    alias:                          acme_tag
+    title_fields:                   [subject]
+    search_template:                DemoBundle:Search:result.html.twig
+    route:
+        name:                       acme_tag_search
+        parameters:
+            id:                     id
+    fields:
+        -
+            name:                   name
+            target_type:            text
+            target_fields:          [name]
+        -
+            name:                   subject
+            target_type:            text
+            target_fields:          [subject]
+```
+
 Entity Configuration
 --------------------
 

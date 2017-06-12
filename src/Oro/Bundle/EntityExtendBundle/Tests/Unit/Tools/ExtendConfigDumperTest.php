@@ -6,7 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,6 +42,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
 
         $this->dumper = new ExtendConfigDumper(
+            $this->configManager,
             $this->configProvider,
             new ExtendDbIdentifierNameGenerator(),
             new FieldTypeHelper([]),

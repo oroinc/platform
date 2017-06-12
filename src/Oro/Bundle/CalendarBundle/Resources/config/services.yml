@@ -81,6 +81,7 @@ services:
         class: %oro_calendar.twig.dateformat.class%
         arguments:
             - @oro_locale.formatter.date_time
+            - @oro_config.global
         tags:
             - { name: twig.extension }
 
@@ -192,7 +193,8 @@ services:
         class: %oro_calendar.activity_list.provider.class%
         arguments:
            - @oro_entity.doctrine_helper
-           - @doctrine
+           - @oro_activity.association_helper
+           - @oro_comment.association_helper
         tags:
            - {name: oro_activity_list.provider, priority: 50}
 

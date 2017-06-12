@@ -12,6 +12,9 @@
         {% if app.request.get('_widgetContainer') == 'dialog' %}
             {% set renderParams = {'enableViews': false}|merge(renderParams) %}
         {% endif %}
+        {% if params._grid_view._disabled is defined and params._grid_view._disabled %}
+            {% set renderParams = renderParams|merge({'enableViews': false}) %}
+        {% endif %}
         {% set metaData = oro_datagrid_metadata(datagrid, params) %}
         {% if renderParams.routerEnabled is defined %}
             {% set metadataOptions = metaData.options is defined ? metaData.options : {} %}

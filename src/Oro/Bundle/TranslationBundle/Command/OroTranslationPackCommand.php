@@ -31,7 +31,7 @@ class OroTranslationPackCommand extends ContainerAwareCommand
             ->setDescription('Dump translation messages and optionally upload them to third-party service')
             ->setDefinition(
                 array(
-                    new InputArgument('project', InputArgument::REQUIRED, 'The project [e.g Oro, OroCRM etc]'),
+                    new InputArgument('project', InputArgument::OPTIONAL, 'The project [e.g Oro, OroCRM etc]'),
                     new InputArgument(
                         'locale',
                         InputArgument::OPTIONAL,
@@ -94,6 +94,12 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         InputOption::VALUE_NONE,
                         'Download all language packs from project at translation service'
                     ),
+                    new InputOption(
+                        'force',
+                        'f',
+                        InputOption::VALUE_NONE,
+                        'Usage with --upload-mode <info>update</info> option. Replace all translation file on crowdin'
+                    )
                 )
             )
             ->setHelp(
@@ -146,6 +152,11 @@ EOF
         }
 
         if ($input->getOption('upload') === true) {
+            if (!$input->getArgument('project')) {
+                $output->writeln('<info>Input argument "project" is required</info>');
+
+                return 1;
+            }
             $translationService = $this->getTranslationService($input, $output);
 
             $langPackDirs = [];
@@ -153,10 +164,17 @@ EOF
                 $langPackDirs[$namespace] = $this->getLangPackDir($namespace);
             }
 
-            $this->upload($translationService, $input->getOption('upload-mode'), $langPackDirs);
+            $force = (bool) $input->getOption('force');
+
+            $this->upload($translationService, $input->getOption('upload-mode'), $langPackDirs, $force);
         }
 
         if ($input->getOption('download') === true) {
+            if (!$input->getArgument('project')) {
+                $output->writeln('<info>Input argument "project" is required</info>');
+
+                return 1;
+            }
             $this->download($input, $output);
         }
 
@@ -167,13 +185,14 @@ EOF
      * @param TranslationServiceProvider $translationService
      * @param string                     $mode
      * @param array                      $languagePackPath one or few dirs
+     * @param bool                       $force
      *
      * @return array
      */
-    protected function upload(TranslationServiceProvider $translationService, $mode, $languagePackPath)
+    protected function upload(TranslationServiceProvider $translationService, $mode, $languagePackPath, $force = false)
     {
         if ('update' == $mode) {
-            $translationService->update($languagePackPath);
+            $translationService->update($languagePackPath, $force);
         } else {
             $translationService->upload($languagePackPath);
         }
@@ -264,7 +283,7 @@ EOF
      */
     protected function dump($projectNamespace, $locale, OutputInterface $output, $outputFormat)
     {
-        $output->writeln(sprintf('Dumping language pack for <info>%s</info>', $projectNamespace));
+        $output->writeln('Dumping language pack');
 
         $container = $this->getContainer();
         $dumper = new TranslationPackDumper(
@@ -272,14 +291,13 @@ EOF
             $container->get('translation.extractor'),
             $container->get('translation.loader'),
             new Filesystem(),
-            $container->get('kernel')->getBundles()
+            $container->get('kernel')->getBundles(),
+            $container->get('oro_translation.utils.translation_dump_helper')
         );
         $dumper->setLogger(new OutputLogger($output));
 
-        $languagePackPath = $this->getLangPackDir($projectNamespace);
         $dumper->dump(
-            $languagePackPath,
-            $projectNamespace,
+            $this->path,
             $outputFormat,
             $locale
         );

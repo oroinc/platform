@@ -66,7 +66,10 @@ class EmailHandler
 
             if ($this->form->isValid()) {
                 try {
-                    $this->emailProcessor->process($model);
+                    $this->emailProcessor->process(
+                        $model,
+                        $this->emailProcessor->getEmailOrigin($model->getFrom(), $model->getOrganization())
+                    );
                     return true;
                 } catch (\Exception $ex) {
                     $this->logger->error('Email sending failed.', ['exception' => $ex]);

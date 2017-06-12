@@ -232,7 +232,6 @@ The last thing to finish the configuration of your association is to create exte
 namespace Oro\Bundle\NoteBundle\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AssociationEntityConfigDumperExtension;
-use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteEntityConfigDumperExtension extends AssociationEntityConfigDumperExtension
 {
@@ -241,7 +240,7 @@ class NoteEntityConfigDumperExtension extends AssociationEntityConfigDumperExten
      */
     protected function getAssociationEntityClass()
     {
-        return Note::ENTITY_NAME;
+        return 'Oro\Bundle\NoteBundle\Entity\Note';
     }
 
     /**
@@ -258,7 +257,6 @@ class NoteEntityConfigDumperExtension extends AssociationEntityConfigDumperExten
 namespace Oro\Bundle\NoteBundle\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
-use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
 {
@@ -268,7 +266,7 @@ class NoteEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExt
     public function supports(array $schema)
     {
         return
-            $schema['class'] === Note::ENTITY_NAME
+            $schema['class'] === 'Oro\Bundle\NoteBundle\Entity\Note'
             && parent::supports($schema);
     }
 }

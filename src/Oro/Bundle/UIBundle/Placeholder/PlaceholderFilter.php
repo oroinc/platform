@@ -5,6 +5,17 @@ namespace Oro\Bundle\UIBundle\Placeholder;
 class PlaceholderFilter
 {
     /**
+     * @param mixed $param1
+     * @param mixed $param2
+     *
+     * @return bool
+     */
+    public function isSame($param1, $param2)
+    {
+        return $param1 === $param2;
+    }
+
+    /**
      * Checks the object is an instance of a given class.
      *
      * @param object $obj

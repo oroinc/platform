@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Content;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -10,7 +12,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\NewEntityStub;
-use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\PersistentCollectionStub;
 
 class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -205,6 +206,12 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function collectNestingDataDataProvider()
     {
+        $entityManagerMock = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $classMetadataMock = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
         return [
             'should not return any data when no association on entity' => [[], [], 0],
             'should collect one to one associations' => [
@@ -212,22 +219,46 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
                 [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_ONE]],
                 1
             ],
-            'should collect all collection associations' => [
+            'should collect all collection associations using persistent collection' => [
                 [
-                    self::TEST_ASSOCIATION_FIELD => new PersistentCollectionStub([
-                        new EntityStub(),
-                        new EntityStub()
-                    ])
+                    self::TEST_ASSOCIATION_FIELD => new PersistentCollection(
+                        $entityManagerMock,
+                        $classMetadataMock,
+                        new ArrayCollection(
+                            [
+                                new EntityStub(),
+                                new EntityStub()
+                            ]
+                        )
+                    )
                 ],
                 [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_MANY]],
                 2
             ],
-            'should process all associated values' => [
+            'should collect all collection associations using array collection' => [
                 [
-                    self::TEST_ASSOCIATION_FIELD . '_1' => new PersistentCollectionStub([
-                        new EntityStub(),
-                        new EntityStub()
-                    ]),
+                    self::TEST_ASSOCIATION_FIELD => new ArrayCollection(
+                        [
+                            new EntityStub(),
+                            new EntityStub()
+                        ]
+                    )
+                ],
+                [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_MANY]],
+                2
+            ],
+            'should process all associated values using persistent collection' => [
+                [
+                    self::TEST_ASSOCIATION_FIELD . '_1' => new PersistentCollection(
+                        $entityManagerMock,
+                        $classMetadataMock,
+                        new ArrayCollection(
+                            [
+                                new EntityStub(),
+                                new EntityStub()
+                            ]
+                        )
+                    ),
                     self::TEST_ASSOCIATION_FIELD . '_2' => new EntityStub()
                 ],
                 [
@@ -236,6 +267,22 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
                 ],
                 3
             ],
+            'should process all associated values using array collection' => [
+                [
+                    self::TEST_ASSOCIATION_FIELD . '_1' => new ArrayCollection(
+                        [
+                            new EntityStub(),
+                            new EntityStub()
+                        ]
+                    ),
+                    self::TEST_ASSOCIATION_FIELD . '_2' => new EntityStub()
+                ],
+                [
+                    self::TEST_ASSOCIATION_FIELD . '_1' => ['type' => ClassMetadata::ONE_TO_MANY],
+                    self::TEST_ASSOCIATION_FIELD . '_2' => ['type' => ClassMetadata::ONE_TO_ONE]
+                ],
+                3
+            ]
         ];
     }
 

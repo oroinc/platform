@@ -28,6 +28,24 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider buildToManyRelationTargetFieldNameProvider
+     */
+    public function testBuildToManyRelationTargetFieldName($entityClassName, $fieldName, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $fieldName)
+        );
+    }
+
+    public static function buildToManyRelationTargetFieldNameProvider()
+    {
+        return [
+            ['Oro\Bundle\TestBundle\Entity\Test', 'testField', 'test_testField'],
+        ];
+    }
+
+    /**
      * @dataProvider buildAssociationNameProvider
      */
     public function testBuildAssociationName($targetEntityClassName, $associationKind, $expected)
@@ -61,6 +79,14 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\TargetEntity|testField',
             ExtendHelper::buildRelationKey('Test\Entity', 'testField', 'manyToOne', 'Test\TargetEntity')
+        );
+    }
+
+    public function testGetRelationType()
+    {
+        $this->assertEquals(
+            'manyToOne',
+            ExtendHelper::getRelationType('manyToOne|Test\Entity|Test\TargetEntity|testField')
         );
     }
 
@@ -353,6 +379,36 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             [
                 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\ExtendTestClass',
                 ExtendHelper::ENTITY_NAMESPACE . 'EX_OroEntityExtendBundle_Tests_Unit_Fixtures_TestClass'
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider updatedPendingValueDataProvider
+     */
+    public function testUpdatedPendingValue($currentVal, array $changeSet, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ExtendHelper::updatedPendingValue($currentVal, $changeSet));
+    }
+
+    public function updatedPendingValueDataProvider()
+    {
+        return [
+            'scalar value' => [
+                1,
+                [
+                    1,
+                    2,
+                ],
+                2,
+            ],
+            'array value' => [
+                ['v1', 'v2', 'v3'],
+                [
+                    ['v1', 'v2'],
+                    ['v1', 'v4'],
+                ],
+                ['v1', 'v3', 'v4'],
             ],
         ];
     }

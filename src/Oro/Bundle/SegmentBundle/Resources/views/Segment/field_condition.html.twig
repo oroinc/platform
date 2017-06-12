@@ -1,0 +1,15 @@
+{% set fieldConditionOptions = {
+    fieldChoice: {
+        select2: {
+            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+        },
+        fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]'
+    }
+} %}
+
+<li class="option" data-criteria="condition-item"
+    data-module="oroquerydesigner/js/field-condition"
+    data-widget="fieldCondition"
+    data-options="{{ fieldConditionOptions|json_encode }}">
+    {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
+</li>

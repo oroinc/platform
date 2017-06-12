@@ -96,7 +96,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider updateDataProvider
      */
-    public function testUpdate($isDownloaded, $downloadFileExists)
+    public function testUpdateWithoutForce($isDownloaded, $downloadFileExists)
     {
         $service = $this->getServiceMock(
             ['download', 'upload', 'cleanup'],
@@ -131,7 +131,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
                 ->method('download')
                 ->will($this->returnValue(false));
 
-            $this->assertFalse($service->update($dir));
+            $this->assertFalse($service->update($dir, false));
             return;
         }
 
@@ -142,7 +142,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $service->expects($this->once())
             ->method('cleanup');
 
-        $service->update([$dir]);
+        $service->update([$dir], false);
     }
 
     public function testDownload()

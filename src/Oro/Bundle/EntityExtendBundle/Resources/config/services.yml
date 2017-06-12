@@ -1,6 +1,6 @@
 parameters:
-    oro_entity_extend.migration.config_processor.options.path: %kernel.cache_dir%/oro_migration/extend_config_options.yml
-    oro_entity_extend.migration.initial_entity_config_state.path: %kernel.cache_dir%/oro_migration/initial_entity_config_state.yml
+    oro_entity_extend.migration.config_processor.options.path: %kernel.cache_dir%/oro_migration/extend_config_options.bin
+    oro_entity_extend.migration.initial_entity_config_state.path: %kernel.cache_dir%/oro_migration/initial_entity_config_state.bin
 
     oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
     oro_entity_extend.datagrid.extension.additional_fields.class:     Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension
@@ -100,6 +100,7 @@ services:
     oro_entity_extend.tools.dumper:
         class: %oro_entity_extend.tools.dumper.class%
         arguments:
+            - @oro_entity_config.config_manager
             - @oro_entity_config.provider.extend
             - @oro_entity_extend.db_id_name_generator
             - @oro_entity_extend.extend.field_type_helper
@@ -166,6 +167,13 @@ services:
              - @oro_entity_extend.extend.unique_field_name_helper
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
+
+    oro_entity_extend.validator.unique_extend_entity_method_name_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
+        arguments:
+            - @oro_entity_extend.tools.class_method_name_checker
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
 
     oro_entity_extend.validator.unique_enum_name:
         class: %oro_entity_extend.validator.unique_enum_name.class%
@@ -243,6 +251,7 @@ services:
         arguments:
             - @oro_entity_extend.migration.entity_metadata_helper
             - @oro_entity_extend.extend.field_type_helper
+            - @oro_entity_config.config_manager
 
     oro_entity_extend.migration.extension.extend:
         class: %oro_entity_extend.migration.extension.extend.class%
@@ -333,6 +342,12 @@ services:
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
 
+    oro_entity_extend.datagrid.action.type.ajaxrestorefield:
+        class: Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxRestoreFieldAction
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: ajaxrestorefield }
+
     oro_entity_extend.validation_loader:
         class: %oro_entity_extend.validation_loader.class%
         public: false
@@ -394,6 +409,14 @@ services:
         tags:
             - { name: oro_service_link, service: oro_security.acl_helper }
 
+    oro_entity_extend.exclusion_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendExclusionProvider
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity.exclusion_provider.default }
+
     oro_entity_extend.entity_alias_provider:
         class: %oro_entity_extend.entity_alias_provider.class%
         public: false
@@ -425,3 +448,6 @@ services:
             - @doctrine
         tags:
             - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
+
+    oro_entity_extend.tools.class_method_name_checker:
+        class: Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker

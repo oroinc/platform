@@ -38,10 +38,12 @@ oro_entity_config:
                             label:          oro.importexport.entity_config.identity.label
                             choices:
                                 false:      'No'
-                                true:       'Yes'
+                                -1:         oro.importexport.entity_config.identity.only_when_not_empty
+                                true:       oro.importexport.entity_config.identity.always
                             empty_value:    false
                             required:       false
                             block:          import_export
+                            tooltip:        oro.importexport.entity_config.identity.tooltip
                 # is field must be excluded from import/export
                 excluded:
                     options: []

@@ -7,9 +7,10 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     $.widget('oroquerydesigner.functionChoice', {
         options: {
             fieldChoiceSelector: '',
-            optionTemplate: _.template('<option value="<%- name %>" title="<%- title %>" ' +
-                    'data-group_name="<%- group_name %>" data-group_type="<%- group_type %>">' +
-                    '<%- label %>' +
+            optionTemplate: _.template('<option value="<%- data.name %>" title="<%- data.title %>" ' +
+                    'data-group_name="<%- data.group_name %>" data-group_type="<%- data.group_type %>" ' +
+                    'data-return_type="<%- data.return_type %>">' +
+                    '<%- data.label %>' +
                 '</option>'),
             converters: [],
             aggregates: []
@@ -90,7 +91,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 });
 
                 _.each(functions, function(func) {
-                    content += options.optionTemplate(func);
+                    content += options.optionTemplate({data: func});
                 });
 
                 if (content !== '') {

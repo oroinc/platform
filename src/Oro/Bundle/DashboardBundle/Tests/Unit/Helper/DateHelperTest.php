@@ -292,41 +292,81 @@ class DateHelperTest extends OrmTestCase
         $this->assertEquals($expectedData, $actualData);
     }
 
-    public function testCombinePreviousDataWithCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
+    public function combinePreviousDataWithCurrentPeriodDataProvider()
     {
-        $result = $this->helper->combinePreviousDataWithCurrentPeriod(
-            new DateTime(),
-            new DateTime(),
-            [],
-            'row',
-            'data'
-        );
-
-        $this->assertSame([], $result);
+        return [
+            'general' => [
+                new DateTime('2015-05-05'),
+                new DateTime('2015-05-10'),
+                [
+                    [
+                        'yearCreated'  => '2015',
+                        'monthCreated' => '05',
+                        'dayCreated'   => '07',
+                        'cnt'          => 5,
+                    ]
+                ],
+                [
+                    ['date' => '2015-05-10'],
+                    ['date' => '2015-05-11'],
+                    ['date' => '2015-05-12', 'count' => 5],
+                    ['date' => '2015-05-13'],
+                    ['date' => '2015-05-14'],
+                    ['date' => '2015-05-15'],
+                ]
+            ],
+            'empty_data_returns_empty_array' => [
+                new DateTime(),
+                new DateTime(),
+                [],
+                []
+            ],
+            'long_period_last_days_of_month' => [
+                new DateTime('2015-05-19 23:00:00'),
+                new DateTime('2015-08-30 00:00:00'),
+                [
+                    [
+                        'yearCreated'  => '2015',
+                        'monthCreated' => '07',
+                        'dayCreated'   => '12',
+                        'cnt'          => 5,
+                    ]
+                ],
+                [
+                    ['date' => '2015-08-01'],
+                    ['date' => '2015-09-01'],
+                    ['date' => '2015-10-01'],
+                    ['date' => '2015-11-01', 'count' => 5],
+                    ['date' => '2015-12-01'],
+                ]
+            ],
+            'long_period_first_days_of_month' => [
+                new DateTime('2015-03-02 22:00:00'),
+                new DateTime('2015-08-01 00:00:00'),
+                [
+                    [
+                        'yearCreated'  => '2015',
+                        'monthCreated' => '07',
+                        'dayCreated'   => '12',
+                        'cnt'          => 5,
+                    ]
+                ],
+                [
+                    ['date' => '2015-08-01'],
+                    ['date' => '2015-09-01'],
+                    ['date' => '2015-10-01'],
+                    ['date' => '2015-11-01', 'count' => 5],
+                    ['date' => '2015-12-01'],
+                ]
+            ]
+        ];
     }
 
-    public function testCombinePreviousDataWithCurrentPeriod()
+    /**
+     * @dataProvider combinePreviousDataWithCurrentPeriodDataProvider
+     */
+    public function testCombinePreviousDataWithCurrentPeriod($previousFrom, $previousTo, $data, $expectedData)
     {
-        $previousFrom = new DateTime('2015-05-05');
-        $previousTo = new DateTime('2015-05-10');
-
-        $data = [
-            [
-                'yearCreated'  => '2015',
-                'monthCreated' => '05',
-                'dayCreated'   => '07',
-                'cnt'          => 5,
-            ],
-        ];
-        $expectedData = [
-            ['date' => '2015-05-10'],
-            ['date' => '2015-05-11'],
-            ['date' => '2015-05-12', 'count' => 5],
-            ['date' => '2015-05-13'],
-            ['date' => '2015-05-14'],
-            ['date' => '2015-05-15'],
-        ];
-
         $actualData = $this->helper->combinePreviousDataWithCurrentPeriod(
             $previousFrom,
             $previousTo,

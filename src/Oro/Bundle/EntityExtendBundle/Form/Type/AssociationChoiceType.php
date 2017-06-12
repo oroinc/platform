@@ -16,7 +16,10 @@ class AssociationChoiceType extends AbstractAssociationType
         $resolver->setDefaults(
             [
                 'empty_value' => false,
-                'choices'     => ['No', 'Yes']
+                'choices'     => ['No', 'Yes'],
+                'schema_update_required' => function ($newVal, $oldVal) {
+                    return true == $newVal && false == $oldVal;
+                },
             ]
         );
     }
@@ -35,13 +38,5 @@ class AssociationChoiceType extends AbstractAssociationType
     public function getParent()
     {
         return 'choice';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isSchemaUpdateRequired($newVal, $oldVal)
-    {
-        return true == $newVal && false == $oldVal;
     }
 }

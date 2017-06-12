@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EntityContextProvider
 {
@@ -79,10 +79,15 @@ class EntityContextProvider
     {
         if (!empty($entityClass)) {
             $entityClass = $this->routingHelper->resolveEntityClass($entityClass);
+            if (ExtendHelper::isCustomEntity($entityClass)) {
+                return 'custom-entity-grid';
+            }
             $config = $this->entityConfigProvider->getConfig($entityClass);
-            $gridName = $config->get('context-grid');
-            if ($gridName) {
-                return $gridName;
+            if ($config->has('context')) {
+                return $config->get('context');
+            }
+            if ($config->has('default')) {
+                return $config->get('default');
             }
         }
 

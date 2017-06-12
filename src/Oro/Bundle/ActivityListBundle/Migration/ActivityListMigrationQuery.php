@@ -88,7 +88,7 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
     {
         $this->configManager->clearModelCache();
 
-        $targetEntities   = $this->provider->getTargetEntityClasses();
+        $targetEntities   = $this->provider->getTargetEntityClasses(false);
         $toSchema         = clone $this->schema;
         $hasSchemaChanges = false;
         foreach ($targetEntities as $targetEntity) {

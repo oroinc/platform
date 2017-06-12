@@ -106,7 +106,13 @@ define([
                 module: $elem.data('pageComponentModule'),
                 options: $elem.data('pageComponentOptions') || {}
             };
-            data.options._sourceElement = $elem;
+
+            if (data.options._sourceElement) {
+                data.options._sourceElement = $(data.options._sourceElement);
+            } else {
+                data.options._sourceElement = $elem;
+            }
+
             var name = $elem.data('pageComponentName') || $elem.attr('data-ftid');
             if (name) {
                 data.options.name = name;
@@ -143,6 +149,13 @@ define([
             $elem.attr('data-bound-component', data.module);
 
             var initDeferred = $.Deferred();
+
+            if (!data.options._sourceElement.get(0)) {
+                var message = 'Cannot resolve _sourceElement by selector "' +
+                    data.options._sourceElement.selector + '"';
+                this._handleError(message, Error(message));
+                initDeferred.resolve();
+            }
 
             require(
                 [data.module],
@@ -229,8 +242,9 @@ define([
             if (tools.debug) {
                 if (console && console.error) {
                     console.error(message);
+                } else {
+                    throw error;
                 }
-                throw error;
             } else {
                 require('oroui/js/mediator')
                     .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));

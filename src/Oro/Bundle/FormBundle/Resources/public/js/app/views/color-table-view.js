@@ -50,7 +50,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         _addPickerHandlers: function() {
             this.$parent.on('click.' + this.cid, 'span.color', _.bind(function(e) {
                 e.preventDefault();
-                if (!this.$el.is(':disabled')) {
+                if (!this.$el.is(':disabled') && !$(e.currentTarget).is(this.$current)) {
                     this.$current = $(e.currentTarget);
                     this.$picker.parent().find('.minicolors-panel').css(this._getPickerPos(this.$current));
                     this.$parent.removeClass('minicolors-focus');

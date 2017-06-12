@@ -10,6 +10,11 @@ class EmailAttachment
     protected $fileName;
 
     /**
+     * @var int
+     */
+    protected $fileSize;
+
+    /**
      * @var string
      */
     protected $contentType;
@@ -135,5 +140,28 @@ class EmailAttachment
     public function setContentId($contentId)
     {
         $this->contentId = $contentId;
+    }
+
+    /**
+     * Get attachment file size in bytes
+     *
+     * @return int
+     */
+    public function getFileSize()
+    {
+        return $this->fileSize;
+    }
+
+    /**
+     * Set attachment file size in bytes
+     *
+     * @param int $fileSize
+     * @return $this
+     */
+    public function setFileSize($fileSize)
+    {
+        $this->fileSize = $fileSize;
+
+        return $this;
     }
 }

@@ -1,7 +1,24 @@
 ## Context ##
 
-**Adding context entity to email**
+How to configure custom grid for activity context dialog
+--------------------------------------------------------
 
-If you want add new context entity class name to email context dialog you need add
-"context-grid"="..." option to entity class @config (See CaseEntity.php, for example)
-and add datagrid with same name. (See cases-for-context-grid grid in CaseBundle) 
+If you want to define context grid for entity(e.g User) in the activity context dialog you need to add the
+`context` option in entity class `@Config` annotation, e.g: 
+
+``` php
+/**
+ * @Config(
+ *      defaultValues={
+ *          "grid"={
+ *              default="default-grid",
+ *              context="default-context-grid"
+ *          }
+ *     }
+ * )
+ */
+class User extends ExtendUser
+```
+
+This option is used to recognize grid for entity with higher priority than `default` option.
+In cases if these options (`context` or `default`) are not defined for entity, it won`t appear in the context dialog.

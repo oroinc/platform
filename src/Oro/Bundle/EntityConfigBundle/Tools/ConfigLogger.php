@@ -72,6 +72,9 @@ class ConfigLogger extends AbstractLogger
         if (is_bool($val)) {
             return $val ? 'true' : 'false';
         }
+        if (is_object($val) && $val instanceof \Serializable) {
+            return serialize($val);
+        }
 
         return (string)$val;
     }

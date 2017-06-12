@@ -162,14 +162,16 @@ services:
         arguments:
             - @oro_entity_merge.accessor.delegate
         tags:
-            - { name: oro_entity_merge.strategy }
+            - { name: oro_entity_merge.strategy, priority: 100 }
 ```
+You can define `priority` for strategy for being able to define your own merge strategy which will work with existing merge modes.
+Supported merge strategy with greatest priority will be used for merge.
 
 Tagging merge step:
 
 ```
 services:
-	oro_entity_merge.step.validate:
+    oro_entity_merge.step.validate:
         class: %oro_entity_merge.step.validate.class%
         arguments:
             - @validator

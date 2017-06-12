@@ -110,21 +110,39 @@ class EmailApiEntityManager extends ApiEntityManager
         );
 
         foreach ($result as &$item) {
-            $route = $this->configManager->getEntityMetadata($item['entity'])->getRoute();
-
             $item['entityId']        = $email->getId();
             $item['targetId']        = $item['id'];
             $item['targetClassName'] = $this->entityClassNameHelper->getUrlSafeClassName($item['entity']);
             $item['icon']            = $this->configManager->getProvider('entity')->getConfig($item['entity'])
                 ->get('icon');
-            $item['link']            = $route
-                ? $this->router->generate($route, ['id' => $item['id']])
-                : null;
+            $item['link']            = $this->getContextLink($item);
 
             unset($item['id'], $item['entity']);
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $item
+     *
+     * @return null|string
+     */
+    protected function getContextLink(array $item)
+    {
+        $metadata = $this->configManager->getEntityMetadata($item['entity']);
+        $link     = null;
+        if ($metadata) {
+            try {
+                $route = $metadata->getRoute('view', true);
+            } catch (\LogicException $exception) {
+                // Need for cases when entity does not have route.
+                return null;
+            }
+            $link = $this->router->generate($route, ['id' => $item['id']]);
+        }
+
+        return $link;
     }
 
     /**

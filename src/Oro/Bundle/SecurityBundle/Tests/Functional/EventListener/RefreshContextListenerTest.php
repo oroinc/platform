@@ -79,7 +79,7 @@ class RefreshContextListenerTest extends WebTestCase
         $this->assertNull($this->getContainer()->get('security.context')->getToken());
     }
 
-    public function testMergeNotExistingUser()
+    public function testRefreshNotExistingUser()
     {
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));

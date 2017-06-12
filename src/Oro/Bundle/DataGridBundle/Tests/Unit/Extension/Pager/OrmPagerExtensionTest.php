@@ -2,12 +2,34 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Pager;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
 class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Pager
+     */
+    protected $pager;
+
+    /**
+     * @var OrmPagerExtension
+     */
+    protected $extension;
+
+    protected function setUp()
+    {
+        $this->pager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->extension = new OrmPagerExtension($this->pager);
+    }
+
     /**
      * @param array $input
      * @param array $expected
@@ -15,13 +37,8 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetParameters(array $input, array $expected)
     {
-        $pager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $extension = new OrmPagerExtension($pager);
-        $extension->setParameters(new ParameterBag($input));
-        $this->assertEquals($expected, $extension->getParameters()->all());
+        $this->extension->setParameters(new ParameterBag($input));
+        $this->assertEquals($expected, $this->extension->getParameters()->all());
     }
 
     /**
@@ -67,5 +84,46 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             ),
         );
+    }
+
+    /**
+     * @param null $count
+     * @param bool $adjustTotalCount
+     *
+     * @dataProvider adjustedCountDataProvider
+     */
+    public function testVisitDatasourceWithAdjustedCount($count, $adjustTotalCount = false)
+    {
+        if ($adjustTotalCount) {
+            $this->pager->expects($this->once())
+                ->method('adjustTotalCount')
+                ->with($count);
+        } else {
+            $this->pager->expects($this->never())
+                ->method('adjustTotalCount')
+                ->with($count);
+        }
+
+        /** @var DatasourceInterface $dataSource */
+        $dataSource   = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        $configObject = DatagridConfiguration::create([]);
+        $parameters   = [];
+        if (null !== $count) {
+            $parameters[PagerInterface::PAGER_ROOT_PARAM] = [PagerInterface::ADJUSTED_COUNT => $count];
+        }
+        $this->extension->setParameters(new ParameterBag($parameters));
+        $this->extension->visitDatasource($configObject, $dataSource);
+    }
+
+    public function adjustedCountDataProvider()
+    {
+        return [
+            'valid value'               => [150, true],
+            'no value'                  => [null],
+            'not valid value(negative)' => [-100],
+            'not valid value(string)'   => ['test'],
+            'not valid value(false)'    => [false],
+            'not valid value(true)'     => [true]
+        ];
     }
 }

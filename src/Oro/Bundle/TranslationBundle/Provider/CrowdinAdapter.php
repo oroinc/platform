@@ -64,8 +64,9 @@ class CrowdinAdapter extends AbstractAPIAdapter
     {
         $this->logger->notice('Creating directories');
 
+        $current = 1;
+
         foreach ($dirs as $index => $dir) {
-            $current = $index + 1;
             $result  = $this->addDirectory($dir);
 
             if (false == $result['success'] && isset($result['error'])) {
@@ -82,13 +83,15 @@ class CrowdinAdapter extends AbstractAPIAdapter
                     sprintf('%0.2f%% [created] <info>%s</info> directory', $current * 100 / count($dirs), $dir)
                 );
             }
+
+            $current++;
         }
 
         return $this;
     }
 
     /**
-     * @param string $files
+     * @param array $files
      * @param string $mode 'add' or 'update'
      *
      * @return bool

@@ -55,7 +55,9 @@ define([
             } else {
                 this.target.select2('container').hide();
                 this.removeRequiredFlag(this.$simpleEl);
-                this.target.validate().hideElementErrors(this.target);
+                if (this.target.closest('form').data('validator')) {
+                    this.target.validate().hideElementErrors(this.target);
+                }
             }
         },
 

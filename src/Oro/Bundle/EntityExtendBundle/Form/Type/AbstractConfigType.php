@@ -3,14 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityExtendBundle\Form\EventListener\ConfigTypeSubscriber;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType as BaseAbstractConfigType;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * The abstract class for form types are used to work with entity config attributes
@@ -39,54 +39,43 @@ abstract class AbstractConfigType extends BaseAbstractConfigType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventListener(FormEvents::POST_SUBMIT, array($this, 'postSubmit'));
+        /*
+         * Prevents to register twice exactly the same listener (which causes issues)
+         *
+         * This is due to strange hierarchies in form types where
+         * Oro\Bundle\ActivityBundle\Form\Type\MultipleAssociationChoiceType has this class in hierarchy
+         * + has defined Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as parent type,
+         * which also has this class in it's hierarchy
+         * (instead of just extending symfony's abstract type and using form extensions/inheritance
+         * to avoid such issues)
+         */
+        if (ArrayUtil::some(
+            function ($listener) {
+                return is_array($listener) && $listener[0] instanceof ConfigTypeSubscriber;
+            },
+            $builder->getEventDispatcher()->getListeners(FormEvents::POST_SUBMIT)
+        )) {
+                return;
+        }
+
+        $builder->addEventSubscriber(
+            new ConfigTypeSubscriber($this->configManager, $options['schema_update_required'])
+        );
     }
 
     /**
-     * POST_SUBMIT event handler
-     *
-     * @param FormEvent $event
+     * {@inheritdoc}
      */
-    public function postSubmit(FormEvent $event)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $form    = $event->getForm();
-        $options = $form->getConfig()->getOptions();
-        /** @var ConfigIdInterface $configId */
-        $configId = $options['config_id'];
+        parent::setDefaultOptions($resolver);
 
-        if (!$form->isValid()) {
-            return;
-        }
-
-        // change the entity state to "Requires update" if the attribute has "require_schema_update" option
-        // and the value of the attribute was changed
-        $configProvider = $this->configManager->getProvider($configId->getScope());
-        if ($configProvider->getPropertyConfig()->isSchemaUpdateRequired($form->getName(), $configId)) {
-            $newVal = $form->getData();
-            $oldVal = $this->configManager->getConfig($configId)->get($form->getName());
-            if ($this->isSchemaUpdateRequired($newVal, $oldVal)) {
-                $extendConfigProvider = $this->configManager->getProvider('extend');
-                $extendConfig         = $extendConfigProvider->getConfig($configId->getClassName());
-                if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                    $extendConfig->set('state', ExtendScope::STATE_UPDATE);
-                    $this->configManager->persist($extendConfig);
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks if the changes require the schema update
-     *
-     * @param mixed $newVal
-     * @param mixed $oldVal
-     *
-     * @return bool
-     */
-    protected function isSchemaUpdateRequired($newVal, $oldVal)
-    {
-        // we cannot use strict comparison here because Symfony form
-        // converts empty value (false, 0, empty string) => null, true => 1
-        return $newVal != $oldVal;
+        $resolver->setDefaults([
+            'schema_update_required' => function ($newVal, $oldVal) {
+                // we cannot use strict comparison here because Symfony form
+                // converts empty value (false, 0, empty string) => null, true => 1
+                return $newVal != $oldVal;
+            },
+        ]);
     }
 }

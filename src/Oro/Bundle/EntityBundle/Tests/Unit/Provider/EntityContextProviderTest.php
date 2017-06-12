@@ -78,7 +78,7 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
         $this->configProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
-            ->setMethods(['getConfig', 'get'])
+            ->setMethods(['getConfig', 'has', 'get'])
             ->getMock();
 
         $this->configProvider->expects($this->any())
@@ -87,8 +87,13 @@ class EntityContextProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->configProvider));
 
         $this->configProvider->expects($this->any())
+            ->method('has')
+            ->with('context')
+            ->willReturn(true);
+
+        $this->configProvider->expects($this->any())
             ->method('get')
-            ->with('context-grid')
+            ->with('context')
             ->will($this->returnValue($this->expectedGridName));
 
         $this->provider = new EntityContextProvider(

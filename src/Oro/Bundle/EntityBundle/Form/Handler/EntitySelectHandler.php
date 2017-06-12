@@ -58,6 +58,20 @@ class EntitySelectHandler extends SearchHandler
     /**
      * {@inheritdoc}
      */
+    public function convertItem($item)
+    {
+        $result = parent::convertItem($item);
+
+        if ($this->idFieldName !== 'id' && !empty($result[$this->idFieldName])) {
+            $result = array_merge($result, ['id' => $result[$this->idFieldName]]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function searchEntities($search, $firstResult, $maxResults)
     {
         $queryBuilder = $this->entityRepository->createQueryBuilder('e');

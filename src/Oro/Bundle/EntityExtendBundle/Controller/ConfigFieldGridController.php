@@ -312,7 +312,7 @@ class ConfigFieldGridController extends Controller
             );
         $fieldConfig->set(
             'state',
-            $isFieldExist ? ExtendScope::STATE_UPDATE : ExtendScope::STATE_NEW
+            $isFieldExist ? ExtendScope::STATE_RESTORE : ExtendScope::STATE_NEW
         );
 
         $configManager->persist($fieldConfig);

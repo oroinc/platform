@@ -104,6 +104,14 @@ class ConfigManager
     }
 
     /**
+     * @return int
+     */
+    public function getScopeId()
+    {
+        return $this->getScopeManager()->getScopeId();
+    }
+
+    /**
      * @param int|null    $scopeId
      * @param string|null $scope
      *
