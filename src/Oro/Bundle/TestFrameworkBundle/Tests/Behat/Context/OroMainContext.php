@@ -366,6 +366,17 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Hover on element on page
+     * Example: When I hover on "Help Icon"
+     *
+     * @When /^(?:|I )hover on "(?P<element>[\w\s]+)"$/
+     */
+    public function iHoverOn($element)
+    {
+        $this->createElement($element)->mouseOver();
+    }
+
+    /**
      * Assert popup with large image on page
      *
      * @Then /^(?:|I )should see large image$/
