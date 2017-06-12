@@ -1175,7 +1175,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @When /^I select following records in (?P<name>grid|[\s\w]+):$/
+     * @When /^I select following records in "(?P<name>[\s\w]+)" grid:$/
+     * @When /^I select following records in grid:$/
      * @param TableNode $table
      * @param string $name
      */
