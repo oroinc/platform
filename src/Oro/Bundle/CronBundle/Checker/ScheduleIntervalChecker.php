@@ -11,20 +11,20 @@ class ScheduleIntervalChecker
 {
     /**
      * @param ScheduleIntervalInterface[]|\Traversable $schedules
-     * @param null|\DateTime $date
+     * @param null|\DateTime $dateTime
      *
      * @return bool
      */
-    public function hasActiveSchedule(\Traversable $schedules, $date = null)
+    public function hasActiveSchedule(\Traversable $schedules, \DateTime $dateTime = null)
     {
-        if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        if (!$dateTime) {
+            $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
         }
 
         foreach ($schedules as $schedule) {
             if ($schedule instanceof ScheduleIntervalInterface
-                && $this->isDateAfterScheduleStart($date, $schedule)
-                && $this->isDateBeforeScheduleEnd($date, $schedule)
+                && $this->isDateAfterScheduleStart($dateTime, $schedule)
+                && $this->isDateBeforeScheduleEnd($dateTime, $schedule)
             ) {
                 return true;
             }
@@ -34,24 +34,24 @@ class ScheduleIntervalChecker
     }
 
     /**
-     * @param \DateTime $date
+     * @param \DateTime $dateTime
      * @param ScheduleIntervalInterface $schedule
      *
      * @return bool
      */
-    private function isDateAfterScheduleStart(\DateTime $date, ScheduleIntervalInterface $schedule)
+    private function isDateAfterScheduleStart(\DateTime $dateTime, ScheduleIntervalInterface $schedule)
     {
-        return (!$schedule->getActiveAt() || $schedule->getActiveAt() < $date);
+        return (!$schedule->getActiveAt() || $schedule->getActiveAt() <= $dateTime);
     }
 
     /**
-     * @param \DateTime $date
+     * @param \DateTime $dateTime
      * @param ScheduleIntervalInterface $schedule
      *
      * @return bool
      */
-    private function isDateBeforeScheduleEnd(\DateTime $date, ScheduleIntervalInterface $schedule)
+    private function isDateBeforeScheduleEnd(\DateTime $dateTime, ScheduleIntervalInterface $schedule)
     {
-        return (!$schedule->getDeactivateAt() || $schedule->getDeactivateAt() > $date);
+        return (!$schedule->getDeactivateAt() || $schedule->getDeactivateAt() > $dateTime);
     }
 }
