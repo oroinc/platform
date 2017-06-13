@@ -10,7 +10,6 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -51,11 +50,9 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
             return;
         }
 
-        $currency = LocaleSettings::getCurrencyByLocale($this->getLocale());
-
         $configManager->set(
             CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_DEFAULT_CURRENCY),
-            $currency
+            CurrencyConfig::DEFAULT_CURRENCY
         );
 
         $configManager->flush();
