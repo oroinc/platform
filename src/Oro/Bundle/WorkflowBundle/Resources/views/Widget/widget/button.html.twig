@@ -4,16 +4,18 @@
         {% for data in workflow.transitionsData %}
             {# Show button for start or transit workflow #}
             {% set transitionLabel = data.transition.label|trans({},'workflows') %}
-            
-            {% set frontendMessage = data.transition.frontendOptions.message|default({'message': '', 'message_parameters' : {}}) %}
-            
-            {% set transitionMessage = frontendMessage.message|trans(frontendMessage.message_parameters, 'workflows') %}
-            {% if transitionMessage and transitionMessage != frontendMessage.message %}
-                {# if no translation for message then do not show message #}
-                {% set message = {
-                    content: transitionMessage|nl2br,
-                    title: frontendMessage.title|default(transitionLabel),
-                } %}
+
+            {% if data.transition.frontendOptions.message is defined and data.transition.frontendOptions.message.content is defined %}
+                {% set frontendMessage = data.transition.frontendOptions.message %}
+
+                {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters|default({}), 'workflows') %}
+                {% if transitionMessage and transitionMessage != frontendMessage.content %}
+                    {# if no translation for message then do not show message #}
+                    {% set message = {
+                        content: transitionMessage|nl2br,
+                        title: frontendMessage.title|default(transitionLabel),
+                    } %}
+                {% endif %}
             {% endif %}
 
             {% set transitionData = {
