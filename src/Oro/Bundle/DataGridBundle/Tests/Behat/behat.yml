@@ -115,6 +115,10 @@ oro_behat_extension:
       selector: 'div.grid-container th.grid-header-cell-massAction div.btn-group .btn i'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    MassActionButton:
+      selector: 'div.grid-container .grid-header-row .action-column .btn i'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     PageSize:
       selector: 'div.page-size'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
