@@ -1141,4 +1141,16 @@ class OroMainContext extends MinkContext implements
         fwrite(STDOUT, "Press [RETURN] to continue...");
         fgets(STDIN, 1024);
     }
+
+    /**
+     * Example: Given I set window size to 320x640
+     *
+     * @Given /^(?:|I )set window size to (?P<width>\d+)x(?P<height>\d+)$/
+     * @param int $width
+     * @param int $height
+     */
+    public function iSetWindowSize($width, $height)
+    {
+        $this->getSession()->resizeWindow((int)$width, (int)$height, 'current');
+    }
 }
