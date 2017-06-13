@@ -147,7 +147,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
      * @expectedExceptionMessage Workflow "test_workflow" not found
      */
     public function testGetWorkflowAndFilteredItem()
