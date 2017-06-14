@@ -6,26 +6,13 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\LocaleBundle\Migrations\Data\ORM\LoadLocalizationData;
 
-class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
-    {
-        return [
-            LoadLocalizationData::class
-        ];
-    }
 
     /**
      * {@inheritDoc}
@@ -54,23 +41,11 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
             return;
         }
 
-        $currency = LocaleSettings::getCurrencyByLocale($this->getLocale());
-
         $configManager->set(
             CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_DEFAULT_CURRENCY),
-            $currency
+            CurrencyConfig::DEFAULT_CURRENCY
         );
 
         $configManager->flush();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getLocale()
-    {
-        $localeSettings = $this->container->get('oro_locale.settings');
-
-        return $localeSettings->getLocale();
     }
 }

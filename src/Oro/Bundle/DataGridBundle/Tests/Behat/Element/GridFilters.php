@@ -20,7 +20,7 @@ class GridFilters extends Element
         $filterItem = null;
 
         if ($strict) {
-            $filterItems = $this->elementFactory->findAllElements($name);
+            $filterItems = $this->elementFactory->findAllElements($name, $this);
             foreach ($filterItems as $item) {
                 if ($item->getText() === $text) {
                     $filterItem = $item;
@@ -28,9 +28,9 @@ class GridFilters extends Element
                 }
             }
         } else {
-            $filterItem = $this->elementFactory->findElementContains($name, $text);
+            $filterItem = $this->elementFactory->findElementContains($name, $text, $this);
             if (!$filterItem->isValid()) {
-                $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text);
+                $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text, true, $this);
             }
         }
 

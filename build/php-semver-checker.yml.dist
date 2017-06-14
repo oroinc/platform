@@ -31,7 +31,7 @@ level:
     V029: PATCH # Class private method removed
     V030: PATCH # *Final class protected method added*
     V031: PATCH # Class private method parameter added
-    V032: MINOR # Interface added
+    V032: PATCH # Interface added
     V033: MAJOR # Interface removed
     V034: MAJOR # Interface method added
     V035: MAJOR # Interface method removed

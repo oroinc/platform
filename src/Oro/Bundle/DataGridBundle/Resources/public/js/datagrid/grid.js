@@ -136,7 +136,8 @@ define(function(require) {
             multipleSorting:        true,
             rowActions:             [],
             massActions:            new Backbone.Collection(),
-            enableFullScreenLayout: false
+            enableFullScreenLayout: false,
+            scopeDelimiter:         ':'
         },
 
         /**
@@ -1371,6 +1372,21 @@ define(function(require) {
             }
 
             return this;
+        },
+
+        /**
+         * @return {String|null}
+         */
+        getGridScope: function() {
+            var nameParts = this.name.split(this.scopeDelimiter);
+            if (nameParts.length > 2) {
+                throw new Error(
+                    'Grid name is invalid, it should not contain more than one occurrence of "' +
+                    this.scopeDelimiter + '"'
+                );
+            }
+
+            return nameParts.length === 2 ? nameParts[1] : null;
         }
     });
 
