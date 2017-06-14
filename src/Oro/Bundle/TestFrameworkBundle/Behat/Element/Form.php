@@ -156,6 +156,10 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
 
+            if ('select' === $field->getTagName()) {
+                return $this->elementFactory->wrapElement('Select', $field);
+            }
+
             return $field;
         }
 
