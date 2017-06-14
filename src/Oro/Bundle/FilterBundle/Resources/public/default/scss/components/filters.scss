@@ -10,7 +10,13 @@
 
     background: get-color('additional', 'base');
 
+    box-shadow: none;
+  
     @include clearfix();
+  
+    .toolbar-sticky-container & {
+        margin: 0;
+    }
 
     &__dropdown {
         padding: $offset-x-m;
