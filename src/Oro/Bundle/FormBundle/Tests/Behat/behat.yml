@@ -48,3 +48,6 @@ oro_behat_extension:
 
     Select2Choices:
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Choices
+
+    Select:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select

@@ -141,7 +141,7 @@ class Grid extends Table implements GridInterface
      */
     public function getMassActionButton()
     {
-        $massActionsButton = $this->findButton('Mass Actions');
+        $massActionsButton = $this->elementFactory->createElement('MassActionButton', $this);
 
         if (!$massActionsButton || !$massActionsButton->isVisible()) {
             throw ElementNotVisible::factory(
@@ -160,7 +160,7 @@ class Grid extends Table implements GridInterface
     {
         $massActionHeadCheckboxElementName = $this->getMappedChildElementName('MassActionHeadCheckbox');
 
-        $this->getElement($massActionHeadCheckboxElementName)->click();
+        $this->elementFactory->createElement($massActionHeadCheckboxElementName, $this)->click();
         $this->elementFactory->createElement('GridFloatingMenu')->clickLink($title);
     }
 

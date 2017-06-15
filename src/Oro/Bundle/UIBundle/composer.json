@@ -22,7 +22,7 @@
         "vakata/jstree": "3.3.*",
         "components/jqueryui": "1.12.*",
         "bower-asset/select2": "3.4.1",
-        "bower-asset/chaplin": "1.0.0",
+        "bower-asset/chaplin": "1.2.0",
         "bower-asset/jquery-form": "3.37.0",
         "bower-asset/jquery-cookie": "1.4.1",
         "bower-asset/crypto-js": "3.1.7",
