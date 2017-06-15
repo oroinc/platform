@@ -41,7 +41,6 @@ class Form extends Element
             }
 
             $field = $this->wrapField($label, $field);
-
             $field->setValue($value);
         }
         if ($isEmbeddedForm) {
@@ -157,6 +156,10 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
 
+            if ('select' === $field->getTagName()) {
+                return $this->elementFactory->wrapElement('Select', $field);
+            }
+
             return $field;
         }
 
@@ -195,6 +198,8 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif ($sndParent->hasClass('control-group-choice')) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
+            } elseif ($field = $sndParent->find('css', '#'.$label->getAttribute('for'))) {
+                return $field;
             } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
                 return $field;
             } else {

@@ -90,9 +90,6 @@ define(function(require) {
 
             this._patchGridCollectionUrl(params);
 
-            if (_.has(this.gridCollection, 'state')) {
-                this.gridCollection.state.currentPage = 1;
-            }
             if (data.reload) {
                 if (data.widgetReload) {
                     var self = this;
@@ -104,7 +101,7 @@ define(function(require) {
                         }
                     );
                 } else {
-                    mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName);
+                    this.gridCollection.getPage(1);
                 }
             }
         },

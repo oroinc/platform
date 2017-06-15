@@ -40,9 +40,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
     /** @var array */
     protected $removedEntityHashes = [];
 
-    /** @var array */
-    protected $queuedJobs = [];
-
     /**
      * @var MessageProducerInterface
      */
@@ -119,6 +116,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         // handle processes
         $hasQueuedOrHandledProcesses = false;
         $handledProcesses = [];
+        $queuedJobs = [];
         foreach ($this->scheduledProcesses as &$entityProcesses) {
             while ($entityProcess = array_shift($entityProcesses)) {
                 /** @var ProcessTrigger $trigger */
@@ -135,7 +133,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
                     $processJob = $this->queueProcess($trigger, $data);
                     $manager->persist($processJob);
 
-                    $this->queuedJobs[(int)$trigger->getTimeShift()][$trigger->getPriority()][] = $processJob;
+                    $queuedJobs[(int)$trigger->getTimeShift()][$trigger->getPriority()][] = $processJob;
                 } else {
                     $this->logger->debug('Process handled', $trigger, $data);
                     $this->handler->handleTrigger($trigger, $data);
@@ -169,7 +167,9 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
             $this->removedEntityHashes = [];
         }
 
-        $this->createJobs();
+        if (!empty($queuedJobs)) {
+            $this->createJobs($queuedJobs);
+        }
     }
 
     /**
@@ -234,13 +234,12 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         return $processJob;
     }
 
-    protected function createJobs()
+    /**
+     * @param array $queuedJobs [time shift => [priority => [process job, ...], ...], ...]
+     */
+    protected function createJobs(array $queuedJobs)
     {
-        if (empty($this->queuedJobs)) {
-            return;
-        }
-
-        foreach ($this->queuedJobs as $timeShift => $processJobBatch) {
+        foreach ($queuedJobs as $timeShift => $processJobBatch) {
             foreach ($processJobBatch as $priority => $processJobs) {
                 /** @var ProcessJob $processJob */
                 foreach ($processJobs as $processJob) {
@@ -257,8 +256,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
                 }
             }
         }
-
-        $this->queuedJobs = [];
     }
 
     /**

@@ -9,7 +9,7 @@ class CumulativeResourceManager
      *
      * @var CumulativeResourceManager
      */
-    private static $instance = null;
+    private static $instance;
 
     /**
      * @var string
@@ -49,6 +49,7 @@ class CumulativeResourceManager
      */
     public function clear()
     {
+        $this->appRootDir = null;
         $this->bundles = [];
 
         return $this;

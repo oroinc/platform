@@ -4,6 +4,7 @@ UPGRADE FROM 2.2 to 2.3
 PhpUtils component
 ------------------
 - Removed deprecated class `Oro\Component\PhpUtils\QueryUtil`. Use `Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil` instead
+- Added class `Oro\Component\PhpUtils\ClassLoader`, it is a simple and fast implementation of the class loader that can be used to map one namespace to one path
 
 DoctrineUtils component
 -----------------------
@@ -51,6 +52,28 @@ DataGridBundle
     - changed constructor signature from `__construct(ContainerInterface $container, SecurityFacade $securityFacade, TranslatorInterface $translator)` to `__construct(MassActionFactory $actionFactory, MassActionMetadataFactory $actionMetadataFactory, SecurityFacade $securityFacade)`
     - removed method `registerAction`. Use `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory::registerAction` instead
 
+CronBundle
+---------------
+- Class `Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor`
+    - removed property `$commandRunner`
+    - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
+- Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
+
+EntityExtendBundle
+------------------
+- Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
+
+IntegrationBundle
+-----------------
+- Class `Oro\Bundle\IntegrationBundle\Controller\IntegrationController`
+    - removed method `getSyncScheduler`
+    - removed method `getTypeRegistry`
+    - removed method `getLogger`
+- Removed translation label `oro.integration.sync_error_invalid_credentials`
+- Removed translation label `oro.integration.progress`
+- Updated translation label `oro.integration.sync_error`
+- Updated translation label `oro.integration.sync_error_integration_deactivated`
+
 MigrationBundle
 ---------------
 - Added event `oro_migration.data_fixtures.pre_load` that is raised before data fixtures are loaded
@@ -62,6 +85,10 @@ SecurityBundle
     - made `organizationId` optional
 - Added class `Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper`
 
+SegmentBundle
+-------------
+* The `Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager::__construct(EntityManager $em, SegmentQueryBuilderRegistry $builderRegistry)` method was changed to `Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager::__construct(EntityManager $em, SegmentQueryBuilderRegistry $builderRegistry, SubQueryLimitHelper $subQueryLimitHelper)`
+
 SearchBundle
 ------------
 - Class `Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataListener` was replaced with `Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener`
@@ -70,3 +97,22 @@ SearchBundle
 TestFrameworkBundle
 -------------------
 - Class `TestListener` namespace added, use `Oro\Bundle\TestFrameworkBundle\Test\TestListener` instead
+
+WorkflowBundle
+--------------
+- Class `Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension`
+    - removed property `$queuedJobs`
+    - changed signature of method `createJobs`. Added parameter `$queuedJobs`
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
+    - changed constructor signature:
+        - first argument replaced with `Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider $definitionProvider`;
+    - following protected methods were moved to `WorkflowDefinitionProvider`:
+        - `refreshWorkflowDefinition`
+        - `getEntityManager`
+        - `getEntityRepository`
+- Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
+- Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
+
+UIBundle
+--------
+- Updated ChaplinJS to 1.2.0 version
