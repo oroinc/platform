@@ -4,6 +4,7 @@ UPGRADE FROM 2.2 to 2.3
 PhpUtils component
 ------------------
 - Removed deprecated class `Oro\Component\PhpUtils\QueryUtil`. Use `Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil` instead
+- Added class `Oro\Component\PhpUtils\ClassLoader`, it is a simple and fast implementation of the class loader that can be used to map one namespace to one path
 
 DoctrineUtils component
 -----------------------
@@ -57,6 +58,10 @@ CronBundle
     - removed property `$commandRunner`
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
 - Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
+
+EntityExtendBundle
+------------------
+- Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
 
 IntegrationBundle
 -----------------

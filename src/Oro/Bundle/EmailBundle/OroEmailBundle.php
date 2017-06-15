@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
-use Symfony\Component\ClassLoader\UniversalClassLoader;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
+use Oro\Component\PhpUtils\ClassLoader;
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
@@ -21,8 +21,7 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfiguration
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\OverrideServiceSwiftMailer;
-
-use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 
 class OroEmailBundle extends Bundle
 {
@@ -38,12 +37,9 @@ class OroEmailBundle extends Bundle
     public function __construct(KernelInterface $kernel)
     {
         // register email address proxy class loader
-        $loader = new UniversalClassLoader();
-        $loader->registerNamespaces(
-            [
-                self::ENTITY_PROXY_NAMESPACE =>
-                    $kernel->getCacheDir() . DIRECTORY_SEPARATOR . self::CACHED_ENTITIES_DIR_NAME
-            ]
+        $loader = new ClassLoader(
+            self::ENTITY_PROXY_NAMESPACE . '\\',
+            $kernel->getCacheDir() . DIRECTORY_SEPARATOR . self::CACHED_ENTITIES_DIR_NAME
         );
         $loader->register();
     }
