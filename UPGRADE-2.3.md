@@ -107,3 +107,7 @@ WorkflowBundle
         - `getEntityRepository`
 - Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
 - Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
+
+UIBundle
+--------
+- Updated ChaplinJS to 1.2.0 version
