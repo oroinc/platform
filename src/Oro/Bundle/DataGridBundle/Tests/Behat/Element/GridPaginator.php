@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
-class GridPaginator extends Element
+class GridPaginator extends Element implements GridPaginatorInterface
 {
     /**
      * @return int

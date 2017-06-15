@@ -48,30 +48,27 @@
 
     &__dropdown-menu {
         min-width: 0;
-    }
 
-    &__dropdown-item {
-        text-decoration: none;
+        .action {
+            display: block;
+            padding: $datagrid-massaction-dropdown-menu-action-offset-inner;
 
-        color: $datagrid-massaction-dropdown-menu-action-color;
-        
-        @include element-state('hover') {
             text-decoration: none;
 
-            background-color: $datagrid-massaction-dropdown-menu-action-hover-bg;
             color: $datagrid-massaction-dropdown-menu-action-color;
+
+            white-space: nowrap;
+
+            @include element-state('hover') {
+                text-decoration: none;
+
+                background-color: $datagrid-massaction-dropdown-menu-action-hover-bg;
+                color: $datagrid-massaction-dropdown-menu-action-color;
+            }
         }
     }
 
     .dropdown-menu__placeholder {
         display: none;
-    }
-
-    .action {
-        display: block;
-
-        padding: $datagrid-massaction-dropdown-menu-action-offset-inner;
-
-        white-space: nowrap;
     }
 }

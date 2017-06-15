@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
-use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ElementNotFoundException;
 use WebDriver\Exception\ElementNotVisible;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
@@ -13,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
  * @method GridRow getRowByContent($content) @see Table::getRowByContent($content)
  * @method GridRow[] getRows() @see Table::getRows()
  */
-class Grid extends Table
+class Grid extends Table implements GridInterface
 {
     const TABLE_HEADER_ELEMENT = 'GridHeader';
     const TABLE_ROW_ELEMENT = 'GridRow';
@@ -21,8 +19,35 @@ class Grid extends Table
     const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
 
     /**
-     * @param string $title
-     * @throws \Exception
+     * {@inheritdoc}
+     */
+    public function getMappedChildElementName($name)
+    {
+        if (!isset($this->options['mapping'][$name])) {
+            return $name;
+        }
+
+        return $this->options['mapping'][$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMassActionLink($title)
+    {
+        return $this->elementFactory->createElement('GridFloatingMenu')->findLink($title);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSelectAllMassActionLink($title)
+    {
+        return $this->getElement('GridActionsMassActionMenu')->findLink($title);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function clickMassActionLink($title)
     {
@@ -32,6 +57,22 @@ class Grid extends Table
         $massActionLink = $this->getMassActionLink($title);
         self::assertNotNull($massActionLink, 'Mass action link not found on the page');
         self::assertTrue($massActionLink->isVisible(), 'Mass action link is not visible');
+
+        $massActionLink->click();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clickSelectAllMassActionLink($title)
+    {
+        $massActionsButton = $this->getMassActionButton();
+        $massActionsButton->press();
+
+        $massActionLink = $this->getSelectAllMassActionLink($title);
+        self::assertNotNull($massActionLink, 'Mass action link not found on the page');
+        self::assertTrue($massActionLink->isVisible(), 'Mass action link is not visible');
+
         $massActionLink->click();
     }
 
@@ -44,8 +85,7 @@ class Grid extends Table
     }
 
     /**
-     * @param int $number
-     * @param int $cellNumber
+     * {@inheritdoc}
      */
     public function checkFirstRecords($number, $cellNumber = 0)
     {
@@ -63,8 +103,7 @@ class Grid extends Table
     }
 
     /**
-     * @param int $number
-     * @param int $cellNumber
+     * {@inheritdoc}
      */
     public function uncheckFirstRecords($number, $cellNumber = 0)
     {
@@ -82,7 +121,7 @@ class Grid extends Table
     }
 
     /**
-     * @param string $content
+     * {@inheritdoc}
      */
     public function checkRecord($content)
     {
@@ -90,7 +129,7 @@ class Grid extends Table
     }
 
     /**
-     * @param string $content
+     * {@inheritdoc}
      */
     public function uncheckRecord($content)
     {
@@ -98,8 +137,7 @@ class Grid extends Table
     }
 
     /**
-     * @return NodeElement
-     * @throws \Exception
+     * {@inheritdoc}
      */
     public function getMassActionButton()
     {
@@ -108,7 +146,7 @@ class Grid extends Table
         if (!$massActionsButton || !$massActionsButton->isVisible()) {
             throw ElementNotVisible::factory(
                 ElementNotVisible::ELEMENT_NOT_VISIBLE,
-                'Mass Action dropdown is not prsent or not visible on page'
+                'Mass Action dropdown is not present or not visible on page'
             );
         }
 
@@ -116,27 +154,18 @@ class Grid extends Table
     }
 
     /**
-     * @param string $title
-     * @return NodeElement|null
-     */
-    public function getMassActionLink($title)
-    {
-        return $this->elementFactory->createElement('GridFloatingMenu')->findLink($title);
-    }
-
-    /**
-     * @param string $title
-     * @throws \Exception
+     * {@inheritdoc}
      */
     public function massCheck($title)
     {
-        $this->elementFactory->createElement('MassActionHeadCheckbox')->click();
+        $massActionHeadCheckboxElementName = $this->getMappedChildElementName('MassActionHeadCheckbox');
+
+        $this->getElement($massActionHeadCheckboxElementName)->click();
         $this->elementFactory->createElement('GridFloatingMenu')->clickLink($title);
     }
 
     /**
-     * @param int $number
-     * @throws ElementNotFoundException
+     * {@inheritdoc}
      */
     public function selectPageSize($number)
     {
@@ -146,8 +175,7 @@ class Grid extends Table
     }
 
     /**
-     * @param string $content
-     * @param string $action
+     * {@inheritdoc}
      */
     public function clickActionLink($content, $action)
     {
@@ -157,10 +185,10 @@ class Grid extends Table
     }
 
     /**
-     * @return NodeElement
+     * {@inheritdoc}
      */
     public function getViewList()
     {
-        return $this->getElement('GridViewList');
+        return $this->getElement($this->getMappedChildElementName('GridViewList'));
     }
 }
