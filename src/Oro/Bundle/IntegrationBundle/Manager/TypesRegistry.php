@@ -258,6 +258,7 @@ class TypesRegistry
      * @param string $type
      *
      * @return ConnectorInterface
+     *
      * @throws LogicException
      */
     public function getConnectorType($integrationType, $type)

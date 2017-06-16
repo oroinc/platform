@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
-use Akeneo\Bundle\BatchBundle\Entity\Warning;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
@@ -153,18 +152,33 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
     public function testHasConfigurationOption()
     {
         $expectedConfiguration = array('foo' => 'value');
-        $this->expectGetRawConfiguration($expectedConfiguration, 2);
+        $this->expectGetRawConfiguration($expectedConfiguration);
+
         $this->assertTrue($this->context->hasOption('foo'));
+    }
+
+    public function testHasConfigurationOptionUnknown()
+    {
+        $expectedConfiguration = array('foo' => 'value');
+        $this->expectGetRawConfiguration($expectedConfiguration);
+
         $this->assertFalse($this->context->hasOption('unknown'));
     }
 
     public function testGetConfigurationOption()
     {
         $expectedConfiguration = array('foo' => 'value');
-        $this->expectGetRawConfiguration($expectedConfiguration, 4);
-        $this->assertEquals('value', $this->context->getOption('foo'));
+        $this->expectGetRawConfiguration($expectedConfiguration);
+
+        self::assertEquals('value', $this->context->getOption('foo'));
+    }
+
+    public function testGetConfigurationOptionDefault()
+    {
+        $expectedConfiguration = array('foo' => 'value');
+        $this->expectGetRawConfiguration($expectedConfiguration);
+
         $this->assertEquals('default', $this->context->getOption('unknown', 'default'));
-        $this->assertNull($this->context->getOption('unknown'));
     }
 
     protected function expectGetRawConfiguration(array $expectedConfiguration, $count = 1)
