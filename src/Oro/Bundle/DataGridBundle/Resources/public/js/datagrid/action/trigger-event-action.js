@@ -26,10 +26,11 @@ define([
          * @inheritDoc
          */
         execute: function() {
-            mediator.trigger(
-                this.event_name + ':' + this.datagrid.$el.closest(this.container).prop('id'),
-                [this.model.id]
-            );
+            var scope = this.datagrid.getGridScope();
+            if (scope) {
+                mediator.trigger(this.event_name + ':' + scope, [this.model.id]);
+            }
+            mediator.trigger(this.event_name, [this.model.id]);
         }
     });
 

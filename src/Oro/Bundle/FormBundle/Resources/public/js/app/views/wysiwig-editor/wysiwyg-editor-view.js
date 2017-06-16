@@ -103,6 +103,14 @@ define(function(require) {
                 'init_instance_callback': function(editor) {
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
+                    editor.on('keydown', function(e) {
+                        if (e.keyCode === 27) {
+                            _.defer(function() {
+                                // action is deferred to give time for tinymce to process the event by itself first
+                                self.$el.trigger(e);
+                            });
+                        }
+                    });
                     if (!tools.isMobile()) {
                         self.tinymceInstance.on('FullscreenStateChanged', function(e) {
                             if (e.state) {

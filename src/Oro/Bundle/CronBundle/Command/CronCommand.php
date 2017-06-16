@@ -25,8 +25,7 @@ class CronCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:cron')
-            ->setDescription('Cron commands launcher')
-        ;
+            ->setDescription('Cron commands launcher');
     }
 
     /**

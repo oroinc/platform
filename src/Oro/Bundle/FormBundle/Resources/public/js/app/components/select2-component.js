@@ -83,16 +83,17 @@ define(function(require) {
         },
 
         setConfig: function(config) {
-            var that = this;
             // configure AJAX object if it exists
             if (config.ajax !== undefined) {
                 config.minimumInputLength = _.result(config, 'minimumInputLength', 0);
-                config.initSelection = _.result(config, 'initSelection') || _.partial(initSelection, config);
-                if (that.excluded) {
+                config.initSelection = config.initSelection ||
+                    _.partial(this.constructor.initSelection, this.constructor, config);
+                if (this.excluded) {
+                    var excluded = this.excluded;
                     config.ajax.results = _.wrap(config.ajax.results, function(func, data, page) {
                         var response = func.call(this, data, page);
                         response.results = _.filter(response.results, function(item) {
-                            return !item.hasOwnProperty('id') || _.indexOf(that.excluded, item.id) < 0;
+                            return !_.contains(excluded, item.id);
                         });
                         return response;
                     });
@@ -142,25 +143,59 @@ define(function(require) {
         makeQuery: function(query, configs) {
             return query;
         }
-    });
+    }, {
+        initSelection: function(self, config, element, callback) {
+            var selectedData;
+            var dataIds;
+            var handleResults = _.partial(self.handleResults, self, config, callback);
+            var setSelect2ValueById = _.partial(self.setSelect2ValueById, self, config, element, callback);
+            var inputValue = element.inputWidget('val');
+            var currentValue = inputValue === '' ? [] : tools.ensureArray(inputValue);
 
-    function initSelection(config, element, callback) {
+            if (config.forceSelectedData && element.data('selected-data')) {
+                var data = element.data('selected-data');
+                var result = [];
+                if (!_.isObject(data)) {
+                    _.each(data.split(config.separator), function(item) {
+                        result.push(JSON.parse(item));
+                    });
+                }
+                handleResults(result.length > 0 ? result : data);
+                return;
+            }
 
-        function handleResults(data) {
-            if (config.multiple === true) {
-                callback(data);
-            } else {
-                var item = data.pop();
-                if (!_.isUndefined(item) && !_.isUndefined(item.children) && _.isArray(item.children)) {
-                    callback(item.children.pop());
-                } else {
-                    callback(item);
+            selectedData = _.filter(
+                tools.ensureArray(element.data('selected-data')),
+                function(item) {
+                    return _.isObject(item);
+                }
+            );
+
+            var emptySelection = selectedData.length === 0 ||
+                (selectedData.length === 1 && _.first(selectedData).id === null && _.first(selectedData).name === null);
+
+            if (!emptySelection) {
+                dataIds = _.map(selectedData, function(item) {
+                    return item.id;
+                });
+
+                // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
+                dataIds = _.compact(dataIds);
+
+                if (dataIds.length === 0 ||
+                    dataIds.sort().join(config.separator) === currentValue.sort().join(config.separator)) {
+                    handleResults(selectedData);
+                    return;
                 }
             }
-        }
 
-        function setSelect2ValueById(id) {
+            if (currentValue.length !== 0) {
+                setSelect2ValueById(currentValue);
+            }
+        },
+        setSelect2ValueById: function(self, config, element, callback, id) {
             var ids = _.isArray(id) ? id.join(config.separator) : id;
+            var handleResults = _.partial(self.handleResults, self, config, callback);
             var select2Obj = element.data('select2');
             var ajaxOptions = select2Obj.opts.ajax;
             var searchData = ajaxOptions.data(ids, 1, true);
@@ -182,54 +217,22 @@ define(function(require) {
                     element.data('selected-data', element.select2('data'));
                 }
             });
-        }
+        },
 
-        var selectedData;
-        var dataIds;
-        var inputValue = element.inputWidget('val');
-        var currentValue = inputValue === '' ? [] : tools.ensureArray(inputValue);
-
-        if (config.forceSelectedData && element.data('selected-data')) {
-            var data = element.data('selected-data');
-            var result = [];
-            if (!_.isObject(data)) {
-                _.each(data.split(config.separator), function(item) {
-                    result.push(JSON.parse(item));
-                });
-            }
-            handleResults(result.length > 0 ? result : data);
-            return;
-        }
-
-        selectedData = _.filter(
-            tools.ensureArray(element.data('selected-data')),
-            function(item) {
-                return _.isObject(item);
-            }
-        );
-
-        var emptySelection = selectedData.length === 0 ||
-            (selectedData.length === 1 && _.first(selectedData).id === null && _.first(selectedData).name === null);
-
-        if (!emptySelection) {
-            dataIds = _.map(selectedData, function(item) {
-                return item.id;
-            });
-
-            // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
-            dataIds = _.compact(dataIds);
-
-            if (dataIds.length === 0 ||
-                dataIds.sort().join(config.separator) === currentValue.sort().join(config.separator)) {
-                handleResults(selectedData);
-                return;
+        handleResults: function(self, config, callback, data) {
+            if (config.multiple === true) {
+                callback(data);
+            } else {
+                var item = data.pop();
+                if (!_.isUndefined(item) && !_.isUndefined(item.children) && _.isArray(item.children)) {
+                    callback(item.children.pop());
+                } else {
+                    callback(item);
+                }
             }
         }
+    });
 
-        if (currentValue.length !== 0) {
-            setSelect2ValueById(currentValue);
-        }
-    }
     function highlightSelection(str, selection) {
         return str && selection && selection.term ?
             str.replace(tools.safeRegExp(selection.term.trim(), 'ig'), '<span class="select2-match">$&</span>') : str;

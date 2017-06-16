@@ -4,6 +4,7 @@ UPGRADE FROM 2.2 to 2.3
 PhpUtils component
 ------------------
 - Removed deprecated class `Oro\Component\PhpUtils\QueryUtil`. Use `Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil` instead
+- Added class `Oro\Component\PhpUtils\ClassLoader`, it is a simple and fast implementation of the class loader that can be used to map one namespace to one path
 
 DoctrineUtils component
 -----------------------
@@ -58,6 +59,39 @@ CronBundle
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
 - Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
 
+EntityExtendBundle
+------------------
+- Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
+
+ImportExportBundle
+------------------
+- Added a possibility to change aggregation strategy for a job summary. An aggregator should implement `Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface`
+- Added two job summary aggregators:
+    - `Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator`, it summarizes counters by the type from all steps and it is a default aggregator
+    - `Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator`, it summarizes counters by the type from all steps marked as `add_to_job_summary`
+- Class `Oro\Bundle\ImportExportBundle\Job\JobExecutor`
+    - changed the constructor signature: added parameter `ContextAggregatorRegistry $contextAggregatorRegistry`
+    - added constant `JOB_CONTEXT_AGGREGATOR_TYPE`
+- Added trait `Oro\Bundle\ImportExportBundle\Job\Step\AddToJobSummaryStepTrait` that can be used in steps support `add_to_job_summary` parameter.
+
+IntegrationBundle
+---------------
+- Class `Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor`
+    - added method `dispatchSyncEvent`
+- Class `Oro\Bundle\IntegrationBundle\Provider\SyncProcessor`
+    - changed method `processImport` signature from `processImport(ConnectorInterface $connector, $jobName, $configuration, Integration $integration)` to `processImport(Integration $integration, ConnectorInterface $connector, array $configuration)`
+- Class `Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor`
+    - changed the constructor signature: added parameter `ManagerRegistry $doctrineRegistry`
+    - changed method `processExport` signature from `processExport($jobName, array $configuration)` to `processExport(Integration $integration, ConnectorInterface $connector, array $configuration)`
+- Class `Oro\Bundle\IntegrationBundle\Controller\IntegrationController`
+    - removed method `getSyncScheduler`
+    - removed method `getTypeRegistry`
+    - removed method `getLogger`
+- Removed translation label `oro.integration.sync_error_invalid_credentials`
+- Removed translation label `oro.integration.progress`
+- Updated translation label `oro.integration.sync_error`
+- Updated translation label `oro.integration.sync_error_integration_deactivated`
+
 MigrationBundle
 ---------------
 - Added event `oro_migration.data_fixtures.pre_load` that is raised before data fixtures are loaded
@@ -81,3 +115,22 @@ SearchBundle
 TestFrameworkBundle
 -------------------
 - Class `TestListener` namespace added, use `Oro\Bundle\TestFrameworkBundle\Test\TestListener` instead
+
+WorkflowBundle
+--------------
+- Class `Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension`
+    - removed property `$queuedJobs`
+    - changed signature of method `createJobs`. Added parameter `$queuedJobs`
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
+    - changed constructor signature:
+        - first argument replaced with `Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider $definitionProvider`;
+    - following protected methods were moved to `WorkflowDefinitionProvider`:
+        - `refreshWorkflowDefinition`
+        - `getEntityManager`
+        - `getEntityRepository`
+- Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
+- Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
+
+UIBundle
+--------
+- Updated ChaplinJS to 1.2.0 version

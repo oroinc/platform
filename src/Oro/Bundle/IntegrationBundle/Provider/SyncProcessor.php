@@ -3,16 +3,20 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcessor extends AbstractSyncProcessor
 {
@@ -58,6 +62,7 @@ class SyncProcessor extends AbstractSyncProcessor
                     $integration->getType()
                 )
             );
+
             return false;
         }
 
@@ -108,21 +113,22 @@ class SyncProcessor extends AbstractSyncProcessor
     }
 
     /**
-     * @param Integration $integration
+     * @param Integration   $integration
      * @param callable|null $callback
+     *
      * @return ConnectorInterface[]
      */
     protected function getConnectorsToProcess(Integration $integration, callable $callback = null)
     {
         $connectors = $this->loadConnectorsToProcess($integration, $callback);
-        $orderedConnectors = $this->getSortedConnectors($connectors);
 
-        return $orderedConnectors;
+        return $this->getSortedConnectors($connectors);
     }
 
     /**
      * @param Integration $integration
-     * @param callable $callback
+     * @param callable    $callback
+     *
      * @return ConnectorInterface[]
      */
     protected function loadConnectorsToProcess($integration, callable $callback = null)
@@ -139,7 +145,7 @@ class SyncProcessor extends AbstractSyncProcessor
 
     /**
      * @param Integration $integration
-     * @param callable $callback
+     * @param callable    $callback
      *
      * @return string[]
      */
@@ -156,6 +162,7 @@ class SyncProcessor extends AbstractSyncProcessor
 
     /**
      * @param ConnectorInterface[] $connectors
+     *
      * @return ConnectorInterface[]
      */
     protected function getSortedConnectors(array $connectors)
@@ -174,8 +181,9 @@ class SyncProcessor extends AbstractSyncProcessor
      * Checks whether connector is allowed to process. Logs information if connector is not allowed.
      *
      * @param ConnectorInterface $connector
-     * @param Integration $integration
-     * @param Status[] $processedConnectorStatuses
+     * @param Integration        $integration
+     * @param Status[]           $processedConnectorStatuses
+     *
      * @return bool
      */
     protected function isConnectorAllowed(
@@ -214,9 +222,8 @@ class SyncProcessor extends AbstractSyncProcessor
         array $parameters = []
     ) {
         try {
-            $this->logger->info(sprintf('Start processing "%s" connector', $connector->getType()));
+            $this->logger->notice(sprintf('Start processing "%s" connector', $connector->getType()));
 
-            $jobName          = $connector->getImportJobName();
             $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
                 ProcessorRegistry::TYPE_IMPORT,
                 $connector->getImportEntityFQCN()
@@ -228,6 +235,7 @@ class SyncProcessor extends AbstractSyncProcessor
                 ->setCode(Status::STATUS_FAILED)
                 ->setMessage($exception->getMessage());
             $this->addConnectorStatusAndFlush($integration, $status);
+
             return $status;
         }
 
@@ -244,40 +252,38 @@ class SyncProcessor extends AbstractSyncProcessor
                 ),
         ];
 
-        return $this->processImport($connector, $jobName, $configuration, $integration);
+        return $this->processImport($integration, $connector, $configuration);
     }
 
     /**
-     * @param ConnectorInterface $connector
-     * @param string             $jobName
-     * @param array              $configuration
      * @param Integration        $integration
+     * @param ConnectorInterface $connector
+     * @param array              $configuration
      *
      * @return Status
      */
-    protected function processImport(ConnectorInterface $connector, $jobName, $configuration, Integration $integration)
+    protected function processImport(Integration $integration, ConnectorInterface $connector, array $configuration)
     {
-        $event = new SyncEvent($jobName, $configuration);
-        $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
-        $configuration = $event->getConfiguration();
+        $importJobName = $connector->getImportJobName();
 
-        $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
+        $syncBeforeEvent = $this->dispatchSyncEvent(SyncEvent::SYNC_BEFORE, $importJobName, $configuration);
 
-        $this->eventDispatcher->dispatch(SyncEvent::SYNC_AFTER, new SyncEvent($jobName, $configuration, $jobResult));
+        $configuration = $syncBeforeEvent->getConfiguration();
+        $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $importJobName, $configuration);
 
-        /** @var ContextInterface $contexts */
+        $this->dispatchSyncEvent(SyncEvent::SYNC_AFTER, $importJobName, $configuration, $jobResult);
+
         $context = $jobResult->getContext();
-
         $connectorData = $errors = [];
         if ($context) {
             $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
-            $errors        = $context->getErrors();
+            $errors = $context->getErrors();
         }
         $exceptions = $jobResult->getFailureExceptions();
-        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
+        $isSuccess = $jobResult->isSuccessful() && empty($exceptions);
 
         $status = $this->createConnectorStatus($connector);
-        $status->setData(is_array($connectorData) ? $connectorData : []);
+        $status->setData((array)$connectorData);
 
         $message = $this->formatResultMessage($context);
         $this->logger->info($message);
@@ -320,10 +326,24 @@ class SyncProcessor extends AbstractSyncProcessor
     }
 
     /**
-     * Adds status of connector to integration and flush changes.
+     * {@inheritdoc}
+     */
+    protected function formatResultMessage(ContextInterface $context = null)
+    {
+        return sprintf(
+            '[%s] %s',
+            strtoupper(ProcessorRegistry::TYPE_IMPORT),
+            parent::formatResultMessage($context)
+        );
+    }
+
+    /**
+     * Saves connector's status.
      *
      * @param Integration $integration
-     * @param Status $status
+     * @param Status      $status
+     *
+     * @return void
      */
     protected function addConnectorStatusAndFlush(Integration $integration, Status $status)
     {
