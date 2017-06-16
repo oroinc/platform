@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ImportExportBundle\Job;
 
 use Akeneo\Bundle\BatchBundle\Connector\ConnectorRegistry;
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 use Akeneo\Bundle\BatchBundle\Job\Job;
@@ -22,6 +22,9 @@ use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
+use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface;
+use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
+use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 
 /**
  * @todo: https://magecore.atlassian.net/browse/BAP-2600 move job results processing outside
@@ -33,53 +36,43 @@ class JobExecutor
     const CONNECTOR_NAME = 'oro_importexport';
 
     /** @deprecated since 2.1, please use JOB_IMPORT_VALIDATION_FROM_CSV instead */
-    const JOB_VALIDATE_IMPORT_FROM_CSV = 'entity_import_validation_from_csv';
-    const JOB_EXPORT_TO_CSV = 'entity_export_to_csv';
-    const JOB_EXPORT_TEMPLATE_TO_CSV = 'entity_export_template_to_csv';
-    const JOB_IMPORT_FROM_CSV = 'entity_import_from_csv';
+    const JOB_VALIDATE_IMPORT_FROM_CSV   = 'entity_import_validation_from_csv';
+    const JOB_EXPORT_TO_CSV              = 'entity_export_to_csv';
+    const JOB_EXPORT_TEMPLATE_TO_CSV     = 'entity_export_template_to_csv';
+    const JOB_IMPORT_FROM_CSV            = 'entity_import_from_csv';
     const JOB_IMPORT_VALIDATION_FROM_CSV = 'entity_import_validation_from_csv';
-    const JOB_CONTEXT_DATA_KEY = 'contextData';
+    const JOB_CONTEXT_DATA_KEY           = 'contextData';
+    const JOB_CONTEXT_AGGREGATOR_TYPE    = 'job_context_aggregator_type';
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var ConnectorRegistry
-     */
+    /** @var ConnectorRegistry */
     protected $batchJobRegistry;
 
-    /**
-     * @var ContextRegistry
-     */
+    /** @var ContextRegistry */
     protected $contextRegistry;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var BatchJobRepository
-     */
+    /** @var BatchJobRepository */
     protected $batchJobRepository;
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $validationMode = false;
 
+    /** var ContextAggregatorRegistry */
+    protected $contextAggregatorRegistry;
+
     /**
-     * @param ConnectorRegistry $jobRegistry
+     * @param ConnectorRegistry  $jobRegistry
      * @param BatchJobRepository $batchJobRepository
-     * @param ContextRegistry $contextRegistry
-     * @param ManagerRegistry $managerRegistry
+     * @param ContextRegistry    $contextRegistry
+     * @param ManagerRegistry    $managerRegistry
      */
     public function __construct(
         ConnectorRegistry $jobRegistry,
@@ -102,15 +95,24 @@ class JobExecutor
     }
 
     /**
+     * @param ContextAggregatorRegistry $contextAggregatorRegistry
+     */
+    public function setContextAggregatorRegistry(ContextAggregatorRegistry $contextAggregatorRegistry)
+    {
+        $this->contextAggregatorRegistry = $contextAggregatorRegistry;
+    }
+
+    /**
      * @param string $jobType
      * @param string $jobName
-     * @param array $configuration
+     * @param array  $configuration
+     *
      * @return JobResult
      */
     public function executeJob($jobType, $jobName, array $configuration = [])
     {
         $this->initialize();
-        $jobInstance = $this->createJobInstance($jobType, $jobName, $configuration);
+        $jobInstance  = $this->createJobInstance($jobType, $jobName, $configuration);
         $jobExecution = $this->createJobExecution($configuration, $jobInstance);
 
         $jobResult = $this->doJob($jobInstance, $jobExecution);
@@ -120,8 +122,9 @@ class JobExecutor
     }
 
     /**
-     * @param JobInstance $jobInstance
+     * @param JobInstance  $jobInstance
      * @param JobExecution $jobExecution
+     *
      * @return JobResult
      */
     protected function doJob(JobInstance $jobInstance, JobExecution $jobExecution)
@@ -169,7 +172,7 @@ class JobExecutor
 
     /**
      * @param JobExecution $jobExecution
-     * @param JobResult $jobResult
+     * @param JobResult    $jobResult
      *
      * @return bool
      */
@@ -207,7 +210,7 @@ class JobExecutor
         $batchManager = $this->batchJobRepository->getJobManager();
         $batchUow     = $batchManager->getUnitOfWork();
         $couldBeSaved = $batchManager->isOpen()
-            && $batchUow->getEntityState($jobExecution) === UnitOfWork::STATE_MANAGED;
+                        && $batchUow->getEntityState($jobExecution) === UnitOfWork::STATE_MANAGED;
 
         if ($couldBeSaved) {
             $batchManager->flush();
@@ -216,6 +219,7 @@ class JobExecutor
 
     /**
      * @param string $jobCode
+     *
      * @return array
      */
     public function getJobErrors($jobCode)
@@ -225,6 +229,7 @@ class JobExecutor
 
     /**
      * @param string $jobCode
+     *
      * @return array
      */
     public function getJobFailureExceptions($jobCode)
@@ -234,7 +239,9 @@ class JobExecutor
 
     /**
      * @param string $jobCode
+     *
      * @return JobExecution
+     *
      * @throws LogicException
      */
     protected function getJobExecutionByJobInstanceCode($jobCode)
@@ -264,6 +271,7 @@ class JobExecutor
 
     /**
      * @param JobExecution $jobExecution
+     *
      * @return array
      */
     protected function collectFailureExceptions(JobExecution $jobExecution)
@@ -280,6 +288,7 @@ class JobExecutor
 
     /**
      * @param JobExecution $jobExecution
+     *
      * @return array
      */
     protected function collectErrors(JobExecution $jobExecution)
@@ -297,6 +306,7 @@ class JobExecutor
 
     /**
      * @param string $prefix
+     *
      * @return string
      */
     protected function generateJobCode($prefix = '')
@@ -323,7 +333,7 @@ class JobExecutor
      * TODO: Find a way to work with multiple amount of job and step executions
      * TODO https://magecore.atlassian.net/browse/BAP-2600
      *
-     * @param JobResult $jobResult
+     * @param JobResult   $jobResult
      * @param JobInstance $jobInstance
      */
     protected function setJobResultData(JobResult $jobResult, JobInstance $jobInstance)
@@ -334,23 +344,9 @@ class JobExecutor
         /** @var JobExecution $jobExecution */
         $jobExecution = $jobInstance->getJobExecutions()->first();
         if ($jobExecution) {
-            $stepExecutions = $jobExecution->getStepExecutions();
-            /** @var StepExecution $firstStepExecution */
-            $firstStepExecution = $stepExecutions->first();
-
-            if ($firstStepExecution) {
-                $context = $this->contextRegistry->getByStepExecution($firstStepExecution);
-
-                if ($stepExecutions->count() > 1) {
-                    /** @var StepExecution $stepExecution */
-                    foreach ($stepExecutions->slice(1) as $stepExecution) {
-                        ContextHelper::mergeContextCounters(
-                            $context,
-                            $this->contextRegistry->getByStepExecution($stepExecution)
-                        );
-                    }
-                }
-
+            $contextAggregator = $this->getContextAggregator($jobExecution->getExecutionContext());
+            $context = $contextAggregator->getAggregatedContext($jobExecution);
+            if ($context) {
                 $jobResult->setContext($context);
             }
         }
@@ -363,7 +359,8 @@ class JobExecutor
      *
      * @param string $jobType
      * @param string $jobName
-     * @param array $configuration
+     * @param array  $configuration
+     *
      * @return JobInstance
      */
     protected function createJobInstance($jobType, $jobName, array $configuration)
@@ -397,8 +394,9 @@ class JobExecutor
     /**
      * Create JobExecution instance.
      *
-     * @param array $configuration
+     * @param array       $configuration
      * @param JobInstance $jobInstance
+     *
      * @return JobExecution
      */
     protected function createJobExecution(array $configuration, JobInstance $jobInstance)
@@ -439,7 +437,7 @@ class JobExecutor
 
     /**
      * @param JobExecution $jobExecution
-     * @param JobResult $jobResult
+     * @param JobResult    $jobResult
      */
     protected function dispatchAfterJobExecutionEvent(JobExecution $jobExecution, JobResult $jobResult)
     {
@@ -449,5 +447,34 @@ class JobExecutor
                 new AfterJobExecutionEvent($jobExecution, $jobResult)
             );
         }
+    }
+
+    /**
+     * @param ExecutionContext $executionContext
+     *
+     * @return ContextAggregatorInterface
+     */
+    protected function getContextAggregator(ExecutionContext $executionContext)
+    {
+        $aggregatorType = $executionContext->get(self::JOB_CONTEXT_AGGREGATOR_TYPE);
+        if (!$aggregatorType) {
+            $aggregatorType = SimpleContextAggregator::TYPE;
+        }
+
+        return $this->getContextAggregatorRegistry()->getAggregator($aggregatorType);
+    }
+
+    /**
+     * @return ContextAggregatorRegistry
+     *
+     * @throws RuntimeException
+     */
+    private function getContextAggregatorRegistry()
+    {
+        if (null === $this->contextAggregatorRegistry) {
+            throw new RuntimeException('Property contextAggregatorRegistry must be set.');
+        }
+
+        return $this->contextAggregatorRegistry;
     }
 }
