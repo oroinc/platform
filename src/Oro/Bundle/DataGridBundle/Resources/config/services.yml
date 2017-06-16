@@ -344,6 +344,8 @@ services:
             - '@security.token_storage'
             - '@logger'
             - '@oro_email.email_renderer'
+        calls:
+            - [setTokenSerializer, ['@oro_security.token_serializer']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

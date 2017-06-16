@@ -190,7 +190,8 @@ class ControllersTest extends WebTestCase
                     ],
                     'format_type' => 'excel'
                 ],
-                'userId' => 1
+                'securityToken' =>
+                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
             ]
         );
     }

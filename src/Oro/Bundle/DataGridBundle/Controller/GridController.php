@@ -33,7 +33,7 @@ class GridController extends Controller
      *
      * @param string $gridName
      *
-     * @return Response
+     * @return []
      */
     public function widgetAction($gridName)
     {
@@ -127,7 +127,7 @@ class GridController extends Controller
      * @AclAncestor("oro_datagrid_gridview_export")
      *
      * @param Request $request
-     * @param string $gridName
+     * @param string  $gridName
      *
      * @return JsonResponse
      */
@@ -136,8 +136,8 @@ class GridController extends Controller
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
         $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
-        $userId = $this->getUser()->getId();
 
+        $token = $this->get('security.token_storage')->getToken();
 
         $this->getMessageProducer()->send(Topics::EXPORT, [
             'format' => $format,
@@ -147,7 +147,7 @@ class GridController extends Controller
                 'gridParameters' => $gridParameters,
                 FormatterProvider::FORMAT_TYPE => $formatType,
             ],
-            'userId' => $userId,
+            'securityToken' => $this->get('oro_security.token_serializer')->serialize($token)
         ]);
 
         return new JsonResponse([

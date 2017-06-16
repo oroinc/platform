@@ -5,6 +5,14 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
@@ -19,15 +27,9 @@ use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\NotificationBundle\Async\Topics as EmailTopics;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -89,6 +91,11 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $renderer;
 
     /**
+     * @var TokenSerializerInterface
+     */
+    private $tokenSerializer;
+
+    /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      * @param ExportHandler $exportHandler
      * @param JobRunner $jobRunner
@@ -128,6 +135,13 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->renderer = $renderer;
     }
 
+    /**
+     * @param TokenSerializerInterface $tokenSerializer
+     */
+    public function setTokenSerializer(TokenSerializerInterface $tokenSerializer)
+    {
+        $this->tokenSerializer = $tokenSerializer;
+    }
 
     /**
      * {@inheritdoc}
@@ -143,10 +157,10 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
                 'gridParameters' => [],
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
-            'userId' => null,
+            'securityToken' => null
         ], $body);
 
-        if (! isset($body['userId'], $body['parameters']['gridName'], $body['format'])) {
+        if (! isset($body['securityToken'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical(
                 sprintf('[DataGridExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
                 ['message' => $message]
@@ -165,19 +179,6 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             return self::REJECT;
         }
 
-        /** @var User $user */
-        $user = $this->doctrineHelper->getEntityRepository(User::class)->find($body['userId']);
-        if (! $user) {
-            $this->logger->critical(
-                sprintf('[DataGridExportMessageProcessor] Cannot find user by id "%s"', $body['userId']),
-                ['message' => $message]
-            );
-
-            return self::REJECT;
-        }
-
-        $this->authorizeUser($user);
-
         $contextParameters = new ParameterBag($body['parameters']['gridParameters']);
         $contextParameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
         $body['parameters']['gridParameters'] = $contextParameters;
@@ -191,7 +192,12 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
             $jobUniqueName,
-            function () use ($body, $jobUniqueName, $user, $writer) {
+            function () use ($body, $jobUniqueName, $writer) {
+                // authenticate the user
+                if (!$this->setSecurityToken($body['securityToken'])) {
+                    return false;
+                }
+
                 $exportResult = $this->exportHandler->handle(
                     $this->exportConnector,
                     $this->exportProcessor,
@@ -206,7 +212,14 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
                     $exportResult['success']
                 ));
 
-                $this->sendNotificationMessage($jobUniqueName, $exportResult, $user);
+                $this->sendNotificationMessage(
+                    $jobUniqueName,
+                    $exportResult,
+                    $this->tokenStorage->getToken()->getUser()
+                );
+
+                // remove the token what was set before message processing
+                $this->tokenStorage->setToken();
 
                 return $exportResult['success'];
             }
@@ -217,6 +230,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
 
     /**
      * @param User $user
+     * @deprecated Use setSecurityToken instead
      */
     protected function authorizeUser(User $user)
     {
@@ -229,6 +243,26 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         );
 
         $this->tokenStorage->setToken($token);
+    }
+
+    /**
+     * Deserialize the token from the string and sets it to the token storage
+     *
+     * @param string $serializedToken
+     *
+     * @return bool
+     */
+    protected function setSecurityToken($serializedToken)
+    {
+        $token = $this->tokenSerializer->deserialize($serializedToken);
+
+        if (null === $token) {
+            return false;
+        }
+
+        $this->tokenStorage->setToken($token);
+
+        return true;
     }
 
     /**

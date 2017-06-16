@@ -44,13 +44,13 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 '[DataGridExportMessageProcessor] Got invalid message: '
-                    .'"{"userId":1,"parameters":"must_be_array","format":"csv"}"',
-                ['userId' => 1, 'parameters' => 'must_be_array', 'format' => 'csv'],
+                    .'"{"securityToken":"test_string","parameters":"must_be_array","format":"csv"}"',
+                ['securityToken' => 'test_string', 'parameters' => 'must_be_array', 'format' => 'csv'],
             ],
             [
                 '[DataGridExportMessageProcessor] Got invalid message: '
-                    .'"{"userId":1,"parameters":{"not_gridName":"value"},"format":"csv"}"',
-                ['userId' => 1, 'parameters' => ['not_gridName' => 'value'], 'format' => 'csv'],
+                    .'"{"securityToken":"test_string","parameters":{"not_gridName":"value"},"format":"csv"}"',
+                ['securityToken' => 'test_string', 'parameters' => ['not_gridName' => 'value'], 'format' => 'csv'],
             ],
         ];
     }
@@ -71,57 +71,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode($messageBody));
-
-        $result = $processor->process($message, $this->createSessionInterfaceMock());
-
-        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageAndLogCriticalIfUserNotFound()
-    {
-        $repository = $this->createMock(EntityRepository::class);
-        $repository
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn(null)
-        ;
-
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
-            ->method('getEntityRepository')
-            ->with(User::class)
-            ->willReturn($repository)
-        ;
-
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('[DataGridExportMessageProcessor] Cannot find user by id "1"')
-        ;
-
-        $writerChain = $this->createWriterChainMock();
-        $writerChain
-            ->expects($this->once())
-            ->method('getWriter')
-            ->with('csv')
-            ->willReturn($this->createCsvWriterMock())
-        ;
-
-        $processor = $this->createExportMessageProcessorStab([
-            'doctrineHelper' => $doctrineHelper,
-            'logger' => $logger,
-            'writerChain' => $writerChain,
-        ]);
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'userId' => 1,
-            'parameters' => ['gridName' => 'grid_name'],
-            'format' => 'csv'
-        ]));
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
 
@@ -155,7 +104,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'userId' => 1,
+            'securityToken' => 'test_token',
             'parameters' => ['gridName' => 'grid_name'],
             'format' => 'csv'
         ]));
@@ -192,7 +141,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'userId' => 1,
+            'securityToken' => 'test_token',
             'parameters' => ['gridName' => 'grid_name'],
             'format' => 'csv'
         ]));
