@@ -212,6 +212,7 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
     public function hasOption($name)
     {
         $configuration = $this->getConfiguration();
+
         return isset($configuration[$name]);
     }
 
@@ -220,10 +221,11 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
      */
     public function getOption($name, $default = null)
     {
-        if ($this->hasOption($name)) {
-            $configuration = $this->getConfiguration();
+        $configuration = $this->getConfiguration();
+        if (isset($configuration[$name])) {
             return $configuration[$name];
         }
+
         return $default;
     }
 
@@ -232,8 +234,8 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
      */
     public function removeOption($name)
     {
-        if ($this->hasOption($name)) {
-            $configuration = $this->getConfiguration();
+        $configuration = $this->getConfiguration();
+        if (isset($configuration[$name])) {
             unset($configuration[$name]);
             $this->stepExecution->getJobExecution()->getJobInstance()->setRawConfiguration($configuration);
         }

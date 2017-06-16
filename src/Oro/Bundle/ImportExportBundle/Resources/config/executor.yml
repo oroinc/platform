@@ -12,3 +12,4 @@ services:
         lazy: true
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
+            - [setContextAggregatorRegistry, ['@oro_importexport.job.context.aggregator_registry']]

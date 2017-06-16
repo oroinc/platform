@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProvider
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\WriterCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ContextAggregatorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -25,5 +26,6 @@ class OroImportExportBundle extends Bundle
         $container->addCompilerPass(new TemplateEntityRepositoryCompilerPass());
         $container->addCompilerPass(new FormatterProviderPass());
         $container->addCompilerPass(new WriterCompilerPass());
+        $container->addCompilerPass(new ContextAggregatorCompilerPass());
     }
 }
