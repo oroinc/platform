@@ -244,7 +244,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
             }
 
             if ($entity) {
-                if (!$this->securityFacade->isGranted('DELETE', $entity)) {
+                if (!$this->isDeleteAllowed($entity)) {
                     continue;
                 }
                 $deletedIds[] = $identifierValue;
@@ -263,6 +263,15 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         }
 
         return $this->getDeleteResponse($args, $iteration);
+    }
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
+    protected function isDeleteAllowed($entity)
+    {
+        return $this->securityFacade->isGranted('DELETE', $entity);
     }
 
     /**
