@@ -75,3 +75,23 @@ services:
         arguments:
           - '@oro_importexport.file.file_manager'
           - '%oro_importexport.export.size_of_batch%'
+
+    oro_importexport.job.context.aggregator_registry:
+        class: 'Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry'
+        public: false
+
+    oro_importexport.job.context.aggregator.selective:
+        class: 'Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator'
+        public: false
+        arguments:
+            - '@oro_importexport.context_registry'
+        tags:
+            - { name: 'oro_importexport.job.context.aggregator' }
+
+    oro_importexport.job.context.aggregator.simple:
+        class: 'Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator'
+        public: false
+        arguments:
+            - '@oro_importexport.context_registry'
+        tags:
+            - { name: 'oro_importexport.job.context.aggregator' }
