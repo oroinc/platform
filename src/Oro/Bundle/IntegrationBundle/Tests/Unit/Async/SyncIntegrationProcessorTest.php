@@ -522,12 +522,14 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSyncProcessorMock()
     {
-        $syncProcessor = $this->createPartialMock(AbstractSyncProcessor::class, ['process', 'getLoggerStrategy']);
+        $syncProcessor = $this->createPartialMock(
+            AbstractSyncProcessor::class,
+            ['process', 'getLoggerStrategy', 'assertValidConnector']
+        );
         $syncProcessor
             ->expects($this->any())
             ->method('getLoggerStrategy')
-            ->willReturn(new LoggerStrategy())
-        ;
+            ->willReturn(new LoggerStrategy());
 
         return $syncProcessor;
     }

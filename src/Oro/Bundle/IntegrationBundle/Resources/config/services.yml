@@ -126,6 +126,8 @@ services:
             - '@oro_importexport.context_registry'
             - '@doctrine'
         lazy: true
+        calls:
+            - [setContextAggregatorRegistry, ['@oro_importexport.job.context.aggregator_registry']]
 
     oro_integration.writer.persistent_batch_writer:
         class: %oro_integration.writer.persistent_batch_writer.class%
@@ -212,6 +214,8 @@ services:
             - '@oro_integration.manager.types_registry'
             - '@event_dispatcher'
             - '@oro_integration.logger.strategy'
+        calls:
+            - ['setManagerRegistry', ['@doctrine']]
         lazy: true
 
     oro_integration.sync_scheduler.link:
