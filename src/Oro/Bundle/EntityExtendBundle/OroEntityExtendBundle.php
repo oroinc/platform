@@ -78,7 +78,8 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
                 [
-                    ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir) => 'Extend\Entity'
+                    ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir) =>
+                        ExtendClassLoadingUtils::getEntityNamespace()
                 ]
             )
         );
