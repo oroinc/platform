@@ -5,8 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 interface TransportCacheClearInterface
 {
     /**
-     * @param mixed|null $resource
+     * @param mixed|null $url
+     *
      * @return void
      */
-    public function cacheClear($resource = null);
+    public function cacheClear($url = null);
 }
