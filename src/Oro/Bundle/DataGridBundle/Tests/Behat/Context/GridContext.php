@@ -244,7 +244,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )click (?P<title>(?:[^"]|\\")*) mass action in "(?P<grid>[\w\s]+)" grid$/
      *
      * @param string $title
-     * @param string $grid
+     * @param string|null $gridName
      */
     public function clickLinkFromMassActionDropdown($title, $gridName = null)
     {
@@ -905,11 +905,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And I click "Delete Current User" on row "John" in grid
      *
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
-     * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in "(?P<gridName>[\w\s]+)"/
+     * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in "(?P<gridName>[\w\s]+)"$/
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) "(?P<content>.+)" in grid$/
-     * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) "(?P<content>.+)" in "(?P<gridName>[\w\s]+)"/
+     * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) "(?P<content>.+)" in "(?P<gridName>[\w\s]+)"$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid$/
-     * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in "(?P<gridName>[\w\s]+)"/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in "(?P<gridName>[\w\s]+)"$/
      * @Given /^(?:|I )click (?P<action>[\w\s]*) on (?P<content>(?:[^"]|\\")*) in grid "(?P<gridName>[\w\s]+)"$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid "(?P<gridName>[\w\s]+)"$/
      *
