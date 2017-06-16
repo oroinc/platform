@@ -63,8 +63,26 @@ EntityExtendBundle
 ------------------
 - Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
 
+ImportExportBundle
+------------------
+- Added a possibility to change aggregation strategy for a job summary. An aggregator should implement `Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface`
+- Added two job summary aggregators:
+    - `Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator`, it summarizes counters by the type from all steps and it is a default aggregator
+    - `Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator`, it summarizes counters by the type from all steps marked as `add_to_job_summary`
+- Class `Oro\Bundle\ImportExportBundle\Job\JobExecutor`
+    - changed the constructor signature: added parameter `ContextAggregatorRegistry $contextAggregatorRegistry`
+    - added constant `JOB_CONTEXT_AGGREGATOR_TYPE`
+- Added trait `Oro\Bundle\ImportExportBundle\Job\Step\AddToJobSummaryStepTrait` that can be used in steps support `add_to_job_summary` parameter.
+
 IntegrationBundle
------------------
+---------------
+- Class `Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor`
+    - added method `dispatchSyncEvent`
+- Class `Oro\Bundle\IntegrationBundle\Provider\SyncProcessor`
+    - changed method `processImport` signature from `processImport(ConnectorInterface $connector, $jobName, $configuration, Integration $integration)` to `processImport(Integration $integration, ConnectorInterface $connector, array $configuration)`
+- Class `Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor`
+    - changed the constructor signature: added parameter `ManagerRegistry $doctrineRegistry`
+    - changed method `processExport` signature from `processExport($jobName, array $configuration)` to `processExport(Integration $integration, ConnectorInterface $connector, array $configuration)`
 - Class `Oro\Bundle\IntegrationBundle\Controller\IntegrationController`
     - removed method `getSyncScheduler`
     - removed method `getTypeRegistry`

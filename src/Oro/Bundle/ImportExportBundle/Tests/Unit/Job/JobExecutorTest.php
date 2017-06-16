@@ -6,9 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
@@ -50,6 +52,9 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
      */
     protected $batchJobManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $contextAggregatorRegistry;
+
     /**
      * @var JobExecutor
      */
@@ -63,9 +68,9 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityManager->expects($this->any())
+        $this->entityManager->expects(self::any())
             ->method('getConnection')
-            ->will($this->returnValue($this->connection));
+            ->will(self::returnValue($this->connection));
         $this->managerRegistry = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
@@ -75,55 +80,53 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->managerRegistry->expects($this->any())->method('getManager')
-            ->will($this->returnValue($this->entityManager));
+        $this->managerRegistry->expects(self::any())->method('getManager')
+            ->will(self::returnValue($this->entityManager));
         $this->batchJobManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->batchJobRepository = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->batchJobRepository->expects($this->any())
+        $this->batchJobRepository->expects(self::any())
             ->method('getJobManager')
-            ->will($this->returnValue($this->batchJobManager));
-        $this->batchJobRepository->expects($this->any())
-            ->method('createJobExecution')
-            ->willReturnCallback(
-                function ($instance) {
-                    $execution = new JobExecution();
-                    $execution->setJobInstance($instance);
+            ->will(self::returnValue($this->batchJobManager));
+        $this->contextAggregatorRegistry = $this
+            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry')
+            ->getMock();
 
-                    return $execution;
-                }
-            );
 
         $this->executor = new JobExecutor(
             $this->batchJobRegistry,
             $this->batchJobRepository,
             $this->contextRegistry,
-            $this->managerRegistry
+            $this->managerRegistry,
+            $this->contextAggregatorRegistry
         );
     }
 
     public function testExecuteJobUnknownJob()
     {
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('getTransactionNestingLevel')
-            ->will($this->returnValue(0));
-        $this->entityManager->expects($this->once())
+            ->will(self::returnValue(0));
+        $this->entityManager->expects(self::once())
             ->method('beginTransaction');
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('rollback');
-        $this->entityManager->expects($this->never())
+        $this->entityManager->expects(self::never())
             ->method('commit');
-        $this->batchJobRegistry->expects($this->once())
+        $this->batchJobRegistry->expects(self::once())
             ->method('getJob')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
+            ->with(self::isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
+        $this->mockCreateJobExecutionWithStepExecution();
+        $this->mockAggregatorContext(SimpleContextAggregator::TYPE);
         $result = $this->executor->executeJob('import', 'test');
-        $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
-        $this->assertFalse($result->isSuccessful());
-        $this->assertEquals(array('Can\'t find job "test"'), $result->getFailureExceptions());
-        $this->assertStringStartsWith('test_' . date('Y_m_d_H_'), $result->getJobCode());
+
+        self::assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
+        self::assertFalse($result->isSuccessful());
+        self::assertEquals(['Can\'t find job "test"'], $result->getFailureExceptions());
+        self::assertStringStartsWith('test_' . date('Y_m_d_H_'), $result->getJobCode());
     }
 
     public function testExecuteJobSuccess()
@@ -144,18 +147,13 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->batchJobManager->expects($this->once())->method('flush')
             ->with();
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
-            ->getMockForAbstractClass();
+        $context = $this->mockAggregatorContext(SimpleContextAggregator::TYPE);
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
         $stepExecution->expects($this->any())
             ->method('getFailureExceptions')
-            ->will($this->returnValue(array()));
-        $this->contextRegistry->expects($this->once())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->will($this->returnValue([]));
 
         $job = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Job\JobInterface')
             ->getMock();
@@ -195,6 +193,16 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->executor->setEventDispatcher($dispatcher);
 
+        $this->batchJobRepository->expects(self::any())
+            ->method('createJobExecution')
+            ->willReturnCallback(
+                function ($instance) {
+                    $execution = new JobExecution();
+                    $execution->setJobInstance($instance);
+
+                    return $execution;
+                }
+            );
         $result = $this->executor->executeJob('import', 'test', $configuration);
         $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
         $this->assertTrue($result->isSuccessful());
@@ -218,19 +226,12 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
         $this->batchJobManager->expects($this->once())->method('flush')
             ->with();
-
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
-            ->getMockForAbstractClass();
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
         $stepExecution->expects($this->any())
             ->method('getFailureExceptions')
             ->will($this->returnValue(array()));
-        $this->contextRegistry->expects($this->once())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->will($this->returnValue($context));
 
         $job = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Job\JobInterface')
             ->getMock();
@@ -267,7 +268,17 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $dispatcher->expects($this->never())->method('dispatch');
 
         $this->executor->setEventDispatcher($dispatcher);
+        $this->batchJobRepository->expects(self::any())
+            ->method('createJobExecution')
+            ->willReturnCallback(
+                function ($instance) {
+                    $execution = new JobExecution();
+                    $execution->setJobInstance($instance);
 
+                    return $execution;
+                }
+            );
+        $context = $this->mockAggregatorContext(SimpleContextAggregator::TYPE);
         $result = $this->executor->executeJob('import', 'test', $configuration);
         $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
         $this->assertTrue($result->isSuccessful());
@@ -309,6 +320,8 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('getJob')
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'))
             ->will($this->returnValue($job));
+        $this->mockCreateJobExecutionWithStepExecution();
+        $this->mockAggregatorContext(SimpleContextAggregator::TYPE);
         $result = $this->executor->executeJob('import', 'test', $configuration);
         $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
         $this->assertFalse($result->isSuccessful());
@@ -350,10 +363,12 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('getJob')
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'))
             ->will($this->returnValue($job));
+        $this->mockCreateJobExecutionWithStepExecution();
+        $this->mockAggregatorContext(SimpleContextAggregator::TYPE);
         $result = $this->executor->executeJob('import', 'test', $configuration);
         $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
         $this->assertFalse($result->isSuccessful());
-        $this->assertEquals(array('Error 1'), $result->getFailureExceptions());
+        $this->assertEquals(['Error 1'], $result->getFailureExceptions());
     }
 
     /**
@@ -485,5 +500,37 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
         $this->assertEquals(array('Error 1'), $this->executor->getJobFailureExceptions($code));
+    }
+
+    protected function mockAggregatorContext($aggregatorType)
+    {
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $aggregator = $this->createMock('Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface');
+        $aggregator
+            ->expects(self::once())
+            ->method('getAggregatedContext')
+            ->willReturn($context);
+        $this->contextAggregatorRegistry
+            ->expects(self::once())
+            ->method('getAggregator')
+            ->with($aggregatorType)
+            ->willReturn($aggregator);
+
+        return $context;
+    }
+
+    protected function mockCreateJobExecutionWithStepExecution()
+    {
+        $this->batchJobRepository->expects(self::any())
+            ->method('createJobExecution')
+            ->willReturnCallback(
+                function ($instance) {
+                    $execution = new JobExecution();
+                    $execution->setJobInstance($instance);
+                    $execution->addStepExecution(new StepExecution('test', $execution));
+
+                    return $execution;
+                }
+            );
     }
 }
