@@ -14,6 +14,7 @@ Feature: Web install
     And I press "Begin Installation"
     And I follow "Next"
     And I fill Configuration form according to my parameters.yml
+    And I select "None" from "Transport"
     And I press "Next"
     And wait for Database initialization finish
     And I follow "Next"
