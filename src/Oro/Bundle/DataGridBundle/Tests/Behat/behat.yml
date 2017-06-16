@@ -124,7 +124,7 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionButton:
-      selector: 'div.grid-container .grid-header-row .action-column .btn i'
+      selector: '.grid-header-row .action-column .dropdown button'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     PageSize:
