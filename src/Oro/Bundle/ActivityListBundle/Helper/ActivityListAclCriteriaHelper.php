@@ -6,32 +6,29 @@ use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Criteria;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-/**
- * Class ActivityListAclCriteriaHelper
- * @package Oro\Bundle\ActivityListBundle\Helper
- */
 class ActivityListAclCriteriaHelper
 {
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param AclHelper $aclHelper
-     * @param ServiceLink $securityContextLink
+     * @param AclHelper                     $aclHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         AclHelper $aclHelper,
-        ServiceLink $securityContextLink
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->aclHelper = $aclHelper;
-        $this->securityContextLink = $securityContextLink;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -87,9 +84,7 @@ class ActivityListAclCriteriaHelper
             'VIEW',
             $mapFields
         );
-        $isGranted = $this->securityContextLink->getService()
-            ->isGranted('VIEW', 'entity:' . $aclClass);
-        if ($isGranted) {
+        if ($this->authorizationChecker->isGranted('VIEW', 'entity:' . $aclClass)) {
             $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
         }
 

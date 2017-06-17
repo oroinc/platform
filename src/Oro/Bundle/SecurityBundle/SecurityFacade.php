@@ -2,65 +2,59 @@
 
 namespace Oro\Bundle\SecurityBundle;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
+use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 
+/**
+ * @deprecated since 2.3
+ */
 class SecurityFacade
 {
-    /** @var SecurityContextInterface */
-    private $securityContext;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
-    /** @var AclAnnotationProvider */
-    protected $annotationProvider;
+    /** @var RequestAuthorizationChecker */
+    private $requestAuthorizationChecker;
 
-    /** @var ObjectIdentityFactory */
-    protected $objectIdentityFactory;
+    /** @var ClassAuthorizationChecker */
+    private $classAuthorizationChecker;
 
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
-    /** @var LoggerInterface */
-    private $logger;
+    /** @var TokenStorageInterface */
+    private $tokenStorage;
 
     /**
-     * Constructor
-     *
-     * @param SecurityContextInterface $securityContext
-     * @param AclAnnotationProvider    $annotationProvider
-     * @param ObjectIdentityFactory    $objectIdentityFactory
-     * @param EntityClassResolver      $classResolver
-     * @param LoggerInterface          $logger
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param RequestAuthorizationChecker   $requestAuthorizationChecker
+     * @param ClassAuthorizationChecker     $classAuthorizationChecker
+     * @param TokenStorageInterface         $tokenStorage
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
-        AclAnnotationProvider $annotationProvider,
-        ObjectIdentityFactory $objectIdentityFactory,
-        EntityClassResolver $classResolver,
-        LoggerInterface $logger
+        AuthorizationCheckerInterface $authorizationChecker,
+        RequestAuthorizationChecker $requestAuthorizationChecker,
+        ClassAuthorizationChecker $classAuthorizationChecker,
+        TokenStorageInterface $tokenStorage
     ) {
-        $this->securityContext       = $securityContext;
-        $this->annotationProvider    = $annotationProvider;
-        $this->objectIdentityFactory = $objectIdentityFactory;
-        $this->entityClassResolver   = $classResolver;
-        $this->logger                = $logger;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->requestAuthorizationChecker = $requestAuthorizationChecker;
+        $this->classAuthorizationChecker = $classAuthorizationChecker;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
      * @return null|TokenInterface
+     * @deprecated since 2.3. Use TokenAccessorInterface::getToken instead
      */
     public function getToken()
     {
-        return $this->securityContext->getToken();
+        return $this->tokenStorage->getToken();
     }
 
     /**
@@ -69,39 +63,11 @@ class SecurityFacade
      * @param  string $class
      * @param  string $method
      * @return bool
+     * @deprecated since 2.3. Use ClassAuthorizationChecker::isClassMethodGranted instead
      */
     public function isClassMethodGranted($class, $method)
     {
-        $isGranted = true;
-
-        // check method level ACL
-        $annotation = $this->annotationProvider->findAnnotation($class, $method);
-        if ($annotation !== null) {
-            $this->logger->debug(
-                sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
-            );
-//            TODO should use AuthorizationChecker
-            $isGranted = $this->securityContext->isGranted(
-                $annotation->getPermission(),
-                $this->objectIdentityFactory->get($annotation)
-            );
-        }
-
-        // check class level ACL
-        if ($isGranted && ($annotation === null || !$annotation->getIgnoreClassAcl())) {
-            $annotation = $this->annotationProvider->findAnnotation($class);
-            if ($annotation !== null) {
-                $this->logger->debug(
-                    sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
-                );
-                $isGranted = $this->securityContext->isGranted(
-                    $annotation->getPermission(),
-                    $this->objectIdentityFactory->get($annotation)
-                );
-            }
-        }
-
-        return $isGranted;
+        return $this->classAuthorizationChecker->isClassMethodGranted($class, $method);
     }
 
     /**
@@ -110,10 +76,11 @@ class SecurityFacade
      * @param string $class
      * @param string $method
      * @return Acl|null
+     * @deprecated since 2.3. Use ClassAuthorizationChecker::getClassMethodAnnotation instead
      */
     public function getClassMethodAnnotation($class, $method)
     {
-        return $this->annotationProvider->findAnnotation($class, $method);
+        return $this->classAuthorizationChecker->getClassMethodAnnotation($class, $method);
     }
 
     /**
@@ -127,55 +94,22 @@ class SecurityFacade
      *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
      *
      * @return bool
+     * @deprecated since 2.3. Use AuthorizationCheckerInterface::isGranted instead
      */
     public function isGranted($attributes, $object = null)
     {
-        if (is_string($attributes) && $annotation = $this->annotationProvider->findAnnotationById($attributes)) {
-            if ($object === null) {
-                $this->logger->debug(
-                    sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
-                );
-                $isGranted = $this->securityContext->isGranted(
-                    $annotation->getPermission(),
-                    $this->objectIdentityFactory->get($annotation)
-                );
-            } else {
-                $this->logger->debug(
-                    sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
-                );
-                $isGranted = $this->securityContext->isGranted(
-                    $annotation->getPermission(),
-                    $object
-                );
-            }
-        } elseif (is_string($object)) {
-            $isGranted = $this->securityContext->isGranted(
-                $attributes,
-                $this->objectIdentityFactory->get($object)
-            );
-        } else {
-            if (is_string($attributes) && $object == null) {
-                $delimiter = strpos($attributes, ';');
-                if ($delimiter) {
-                    $object     = substr($attributes, $delimiter + 1);
-                    $attributes = substr($attributes, 0, $delimiter);
-                }
-            }
-
-            $isGranted = $this->securityContext->isGranted($attributes, $object);
-        }
-
-        return $isGranted;
+        return $this->authorizationChecker->isGranted($attributes, $object);
     }
 
     /**
      * Gets logged user object or null
      *
      * @return mixed|null
+     * @deprecated since 2.3. Use TokenAccessorInterface::getUser instead
      */
     public function getLoggedUser()
     {
-        if (null === $token = $this->securityContext->getToken()) {
+        if (null === $token = $this->tokenStorage->getToken()) {
             return null;
         }
 
@@ -190,6 +124,7 @@ class SecurityFacade
      * Gets id of currently logged in user.
      *
      * @return int 0 if there is not currently logged in user; otherwise, a number greater than zero
+     * @deprecated since 2.3. Use TokenAccessorInterface::getUserId instead
      */
     public function getLoggedUserId()
     {
@@ -201,6 +136,7 @@ class SecurityFacade
      * Checks whether any user is currently logged in or not
      *
      * @return bool
+     * @deprecated since 2.3. Use "if (null !== TokenAccessorInterface::getUser())" instead
      */
     public function hasLoggedUser()
     {
@@ -211,10 +147,11 @@ class SecurityFacade
      * Get current organization object from the security token
      *
      * @return bool|Organization
+     * @deprecated since 2.3. Use TokenAccessorInterface::getOrganization instead
      */
     public function getOrganization()
     {
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
             return $token->getOrganizationContext();
         }
@@ -226,6 +163,7 @@ class SecurityFacade
      * Get current organization id from the security token
      *
      * @return int|null
+     * @deprecated since 2.3. Use TokenAccessorInterface::getOrganizationId instead
      */
     public function getOrganizationId()
     {
@@ -240,28 +178,11 @@ class SecurityFacade
      * @param Request $request
      * @param bool    $convertClassName
      * @return null|Acl
+     * @deprecated since 2.3. Use RequestAuthorizationChecker::getRequestAcl instead
      */
     public function getRequestAcl(Request $request, $convertClassName = false)
     {
-        $controller = $request->attributes->get('_controller');
-        if (strpos($controller, '::') !== false) {
-            $controllerData = explode('::', $controller);
-            $acl = $this->getClassMethodAnnotation(
-                $controllerData[0],
-                $controllerData[1]
-            );
-
-            if ($convertClassName && $acl) {
-                $entityClass = $acl->getClass();
-                if (!empty($entityClass) && $this->entityClassResolver->isEntity($entityClass)) {
-                    $acl->setClass($this->entityClassResolver->getEntityClass($entityClass));
-                }
-            }
-
-            return $acl;
-        }
-
-        return null;
+        return $this->requestAuthorizationChecker->getRequestAcl($request, $convertClassName);
     }
 
     /**
@@ -270,21 +191,10 @@ class SecurityFacade
      * @param Request $request
      * @param         $object
      * @return int -1 if no access, 0 if can't decide, 1 if access is granted
+     * @deprecated since 2.3. Use RequestAuthorizationChecker::isRequestObjectIsGranted instead
      */
     public function isRequestObjectIsGranted(Request $request, $object)
     {
-        $aclAnnotation = $this->getRequestAcl($request, true);
-        if ($aclAnnotation) {
-            $class      = $aclAnnotation->getClass();
-            $permission = $aclAnnotation->getPermission();
-            if ($permission
-                && $class
-                && is_a($object, $class)
-            ) {
-                return $this->isGranted($permission, $object) ? 1 : -1;
-            }
-        }
-
-        return 0;
+        return $this->requestAuthorizationChecker->isRequestObjectIsGranted($request, $object);
     }
 }

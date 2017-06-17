@@ -30,7 +30,8 @@ services:
             - '@doctrine.orm.entity_manager'
             - %oro_tag.tag.entity.class%
             - %oro_tag.tagging.entity.class%
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@router'
 
     oro_tag.docrine.event.listener:
@@ -136,7 +137,8 @@ services:
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@security.token_storage'
         calls:
             - [addUnsupportedGridPrefix, ['oro_report']]
             - [addUnsupportedGridPrefix, ['oro_segment']]

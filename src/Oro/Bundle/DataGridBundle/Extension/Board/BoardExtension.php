@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -15,7 +16,6 @@ use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class BoardExtension extends AbstractExtension
 {
@@ -32,23 +32,17 @@ class BoardExtension extends AbstractExtension
      */
     const BOARD_COLUMNS_ID_PARAM_ID = 'boardColumnIds';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $boards;
 
-     /**
-     * @var RequestStack
-     */
+    /** @var RequestStack */
     protected $requestStack;
 
-    /**
-     * @var BoardProcessorInterface[]
-     */
+    /** @var BoardProcessorInterface[] */
     protected $processors;
 
-     /** @var SecurityFacade */
-    protected $securityFacade;
+     /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -66,23 +60,23 @@ class BoardExtension extends AbstractExtension
     protected $entityClassResolver;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param TranslatorInterface $translator
-     * @param RestrictionManager $restrictionManager
-     * @param Configuration $configuration
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param EntityClassResolver $entityClassResolver
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TranslatorInterface           $translator
+     * @param RestrictionManager            $restrictionManager
+     * @param Configuration                 $configuration
+     * @param EntityClassNameHelper         $entityClassNameHelper
+     * @param EntityClassResolver           $entityClassResolver
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         TranslatorInterface $translator,
         RestrictionManager $restrictionManager,
         Configuration $configuration,
         EntityClassNameHelper $entityClassNameHelper,
         EntityClassResolver $entityClassResolver
     ) {
-        $this->securityFacade = $securityFacade;
-        $this->translator     = $translator;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->translator = $translator;
         $this->restrictionManager = $restrictionManager;
         $this->configuration = $configuration;
         $this->entityClassNameHelper = $entityClassNameHelper;
@@ -276,7 +270,7 @@ class BoardExtension extends AbstractExtension
     {
         if (isset($boardConfig[Configuration::ACL_RESOURCE_KEY])) {
             $aclResource = $boardConfig[Configuration::ACL_RESOURCE_KEY];
-            return !$this->securityFacade->isGranted($aclResource);
+            return !$this->authorizationChecker->isGranted($aclResource);
         }
 
         return false;

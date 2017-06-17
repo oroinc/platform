@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Placeholder;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter;
 use Oro\Bundle\CommentBundle\Tests\Unit\Fixtures\TestEntity;
+use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,23 +20,16 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var  CommentPlaceholderFilter */
     protected $filter;
 
     protected function setUp()
     {
-        $this->commentAssociationHelper = $this
-            ->getMockBuilder('Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityFacade        = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->commentAssociationHelper = $this->createMock(CommentAssociationHelper::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->doctrineHelper->expects($this->any())
             ->method('isManageableEntity')
@@ -43,7 +40,7 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
         $this->filter = new CommentPlaceholderFilter(
             $this->commentAssociationHelper,
             $this->doctrineHelper,
-            $this->securityFacade
+            $this->authorizationChecker
         );
     }
 
@@ -81,7 +78,7 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsApplicableWhenPermissionsAreNotGranted()
     {
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('oro_comment_view')
             ->willReturn(false);
@@ -96,7 +93,7 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsApplicableWithCommentAssociationDisabled()
     {
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('oro_comment_view')
             ->willReturn(true);
@@ -111,7 +108,7 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsApplicableWithCommentAssociationEnabled()
     {
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('oro_comment_view')
             ->willReturn(true);

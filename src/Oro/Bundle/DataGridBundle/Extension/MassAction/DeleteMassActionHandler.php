@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -17,20 +18,19 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassD
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Async\Topics;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
     const FLUSH_BATCH_SIZE = 100;
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var MassDeleteLimiter */
     protected $limiter;
@@ -48,28 +48,28 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
 
     /**
-     * @param RegistryInterface        $registry
-     * @param TranslatorInterface      $translator
-     * @param SecurityFacade           $securityFacade
-     * @param MassDeleteLimiter        $limiter
-     * @param RequestStack             $requestStack
-     * @param OptionalListenerManager  $listenerManager
-     * @param MessageProducerInterface $producer
+     * @param ManagerRegistry               $registry
+     * @param TranslatorInterface           $translator
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param MassDeleteLimiter             $limiter
+     * @param RequestStack                  $requestStack
+     * @param OptionalListenerManager       $listenerManager
+     * @param MessageProducerInterface      $producer
      */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         TranslatorInterface $translator,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         MassDeleteLimiter $limiter,
         RequestStack $requestStack,
         OptionalListenerManager $listenerManager,
         MessageProducerInterface $producer
     ) {
-        $this->registry        = $registry;
-        $this->translator      = $translator;
-        $this->securityFacade  = $securityFacade;
-        $this->limiter         = $limiter;
-        $this->requestStack    = $requestStack;
+        $this->registry = $registry;
+        $this->translator = $translator;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->limiter = $limiter;
+        $this->requestStack = $requestStack;
         $this->listenerManager = $listenerManager;
         $this->producer = $producer;
     }
@@ -271,7 +271,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      */
     protected function isDeleteAllowed($entity)
     {
-        return $this->securityFacade->isGranted('DELETE', $entity);
+        return $this->authorizationChecker->isGranted('DELETE', $entity);
     }
 
     /**

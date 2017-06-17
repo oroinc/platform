@@ -2,25 +2,23 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\FormBundle\Autocomplete\Security;
 
 class SecurityTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
-    /**
-     * @var Security
-     */
+    /** @var Security */
     protected $security;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
-        $this->security = new Security($this->securityFacade);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+
+        $this->security = new Security($this->authorizationChecker);
     }
 
     public function testSetAutocompleteAclResource()
@@ -47,7 +45,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase
 
         $this->security->setAutocompleteAclResource('test_search', 'test_acl_resource');
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('test_acl_resource')
             ->will($this->returnValue(true));

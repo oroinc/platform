@@ -3,59 +3,36 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Security\UserChecker;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class UserCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var UserChecker|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var UserChecker|\PHPUnit_Framework_MockObject_MockObject */
     protected $userChecker;
 
-    /**
-     * @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityContextLink;
+    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
 
-    /**
-     * @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $flashBag;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $service;
 
     protected function setUp()
     {
-        $this->service = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->flashBag = $this->createMock(FlashBagInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->securityContextLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityContextLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->service);
-
-        $this->flashBag = $this->createMock('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
-
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
 
-        $this->userChecker = new UserChecker($this->securityContextLink, $this->flashBag, $translator);
+        $this->userChecker = new UserChecker($this->tokenStorage, $this->flashBag, $translator);
     }
 
     /**
@@ -68,7 +45,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckPreAuth(UserInterface $user, $getTokenCalls, $token, $exceptionThrown)
     {
-        $this->service->expects($this->exactly($getTokenCalls))
+        $this->tokenStorage->expects($this->exactly($getTokenCalls))
             ->method('getToken')
             ->willReturn($token);
 

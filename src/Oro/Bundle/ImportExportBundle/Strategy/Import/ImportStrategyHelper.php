@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ValidatorInterface;
@@ -19,50 +20,42 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class ImportStrategyHelper
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var ValidatorInterface
-     */
+    /** @var ValidatorInterface */
     protected $validator;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var FieldHelper
-     */
+    /** @var FieldHelper */
     protected $fieldHelper;
 
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @var ConfigurableTableDataConverter
-     */
+    /** @var ConfigurableTableDataConverter */
     protected $configurableDataConverter;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param ManagerRegistry $managerRegistry
-     * @param ValidatorInterface $validator
-     * @param TranslatorInterface $translator
-     * @param FieldHelper $fieldHelper
+     * @param ManagerRegistry                $managerRegistry
+     * @param ValidatorInterface             $validator
+     * @param TranslatorInterface            $translator
+     * @param FieldHelper                    $fieldHelper
      * @param ConfigurableTableDataConverter $configurableDataConverter
-     * @param SecurityFacade $securityFacade
+     * @param AuthorizationCheckerInterface  $authorizationChecker
+     * @param TokenAccessorInterface         $tokenAccessor
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -70,14 +63,16 @@ class ImportStrategyHelper
         TranslatorInterface $translator,
         FieldHelper $fieldHelper,
         ConfigurableTableDataConverter $configurableDataConverter,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
         $this->translator = $translator;
         $this->fieldHelper = $fieldHelper;
         $this->configurableDataConverter = $configurableDataConverter;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -102,7 +97,7 @@ class ImportStrategyHelper
      */
     public function isGranted($attributes, $obj, $property = null)
     {
-        if (!$this->securityFacade->hasLoggedUser()) {
+        if (!$this->tokenAccessor->hasUser()) {
             return true;
         }
         if ($property && !($obj instanceof FieldVote)) {
@@ -110,7 +105,7 @@ class ImportStrategyHelper
         }
 
         try {
-            return $this->securityFacade->isGranted($attributes, $obj);
+            return $this->authorizationChecker->isGranted($attributes, $obj);
         } catch (InvalidDomainObjectException $exception) {
             // if object do not have identity we skipp check
             return true;
@@ -234,7 +229,7 @@ class ImportStrategyHelper
      */
     public function getLoggedUser()
     {
-        return $this->securityFacade->getLoggedUser();
+        return $this->tokenAccessor->getUser();
     }
 
     /**

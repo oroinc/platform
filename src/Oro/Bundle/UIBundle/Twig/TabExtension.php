@@ -4,13 +4,13 @@ namespace Oro\Bundle\UIBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 use Knp\Menu\MenuItem;
 
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TabExtension extends \Twig_Extension
 {
@@ -45,11 +45,11 @@ class TabExtension extends \Twig_Extension
     }
 
     /**
-     * @return SecurityFacade
+     * @return AuthorizationCheckerInterface
      */
-    protected function getSecurityFacade()
+    protected function getAuthorizationChecker()
     {
-        return $this->container->get('oro_security.security_facade');
+        return $this->container->get('security.authorization_checker');
     }
 
     /**
@@ -139,7 +139,7 @@ class TabExtension extends \Twig_Extension
                 }
             }
 
-            if ($this->getSecurityFacade()->isGranted($child->getExtra('widgetAcl'))) {
+            if ($this->getAuthorizationChecker()->isGranted($child->getExtra('widgetAcl'))) {
                 $label = $child->getLabel();
                 if (!empty($label)) {
                     $label = $this->getTranslator()->trans($label);

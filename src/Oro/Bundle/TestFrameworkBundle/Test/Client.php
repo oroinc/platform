@@ -134,7 +134,7 @@ class Client extends BaseClient
             $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
             $acl         = $gridConfig->getAclResource();
 
-            if ($acl && !$container->get('oro_security.security_facade')->isGranted($acl)) {
+            if ($acl && !$container->get('security.authorization_checker')->isGranted($acl)) {
                 return new Response('Access denied.', 403);
             }
 

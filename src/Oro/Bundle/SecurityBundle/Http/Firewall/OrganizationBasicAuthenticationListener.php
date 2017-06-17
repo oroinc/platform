@@ -5,8 +5,8 @@ namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -17,8 +17,8 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 
 class OrganizationBasicAuthenticationListener
 {
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var AuthenticationManagerInterface */
     protected $authenticationManager;
@@ -44,15 +44,15 @@ class OrganizationBasicAuthenticationListener
     protected $tokenFactory;
 
     /**
-     * @param SecurityContextInterface $securityContext
-     * @param AuthenticationManagerInterface $authenticationManager
-     * @param string $providerKey
+     * @param TokenStorageInterface             $tokenStorage
+     * @param AuthenticationManagerInterface    $authenticationManager
+     * @param string                            $providerKey
      * @param AuthenticationEntryPointInterface $authenticationEntryPoint
-     * @param OrganizationManager $manager
-     * @param LoggerInterface $logger
+     * @param OrganizationManager               $manager
+     * @param LoggerInterface                   $logger
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
+        TokenStorageInterface $tokenStorage,
         AuthenticationManagerInterface $authenticationManager,
         $providerKey,
         AuthenticationEntryPointInterface $authenticationEntryPoint,
@@ -63,7 +63,7 @@ class OrganizationBasicAuthenticationListener
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
@@ -93,7 +93,7 @@ class OrganizationBasicAuthenticationListener
             return;
         }
 
-        if (null !== $token = $this->securityContext->getToken()) {
+        if (null !== $token = $this->tokenStorage->getToken()) {
             if ($token instanceof OrganizationContextTokenInterface
                 && $token->isAuthenticated()
                 && $token->getUsername() === $username
@@ -122,11 +122,11 @@ class OrganizationBasicAuthenticationListener
                 );
             }
 
-            $this->securityContext->setToken($this->authenticationManager->authenticate($authToken));
+            $this->tokenStorage->setToken($this->authenticationManager->authenticate($authToken));
         } catch (AuthenticationException $failed) {
-            $token = $this->securityContext->getToken();
+            $token = $this->tokenStorage->getToken();
             if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
-                $this->securityContext->setToken(null);
+                $this->tokenStorage->setToken(null);
             }
 
             $this->logError($username, $failed->getMessage());

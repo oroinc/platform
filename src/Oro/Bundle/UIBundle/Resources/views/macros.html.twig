@@ -127,7 +127,7 @@
         fieldName - the name of field on wich Field ACL should be checked
 #}
 {% macro renderHtmlProperty(title, data, entity = null, fieldName = null) %}
-    {% if entity is defined and fieldName is defined and not resource_granted('VIEW', entity, fieldName) %}
+    {% if entity is defined and fieldName is defined and not is_granted('VIEW', entity, fieldName) %}
     {% else %}
         {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
     {% endif %}
@@ -142,7 +142,7 @@
         fieldName - the name of field on wich Field ACL should be checked
 #}
 {% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName) %}
-    {% if resource_granted('VIEW', entity, fieldName) %}
+    {% if is_granted('VIEW', entity, fieldName) %}
         {% set collapseView = {
                 component: 'oroui/js/app/components/jquery-widget-component',
                 widgetModule: 'oroui/js/widget/collapse-widget',
@@ -1076,7 +1076,7 @@
         {%- if entity %}
             {% set ownerType = oro_get_owner_type(entity) %}
             {%- if ownerType %}
-                {% if  resource_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
+                {% if  is_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
                     {% set owner = oro_get_entity_owner(entity) %}
                     {% if owner %}
                         {% if (ownerType == 'USER') %}
@@ -1096,7 +1096,7 @@
                                     )|trans
                                 }}:
                             {% endif %}
-                            {% if ownerPath is defined and resource_granted('VIEW', owner) %}
+                            {% if ownerPath is defined and is_granted('VIEW', owner) %}
                                 {{ _self.renderUrl(ownerPath, ownerName) }}
                             {% else %}
                                 {{ ownerName }}
@@ -1192,7 +1192,7 @@
 
 {%- macro entityViewLink(entity, label, route, permission) -%}
     {% if entity %}
-        {% if route and resource_granted(permission|default('VIEW'), entity) %}
+        {% if route and is_granted(permission|default('VIEW'), entity) %}
             {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
         {% else %}
             {{ label|escape }}
@@ -1226,7 +1226,7 @@
         entityLabelIfNotGranted - Entity label that should be rendered in case if user have no access to see field value
 #}
 {%- macro renderEntityViewLabel(entity, fieldName, entityLabelIfNotGranted = null) -%}
-    {% if entity is not null and resource_granted('VIEW', entity, fieldName) %}
+    {% if entity is not null and is_granted('VIEW', entity, fieldName) %}
         {{ attribute(entity, fieldName) }}
     {% else %}
         {% if entityLabelIfNotGranted is not null %}

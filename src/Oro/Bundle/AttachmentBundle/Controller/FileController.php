@@ -25,11 +25,10 @@ class FileController extends Controller
      */
     public function getAttachmentAction($codedString, $extension)
     {
-        list($parentClass, $fieldName, $parentId, $type, $filename) = $this->get(
-            'oro_attachment.manager'
-        )->decodeAttachmentUrl($codedString);
+        list($parentClass, $fieldName, $parentId, $type, $filename) = $this->get('oro_attachment.manager')
+            ->decodeAttachmentUrl($codedString);
         $parentEntity = $this->getDoctrine()->getRepository($parentClass)->find($parentId);
-        if (!$this->get('oro_security.security_facade')->isGranted('VIEW', $parentEntity)) {
+        if (!$this->isGranted('VIEW', $parentEntity)) {
             throw new AccessDeniedException();
         }
 

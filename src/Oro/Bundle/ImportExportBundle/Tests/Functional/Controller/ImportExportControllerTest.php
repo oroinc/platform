@@ -5,6 +5,7 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Filesystem\Filesystem;
@@ -31,7 +32,7 @@ class ImportExportControllerTest extends WebTestCase
 
         $this->assertJsonResponseSuccess();
 
-        $organization = $this->getSecurityFacade()->getOrganization();
+        $organization = $this->getTokenAccessor()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
 
         $this->assertMessageSent(Topics::PRE_EXPORT, [
@@ -63,7 +64,7 @@ class ImportExportControllerTest extends WebTestCase
 
         $this->assertJsonResponseSuccess();
 
-        $organization = $this->getSecurityFacade()->getOrganization();
+        $organization = $this->getTokenAccessor()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
 
         $this->assertMessageSent(Topics::PRE_EXPORT, [
@@ -242,11 +243,11 @@ class ImportExportControllerTest extends WebTestCase
     }
 
     /**
-     * @return object
+     * @return TokenAccessorInterface
      */
-    private function getSecurityFacade()
+    private function getTokenAccessor()
     {
-        return $this->getContainer()->get('oro_security.security_facade');
+        return $this->getContainer()->get('oro_security.token_accessor');
     }
 
     /**

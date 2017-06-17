@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
-use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
@@ -22,10 +24,10 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacadeLink;
+    protected $authorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContextLink;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineRegistryLink;
@@ -47,16 +49,8 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacadeLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->setMethods(['getService', 'getRepository', 'findBy'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityContextLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->setMethods(['getService', 'getRepository', 'findBy'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -101,13 +95,12 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             $configManager,
             $emailThreadProvider,
             $htmlTagHelper,
-            $this->securityFacadeLink,
+            $this->authorizationChecker,
+            $this->tokenAccessor,
             $this->mailboxProcessStorageLink,
             $this->activityAssociationHelper,
-            $this->commentAssociationHelper,
-            new EmailBodyHelper($htmlTagHelper)
+            $this->commentAssociationHelper
         );
-        $this->emailActivityListProvider->setSecurityContextLink($this->securityContextLink);
     }
 
     public function testGetActivityOwners()

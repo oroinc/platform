@@ -2,31 +2,48 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testShouldImplementWidgetProviderInterface()
-    {
-        $rc = new \ReflectionClass(ActivityWidgetProvider::class);
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $activityManager;
 
-        $this->assertTrue($rc->implementsInterface(WidgetProviderInterface::class));
-    }
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $authorizationChecker;
 
-    public function testCouldBeConstructedWithExpectedSetOfArguments()
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $translator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $entityIdAccessor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $entityRoutingHelper;
+
+    /** @var ActivityWidgetProvider */
+    private $provider;
+
+    protected function setUp()
     {
-        new ActivityWidgetProvider(
-            $this->createActivityManagerMock(),
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
+        $this->activityManager = $this->createMock(ActivityManager::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->entityIdAccessor = $this->createMock(EntityIdAccessor::class);
+        $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
+
+        $this->provider = new ActivityWidgetProvider(
+            $this->activityManager,
+            $this->authorizationChecker,
+            $this->translator,
+            $this->entityIdAccessor,
+            $this->entityRoutingHelper
         );
     }
 
@@ -34,46 +51,24 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass;
 
-        $activityManagerMock = $this->createActivityManagerMock();
-        $activityManagerMock
-            ->expects($this->once())
+        $this->activityManager->expects($this->once())
             ->method('hasActivityAssociations')
             ->with(\stdClass::class)
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $this->assertTrue($provider->supports($entity));
+        $this->assertTrue($this->provider->supports($entity));
     }
 
     public function testShouldReturnFalseOnSupportsIfActivityHasNoAssociations()
     {
         $entity = new \stdClass;
 
-        $activityManagerMock = $this->createActivityManagerMock();
-        $activityManagerMock
-            ->expects($this->once())
+        $this->activityManager->expects($this->once())
             ->method('hasActivityAssociations')
             ->with(\stdClass::class)
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $this->assertFalse($provider->supports($entity));
+        $this->assertFalse($this->provider->supports($entity));
     }
 
     public function testShouldFindActivitiesAssociatedWithEntityClassAndConvertThemToWidgets()
@@ -101,23 +96,12 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerMock();
-        $activityManagerMock
-            ->expects($this->once())
+        $this->activityManager->expects($this->once())
             ->method('getActivityAssociations')
             ->with(\stdClass::class)
-            ->willReturn($activities)
-        ;
+            ->willReturn($activities);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         $this->assertInternalType('array', $widgets);
         $this->assertCount(3, $widgets);
@@ -144,31 +128,20 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerStub($activities);
+        $this->activityManager->expects($this->any())
+            ->method('getActivityAssociations')
+            ->willReturn($activities);
 
-        $securityFacadeMock = $this->createSecurityFacadeMock();
-        $securityFacadeMock
-            ->expects($this->at(0))
+        $this->authorizationChecker->expects($this->at(0))
             ->method('isGranted')
             ->with('theFooAcl')
-            ->willReturn(true)
-        ;
-        $securityFacadeMock
-            ->expects($this->at(1))
+            ->willReturn(true);
+        $this->authorizationChecker->expects($this->at(1))
             ->method('isGranted')
             ->with('theBarAcl')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $securityFacadeMock,
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         $this->assertInternalType('array', $widgets);
         $this->assertCount(2, $widgets);
@@ -195,31 +168,20 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerStub($activities);
+        $this->activityManager->expects($this->any())
+            ->method('getActivityAssociations')
+            ->willReturn($activities);
 
-        $securityFacadeMock = $this->createSecurityFacadeMock();
-        $securityFacadeMock
-            ->expects($this->at(0))
+        $this->authorizationChecker->expects($this->at(0))
             ->method('isGranted')
             ->with('theFooAcl')
-            ->willReturn(false)
-        ;
-        $securityFacadeMock
-            ->expects($this->at(1))
+            ->willReturn(false);
+        $this->authorizationChecker->expects($this->at(1))
             ->method('isGranted')
             ->with('theBarAcl')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $securityFacadeMock,
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         $this->assertInternalType('array', $widgets);
         $this->assertCount(0, $widgets);
@@ -244,38 +206,24 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerStub($activities);
+        $this->activityManager->expects($this->any())
+            ->method('getActivityAssociations')
+            ->willReturn($activities);
 
-        $entityIdAccessorMock = $this->createEntityIdAccessorMock();
-        $entityIdAccessorMock
-            ->expects($this->once())
+        $this->entityIdAccessor->expects($this->once())
             ->method('getIdentifier')
-            ->willReturn('theEntityId')
-        ;
+            ->willReturn('theEntityId');
 
-        $entityRoutingHelperMock = $this->createEntityRoutingHelperMock();
-        $entityRoutingHelperMock
-            ->expects($this->at(0))
+        $this->entityRoutingHelper->expects($this->at(0))
             ->method('generateUrl')
             ->with('theFooRoute', \stdClass::class, 'theEntityId')
-            ->willReturn('theFooUrl')
-        ;
-        $entityRoutingHelperMock
-            ->expects($this->at(1))
+            ->willReturn('theFooUrl');
+        $this->entityRoutingHelper->expects($this->at(1))
             ->method('generateUrl')
             ->with('theBarRoute', \stdClass::class, 'theEntityId')
-            ->willReturn('theBarUrl')
-        ;
+            ->willReturn('theBarUrl');
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $entityIdAccessorMock,
-            $entityRoutingHelperMock
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         //guard
         $this->assertInternalType('array', $widgets);
@@ -304,31 +252,20 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerStub($activities);
+        $this->activityManager->expects($this->any())
+            ->method('getActivityAssociations')
+            ->willReturn($activities);
 
-        $translatorMock = $this->createTranslatorMock();
-        $translatorMock
-            ->expects($this->at(0))
+        $this->translator->expects($this->at(0))
             ->method('trans')
             ->with('theFooLabel')
-            ->willReturn('theFooLabelTranslated')
-        ;
-        $translatorMock
-            ->expects($this->at(1))
+            ->willReturn('theFooLabelTranslated');
+        $this->translator->expects($this->at(1))
             ->method('trans')
             ->with('theBarLabel')
-            ->willReturn('theBarLabelTranslated')
-        ;
+            ->willReturn('theBarLabelTranslated');
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $translatorMock,
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         //guard
         $this->assertInternalType('array', $widgets);
@@ -357,17 +294,11 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerStub($activities);
+        $this->activityManager->expects($this->any())
+            ->method('getActivityAssociations')
+            ->willReturn($activities);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         //guard
         $this->assertInternalType('array', $widgets);
@@ -397,17 +328,11 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerStub($activities);
+        $this->activityManager->expects($this->any())
+            ->method('getActivityAssociations')
+            ->willReturn($activities);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         //guard
         $this->assertInternalType('array', $widgets);
@@ -438,17 +363,11 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $activityManagerMock = $this->createActivityManagerStub($activities);
+        $this->activityManager->expects($this->any())
+            ->method('getActivityAssociations')
+            ->willReturn($activities);
 
-        $provider = new ActivityWidgetProvider(
-            $activityManagerMock,
-            $this->createSecurityFacadeMock(),
-            $this->createTranslatorMock(),
-            $this->createEntityIdAccessorMock(),
-            $this->createEntityRoutingHelperMock()
-        );
-
-        $widgets = $provider->getWidgets($entity);
+        $widgets = $this->provider->getWidgets($entity);
 
         //guard
         $this->assertInternalType('array', $widgets);
@@ -456,60 +375,5 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('thefooclassname_6a3e4d5a_theFooAssociationName', $widgets[0]['alias']);
         $this->assertEquals('thebarclassname_e91e577b_theBarAssociationName', $widgets[1]['alias']);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ActivityManager
-     */
-    private function createActivityManagerMock()
-    {
-        return $this->createMock(ActivityManager::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ActivityManager
-     */
-    private function createActivityManagerStub($activities)
-    {
-        $activityManagerMock = $this->createActivityManagerMock();
-        $activityManagerMock
-            ->expects($this->any())
-            ->method('getActivityAssociations')
-            ->willReturn($activities)
-        ;
-        
-        return $activityManagerMock;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    private function createSecurityFacadeMock()
-    {
-        return $this->createMock(SecurityFacade::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
-     */
-    private function createTranslatorMock()
-    {
-        return $this->createMock(TranslatorInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityIdAccessor
-     */
-    private function createEntityIdAccessorMock()
-    {
-        return $this->createMock(EntityIdAccessor::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityRoutingHelper
-     */
-    private function createEntityRoutingHelperMock()
-    {
-        return $this->createMock(EntityRoutingHelper::class);
     }
 }

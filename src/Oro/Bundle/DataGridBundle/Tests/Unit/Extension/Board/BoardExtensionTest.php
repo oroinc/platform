@@ -2,62 +2,44 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
+use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class BoardExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $restrictionManager;
 
-    /**
-     * @var BoardExtension
-     */
+    /** @var BoardExtension */
     protected $extension;
 
     public function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->restrictionManager = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->restrictionManager = $this->createMock(RestrictionManager::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $configuration = new Configuration();
-
-        $entityClassResolver = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityClassNameHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
 
         $this->extension = new BoardExtension(
-            $this->securityFacade,
+            $this->authorizationChecker,
             $this->translator,
             $this->restrictionManager,
             $configuration,
@@ -133,7 +115,7 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('board label')
             ->will($this->returnValue('translated board label'));
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('update_acl_resource')
             ->will($this->returnValue(true));

@@ -7,7 +7,7 @@
 {% set formAction = path('oro_user_profile_update') %}
 
 {% block navButtons %}
-    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) and form.vars.value.id != app.user.id %}
+    {% if form.vars.value.id and is_granted('DELETE', form.vars.value) and form.vars.value.id != app.user.id %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_user', {'id': form.vars.value.id}),
             'dataRedirect': path('oro_user_index'),
@@ -23,12 +23,12 @@
     {% set html = UI.saveAndCloseButton({
         'route': 'oro_user_profile_view'
     }) %}
-    {% if resource_granted('oro_user_create') %}
+    {% if is_granted('oro_user_create') %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_user_create'
         }) %}
     {% endif %}
-    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+    {% if form.vars.value.id or is_granted('oro_user_user_update') %}
         {% set html = html ~ UI.saveAndStayButton({
             'route': 'oro_user_profile_update'
         }) %}

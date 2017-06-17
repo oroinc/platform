@@ -75,7 +75,7 @@ class AclPermissionController extends Controller
      */
     public function switchOrganizationAction(Organization $organization)
     {
-        $token = $this->container->get('security.context')->getToken();
+        $token = $this->container->get('security.token_storage')->getToken();
         $user  = $token->getUser();
 
         if (!$token instanceof OrganizationContextTokenInterface ||
