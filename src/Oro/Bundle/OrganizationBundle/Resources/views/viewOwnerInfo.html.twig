@@ -1,5 +1,5 @@
 {% import 'OroUserBundle::macros.html.twig' as U %}
-{% if  resource_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
+{% if is_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
     {% if bracket_parts is not defined %}
         {% set bracket_parts = [] %}
     {% endif %}

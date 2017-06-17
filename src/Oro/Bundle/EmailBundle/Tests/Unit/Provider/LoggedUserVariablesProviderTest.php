@@ -5,12 +5,13 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityNameResolver;
@@ -30,9 +31,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
@@ -44,7 +43,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->provider = new LoggedUserVariablesProvider(
             $translator,
-            $this->securityFacade,
+            $this->tokenAccessor,
             $this->entityNameResolver,
             $this->configManager
         );
@@ -52,8 +51,8 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVariableDefinitionsWithoutLoggedUser()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue(null));
 
         $result = $this->provider->getVariableDefinitions();
@@ -67,8 +66,8 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
     {
         $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
 
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
         $result = $this->provider->getVariableDefinitions();
@@ -93,11 +92,11 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $organization = new Organization();
         $user         = new User();
 
-        $this->securityFacade->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->will($this->returnValue($organization));
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
         $result = $this->provider->getVariableDefinitions();
@@ -120,11 +119,11 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVariableValuesWithoutLoggedUser()
     {
-        $this->securityFacade->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->will($this->returnValue(null));
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue(null));
 
         $result = $this->provider->getVariableValues();
@@ -148,11 +147,11 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getUsername')
             ->will($this->returnValue('test'));
 
-        $this->securityFacade->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->will($this->returnValue(null));
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
         $result = $this->provider->getVariableValues();
@@ -179,11 +178,11 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $user->setFirstName('FirstName');
         $user->setLastName('LastName');
 
-        $this->securityFacade->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->will($this->returnValue($organization));
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
         $this->entityNameResolver->expects($this->once())

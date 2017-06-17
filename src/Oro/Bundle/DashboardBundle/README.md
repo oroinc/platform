@@ -137,7 +137,7 @@ datagrids:
                         - { join: call.owner, alias: ownerUser }
                 where:
                     and:
-                      - ownerUser.id = @oro_security.security_facade->getLoggedUserId
+                      - ownerUser.id = @oro_security.token_accessor->getUserId
         columns:
             callDirection:
                 type: twig

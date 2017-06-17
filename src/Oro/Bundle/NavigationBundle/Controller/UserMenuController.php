@@ -95,7 +95,7 @@ class UserMenuController extends AbstractMenuController
      */
     protected function checkAcl(array $context)
     {
-        if (!$this->get('oro_security.security_facade')->isGranted(
+        if (!$this->isGranted(
             'oro_user_user_update',
             $context[ScopeUserCriteriaProvider::SCOPE_KEY]
         )

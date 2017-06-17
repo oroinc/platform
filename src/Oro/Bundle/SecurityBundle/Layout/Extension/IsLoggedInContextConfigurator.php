@@ -2,25 +2,23 @@
 
 namespace Oro\Bundle\SecurityBundle\Layout\Extension;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class IsLoggedInContextConfigurator implements
-    ContextConfiguratorInterface
+class IsLoggedInContextConfigurator implements ContextConfiguratorInterface
 {
     const OPTION_NAME = 'is_logged_in';
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -34,6 +32,6 @@ class IsLoggedInContextConfigurator implements
                 self::OPTION_NAME => ['bool']
             ]);
 
-        $context->set(self::OPTION_NAME, $this->securityFacade->hasLoggedUser());
+        $context->set(self::OPTION_NAME, $this->tokenAccessor->hasUser());
     }
 }

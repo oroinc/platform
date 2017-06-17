@@ -47,7 +47,7 @@ services:
         class: %oro_entity_pagination.navigation.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_entity_pagination.storage'
 
     oro_entity_pagination.event_listener.entity_pagination:

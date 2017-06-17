@@ -31,9 +31,10 @@ class UserController extends Controller
      */
     public function viewAction(User $user)
     {
-        $securityFacade = $this->get('oro_security.security_facade');
-
-        return $this->view($user, $securityFacade->getLoggedUserId() === $user->getId());
+        return $this->view(
+            $user,
+            $this->get('oro_security.token_accessor')->getUserId() === $user->getId()
+        );
     }
 
     /**
@@ -60,9 +61,8 @@ class UserController extends Controller
      */
     public function apigenAction(User $user)
     {
-        $securityFacade = $this->get('oro_security.security_facade');
-        if ($securityFacade->getLoggedUserId() !== $user->getId()
-            && !$securityFacade->isGranted('MANAGE_API_KEY', $user)
+        if ($this->get('oro_security.token_accessor')->getUserId() !== $user->getId()
+            && !$this->isGranted('MANAGE_API_KEY', $user)
         ) {
             throw $this->createAccessDeniedException();
         }
@@ -223,7 +223,7 @@ class UserController extends Controller
     protected function getOrganization()
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get('security.context')->getToken();
+        $token = $this->get('security.token_storage')->getToken();
         return $token->getOrganizationContext();
     }
 

@@ -310,7 +310,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper'
         arguments:
             - '@oro_workflow.manager'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@translator'
             - '@router'
 

@@ -38,7 +38,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }

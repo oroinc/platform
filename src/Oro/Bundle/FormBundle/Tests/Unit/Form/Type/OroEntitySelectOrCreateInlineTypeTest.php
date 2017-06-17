@@ -3,33 +3,26 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 
 class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $config;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|OroEntitySelectOrCreateInlineType
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OroEntitySelectOrCreateInlineType */
     protected $formType;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -73,7 +66,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->setMethods(['createDefaultTransformer'])
             ->setConstructorArgs(
                 [
-                    $this->securityFacade,
+                    $this->authorizationChecker,
                     $configManager,
                     $entityManager,
                     $searchRegistry
@@ -177,18 +170,18 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 
         if ($aclExpectedToCall) {
             if (!empty($expectedOptions['create_acl'])) {
-                $this->securityFacade->expects($this->any())
+                $this->authorizationChecker->expects($this->any())
                     ->method('isGranted')
                     ->with($expectedOptions['create_acl'])
                     ->will($this->returnValue($aclAllowed));
             } else {
-                $this->securityFacade->expects($this->any())
+                $this->authorizationChecker->expects($this->any())
                     ->method('isGranted')
                     ->with('CREATE', 'Entity:Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity')
                     ->will($this->returnValue($aclAllowed));
             }
         } else {
-            $this->securityFacade->expects($this->any())
+            $this->authorizationChecker->expects($this->any())
                 ->method('isGranted');
         }
 

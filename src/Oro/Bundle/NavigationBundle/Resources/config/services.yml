@@ -51,7 +51,9 @@ services:
         class: %oro_menu.factory.acl_extension.class%
         arguments:
             - '@router'
-            - '@oro_security.security_facade.link'
+            - '@security.authorization_checker'
+            - '@oro_security.class_authorization_checker'
+            - '@oro_security.token_accessor'
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
             - [ setLogger, [ '@logger' ] ]
@@ -162,7 +164,7 @@ services:
     oro_navigation.pinbar_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%
         arguments:
-            - '@security.context'
+            - '@oro_security.token_accessor'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
             - '@router'
@@ -173,7 +175,7 @@ services:
     oro_navigation.favorites_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%
         arguments:
-            - '@security.context'
+            - '@oro_security.token_accessor'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
             - '@router'
@@ -184,13 +186,13 @@ services:
     oro_navigation.history_menu.builder:
         class: %oro_navigation.navigation_history_menu.builder.class%
         arguments:
-            - '@security.context'
+            - '@oro_security.token_accessor'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
             - '@router'
         calls:
             - [ setMatcher, [ '@knp_menu.matcher' ]]
-            - [ setOptions, [ '@oro_config.user' ]]
+            - [ setConfigManager, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: history }
             - { name: oro_featuretogle.feature, feature: email }
@@ -198,12 +200,12 @@ services:
     oro_navigation.mostviewed_menu.builder:
         class: %oro_navigation.navigation_mostviewed_menu.builder.class%
         arguments:
-            - '@security.context'
+            - '@oro_security.token_accessor'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
             - "@router"
         calls:
-            - [ setOptions, [ '@oro_config.user' ]]
+            - [ setConfigManager, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: mostviewed }
             - { name: oro_featuretogle.feature, feature: email }
@@ -224,7 +226,7 @@ services:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
         arguments:
             - '@oro_navigation.item.factory'
-            - '@security.context'
+            - '@security.token_storage'
             - '@doctrine'
             - '@oro_navigation.title_service'
         calls:
@@ -341,14 +343,18 @@ services:
             - { name: form.type, alias: oro_route_choice }
 
     oro_navigation.form.handler.pagestate:
-        class:                        %oro_navigation.form.handler.pagestate.class%
-        scope:                        request
-        arguments:                    ["@oro_navigation.form.pagestate", "@request", "@doctrine.orm.entity_manager", "@security.context"]
+        class: %oro_navigation.form.handler.pagestate.class%
+        scope: request
+        arguments:
+            - "@oro_navigation.form.pagestate"
+            - "@request"
+            - "@doctrine.orm.entity_manager"
+            - "@security.token_storage"
 
     kernel.listener.hashnav_response:
         class: %oro_navigation.event.response_hashnav.listener.class%
         arguments:
-            - '@security.context'
+            - '@security.token_storage'
             - '@templating'
             - '%kernel.debug%'
         tags:
@@ -426,7 +432,8 @@ services:
     oro_navigation.event_listener.navigation:
         class: Oro\Bundle\NavigationBundle\EventListener\NavigationListener
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 

@@ -4,26 +4,22 @@ namespace Oro\Bundle\OrganizationBundle\ImportExport\TemplateFixture;
 
 use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class OrganizationFixture extends AbstractTemplateRepository
 {
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    /**
-     * @var Organization
-     */
+    /** @var Organization */
     protected $defaultOrganization;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -50,7 +46,7 @@ class OrganizationFixture extends AbstractTemplateRepository
     {
         switch ($key) {
             case 'default':
-                $organization = $this->securityFacade->getOrganization();
+                $organization = $this->tokenAccessor->getOrganization();
                 if ($organization) {
                     $entity->setName($organization->getName());
                 }

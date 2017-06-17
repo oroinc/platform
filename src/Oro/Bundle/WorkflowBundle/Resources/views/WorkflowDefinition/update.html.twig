@@ -60,7 +60,7 @@
 {% set gridUrl = path('oro_workflow_definition_index') %}
 
 {% block navButtons %}
-    {% if entity.name and delete_allowed and resource_granted('DELETE', entity) %}
+    {% if entity.name and delete_allowed and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
             'dataRedirect': gridUrl,

@@ -2,45 +2,40 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Import;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $managerRegistry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $fieldHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
-    /**
-     * @var ImportStrategyHelper
-     */
-    protected $helper;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configurableDataConverter;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
+
+    /** @var ImportStrategyHelper */
+    protected $helper;
 
     protected function setUp()
     {
@@ -67,10 +62,8 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->helper = new ImportStrategyHelper(
             $this->managerRegistry,
@@ -78,7 +71,8 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             $this->translator,
             $this->fieldHelper,
             $this->configurableDataConverter,
-            $this->securityFacade
+            $this->authorizationChecker,
+            $this->tokenAccessor
         );
 
         $this->helper->setConfigProvider($this->extendConfigProvider);
@@ -118,8 +112,8 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
     {
         $loggedUser = new User();
 
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($loggedUser);
 
         $this->assertSame($loggedUser, $this->helper->getLoggedUser());

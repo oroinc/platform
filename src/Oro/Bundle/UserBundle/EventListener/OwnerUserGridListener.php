@@ -2,33 +2,33 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
  * Owner users select grid. This grid does not use search index or an ACL helper to limit data.
- *
- * Class OwnerUserGridListener
- * @package Oro\Bundle\UserBundle\EventListener
  */
 class OwnerUserGridListener
 {
     /** @var EntityManager */
     protected $em;
 
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var AclVoter */
     protected $aclVoter;
@@ -37,21 +37,24 @@ class OwnerUserGridListener
     protected $treeProvider;
 
     /**
-     * @param EntityManager     $em
-     * @param ServiceLink       $securityContextLink
-     * @param OwnerTreeProvider $treeProvider
-     * @param AclVoter          $aclVoter
+     * @param EntityManager                 $em
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param OwnerTreeProvider             $treeProvider
+     * @param AclVoter                      $aclVoter
      */
     public function __construct(
         EntityManager $em,
-        ServiceLink $securityContextLink,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
         AclVoter $aclVoter = null
     ) {
-        $this->em                  = $em;
-        $this->aclVoter            = $aclVoter;
-        $this->securityContextLink = $securityContextLink;
-        $this->treeProvider        = $treeProvider;
+        $this->em = $em;
+        $this->aclVoter = $aclVoter;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->treeProvider = $treeProvider;
     }
 
     /**
@@ -77,12 +80,12 @@ class OwnerUserGridListener
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $this->getSecurityContext()->isGranted($permission, $object);
+        $this->authorizationChecker->isGranted($permission, $object);
         $accessLevel = $observer->getAccessLevel();
 
-        $config       = $event->getConfig();
-        $user         = $this->getSecurityContext()->getToken()->getUser();
-        $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
+        $config = $event->getConfig();
+        $user = $this->tokenAccessor->getUser();
+        $organization = $this->tokenAccessor->getOrganization();
 
         $this->applyACL($config, $accessLevel, $user, $organization);
     }
@@ -129,13 +132,5 @@ class OwnerUserGridListener
                 $query->addAndWhere('1 = 0');
             }
         }
-    }
-
-    /**
-     * @return SecurityContextInterface
-     */
-    protected function getSecurityContext()
-    {
-        return $this->securityContextLink->getService();
     }
 }

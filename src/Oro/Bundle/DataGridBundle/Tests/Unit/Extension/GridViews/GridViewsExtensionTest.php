@@ -4,6 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\GridViews;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
@@ -12,13 +17,11 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,8 +33,11 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
     protected $serviceLink;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var GridViewsExtension */
     private $gridViewsExtension;
@@ -42,8 +48,10 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
-        $this->securityFacade->expects($this->any())->method('isGranted')->willReturn(true);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->authorizationChecker->expects($this->any())->method('isGranted')->willReturn(true);
+
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
@@ -56,7 +64,8 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->gridViewsExtension = new GridViewsExtension(
             $this->eventDispatcher,
-            $this->securityFacade,
+            $this->authorizationChecker,
+            $this->tokenAccessor,
             $translator,
             $registry,
             $aclHelper,
@@ -123,7 +132,7 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
         $view1 = $this->getEntity(GridView::class, ['id' => 'view1']);
         $view2 = $this->getEntity(GridView::class, ['id' => 'view2']);
 
-        $this->securityFacade->expects($this->any())->method('getLoggedUser')->willReturn($user);
+        $this->tokenAccessor->expects($this->any())->method('getUser')->willReturn($user);
 
         /** @var GridViewManager|\PHPUnit_Framework_MockObject_MockObject $gridViewManager */
         $gridViewManager = $this->createMock(GridViewManager::class);

@@ -2,28 +2,28 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\EntityBundle\ORM\Registry;
-use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailOriginFromType extends AbstractType
 {
     const NAME = 'oro_email_email_origin_from';
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var EmailModelBuilderHelper */
     protected $helper;
@@ -34,29 +34,29 @@ class EmailOriginFromType extends AbstractType
     /** @var MailboxManager */
     protected $mailboxManager;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param RelatedEmailsProvider $relatedEmailsProvider
+     * @param TokenAccessorInterface  $tokenAccessor
+     * @param RelatedEmailsProvider   $relatedEmailsProvider
      * @param EmailModelBuilderHelper $helper
-     * @param MailboxManager $mailboxManager
-     * @param Registry $registry
-     * @param EmailOriginHelper $emailOriginHelper
+     * @param MailboxManager          $mailboxManager
+     * @param ManagerRegistry         $registry
+     * @param EmailOriginHelper       $emailOriginHelper
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         RelatedEmailsProvider $relatedEmailsProvider,
         EmailModelBuilderHelper $helper,
         MailboxManager $mailboxManager,
-        Registry $registry,
+        ManagerRegistry $registry,
         EmailOriginHelper $emailOriginHelper
     ) {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
         $this->helper = $helper;
         $this->mailboxManager = $mailboxManager;
@@ -72,7 +72,7 @@ class EmailOriginFromType extends AbstractType
         $builder->addModelTransformer(
             new OriginTransformer(
                 $this->registry->getManager(),
-                $this->securityFacade,
+                $this->tokenAccessor,
                 $this->emailOriginHelper
             )
         );
@@ -95,7 +95,7 @@ class EmailOriginFromType extends AbstractType
      */
     protected function createChoices()
     {
-        $user = $this->securityFacade->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
         if (!$user instanceof User) {
             return [];
         }
@@ -204,7 +204,7 @@ class EmailOriginFromType extends AbstractType
      */
     protected function fillMailboxOrigins(User $user, $origins)
     {
-        $mailboxes = $this->mailboxManager->findAvailableMailboxes($user, $this->securityFacade->getOrganization());
+        $mailboxes = $this->mailboxManager->findAvailableMailboxes($user, $this->tokenAccessor->getOrganization());
         foreach ($mailboxes as $mailbox) {
             $origin = $mailbox->getOrigin();
             if ($origin->isActive()) {
