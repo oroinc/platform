@@ -3,7 +3,7 @@
 {% oro_title_set({ params : {"%form.title%": entity.title} }) %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_embedded_form_delete') %}
+    {% if is_granted('oro_embedded_form_delete') %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
             'dataRedirect': path('oro_embedded_form_list'),
@@ -14,7 +14,7 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
 
-    {% if resource_granted('oro_embedded_form_delete') %}
+    {% if is_granted('oro_embedded_form_delete') %}
         {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Edit'|trans, 'label' : 'Edit'|trans}) }}
     {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}

@@ -120,7 +120,8 @@ services:
     #oro_distribution.listener.navigation_listener:
     #    class: %oro_distribution.listener.navigation_listener.class%
     #    arguments:
-    #        - '@security.context'
+    #        - '@security.authorization_checker'
+    #        - '@security.token_storage'
     #        - %oro_distribution.entry_point%
     #    tags:
     #        - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

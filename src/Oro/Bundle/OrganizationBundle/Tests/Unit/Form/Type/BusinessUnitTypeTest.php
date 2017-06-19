@@ -1,7 +1,9 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -10,15 +12,11 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject $businessUnitManager */
         $businessUnitManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $securityFacade */
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $businessUnitManager->expects($this->any())
             ->method('getBusinessUnitsTree')
@@ -28,7 +26,7 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getBusinessUnitIds')
             ->will($this->returnValue([]));
 
-        $this->form = new BusinessUnitType($businessUnitManager, $securityFacade);
+        $this->form = new BusinessUnitType($businessUnitManager, $tokenAccessor);
     }
 
     public function testSetDefaultOptions()

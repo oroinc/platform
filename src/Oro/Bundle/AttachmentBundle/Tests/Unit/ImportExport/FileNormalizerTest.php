@@ -31,20 +31,6 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $serviceLink->expects($this->any())->method('getService')
-            ->will($this->returnValue($securityFacade));
-
-        $securityFacade->expects($this->any())->method('getLoggedUser')
-            ->will($this->returnValue(null));
-
         $associationManager = $this
             ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
             ->disableOriginalConstructor()

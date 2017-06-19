@@ -32,7 +32,7 @@ services:
         class: %oro_organization.form.type.business_unit.class%
         arguments:
             - '@oro_organization.business_unit_manager'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: oro_business_unit }
 
@@ -40,7 +40,7 @@ services:
         class: %oro_organization.form.type.business_unit.api.class%
         arguments:
             - '@oro_organization.business_unit_manager'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: business_unit }
 
@@ -82,7 +82,7 @@ services:
         class: %oro_organization.form.type.business_unit_select.class%
         arguments:
             - '@doctrine'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: oro_business_unit_select }
 
@@ -101,7 +101,7 @@ services:
     oro_organization.form.type.organization:
         class: %oro_organization.form.type.organization.class%
         arguments:
-            - '@security.context'
+            - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: oro_organization }
 
@@ -131,7 +131,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_organization.business_unit_manager'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - { name: form.type, alias: oro_organizations_select }
     #
@@ -143,7 +143,8 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
             - '@oro_organization.business_unit_manager'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@?security.acl.voter.basic_permissions'
             - '@oro_security.ownership_tree_provider'
             - '@oro_security.owner.entity_owner_accessor'
@@ -156,7 +157,7 @@ services:
         class: %oro_organization.form.extension.organization.class%
         arguments:
             - '@doctrine'
-            - '@oro_security.security_facade.link'
+            - '@oro_security.token_accessor'
             - '@oro_security.owner.ownership_metadata_provider.link'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }

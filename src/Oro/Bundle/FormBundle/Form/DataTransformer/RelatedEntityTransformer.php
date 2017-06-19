@@ -6,11 +6,11 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EntityBundle\Exception\EntityExceptionInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class RelatedEntityTransformer implements DataTransformerInterface
 {
@@ -20,22 +20,22 @@ class RelatedEntityTransformer implements DataTransformerInterface
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param SecurityFacade        $securityFacade
+     * @param DoctrineHelper                $doctrineHelper
+     * @param EntityClassNameHelper         $entityClassNameHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassNameHelper $entityClassNameHelper,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
-        $this->doctrineHelper        = $doctrineHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->entityClassNameHelper = $entityClassNameHelper;
-        $this->securityFacade        = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -90,7 +90,7 @@ class RelatedEntityTransformer implements DataTransformerInterface
         $entityName = $this->entityClassNameHelper->resolveEntityClass($entityName);
         $entity     = $this->doctrineHelper->getEntityRepository($entityName)->find($id);
 
-        return $entity && $this->securityFacade->isGranted('VIEW', $entity)
+        return $entity && $this->authorizationChecker->isGranted('VIEW', $entity)
             ? $entity
             : null;
     }

@@ -20,7 +20,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 {
@@ -94,11 +94,11 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     }
 
     /**
-     * @return SecurityFacade
+     * @return AuthorizationCheckerInterface
      */
-    private function getSecurityFacade()
+    private function getAuthorizationChecker()
     {
-        return $this->container->get('oro_security.security_facade');
+        return $this->container->get('security.authorization_checker');
     }
 
     /**
@@ -204,7 +204,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     private function createDynamicFieldRow(FieldConfigId $fieldConfigId, $fieldName, $entity)
     {
         // Field ACL check
-        if (!$this->getSecurityFacade()->isGranted('VIEW', new FieldVote($entity, $fieldName))) {
+        if (!$this->getAuthorizationChecker()->isGranted('VIEW', new FieldVote($entity, $fieldName))) {
             return [];
         }
 

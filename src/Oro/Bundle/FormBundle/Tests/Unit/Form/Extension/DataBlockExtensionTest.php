@@ -2,25 +2,21 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
 
-use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Symfony\Component\Form\FormView;
+use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
 class DataBlockExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  DataBlockExtension */
     private $formExtension;
 
-    private $securityFacade;
-
     private $options = array('block' => 1, 'subblock' => 1, 'block_config' => 1, 'tooltip' => 1);
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
-        $this->formExtension = new DataBlockExtension($this->securityFacade);
+        $this->formExtension = new DataBlockExtension();
     }
 
     public function testSetDefaultOptions()

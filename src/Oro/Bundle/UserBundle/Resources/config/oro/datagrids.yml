@@ -720,7 +720,7 @@ datagrids:
             query:
                 where:
                     and:
-                        - u.id != @oro_security.security_facade->getLoggedUserId
+                        - u.id != @oro_security.token_accessor->getUserId
 
     users-for-context-grid:
         extended_entity_name: %oro_user.entity.class%
@@ -746,7 +746,7 @@ datagrids:
                     - { table: %oro_user.entity.class%, alias: u }
                 where:
                     and:
-                        - u.id != @oro_security.security_facade->getLoggedUserId
+                        - u.id != @oro_security.token_accessor->getUserId
         columns:
             id:
                 label:         oro.user.id.label

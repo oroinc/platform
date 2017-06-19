@@ -2,6 +2,6 @@ services:
     oro_security.layout_context_configurator.is_logged_in:
         class: Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - { name: layout.context_configurator }
