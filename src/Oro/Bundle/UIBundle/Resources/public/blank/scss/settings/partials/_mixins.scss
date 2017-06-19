@@ -206,6 +206,14 @@
     }
 }
 
+// Wrap element
+@mixin fullscreen-mode {
+    @at-root {
+        .fullscreen-mode {
+            @content;
+        }
+    }
+}
 // Mixin for border, if need to use shorthand property, set $use-shorthand to true
 // Null property doesn't render
 @mixin border(
