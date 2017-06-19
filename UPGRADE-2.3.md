@@ -262,3 +262,7 @@ WorkflowBundle
 UIBundle
 --------
 - Updated ChaplinJS to 1.2.0 version
+
+LocaleBundle
+------------
+- Updated Moment.js to 2.18.* version
