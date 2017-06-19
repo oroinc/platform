@@ -65,21 +65,21 @@ abstract class AbstractFieldsExtension extends AbstractExtension
 
         foreach ($fields as $field) {
             $fieldName = $field->getFieldName();
-            $columnOptions =
-                [
-                    DatagridGuesser::FORMATTER => $config->offsetGetByPath(
-                        sprintf('[%s][%s]', FormatterConfiguration::COLUMNS_KEY, $fieldName),
-                        []
-                    ),
-                    DatagridGuesser::SORTER => $config->offsetGetByPath(
-                        sprintf('%s[%s]', SorterConfiguration::COLUMNS_PATH, $fieldName),
-                        []
-                    ),
-                    DatagridGuesser::FILTER => $config->offsetGetByPath(
-                        sprintf('%s[%s]', FilterConfiguration::COLUMNS_PATH, $fieldName),
-                        []
-                    ),
-                ];
+            $columnOptions = [
+                DatagridGuesser::FORMATTER => $config->offsetGetByPath(
+                    sprintf('[%s][%s]', FormatterConfiguration::COLUMNS_KEY, $fieldName),
+                    []
+                ),
+                DatagridGuesser::SORTER => $config->offsetGetByPath(
+                    sprintf('%s[%s]', SorterConfiguration::COLUMNS_PATH, $fieldName),
+                    []
+                ),
+                DatagridGuesser::FILTER => $config->offsetGetByPath(
+                    sprintf('%s[%s]', FilterConfiguration::COLUMNS_PATH, $fieldName),
+                    []
+                ),
+            ];
+
             $this->prepareColumnOptions($field, $columnOptions);
             $this->datagridGuesser->setColumnOptions($config, $field->getFieldName(), $columnOptions);
         }
