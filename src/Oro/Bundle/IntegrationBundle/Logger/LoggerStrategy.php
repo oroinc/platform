@@ -33,7 +33,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        return $this->logger->emergency($this->buildMessage($message), $context);
+        $this->logger->emergency($this->buildMessage($message), $context);
     }
 
     /**
@@ -41,7 +41,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        return $this->logger->alert($this->buildMessage($message), $context);
+        $this->logger->alert($this->buildMessage($message), $context);
     }
 
     /**
@@ -49,7 +49,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        return $this->logger->critical($this->buildMessage($message), $context);
+        $this->logger->critical($this->buildMessage($message), $context);
     }
 
     /**
@@ -57,7 +57,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        return $this->logger->error($this->buildMessage($message), $context);
+        $this->logger->error($this->buildMessage($message), $context);
     }
 
     /**
@@ -65,7 +65,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        return $this->logger->warning($this->buildMessage($message), $context);
+        $this->logger->warning($this->buildMessage($message), $context);
     }
 
     /**
@@ -73,7 +73,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        return $this->logger->notice($this->buildMessage($message), $context);
+        $this->logger->notice($this->buildMessage($message), $context);
     }
 
     /**
@@ -81,7 +81,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        return $this->logger->info($this->buildMessage($message), $context);
+        $this->logger->info($this->buildMessage($message), $context);
     }
 
     /**
@@ -89,7 +89,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        return $this->logger->debug($this->buildMessage($message), $context);
+        $this->logger->debug($this->buildMessage($message), $context);
     }
 
     /**
@@ -97,7 +97,7 @@ class LoggerStrategy implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        return $this->logger->log($level, $this->buildMessage($message), $context);
+        $this->logger->log($level, $this->buildMessage($message), $context);
     }
 
     /**

@@ -1,0 +1,65 @@
+{% block _select_row_cell_template_widget %}
+    <script type="text/template" id="template-select-row-cell">
+        <label class="custom-checkbox">
+            <input type="checkbox"
+                   tabindex="-1"
+                   data-role="select-row-cell"
+                   class="custom-checkbox__input"
+                   <% if (checked) { %> checked="checked"<% } %>
+            >
+            <span class="custom-checkbox__icon"></span>
+        </label>
+    </script>
+{% endblock %}
+
+{% block _datagrid_action_header_cell_template_widget %}
+    <script type="text/template" id="template-datagrid-action-header-cell">
+        <div class="dropdown datagrid-massaction">
+            <button type="button" class="datagrid-massaction__toggle"
+                    data-toggle="dropdown" title="{{ 'oro.grid.mass_action.label'|trans }}">
+                <span class="datagrid-massaction__dots">{{ 'oro.grid.mass_action.button_label'|trans }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right datagrid-massaction__dropdown-menu"
+                data-action-panel
+                data-options="{&quot;align&quot;: &quot;right&quot;}">
+            </ul>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _select_all_header_cell_template_widget %}
+    <script type="text/template" id="template-select-all-header-cell">
+        <div class="datagrid-massaction">
+            <div class="dropdown datagrid-massaction__toggle">
+                <button type="button" class="datagrid-massaction__invisible" data-toggle="dropdown"></button>
+                <label class="custom-checkbox">
+                    <input type="checkbox" name="is_default" class="custom-checkbox__input" data-select>
+                    <span class="custom-checkbox__icon"></span>
+                </label>
+                <ul class="dropdown-menu datagrid-massaction__dropdown-menu" data-options="{&quot;container&quot;: true}">
+                    <li>
+                        {%- spaceless -%}
+                            <a href="#" class="action" data-select-all>
+                                <%- _.__('oro.datagrid.headerCell.selectAll.all') %>
+                            </a>
+                        {%- endspaceless -%}
+                    </li>
+                    <li class="all-visible">
+                        {%- spaceless -%}
+                            <a href="#" class="action" data-select-all-visible>
+                                <%- _.__('oro.datagrid.headerCell.selectAll.allVisible') %>
+                            </a>
+                        {%- endspaceless -%}
+                    </li>
+                    <li>
+                        {% spaceless %}
+                            <a href="#" class="action" data-select-none>
+                                <%- _.__('oro.datagrid.headerCell.selectAll.none') %>
+                            </a>
+                        {%- endspaceless -%}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </script>
+{% endblock %}

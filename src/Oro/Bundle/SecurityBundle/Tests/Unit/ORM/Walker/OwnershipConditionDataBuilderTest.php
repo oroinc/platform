@@ -5,6 +5,8 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 use Doctrine\ORM\Query\AST\PathExpression;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -31,7 +33,10 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
     private $metadataProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $securityContext;
+    private $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $tokenStorage;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $aclVoter;
@@ -73,13 +78,9 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $securityContextLink =
-            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $securityContextLink->expects($this->any())->method('getService')
-            ->will($this->returnValue($this->securityContext));
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+
         $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -89,7 +90,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->builder = new OwnershipConditionDataBuilder(
-            $securityContextLink,
+            $this->authorizationChecker,
+            $this->tokenStorage,
             new ObjectIdAccessor($doctrineHelper),
             $entityMetadataProvider,
             $this->metadataProvider,
@@ -235,7 +237,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->builder->setAclGroupProvider($aclGroupProvider);
 
-        $this->securityContext->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->with(
                 $this->equalTo('VIEW'),
@@ -252,7 +254,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->will($this->returnValue($isGranted));
-        $this->securityContext->expects($this->any())
+        $this->tokenStorage->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($userId ? $token : null));
 
@@ -270,7 +272,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue('anon'));
-        $this->securityContext->expects($this->any())
+        $this->tokenStorage->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($token));
         $this->assertNull($this->builder->getUserId());

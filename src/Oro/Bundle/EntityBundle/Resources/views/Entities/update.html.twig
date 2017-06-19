@@ -14,7 +14,7 @@
 {% set audit_title  = (entity_config.get('label')|trans)|default('N/A') %}
 
 {% block navButtons %}
-    {% if entity.id and resource_granted('DELETE', entity) %}
+    {% if entity.id and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_entity_delete', {'entityName': entity_class, 'id': entity.id}),
             'dataRedirect': path('oro_entity_index', {'entityName': entity_class}),
@@ -30,13 +30,13 @@
         'route': 'oro_entity_view',
         'params': {'entityName': entity_name, 'id': '$id'}
     }) %}
-    {% if resource_granted('CREATE', 'entity:' ~ entity_class) %}
+    {% if is_granted('CREATE', 'entity:' ~ entity_class) %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_entity_update',
             'params': {'entityName': entity_name}
         }) %}
     {% endif %}
-    {% if entity.id or resource_granted('EDIT', 'entity:' ~ entity_class) %}
+    {% if entity.id or is_granted('EDIT', 'entity:' ~ entity_class) %}
         {% set html = html ~ UI.saveAndStayButton({
             'route': 'oro_entity_update',
             'params': {'entityName': entity_name, 'id': '$id'}

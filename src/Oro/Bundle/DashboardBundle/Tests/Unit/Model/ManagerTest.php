@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -45,7 +47,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
+    protected $tokenStorage;
 
     protected function setUp()
     {
@@ -85,13 +87,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $this->manager = new Manager(
             $this->factory,
             $this->entityManager,
             $this->aclHelper,
-            $this->securityContext
+            $this->tokenStorage
         );
     }
 
@@ -277,7 +279,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Oro\Bundle\DashboardBundle\Entity\Dashboard'))
             ->will($this->returnValue($dashboardModel));
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
@@ -525,7 +527,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
@@ -564,7 +566,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
@@ -596,7 +598,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
@@ -629,7 +631,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
@@ -709,7 +711,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
@@ -747,7 +749,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 

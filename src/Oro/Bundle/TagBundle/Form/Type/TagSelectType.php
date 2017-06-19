@@ -6,8 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
@@ -17,25 +16,25 @@ class TagSelectType extends AbstractType
     /** @var TagSubscriber */
     protected $subscriber;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var TagTransformer */
     protected $tagTransformer;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param TagTransformer $tagTransformer
-     * @param TagSubscriber  $subscriber
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TagTransformer                $tagTransformer
+     * @param TagSubscriber                 $subscriber
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         TagTransformer $tagTransformer,
         TagSubscriber $subscriber
     ) {
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
         $this->tagTransformer = $tagTransformer;
-        $this->subscriber     = $subscriber;
+        $this->subscriber = $subscriber;
     }
 
     /**
@@ -53,7 +52,8 @@ class TagSelectType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['component_options']['oro_tag_create_granted'] = $this->securityFacade->isGranted('oro_tag_create');
+        $view->vars['component_options']['oro_tag_create_granted'] =
+            $this->authorizationChecker->isGranted('oro_tag_create');
     }
 
     /**

@@ -9,6 +9,7 @@ services:
             - '@akeneo_batch.job_repository'
             - '@oro_importexport.context_registry'
             - '@doctrine'
+            - '@oro_importexport.job.context.aggregator_registry'
         lazy: true
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]

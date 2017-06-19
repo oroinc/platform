@@ -5,22 +5,17 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Util\MenuManipulator;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class NavigationHistoryBuilder extends NavigationItemBuilder
 {
-    /**
-     * @var Matcher
-     */
+    /** @var Matcher */
     private $matcher;
 
-    /**
-     * @var \Oro\Bundle\ConfigBundle\Config\ConfigManager
-     */
-    private $configOptions = null;
+    /** @var ConfigManager */
+    private $configManager;
 
-    /**
-     * @var MenuManipulator
-     */
+    /** @var MenuManipulator */
     private $manipulator;
 
     /**
@@ -35,13 +30,11 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
     }
 
     /**
-     * Inject config
-     *
-     * @param \Oro\Bundle\ConfigBundle\Config\ConfigManager $config
+     * @param ConfigManager $configManager
      */
-    public function setOptions($config)
+    public function setConfigManager(ConfigManager $configManager)
     {
-        $this->configOptions = $config;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -53,7 +46,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $maxItems = $this->configOptions->get('oro_navigation.max_items');
+        $maxItems = $this->configManager->get('oro_navigation.max_items');
 
         if (!is_null($maxItems)) {
             // we'll hide current item, so always select +1 item

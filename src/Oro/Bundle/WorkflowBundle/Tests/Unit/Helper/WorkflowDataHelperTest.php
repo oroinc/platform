@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -24,8 +24,8 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
 
 class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
     /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
@@ -41,15 +41,19 @@ class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)->disableOriginalConstructor()->getMock();
-        $this->securityFacade->expects($this->any())->method('isGranted')->willReturn(true);
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)->disableOriginalConstructor()->getMock();
-        $this->router = $this->getMockBuilder(UrlGeneratorInterface::class)->disableOriginalConstructor()->getMock();
-        $this->router->expects($this->any())->method('generate')->willReturnCallback(
-            function ($route, array $params) {
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->router = $this->createMock(UrlGeneratorInterface::class);
+
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
+
+        $this->router->expects($this->any())
+            ->method('generate')
+            ->willReturnCallback(function ($route, array $params) {
                 return sprintf('%s/%s', $route, implode('/', $params));
-            }
-        );
+            });
     }
 
     /**
@@ -173,7 +177,7 @@ class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
 
         $workflowDataHelper = new WorkflowDataHelper(
             $this->getWorkflowManager($entity, $workflowsData),
-            $this->securityFacade,
+            $this->authorizationChecker,
             $this->translator,
             $this->router
         );
