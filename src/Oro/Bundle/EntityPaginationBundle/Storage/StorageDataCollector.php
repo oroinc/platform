@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityPaginationBundle\Storage;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -19,7 +18,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 class StorageDataCollector
 {
     const PAGINGATION_PARAM = 'entity_pagination';
-    
+
     /**
      * @var DataGridManager
      */
@@ -32,6 +31,8 @@ class StorageDataCollector
 
     /**
      * @var AclHelper
+     *
+     * @deprecated since 2.3. Will be removed in 2.4.
      */
     protected $aclHelper;
 
@@ -82,6 +83,7 @@ class StorageDataCollector
         foreach ($this->getGridNames($request) as $gridName) {
             try {
                 // datagrid manager automatically extracts all required parameters from request
+                /** @var \Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface $dataGrid */
                 $dataGrid = $this->datagridManager
                     ->getDatagridByRequestParams(
                         $gridName,
@@ -104,6 +106,8 @@ class StorageDataCollector
 
             // if entities are not in storage
             if (!$this->storage->hasData($entityName, $stateHash, $scope)) {
+                $originalScope = $dataGrid->getScope();
+                $dataGrid->setScope($scope);
                 $entitiesLimit = $this->getEntitiesLimit();
                 $totalCount = $this->getTotalCount($dataGrid, $scope);
 
@@ -118,6 +122,7 @@ class StorageDataCollector
                     // set empty array as a sign that data is collected, but pagination itself must be disabled
                     $this->storage->setData($entityName, $stateHash, [], $scope);
                 }
+                $dataGrid->setScope($originalScope);
             }
 
             $isDataCollected = true;
@@ -133,7 +138,6 @@ class StorageDataCollector
      */
     protected function getAllEntityIds(OrmDatasource $dataSource, $scope)
     {
-        $permission = EntityPaginationManager::getPermission($scope);
         $entityName = $this->getEntityName($dataSource);
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
 
@@ -141,13 +145,11 @@ class StorageDataCollector
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults($this->getEntitiesLimit());
 
-        $query = $this->aclHelper->apply($queryBuilder, $permission);
-        $results = $query->execute();
+        $results = $dataSource->getResults();
 
         $entityIds = [];
         foreach ($results as $result) {
-            $record = new ResultRecord($result);
-            $entityIds[] = $record->getValue($entityIdentifier);
+            $entityIds[] = $result->getValue($entityIdentifier);
         }
 
         return $entityIds;

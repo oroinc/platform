@@ -12,6 +12,7 @@ use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
 class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -220,23 +221,6 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->method('setMaxResults')
             ->with($entitiesLimit);
 
-        $entities = [];
-        foreach ($entityIds as $id) {
-            $entities[] = [$identifierField => $id];
-        }
-
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['execute'])
-            ->getMockForAbstractClass();
-        $query->expects($this->any())
-            ->method('execute')
-            ->will($this->returnValue($entities));
-
-        $this->aclHelper->expects($this->any())
-            ->method('apply')
-            ->with($queryBuilder, $permission)
-            ->will($this->returnValue($query));
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityMetadata')
             ->with(self::ENTITY_NAME)
@@ -246,12 +230,20 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_NAME)
             ->will($this->returnValue($identifierField));
 
+        $entities = [];
+        foreach ($entityIds as $id) {
+            $entities[] = new ResultRecord([$identifierField => $id]);
+        }
+
         $dataSource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
         $dataSource->expects($this->any())
             ->method('getQueryBuilder')
             ->will($this->returnValue($queryBuilder));
+        $dataSource->expects($this->any())
+            ->method('getResults')
+            ->will($this->returnValue($entities));
 
         $acceptor = $this->createMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
         $result = ResultsObject::create(['data' => []]);
