@@ -480,7 +480,7 @@ Feature: Payment Rules CRUD
       | Method | PayPal |
 ```
 
-### Ebedded Form Mappings
+### Embedded Form Mappings
 
 It's common happens that form appears in iframe.
 Behat can switch to iframe by it's id.
