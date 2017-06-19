@@ -262,6 +262,7 @@ WorkflowBundle
 UIBundle
 --------
 - Updated ChaplinJS to 1.2.0 version
+- Updated Autolinker.js to 1.4.* version
 
 LocaleBundle
 ------------
