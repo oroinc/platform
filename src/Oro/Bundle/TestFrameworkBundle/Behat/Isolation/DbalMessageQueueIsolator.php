@@ -43,7 +43,7 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
         $connectionMQ->executeQuery('DELETE FROM oro_message_queue_job_unique');
 
         $this->getFilesystem()
-            ->remove(rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'oro-message-queue');
+            ->remove(rtrim($this->kernel->getContainer()->getParameter('oro_message_queue.dbal.pid_file_dir')));
     }
 
     /**

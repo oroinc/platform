@@ -8,20 +8,20 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class CommentLifecycleListener
 {
-    /** @var ServiceLink */
-    protected $securityFacadeLink;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param ServiceLink $securityFacadeLink
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(ServiceLink $securityFacadeLink)
+    public function __construct(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacadeLink = $securityFacadeLink;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -73,9 +73,11 @@ class CommentLifecycleListener
      */
     protected function getUser(EntityManager $entityManager)
     {
-        $user = $this->securityFacadeLink->getService()->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
 
-        if ($user && $entityManager->getUnitOfWork()->getEntityState($user) == UnitOfWork::STATE_DETACHED) {
+        if (null !== $user
+            && $entityManager->getUnitOfWork()->getEntityState($user) === UnitOfWork::STATE_DETACHED
+        ) {
             $user = $entityManager->find('OroUserBundle:User', $user->getId());
         }
 

@@ -8,7 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -28,7 +28,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
@@ -73,11 +73,11 @@ class EmailActivityListProvider implements
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    /** @var ServiceLink */
-    protected $securityFacadeLink;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var ServiceLink */
     protected $mailboxProcessStorageLink;
@@ -89,17 +89,18 @@ class EmailActivityListProvider implements
     protected $commentAssociationHelper;
 
     /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ServiceLink               $doctrineRegistryLink
-     * @param EntityNameResolver        $entityNameResolver
-     * @param Router                    $router
-     * @param ConfigManager             $configManager
-     * @param EmailThreadProvider       $emailThreadProvider
-     * @param HtmlTagHelper             $htmlTagHelper
-     * @param ServiceLink               $securityFacadeLink
-     * @param ServiceLink               $mailboxProcessStorageLink
-     * @param ActivityAssociationHelper $activityAssociationHelper
-     * @param CommentAssociationHelper  $commentAssociationHelper
+     * @param DoctrineHelper                $doctrineHelper
+     * @param ServiceLink                   $doctrineRegistryLink
+     * @param EntityNameResolver            $entityNameResolver
+     * @param Router                        $router
+     * @param ConfigManager                 $configManager
+     * @param EmailThreadProvider           $emailThreadProvider
+     * @param HtmlTagHelper                 $htmlTagHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param ServiceLink                   $mailboxProcessStorageLink
+     * @param ActivityAssociationHelper     $activityAssociationHelper
+     * @param CommentAssociationHelper      $commentAssociationHelper
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -111,30 +112,24 @@ class EmailActivityListProvider implements
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
         HtmlTagHelper $htmlTagHelper,
-        ServiceLink $securityFacadeLink,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         ServiceLink $mailboxProcessStorageLink,
         ActivityAssociationHelper $activityAssociationHelper,
         CommentAssociationHelper $commentAssociationHelper
     ) {
-        $this->doctrineHelper            = $doctrineHelper;
-        $this->doctrineRegistryLink      = $doctrineRegistryLink;
-        $this->entityNameResolver        = $entityNameResolver;
-        $this->router                    = $router;
-        $this->configManager             = $configManager;
-        $this->emailThreadProvider       = $emailThreadProvider;
-        $this->htmlTagHelper             = $htmlTagHelper;
-        $this->securityFacadeLink        = $securityFacadeLink;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrineRegistryLink = $doctrineRegistryLink;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->router = $router;
+        $this->configManager = $configManager;
+        $this->emailThreadProvider = $emailThreadProvider;
+        $this->htmlTagHelper = $htmlTagHelper;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
         $this->mailboxProcessStorageLink = $mailboxProcessStorageLink;
         $this->activityAssociationHelper = $activityAssociationHelper;
-        $this->commentAssociationHelper  = $commentAssociationHelper;
-    }
-
-    /**
-     * @param ServiceLink $securityContextLink
-     */
-    public function setSecurityContextLink(ServiceLink $securityContextLink)
-    {
-        $this->securityContextLink = $securityContextLink;
+        $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
     /**
@@ -247,11 +242,9 @@ class EmailActivityListProvider implements
             return $emailAddressOwner->getOrganization();
         }
 
-        /** @var SecurityContextInterface $securityContext */
-        $securityContext = $this->securityContextLink->getService();
-        $token           = $securityContext->getToken();
-        if ($token instanceof OrganizationContextTokenInterface) {
-            return $token->getOrganizationContext();
+        $currentOrganization = $this->tokenAccessor->getOrganization();
+        if (null !== $currentOrganization) {
+            return $currentOrganization;
         }
 
         $processes = $this->mailboxProcessStorageLink->getService()->getProcesses();
@@ -471,8 +464,7 @@ class EmailActivityListProvider implements
     {
         $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
             ->getRoute('view');
-        $securityFacade = $this->securityFacadeLink->getService();
-        if (null !== $route && $securityFacade->isGranted('VIEW', $owner)) {
+        if (null !== $route && $this->authorizationChecker->isGranted('VIEW', $owner)) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
             try {
                 $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);

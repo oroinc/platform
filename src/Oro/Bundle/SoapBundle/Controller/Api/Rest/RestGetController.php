@@ -173,7 +173,6 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {
             $entity->__load();
         }
-        $securityFacade = $this->get('oro_security.security_facade');
 
         $result = [];
         if ($entity) {
@@ -181,7 +180,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 $voteObject = $this->get('oro_entity.doctrine_helper')->createEntityInstance($entity['entity']);
 
                 foreach ($entity as $field => $value) {
-                    if (!$securityFacade->isGranted('VIEW', new FieldVote($voteObject, $field))) {
+                    if (!$this->isGranted('VIEW', new FieldVote($voteObject, $field))) {
                         continue;
                     }
 
@@ -205,7 +204,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                     $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
                     foreach ($accessors as $accessor) {
                         if (method_exists($entity, $accessor)) {
-                            $isForbidden = !$securityFacade->isGranted('VIEW', new FieldVote($entity, $field));
+                            $isForbidden = !$this->isGranted('VIEW', new FieldVote($entity, $field));
                             if ($isForbidden) {
                                 continue;
                             }

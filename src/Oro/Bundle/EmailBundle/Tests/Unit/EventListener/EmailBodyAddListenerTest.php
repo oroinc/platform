@@ -4,14 +4,15 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,11 +28,11 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EmailActivityListProvider */
     protected $activityListProvider;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
-    /** @var ServiceLink */
-    protected $securityFacadeLink;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
 
     /** @var ActivityListChainProvider */
     protected $chainProvider;
@@ -47,14 +48,8 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->activityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
             ->disableOriginalConstructor()->getMock();
-        $this->securityFacadeLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
-        $this->securityFacadeLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($this->securityFacade);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->chainProvider =
             $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()->getMock();
@@ -65,7 +60,8 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
             $this->emailAttachmentManager,
             $this->configProvider,
             $this->activityListProvider,
-            $this->securityFacadeLink,
+            $this->authorizationChecker,
+            $this->tokenStorage,
             $this->chainProvider,
             $this->entityManager
         );
@@ -76,10 +72,10 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
             ->disableOriginalConstructor()->getMock();
 
-        $this->securityFacade->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn(1);
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->willReturn(false);
         $this->activityListProvider->expects($this->never())
@@ -105,10 +101,10 @@ class EmailBodyAddListenerTest extends \PHPUnit_Framework_TestCase
         $configInterface = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
             ->disableOriginalConstructor()->getMock();
 
-        $this->securityFacade->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn(1);
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->willReturn(true);
         $this->activityListProvider->expects($this->once())

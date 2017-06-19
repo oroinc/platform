@@ -605,7 +605,7 @@
 {% endblock %}
 
 {% block oro_link_type_widget %}
-    {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
+    {% if isPath or is_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
         <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
             {{ title|trans }}
         </a>

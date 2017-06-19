@@ -9,7 +9,6 @@ use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SearchListener
@@ -20,20 +19,15 @@ class SearchListener
     /** @var OwnershipMetadataProvider */
     protected $metadataProvider;
 
-    /**  @var SecurityFacade */
-    protected $securityFacade;
-
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
     /**
      * @param OwnershipMetadataProvider $metadataProvider
-     * @param SecurityFacade            $securityFacade
      */
-    public function __construct(OwnershipMetadataProvider $metadataProvider, SecurityFacade $securityFacade)
+    public function __construct(OwnershipMetadataProvider $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
-        $this->securityFacade   = $securityFacade;
     }
 
     /**

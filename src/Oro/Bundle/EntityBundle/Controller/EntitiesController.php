@@ -18,7 +18,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Entities controller.
@@ -350,10 +349,7 @@ class EntitiesController extends Controller
      */
     private function checkAccess($permission, $entityName)
     {
-        /** @var SecurityFacade $securityFacade */
-        $securityFacade = $this->get('oro_security.security_facade');
-        $isGranted      = $securityFacade->isGranted($permission, 'entity:' . $entityName);
-        if (!$isGranted) {
+        if (!$this->isGranted($permission, 'entity:' . $entityName)) {
             throw new AccessDeniedException('Access denied.');
         }
     }

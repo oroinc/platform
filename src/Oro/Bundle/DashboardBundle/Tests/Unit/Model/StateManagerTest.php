@@ -2,54 +2,38 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\DashboardBundle\Model\StateManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class StateManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $widget;
 
-    /**
-     * @var StateManager
-     */
+    /** @var StateManager */
     protected $stateManager;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->repository = $this
-            ->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityManager = $this
-            ->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->repository = $this->createMock(EntityRepository::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
 
         $this->stateManager = new StateManager(
             $this->entityManager,
-            $this->securityFacade
+            $this->tokenAccessor
         );
     }
 
@@ -57,9 +41,8 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
     {
         $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
 
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue(null));
 
         $this->repository->expects($this->never())->method($this->anything());
@@ -78,13 +61,11 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
         $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->will($this->returnValue($this->repository));
 
@@ -106,13 +87,11 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
         $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->will($this->returnValue($this->repository));
 

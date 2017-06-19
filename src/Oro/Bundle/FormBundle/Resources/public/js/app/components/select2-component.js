@@ -9,7 +9,8 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     Select2Component = BaseComponent.extend({
-
+        resultTemplate: require('text!oroui/templates/select2/default-template.html'),
+        selectionTemplate: require('text!oroui/templates/select2/default-template.html'),
         url: '',
         perPage: 10,
         excluded: [],
@@ -22,6 +23,17 @@ define(function(require) {
          */
         initialize: function(options) {
             var config = options.configs || {};
+
+            //Check enable icon for each option and set default template
+            if (config.showIcon) {
+                if (!config.result_template) {
+                    config.result_template = this.resultTemplate;
+                }
+                if (!config.selection_template) {
+                    config.selection_template = this.selectionTemplate;
+                }
+            }
+
             this.perPage = _.result(config, 'per_page') || this.perPage;
             this.url = _.result(options, 'url') || '';
             this.excluded = _.result(options, 'excluded') || this.excluded;

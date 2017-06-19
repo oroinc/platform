@@ -2,37 +2,30 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Provider\MultiGridProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MultiGridProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var MultiGridProvider */
     protected $multiGridProvider;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $entityClass = 'Oro\Bundle\UserBundle\Entity\User';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $expectedGridName = 'mygrig1';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $permissions = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $entityConfigs = [
         'Oro\Bundle\UserBundle\Entity\User' => [
             'label' => 'label1',
@@ -44,18 +37,16 @@ class MultiGridProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $securityFacade = $this->getMockBuilder(SecurityFacade::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityFacade->expects($this->any())
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->will($this->returnCallback(function ($attributes, $object) {
+            ->willReturnCallback(function ($attributes, $object) {
                 $result = isset($this->permissions[$attributes][$object])
                     ? $this->permissions[$attributes][$object]
                     : true;
 
                 return $result;
-            }));
+            });
 
         $gridConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
@@ -97,7 +88,7 @@ class MultiGridProviderTest extends \PHPUnit_Framework_TestCase
         $gridManager = $this->createMock(ManagerInterface::class);
 
         $this->multiGridProvider = new MultiGridProvider(
-            $securityFacade,
+            $authorizationChecker,
             $configManager,
             $gridManager
         );

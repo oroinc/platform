@@ -3,31 +3,27 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Datagrid\ActionChecker;
 
 class ActionCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var ActionChecker */
     protected $actionChecker;
 
     public function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->actionChecker = new ActionChecker($this->securityFacade);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->actionChecker = new ActionChecker($this->tokenAccessor);
     }
 
     /**
      * @dataProvider actionCheckDataProvider
      */
-    public function testCheckActions($curent, $row, $result)
+    public function testCheckActions($current, $row, $result)
     {
         $resultRecord = $this->getMockBuilder(ResultRecordInterface::class)
             ->disableOriginalConstructor()
@@ -38,9 +34,9 @@ class ActionCheckerTest extends \PHPUnit_Framework_TestCase
             ->with('id')
             ->willReturn($row);
 
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUserId')
-            ->willReturn($curent);
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUserId')
+            ->willReturn($current);
 
         $configuration = $this->actionChecker->checkActions($resultRecord);
         $this->assertSame($configuration, $result);
