@@ -633,7 +633,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     //@codingStandardsIgnoreStart
-
     /**
      * Filter grid by string filter
      * Example: When I filter First Name as contains "Aadi"
@@ -645,7 +644,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function applyStringFilter($filterName, $type, $value, $grid = 'Grid')
     {
         /** @var GridFilterStringItem $filterItem */
-        $filterItem = $this->getGridFilters($grid)->getFilterItem($grid . 'FilterStringItem', $filterName);
+        $filterItem = $this->getGridFilters($grid)->getFilterItem('GridFilterStringItem', $filterName);
 
         $filterItem->open();
         $filterItem->selectType($type);
