@@ -41,7 +41,7 @@
 
 {% block activityActions %}
     {% set action %}
-        {% if resource_granted('oro_email_email_user_edit') %}
+        {% if is_granted('oro_email_email_user_edit') %}
             <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
                data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': '{{ entityClass|replace({'\\': '_'}) }}' }) %>"
                     {{ UI.renderWidgetDataAttributes({
@@ -69,7 +69,7 @@
     {% set actions = [action] %}
 
     {% set action %}
-        {% if resource_granted('oro_email_email_create') %}
+        {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.reply'|trans }}"
                data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
                {{ UI.renderWidgetDataAttributes({
@@ -95,7 +95,7 @@
     {% set actions = actions|merge([action]) %}
 
     {% set action %}
-    {% if resource_granted('oro_email_email_create') %}
+    {% if is_granted('oro_email_email_create') %}
         <a href="#" title="{{ 'oro.email.reply_all'|trans|raw }}"
            data-url="<%= routing.generate('oro_email_email_reply_all', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
                 {{ UI.renderWidgetDataAttributes({
@@ -121,7 +121,7 @@
     {% set actions = actions|merge([action]) %}
 
     {% set action %}
-        {% if resource_granted('oro_email_email_create') %}
+        {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.forward'|trans }}"
                data-url="<%= routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
                {{ UI.renderWidgetDataAttributes({

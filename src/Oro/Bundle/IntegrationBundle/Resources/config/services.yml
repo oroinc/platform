@@ -89,7 +89,7 @@ services:
     oro_integration.form.subscriber.default_owner_subscriber:
         class: %oro_integration.form.subscriber.default_owner_subscriber.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_integration.manager.types_registry'
 
     oro_integration.form.handler.integration:
@@ -125,6 +125,7 @@ services:
             - '@akeneo_batch.job_repository'
             - '@oro_importexport.context_registry'
             - '@doctrine'
+            - '@oro_importexport.job.context.aggregator_registry'
         lazy: true
 
     oro_integration.writer.persistent_batch_writer:
@@ -207,6 +208,7 @@ services:
     oro_integration.reverse_sync.processor:
         class: 'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor'
         arguments:
+            - '@doctrine'
             - '@oro_importexport.processor.registry'
             - '@oro_integration.job_executor'
             - '@oro_integration.manager.types_registry'

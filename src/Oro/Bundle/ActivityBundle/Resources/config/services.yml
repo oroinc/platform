@@ -60,22 +60,12 @@ services:
         class: %oro_activity.widget_provider.activities.main.class%
         arguments:
             - '@oro_activity.manager'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@translator'
             - '@oro_entity.entity_identifier_accessor'
             - '@oro_entity.routing_helper'
         tags:
             - { name: oro_activity.activity_widget_provider }
-
-    oro_activity.provider.context_grid:
-        class: Oro\Bundle\ActivityBundle\Provider\ContextGridProvider
-        arguments:
-            - '@oro_entity.routing_helper'
-            - '@oro_entity.entity_provider'
-            - '@oro_entity_config.provider.grid'
-            - '@oro_security.security_facade'
-            - '@oro_activity.manager'
-            - '@oro_datagrid.multi_grid_provider'
 
     oro_activity.listener.context_grid:
         class: Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
@@ -145,7 +135,7 @@ services:
         class: '%oro_activity.handler.delete.activity_entity.class%'
         parent: oro_soap.handler.delete.abstract
         calls:
-            - [setSecurityFacade, ['@oro_security.security_facade']]
+            - [setAuthorizationChecker, ['@security.authorization_checker']]
             - [setActivityManager, ['@oro_activity.manager']]
         tags:
             - { name: oro_activity.activity_entity_delete_handler }
@@ -171,7 +161,7 @@ services:
             - '@request'
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
 
     oro_activity.form.activity_entity.api:
         class: Symfony\Component\Form\Form

@@ -5,9 +5,9 @@ namespace Oro\Bundle\UserBundle\Autocomplete;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class WidgetUserSearchHandler extends UserSearchHandler
 {
@@ -17,8 +17,8 @@ class WidgetUserSearchHandler extends UserSearchHandler
     /** @var bool */
     protected $addCurrent = false;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var SearchCriteria */
     protected $searchUserCriteria;
@@ -41,11 +41,11 @@ class WidgetUserSearchHandler extends UserSearchHandler
     }
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
+    public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -139,7 +139,7 @@ class WidgetUserSearchHandler extends UserSearchHandler
         $queryBuilder->leftJoin('u.organizations', 'org')
             ->andWhere('org.id = :org')
             ->andWhere('u.enabled = :enabled')
-            ->setParameter('org', $this->securityFacade->getOrganizationId())
+            ->setParameter('org', $this->tokenAccessor->getOrganizationId())
             ->setParameter('enabled', true);
 
         return $queryBuilder;

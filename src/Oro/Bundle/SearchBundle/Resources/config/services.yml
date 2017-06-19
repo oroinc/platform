@@ -50,7 +50,7 @@ services:
         class:                        %oro_search.security_provider.class%
         public:                       false
         arguments:
-            - "@oro_security.security_facade"
+            - "@security.authorization_checker"
             - "@oro_security.entity_security_metadata_provider"
 
     oro_search.index_listener:

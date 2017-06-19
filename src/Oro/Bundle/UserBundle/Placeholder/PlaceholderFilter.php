@@ -2,23 +2,21 @@
 
 namespace Oro\Bundle\UserBundle\Placeholder;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class PlaceholderFilter
 {
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -56,6 +54,6 @@ class PlaceholderFilter
      */
     public function isUserApplicable()
     {
-        return $this->securityFacade->getLoggedUser() instanceof User;
+        return $this->tokenAccessor->getUser() instanceof User;
     }
 }

@@ -12,9 +12,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class DashboardConfigurationFormProviderTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
-
     protected function setUp()
     {
         parent::setUp();
@@ -30,7 +27,6 @@ class DashboardConfigurationFormProviderTest extends FormIntegrationTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        unset($this->securityFacade);
     }
 
     /**

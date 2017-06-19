@@ -11,6 +11,7 @@ use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistry
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ReaderCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\WriterCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ContextAggregatorCompilerPass;
 
 class OroImportExportBundle extends Bundle
 {
@@ -27,5 +28,6 @@ class OroImportExportBundle extends Bundle
         $container->addCompilerPass(new FormatterProviderPass());
         $container->addCompilerPass(new WriterCompilerPass());
         $container->addCompilerPass(new ReaderCompilerPass());
+        $container->addCompilerPass(new ContextAggregatorCompilerPass());
     }
 }

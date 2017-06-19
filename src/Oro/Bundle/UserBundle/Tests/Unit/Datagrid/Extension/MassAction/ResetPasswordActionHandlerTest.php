@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
-use Oro\Bundle\NotificationBundle\Model\EmailTemplate;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 
 class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
@@ -17,32 +18,25 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ResetPasswordActionHandler */
     protected $translator;
 
-    /** @var  int */
+    /** @var int */
     protected $methodCalls;
 
     protected function setUp()
     {
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityFacade
-            ->expects($this->atLeastOnce())
-            ->method('getLoggedUser')
+        $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $tokenAccessor->expects($this->atLeastOnce())
+            ->method('getUser')
             ->willReturn(new User());
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $resetPasswordHandler = $this->getMockBuilder(ResetPasswordHandler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resetPasswordHandler = $this->createMock(ResetPasswordHandler::class);
 
         $this->methodCalls = 0;
         $this->handler = new ResetPasswordActionHandler(
             $resetPasswordHandler,
             $this->translator,
-            $securityFacade
+            $tokenAccessor
         );
     }
 

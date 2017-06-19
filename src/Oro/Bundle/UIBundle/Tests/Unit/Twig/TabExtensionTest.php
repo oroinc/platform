@@ -3,10 +3,10 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Twig\TabExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -24,7 +24,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     protected $router;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
@@ -40,15 +40,13 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getMenu'])
             ->getMock();
         $this->router = $this->createMock(RouterInterface::class);
-        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_menu.twig.extension', $this->menuExtension)
             ->add('router', $this->router)
-            ->add('oro_security.security_facade', $this->securityFacade)
+            ->add('security.authorization_checker', $this->authorizationChecker)
             ->add('translator', $this->translator)
             ->getContainer($this);
 
@@ -117,7 +115,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('render')
             ->willReturn($expected);
 
-        $this->securityFacade->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->will(
                 $this->returnValueMap($acl)
@@ -155,7 +153,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->securityFacade->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->will(
                 $this->returnCallback(

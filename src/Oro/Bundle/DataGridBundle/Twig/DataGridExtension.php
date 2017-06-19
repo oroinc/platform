@@ -7,12 +7,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DataGridExtension extends \Twig_Extension
 {
@@ -54,11 +54,11 @@ class DataGridExtension extends \Twig_Extension
     }
 
     /**
-     * @return SecurityFacade
+     * @return AuthorizationCheckerInterface
      */
-    protected function getSecurityFacade()
+    protected function getAuthorizationChecker()
     {
-        return $this->container->get('oro_security.security_facade');
+        return $this->container->get('security.authorization_checker');
     }
 
     /**
@@ -315,7 +315,7 @@ class DataGridExtension extends \Twig_Extension
 
         if ($gridConfig) {
             $aclResource = $gridConfig->getAclResource();
-            if ($aclResource && !$this->getSecurityFacade()->isGranted($aclResource)) {
+            if ($aclResource && !$this->getAuthorizationChecker()->isGranted($aclResource)) {
                 return false;
             } else {
                 return true;

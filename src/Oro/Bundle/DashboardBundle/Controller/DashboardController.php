@@ -14,7 +14,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
@@ -76,7 +75,7 @@ class DashboardController extends Controller
             return $this->quickLaunchpadAction();
         }
 
-        if (!$this->getSecurityFacade()->isGranted('VIEW', $currentDashboard->getEntity())) {
+        if (!$this->isGranted('VIEW', $currentDashboard->getEntity())) {
             return $this->quickLaunchpadAction();
         }
 
@@ -110,7 +109,7 @@ class DashboardController extends Controller
      */
     public function configureAction(Request $request, Widget $widget)
     {
-        if (!$this->getSecurityFacade()->isGranted('EDIT', $widget->getDashboard())) {
+        if (!$this->isGranted('EDIT', $widget->getDashboard())) {
             throw new AccessDeniedException();
         }
 
@@ -310,9 +309,7 @@ class DashboardController extends Controller
             $dashboard = $this->getDashboardManager()->getDashboardModel($dashboard);
         } else {
             $dashboard = $this->getDashboardManager()->findUserActiveOrDefaultDashboard($this->getUser());
-            if ($dashboard &&
-                !$this->getSecurityFacade()->isGranted($permission, $dashboard->getEntity())
-            ) {
+            if ($dashboard && !$this->isGranted($permission, $dashboard->getEntity())) {
                 $dashboard = null;
             }
         }
@@ -438,13 +435,5 @@ class DashboardController extends Controller
     protected function getEntityManager()
     {
         return $this->container->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return SecurityFacade
-     */
-    protected function getSecurityFacade()
-    {
-        return $this->get('oro_security.security_facade');
     }
 }

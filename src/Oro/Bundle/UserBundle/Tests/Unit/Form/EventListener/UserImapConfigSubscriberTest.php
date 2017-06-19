@@ -2,18 +2,22 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\EventListener;
 
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 
 class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContext;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
@@ -29,21 +33,12 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMockForAbstractClass(
-            'Symfony\Component\Security\Core\SecurityContextInterface'
-        );
-
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->requestStack = new RequestStack();
+        $this->manager = $this->createMock(EntityManager::class);
+        $this->eventMock = $this->createMock(FormEvent::class);
 
-        $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->subscriber = new UserImapConfigSubscriber($this->manager, $this->requestStack, $this->securityContext);
+        $this->subscriber = new UserImapConfigSubscriber($this->manager, $this->requestStack, $this->tokenAccessor);
     }
 
     public function testSubscribedEvents()
@@ -76,6 +71,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $id = 1;
         $user = new User();
+        $organization = new Organization();
         $request = new Request();
         $request->attributes->add(
             [
@@ -85,22 +81,11 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         );
         $this->requestStack->push($request);
 
-        $token = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
-            ->disableOriginalConstructor()
-            ->setMethods(['getOrganizationContext', 'getUser'])
-            ->getMock();
-
-        $token->expects($this->never())->method('getUser');
-
-        $organization = new Organization();
-        $token->expects($this->any())
-            ->method('getOrganizationContext')
-            ->will($this->returnValue($organization));
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
+        $this->tokenAccessor->expects($this->never())
+            ->method('getUser');
+        $this->tokenAccessor->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($organization);
 
         $this->manager->expects($this->once())->method('find')->with('OroUserBundle:User', $id)
             ->will($this->returnValue($user));
@@ -115,6 +100,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testPreSetDataForProfileConfig()
     {
         $user = new User();
+        $organization = new Organization();
         $request = new Request();
         $request->attributes->add(
             [
@@ -125,24 +111,12 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->expects($this->never())->method('find');
 
-        $token = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
-            ->disableOriginalConstructor()
-            ->setMethods(['getUser', 'getOrganizationContext'])
-            ->getMock();
-
-        $token->expects($this->any())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
-
-        $organization = new Organization();
-        $token->expects($this->once())
-            ->method('getOrganizationContext')
-            ->will($this->returnValue($organization));
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($user);
+        $this->tokenAccessor->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($organization);
 
         $this->eventMock->expects($this->once())
             ->method('setData')

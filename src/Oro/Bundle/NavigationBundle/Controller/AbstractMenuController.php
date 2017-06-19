@@ -32,7 +32,7 @@ abstract class AbstractMenuController extends Controller
      */
     protected function checkAcl(array $context)
     {
-        if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
+        if (!$this->isGranted('oro_navigation_manage_menus')) {
             throw $this->createAccessDeniedException();
         }
     }

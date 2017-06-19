@@ -7,52 +7,44 @@ use Doctrine\ORM\EntityManager;
 
 use Knp\Menu\ItemInterface;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
 
-    /**
-     * @var SecurityContextInterface
-     */
-    private $securityContext;
+    /** @var TokenAccessorInterface */
+    private $tokenAccessor;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     private $em;
 
-    /**
-     * @var ItemFactory
-     */
+    /** @var ItemFactory */
     private $factory;
 
-    /**
-     * @var Router
-     */
+    /** @var RouterInterface */
     private $router;
 
     /**
-     * @param SecurityContextInterface $securityContext
-     * @param EntityManager            $em
-     * @param ItemFactory              $factory
-     * @param Router                   $router
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param EntityManager          $em
+     * @param ItemFactory            $factory
+     * @param RouterInterface        $router
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
+        TokenAccessorInterface $tokenAccessor,
         EntityManager $em,
         ItemFactory $factory,
-        Router $router
+        RouterInterface $router
     ) {
-        $this->securityContext = $securityContext;
+        $this->tokenAccessor = $tokenAccessor;
         $this->em = $em;
         $this->factory = $factory;
         $this->router = $router;
@@ -67,10 +59,10 @@ class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterf
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $user = $this->securityContext->getToken() ? $this->securityContext->getToken()->getUser() : null;
+        $user = $this->tokenAccessor->getUser();
         $menu->setExtra('type', $alias);
         if (is_object($user)) {
-            $currentOrganization = $this->securityContext->getToken()->getOrganizationContext();
+            $currentOrganization = $this->tokenAccessor->getOrganization();
             /** @var $entity NavigationItemInterface */
             $entity = $this->factory->createItem($alias, []);
 
