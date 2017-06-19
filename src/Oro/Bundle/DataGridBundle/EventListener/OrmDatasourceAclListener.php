@@ -8,6 +8,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class OrmDatasourceAclListener
 {
+    const EDIT_SCOPE = 'edit';
+
     /** @var AclHelper */
     protected $aclHelper;
 
@@ -24,9 +26,25 @@ class OrmDatasourceAclListener
      */
     public function onResultBefore(OrmResultBefore $event)
     {
-        $config = $event->getDatagrid()->getConfig();
+        $dataGrid = $event->getDatagrid();
+        $config = $dataGrid->getConfig();
         if (!$config->isDatasourceSkipAclApply()) {
-            $this->aclHelper->apply($event->getQuery());
+            $permission = $this->getPermission($dataGrid->getScope());
+            $this->aclHelper->apply($event->getQuery(), $permission);
         }
+    }
+
+    /**
+     * @param string|null $scope
+     *
+     * @return string
+     */
+    protected function getPermission($scope)
+    {
+        if (self::EDIT_SCOPE === $scope) {
+            return 'EDIT';
+        }
+
+        return 'VIEW';
     }
 }
