@@ -4,13 +4,15 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 
 class UserConfigurationFormProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configBag;
@@ -23,23 +25,20 @@ class UserConfigurationFormProviderTest extends \PHPUnit_Framework_TestCase
     
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configBag = $this->createMock(ConfigBag::class);
+        $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->configBag = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigBag')
-            ->disableOriginalConstructor()
-            ->getMock();
-        
-        $this->factory = Forms::createFormFactoryBuilder()
-            ->getFormFactory();
-        
-        $this->provider = new UserConfigurationFormProvider($this->configBag, $this->factory, $this->securityFacade);
+        $this->provider = new UserConfigurationFormProvider(
+            $this->configBag,
+            $this->factory,
+            $this->authorizationChecker
+        );
     }
 
     protected function tearDown()
     {
-        unset($this->securityFacade);
+        unset($this->authorizationChecker);
         unset($this->factory);
         unset($this->configBag);
         unset($this->provider);

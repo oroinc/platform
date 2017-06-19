@@ -3,7 +3,7 @@
 namespace Oro\Component\Action\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Exception\ActionException;
@@ -11,25 +11,21 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 
 class AssignActiveUser extends AbstractAction
 {
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options;
 
     /**
-     * @param ContextAccessor $contextAccessor
-     * @param SecurityContextInterface $securityContext
+     * @param ContextAccessor       $contextAccessor
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(ContextAccessor $contextAccessor, SecurityContextInterface $securityContext)
+    public function __construct(ContextAccessor $contextAccessor, TokenStorageInterface $tokenStorage)
     {
         parent::__construct($contextAccessor);
 
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -39,7 +35,8 @@ class AssignActiveUser extends AbstractAction
     {
         $activeUser = null;
 
-        if ($token = $this->securityContext->getToken()) {
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
             $activeUser = $token->getUser();
         }
 
@@ -55,7 +52,7 @@ class AssignActiveUser extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (count($options) != 1) {
+        if (count($options) !== 1) {
             throw new InvalidParameterException('Only one attribute parameter must be defined');
         }
 

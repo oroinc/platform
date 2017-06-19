@@ -74,7 +74,7 @@
         "liuggio/excelbundle": "2.1.*",
         "components/jqueryui": "1.12.*",
         "bower-asset/select2": "3.4.1",
-        "bower-asset/chaplin": "1.0.0",
+        "bower-asset/chaplin": "1.2.0",
         "bower-asset/jquery-cookie": "1.4.1",
         "bower-asset/jquery-ajax-queue": "0.0.1",
         "bower-asset/autobahnjs": "0.8.0",

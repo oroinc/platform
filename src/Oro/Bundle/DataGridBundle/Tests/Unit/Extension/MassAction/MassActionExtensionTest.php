@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -11,7 +13,6 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,8 +22,8 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var MassActionMetadataFactory|\PHPUnit_Framework_MockObject_MockObject */
     protected $actionMetadataFactory;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
     /** @var MassActionExtension */
     protected $extension;
@@ -31,12 +32,12 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->actionFactory = $this->createMock(MassActionFactory::class);
         $this->actionMetadataFactory = $this->createMock(MassActionMetadataFactory::class);
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->extension = new MassActionExtension(
             $this->actionFactory,
             $this->actionMetadataFactory,
-            $this->securityFacade
+            $this->authorizationChecker
         );
     }
 
@@ -87,7 +88,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
         $this->actionMetadataFactory->expects(self::once())
             ->method('createActionMetadata')
@@ -133,7 +134,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(true);
@@ -177,7 +178,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(false);
@@ -237,7 +238,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
         $this->actionMetadataFactory->expects(self::once())
             ->method('createActionMetadata')
@@ -284,7 +285,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(true);
@@ -329,7 +330,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(false);
@@ -375,7 +376,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
         $this->actionMetadataFactory->expects(self::once())
             ->method('createActionMetadata')
@@ -443,7 +444,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         self::assertSame(
@@ -482,7 +483,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(true);
@@ -523,7 +524,7 @@ class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(false);

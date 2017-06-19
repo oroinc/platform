@@ -3,19 +3,19 @@
 namespace Oro\Bundle\UserBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class ActionChecker
 {
-    /** @var  SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -24,7 +24,7 @@ class ActionChecker
      */
     public function checkActions(ResultRecordInterface $record)
     {
-        return ($this->securityFacade->getLoggedUserId() === $record->getValue('id'))
+        return ($this->tokenAccessor->getUserId() === $record->getValue('id'))
             ? ['delete' => false]
             : [];
     }

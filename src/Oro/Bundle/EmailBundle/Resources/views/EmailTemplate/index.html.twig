@@ -4,7 +4,7 @@
 {% set pageTitle = 'oro.email.emailtemplate.entity_plural_label'|trans %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_email_emailtemplate_create') %}
+    {% if is_granted('oro_email_emailtemplate_create') %}
         {{ UI.addButton({
             'path' : path('oro_email_emailtemplate_create'),
             'entity_label': 'oro.email.emailtemplate.entity_label'|trans

@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
@@ -15,10 +16,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
@@ -35,8 +34,11 @@ class GridViewsExtension extends AbstractExtension
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -54,26 +56,29 @@ class GridViewsExtension extends AbstractExtension
     protected $defaultGridView = [];
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param SecurityFacade $securityFacade
-     * @param TranslatorInterface $translator
-     * @param ManagerRegistry $registry
-     * @param AclHelper $aclHelper
-     * @param ServiceLink $managerLink
+     * @param EventDispatcherInterface      $eventDispatcher
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param TranslatorInterface           $translator
+     * @param ManagerRegistry               $registry
+     * @param AclHelper                     $aclHelper
+     * @param ServiceLink                   $managerLink
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         TranslatorInterface $translator,
         ManagerRegistry $registry,
         AclHelper $aclHelper,
         ServiceLink $managerLink
     ) {
         $this->eventDispatcher = $eventDispatcher;
-        $this->securityFacade  = $securityFacade;
-        $this->translator      = $translator;
-        $this->registry        = $registry;
-        $this->aclHelper       = $aclHelper;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->translator = $translator;
+        $this->registry = $registry;
+        $this->aclHelper = $aclHelper;
         $this->managerLink = $managerLink;
     }
 
@@ -122,7 +127,7 @@ class GridViewsExtension extends AbstractExtension
             $systemGridView->setLabel($this->translator->trans($config['options']['gridViews']['allLabel']));
         }
 
-        $currentUser = $this->getCurrentUser();
+        $currentUser = $this->tokenAccessor->getUser();
         $gridViews = $this->managerLink->getService()->getAllGridViews($currentUser, $config->getName());
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
@@ -198,7 +203,8 @@ class GridViewsExtension extends AbstractExtension
     protected function getDefaultView($gridName)
     {
         if (!array_key_exists($gridName, $this->defaultGridView)) {
-            if (!$currentUser = $this->getCurrentUser()) {
+            $currentUser = $this->tokenAccessor->getUser();
+            if (null === $currentUser) {
                 return null;
             }
             $this->defaultGridView[$gridName] = $this->managerLink->getService()
@@ -246,11 +252,11 @@ class GridViewsExtension extends AbstractExtension
     protected function getPermissions()
     {
         return [
-            'VIEW'        => $this->securityFacade->isGranted('oro_datagrid_gridview_view'),
-            'CREATE'      => $this->securityFacade->isGranted('oro_datagrid_gridview_create'),
-            'EDIT'        => $this->securityFacade->isGranted('oro_datagrid_gridview_update'),
-            'DELETE'      => $this->securityFacade->isGranted('oro_datagrid_gridview_delete'),
-            'SHARE'       => $this->securityFacade->isGranted('oro_datagrid_gridview_publish'),
+            'VIEW'   => $this->authorizationChecker->isGranted('oro_datagrid_gridview_view'),
+            'CREATE' => $this->authorizationChecker->isGranted('oro_datagrid_gridview_create'),
+            'EDIT'   => $this->authorizationChecker->isGranted('oro_datagrid_gridview_update'),
+            'DELETE' => $this->authorizationChecker->isGranted('oro_datagrid_gridview_delete'),
+            'SHARE'  => $this->authorizationChecker->isGranted('oro_datagrid_gridview_publish'),
         ];
     }
 
@@ -271,18 +277,5 @@ class GridViewsExtension extends AbstractExtension
         }
 
         parent::setParameters($parameters);
-    }
-
-    /**
-     * @return AbstractUser
-     */
-    protected function getCurrentUser()
-    {
-        $user = $this->securityFacade->getLoggedUser();
-        if ($user instanceof AbstractUser) {
-            return $user;
-        }
-
-        return null;
     }
 }

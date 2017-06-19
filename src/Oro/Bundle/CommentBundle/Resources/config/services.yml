@@ -39,7 +39,7 @@ services:
         class: %oro_comment.comment.api_manager.class%
         arguments:
             - '@doctrine'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_entity.entity_name_resolver'
             - '@oro_datagrid.extension.pager.orm.pager'
             - '@event_dispatcher'
@@ -52,7 +52,7 @@ services:
     oro_comment.comment_lifecycle_listener:
         class: %oro_comment.comment_lifecycle_listener.class%
         arguments:
-            - '@oro_security.security_facade.link'
+            - '@oro_security.token_accessor'
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
     
@@ -61,4 +61,4 @@ services:
         arguments:
             - '@oro_comment.association_helper'
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'

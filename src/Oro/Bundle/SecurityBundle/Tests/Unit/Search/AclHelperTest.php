@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Search;
 
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 
 class AclHelperTest extends \PHPUnit_Framework_TestCase
@@ -14,7 +17,7 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
     protected $mappingProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipDataBuilder;
@@ -61,20 +64,15 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->mappingProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Provider\SearchMappingProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mappingProvider = $this->createMock(SearchMappingProvider::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->ownershipDataBuilder = $this->createMock(OwnershipConditionDataBuilder::class);
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->ownershipDataBuilder = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->aclHelper = new AclHelper($this->mappingProvider, $this->securityFacade, $this->ownershipDataBuilder);
+        $this->aclHelper = new AclHelper(
+            $this->mappingProvider,
+            $this->tokenAccessor,
+            $this->ownershipDataBuilder
+        );
     }
 
     /**
@@ -113,7 +111,7 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganizationId')
             ->willReturn(1);
 

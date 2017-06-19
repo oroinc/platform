@@ -5,11 +5,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 {
-    protected $securityFacade;
+    protected $tokenAccessor;
     protected $aclHelper;
     protected $relatedEmailsProvider;
     protected $registry;
@@ -20,9 +21,7 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
@@ -52,7 +51,7 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->emailRecipientsProvider = new RecentEmailRecipientsProvider(
-            $this->securityFacade,
+            $this->tokenAccessor,
             $this->relatedEmailsProvider,
             $this->aclHelper,
             $this->registry,
@@ -68,8 +67,8 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRecipientsShouldReturnEmptyArrayIfUserIsNotLoggedIn()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue(null));
 
         $args = new EmailRecipientsProviderArgs(null, '', 100);
@@ -88,8 +87,8 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $user = new User();
 
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
         $this->relatedEmailsProvider->expects($this->once())
