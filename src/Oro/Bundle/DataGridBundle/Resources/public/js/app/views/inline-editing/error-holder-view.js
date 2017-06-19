@@ -34,10 +34,14 @@ define(function(require) {
     InlineEditorErrorHolderView = BaseView.extend({
         keepElement: true,
 
-        POSITION_TOP: '',
-        POSITION_RIGHT: 'error-message-right',
-        POSITION_BOTTOM: 'error-message-below',
-        POSITION_LEFT: 'error-message-left',
+        DEFAULT_POSITION: 'top',
+
+        POSITION_CLASSES: {
+            bottom: 'error-message-below',
+            right: 'error-message-right',
+            left: 'error-message-left',
+        },
+
         DROPDOWNS: [
             '.select2-container.select2-drop-below',
             '.timepicker-dialog-is-below',
@@ -57,9 +61,9 @@ define(function(require) {
         },
 
         events: {
-            click: 'updatePosition',
-            mouseenter: 'updatePosition',
-            updatePosition: 'updatePosition',
+            'click': 'updatePosition',
+            'mouseenter': 'updatePosition',
+            'updatePosition': 'updatePosition',
             'datepicker:dialogShow': 'updatePosition',
             'datepicker:dialogReposition': 'updatePosition',
             'datepicker:dialogHide': 'updatePosition',
@@ -137,80 +141,62 @@ define(function(require) {
                 return;
             }
             var withinRect = this.getWithinRect();
-            var classes = [this.POSITION_TOP, this.POSITION_RIGHT, this.POSITION_BOTTOM, this.POSITION_LEFT].join(' ');
+            var positionSequence = _.keys(this.POSITION_CLASSES);
+            var initialPosition = this.getPositionByClass();
+            // check if current position is default and correct
+            if (initialPosition === this.DEFAULT_POSITION) {
+                if (this.checkPosition(initialPosition, withinRect, errorMessageElements[0])) {
+                    return;
+                }
+            } else {
+                // if initial position is'n default it needs to try default position as well
+                positionSequence.unshift(this.DEFAULT_POSITION);
+            }
             var initialOpacity = errorMessageElements.css('opacity');
             errorMessageElements.css('opacity', 0);
-            this.$el.removeClass(classes);
-            $.Deferred().resolve(false).promise()
-                .then(_.bind(this.tryTop, this, withinRect))
-                .then(_.bind(this.tryBottom, this, withinRect))
-                .then(_.bind(this.tryRight, this, withinRect))
-                .then(_.bind(this.tryLeft, this, withinRect))
-                .then(function() {
-                    errorMessageElements.css('opacity', initialOpacity);
-                });
+            for (var i = 0; i < positionSequence.length; i++) {
+                var position = positionSequence[i];
+                this.setPositionClass(position);
+                if (this.checkPosition(position, withinRect, errorMessageElements[0])) {
+                    break;
+                }
+            }
+            errorMessageElements.css('opacity', initialOpacity);
         },
 
-        tryTop: function(withinRect, done) {
-            if (done || this.$(this.DROPUPS.join(', ')).length) {
-                return done;
-            }
-            this.$el.addClass(this.POSITION_TOP);
-            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
-            if (messageRect && messageRect.top >= withinRect.top && messageRect.right <= withinRect.right) {
-                done = true;
+        checkPosition: function(position, withinRect, errorMessageElement) {
+            var methodName = 'check' + _.capitalize(position);
+            if (_.isFunction(this[methodName])) {
+                return this[methodName](withinRect, errorMessageElement);
             } else {
-                this.$el.removeClass(this.POSITION_TOP);
+                return false;
             }
-
-            return done;
         },
 
-        tryBottom: function(withinRect, done) {
-            if (done || this.$(this.DROPDOWNS.join(', ')).length) {
-                return done;
+        checkTop: function(withinRect, errorMessageElement) {
+            if (this.$(this.DROPUPS.join(', ')).length > 0) { // don't show error above if dropup is present
+                return false;
             }
-            this.$el.addClass(this.POSITION_BOTTOM);
-            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
-            if (messageRect && messageRect.bottom <= withinRect.bottom && messageRect.right <= withinRect.right) {
-                done = true;
-            } else {
-                this.$el.removeClass(this.POSITION_BOTTOM);
-            }
-
-            return done;
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.top >= withinRect.top && messageRect.right <= withinRect.right;
         },
 
-        tryRight: function(withinRect, done) {
-            if (done) {
-                return done;
+        checkBottom: function(withinRect, errorMessageElement) {
+            if (this.$(this.DROPDOWNS.join(', ')).length > 0) { // don't show error below if dropdown is present
+                return false;
             }
-
-            this.$el.addClass(this.POSITION_RIGHT);
-            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
-            if (messageRect && messageRect.right <= withinRect.right) {
-                done = true;
-            } else {
-                this.$el.removeClass(this.POSITION_RIGHT);
-            }
-
-            return done;
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.bottom <= withinRect.bottom && messageRect.right <= withinRect.right;
         },
 
-        tryLeft: function(withinRect, done) {
-            if (done) {
-                return done;
-            }
+        checkRight: function(withinRect, errorMessageElement) {
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.right <= withinRect.right;
+        },
 
-            this.$el.addClass(this.POSITION_LEFT);
-            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
-            if (messageRect && messageRect.left >= withinRect.left) {
-                done = true;
-            } else {
-                this.$el.removeClass(this.POSITION_LEFT);
-            }
-
-            return done;
+        checkLeft: function(withinRect, errorMessageElement) {
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.left >= withinRect.left;
         },
 
         getErrorMessageElements: function() {
@@ -234,6 +220,21 @@ define(function(require) {
                 errors[name] = $(label).text();
             }, this);
             this._errors = errors;
+        },
+
+        setPositionClass: function(position) {
+            var classesToRemove = _.values(_.omit(this.POSITION_CLASSES, position));
+            this.$el.removeClass(classesToRemove.join(' '));
+            if (position !== this.DEFAULT_POSITION) {
+                this.$el.addClass(_.result(this.POSITION_CLASSES, position));
+            }
+        },
+
+        getPositionByClass: function() {
+            var position = _.findKey(this.POSITION_CLASSES, function(value) {
+                return this.$el.hasClass(value);
+            }, this);
+            return position || this.DEFAULT_POSITION;
         }
     });
 
