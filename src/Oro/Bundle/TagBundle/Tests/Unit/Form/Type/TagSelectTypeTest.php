@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\TagBundle\Form\Type\TagSelectType;
 
 class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
@@ -10,7 +12,7 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
     protected $type;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $transformer;
@@ -20,9 +22,7 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->transformer = $this->getMockBuilder('Oro\Bundle\TagBundle\Form\Transformer\TagTransformer')
             ->disableOriginalConstructor()
@@ -33,12 +33,12 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new TagSelectType($this->securityFacade, $this->transformer, $this->subscriber);
+        $this->type = new TagSelectType($this->authorizationChecker, $this->transformer, $this->subscriber);
     }
 
     protected function tearDown()
     {
-        unset($this->securityFacade, $this->transformer, $this->subscriber, $this->type);
+        unset($this->authorizationChecker, $this->transformer, $this->subscriber, $this->type);
     }
 
     public function testSetDefaultOptions()

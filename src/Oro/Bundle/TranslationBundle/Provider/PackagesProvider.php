@@ -6,12 +6,11 @@ use Composer\Config;
 use Composer\Package\PackageInterface;
 
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 class PackagesProvider implements PackageProviderInterface
 {
-    /** @var ServiceLink */
-    protected $pmLink;
+    /** @var PackageManager */
+    protected $pm;
 
     /** @var array */
     protected $bundles;
@@ -29,24 +28,24 @@ class PackagesProvider implements PackageProviderInterface
     protected $packageProviders;
 
     /**
-     * @param ServiceLink $pmLink
+     * @param PackageManager $pm
      * @param array $bundles
      * @param string $kernelRootDir
      * @param string $composerCacheHome
      * @param array $packageProviders
      */
     public function __construct(
-        ServiceLink $pmLink,
+        PackageManager $pm,
         array $bundles,
         $kernelRootDir,
         $composerCacheHome,
         array $packageProviders = []
     ) {
-        $this->pmLink            = $pmLink;
-        $this->bundles           = $bundles;
-        $this->kernelRootDir     = $kernelRootDir;
+        $this->pm = $pm;
+        $this->bundles = $bundles;
+        $this->kernelRootDir = $kernelRootDir;
         $this->composerCacheHome = $composerCacheHome;
-        $this->packageProviders  = $packageProviders;
+        $this->packageProviders = $packageProviders;
     }
 
     /**
@@ -65,7 +64,7 @@ class PackagesProvider implements PackageProviderInterface
             Config::$defaultConfig['vendor-dir'] = $rootPath . Config::$defaultConfig['vendor-dir'];
         }
 
-        return $this->pmLink->getService();
+        return $this->pm;
     }
 
     /**

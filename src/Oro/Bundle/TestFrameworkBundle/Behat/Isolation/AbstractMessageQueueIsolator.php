@@ -89,7 +89,7 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
             $killCommand = sprintf('TASKKILL /PID %d /T /F', $this->process->getPid());
         } else {
             $pattern = '[p]hp'.substr($this->process->getCommandLine(), strlen('php'));
-            $killCommand = sprintf('pkill -15 -f "%s"', $pattern);
+            $killCommand = sprintf('pkill -9 -f "%s"', $pattern);
         }
 
         // Process::stop() might not work as expected

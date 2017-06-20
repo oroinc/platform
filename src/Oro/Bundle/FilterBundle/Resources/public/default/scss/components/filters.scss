@@ -10,7 +10,13 @@
 
     background: get-color('additional', 'base');
 
+    box-shadow: none;
+  
     @include clearfix();
+  
+    .toolbar-sticky-container & {
+        margin: 0;
+    }
 
     &__dropdown {
         padding: $offset-x-m;
@@ -530,7 +536,6 @@
         padding: 20px 20px 10px;
 
         @media (max-width: $screen-md) {
-            width: calc(100% - 30px) !important;
             min-width: 0 !important;
         }
 
@@ -675,6 +680,14 @@
                 background: get-color('ui', 'focus');;
                 color: get-color('additional', 'ultra');
             }
+        }
+    }
+}
+
+@include breakpoint('mobile') {
+    .ui-multiselect-menu {
+        &.select-filter-widget {
+            width: calc(100% - 30px) !important;
         }
     }
 }

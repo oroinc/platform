@@ -8,11 +8,12 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailAddressFromTypeTest extends TypeTestCase
 {
-    protected $securityFacade;
+    protected $tokenAccessor;
     protected $relatedEmailsProvider;
     protected $mailboxManager;
 
@@ -20,9 +21,7 @@ class EmailAddressFromTypeTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
             ->disableOriginalConstructor()
@@ -43,8 +42,8 @@ class EmailAddressFromTypeTest extends TypeTestCase
         ];
 
         $user = new User();
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
         $this->relatedEmailsProvider->expects($this->once())
@@ -55,7 +54,7 @@ class EmailAddressFromTypeTest extends TypeTestCase
             ->method('findAvailableMailboxEmails')
             ->will($this->returnValue([]));
 
-        $type = new EmailAddressFromType($this->securityFacade, $this->relatedEmailsProvider, $this->mailboxManager);
+        $type = new EmailAddressFromType($this->tokenAccessor, $this->relatedEmailsProvider, $this->mailboxManager);
         $form = $this->factory->create($type);
 
         $form->submit($formData);

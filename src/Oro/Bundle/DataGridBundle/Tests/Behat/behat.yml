@@ -64,6 +64,14 @@ oro_behat_extension:
       selector: 'div.column-manager div.dropdown-menu'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager
 
+    FrontendGridFilterManagerButton:
+      selector: 'button.select-filter-widget'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    FrontendGridFilterManager:
+      selector: 'div.filter-container div.datagrid-manager div.dropdown-menu'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager
+
     GridColumnManagerTable:
       selector: 'div.column-manager-table'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
@@ -79,7 +87,11 @@ oro_behat_extension:
       selector: 'input.timepicker-input'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TimePicker
 
-    GridPaginator:
+    GridToolbar:
+      selector: 'div.toolbar'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    GridToolbarPaginator:
       selector: 'div.toolbar div.pagination'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
 
@@ -103,8 +115,16 @@ oro_behat_extension:
       selector: '.dropdown-menu__floating'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    GridActionsMassActionMenu:
+      selector: 'th.action-column .datagrid-massaction__dropdown-menu'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     MassActionHeadCheckbox:
-      selector: 'div.grid-container th.grid-header-cell-massAction div.btn-group .btn i'
+      selector: 'th.grid-header-cell-massAction div.btn-group .btn i'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    MassActionButton:
+      selector: '.grid-header-row .action-column .dropdown button'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     PageSize:

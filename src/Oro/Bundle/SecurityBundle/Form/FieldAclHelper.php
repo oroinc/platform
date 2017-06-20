@@ -6,18 +6,18 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 
 class FieldAclHelper
 {
-    /** @var SecurityFacade */
-    private $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
     /** @var ConfigManager */
     private $configManager;
@@ -26,16 +26,16 @@ class FieldAclHelper
     private $doctrineHelper;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param ConfigManager  $configManager
-     * @param DoctrineHelper $doctrineHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ConfigManager                 $configManager
+     * @param DoctrineHelper                $doctrineHelper
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper
     ) {
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
         $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
     }
@@ -90,7 +90,7 @@ class FieldAclHelper
             return true;
         }
 
-        return $this->securityFacade->isGranted('VIEW', new FieldVote($entity, $fieldName));
+        return $this->authorizationChecker->isGranted('VIEW', new FieldVote($entity, $fieldName));
     }
 
     /**
@@ -111,7 +111,7 @@ class FieldAclHelper
             ? 'CREATE'
             : 'EDIT';
 
-        return $this->securityFacade->isGranted($permission, new FieldVote($entity, $fieldName));
+        return $this->authorizationChecker->isGranted($permission, new FieldVote($entity, $fieldName));
     }
 
     /**

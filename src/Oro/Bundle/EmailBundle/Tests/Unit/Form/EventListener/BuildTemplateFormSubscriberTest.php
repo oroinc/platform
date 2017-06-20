@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\EventListener;
 
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 
@@ -14,15 +15,16 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
+    protected $tokenStorage;
 
     /**
      * SetUp test environment
      */
     protected function setUp()
     {
-        $this->securityContext  = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->listener = new BuildTemplateFormSubscriber($this->securityContext);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+
+        $this->listener = new BuildTemplateFormSubscriber($this->tokenStorage);
     }
 
     /**
@@ -30,7 +32,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset($this->securityContext);
+        unset($this->tokenStorage);
         unset($this->listener);
     }
 
@@ -85,7 +87,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
@@ -150,7 +152,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 

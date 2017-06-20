@@ -1,41 +1,38 @@
 <?php
+
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
+use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SyncBundle\EventListener\MaintenanceListener;
+use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 
 class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $topicPublisher;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $tokenAccessor;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $logger;
+
+    /** @var MaintenanceListener */
+    private $publisher;
 
     protected function setUp()
     {
-        $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+        $this->topicPublisher = $this->createMock(TopicPublisher::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-    protected function tearDown()
-    {
-        unset($this->topicPublisher);
+        $this->publisher = new MaintenanceListener(
+            $this->topicPublisher,
+            $this->tokenAccessor,
+            $this->logger
+        );
     }
 
     public function testOnModeOn()
@@ -45,16 +42,11 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
             ->with('oro/maintenance', array('isOn' => true, 'userId' => $expectedUserId));
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUserId')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUserId')
             ->will($this->returnValue($expectedUserId));
-        /** @var MaintenanceListener $publisher */
-        $publisher = new MaintenanceListener(
-            $this->topicPublisher,
-            $this->securityFacade,
-            $this->logger
-        );
-        $publisher->onModeOn();
+
+        $this->publisher->onModeOn();
     }
 
     public function testOnModeOff()
@@ -64,15 +56,10 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('send')
             ->with('oro/maintenance', array('isOn' => false, 'userId' => $expectedUserId));
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUserId')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUserId')
             ->will($this->returnValue($expectedUserId));
-        /** @var MaintenanceListener $publisher */
-        $publisher = new MaintenanceListener(
-            $this->topicPublisher,
-            $this->securityFacade,
-            $this->logger
-        );
-        $publisher->onModeOff();
+
+        $this->publisher->onModeOff();
     }
 }

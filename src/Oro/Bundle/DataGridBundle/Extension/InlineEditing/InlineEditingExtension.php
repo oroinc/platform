@@ -11,7 +11,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class InlineEditingExtension extends AbstractExtension
@@ -19,31 +18,25 @@ class InlineEditingExtension extends AbstractExtension
     /** @var InlineEditColumnOptionsGuesser */
     protected $guesser;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
     /** @var AuthorizationCheckerInterface */
-    protected $authChecker;
+    protected $authorizationChecker;
 
     /**
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
-     * @param SecurityFacade $securityFacade
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param EntityClassNameHelper          $entityClassNameHelper
+     * @param AuthorizationCheckerInterface  $authorizationChecker
      */
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
-        SecurityFacade $securityFacade,
         EntityClassNameHelper $entityClassNameHelper,
         AuthorizationCheckerInterface $authorizationChecker
     ) {
-        $this->securityFacade = $securityFacade;
         $this->guesser = $inlineEditColumnOptionsGuesser;
         $this->entityClassNameHelper = $entityClassNameHelper;
-        $this->authChecker = $authorizationChecker;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -61,7 +54,7 @@ class InlineEditingExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $configItems   = $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, []);
+        $configItems = $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, []);
 
         if (empty($configItems[Configuration::CONFIG_ENTITY_KEY])) {
             $configItems[Configuration::CONFIG_ENTITY_KEY] = $config->getExtendedEntityClassName();
@@ -137,7 +130,7 @@ class InlineEditingExtension extends AbstractExtension
             $configItems[Configuration::CONFIG_ACL_KEY] :
             'EDIT;entity:' . $configItems[Configuration::CONFIG_ENTITY_KEY];
 
-        return $this->securityFacade->isGranted($acl);
+        return $this->authorizationChecker->isGranted($acl);
     }
 
     /**
@@ -159,7 +152,7 @@ class InlineEditingExtension extends AbstractExtension
      *
      * @return string
      */
-    protected function getColummFieldName($columnName, $column)
+    protected function getColumnFieldName($columnName, $column)
     {
         $dadaFieldName = $columnName;
         if (array_key_exists(Configuration::BASE_CONFIG_KEY, $column)
@@ -223,10 +216,11 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected function isFieldEditable($newColumn, $objectIdentity, $columnName, $column)
     {
-        return $this->isEnabledEdit($newColumn, $column)
-        && $this->authChecker->isGranted(
-            'EDIT',
-            new FieldVote($objectIdentity, $this->getColummFieldName($columnName, $column))
-        );
+        return
+            $this->isEnabledEdit($newColumn, $column)
+            && $this->authorizationChecker->isGranted(
+                'EDIT',
+                new FieldVote($objectIdentity, $this->getColumnFieldName($columnName, $column))
+            );
     }
 }

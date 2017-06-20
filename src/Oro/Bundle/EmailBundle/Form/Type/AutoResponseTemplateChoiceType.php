@@ -12,25 +12,25 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class AutoResponseTemplateChoiceType extends AbstractType
 {
     const NAME = 'oro_email_autoresponse_template_choice';
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var TranslatorInterface */
     protected $translator;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param TranslatorInterface $translator
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param TranslatorInterface    $translator
      */
-    public function __construct(SecurityFacade $securityFacade, TranslatorInterface $translator)
+    public function __construct(TokenAccessorInterface $tokenAccessor, TranslatorInterface $translator)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->translator = $translator;
     }
 
@@ -44,7 +44,7 @@ class AutoResponseTemplateChoiceType extends AbstractType
             'query_builder' => function (EmailTemplateRepository $repository) {
                 return $repository->getEntityTemplatesQueryBuilder(
                     Email::ENTITY_CLASS,
-                    $this->securityFacade->getOrganization(),
+                    $this->tokenAccessor->getOrganization(),
                     true
                 );
             },

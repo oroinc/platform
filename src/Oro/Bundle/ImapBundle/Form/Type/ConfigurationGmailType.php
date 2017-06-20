@@ -17,7 +17,7 @@ use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\GmailOAuthSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -32,22 +32,22 @@ class ConfigurationGmailType extends AbstractType
     /** ConfigManager */
     protected $userConfigManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param TranslatorInterface $translator
-     * @param ConfigManager $userConfigManager
-     * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface    $translator
+     * @param ConfigManager          $userConfigManager
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $userConfigManager,
-        SecurityFacade $securityFacade
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->translator = $translator;
         $this->userConfigManager = $userConfigManager;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -166,12 +166,12 @@ class ConfigurationGmailType extends AbstractType
                 $data = $event->getData();
                 if ($data !== null) {
                     if (($data->getOwner() === null) && ($data->getMailbox() === null)) {
-                        $data->setOwner($this->securityFacade->getLoggedUser());
+                        $data->setOwner($this->tokenAccessor->getUser());
                     }
                     if ($data->getOrganization() === null) {
-                        $organization = $this->securityFacade->getOrganization()
-                            ? $this->securityFacade->getOrganization()
-                            : $this->securityFacade->getLoggedUser()->getOrganization();
+                        $organization = $this->tokenAccessor->getOrganization()
+                            ? $this->tokenAccessor->getOrganization()
+                            : $this->tokenAccessor->getUser()->getOrganization();
                         $data->setOrganization($organization);
                     }
 

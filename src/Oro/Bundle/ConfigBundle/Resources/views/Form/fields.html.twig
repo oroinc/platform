@@ -23,7 +23,8 @@
     {% if form.vars.value_field_only %}
         {{ form_row(form.value, {label: form.vars.label}) }}
     {% else %}
-        {{ form_row(form) }}
+        {% set label_attr = label_attr|merge({'for': form.value.vars.id}) %}
+        {{ form_row(form, {'label_attr': label_attr}) }}
     {% endif %}
 {% endblock %}
 

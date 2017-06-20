@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
-class FormatConversionEvent
+use Symfony\Component\EventDispatcher\Event;
+
+class FormatConversionEvent extends Event
 {
     /** @var array */
     protected $record = [];
@@ -44,6 +46,8 @@ class FormatConversionEvent
     public function setRecord(array $record)
     {
         $this->record = $record;
+
+        return $this;
     }
 
     /**

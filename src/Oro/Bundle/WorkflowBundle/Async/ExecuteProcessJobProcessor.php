@@ -83,28 +83,19 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         $entityManager->beginTransaction();
-
         try {
-            $this->processHandler->handleJob($processJob);
-            $entityManager->remove($processJob);
-            $entityManager->flush();
-
-            $this->processHandler->finishJob($processJob);
+            try {
+                $this->processHandler->handleJob($processJob);
+                $entityManager->remove($processJob);
+                $entityManager->flush();
+            } finally {
+                $this->processHandler->finishJob($processJob);
+            }
             $entityManager->commit();
         } catch (\Exception $e) {
-            $this->processHandler->finishJob($processJob);
             $entityManager->rollback();
 
-            $this->logger->critical(
-                '[ExecuteProcessJobProcessor] Raised exception for job with id {process_job_id}',
-                [
-                    'process_job_id' => $body['process_job_id'],
-                    'exception' => $e,
-                ]
-            );
-
-            //Returned "REJECTED", because cannot be determined if job can be re-queued
-            return self::REJECT;
+            throw $e;
         }
 
         return self::ACK;

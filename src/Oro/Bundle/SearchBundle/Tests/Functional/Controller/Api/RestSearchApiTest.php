@@ -36,6 +36,7 @@ class RestSearchApiTest extends SearchBundleWebTestCase
      */
     public function testSearch(array $request, array $response)
     {
+        $this->markTestSkipped('Should be fixed in #BB-5361');
         $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         if (array_key_exists('supported_engines', $request)) {
             $engine = $this->getContainer()->getParameter('oro_search.engine');

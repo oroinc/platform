@@ -4,13 +4,13 @@
 {% oro_title_set({params : {"%business_unit.name%": entity.name|default('N/A') }}) %}
 
 {% block navButtons %}
-    {% if resource_granted('EDIT', entity) %}
+    {% if is_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path' : path('oro_business_unit_update', { id: entity.id }),
             'entity_label': 'oro.organization.businessunit.entity_label'|trans
         })  }}
     {% endif %}
-    {% if oro_get_business_units_count() > 1 and resource_granted('DELETE', entity) %}
+    {% if oro_get_business_units_count() > 1 and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_businessunit', {'id': entity.id}),
             'dataRedirect': path('oro_business_unit_index'),

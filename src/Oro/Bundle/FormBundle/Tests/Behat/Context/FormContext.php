@@ -66,6 +66,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
+        $possibleElementName = $this->fixStepArgument($fieldName);
+        if ($this->elementFactory->hasElement($possibleElementName)) {
+            $value = $this->elementFactory->createElement($possibleElementName)->getValue();
+            self::assertEquals($fieldValue, $value);
+
+            return;
+        }
+
         $page = $this->getSession()->getPage();
         $labels = $page->findAll('css', 'label');
 

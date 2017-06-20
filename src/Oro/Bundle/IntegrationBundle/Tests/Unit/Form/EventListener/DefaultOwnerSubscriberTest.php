@@ -9,6 +9,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,18 +25,17 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->user     = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
+        $this->user = $this->createMock(AbstractUser::class);
+        $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $securityFacade->expects($this->any())
-            ->method('getLoggedUser')
+        $tokenAccessor->expects($this->any())
+            ->method('getUser')
             ->will($this->returnValue($this->user));
 
         $this->typesRegistry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
             ->getMock();
 
-        $this->subscriber = new DefaultOwnerSubscriber($securityFacade, $this->typesRegistry);
+        $this->subscriber = new DefaultOwnerSubscriber($tokenAccessor, $this->typesRegistry);
     }
 
     public function tearDown()
