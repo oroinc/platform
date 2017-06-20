@@ -86,6 +86,8 @@ services:
         tags:
             - { name: doctrine.event_listener, event: preRemove }
             - { name: doctrine.event_listener, event: postFlush }
+        calls:
+            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
 
     oro_segment.entity_name_provider:
         class: %oro_segment.entity_name_provider.class%
