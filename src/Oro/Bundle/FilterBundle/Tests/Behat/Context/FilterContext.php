@@ -22,6 +22,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table->getRows() as $row) {
             list($filter, $column, $type) = $row;
             $this->addFilter($filter, $column, $type);
+            $this->waitForAjax();
         }
     }
 
@@ -33,7 +34,9 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     private function addFilter($filter, $column, $condition)
     {
         $this->dragFilterToConditionBuilder($filter);
+        $this->waitForAjax();
         $this->chooseFilterColumn($column);
+        $this->waitForAjax();
         $this->setFilterCondition($condition);
     }
 
@@ -65,6 +68,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
                 "//div[@id='select2-drop']/div/input"
             )
             ->setValue($column);
+        $this->waitForAjax();
         $this->getPage()
             ->find(
                 'xpath',
@@ -94,6 +98,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
         $this->getPage()
             ->find('xpath', "(//a[contains(@class, 'dropdown-toggle')] | //div/div/button)[last()]")
             ->click();
+        $this->waitForAjax();
         $this->getPage()
             ->find('xpath', "(//span[contains(., '{$condition}')] | //li/a[contains(., '{$condition}')])[last()]")
             ->click();
