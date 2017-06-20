@@ -111,7 +111,7 @@ DataGridBundle
     - method `getSecurityFacade` was replaced with `getAuthorizationChecker`
 
 CronBundle
----------------
+----------
 - Class `Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor`
     - removed property `$commandRunner`
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
@@ -137,6 +137,12 @@ EntityExtendBundle
 - Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
 - Class `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker`
+
+EntityPaginationBundle
+----------------------
+- Class `Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector`
+    - removed property `aclHelper`
+    - changed constructor signature: removed parameter `AclHelper $aclHelper`
 
 ImportExportBundle
 ------------------
@@ -262,3 +268,8 @@ WorkflowBundle
 UIBundle
 --------
 - Updated ChaplinJS to 1.2.0 version
+- Updated Autolinker.js to 1.4.* version
+
+LocaleBundle
+------------
+- Updated Moment.js to 2.18.* version

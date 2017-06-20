@@ -78,25 +78,17 @@ class Controller
     {
         $domainsTranslations = $this->translator->getTranslations($domains, $locale);
 
-        $result = array(
+        $result = [
             'locale' => $locale,
-            'defaultDomains' => $domains,
-            'messages' => array(),
-        );
+            'defaultDomain' => reset($domains) ?: '',
+            'translations' => [$locale => []]
+        ];
         if ($debug) {
             $result['debug'] = true;
         }
 
         foreach ($domainsTranslations as $domain => $translations) {
-            $result['messages'] += array_combine(
-                array_map(
-                    function ($id) use ($domain) {
-                        return sprintf('%s:%s', $domain, $id);
-                    },
-                    array_keys($translations)
-                ),
-                array_values($translations)
-            );
+            $result['translations'][$locale][$domain] = $translations;
         }
 
         return $this->templating->render($this->template, array('json' => $result));
