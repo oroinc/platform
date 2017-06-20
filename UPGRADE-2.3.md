@@ -250,6 +250,13 @@ TestFrameworkBundle
 -------------------
 - Class `TestListener` namespace added, use `Oro\Bundle\TestFrameworkBundle\Test\TestListener` instead
 
+TranslationBundle
+-----------------
+- Class `Oro\Bundle\TranslationBundle\Provider\PackagesProvider`
+    - property `pmLink` was replaced with `pm`
+    - changed the constructor signature: parameter `ServiceLink $pmLink` was replaced with `PackageManager $pm`
+- Removed service `oro_translation.distribution.package_manager.link`
+
 WorkflowBundle
 --------------
 - Class `Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension`
