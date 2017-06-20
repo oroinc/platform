@@ -12,6 +12,7 @@
         "oro/config": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/config-bundle": "dev-master",
+        "bower-asset/moment": "2.18.*",
         "bower-asset/moment-timezone": "0.5.*",
         "bower-asset/numeral": "1.5.2"
     },
