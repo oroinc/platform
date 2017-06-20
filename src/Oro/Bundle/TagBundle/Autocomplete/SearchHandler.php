@@ -3,28 +3,23 @@
 namespace Oro\Bundle\TagBundle\Autocomplete;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler as BaseSearchHandler;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class SearchHandler extends BaseSearchHandler
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    /** @var PropertyAccessor */
-    protected $propertyAccessor;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param string         $entityName
-     * @param array          $properties
-     * @param SecurityFacade $securityFacade
+     * @param string                 $entityName
+     * @param array                  $properties
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct($entityName, array $properties, SecurityFacade $securityFacade)
+    public function __construct($entityName, array $properties, TokenAccessorInterface $tokenAccessor)
     {
         parent::__construct($entityName, $properties);
 
-        $this->securityFacade   = $securityFacade;
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -44,7 +39,7 @@ class SearchHandler extends BaseSearchHandler
         $object = $this->entityRepository->findOneBy(
             [
                 'name'         => $search,
-                'organization' => $this->securityFacade->getOrganization()
+                'organization' => $this->tokenAccessor->getOrganization()
             ]
         );
         if ($object !== null) {

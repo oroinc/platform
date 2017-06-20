@@ -4,31 +4,28 @@ namespace Oro\Bundle\UserBundle\Autocomplete;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 
 /**
  * This user search handler return users that was assigned to current organization and limit by search string
  * excluding current user.
  * This handler does not use ACL helper and search engine because we does not needed any ACL checks
- *
- * Class OrganizationUsersHandler
- * @package Oro\Bundle\UserBundle\Autocomplete
  */
 class OrganizationUsersHandler extends UserSearchHandler
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var SearchCriteria */
     protected $searchUserCriteria;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
+    public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -81,8 +78,8 @@ class OrganizationUsersHandler extends UserSearchHandler
             ->andWhere('org.id = :org')
             ->andWhere('u.id != :currentUser')
             ->andWhere('u.enabled = :enabled')
-            ->setParameter('org', $this->securityFacade->getOrganizationId())
-            ->setParameter('currentUser', $this->securityFacade->getLoggedUserId())
+            ->setParameter('org', $this->tokenAccessor->getOrganizationId())
+            ->setParameter('currentUser', $this->tokenAccessor->getUserId())
             ->setParameter('enabled', true);
 
         return $queryBuilder;

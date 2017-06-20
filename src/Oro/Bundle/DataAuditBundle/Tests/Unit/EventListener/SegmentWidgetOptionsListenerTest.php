@@ -5,11 +5,11 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\EventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,23 +19,23 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
     /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
     protected $request;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $security;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
     /** @var SegmentWidgetOptionsListener */
     protected $listener;
 
     public function setUp()
     {
-        $this->httpKernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $this->request    = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->security   = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->httpKernel = $this->createMock(HttpKernelInterface::class);
+        $this->request = $this->createMock(Request::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->listener = new SegmentWidgetOptionsListener($this->httpKernel, $this->security, new ContextChecker());
+        $this->listener = new SegmentWidgetOptionsListener(
+            $this->httpKernel,
+            $this->authorizationChecker,
+            new ContextChecker()
+        );
         $this->listener->setRequest($this->request);
     }
 
@@ -116,8 +116,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
             ->method('handle')
             ->with($subRequest)
             ->will($this->returnValue(new Response($auditFields)));
-        $this->security
-            ->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->willReturn(true);
 
@@ -152,8 +151,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $event = new WidgetOptionsLoadEvent($options);
-        $this->security
-            ->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->willReturn(true);
 
@@ -185,8 +183,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $event = new WidgetOptionsLoadEvent($options);
-        $this->security
-            ->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->willReturn(false);
 

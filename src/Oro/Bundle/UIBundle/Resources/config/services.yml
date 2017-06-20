@@ -33,7 +33,7 @@ services:
         arguments:
             - %oro_ui.placeholders%
             - '@oro_ui.placeholder.resolver'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_ui.placeholder.resolver:
@@ -47,7 +47,10 @@ services:
     # Other services
     oro_ui.router:
         class: %oro_ui.router.class%
-        arguments:  ['@request_stack', '@router', '@oro_security.security_facade']
+        arguments:
+            - '@request_stack'
+            - '@router'
+            - '@security.authorization_checker'
 
     oro_ui.dynamic_asset_version_manager:
         class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\EventListener\ControllerListener;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
 
 class ControllerListenerTest extends \PHPUnit_Framework_TestCase
@@ -18,13 +18,10 @@ class ControllerListenerTest extends \PHPUnit_Framework_TestCase
     protected $methodName = 'getId';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContext;
+    protected $classAuthorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $annotationProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $objectIdentityFactory;
+    protected $logger;
 
     /** @var Request */
     protected $request;
@@ -32,220 +29,37 @@ class ControllerListenerTest extends \PHPUnit_Framework_TestCase
     /** @var ControllerListener */
     protected $listener;
 
-    /** @var FilterControllerEvent */
-    protected $event;
-
     protected function setUp()
     {
-        $logger = $this->createMock('Psr\Log\LoggerInterface');
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->annotationProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->objectIdentityFactory =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->classAuthorizationChecker = $this->createMock(ClassAuthorizationChecker::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->request = new Request();
-        $this->request->attributes->add(array('_route' => 'test'));
+        $this->request->attributes->add(['_route' => 'test']);
+
         $this->listener = new ControllerListener(
-            new SecurityFacade(
-                $this->securityContext,
-                $this->annotationProvider,
-                $this->objectIdentityFactory,
-                $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-                    ->disableOriginalConstructor()
-                    ->getMock(),
-                $logger
-            ),
-            $logger
+            $this->classAuthorizationChecker,
+            $this->logger
         );
     }
 
-    public function testInterceptWithNoAnnotation()
+    public function testAccessGranted()
     {
         $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
+            $this->createMock(HttpKernelInterface::class),
+            [new TestDomainObject(), $this->methodName],
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
         );
 
-        $this->annotationProvider->expects($this->at(0))
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue(null));
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with(
-                $this->className
-            )
-            ->will($this->returnValue(null));
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(sprintf('Invoked controller "%s::%s". (MASTER_REQUEST)', $this->className, $this->methodName));
 
-        $this->securityContext->expects($this->never())
-            ->method('isGranted');
-
-        $this->listener->onKernelController($event);
-    }
-
-    public function testInterceptAccessGranted()
-    {
-        $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
-            $this->request,
-            HttpKernelInterface::MASTER_REQUEST
-        );
-
-        $classAnnotation = new AclAnnotation(array('id' => 'test_class', 'type' => 'test', 'permission' => 'TEST'));
-        $classIdentity = new ObjectIdentity('123', 'test_class');
-        $methodAnnotation = new AclAnnotation(array('id' => 'test_method', 'type' => 'test', 'permission' => 'TEST'));
-        $methodIdentity = new ObjectIdentity('123', 'test_method');
-
-        $this->annotationProvider->expects($this->at(0))
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue($methodAnnotation));
-        $this->objectIdentityFactory->expects($this->at(0))
-            ->method('get')
-            ->with($this->identicalTo($methodAnnotation))
-            ->will($this->returnValue($methodIdentity));
-        $this->securityContext->expects($this->at(0))
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($methodIdentity))
-            ->will($this->returnValue(true));
-
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with(
-                $this->className
-            )
-            ->will($this->returnValue($classAnnotation));
-        $this->objectIdentityFactory->expects($this->at(1))
-            ->method('get')
-            ->with($this->identicalTo($classAnnotation))
-            ->will($this->returnValue($classIdentity));
-        $this->securityContext->expects($this->at(1))
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($classIdentity))
-            ->will($this->returnValue(true));
-
-        $this->listener->onKernelController($event);
-    }
-
-    public function testInterceptAccessGrantedWithIgnoreClassAcl()
-    {
-        $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
-            $this->request,
-            HttpKernelInterface::MASTER_REQUEST
-        );
-
-        $methodAnnotation = new AclAnnotation(
-            array('id' => 'test_method', 'type' => 'test', 'permission' => 'TEST', 'ignore_class_acl' => true)
-        );
-        $methodIdentity = new ObjectIdentity('123', 'test_method');
-
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue($methodAnnotation));
-        $this->objectIdentityFactory->expects($this->once())
-            ->method('get')
-            ->with($this->identicalTo($methodAnnotation))
-            ->will($this->returnValue($methodIdentity));
-        $this->securityContext->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($methodIdentity))
-            ->will($this->returnValue(true));
-
-        $this->listener->onKernelController($event);
-    }
-
-    public function testInterceptAccessGrantedWithoutClassAcl()
-    {
-        $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
-            $this->request,
-            HttpKernelInterface::MASTER_REQUEST
-        );
-
-        $methodAnnotation = new AclAnnotation(
-            array('id' => 'test_method', 'type' => 'test', 'permission' => 'TEST')
-        );
-        $methodIdentity = new ObjectIdentity('123', 'test_method');
-
-        $this->annotationProvider->expects($this->at(0))
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue($methodAnnotation));
-        $this->objectIdentityFactory->expects($this->once())
-            ->method('get')
-            ->with($this->identicalTo($methodAnnotation))
-            ->will($this->returnValue($methodIdentity));
-        $this->securityContext->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($methodIdentity))
-            ->will($this->returnValue(true));
-
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with(
-                $this->className
-            )
-            ->will($this->returnValue(null));
-
-        $this->listener->onKernelController($event);
-    }
-
-    public function testInterceptAccessGrantedByClassAcl()
-    {
-        $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
-            $this->request,
-            HttpKernelInterface::MASTER_REQUEST
-        );
-
-        $classAnnotation = new AclAnnotation(array('id' => 'test_class', 'type' => 'test', 'permission' => 'TEST'));
-        $classIdentity = new ObjectIdentity('123', 'test_class');
-
-        $this->annotationProvider->expects($this->at(0))
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue(null));
-
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with(
-                $this->className
-            )
-            ->will($this->returnValue($classAnnotation));
-        $this->objectIdentityFactory->expects($this->once())
-            ->method('get')
-            ->with($this->identicalTo($classAnnotation))
-            ->will($this->returnValue($classIdentity));
-        $this->securityContext->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($classIdentity))
-            ->will($this->returnValue(true));
+        $this->classAuthorizationChecker->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with($this->className, $this->methodName)
+            ->willReturn(true);
 
         $this->listener->onKernelController($event);
     }
@@ -253,155 +67,83 @@ class ControllerListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function testInterceptAccessDeniedByClassAcl()
+    public function testAccessDenied()
     {
         $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
+            $this->createMock(HttpKernelInterface::class),
+            [new TestDomainObject(), $this->methodName],
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
         );
 
-        $classAnnotation = new AclAnnotation(array('id' => 'test_class', 'type' => 'test', 'permission' => 'TEST'));
-        $classIdentity = new ObjectIdentity('123', 'test_class');
-        $methodAnnotation = new AclAnnotation(array('id' => 'test_method', 'type' => 'test', 'permission' => 'TEST'));
-        $methodIdentity = new ObjectIdentity('123', 'test_method');
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(sprintf('Invoked controller "%s::%s". (MASTER_REQUEST)', $this->className, $this->methodName));
 
-        $this->annotationProvider->expects($this->at(0))
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue($methodAnnotation));
-        $this->objectIdentityFactory->expects($this->at(0))
-            ->method('get')
-            ->with($this->identicalTo($methodAnnotation))
-            ->will($this->returnValue($methodIdentity));
-        $this->securityContext->expects($this->at(0))
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($methodIdentity))
-            ->will($this->returnValue(true));
-
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with(
-                $this->className
-            )
-            ->will($this->returnValue($classAnnotation));
-        $this->objectIdentityFactory->expects($this->at(1))
-            ->method('get')
-            ->with($this->identicalTo($classAnnotation))
-            ->will($this->returnValue($classIdentity));
-        $this->securityContext->expects($this->at(1))
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($classIdentity))
-            ->will($this->returnValue(false));
+        $this->classAuthorizationChecker->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with($this->className, $this->methodName)
+            ->willReturn(false);
 
         $this->listener->onKernelController($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
-    public function testInterceptAccessDeniedByMethodAcl()
+    public function testAccessDeniedForSubRequest()
     {
         $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
-            $this->request,
-            HttpKernelInterface::MASTER_REQUEST
-        );
-
-        $methodAnnotation = new AclAnnotation(
-            array('id' => 'test_method', 'type' => 'test', 'permission' => 'TEST', 'ignore_class_acl' => true)
-        );
-        $methodIdentity = new ObjectIdentity('123', 'test_method');
-
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue($methodAnnotation));
-        $this->objectIdentityFactory->expects($this->once())
-            ->method('get')
-            ->with($this->identicalTo($methodAnnotation))
-            ->will($this->returnValue($methodIdentity));
-        $this->securityContext->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($methodIdentity))
-            ->will($this->returnValue(false));
-
-        $this->listener->onKernelController($event);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
-    public function testInterceptAccessDenied()
-    {
-        $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
-            $this->request,
-            HttpKernelInterface::MASTER_REQUEST
-        );
-
-        $annotation = new AclAnnotation(array('id' => 'test', 'type' => 'test', 'permission' => 'TEST'));
-        $identity = new ObjectIdentity('123', 'test');
-
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue($annotation));
-        $this->objectIdentityFactory->expects($this->once())
-            ->method('get')
-            ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($identity));
-
-        $this->securityContext->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($identity))
-            ->will($this->returnValue(false));
-
-        $this->listener->onKernelController($event);
-    }
-
-    public function testInterceptAccessDeniedForInternalAction()
-    {
-        $event = new FilterControllerEvent(
-            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
-            array(new TestDomainObject(), $this->methodName),
+            $this->createMock(HttpKernelInterface::class),
+            [new TestDomainObject(), $this->methodName],
             $this->request,
             HttpKernelInterface::SUB_REQUEST
         );
 
-        $this->request->attributes->remove('_route');
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(sprintf('Invoked controller "%s::%s". (SUB_REQUEST)', $this->className, $this->methodName));
 
-        $annotation = new AclAnnotation(array('id' => 'test', 'type' => 'test', 'permission' => 'TEST'));
-        $identity = new ObjectIdentity('123', 'test');
+        $this->classAuthorizationChecker->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with($this->className, $this->methodName)
+            ->willReturn(false);
 
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
-            ->with(
-                $this->className,
-                $this->methodName
-            )
-            ->will($this->returnValue($annotation));
-        $this->objectIdentityFactory->expects($this->once())
-            ->method('get')
-            ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($identity));
+        $this->listener->onKernelController($event);
+    }
 
-        $this->securityContext->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('TEST'), $this->identicalTo($identity))
-            ->will($this->returnValue(false));
+    public function testUnsupportedControllerType()
+    {
+        $event = new FilterControllerEvent(
+            $this->createMock(HttpKernelInterface::class),
+            function () {
+                // some controller
+            },
+            $this->request,
+            HttpKernelInterface::MASTER_REQUEST
+        );
+
+        $this->logger->expects(self::never())
+            ->method('debug');
+
+        $this->classAuthorizationChecker->expects(self::never())
+            ->method('isClassMethodGranted');
+
+        $this->listener->onKernelController($event);
+    }
+
+    public function testAccessAlreadyChecked()
+    {
+        $this->request->attributes->set('_oro_access_checked', true);
+        $event = new FilterControllerEvent(
+            $this->createMock(HttpKernelInterface::class),
+            [new TestDomainObject(), $this->methodName],
+            $this->request,
+            HttpKernelInterface::MASTER_REQUEST
+        );
+
+        $this->logger->expects(self::never())
+            ->method('debug');
+
+        $this->classAuthorizationChecker->expects(self::never())
+            ->method('isClassMethodGranted');
 
         $this->listener->onKernelController($event);
     }

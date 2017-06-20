@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ConfigBundle\Api\Processor\GetList;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Loads configuration sections.
@@ -17,17 +18,19 @@ class LoadConfigurationSections implements ProcessorInterface
     /** @var ConfigurationRepository */
     protected $configRepository;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param ConfigurationRepository $configRepository
-     * @param SecurityFacade          $securityFacade
+     * @param ConfigurationRepository       $configRepository
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(ConfigurationRepository $configRepository, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        ConfigurationRepository $configRepository,
+        AuthorizationCheckerInterface $authorizationChecker
+    ) {
         $this->configRepository = $configRepository;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -48,7 +51,7 @@ class LoadConfigurationSections implements ProcessorInterface
         // So, such sections will be added by separate loaders in additional to existing sections.
         $isAccessToSystemConfigurationGranted = true;
         $aclResource = $context->getConfig()->getAclResource();
-        if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
+        if ($aclResource && !$this->authorizationChecker->isGranted($aclResource)) {
             $isAccessToSystemConfigurationGranted = false;
         }
 

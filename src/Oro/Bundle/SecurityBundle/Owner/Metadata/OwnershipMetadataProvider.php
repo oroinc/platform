@@ -154,7 +154,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     public function supports()
     {
-        return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
+        return $this->getContainer()->get('oro_security.token_accessor')->getUser() instanceof User;
     }
 
     /**

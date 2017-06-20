@@ -10,7 +10,7 @@
 {% oro_title_set({params : {"%entityName%": label|default('N/A')|trans }}) %}
 
 {% block navButtons %}
-    {% if resource_granted('CREATE', 'entity:' ~ entity_class) %}
+    {% if is_granted('CREATE', 'entity:' ~ entity_class) %}
         {{ UI.addButton({
             'path': path('oro_entity_update', {'entityName': entity_name}),
             'entity_label': label|trans,

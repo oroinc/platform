@@ -5,28 +5,29 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
 
 class ActivityEntityDeleteHandler extends DeleteHandler implements ActivityEntityDeleteHandlerInterface
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var ActivityManager */
     protected $activityManager;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
+    public function setAuthorizationChecker(AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -73,7 +74,7 @@ class ActivityEntityDeleteHandler extends DeleteHandler implements ActivityEntit
      */
     protected function checkPermissions($entity, ObjectManager $em)
     {
-        if (!$this->securityFacade->isGranted('EDIT', $entity)) {
+        if (!$this->authorizationChecker->isGranted('EDIT', $entity)) {
             throw new ForbiddenException('has no edit permissions for activity entity');
         }
     }
@@ -83,7 +84,7 @@ class ActivityEntityDeleteHandler extends DeleteHandler implements ActivityEntit
      */
     protected function checkPermissionsForTargetEntity($entity, ObjectManager $em)
     {
-        if (!$this->securityFacade->isGranted('VIEW', $entity)) {
+        if (!$this->authorizationChecker->isGranted('VIEW', $entity)) {
             throw new ForbiddenException('has no view permissions for related entity');
         }
     }

@@ -64,7 +64,7 @@ class GridController extends Controller
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
-        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+        if ($acl && !$this->isGranted($acl)) {
             throw new AccessDeniedException('Access denied.');
         }
 
@@ -99,7 +99,7 @@ class GridController extends Controller
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
-        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+        if ($acl && !$this->isGranted($acl)) {
             throw new AccessDeniedException('Access denied.');
         }
 

@@ -6,7 +6,7 @@
 {% set pageTitle = attributesLabel|trans %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_attribute_create') and resource_granted('oro_attribute_update') %}
+    {% if is_granted('oro_attribute_create') and is_granted('oro_attribute_update') %}
         {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
             entity_class: fieldClassName,
             importJob: 'attribute_import_from_csv',
@@ -21,7 +21,7 @@
     {% endif %}
 
     {{ entityConfig.displayLayoutActions(layoutActions) }}
-    {% if resource_granted('oro_attribute_create') %}
+    {% if is_granted('oro_attribute_create') %}
         <div class="btn-group pull-right">
             {{ UI.addButton({
                 'path': path('oro_attribute_create', {alias: entityAlias}),

@@ -9,10 +9,9 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class ChoiceTreeBusinessUnitProvider
 {
@@ -22,28 +21,28 @@ class ChoiceTreeBusinessUnitProvider
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var ChainOwnerTreeProvider */
     protected $treeProvider;
 
     /**
-     * @param Registry               $registry
-     * @param SecurityFacade         $securityFacade
-     * @param AclHelper              $aclHelper
-     * @param ChainOwnerTreeProvider $treeProvider
+     * @param Registry                $registry
+     * @param TokenAccessorInterface  $tokenAccessor
+     * @param AclHelper               $aclHelper
+     * @param ChainOwnerTreeProvider  $treeProvider
      */
     public function __construct(
         Registry $registry,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         AclHelper $aclHelper,
         ChainOwnerTreeProvider $treeProvider
     ) {
-        $this->registry       = $registry;
-        $this->securityFacade = $securityFacade;
-        $this->aclHelper      = $aclHelper;
-        $this->treeProvider   = $treeProvider;
+        $this->registry = $registry;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->aclHelper = $aclHelper;
+        $this->treeProvider = $treeProvider;
     }
 
     /**
@@ -100,21 +99,13 @@ class ChoiceTreeBusinessUnitProvider
     }
 
     /**
-     * @return User
-     */
-    protected function getUser()
-    {
-        return $this->securityFacade->getToken()->getUser();
-    }
-
-    /**
      * @return array
      */
     protected function getBusinessUnitIds()
     {
         /** @var OwnerTree $tree */
         $tree   = $this->treeProvider->getTree();
-        $user   = $this->getUser();
+        $user   = $this->tokenAccessor->getUser();
         $result = [];
 
         $organizations = $user->getOrganizations();

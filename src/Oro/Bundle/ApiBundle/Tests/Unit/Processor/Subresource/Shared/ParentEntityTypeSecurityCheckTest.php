@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck;
@@ -11,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var ParentEntityTypeSecurityCheck */
     protected $processor;
@@ -20,11 +21,13 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelate
     {
         parent::setUp();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->processor = new ParentEntityTypeSecurityCheck($this->doctrineHelper, $this->securityFacade, 'VIEW');
+        $this->processor = new ParentEntityTypeSecurityCheck(
+            $this->doctrineHelper,
+            $this->authorizationChecker,
+            'VIEW'
+        );
     }
 
     public function testProcessWhenAccessGrantedForManageableParentEntityWithoutConfigOfAclResource()
@@ -32,7 +35,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelate
         $parentClassName = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
         $parentConfig = new EntityDefinitionConfig();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', new ObjectIdentity('entity', $parentClassName))
             ->willReturn(true);
@@ -50,7 +53,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelate
         $parentClassName = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
         $parentConfig = new EntityDefinitionConfig();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', new ObjectIdentity('entity', $parentClassName))
             ->willReturn(false);
@@ -67,7 +70,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelate
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->setAclResource($aclResource);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($aclResource)
             ->willReturn(true);
@@ -87,7 +90,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelate
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->setAclResource($aclResource);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($aclResource)
             ->willReturn(false);
@@ -104,7 +107,7 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelate
 
         $this->notManageableClassNames = [$parentClassName];
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $this->context->setParentClassName($parentClassName);

@@ -139,12 +139,12 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
      */
     protected function setSecurityContext(User $user, Organization $organization = null)
     {
-        $securityContext = $this->container->get('security.context');
+        $tokenStorage = $this->container->get('security.token_storage');
         if ($organization) {
             $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
         } else {
             $token = new UsernamePasswordToken($user, $user->getUsername(), 'main');
         }
-        $securityContext->setToken($token);
+        $tokenStorage->setToken($token);
     }
 }

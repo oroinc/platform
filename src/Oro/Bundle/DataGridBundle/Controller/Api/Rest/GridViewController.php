@@ -16,7 +16,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
@@ -185,7 +184,7 @@ class GridViewController extends RestController
      */
     protected function isGridViewPublishGranted()
     {
-        return $this->getSecurityFacade()->isGranted('oro_datagrid_gridview_publish');
+        return $this->isGranted('oro_datagrid_gridview_publish');
     }
 
     /**
@@ -221,13 +220,5 @@ class GridViewController extends RestController
     public function getManager()
     {
         return $this->get('oro_datagrid.grid_view.manager.api');
-    }
-
-    /**
-     * @return SecurityFacade
-     */
-    protected function getSecurityFacade()
-    {
-        return $this->get('oro_security.security_facade');
     }
 }

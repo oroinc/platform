@@ -7,11 +7,10 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
-use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 
 class EmailManager
 {
@@ -24,8 +23,8 @@ class EmailManager
     /** @var EntityManager */
     protected $em;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var MailboxManager */
     protected $mailboxManager;
@@ -33,24 +32,24 @@ class EmailManager
     /**
      * Constructor
      *
-     * @param EntityManager $em - Entity Manager
-     * @param EmailThreadManager $emailThreadManager - Email Thread Manager
-     * @param EmailThreadProvider $emailThreadProvider - Email Thread Provider
-     * @param SecurityFacade $securityFacade - Security Facade
-     * @param MailboxManager $mailboxManager
+     * @param EntityManager          $em
+     * @param EmailThreadManager     $emailThreadManager
+     * @param EmailThreadProvider    $emailThreadProvider
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param MailboxManager         $mailboxManager
      */
     public function __construct(
         EntityManager $em,
         EmailThreadManager $emailThreadManager,
         EmailThreadProvider $emailThreadProvider,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         MailboxManager $mailboxManager
     ) {
-        $this->em                  = $em;
-        $this->emailThreadManager  = $emailThreadManager;
+        $this->em = $em;
+        $this->emailThreadManager = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
-        $this->securityFacade      = $securityFacade;
-        $this->mailboxManager      = $mailboxManager;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->mailboxManager = $mailboxManager;
     }
 
     /**
@@ -79,9 +78,9 @@ class EmailManager
      */
     public function setSeenStatus(Email $entity, $isSeen = true, $checkThread = false)
     {
-        $user         = $this->securityFacade->getLoggedUser();
-        $organization = $this->securityFacade->getOrganization();
-        $emailUsers   = $this->getEmailUserRepository()
+        $user = $this->tokenAccessor->getUser();
+        $organization = $this->tokenAccessor->getOrganization();
+        $emailUsers = $this->getEmailUserRepository()
             ->getAllEmailUsersByEmail($entity, $user, $organization, $checkThread);
 
         foreach ($emailUsers as $emailUser) {

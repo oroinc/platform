@@ -6,35 +6,29 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SoapBundle\Event\FindAfter;
-use Oro\Bundle\SoapBundle\Event\GetListBefore;
-
+use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ApiEventListener
 {
-    /**
-     * @var Request
-     */
+    /** @var Request */
     protected $request;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var RequestAuthorizationChecker */
+    protected $requestAuthorizationChecker;
 
-    /**
-     * @var AclHelper
-     */
+    /** @var AclHelper */
     protected $aclHelper;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param AclHelper      $aclHelper
+     * @param RequestAuthorizationChecker $requestAuthorizationChecker
+     * @param AclHelper                   $aclHelper
      */
-    public function __construct(SecurityFacade $securityFacade, AclHelper $aclHelper)
-    {
-        $this->securityFacade = $securityFacade;
+    public function __construct(
+        RequestAuthorizationChecker $requestAuthorizationChecker,
+        AclHelper $aclHelper
+    ) {
+        $this->requestAuthorizationChecker = $requestAuthorizationChecker;
         $this->aclHelper = $aclHelper;
     }
 
@@ -66,7 +60,9 @@ class ApiEventListener
      */
     protected function checkObjectAccess($object)
     {
-        if (is_object($object) && $this->securityFacade->isRequestObjectIsGranted($this->request, $object) === -1) {
+        if (is_object($object)
+            && $this->requestAuthorizationChecker->isRequestObjectIsGranted($this->request, $object) === -1
+        ) {
             throw new AccessDeniedException();
         }
     }
