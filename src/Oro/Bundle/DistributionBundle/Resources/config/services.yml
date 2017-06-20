@@ -102,6 +102,7 @@ services:
         factory_class: Composer\Factory
         factory_method: create
         arguments: ['@oro_distribution.composer.io', %oro_distribution.composer_json%]
+        lazy: true
 
     oro_distribution.composer.installation_manager:
         class: %oro_distribution.composer.installation_manager.class%
