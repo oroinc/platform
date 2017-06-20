@@ -2,3 +2,5 @@ oro:
     currency:
         price:
             value.blank: Price value should not be blank.
+        multi_currency:
+            value.blank: Price value should not be blank.
