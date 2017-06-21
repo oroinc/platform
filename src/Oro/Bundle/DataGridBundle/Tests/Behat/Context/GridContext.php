@@ -1396,6 +1396,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Given /^I should not see "(?P<gridName>[\s\w]+)" grid$/
+     */
+    public function iShouldNotSeeGrid($gridName = 'Grid')
+    {
+        $grid = $this->elementFactory->createElement($gridName);
+
+        self::assertFalse(
+            $grid->isIsset(),
+            sprintf('Grid "%s" was found on page, but it should not.', $gridName)
+        );
+    }
+
+    /**
      * @param string $stringNumber
      *
      * @return int
