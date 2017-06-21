@@ -5,20 +5,20 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 
 class FieldAclHelperTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -33,12 +33,12 @@ class FieldAclHelperTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->fieldAclHelper = new FieldAclHelper(
-            $this->securityFacade,
+            $this->authorizationChecker,
             $this->configManager,
             $this->doctrineHelper
         );
@@ -234,7 +234,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
 
     public function testIsFieldViewGrantedForUnsupportedEntityType()
     {
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         self::assertTrue($this->fieldAclHelper->isFieldViewGranted(null, 'city'));
@@ -245,7 +245,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
         $entity = new CmsAddress();
         $fieldName = 'city';
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with(
                 'VIEW',
@@ -258,7 +258,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
 
     public function testIsFieldModificationGrantedForUnsupportedEntityType()
     {
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         self::assertTrue($this->fieldAclHelper->isFieldModificationGranted(null, 'city'));
@@ -273,7 +273,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
             ->method('isNewEntity')
             ->with(self::identicalTo($entity))
             ->willReturn(true);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with(
                 'CREATE',
@@ -293,7 +293,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
             ->method('isNewEntity')
             ->with(self::identicalTo($entity))
             ->willReturn(false);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with(
                 'EDIT',

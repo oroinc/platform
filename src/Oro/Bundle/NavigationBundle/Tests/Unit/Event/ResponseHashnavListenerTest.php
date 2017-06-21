@@ -1,9 +1,12 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
-use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 
 class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +41,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
+    protected $tokenStorage;
 
     protected function setUp()
     {
@@ -57,10 +60,10 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getResponse')
             ->will($this->returnValue($this->response));
 
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->templating      = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $this->kernel          = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-        $this->listener        = $this->getListener(false);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->templating = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
+        $this->listener = $this->getListener(false);
     }
 
     public function testPlainRequest()
@@ -78,7 +81,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
         $this->response->setStatusCode(302);
         $this->response->headers->add(array('location' => self::TEST_URL));
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(false));
 
@@ -106,7 +109,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->request->attributes->set('_fullRedirect', true);
 
-        $this->securityContext->expects($this->never())
+        $this->tokenStorage->expects($this->never())
             ->method('getToken');
 
         $this->event->expects($this->once())
@@ -165,7 +168,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getListener($isDebug)
     {
-        return new ResponseHashnavListener($this->securityContext, $this->templating, $isDebug);
+        return new ResponseHashnavListener($this->tokenStorage, $this->templating, $isDebug);
     }
 
     private function serverErrorHandle()

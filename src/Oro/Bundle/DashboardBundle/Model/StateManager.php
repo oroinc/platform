@@ -4,37 +4,30 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class StateManager
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param EntityManager $em
-     * @param SecurityFacade $securityFacade
+     * @param EntityManager          $em
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
         EntityManager $em,
-        SecurityFacade $securityFacade
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->entityManager = $em;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -43,7 +36,7 @@ class StateManager
      */
     public function getWidgetState(Widget $widget)
     {
-        $user = $this->securityFacade->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
 
         if (!$user instanceof User) {
             $state = new WidgetStateNullObject();

@@ -4,16 +4,15 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +20,10 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $permissionManager;
@@ -31,15 +33,13 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->permissionManager = $this->getMockBuilder(PermissionManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->permissionManager = $this->createMock(PermissionManager::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_security.security_facade', $this->securityFacade)
+            ->add('security.authorization_checker', $this->authorizationChecker)
+            ->add('oro_security.token_accessor', $this->tokenAccessor)
             ->add('oro_security.acl.permission_manager', $this->permissionManager)
             ->getContainer($this);
 
@@ -51,9 +51,12 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_security_extension', $this->extension->getName());
     }
 
+    /**
+     * @deprecated since 2.3. Use Symfony "is_granted" function instead
+     */
     public function testCheckResourceIsGranted()
     {
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($this->equalTo('test_acl'))
             ->will($this->returnValue(true));
@@ -72,13 +75,8 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $organization->setEnabled(true);
 
         $user->setOrganizations(new ArrayCollection(array($organization, $disabledOrganization)));
-        $token = $this->createMock(TokenInterface::class);
 
-        $this->securityFacade->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $token->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
 
@@ -89,18 +87,12 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($organization, $result[0]);
     }
 
-    public function testGetCurrentOrganizationWorks()
+    public function testGetCurrentOrganization()
     {
         $organization = $this->createMock(Organization::class);
 
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
-
-        $this->securityFacade->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $token->expects($this->once())
-            ->method('getOrganizationContext')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
 
         $this->assertSame(
@@ -109,15 +101,11 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetCurrentOrganizationWorksWithNotOrganizationContextToken()
+    public function testGetCurrentOrganizationWhenNoOrganizationInToken()
     {
-        $token = $this->createMock(TokenInterface::class);
-
-        $this->securityFacade->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $token->expects($this->never())->method($this->anything());
+        $this->tokenAccessor->expects($this->once())
+            ->method('getOrganization')
+            ->will($this->returnValue(null));
 
         $this->assertNull(
             self::callTwigFunction($this->extension, 'get_current_organization', [])

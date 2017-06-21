@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
@@ -11,17 +12,19 @@ use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsLoadListener
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var AclHelper */
     protected $aclHelper;
@@ -38,23 +41,26 @@ class GridViewsLoadListener
     protected $appearanceTypeManager;
 
     /**
-     * @param Registry $registry
-     * @param SecurityFacade $securityFacade
-     * @param AclHelper $aclHelper
-     * @param TranslatorInterface $translator
-     * @param GridViewManager $gridViewManager
-     * @param AppearanceTypeManager $appearanceTypeManager
+     * @param ManagerRegistry               $registry
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param AclHelper                     $aclHelper
+     * @param TranslatorInterface           $translator
+     * @param GridViewManager               $gridViewManager
+     * @param AppearanceTypeManager         $appearanceTypeManager
      */
     public function __construct(
-        Registry $registry,
-        SecurityFacade $securityFacade,
+        ManagerRegistry $registry,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         AclHelper $aclHelper,
         TranslatorInterface $translator,
         GridViewManager $gridViewManager,
         AppearanceTypeManager $appearanceTypeManager
     ) {
         $this->registry = $registry;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
         $this->aclHelper = $aclHelper;
         $this->translator = $translator;
         $this->gridViewManager = $gridViewManager;
@@ -66,14 +72,14 @@ class GridViewsLoadListener
      */
     public function onViewsLoad(GridViewsLoadEvent $event)
     {
-        $gridName    = $event->getGridName();
+        $gridName = $event->getGridName();
         $views = [];
-        $currentUser = $this->getCurrentUser();
-        if (!$currentUser) {
+        $currentUser = $this->tokenAccessor->getUser();
+        if (null === $currentUser) {
             return;
         }
 
-        $defaultGridView    = $this->gridViewManager->getDefaultView($currentUser, $gridName);
+        $defaultGridView = $this->gridViewManager->getDefaultView($currentUser, $gridName);
         $gridViews = $event->getGridViews();
 
         foreach ($gridViews['system'] as $systemView) {
@@ -88,15 +94,15 @@ class GridViewsLoadListener
         }
         foreach ($gridViews['user'] as $gridView) {
             $view = $gridView->createView();
-            $view->setEditable($this->securityFacade->isGranted('EDIT', $gridView));
-            $view->setDeletable($this->securityFacade->isGranted('DELETE', $gridView));
+            $view->setEditable($this->authorizationChecker->isGranted('EDIT', $gridView));
+            $view->setDeletable($this->authorizationChecker->isGranted('DELETE', $gridView));
             if ($defaultGridView) {
                 $view->setDefault($defaultGridView->getName() === $gridView->getName());
             }
             if ($gridView->getOwner() && $gridView->getOwner()->getId() !== $currentUser->getId()) {
                 $view->setSharedBy($gridView->getOwner()->getUsername());
             }
-            $views[]   = $view->getMetadata();
+            $views[] = $view->getMetadata();
         }
 
         foreach ($views as &$view) {
@@ -121,19 +127,6 @@ class GridViewsLoadListener
         $icon = isset($types[$appearanceType]['icon']) ? $types[$appearanceType]['icon'] : '';
 
         return $icon;
-    }
-
-    /**
-     * @return AbstractUser
-     */
-    protected function getCurrentUser()
-    {
-        $user = $this->securityFacade->getLoggedUser();
-        if ($user instanceof AbstractUser) {
-            return $user;
-        }
-
-        return null;
     }
 
     /**

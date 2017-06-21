@@ -7,38 +7,38 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActivityEntityApiHandler extends ApiFormHandler
 {
     /** @var ActivityManager */
     protected $activityManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param FormInterface   $form
-     * @param Request         $request
-     * @param ObjectManager   $entityManager
-     * @param ActivityManager $activityManager
-     * @param SecurityFacade  $securityFacade
+     * @param FormInterface                 $form
+     * @param Request                       $request
+     * @param ObjectManager                 $entityManager
+     * @param ActivityManager               $activityManager
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $entityManager,
         ActivityManager $activityManager,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         parent::__construct($form, $request, $entityManager);
         $this->activityManager = $activityManager;
-        $this->securityFacade  = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -86,7 +86,7 @@ class ActivityEntityApiHandler extends ApiFormHandler
      */
     protected function checkPermissions($entity)
     {
-        if (!$this->securityFacade->isGranted('EDIT', $entity)) {
+        if (!$this->authorizationChecker->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
         }
     }

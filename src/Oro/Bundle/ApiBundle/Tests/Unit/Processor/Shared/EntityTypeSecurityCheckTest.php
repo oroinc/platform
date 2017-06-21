@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck;
@@ -11,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var EntityTypeSecurityCheck */
     protected $processor;
@@ -20,11 +21,13 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
     {
         parent::setUp();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->processor = new EntityTypeSecurityCheck($this->doctrineHelper, $this->securityFacade, 'VIEW');
+        $this->processor = new EntityTypeSecurityCheck(
+            $this->doctrineHelper,
+            $this->authorizationChecker,
+            'VIEW'
+        );
     }
 
     public function testProcessWhenAccessGrantedForManageableEntityWithoutConfigOfAclResource()
@@ -32,7 +35,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
         $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
         $config = new EntityDefinitionConfig();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', new ObjectIdentity('entity', $className))
             ->willReturn(true);
@@ -50,7 +53,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
         $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
         $config = new EntityDefinitionConfig();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', new ObjectIdentity('entity', $className))
             ->willReturn(false);
@@ -67,7 +70,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $config->setAclResource($aclResource);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($aclResource)
             ->willReturn(true);
@@ -87,7 +90,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $config->setAclResource($aclResource);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($aclResource)
             ->willReturn(false);
@@ -104,7 +107,7 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
 
         $this->notManageableClassNames = [$className];
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $this->context->setClassName($className);

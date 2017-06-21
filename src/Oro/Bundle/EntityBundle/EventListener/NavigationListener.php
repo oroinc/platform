@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -10,12 +11,15 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class NavigationListener
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var ConfigManager $configManager */
     protected $configManager;
@@ -24,18 +28,21 @@ class NavigationListener
     protected $translator;
 
     /**
-     * @param SecurityFacade      $securityFacade
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param ConfigManager                 $configManager
+     * @param TranslatorInterface           $translator
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         ConfigManager $configManager,
         TranslatorInterface $translator
     ) {
-        $this->securityFacade   = $securityFacade;
-        $this->configManager    = $configManager;
-        $this->translator       = $translator;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->configManager = $configManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -58,8 +65,8 @@ class NavigationListener
                 if ($this->checkAvailability($extendConfig)) {
                     $config = $entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
                     if (!class_exists($config->getId()->getClassName()) ||
-                        !$this->securityFacade->hasLoggedUser() ||
-                        !$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())
+                        !$this->tokenAccessor->hasUser() ||
+                        !$this->authorizationChecker->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())
                     ) {
                         continue;
                     }

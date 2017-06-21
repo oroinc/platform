@@ -3,9 +3,9 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
@@ -21,26 +21,20 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     const RULE_GROUP          = 'oro_user_group_view';
     const RULE_ROLE           = 'oro_user_role_view';
 
-    /** @var SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject */
-    private $securityInterface;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $authorizationChecker;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    private $securityFacade;
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $tokenAccessor;
 
     /** @var PasswordFieldOptionsProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $optionsProvider;
 
     protected function setUp()
     {
-        $this->securityInterface = $this->getMockBuilder(SecurityContextInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->optionsProvider = $this->getMockBuilder(PasswordFieldOptionsProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->optionsProvider = $this->createMock(PasswordFieldOptionsProvider::class);
     }
 
     /**
@@ -55,7 +49,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $order = 0;
 
         foreach ($permissions as $rule => $isGranted) {
-            $this->securityFacade->expects($this->at($order))
+            $this->authorizationChecker->expects($this->at($order))
                 ->method('isGranted')
                 ->with($rule)
                 ->will($this->returnValue($isGranted));
@@ -69,7 +63,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $userSubscriber = new UserSubscriber($formFactory, $this->securityInterface);
+        $userSubscriber = new UserSubscriber($formFactory, $this->tokenAccessor);
 
         $order   = 0;
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
@@ -136,7 +130,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
-        $type = new UserType($this->securityInterface, $this->securityFacade, $request, $this->optionsProvider);
+        $type = new UserType($this->authorizationChecker, $this->tokenAccessor, $request, $this->optionsProvider);
         $type->buildForm($builder, []);
     }
 
@@ -237,8 +231,8 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults');
         $type = new UserType(
-            $this->securityInterface,
-            $this->securityFacade,
+            $this->authorizationChecker,
+            $this->tokenAccessor,
             new Request(),
             $this->optionsProvider
         );

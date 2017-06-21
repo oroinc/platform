@@ -35,7 +35,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }

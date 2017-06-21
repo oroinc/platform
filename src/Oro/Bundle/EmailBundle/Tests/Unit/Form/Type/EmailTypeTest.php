@@ -28,6 +28,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -35,72 +36,53 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailTypeTest extends TypeTestCase
 {
-    /**
-     * @var SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityContext;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
-    /**
-     * @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
+
+    /** @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject */
     protected $emailRenderer;
 
-    /**
-     * @var EmailModelBuilderHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var EmailModelBuilderHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $emailModelBuilderHelper;
 
-    /**
-     * @var EmailTemplate
-     */
+    /** @var EmailTemplate */
     protected $emailTemplate;
 
-    /**
-     * @var MailboxManager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var MailboxManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $mailboxManager;
 
-    /**
-     * @var Registry|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /**
-     * @var EmailOriginHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var EmailOriginHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $emailOriginHelper;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var HtmlTagProvider
-     */
+    /** @var HtmlTagProvider */
     protected $htmlTagProvider;
 
-    /**
-     * @var ValidatorInterface
-     */
+    /** @var ValidatorInterface */
     protected $validator;
 
     protected function setUp()
     {
-        parent::setUp();
-        $this->securityContext  = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->emailRenderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()->getMock();
         $this->emailModelBuilderHelper = $this
@@ -109,6 +91,8 @@ class EmailTypeTest extends TypeTestCase
         $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
+
+        parent::setUp();
     }
 
     /**
@@ -117,7 +101,8 @@ class EmailTypeTest extends TypeTestCase
     protected function createEmailType()
     {
         return new EmailType(
-            $this->securityContext,
+            $this->authorizationChecker,
+            $this->tokenAccessor,
             $this->emailRenderer,
             $this->emailModelBuilderHelper,
             $this->configManager
@@ -130,7 +115,7 @@ class EmailTypeTest extends TypeTestCase
      */
     protected function getExtensions()
     {
-        $emailAddressType  = new EmailAddressType($this->securityContext);
+        $emailAddressType  = new EmailAddressType();
         $translatableType = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType')
             ->disableOriginalConstructor()
             ->getMock();
@@ -149,11 +134,8 @@ class EmailTypeTest extends TypeTestCase
             ->getMock();
 
         $user = new User();
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityFacade->expects($this->any())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
         $relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
@@ -189,7 +171,7 @@ class EmailTypeTest extends TypeTestCase
             ->disableOriginalConstructor()->getMock();
 
         $emailOriginFromType = new EmailOriginFromType(
-            $securityFacade,
+            $this->tokenAccessor,
             $relatedEmailsProvider,
             $helper,
             $this->mailboxManager,
@@ -198,7 +180,7 @@ class EmailTypeTest extends TypeTestCase
         );
 
         $emailAddressFromType = new EmailAddressFromType(
-            $securityFacade,
+            $this->tokenAccessor,
             $relatedEmailsProvider,
             $this->mailboxManager
         );

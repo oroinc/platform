@@ -10,7 +10,7 @@
         'route': 'oro_entityconfig_view',
         'params': {'id': '$id'}
     }) %}
-    {% if resource_granted('oro_entityextend_entity_create') %}
+    {% if is_granted('oro_entityextend_entity_create') %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_entityextend_entity_create'
         }) %}

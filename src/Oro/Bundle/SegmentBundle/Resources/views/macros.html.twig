@@ -62,7 +62,7 @@
 #}
 {% macro runButton(entity, reloadRequired = false) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% if entity.id and resource_granted('EDIT', entity)
+    {% if entity.id and is_granted('EDIT', entity)
         and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
     %}
         {{ UI.clientButton({
@@ -88,7 +88,7 @@
 {% macro saveAndRefreshButton(entity) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-    {% if entity.id and resource_granted('EDIT', entity)
+    {% if entity.id and is_granted('EDIT', entity)
         and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
     %}
         {{ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save and refresh', 'action': 'save_and_refresh'}) }}

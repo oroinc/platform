@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constrains;
 
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
@@ -33,7 +35,10 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
     protected $aclVoter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $treeProvider;
@@ -66,9 +71,8 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,13 +83,13 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $this->currentOrg = new Organization();
         $this->currentOrg->setId(2);
 
-        $this->securityFacade->expects($this->any())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
             ->willReturn($this->currentUser);
-        $this->securityFacade->expects($this->any())
-            ->method('getLoggedUserId')
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUserId')
             ->willReturn($this->currentUser->getId());
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
             ->willReturn($this->currentOrg);
 
@@ -102,7 +106,8 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
             $this->businessUnitManager,
             $this->ownershipMetadataProvider,
             $this->entityOwnerAccessor,
-            $this->securityFacade,
+            $this->authorizationChecker,
+            $this->tokenAccessor,
             $this->treeProvider,
             $this->aclVoter
         );
@@ -168,7 +173,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
@@ -207,7 +212,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
@@ -246,7 +251,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
@@ -282,7 +287,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
@@ -324,7 +329,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
@@ -366,7 +371,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ASSIGN', $this->testEntity)
             ->willReturn(true);
@@ -404,7 +409,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -442,7 +447,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -480,7 +485,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -515,7 +520,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -556,7 +561,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -597,7 +602,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -636,7 +641,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -681,7 +686,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -726,7 +731,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
@@ -774,7 +779,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
         $classMetadata = $this->getClassMetadataMock();
         $this->getClassMetadataExpectation($classMetadata);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);

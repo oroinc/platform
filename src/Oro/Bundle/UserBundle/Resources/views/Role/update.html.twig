@@ -8,7 +8,7 @@
 
 {% block navButtons %}
     {{ parent() }}
-    {% if entityId and resource_granted('DELETE', form.vars.value) %}
+    {% if entityId and is_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
                 'dataUrl': path('oro_api_delete_role', {'id': entityId}),
                 'dataRedirect': path('oro_user_role_index'),
@@ -27,12 +27,12 @@
         'route': 'oro_user_role_view',
         'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
     }) %}
-    {% if resource_granted('oro_user_role_create') %}
+    {% if is_granted('oro_user_role_create') %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_user_role_create'
         }) %}
     {% endif %}
-    {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
+    {% if form.vars.value.id or is_granted('oro_user_role_update') %}
         {# button attribute 'action' is avoided because of there is unacceptable submit binding on .action-button in init-layout.js #}
         {% set html = html ~ UI.saveAndStayButton({
             'class': 'btn-success main-group role-submit',

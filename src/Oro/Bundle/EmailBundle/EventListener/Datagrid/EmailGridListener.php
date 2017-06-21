@@ -17,7 +17,7 @@ use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailGridListener implements FeatureToggleableInterface
 {
@@ -26,8 +26,8 @@ class EmailGridListener implements FeatureToggleableInterface
     /** @var EmailQueryFactory */
     protected $factory;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var GridViewManager */
     protected $gridViewManager;
@@ -43,19 +43,19 @@ class EmailGridListener implements FeatureToggleableInterface
     protected $filterJoins;
 
     /**
-     * @param EmailQueryFactory $factory
-     * @param SecurityFacade $securityFacade
-     * @param GridViewManager $gridViewManager
-     * @param ConfigManager $configManager
+     * @param EmailQueryFactory      $factory
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param GridViewManager        $gridViewManager
+     * @param ConfigManager          $configManager
      */
     public function __construct(
         EmailQueryFactory $factory,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         GridViewManager $gridViewManager,
         ConfigManager $configManager
     ) {
         $this->factory = $factory;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->gridViewManager = $gridViewManager;
         $this->configManager = $configManager;
     }
@@ -197,7 +197,7 @@ class EmailGridListener implements FeatureToggleableInterface
     protected function getGridViewFiltersData()
     {
         $filters = [];
-        $user = $this->securityFacade->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
         if (!$user) {
             return $filters;
         }

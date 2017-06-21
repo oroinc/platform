@@ -1,0 +1,15 @@
+// @theme: blank;
+
+$datagrid-massaction-toggle-offset-inner: 3px 5px !default;
+$datagrid-massaction-toggle-font-size: $base-font-size + 1px !default;
+$datagrid-massaction-toggle-font-weight: normal !default;
+$datagrid-massaction-toggle-background-color: lighten(get-color('additional', 'base'), 2%) !default;
+$datagrid-massaction-toggle-color: lighten(get-color('additional', 'dark'), 21%) !default;
+$datagrid-massaction-toggle-border: 1px solid get-color('additional', 'light') !default;
+$datagrid-massaction-toggle-border-radius: 5px !default;
+
+$datagrid-massaction-toggle-hover-box-shadow: inset 0 3px 5px 0 rgba(0, 0, 0, .35) !default;
+
+$datagrid-massaction-dropdown-menu-action-offset-inner: $offset-y-s ($offset-x - 1px) !default;
+$datagrid-massaction-dropdown-menu-action-color: get-color('additional', 'dark') !default;
+$datagrid-massaction-dropdown-menu-action-hover-bg: get-color('additional', 'base') !default;

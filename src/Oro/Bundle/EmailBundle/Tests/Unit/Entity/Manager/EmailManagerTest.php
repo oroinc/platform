@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailManagerTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +27,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
     protected $queryBuilder;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $mailboxManager;
@@ -49,9 +50,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
             ->disableOriginalConstructor()
@@ -61,7 +60,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->emailThreadManager,
             $this->emailThreadProvider,
-            $this->securityFacade,
+            $this->tokenAccessor,
             $this->mailboxManager
         );
     }
@@ -323,12 +322,10 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             $emailUsers
         );
 
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($user);
-        $this->securityFacade
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->willReturn($organization);
         $emailUsersRepo = $this
