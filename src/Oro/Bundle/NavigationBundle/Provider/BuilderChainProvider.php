@@ -15,12 +15,13 @@ use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 class BuilderChainProvider implements MenuProviderInterface
 {
     const COMMON_BUILDER_ALIAS = '_common_builder';
+    const MENU_LOCAL_CACHE_PREFIX = 'menuLocalCachePrefix';
     const IGNORE_CACHE_OPTION = 'ignoreCache';
 
     /**
      * Collection of builders grouped by alias.
      *
-     * @var BuilderInterface[]
+     * @var array[]
      */
     protected $builders = [];
 
@@ -51,7 +52,11 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     private $cache;
 
-
+    /**
+     * @param FactoryInterface $factory
+     * @param ArrayLoader $loader
+     * @param MenuManipulator $manipulator
+     */
     public function __construct(
         FactoryInterface $factory,
         ArrayLoader $loader,
@@ -93,8 +98,8 @@ class BuilderChainProvider implements MenuProviderInterface
     /**
      * Build menu.
      *
-     * @param  string        $alias
-     * @param  array         $options
+     * @param string $alias
+     * @param array $options
      * @return ItemInterface
      */
     public function get($alias, array $options = [])
@@ -102,17 +107,21 @@ class BuilderChainProvider implements MenuProviderInterface
         $this->assertAlias($alias);
 
         $ignoreCache = array_key_exists(self::IGNORE_CACHE_OPTION, $options);
+        $cacheAlias = $alias;
+        if (array_key_exists(self::MENU_LOCAL_CACHE_PREFIX, $options)) {
+            $cacheAlias = $options[self::MENU_LOCAL_CACHE_PREFIX] . $cacheAlias;
+        }
 
-        if (!array_key_exists($alias, $this->menus)) {
+        if (!array_key_exists($cacheAlias, $this->menus)) {
             if (!$ignoreCache && $this->cache && $this->cache->contains($alias)) {
                 $menuData = $this->cache->fetch($alias);
-                $this->menus[$alias] = $this->loader->load($menuData);
+                $this->menus[$cacheAlias] = $this->loader->load($menuData);
             } else {
-                $this->buildMenu($alias, $options);
+                $this->menus[$cacheAlias] = $this->buildMenu($alias, $options);
             }
         }
 
-        return $this->menus[$alias];
+        return $this->menus[$cacheAlias];
     }
 
     /**
@@ -169,7 +178,7 @@ class BuilderChainProvider implements MenuProviderInterface
     /**
      * Assert alias not empty
      *
-     * @param  string                    $alias
+     * @param string $alias
      * @throws \InvalidArgumentException
      */
     protected function assertAlias($alias)
@@ -180,8 +189,9 @@ class BuilderChainProvider implements MenuProviderInterface
     }
 
     /**
-     * @param       $alias
+     * @param string $alias
      * @param array $options
+     * @return ItemInterface
      */
     protected function buildMenu($alias, array $options)
     {
@@ -202,12 +212,12 @@ class BuilderChainProvider implements MenuProviderInterface
             }
         }
 
-        $this->menus[$alias] = $menu;
-
         $this->sort($menu);
 
         if ($this->cache) {
             $this->cache->save($alias, $this->manipulator->toArray($menu));
         }
+
+        return $menu;
     }
 }

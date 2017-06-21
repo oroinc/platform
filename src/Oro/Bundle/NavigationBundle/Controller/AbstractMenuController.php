@@ -14,6 +14,7 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
@@ -100,7 +101,13 @@ abstract class AbstractMenuController extends Controller
     {
         $this->checkAcl();
 
-        $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menuName, $key, $this->getScope($context));
+        $options = [
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $menuTreeContext,
+            BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
+        ];
+        $menu = $this->getMenuUpdateManager()->getMenu($menuName, $options);
+        $menuUpdate = $this->getMenuUpdateManager()
+            ->findOrCreateMenuUpdate($menu, $key, $this->getScope($context));
         if (!$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
                 sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
@@ -166,7 +173,8 @@ abstract class AbstractMenuController extends Controller
     protected function getMenu($menuName, array $menuTreeContext = [])
     {
         $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $menuTreeContext
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $menuTreeContext,
+            BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];
         $menu = $this->getMenuUpdateManager()->getMenu($menuName, $options);
         if (!count($menu->getChildren())) {

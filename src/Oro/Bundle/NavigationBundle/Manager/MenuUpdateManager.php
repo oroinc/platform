@@ -119,14 +119,16 @@ class MenuUpdateManager
     /**
      * Get existing or create new MenuUpdate for specified menu, key and scope
      *
-     * @param string $menuName
+     * @param string|ItemInterface $menu
      * @param string $key
-     * @param Scope  $scope
+     * @param Scope $scope
      *
      * @return null|MenuUpdateInterface
      */
-    public function findOrCreateMenuUpdate($menuName, $key, Scope $scope)
+    public function findOrCreateMenuUpdate($menu, $key, Scope $scope)
     {
+        $menuName = $menu instanceof ItemInterface ? $menu->getName() : $menu;
+
         /** @var MenuUpdateInterface $update */
         $update = $this->getRepository()->findOneBy(
             [
@@ -140,7 +142,7 @@ class MenuUpdateManager
             $update = $this->createMenuUpdate($scope, ['key' => $key, 'menu' => $menuName]);
         }
 
-        $item = $this->findMenuItem($update->getMenu(), $update->getKey(), $update->getScope());
+        $item = $this->findMenuItem($menu, $update->getKey(), $update->getScope());
         if ($item) {
             MenuUpdateUtils::updateMenuUpdate($update, $item, $update->getMenu(), $this->menuUpdateHelper);
         } else {
@@ -151,22 +153,26 @@ class MenuUpdateManager
     }
 
     /**
-     * @param string $menuName
+     * @param string|ItemInterface $menu
      * @param string $key
-     * @param Scope  $scope
+     * @param Scope $scope
      *
      * @return ItemInterface|null
      */
-    protected function findMenuItem($menuName, $key, Scope $scope)
+    protected function findMenuItem($menu, $key, Scope $scope)
     {
-        $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => [
-                'organization' => $scope->getOrganization(),
-                'user' => $scope->getUser(),
-            ]
-        ];
-        $menu = $this->getMenu($menuName, $options);
-        if ($menuName === $key) {
+        if (!$menu instanceof ItemInterface) {
+            $options = [
+                MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => [
+                    'organization' => $scope->getOrganization(),
+                    'user' => $scope->getUser(),
+                ]
+            ];
+
+            $menu = $this->getMenu($menu, $options);
+        }
+
+        if ($menu->getName() === $key) {
             return $menu;
         }
 
