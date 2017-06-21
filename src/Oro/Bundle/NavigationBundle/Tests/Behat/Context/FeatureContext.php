@@ -475,4 +475,30 @@ class FeatureContext extends OroFeatureContext implements
 
         $item->find('css', 'a')->click();
     }
+
+    /**
+     * Assert main menu item existing
+     *
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<path>[\/\w\s]+) in main menu$/
+     */
+    public function iShouldSeeOrNotInMainMenu($negotiation, $path)
+    {
+        $isMenuItemVisibleExpectation = empty(trim($negotiation));
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $hasLink = $mainMenu->hasLink($path);
+        self::assertSame($isMenuItemVisibleExpectation, $hasLink);
+    }
+
+    /**
+     * Example: And I click Dashboards in menu tree
+     *
+     * @Given /^(?:|I )click (?P<record>[\w\s]+) in menu tree$/
+     */
+    public function iClickLinkInMenuTree($record)
+    {
+        $menuTree = $this->createElement('MenuTree');
+        self::assertTrue($menuTree->isValid());
+        $menuTree->clickLink($record);
+    }
 }
