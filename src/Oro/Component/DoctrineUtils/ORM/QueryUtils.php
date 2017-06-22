@@ -4,22 +4,19 @@ namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\SQLParserUtils;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @deprecated since 2.3. Use QueryUtil, QueryBuilderUtil, ResultSetMappingUtil or DqlUtil instead
  */
 class QueryUtils
 {
-    const IN         = 'in';
-    const IN_BETWEEN = 'in_between';
+    const IN         = QueryBuilderUtil::IN;
+    const IN_BETWEEN = QueryBuilderUtil::IN_BETWEEN;
 
     /**
      * Makes full clone of the given query, including its parameters and hints
@@ -30,18 +27,7 @@ class QueryUtils
      */
     public static function cloneQuery(Query $query)
     {
-        $cloneQuery = clone $query;
-
-        // clone parameters
-        $cloneQuery->setParameters(clone $query->getParameters());
-
-        // clone hints
-        $hints = $query->getHints();
-        foreach ($hints as $name => $value) {
-            $cloneQuery->setHint($name, $value);
-        }
-
-        return $cloneQuery;
+        return QueryUtil::cloneQuery($query);
     }
 
     /**
@@ -55,20 +41,7 @@ class QueryUtils
      */
     public static function addTreeWalker(Query $query, $walkerClass)
     {
-        $walkers = $query->getHint(Query::HINT_CUSTOM_TREE_WALKERS);
-        if (false === $walkers) {
-            $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [$walkerClass]);
-
-            return true;
-        }
-        if (!in_array($walkerClass, $walkers, true)) {
-            $walkers[] = $walkerClass;
-            $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
-
-            return true;
-        }
-
-        return false;
+        return QueryUtil::addTreeWalker($query, $walkerClass);
     }
 
     /**
@@ -81,48 +54,7 @@ class QueryUtils
      */
     public static function processParameterMappings(Query $query, $paramMappings)
     {
-        $sqlParams = [];
-        $types     = [];
-
-        /** @var Query\Parameter $parameter */
-        foreach ($query->getParameters() as $parameter) {
-            $key = $parameter->getName();
-
-            if (!isset($paramMappings[$key])) {
-                throw QueryException::unknownParameter($key);
-            }
-
-            $value = $query->processParameterValue($parameter->getValue());
-            $type  = ($parameter->getValue() === $value)
-                ? $parameter->getType()
-                : Query\ParameterTypeInferer::inferType($value);
-
-            foreach ($paramMappings[$key] as $position) {
-                $types[$position] = $type;
-            }
-
-            $sqlPositions = $paramMappings[$key];
-            $value        = [$value];
-            $countValue   = count($value);
-
-            for ($i = 0, $l = count($sqlPositions); $i < $l; $i++) {
-                $sqlParams[$sqlPositions[$i]] = $value[($i % $countValue)];
-            }
-        }
-
-        if (count($sqlParams) !== count($types)) {
-            throw QueryException::parameterTypeMismatch();
-        }
-
-        if ($sqlParams) {
-            ksort($sqlParams);
-            $sqlParams = array_values($sqlParams);
-
-            ksort($types);
-            $types = array_values($types);
-        }
-
-        return [$sqlParams, $types];
+        return QueryUtil::processParameterMappings($query, $paramMappings);
     }
 
     /**
@@ -132,7 +64,7 @@ class QueryUtils
      */
     public static function createResultSetMapping(AbstractPlatform $platform)
     {
-        return new PlatformResultSetMapping($platform);
+        return ResultSetMappingUtil::createResultSetMapping($platform);
     }
 
     /**
@@ -145,13 +77,7 @@ class QueryUtils
      */
     public static function getColumnNameByAlias(ResultSetMapping $mapping, $alias)
     {
-        foreach ($mapping->scalarMappings as $key => $val) {
-            if ($alias === $val) {
-                return $key;
-            }
-        }
-
-        throw new QueryException(sprintf('Unknown column alias: %s', $alias));
+        return ResultSetMappingUtil::getColumnNameByAlias($mapping, $alias);
     }
 
     /**
@@ -164,20 +90,7 @@ class QueryUtils
      */
     public static function getSelectExprByAlias(QueryBuilder $qb, $alias)
     {
-        /** @var \Doctrine\ORM\Query\Expr\Select $selectPart */
-        foreach ($qb->getDQLPart('select') as $selectPart) {
-            foreach ($selectPart->getParts() as $part) {
-                if (preg_match_all('#(\,\s*)*(?P<expr>.+?)\\s+AS\\s+(?P<alias>\\w+)#i', $part, $matches)) {
-                    foreach ($matches['alias'] as $key => $val) {
-                        if ($val === $alias) {
-                            return $matches['expr'][$key];
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
+        return QueryBuilderUtil::getSelectExprByAlias($qb, $alias);
     }
 
     /**
@@ -190,26 +103,7 @@ class QueryUtils
      */
     public static function getExecutableSql(Query $query, Query\ParserResult $parsedQuery = null)
     {
-        if (null === $parsedQuery) {
-            $parsedQuery = static::parseQuery($query);
-        }
-
-        $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
-
-        list($params, $types) = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
-        list($sql, $params, $types) = SQLParserUtils::expandListParameters($sql, $params, $types);
-
-        $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
-        for ($i = count($paramPos) - 1; $i >= 0; $i--) {
-            $sql = substr_replace(
-                $sql,
-                $query->getEntityManager()->getConnection()->quote($params[$i], $types[$i]),
-                $paramPos[$i],
-                1
-            );
-        }
-
-        return $sql;
+        return QueryUtil::getExecutableSql($query, $parsedQuery);
     }
 
     /**
@@ -219,9 +113,7 @@ class QueryUtils
      */
     public static function parseQuery(Query $query)
     {
-        $parser = new Query\Parser($query);
-
-        return $parser->parse();
+        return QueryUtil::parseQuery($query);
     }
 
     /**
@@ -233,18 +125,7 @@ class QueryUtils
      */
     public static function buildConcatExpr(array $parts)
     {
-        $stack = [];
-        for ($i = count($parts) - 1; $i >= 0; $i--) {
-            $stack[] = count($stack) === 0
-                ? $parts[$i]
-                : sprintf('CONCAT(%s, %s)', $parts[$i], array_pop($stack));
-        }
-
-        if (empty($stack)) {
-            return '';
-        }
-
-        return array_pop($stack);
+        return DqlUtil::buildConcatExpr($parts);
     }
 
     /**
@@ -259,27 +140,7 @@ class QueryUtils
      */
     public static function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
     {
-        $rootAliases = $qb->getRootAliases();
-
-        $result = null;
-        if (count($rootAliases) !== 1) {
-            if ($throwException) {
-                $errorReason = count($rootAliases) === 0
-                    ? 'the query has no any root aliases'
-                    : sprintf('the query has several root aliases. "%s"', implode(', ', $rootAliases));
-
-                throw new QueryException(
-                    sprintf(
-                        'Can\'t get single root alias for the given query. Reason: %s.',
-                        $errorReason
-                    )
-                );
-            }
-        } else {
-            $result = $rootAliases[0];
-        }
-
-        return $result;
+        return QueryBuilderUtil::getSingleRootAlias($qb, $throwException);
     }
 
     /**
@@ -292,9 +153,7 @@ class QueryUtils
      */
     public static function getPageOffset($page, $limit)
     {
-        return $page > 0
-            ? ($page - 1) * $limit
-            : 0;
+        return QueryBuilderUtil::getPageOffset($page, $limit);
     }
 
     /**
@@ -305,38 +164,7 @@ class QueryUtils
      */
     public static function applyJoins(QueryBuilder $qb, $joins)
     {
-        if (empty($joins)) {
-            return;
-        }
-
-        $qb->distinct(true);
-        $rootAlias = self::getSingleRootAlias($qb);
-        foreach ($joins as $key => $val) {
-            if (empty($val)) {
-                $qb->leftJoin($rootAlias . '.' . $key, $key);
-            } elseif (is_array($val)) {
-                if (isset($val['join'])) {
-                    $join = $val['join'];
-                    if (false === strpos($join, '.')) {
-                        $join = $rootAlias . '.' . $join;
-                    }
-                } else {
-                    $join = $rootAlias . '.' . $key;
-                }
-                $condition     = null;
-                $conditionType = null;
-                if (isset($val['condition'])) {
-                    $condition     = $val['condition'];
-                    $conditionType = Expr\Join::WITH;
-                }
-                if (isset($val['conditionType'])) {
-                    $conditionType = $val['conditionType'];
-                }
-                $qb->leftJoin($join, $key, $conditionType, $condition);
-            } else {
-                $qb->leftJoin($rootAlias . '.' . $val, $val);
-            }
-        }
+        QueryBuilderUtil::applyJoins($qb, $joins);
     }
 
     /**
@@ -348,18 +176,7 @@ class QueryUtils
      */
     public static function normalizeCriteria($criteria)
     {
-        if (null === $criteria) {
-            $criteria = new Criteria();
-        } elseif (is_array($criteria)) {
-            $newCriteria = new Criteria();
-            foreach ($criteria as $fieldName => $value) {
-                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
-            }
-
-            $criteria = $newCriteria;
-        }
-
-        return $criteria;
+        return QueryBuilderUtil::normalizeCriteria($criteria);
     }
 
     /**
@@ -369,34 +186,7 @@ class QueryUtils
      */
     public static function applyOptimizedIn(QueryBuilder $qb, $field, array $values)
     {
-        $expressions     = [];
-        $optimizedValues = static::optimizeIntegerValues($values);
-
-        if ($optimizedValues[static::IN]) {
-            $param = static::generateParameterName($field);
-
-            $qb->setParameter($param, $optimizedValues[static::IN]);
-            $expressions[] = $qb->expr()->in($field, sprintf(':%s', $param));
-        }
-
-        foreach ($optimizedValues[static::IN_BETWEEN] as $range) {
-            list($min, $max) = $range;
-            $minParam = static::generateParameterName($field);
-            $maxParam = static::generateParameterName($field);
-
-            $qb->setParameter($minParam, $min);
-            $qb->setParameter($maxParam, $max);
-
-            $expressions[] = $qb->expr()->between(
-                $field,
-                sprintf(':%s', $minParam),
-                sprintf(':%s', $maxParam)
-            );
-        }
-
-        if ($expressions) {
-            $qb->andWhere(call_user_func_array([$qb->expr(), 'orX'], $expressions));
-        }
+        QueryBuilderUtil::applyOptimizedIn($qb, $field, $values);
     }
 
     /**
@@ -406,28 +196,7 @@ class QueryUtils
      */
     public static function optimizeIntegerValues(array $values)
     {
-        $result = [
-            static::IN         => [],
-            static::IN_BETWEEN => [],
-        ];
-
-        $ranges = ArrayUtil::intRanges($values);
-        foreach ($ranges as $range) {
-            list($min, $max) = $range;
-            if ($min === $max) {
-                $result[static::IN][] = $min;
-            } else {
-                $result[static::IN_BETWEEN][] = $range;
-            }
-        }
-
-        // when there is lots of ranges, it takes way longer than IN
-        if (count($result[static::IN_BETWEEN]) > 1000) {
-            $result[static::IN]         = $values;
-            $result[static::IN_BETWEEN] = [];
-        }
-
-        return $result;
+        return QueryBuilderUtil::optimizeIntegerValues($values);
     }
 
     /**
@@ -437,10 +206,7 @@ class QueryUtils
      */
     public static function generateParameterName($prefix)
     {
-        static $n = 0;
-        $n++;
-
-        return sprintf('%s_%d', uniqid(str_replace('.', '', $prefix)), $n);
+        return QueryBuilderUtil::generateParameterName($prefix);
     }
 
     /**
@@ -450,17 +216,7 @@ class QueryUtils
      */
     public static function removeUnusedParameters(QueryBuilder $qb)
     {
-        $dql = $qb->getDQL();
-        $usedParameters = [];
-        foreach ($qb->getParameters() as $parameter) {
-            /** @var $parameter \Doctrine\ORM\Query\Parameter */
-            $parameterName = $parameter->getName();
-            if (self::dqlContainsParameter($dql, $parameterName)) {
-                $usedParameters[$parameterName] = $parameter->getValue();
-            }
-        }
-
-        $qb->setParameters($usedParameters);
+        QueryBuilderUtil::removeUnusedParameters($qb);
     }
 
     /**
@@ -473,11 +229,7 @@ class QueryUtils
      */
     public static function dqlContainsParameter($dql, $parameterName)
     {
-        $pattern = is_numeric($parameterName)
-            ? sprintf('/\?%s[^\w]/', preg_quote($parameterName))
-            : sprintf('/\:%s[^\w]/', preg_quote($parameterName));
-
-        return (bool) preg_match($pattern, $dql . ' ');
+        return DqlUtil::hasParameter($dql, $parameterName);
     }
 
     /**
@@ -487,10 +239,7 @@ class QueryUtils
      */
     public static function getDqlAliases($dql)
     {
-        $matches = [];
-        preg_match_all('/(FROM|JOIN)\s+\S+\s+(AS\s+)?(\S+)/i', $dql, $matches);
-
-        return $matches[3];
+        return DqlUtil::getAliases($dql);
     }
 
     /**
@@ -501,13 +250,7 @@ class QueryUtils
      */
     public static function replaceDqlAliases($dql, array $replacements)
     {
-        return array_reduce(
-            $replacements,
-            function ($carry, array $replacement) {
-                return preg_replace(sprintf('/(?<=[^\w\.\:])%s(?=\b)/', $replacement[0]), $replacement[1], $carry);
-            },
-            $dql
-        );
+        return DqlUtil::replaceAliases($dql, $replacements);
     }
 
     /**
@@ -518,44 +261,18 @@ class QueryUtils
      */
     public static function getJoinClass(QueryBuilder $qb, Expr\Join $join)
     {
-        if (class_exists($join->getJoin())) {
-            return $join->getJoin();
-        }
-
-        $fromParts = $qb->getDqlPart('from');
-        $aliasToClassMap = [];
-        foreach ($fromParts as $from) {
-            $aliasToClassMap[$from->getAlias()] = $from->getFrom();
-        }
-
-        list($parentAlias, $field) = explode('.', $join->getJoin());
-        $parentClass = isset($aliasToClassMap[$parentAlias])
-            ? $aliasToClassMap[$parentAlias]
-            : static::getJoinClass($qb, static::findJoinByAlias($qb, $parentAlias));
-
-        return $qb->getEntityManager()
-            ->getClassMetadata($parentClass)
-            ->getAssociationTargetClass($field);
+        return QueryBuilderUtil::getJoinClass($qb, $join);
     }
 
     /**
      * @param QueryBuilder $qb
      * @param string $alias
      *
-     * @return Expr\Join
+     * @return Expr\Join|null
      */
     public static function findJoinByAlias(QueryBuilder $qb, $alias)
     {
-        $joinParts = $qb->getDQLPart('join');
-        foreach ($joinParts as $joins) {
-            foreach ($joins as $join) {
-                if ($join->getAlias() === $alias) {
-                    return $join;
-                }
-            }
-        }
-
-        return null;
+        return QueryBuilderUtil::findJoinByAlias($qb, $alias);
     }
 
     /**
@@ -566,65 +283,6 @@ class QueryUtils
      */
     public static function isToOne(QueryBuilder $qb, $alias)
     {
-        $rootAliases = $qb->getRootAliases();
-        if (count($rootAliases) !== 1) {
-            return false;
-        }
-
-        $joins = [];
-        $currentAlias = $alias;
-        while ($parentAliasWithJoin = static::findParentAliasWithJoin($qb, $currentAlias)) {
-            $currentAlias = key($parentAliasWithJoin);
-            $joins[] = reset($parentAliasWithJoin);
-        }
-
-        if ($currentAlias !== $rootAliases[0]) {
-            return false;
-        }
-
-        $rootEntities = $qb->getRootEntities();
-        $em = $qb->getEntityManager();
-
-        $metadata = $em->getClassMetadata($rootEntities[0]);
-        $startIndex = count($joins) - 1;
-        for ($i = $startIndex; $i >= 0; $i--) {
-            list(, $field) = explode('.', $joins[$i]);
-            if (!isset($metadata->associationMappings[$field])) {
-                return false;
-            }
-
-            $assoc = $metadata->associationMappings[$field];
-
-            if (!($assoc['type'] & ClassMetadataInfo::TO_ONE)) {
-                return false;
-            }
-
-            $metadata = $em->getClassMetadata($assoc['targetEntity']);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string $alias
-     *
-     * @return array
-     * [parent alias, join]
-     */
-    protected static function findParentAliasWithJoin(QueryBuilder $qb, $alias)
-    {
-        $joinPart = $qb->getDQLPart('join');
-        foreach ($joinPart as $joins) {
-            foreach ($joins as $join) {
-                if ($join->getAlias() === $alias) {
-                    list($parentAlias) = explode('.', $join->getJoin());
-
-                    return [$parentAlias => $join->getJoin()];
-                }
-            }
-        }
-
-        return null;
+        return QueryBuilderUtil::isToOne($qb, $alias);
     }
 }

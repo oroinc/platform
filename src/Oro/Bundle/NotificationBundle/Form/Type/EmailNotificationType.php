@@ -3,11 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -17,12 +13,22 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+
 class EmailNotificationType extends AbstractType
 {
     const NAME = 'emailnotification';
 
     /** @var BuildTemplateFormSubscriber */
-    protected $subscriber;
+    protected $buildTemplateSubscriber;
+
+    /** @var AdditionalEmailsSubscriber */
+    protected $additionalEmailsSubscriber;
 
     /** @var ConfigProvider */
     protected $ownershipConfigProvider;
@@ -31,16 +37,19 @@ class EmailNotificationType extends AbstractType
     private $router;
 
     /**
-     * @param BuildTemplateFormSubscriber $subscriber
+     * @param BuildTemplateFormSubscriber $buildTemplateSubscriber
+     * @param AdditionalEmailsSubscriber $additionalEmailsSubscriber
      * @param ConfigProvider $ownershipConfigProvider
      * @param RouterInterface $router
      */
     public function __construct(
-        BuildTemplateFormSubscriber $subscriber,
+        BuildTemplateFormSubscriber $buildTemplateSubscriber,
+        AdditionalEmailsSubscriber $additionalEmailsSubscriber,
         ConfigProvider $ownershipConfigProvider,
         RouterInterface $router
     ) {
-        $this->subscriber = $subscriber;
+        $this->buildTemplateSubscriber = $buildTemplateSubscriber;
+        $this->additionalEmailsSubscriber = $additionalEmailsSubscriber;
         $this->ownershipConfigProvider = $ownershipConfigProvider;
         $this->router = $router;
     }
@@ -50,7 +59,8 @@ class EmailNotificationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber($this->subscriber);
+        $builder->addEventSubscriber($this->buildTemplateSubscriber);
+        $builder->addEventSubscriber($this->additionalEmailsSubscriber);
 
         $builder->add(
             'entityName',
@@ -133,7 +143,6 @@ class EmailNotificationType extends AbstractType
                             'owner',
                             array_merge($recipientList->get('owner')->getConfig()->getOptions(), ['disabled' => true])
                         );
-
                     }
                 }
             }

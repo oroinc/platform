@@ -6,14 +6,15 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -21,35 +22,23 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $configProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
     protected $cache;
 
-    /**
-     * @var OwnershipMetadataProvider
-     */
+    /** @var OwnershipMetadataProvider */
     protected $provider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
     protected $container;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    protected $tokenAccessor;
 
     protected function setUp()
     {
@@ -65,39 +54,14 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['fetch', 'save'])
             ->getMockForAbstractClass();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [
-                            'oro_entity_config.provider.ownership',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->configProvider,
-                        ],
-                        [
-                            'oro_security.owner.ownership_metadata_provider.cache',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->cache,
-                        ],
-                        [
-                            'oro_entity.orm.entity_class_resolver',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->entityClassResolver,
-                        ],
-                        [
-                            'oro_security.security_facade',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->securityFacade,
-                        ],
-                    ]
-                )
-            );
+        $this->container = TestContainerBuilder::create()
+            ->add('oro_entity_config.provider.ownership', $this->configProvider)
+            ->add('oro_security.owner.ownership_metadata_provider.cache', $this->cache)
+            ->add('oro_entity.orm.entity_class_resolver', $this->entityClassResolver)
+            ->add('oro_security.token_accessor', $this->tokenAccessor)
+            ->getContainer($this);
 
         $this->provider = new OwnershipMetadataProvider(
             [
@@ -117,7 +81,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->cache,
             $this->provider,
             $this->container,
-            $this->securityFacade
+            $this->tokenAccessor
         );
     }
 
@@ -261,9 +225,8 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports($user, $expectedResult)
     {
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($user);
 
         $this->assertEquals($expectedResult, $this->provider->supports());
@@ -275,16 +238,16 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function supportsDataProvider()
     {
         return [
-            'without security facade' => [
-                'securityFacade' => null,
+            'without user' => [
+                'user' => null,
                 'expectedResult' => false,
             ],
-            'security facade with incorrect user class' => [
-                'securityFacade' => new \stdClass(),
+            'unsupported user' => [
+                'user' => new \stdClass(),
                 'expectedResult' => false,
             ],
-            'security facade with user class' => [
-                'securityFacade' => new User(),
+            'supported user' => [
+                'user' => new User(),
                 'expectedResult' => true,
             ],
         ];

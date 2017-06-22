@@ -7,26 +7,24 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class BusinessUnitSelectType extends AbstractType
 {
     /** @var Registry */
     private $doctrine;
-    /** @var SecurityFacade */
-    private $securityFacade;
+
+    /** @var TokenAccessorInterface */
+    private $tokenAccessor;
 
     /**
-     * BusinessUnitSelectType constructor.
-     *
-     * @param Registry       $doctrine
-     * @param SecurityFacade $securityFacade
+     * @param Registry               $doctrine
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(Registry $doctrine, SecurityFacade $securityFacade)
+    public function __construct(Registry $doctrine, TokenAccessorInterface $tokenAccessor)
     {
         $this->doctrine = $doctrine;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -42,17 +40,14 @@ class BusinessUnitSelectType extends AbstractType
             ]
         );
 
-        $securityFacade = $this->securityFacade;
-        $doctrine = $this->doctrine;
-
-        $queryBuilderNormalizer = function () use ($securityFacade, $doctrine) {
-            $qb = $doctrine->getRepository('OroOrganizationBundle:BusinessUnit')
+        $queryBuilderNormalizer = function () {
+            $qb = $this->doctrine->getRepository('OroOrganizationBundle:BusinessUnit')
                 ->createQueryBuilder('bu');
 
             $qb->select('bu')
                 ->where('bu.organization = :organization');
 
-            $qb->setParameter('organization', $securityFacade->getOrganization());
+            $qb->setParameter('organization', $this->tokenAccessor->getOrganization());
 
             return $qb;
         };

@@ -46,7 +46,7 @@ services:
         class: %oro_wamp.listener.maintenance.class%
         arguments:
             - "@oro_wamp.publisher"
-            - "@oro_security.security_facade"
+            - "@oro_security.token_accessor"
             - "@logger"
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
@@ -86,6 +86,7 @@ services:
             - { name: oro_sync.tag_generator }
 
     oro_sync.content.security.context.link:
+        deprecated: The "%service_id%" service is deprecated since 2.3.
         tags:
             - { name: oro_service_link, service: security.context }
 
@@ -98,5 +99,5 @@ services:
         arguments:
             - '@oro_wamp.publisher'
             - '@oro_sync.content.tag_generator_chain.link'
-            - '@oro_sync.content.security.context.link'
+            - '@security.token_storage'
             - '@logger'

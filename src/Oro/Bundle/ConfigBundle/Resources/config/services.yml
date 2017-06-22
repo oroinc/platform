@@ -80,7 +80,7 @@ services:
         arguments:
             - '@oro_config.config_bag'
             - '@form.factory'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
@@ -138,3 +138,8 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
+
+    oro_config.cache.doctrine_metadata:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'doctrine_metadata_config' ] ]

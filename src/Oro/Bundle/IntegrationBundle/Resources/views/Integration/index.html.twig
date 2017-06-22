@@ -6,7 +6,7 @@
 {% set gridName  = 'oro-integration-grid' %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_integration_create') %}
+    {% if is_granted('oro_integration_create') %}
         {{ UI.addButton({
             'path': path('oro_integration_create'),
             'entity_label': 'oro.integration.integration.entity_label'|trans

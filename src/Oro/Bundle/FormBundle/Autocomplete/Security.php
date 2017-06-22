@@ -2,24 +2,23 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class Security
 {
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $autocompleteAclResources;
 
-    public function __construct(SecurityFacade $securityFacade)
+    /**
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     */
+    public function __construct(AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->securityFacade = $securityFacade;
-        $this->autocompleteAclResources = array();
+        $this->authorizationChecker = $authorizationChecker;
+        $this->autocompleteAclResources = [];
     }
 
     /**
@@ -49,7 +48,7 @@ class Security
         $aclResource = $this->getAutocompleteAclResource($name);
 
         if ($aclResource) {
-            return $this->securityFacade->isGranted($aclResource);
+            return $this->authorizationChecker->isGranted($aclResource);
         }
 
         return true;

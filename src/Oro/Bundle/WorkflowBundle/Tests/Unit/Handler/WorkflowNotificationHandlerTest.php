@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
@@ -50,7 +52,12 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager = $this->createMock(EmailNotificationManager::class);
 
-        $this->handler = new WorkflowNotificationHandler($this->manager, $this->em, $this->configProvider);
+        $this->handler = new WorkflowNotificationHandler(
+            $this->manager,
+            $this->em,
+            $this->configProvider,
+            new PropertyAccessor()
+        );
     }
 
     /**
@@ -67,7 +74,8 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
                     $this->entity,
                     $notification,
                     $this->em,
-                    $this->configProvider
+                    $this->configProvider,
+                    new PropertyAccessor()
                 );
             },
             $expected

@@ -136,7 +136,8 @@ define(function(require) {
             multipleSorting:        true,
             rowActions:             [],
             massActions:            new Backbone.Collection(),
-            enableFullScreenLayout: false
+            enableFullScreenLayout: false,
+            scopeDelimiter:         ':'
         },
 
         /**
@@ -751,8 +752,8 @@ define(function(require) {
                     launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
-                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
-                    if (this.$el.is(':visible')) {
+                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function(ignoreVisibility) {
+                    if (ignoreVisibility || this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
                 }, 100));
@@ -1369,6 +1370,21 @@ define(function(require) {
             }
 
             return this;
+        },
+
+        /**
+         * @return {String|null}
+         */
+        getGridScope: function() {
+            var nameParts = this.name.split(this.scopeDelimiter);
+            if (nameParts.length > 2) {
+                throw new Error(
+                    'Grid name is invalid, it should not contain more than one occurrence of "' +
+                    this.scopeDelimiter + '"'
+                );
+            }
+
+            return nameParts.length === 2 ? nameParts[1] : null;
         }
     });
 

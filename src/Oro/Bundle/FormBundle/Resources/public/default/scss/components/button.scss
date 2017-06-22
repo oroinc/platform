@@ -1,3 +1,5 @@
+// @theme: default;
+
 .button,
 .btn {
     text-align: center;
@@ -9,6 +11,11 @@
     }
 
     @include element-state('active') {
+        box-shadow: $btn-shadow;
+    }
+
+    &.active,
+    &.pressed {
         box-shadow: $btn-shadow;
     }
 
@@ -57,10 +64,6 @@
 
         @include element-state('focus') {
             border-color: darken(get-color('additional', 'light'), 5%);
-        }
-
-        &.pressed {
-            box-shadow: $btn-shadow;
         }
     }
 
@@ -121,6 +124,43 @@
         @include element-state('active') {
             box-shadow: none;
         }
+
+        &.active,
+        &.pressed {
+            box-shadow: none;
+        }
+    }
+
+    &--plain {
+        padding: 0 3px;
+
+        line-height: 1;
+
+        border-color: transparent;
+        background-color: transparent;
+        color: get-color('additional', 'middle');
+
+        cursor: pointer;
+
+        @include element-state('hover') {
+            background-color: transparent;
+            border-color: transparent;
+            color: get-color('additional', 'light');
+        }
+
+        @include element-state('focus') {
+            background-color: transparent;
+            border-color: transparent;
+        }
+
+        @include element-state('active') {
+            box-shadow: none;
+        }
+
+        &.active,
+        &.pressed {
+            box-shadow: none;
+        }
     }
 
     &--large {
@@ -134,7 +174,9 @@
             font-size: $base-font-size - 1;
             line-height: 18px;
 
-            border-radius: 3px;
+            @if ($button-border-radius) {
+                border-radius: 3px;
+            }
         }
 
         &-s {
@@ -143,8 +185,11 @@
             font-size: $base-font-size;
             line-height: 30px;
 
-            border-radius: 6px;
+            @if ($button-border-radius) {
+                border-radius: 6px;
+            }
         }
+
         &-m {
             font-size: 17px;
             line-height: 38px;

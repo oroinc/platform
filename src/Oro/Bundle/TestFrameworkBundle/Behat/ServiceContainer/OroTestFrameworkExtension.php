@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
@@ -67,6 +68,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processSuiteAwareSubscriber($container);
         $this->processClassResolvers($container);
         $this->processArtifactHandlers($container);
+        $this->replaceSessionListener($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -215,6 +217,16 @@ class OroTestFrameworkExtension implements TestworkExtension
     /**
      * @param ContainerBuilder $container
      */
+    private function replaceSessionListener(ContainerBuilder $container)
+    {
+        $container
+            ->getDefinition('mink.listener.sessions')
+            ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
     private function injectMessageQueueIsolator(ContainerBuilder $container)
     {
         $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
@@ -280,6 +292,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     private function processBundleBehatConfigurations(ContainerBuilder $container)
     {
+        /** @var KernelInterface $kernel */
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
         $processor = new Processor();
         $configuration = new BehatBundleConfiguration($container);
@@ -305,14 +318,25 @@ class OroTestFrameworkExtension implements TestworkExtension
                 $config
             );
 
-            $pages = array_merge($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
-            $elements = array_merge($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
+            $this->appendConfiguration($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
+            $this->appendConfiguration($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
             $suites = array_merge($suites, $processedConfiguration[self::SUITES_CONFIG_ROOT]);
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
         $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
         $container->setParameter('suite.configurations', $suites);
+    }
+
+    private function appendConfiguration(array &$baseConfig, array $config)
+    {
+        foreach ($config as $key => $value) {
+            if (array_key_exists($key, $baseConfig)) {
+                throw new \InvalidArgumentException(sprintf('Configuration with "%s" key is already defined', $key));
+            }
+
+            $baseConfig[$key] = $value;
+        }
     }
 
     /**
@@ -334,7 +358,9 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $bundleSuite = $suiteGenerator->generateSuite($bundle->getName(), []);
+            // Add ! to the start of bundle name, because we need to get the real bundle not the inheritance
+            // See OroKernel->getBundle
+            $bundleSuite = $suiteGenerator->generateSuite('!'.$bundle->getName(), []);
 
             if (!$this->hasValidPaths($bundleSuite)) {
                 continue;

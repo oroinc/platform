@@ -2,15 +2,21 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
-use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
+use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 
 class ActionExtension extends AbstractExtension
 {
@@ -19,41 +25,65 @@ class ActionExtension extends AbstractExtension
 
     const ACTION_KEY               = 'actions';
     const ACTION_CONFIGURATION_KEY = 'action_configuration';
-    const ACTION_TYPE_KEY          = 'type';
 
     const ENABLE_ACTIONS_PARAMETER = '_enable_actions';
 
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var ActionFactory */
+    protected $actionFactory;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var ActionMetadataFactory */
+    protected $actionMetadataFactory;
 
-    /** @var TranslatorInterface */
-    protected $translator;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /** @var array */
-    protected $actions = [];
+    /** @var OwnershipQueryHelper */
+    protected $ownershipQueryHelper;
 
     /** @var DatagridActionProviderInterface[] */
     protected $actionsProviders = [];
 
-    /** @var array */
-    protected static $excludeParams = [ActionInterface::ACL_KEY];
+    /** @var bool */
+    protected $isMetadataVisited = false;
 
     /**
-     * @param ContainerInterface $container
-     * @param SecurityFacade $securityFacade
-     * @param TranslatorInterface $translator
+     * @var array [entity alias => [
+     *                      entity class,
+     *                      entity id field alias,
+     *                      organization id field alias,
+     *                      owner id field alias
+     *                  ],
+     *                  ...
+     *              ]
+     */
+    private $ownershipFields = [];
+
+    /**
+     * @param ActionFactory                 $actionFactory
+     * @param ActionMetadataFactory         $actionMetadataFactory
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param OwnershipQueryHelper          $ownershipQueryHelper
      */
     public function __construct(
-        ContainerInterface $container,
-        SecurityFacade $securityFacade,
-        TranslatorInterface $translator
+        ActionFactory $actionFactory,
+        ActionMetadataFactory $actionMetadataFactory,
+        AuthorizationCheckerInterface $authorizationChecker,
+        OwnershipQueryHelper $ownershipQueryHelper
     ) {
-        $this->container = $container;
-        $this->securityFacade = $securityFacade;
-        $this->translator = $translator;
+        $this->actionFactory = $actionFactory;
+        $this->actionMetadataFactory = $actionMetadataFactory;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->ownershipQueryHelper = $ownershipQueryHelper;
+    }
+
+    /**
+     * Registers a provider of actions.
+     *
+     * @param DatagridActionProviderInterface $actionsProvider
+     */
+    public function addActionProvider(DatagridActionProviderInterface $actionsProvider)
+    {
+        $this->actionsProviders[] = $actionsProvider;
     }
 
     /**
@@ -61,13 +91,7 @@ class ActionExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        if (!$this->getParameters()->get(static::ENABLE_ACTIONS_PARAMETER, true)) {
-            return false;
-        }
-
-        $actionsProviders = $this->getApplicableActionProviders($config);
-
-        return !empty($actionsProviders) || !empty($config->offsetGetOr(ActionExtension::ACTION_KEY));
+        return $this->getParameters()->get(self::ENABLE_ACTIONS_PARAMETER, true);
     }
 
     /**
@@ -75,23 +99,11 @@ class ActionExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        foreach ($this->getApplicableActionProviders($config) as $provider) {
-            $provider->applyActions($config);
-        }
-    }
-
-    /**
-     * @param DatagridConfiguration $config
-     * @return array|DatagridActionProviderInterface[]
-     */
-    protected function getApplicableActionProviders(DatagridConfiguration $config)
-    {
-        return array_filter(
-            $this->actionsProviders,
-            function (DatagridActionProviderInterface $provider) use ($config) {
-                return $provider->hasActions($config);
+        foreach ($this->actionsProviders as $provider) {
+            if ($provider->hasActions($config)) {
+                $provider->applyActions($config);
             }
-        );
+        }
     }
 
     /**
@@ -109,26 +121,91 @@ class ActionExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $data->offsetAddToArray(static::METADATA_ACTION_KEY, $this->getActionsMetadata($config));
+        $this->isMetadataVisited = true;
+        $data->offsetAddToArray(self::METADATA_ACTION_KEY, $this->getActionsMetadata($config));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
+    {
+        if ($datasource instanceof OrmDatasource && $this->hasAclProtectedActions($config)) {
+            $this->ownershipFields = $this->ownershipQueryHelper->addOwnershipFields(
+                $datasource->getQueryBuilder()
+            );
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    {
+        if (!$this->isMetadataVisited) {
+            $result->offsetAddToArray(
+                'metadata',
+                [self::METADATA_ACTION_KEY => $this->getActionsMetadata($config)]
+            );
+        }
+
+        if (!empty($this->ownershipFields)) {
+            $aclResources = $this->getActionsAclResources($config);
+            if (!empty($aclResources)) {
+                $aliases = array_keys($this->ownershipFields);
+                $entityAlias = reset($aliases);
+                list(
+                    $entityClass,
+                    $entityIdFieldAlias,
+                    $organizationIdFieldAlias,
+                    $ownerIdFieldAlias
+                    ) = $this->ownershipFields[$entityAlias];
+
+                $disabledActions = [];
+                /** @var ResultRecord[] $records */
+                $records = $result->getData();
+                foreach ($records as $record) {
+                    $entityId = $record->getValue($entityIdFieldAlias);
+                    $entityReference = null;
+                    $ownerId = $record->getValue($ownerIdFieldAlias);
+                    if (null !== $ownerId) {
+                        $entityReference = new DomainObjectReference(
+                            $entityClass,
+                            $record->getValue($entityIdFieldAlias),
+                            $ownerId,
+                            $record->getValue($organizationIdFieldAlias)
+                        );
+                    }
+
+                    foreach ($aclResources as $actionName => $aclResource) {
+                        if (!$this->authorizationChecker->isGranted($aclResource, $entityReference)) {
+                            $disabledActions[$entityId][$actionName] = false;
+                        }
+                    }
+                }
+
+                // set action_configuration callback only if there are some actions to disable.
+                if (!empty($disabledActions)) {
+                    $this->setActionsCallback($config, $disabledActions, $entityIdFieldAlias);
+                }
+            }
+        }
     }
 
     /**
      * @param DatagridConfiguration $config
+     *
      * @return array
      */
     protected function getActionsMetadata(DatagridConfiguration $config)
     {
         $actionsMetadata = [];
-        $actions         = $config->offsetGetOr(static::ACTION_KEY, []);
-
-        foreach ($actions as $name => $action) {
-            $action = $this->getActionObject($name, $action);
-            if ($action !== false) {
-                $metadata          = $action->getOptions()->toArray([], static::$excludeParams);
-                $metadata['label'] = isset($metadata['label'])
-                    ? $this->translator->trans($metadata['label']) : null;
-
-                $actionsMetadata[$action->getName()] = $metadata;
+        /** @var array $actions */
+        $actions = $config->offsetGetOr(self::ACTION_KEY, []);
+        foreach ($actions as $actionName => $actionConfig) {
+            $action = $this->createAction($actionName, $actionConfig);
+            if (null !== $action) {
+                $actionsMetadata[$action->getName()] = $this->createActionMetadata($action);
             }
         }
 
@@ -136,94 +213,137 @@ class ActionExtension extends AbstractExtension
     }
 
     /**
-     * @param  string $name
-     * @param array   $config
+     * @param DatagridConfiguration $config
      *
-     * @return bool|ActionInterface
+     * @return bool
      */
-    protected function getActionObject($name, array $config)
+    protected function hasAclProtectedActions(DatagridConfiguration $config)
     {
-        $config = ActionConfiguration::createNamed($name, $config);
-        $action = $this->create($config);
-
-        if (null === $action->getAclResource() || $this->isResourceGranted($action->getAclResource())) {
-            return $action;
+        $hasAclActions = false;
+        $actions = $config->offsetGetOr(self::ACTION_KEY, []);
+        foreach ($actions as $actionName => $actionConfig) {
+            if (!empty($actionConfig[ActionInterface::ACL_KEY])) {
+                $hasAclActions = true;
+                break;
+            }
         }
 
-        return false;
+        return $hasAclActions;
     }
 
     /**
-     * Register action type
+     * @param string $actionName
+     * @param array  $actionConfig
      *
-     * @param string $type
-     * @param string $serviceId
-     *
-     * @return $this
+     * @return ActionInterface|null
      */
-    public function registerAction($type, $serviceId)
+    protected function createAction($actionName, array $actionConfig)
     {
-        $this->actions[$type] = $serviceId;
+        $action = $this->actionFactory->createAction($actionName, $actionConfig);
 
-        return $this;
-    }
-
-    /**
-     * Creates and configure action object
-     * Services are marked as scope: prototype
-     *
-     * @param ActionConfiguration $config
-     *
-     * @throws RuntimeException
-     * @return ActionInterface
-     */
-    protected function create(ActionConfiguration $config)
-    {
-        if (!$config->offsetExists(static::ACTION_TYPE_KEY)) {
-            throw new RuntimeException('The type must be defined');
+        $aclResource = $action->getAclResource();
+        if ($aclResource && !$this->authorizationChecker->isGranted($aclResource)) {
+            $action = null;
         }
-
-        $type = $config->offsetGet(static::ACTION_TYPE_KEY);
-        if (!isset($this->actions[$type])) {
-            throw new RuntimeException(
-                sprintf('No attached service to action type named "%s"', $config->offsetGet(static::ACTION_TYPE_KEY))
-            );
-        }
-
-        $actionServiceId = $this->actions[$type];
-
-        /** @var $action ActionInterface */
-        $action = $this->container->get($actionServiceId);
-        $action->setOptions($config);
 
         return $action;
     }
 
     /**
-     * Checks if an access to a resource is granted or not
+     * @param ActionInterface $action
      *
-     * @param string $aclResource An ACL annotation id or "permission;descriptor"
-     *
-     * @return bool
+     * @return array
      */
-    protected function isResourceGranted($aclResource)
+    protected function createActionMetadata(ActionInterface $action)
     {
-        $delimiter = strpos($aclResource, ';');
-        if ($delimiter) {
-            $permission = substr($aclResource, 0, $delimiter);
-            $descriptor = substr($aclResource, $delimiter + 1);
-
-            return $this->securityFacade->isGranted($permission, $descriptor);
-        }
-
-        return $this->securityFacade->isGranted($aclResource);
+        return $this->actionMetadataFactory->createActionMetadata($action);
     }
 
     /**
-     * @param DatagridActionProviderInterface $actionsProvider
+     * @param DatagridConfiguration $config
+     *
+     * @return array [action name => acl resource, ...]
      */
-    public function addActionProvider(DatagridActionProviderInterface $actionsProvider)
+    protected function getActionsAclResources(DatagridConfiguration $config)
     {
-        $this->actionsProviders[] = $actionsProvider;
+        $aclResources = [];
+        $actions = $config->offsetGetOr(self::ACTION_KEY, []);
+        foreach ($actions as $actionName => $actionConfig) {
+            if (!empty($actionConfig[ActionInterface::ACL_KEY])) {
+                $aclResources[$actionName] = $actionConfig[ActionInterface::ACL_KEY];
+            }
+        }
+
+        return $aclResources;
+    }
+
+    /**
+     * Set actions callback to disable actions where not allowed.
+     *
+     * @param DatagridConfiguration $config
+     * @param array                 $disabledActions
+     * @param string                $entityIdFieldAlias
+     */
+    protected function setActionsCallback(DatagridConfiguration $config, $disabledActions, $entityIdFieldAlias)
+    {
+        $actionConfigurationPropertyPath = sprintf(
+            '[%s][%s]',
+            Configuration::PROPERTIES_KEY,
+            self::METADATA_ACTION_CONFIGURATION_KEY
+        );
+
+        $existingCallback = null;
+        $actionConfiguration = $config->offsetGetByPath($actionConfigurationPropertyPath);
+        if ($actionConfiguration
+            && 'callback' === $actionConfiguration[CallbackProperty::TYPE_KEY]
+            && !empty($actionConfiguration[CallbackProperty::CALLABLE_KEY])
+        ) {
+            $existingCallback = $actionConfiguration[CallbackProperty::CALLABLE_KEY];
+        }
+
+        $config->offsetAddToArrayByPath(
+            $actionConfigurationPropertyPath,
+            [
+                CallbackProperty::TYPE_KEY          => 'callback',
+                CallbackProperty::CALLABLE_KEY      => $this->getActionsCallback(
+                    $disabledActions,
+                    $entityIdFieldAlias,
+                    $existingCallback
+                ),
+                CallbackProperty::FRONTEND_TYPE_KEY => CallbackProperty::TYPE_ROW_ARRAY
+            ]
+        );
+    }
+
+    /**
+     * @param array         $disabledActions
+     * @param string        $entityIdFieldAlias
+     * @param callable|null $existingCallback
+     *
+     * @return callable
+     */
+    protected function getActionsCallback(array $disabledActions, $entityIdFieldAlias, $existingCallback)
+    {
+        return function (
+            ResultRecordInterface $record,
+            array $actions = []
+        ) use (
+            $disabledActions,
+            $entityIdFieldAlias,
+            $existingCallback
+        ) {
+            $result = [];
+
+            $entityId = $record->getValue($entityIdFieldAlias);
+            if (!empty($disabledActions[$entityId])) {
+                $result = $disabledActions[$entityId];
+            }
+
+            if (null !== $existingCallback) {
+                $result = array_merge($existingCallback($record, $actions), $result);
+            }
+
+            return $result;
+        };
     }
 }

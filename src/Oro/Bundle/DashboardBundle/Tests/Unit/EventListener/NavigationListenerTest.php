@@ -5,30 +5,22 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DashboardBundle\EventListener\NavigationListener;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var NavigationListener
-     */
+    /** @var NavigationListener */
     protected $navigationListener;
 
-    /**
-     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
-    /**
-     * @var Manager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Manager|\PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->manager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\Manager')
             ->setMethods(['getDashboards', 'findAllowedDashboards'])
@@ -36,7 +28,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->navigationListener = new NavigationListener(
-            $this->securityFacade,
+            $this->tokenAccessor,
             $this->manager
         );
     }
@@ -145,7 +137,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
         $menu->expects($this->once())->method('getChild')->will($this->returnValue($item));
         $event->expects($this->once())->method('getMenu')->will($this->returnValue($menu));
-        $this->securityFacade->expects($this->once())->method('hasLoggedUser')->will($this->returnValue(true));
+        $this->tokenAccessor->expects($this->once())->method('hasUser')->will($this->returnValue(true));
         $this->manager->expects($this->once())->method('findAllowedDashboards')->will($this->returnValue($dashboards));
 
         $this->navigationListener->onNavigationConfigure($event);

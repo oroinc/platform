@@ -351,9 +351,8 @@ class ImportExportController extends Controller
      */
     public function downloadExportResultAction($fileName)
     {
-        $securityFacade = $this->get('oro_security.security_facade');
-        if (!$securityFacade->isGranted('oro_importexport_import') &&
-            !$securityFacade->isGranted('oro_importexport_export')
+        if (!$this->isGranted('oro_importexport_import')
+            && !$this->isGranted('oro_importexport_export')
         ) {
             throw new AccessDeniedException('Insufficient permission');
         }
@@ -370,9 +369,8 @@ class ImportExportController extends Controller
      */
     public function errorLogAction($jobCode)
     {
-        $securityFacade = $this->get('oro_security.security_facade');
-        if (!$securityFacade->isGranted('oro_importexport_import') &&
-            !$securityFacade->isGranted('oro_importexport_export')
+        if (!$this->isGranted('oro_importexport_import')
+            && !$this->isGranted('oro_importexport_export')
         ) {
             throw new AccessDeniedException('Insufficient permission');
         }
@@ -395,9 +393,8 @@ class ImportExportController extends Controller
      */
     public function importExportJobErrorLogAction($jobId)
     {
-        $securityFacade = $this->get('oro_security.security_facade');
-        if (!$securityFacade->isGranted('oro_importexport_import') &&
-            !$securityFacade->isGranted('oro_importexport_export')
+        if (!$this->isGranted('oro_importexport_import')
+            && !$this->isGranted('oro_importexport_export')
         ) {
             throw new AccessDeniedException('Insufficient permission');
         }

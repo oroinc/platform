@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -14,7 +15,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 /**
@@ -34,8 +34,8 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var DataGridExtension */
     protected $extension;
@@ -54,12 +54,8 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->manager = $this->createMock(ManagerInterface::class);
         $this->nameStrategy = $this->createMock(NameStrategyInterface::class);
         $this->router = $this->createMock(RouterInterface::class);
-        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->datagridRouteHelper = $this->getMockBuilder(DatagridRouteHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->datagridRouteHelper = $this->createMock(DatagridRouteHelper::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -67,7 +63,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->add('oro_datagrid.datagrid.manager', $this->manager)
             ->add('oro_datagrid.datagrid.name_strategy', $this->nameStrategy)
             ->add('router', $this->router)
-            ->add('oro_security.security_facade', $this->securityFacade)
+            ->add('security.authorization_checker', $this->authorizationChecker)
             ->add('oro_datagrid.helper.route', $this->datagridRouteHelper)
             ->add('request_stack', $this->requestStack)
             ->add('logger', $this->logger)
@@ -146,7 +142,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($gridName)
             ->will($this->returnValue($configuration));
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($acl)
             ->will($this->returnValue(false));

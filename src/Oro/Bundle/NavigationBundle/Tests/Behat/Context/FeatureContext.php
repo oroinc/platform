@@ -201,7 +201,7 @@ class FeatureContext extends OroFeatureContext implements
         $clicked = $menu->openAndClick($firstPage);
 
         $this->waitForAjax();
-        $this->messageQueueIsolator->waitWhileProcessingMessages(5);
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         $actualPage = $this->getLastPersistedPage($em);
 
@@ -221,7 +221,7 @@ class FeatureContext extends OroFeatureContext implements
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
-            $this->messageQueueIsolator->waitWhileProcessingMessages(5);
+            $this->messageQueueIsolator->waitWhileProcessingMessages();
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
             $actualTitle = $crawler->filter('head title')->first()->text();
 
@@ -491,5 +491,17 @@ class FeatureContext extends OroFeatureContext implements
         $userMenu->open();
 
         self::assertSame($isLinkVisibleInUserMenuExpectation, $userMenu->hasLink($title));
+    }
+
+    /**
+     * Example: And I click Dashboards in menu tree
+     *
+     * @Given /^(?:|I )click (?P<record>[\w\s]+) in menu tree$/
+     */
+    public function iClickLinkInMenuTree($record)
+    {
+        $menuTree = $this->createElement('MenuTree');
+        self::assertTrue($menuTree->isValid());
+        $menuTree->clickLink($record);
     }
 }

@@ -20,8 +20,9 @@
 
   td.fallback-item-use-fallback,
   .fallback-status {
-    padding-left: 5px;
-    padding-right: 5px;
+    width: 30px;
+    padding-left: 6px;
+    padding-right: 6px;
   }
 
   input {
@@ -87,12 +88,63 @@
     font-size: 20px;
     cursor: pointer;
   }
+
+  .mce-container ~ & {
+    position: relative;
+    left: 6px;
+    width: 0;
+    padding: 0;
+  }
+}
+
+.fallback-item-value--first {
+  display: inline-flex;
+  flex-wrap: wrap;
+  width: auto;
+
+  .validation-failed {
+    order: 1;
+  }
 }
 
 .mobile-version {
   .content-with-sidebar--container {
     .fallback-container td {
       width: 100%;
+    }
+  }
+
+  .controls {
+    .fallback-container {
+      width: 100%;
+
+      .mce-tinymce {
+        width: calc(~'100% - 30px') !important;
+      }
+
+      .fallback-item {
+        table {
+          width: calc(~'100% - 29px');
+        }
+      }
+
+      td {
+        &.fallback-item-value {
+          width: 100%;
+
+          &--first {
+            padding-left: 1px;
+
+            input {
+              width: calc(~'100% - 30px');
+            }
+          }
+        }
+      }
+
+      .fallback-status {
+        padding-right: 0;
+      }
     }
   }
 }

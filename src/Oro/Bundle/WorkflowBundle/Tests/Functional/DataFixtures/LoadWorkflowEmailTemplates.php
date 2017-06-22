@@ -13,7 +13,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadWorkflowEmailTemplates extends AbstractFixture
 {
-
     const WFA_EMAIL_TEMPLATE_NAME = 'wfa_email_template';
 
     /** @var User */

@@ -1,11 +1,11 @@
-#Viewport Manager
+# Viewport Manager
 
 Viewport manager contains a collection of available screen types that can be used on the theme.
 Also responsible for triggering event `viewport:change` through mediator, when change the type of screen.
 Possibility subscribe to event `viewport:change` in view and create a logic based on the viewport changes.
 For example [DOM Relocation View](../../../../../../../../../commerce/src/Oro/Bundle/FrontendBundle/Resources/doc/components/dom-relocation-view.md) already implemented functionality based by Viewport Manager.
 
-##Screen Map
+## Screen Map
 Settings for list of screen types. By default has parameters:
 ```javascript
 screenMap: [
@@ -56,7 +56,7 @@ require({
 ```
 
 
-##Screen Types
+## Screen Types
 Screen type used for describe some viewport size range.
 It provides an opportunity to describe the parameters like `name`, `max` size of screen type.
 For example:
@@ -66,21 +66,21 @@ For example:
     max: 1024
 }
 ```
-###name
+### name
 **Type:** String
 
 Set name for screen type.
 
-###max
+### max
 **Type:** Number
 
 **Default:** Infinity
 
 Set max *viewport* size for screen type
 
-##Events
+## Events
 
-###viewport:change
+### viewport:change
 **Event Data:** Object
 
 **Data Structure:**

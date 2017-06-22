@@ -1,0 +1,38 @@
+// @theme: default;
+
+.select2-container {
+    a.select2-choice {
+        height: auto;
+
+        .action-selectbox_custom_in-pager & {
+            padding: 8px;
+        }
+
+        .select2-arrow,
+        .select2-search-choice-close {
+            top: 9px;
+        }
+    }
+
+    .select2-chosen {
+        max-width: 215px;
+        margin-right: 12px;
+    }
+
+    &.input {
+        .input-append & {
+            display: inline-block;
+            width: auto;
+            height: auto;
+            padding: 7px;
+
+            .select2-choice {
+                max-width: 255px;
+            }
+        }
+    }
+}
+
+.action-selectbox_custom_in-pager {
+    display: inline-block;
+}

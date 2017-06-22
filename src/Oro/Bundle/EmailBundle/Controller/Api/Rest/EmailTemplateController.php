@@ -16,7 +16,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
@@ -96,11 +95,6 @@ class EmailTemplateController extends RestController
             );
         }
 
-        $securityContext = $this->get('security.context');
-        /** @var UsernamePasswordOrganizationToken $token */
-        $token        = $securityContext->getToken();
-        $organization = $token->getOrganizationContext();
-
         $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
@@ -108,7 +102,7 @@ class EmailTemplateController extends RestController
         $templates = $emailTemplateRepository
             ->getTemplateByEntityName(
                 $entityName,
-                $organization,
+                $this->get('oro_security.token_accessor')->getOrganization(),
                 (bool)$includeNonEntity,
                 (bool)$includeSystemTemplates
             );

@@ -1,4 +1,4 @@
-#Datagrid widget
+# Datagrid widget
 
 Datagrid widget provide ability to render datagrid by name as widget.
 When datagrid is rendered inside widget it's rowClickAction will be disabled and replaced

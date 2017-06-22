@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\RelatedEntityTransformer;
 
 class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
@@ -16,27 +20,21 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
     protected $entityClassNameHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var RelatedEntityTransformer */
     protected $transformer;
 
     protected function setUp()
     {
-        $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityFacade        = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->transformer = new RelatedEntityTransformer(
             $this->doctrineHelper,
             $this->entityClassNameHelper,
-            $this->securityFacade
+            $this->authorizationChecker
         );
     }
 
@@ -139,7 +137,7 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
             ->with($value['id'])
             ->willReturn($entity);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($entity))
             ->willReturn(true);
@@ -169,7 +167,7 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
             ->with($value['id'])
             ->willReturn($entity);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($entity))
             ->willReturn(true);
@@ -198,7 +196,7 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
             ->with($value['id'])
             ->willReturn(null);
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $this->assertSame($value, $this->transformer->reverseTransform($value));
@@ -218,7 +216,7 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
             ->with($value['entity'])
             ->will($this->throwException(new NotManageableEntityException($value['entity'])));
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $this->assertSame($value, $this->transformer->reverseTransform($value));
@@ -246,7 +244,7 @@ class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
             ->with($value['id'])
             ->willReturn($entity);
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($entity))
             ->willReturn(false);

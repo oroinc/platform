@@ -7,53 +7,60 @@
 
     margin: 0;
 
-    line-height: 12px;
+    line-height: $custom-radio-line-height;
 
     &__control,
     input[type='radio'] {
         display: none;
     }
 
+    &__control {
+        &:checked {
+            ~ .custom-radio__text {
+                &:before {
+                    background: $custom-radio-icon-checked-bg;
+                    box-shadow: $custom-radio-icon-checked-box-shadow;
+                }
+            }
+        }
+    }
     &__text {
         display: inline-block;
 
         vertical-align: middle;
-    }
 
-    &__control + &__text::before {
-        display: inline-block;
+        &:before {
+            display: inline-block;
 
-        width: 13px;
-        height: 13px;
-        margin-right: 4px;
+            width: $custom-radio-icon-size;
+            height: $custom-radio-icon-size;
+            margin: $custom-radio-icon-offset;
 
-        content: '';
-        vertical-align: middle;
+            content: '';
+            vertical-align: middle;
 
-        border: 1px solid #cdcdcd;
-        border-radius: 50%;
-        background: #fff;
-    }
-
-    &__control:checked + &__text::before {
-        background: #3991c7;
-        box-shadow: inset 0 0 0 2px #ebebeb;
+            border: $custom-radio-icon-border;
+            border-radius: 50%;
+            background: $custom-radio-icon-bg;
+        }
     }
 
     &--large {
-        line-height: 15px;
-    }
+        line-height: $custom-radio-large-line-height;
 
-    &--large &__control + &__text::before {
-        width: 16px;
-        height: 16px;
+        .custom-radio__text {
+            &:before {
+                width: $custom-radio-large-icon-size;
+                height: $custom-radio-large-icon-size;;
+            }
+        }
     }
 
     &.absolute {
         position: relative;
 
         .custom-radio__text {
-            margin-left: 25px;
+            margin: $custom-radio-absolute-icon-offset;
 
             &:before {
                 position: absolute;

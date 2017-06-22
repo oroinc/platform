@@ -11,6 +11,9 @@ use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @group schema
+ */
 class SchemaTest extends WebTestCase
 {
     use SchemaTrait;

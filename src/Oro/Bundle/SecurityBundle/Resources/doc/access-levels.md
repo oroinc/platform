@@ -20,13 +20,13 @@ There are 6 access levels:
   
 There are several ways to protect the records with access levels.
 
-###Data grids protections.
+### Data grids protections.
 
 All records in datagrids automatically protect with access levels. Developer doesn't need turn on the protection manually.
 
 Now it protects view permission for records.
 
-###Protection with Param Converters.
+### Protection with Param Converters.
 
 When a developer uses Sensio Param Converter in controller's actions and this action has ACL annotation an additional security check will be run for the input parameters.
 
@@ -34,7 +34,7 @@ If input parameters for this action contain a doctrine entity object whose class
 
 If Param converter ACL access level check can't protect the entity, then was turn on protection on class level from action ACL annotation.
 
-###Manual protection of select queries.
+### Manual protection of select queries.
 
 Developers can protect select DQL in QueryBuilder or Query with oro_security.acl_helper service:
 
@@ -51,35 +51,35 @@ $query = $this->get('oro_security.acl_helper')->apply($queryBuilder, 'VIEW');
 
 As result, $query will be marked as ACL protected and it will automatically delete records that user doesn't have permission.
 
-###Manual access check on object.
+### Manual access check on object.
 
-Developer can check access to the given entity record by using isGranted method of Security facade service:
+Developer can check access to the given entity record by using `isGranted` method of the [Authorization Checker](https://symfony.com/doc/current/components/security/authorization.html#authorization-checker):
 
 ``` php
 $entity = $repository->findOneBy('id' => 10);
 
-if (!$this->securityFacade->isGranted('VIEW', $entity)) {
+if (!$this->authorizationChecker->isGranted('VIEW', $entity)) {
     throw new AccessDeniedException('Access denied');
 } else {
     // access is granted
 }  
 ```
 
-###Manual access check on object field.
+### Manual access check on object field.
 
-Developer can check access to the given entity record by using isGranted method of Security facade service:
+Developer can check access to the given entity field by passing instance `FieldVote` class to `isGranted` method of the [Authorization Checker](https://symfony.com/doc/current/components/security/authorization.html#authorization-checker):
 
 ``` php
 $entity = $repository->findOneBy('id' => 10);
 
-if (!$this->securityFacade->isGranted('VIEW', new FieldVote($entity, '_field_name_'))) {
+if (!$this->authorizationChecker->isGranted('VIEW', new FieldVote($entity, '_field_name_'))) {
     throw new AccessDeniedException('Access denided');
 } else {
     // access is granted
 }  
 ```
 
-###Check ACL for search queries
+### Check ACL for search queries
 
 During collecting entities to search, information about owner and organization will be added to search index automatically.
 

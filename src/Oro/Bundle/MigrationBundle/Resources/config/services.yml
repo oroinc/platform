@@ -19,6 +19,12 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@service_container'
 
+    oro_migration.data_fixtures.executor:
+        class: Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@event_dispatcher'
+
     oro_migration.migrations.loader:
         class: %oro_migration.migrations.loader.class%
         arguments:

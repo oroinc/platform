@@ -1,10 +1,11 @@
 <?php
+
 namespace Oro\Bundle\NotificationBundle\Tests\Unit;
 
 use Oro\Bundle\NotificationBundle\OroNotificationBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
-class OroNavigationBundleTest extends \PHPUnit_Framework_TestCase
+class OroNotificationBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testBuild()
     {

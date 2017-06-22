@@ -2,77 +2,62 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Autocomplete;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler;
 
 class UserWithoutCurrentHandlerTest extends \PHPUnit_Framework_TestCase
 {
     const NAME = 'OroUserBundle:User';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $indexer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $aclHelper;
 
-    /**
-     * @var UserWithoutCurrentHandler
-     */
+    /** @var UserWithoutCurrentHandler */
     protected $handler;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $attachmentManager = $this->createMock(AttachmentManager::class);
+        $this->indexer = $this->createMock(Indexer::class);
 
-        $attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repository = $this->createMock(EntityRepository::class);
 
-        $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
 
-        $metadataFactory = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(self::NAME)
             ->will($this->returnValue($metadata));
 
-        $this->manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->manager = $this->createMock(ObjectManager::class);
         $this->manager->expects($this->any())
             ->method('getRepository')
             ->with(self::NAME)
@@ -81,11 +66,9 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->aclHelper = $this->createMock(AclHelper::class);
 
-        $this->handler = new UserWithoutCurrentHandler($this->securityFacade, $attachmentManager, self::NAME, []);
+        $this->handler = new UserWithoutCurrentHandler($this->tokenAccessor, $attachmentManager, self::NAME, []);
         $this->handler->initSearchIndexer($this->indexer, [self::NAME => ['alias' => 'user']]);
         $this->handler->initDoctrinePropertiesByEntityManager($this->manager);
         $this->handler->setAclHelper($this->aclHelper);
@@ -108,8 +91,8 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit_Framework_TestCase
             $foundSearchRecords[] = new Item(self::NAME, $userId);
         }
 
-        $this->securityFacade->expects($this->any())
-            ->method('getLoggedUserId')
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUserId')
             ->will($this->returnValue($currentUserId));
 
         $expr = $this->createMock('Doctrine\ORM\Query\Expr');

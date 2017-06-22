@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
@@ -9,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var ParentEntityObjectSecurityCheck */
     protected $processor;
@@ -18,11 +20,13 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
     {
         parent::setUp();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->processor = new ParentEntityObjectSecurityCheck($this->doctrineHelper, $this->securityFacade, 'VIEW');
+        $this->processor = new ParentEntityObjectSecurityCheck(
+            $this->doctrineHelper,
+            $this->authorizationChecker,
+            'VIEW'
+        );
     }
 
     public function testProcessWhenNoParentEntity()
@@ -34,7 +38,7 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
     {
         $parentEntity = new Product();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($parentEntity))
             ->willReturn(true);
@@ -51,7 +55,7 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
     {
         $parentEntity = new Product();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($parentEntity))
             ->willReturn(false);
@@ -67,7 +71,7 @@ class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorOrmRela
 
         $this->notManageableClassNames = [get_class($parentEntity)];
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $this->context->setParentClassName(get_class($parentEntity));

@@ -3,6 +3,7 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\User;
 
 use Oro\Component\Action\Action\AssignActiveUser;
@@ -13,23 +14,17 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 {
     const ATTRIBUTE_NAME = 'some_attribute';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityContext;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
 
-    /**
-     * @var AssignActiveUser
-     */
+    /** @var AssignActiveUser */
     protected $action;
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $this->action = new AssignActiveUser(new ContextAccessor(), $this->securityContext);
+        $this->action = new AssignActiveUser(new ContextAccessor(), $this->tokenStorage);
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -38,7 +33,7 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->securityContext);
+        unset($this->tokenStorage);
         unset($this->action);
     }
 
@@ -131,7 +126,7 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
             ->method('getUser')
             ->will($this->returnValue($user));
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 

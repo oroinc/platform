@@ -1,7 +1,1 @@
-oro:
-    testframework:
-        workflowawareentity:
-            entity_label: 'Workflow Aware Entity'
-            entity_plural_label: 'Workflow Aware Entities'
-            name.label: 'Name'
-
+oro.product.test_variant_field.label: Test variant field

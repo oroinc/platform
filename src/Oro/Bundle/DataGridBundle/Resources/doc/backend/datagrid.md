@@ -10,13 +10,13 @@ Table of content
 - [Implementation](#implementation)
 - [Extendability](#extendability)
 
-##Overview
+## Overview
 Datagrid is table oriented representation of some data from some datasource.
  It's configuration is declarative YAML based file, that should be placed in `Resources/config/oro` folder of your bundle and named `datagrids.yml`.
   This file should contain root node `datagrids` and each grid configuration should be placed under it.
 
-##Getting Started
-####Configuration file
+## Getting Started
+#### Configuration file
 First of all to define own datagrid you should create configuration file as described in "overview" section.
 After that, you have to choose identifier of yours future grid and declare it by adding associative array with identifier as key.
 e.g.
@@ -26,7 +26,7 @@ datagrids:
         ...                 # configuration will be here
 ``` 
 
-####Datasource
+#### Datasource
 When it's done, next step is to configure datasource, basically it's similar array under `source` node.
 You have to choose datasource type and properly configure  depending on it. For further details [see](./datasources.md).
 e.g.
@@ -39,7 +39,7 @@ datagrids:
                 ....   # some query configuration
 ```
 
-#####Datasource as service
+##### Datasource as service
 Other than the `query` yaml-oriented provider, ORM datasource supports an alternative `query_builder` service-oriented provider. 
 Basically it is possible to use any arbitrary method that returns a valid `Doctrine\ORM\QueryBuilder` instance.
 
@@ -76,7 +76,7 @@ datagrids:
             query_builder: "@acme_demo.user.repository->getUsersQb"
 ```
 
-#####Parameters binding
+##### Parameters binding
 
 If datasource supports parameters binding, additional option "bind_parameters" can be specified. For example
 
@@ -102,7 +102,7 @@ Each binding will call `->setParameter('group_id', group_id)` automatically upon
 
 [More about parameters binding](./parameter_binding.md).
 
-####Columns and properties
+#### Columns and properties
 Next step is columns definition. It's array as well as other parts of grid configuration.
  Root node for columns is `columns`, definition key should be unique column identifier, value is array of column configuration.
   The same for properties, but root node is `properties`.
@@ -151,7 +151,7 @@ datagrids:
 
 *Note: Since `%` is a reserved symbol for container parameters, you need to escape it by using `%%` instead.*
 
-####Sorting
+#### Sorting
 After that you may want to make your columns sortable. Sorting configuration should be placed under `sorters` node.
  In basic sorter implementation, configuration takes `columns` and `default` keys.
 Basically it's array of column names where value is sorter configuration.
@@ -176,7 +176,7 @@ datagrids:
 
 For detailed explanation [see](./extensions/sorter.md).
 
-####Final step
+#### Final step
 Final step for this tutorial is to add grid to template.
 There is predefined macros used for grid render. It defined in ` OroDataGridBundle::macros.html.twig` and could be imported
 by following call `{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}` .
@@ -193,10 +193,10 @@ So for displaying our grid we have to add following code to template:
 
 Actions, mass actions, toolbar, pagers, grid views and other functionality are explained on [advanced grid configuration](./advanced_grid_configuration.md) page.
 
-##Implementation
+## Implementation
 [Base classes diagram](./diagrams/datagrid_base_uml.jpg) shows class relations and dependencies.
 
-####Key classes
+#### Key classes
 
 - Datagrid\Manager - responsible of preparing of grid and it's configuration.
 - Datagrid\Builder - responsible of creating and configuring datagrid object and it's datasource.
@@ -207,8 +207,8 @@ Contains registered datasource type and extensions, also it performs check for d
 - Extension\AbstractExtension - basic empty implementation
 - Datasource\DatasourceInterface - link object between data and grid. Should provide results as array of ResultRecordInterface compatible objects
 - Provider\SystemAwareResolver - resolve specific grid YAML syntax expressions. For details [see](./references_in_configuration.md).
-##Extendability
-####Behavior customization
+## Extendability
+#### Behavior customization
 For customization of grid behavior(e.g. dynamic columns, actions etc) event listeners could be used.
 Grid dispatches 4 event during preparing.
 
@@ -221,7 +221,7 @@ Basically build.before event is intended to make changes of grid configuration b
 Single argument pass to listeners is BuildBefore event mediator object.
 
 build.after event is intended to make changes of datasource(e.g. take some parameters from request and do filtering based on it).
-####Extending
+#### Extending
 Grid could be extended in few ways:
 
 - create custom datasource if needed (e.g. already implemented SearchDatasource for working with search engine)

@@ -1,8 +1,19 @@
 {% block _filter_container_tpl_widget %}
+    {% set attr = attr|merge({
+        'data-grid-toolbar': 'top',
+        'data-sticky-target': 'top-sticky-panel',
+        'data-proxy-data': 'true',
+        'data-sticky': {
+            'isSticky': true,
+            'autoWidth': true,
+            'toggleClass': 'toolbar-sticky-container',
+            'placeholderId': 'sticky_element_toolbar'
+        }
+    }) %}
     <script type="text/html" id="filter-container">
         <% if (!_.isEmpty(filters)) { %>
         {% if isMobileVersion() %}
-            <div class="filter-box oro-clearfix-width">
+            <div class="filter-box oro-clearfix-width" {{ block('block_attributes') }}>
                 <div class="dropdown">
                     <a href="javascript:void(0);" class="btn btn--default btn--size-s dropdown-toggle" data-name="filters-dropdown">{{ 'Filter Results'|trans|e('html')|raw }}</a>
                     <ul class="filter-box__dropdown dropdown-menu">
@@ -26,7 +37,7 @@
                 </div>
             </div>
         {% else %}
-            <div class="filter-box oro-clearfix-width">
+            <div class="filter-box oro-clearfix-width" {{ block('block_attributes') }}>
                 <div class="filter-container">
                     <select data-action="add-filter-select" multiple data-skip-input-widgets>
                         <% _.each(filters, function (filter, name) { %>

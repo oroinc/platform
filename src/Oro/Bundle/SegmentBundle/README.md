@@ -3,7 +3,7 @@ OroSegmentBundle
 
 The goal of OroSegmentBundle is to provide entities segmentation, that can be used for further processing.
 
-##Table of Contents
+## Table of Contents
  - [Overview](#overview)
  - [Frontend implementation](#frontend-implementation)
  - [Backend implementation](#backend-implementation)

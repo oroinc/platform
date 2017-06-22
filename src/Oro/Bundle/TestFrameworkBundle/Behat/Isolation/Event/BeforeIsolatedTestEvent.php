@@ -12,7 +12,7 @@ final class BeforeIsolatedTestEvent implements TestIsolationEvent
      */
     protected $test;
 
-    public function __construct($test)
+    public function __construct($test = null)
     {
         $this->test = $test;
     }
