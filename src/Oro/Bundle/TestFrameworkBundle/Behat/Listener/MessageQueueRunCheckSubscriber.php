@@ -6,11 +6,14 @@ use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\SkipIsolatorsTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, MessageQueueIsolatorAwareInterface
 {
+    use SkipIsolatorsTrait;
+
     /**
      * @var MessageQueueIsolatorInterface
      */
@@ -33,6 +36,14 @@ class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, Messag
 
     public function beforeStep()
     {
+        if ($this->skip) {
+            return;
+        }
+
+        if (in_array($this->messageQueueIsolator->getTag(), $this->skipIsolators, true)) {
+            return;
+        }
+
         $mqProcess = $this->messageQueueIsolator->getProcess();
 
         if (!$mqProcess || $mqProcess->isRunning()) {
