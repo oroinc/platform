@@ -736,7 +736,7 @@ define(function(require) {
                     if (this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
-                }, 100));
+                }, 100, true));
 
                 this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);
@@ -763,7 +763,7 @@ define(function(require) {
                     if (this.$el.is(':visible')) {
                         this.resetAction.execute();
                     }
-                }, 100));
+                }, 100, true));
 
                 this.listenTo(this.resetAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:reset:' + this.name, [action, options]);
