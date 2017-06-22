@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty;
@@ -15,7 +17,6 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActionExtension extends AbstractExtension
 {
@@ -33,8 +34,8 @@ class ActionExtension extends AbstractExtension
     /** @var ActionMetadataFactory */
     protected $actionMetadataFactory;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var OwnershipQueryHelper */
     protected $ownershipQueryHelper;
@@ -58,20 +59,20 @@ class ActionExtension extends AbstractExtension
     private $ownershipFields = [];
 
     /**
-     * @param ActionFactory         $actionFactory
-     * @param ActionMetadataFactory $actionMetadataFactory
-     * @param SecurityFacade        $securityFacade
-     * @param OwnershipQueryHelper  $ownershipQueryHelper
+     * @param ActionFactory                 $actionFactory
+     * @param ActionMetadataFactory         $actionMetadataFactory
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param OwnershipQueryHelper          $ownershipQueryHelper
      */
     public function __construct(
         ActionFactory $actionFactory,
         ActionMetadataFactory $actionMetadataFactory,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         OwnershipQueryHelper $ownershipQueryHelper
     ) {
         $this->actionFactory = $actionFactory;
         $this->actionMetadataFactory = $actionMetadataFactory;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
         $this->ownershipQueryHelper = $ownershipQueryHelper;
     }
 
@@ -177,7 +178,7 @@ class ActionExtension extends AbstractExtension
                     }
 
                     foreach ($aclResources as $actionName => $aclResource) {
-                        if (!$this->securityFacade->isGranted($aclResource, $entityReference)) {
+                        if (!$this->authorizationChecker->isGranted($aclResource, $entityReference)) {
                             $disabledActions[$entityId][$actionName] = false;
                         }
                     }
@@ -241,7 +242,7 @@ class ActionExtension extends AbstractExtension
         $action = $this->actionFactory->createAction($actionName, $actionConfig);
 
         $aclResource = $action->getAclResource();
-        if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
+        if ($aclResource && !$this->authorizationChecker->isGranted($aclResource)) {
             $action = null;
         }
 

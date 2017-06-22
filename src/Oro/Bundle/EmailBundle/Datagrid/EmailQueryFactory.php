@@ -18,7 +18,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailQueryFactory
 {
@@ -34,8 +34,8 @@ class EmailQueryFactory
     /** @var Registry */
     protected $mailboxManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var FormFactoryInterface */
     protected $formFactory;
@@ -47,7 +47,7 @@ class EmailQueryFactory
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
      * @param MailboxManager            $mailboxManager
-     * @param SecurityFacade            $securityFacade
+     * @param TokenAccessorInterface    $tokenAccessor
      * @param FormFactoryInterface      $formFactory
      * @param FilterUtility             $filterUtil
      */
@@ -55,16 +55,16 @@ class EmailQueryFactory
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EntityNameResolver $entityNameResolver,
         MailboxManager $mailboxManager,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         FormFactoryInterface $formFactory,
         FilterUtility $filterUtil
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
-        $this->entityNameResolver        = $entityNameResolver;
-        $this->mailboxManager            = $mailboxManager;
-        $this->securityFacade            = $securityFacade;
-        $this->formFactory               = $formFactory;
-        $this->filterUtil                = $filterUtil;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->mailboxManager = $mailboxManager;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->formFactory = $formFactory;
+        $this->filterUtil = $filterUtil;
     }
 
     /**
@@ -110,7 +110,7 @@ class EmailQueryFactory
             $qb->andWhere($uoCheck);
         }
 
-        $qb->setParameter('owner', $this->securityFacade->getLoggedUserId());
+        $qb->setParameter('owner', $this->tokenAccessor->getUserId());
     }
 
     /**
@@ -336,7 +336,7 @@ class EmailQueryFactory
      */
     protected function getOwningExpression($expr, $tableAlias)
     {
-        $user         = $this->securityFacade->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
         $organization = $this->getOrganization();
 
         if ($organization === null) {
@@ -366,7 +366,7 @@ class EmailQueryFactory
     protected function getAvailableMailboxIds()
     {
         return $this->mailboxManager->findAvailableMailboxIds(
-            $this->securityFacade->getLoggedUser(),
+            $this->tokenAccessor->getUser(),
             $this->getOrganization()
         );
     }
@@ -376,7 +376,7 @@ class EmailQueryFactory
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
+        return $this->tokenAccessor->getOrganization();
     }
 
     /**

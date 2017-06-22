@@ -47,7 +47,6 @@ services:
         class: %oro_datagrid.extension.inline_editing.class%
         arguments:
             - '@oro_datagrid.datagrid.inline_edit_column_options_guesser'
-            - '@oro_security.security_facade'
             - '@oro_entity.entity_class_name_helper'
             - '@security.authorization_checker'
         tags:
@@ -58,7 +57,7 @@ services:
         arguments:
             - '@oro_datagrid.extension.action.factory'
             - '@oro_datagrid.extension.action.metadata_factory'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_security.owner.ownership_query_helper'
         tags:
             - { name: oro_datagrid.extension }
@@ -81,7 +80,7 @@ services:
         arguments:
             - '@oro_datagrid.extension.mass_action.factory'
             - '@oro_datagrid.extension.mass_action.metadata_factory'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -96,7 +95,8 @@ services:
         class: %oro_datagrid.extension.views.class%
         arguments:
             - '@event_dispatcher'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@translator'
             - '@doctrine'
             - '@oro_security.acl_helper'
@@ -108,7 +108,8 @@ services:
         class: %oro_datagrid.extension.export.class%
         arguments:
             - '@translator'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@security.token_storage'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -131,7 +132,7 @@ services:
         class: %oro_datagrid.extension.columns.class%
         arguments:
             - '@doctrine'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
             - '@oro_datagrid.columns.helper'
         tags:
@@ -161,7 +162,7 @@ services:
     oro_datagrid.extension.board:
         class: %oro_datagrid.extension.board.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@translator'
             - '@oro_datagrid.datagrid.board.restriction_manager'
             - '@oro_datagrid.datagrid.board.configuration'

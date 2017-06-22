@@ -209,9 +209,7 @@ class WidgetController extends Controller
      */
     protected function isWorkflowPermissionGranted($permission, $workflowName, $entity)
     {
-        $securityFacade = $this->container->get('oro_security.security_facade');
-
-        return $securityFacade->isGranted(
+        return $this->isGranted(
             $permission,
             new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName))
         );

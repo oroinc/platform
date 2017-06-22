@@ -1,6 +1,6 @@
 {% block oro_tag_select_row %}
-    {% if resource_granted('oro_tag_view') %}
-        {% if resource_granted('oro_tag_assign_unassign') %}
+    {% if is_granted('oro_tag_view') %}
+        {% if is_granted('oro_tag_assign_unassign') %}
             <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}">
                 <div class="control-label wrap">
                     {{ form_label(form, '' , { label_attr: label_attr}) }}

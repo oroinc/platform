@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -20,7 +21,6 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
@@ -46,32 +46,22 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
     protected $dispatcher;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker */
     protected $featureChecker;
 
     protected function setUp()
     {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
         $this->entityConfigProvider = new ConfigProviderMock($configManager, 'entity');
         $this->viewConfigProvider = new ConfigProviderMock($configManager, 'view');
-        $this->fieldTypeHelper = $this->getMockBuilder(FieldTypeHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldTypeHelper = $this->createMock(FieldTypeHelper::class);
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $propertyAccessor = new PropertyAccessor();
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
@@ -84,7 +74,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->add('oro_entity_extend.extend.field_type_helper', $this->fieldTypeHelper)
             ->add('property_accessor', $propertyAccessor)
             ->add('event_dispatcher', $this->dispatcher)
-            ->add('oro_security.security_facade', $this->securityFacade)
+            ->add('security.authorization_checker', $this->authorizationChecker)
             ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
             ->getContainer($this);
 
@@ -115,7 +105,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extendConfigProvider->addFieldConfig($entityClass, $fieldName);
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(false);
@@ -136,7 +126,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extendConfigProvider->addFieldConfig($entityClass, $fieldName);
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -173,7 +163,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
         $this->viewConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -214,7 +204,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
         $this->viewConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -252,7 +242,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType, ['label' => 'field.label']);
         $this->viewConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType, ['type' => 'view.type']);
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -291,7 +281,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['owner' => ExtendScope::OWNER_SYSTEM]
         );
 
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         self::assertSame(
@@ -314,7 +304,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true, 'is_deleted' => true]
         );
 
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         self::assertSame(
@@ -343,7 +333,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => false]
         );
 
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         self::assertSame(
@@ -381,7 +371,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getUnderlyingType')
             ->with($fieldType)
             ->willReturn(RelationType::MANY_TO_ONE);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         self::assertSame(
@@ -416,7 +406,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getUnderlyingType')
             ->with($fieldType)
             ->willReturn(RelationType::MANY_TO_ONE);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(false);
@@ -447,7 +437,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => true]
         );
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(false);
@@ -478,7 +468,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => true]
         );
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -523,7 +513,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => true]
         );
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -574,7 +564,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => true]
         );
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -628,7 +618,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => true, 'type' => 'view.type']
         );
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
@@ -701,7 +691,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => true]
         );
 
-        $this->securityFacade->expects(self::exactly(2))
+        $this->authorizationChecker->expects(self::exactly(2))
             ->method('isGranted')
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))
@@ -771,7 +761,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ['is_displayable' => true, 'priority' => 20]
         );
 
-        $this->securityFacade->expects(self::exactly(2))
+        $this->authorizationChecker->expects(self::exactly(2))
             ->method('isGranted')
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))

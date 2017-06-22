@@ -35,6 +35,16 @@ oro_behat_extension:
       selector: 'div.jstree-wrapper'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Menu Form:
+      selector: 'div#container'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Title: 'menu_update[titles][values][default]'
+          URI: 'menu_update[uri]'
+          Icon: 'menu_update[icon]'
+          Description: 'menu_update[descriptions][values][default]'
+
   pages:
     Shortcut Actionslist:
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Page\ShortcutActionslist

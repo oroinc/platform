@@ -5,13 +5,13 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FormBundle\Entity\PriorityItem;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -25,62 +25,48 @@ class ExtendFieldValueRenderListener
 {
     const ENTITY_VIEW_ROUTE = 'oro_entity_view';
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $extendProvider;
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
+    /** @var UrlGeneratorInterface */
     protected $router;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var EntityClassNameHelper
-     */
+    /** @var EntityClassNameHelper */
     private $entityClassNameHelper;
 
     /**
-     * @param ConfigManager         $configManager
-     * @param UrlGeneratorInterface $router
-     * @param ManagerRegistry       $registry
-     * @param SecurityFacade        $securityFacade
-     * @param EntityClassNameHelper $entityClassNameHelper
+     * @param ConfigManager                 $configManager
+     * @param UrlGeneratorInterface         $router
+     * @param ManagerRegistry               $registry
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param EntityClassNameHelper         $entityClassNameHelper
      */
     public function __construct(
         ConfigManager $configManager,
         UrlGeneratorInterface $router,
         ManagerRegistry $registry,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         EntityClassNameHelper $entityClassNameHelper
     ) {
-        $this->configManager         = $configManager;
-        $this->router                = $router;
-        $this->registry              = $registry;
-        $this->securityFacade        = $securityFacade;
+        $this->configManager = $configManager;
+        $this->router = $router;
+        $this->registry = $registry;
+        $this->authorizationChecker = $authorizationChecker;
         $this->entityClassNameHelper = $entityClassNameHelper;
 
-        $this->extendProvider   = $configManager->getProvider('extend');
+        $this->extendProvider = $configManager->getProvider('extend');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -144,7 +130,7 @@ class ExtendFieldValueRenderListener
             }
 
             $value = ['id' => $id, 'title' => implode(' ', $title)];
-            if (!empty($routeOptions['route']) && $this->securityFacade->isGranted('VIEW', $item)) {
+            if (!empty($routeOptions['route']) && $this->authorizationChecker->isGranted('VIEW', $item)) {
                 $value['link'] = $this->router->generate($routeOptions['route'], $routeOptions['route_params']);
             }
             $values[] = $value;
@@ -191,7 +177,7 @@ class ExtendFieldValueRenderListener
         $id = $this->propertyAccessor->getValue($targetEntity, $targetMetadata->getSingleIdentifierFieldName());
 
         $routeOptions = $this->getEntityRouteOptions($targetClassName, $id);
-        if ($routeOptions['route'] && $this->securityFacade->isGranted('VIEW', $targetEntity)) {
+        if ($routeOptions['route'] && $this->authorizationChecker->isGranted('VIEW', $targetEntity)) {
             return [
                 'link'  => $this->router->generate($routeOptions['route'], $routeOptions['route_params']),
                 'title' => $title

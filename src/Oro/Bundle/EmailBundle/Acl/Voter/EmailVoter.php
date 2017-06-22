@@ -82,7 +82,7 @@ class EmailVoter implements VoterInterface
         $emailUsers = $object->getEmailUsers();
         foreach ($attributes as $attribute) {
             foreach ($emailUsers as $emailUser) {
-                if ($this->container->get('oro_security.security_facade')->isGranted($attribute, $emailUser)) {
+                if ($this->container->get('security.authorization_checker')->isGranted($attribute, $emailUser)) {
                     return self::ACCESS_GRANTED;
                 }
                 if ($mailbox = $emailUser->getMailboxOwner() !== null

@@ -32,12 +32,12 @@
             '_enableContentProviders': 'mainMenu'
         }
     }) %}
-    {% if resource_granted('oro_dashboard_create') %}
+    {% if is_granted('oro_dashboard_create') %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_dashboard_create'
         }) %}
     {% endif %}
-    {% if form.vars.value.id or resource_granted('oro_dashboard_update') %}
+    {% if form.vars.value.id or is_granted('oro_dashboard_update') %}
         {% set html = html ~ UI.saveAndStayButton({
             'route': 'oro_dashboard_update',
             'params': {

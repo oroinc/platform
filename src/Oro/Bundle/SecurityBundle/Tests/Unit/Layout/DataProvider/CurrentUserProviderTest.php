@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class CurrentUserProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var CurrentUserProvider */
     protected $provider;
@@ -18,17 +18,16 @@ class CurrentUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
-        $this->provider = new CurrentUserProvider($this->securityFacade);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->provider = new CurrentUserProvider($this->tokenAccessor);
     }
 
     public function testGetCurrentUserLoggedIn()
     {
         $object = new \stdClass();
 
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($object));
 
         $this->assertEquals($object, $this->provider->getCurrentUser());
@@ -36,9 +35,8 @@ class CurrentUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCurrentUserLoggedOut()
     {
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue(null));
 
         $this->assertNull($this->provider->getCurrentUser());

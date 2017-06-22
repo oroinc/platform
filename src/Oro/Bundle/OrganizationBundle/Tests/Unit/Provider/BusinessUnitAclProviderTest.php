@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider;
 
 class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
@@ -14,7 +17,10 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $aclVoter;
@@ -33,9 +39,8 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
             ->disableOriginalConstructor()
@@ -66,18 +71,19 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade->expects($this->any())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
             ->will($this->returnValue($this->user));
 
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
             ->will($this->returnValue($this->organization));
 
         $this->provider = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider')
             ->setMethods(['getAccessLevel'])
             ->setConstructorArgs([
-                $this->securityFacade,
+                $this->authorizationChecker,
+                $this->tokenAccessor,
                 $this->aclVoter,
                 $this->treeProvider
                 ])

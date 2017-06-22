@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\OrganizationBundle\Autocomplete;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class BusinessUnitTreeSearchHandler extends BusinessUnitOwnerSearchHandler
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
+    public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 }

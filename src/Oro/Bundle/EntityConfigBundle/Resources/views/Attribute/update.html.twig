@@ -8,14 +8,14 @@
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_attribute_index', {alias: entityAlias})) }}
-    {% if resource_granted('oro_attribute_create') %}
+    {% if is_granted('oro_attribute_create') %}
         {% set html = UI.saveAndCloseButton({'route': 'oro_attribute_index', 'params': {alias: entityAlias}}) %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_attribute_create',
             'params': {alias: entityAlias}
         }) %}
     {% endif %}
-    {% if resource_granted('oro_attribute_update') %}
+    {% if is_granted('oro_attribute_update') %}
         {% set html = html ~ UI.saveAndStayButton({
             'route': 'oro_attribute_update',
             'params': {'id': '$id'}

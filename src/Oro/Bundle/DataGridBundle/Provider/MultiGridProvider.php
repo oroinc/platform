@@ -2,39 +2,34 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MultiGridProvider
 {
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var ManagerInterface
-     */
+    /** @var ManagerInterface */
     protected $gridManager;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param ConfigManager $configManager
-     * @param ManagerInterface $gridManager
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ConfigManager                 $configManager
+     * @param ManagerInterface              $gridManager
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,
         ManagerInterface $gridManager
     ) {
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
         $this->configManager = $configManager;
         $this->gridManager = $gridManager;
     }
@@ -99,7 +94,7 @@ class MultiGridProvider
      */
     protected function getEntityData($className)
     {
-        if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $className))) {
+        if (!$this->authorizationChecker->isGranted('VIEW', sprintf('entity:%s', $className))) {
             return null;
         }
 
@@ -135,6 +130,6 @@ class MultiGridProvider
         $gridConfig = $this->gridManager->getConfigurationForGrid($gridName);
         $acl = $gridConfig ? $gridConfig->getAclResource() : null;
 
-        return $this->securityFacade->isGranted($acl);
+        return $this->authorizationChecker->isGranted($acl);
     }
 }

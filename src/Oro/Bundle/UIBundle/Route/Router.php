@@ -6,8 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class Router
@@ -16,39 +16,31 @@ class Router
     const ACTION_SAVE_AND_STAY = 'save_and_stay';
     const ACTION_SAVE_CLOSE    = 'save_and_close';
 
-    /**
-     * @var RequestStack
-     */
+    /** @var RequestStack */
     protected $requestStack;
 
-    /**
-     * @var SymfonyRouter
-     */
+    /** @var SymfonyRouter */
     protected $router;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     protected $propertyAccessor;
 
     /**
-     * @param RequestStack   $requestStack
-     * @param SymfonyRouter  $router
-     * @param SecurityFacade $securityFacade
+     * @param RequestStack                  $requestStack
+     * @param SymfonyRouter                 $router
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         RequestStack $requestStack,
         SymfonyRouter $router,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->requestStack = $requestStack;
         $this->router = $router;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
 
         $this->propertyAccessor = new PropertyAccessor();
     }
@@ -76,7 +68,7 @@ class Router
                 /**
                  * If user has no permission to edit Save and close callback should be used
                  */
-                if (is_null($entity) || $this->securityFacade->isGranted('EDIT', $entity)) {
+                if (is_null($entity) || $this->authorizationChecker->isGranted('EDIT', $entity)) {
                     $routeData = $saveAndStayRoute;
                 } else {
                     $routeData = $saveAndCloseRoute;

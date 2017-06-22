@@ -13,8 +13,8 @@ use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ChoiceAccountTypeTest extends FormIntegrationTestCase
@@ -22,8 +22,8 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
     /** @var Mcrypt */
     protected $encryptor;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
@@ -46,15 +46,11 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade->expects($this->any())
-            ->method('getLoggedUser')
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
             ->willReturn($user);
-
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
             ->willReturn($organization);
 
@@ -94,11 +90,11 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                         'oro_imap_configuration_gmail' => new ConfigurationGmailType(
                             $this->translator,
                             $this->userConfigManager,
-                            $this->securityFacade
+                            $this->tokenAccessor
                         ),
                         'oro_imap_configuration' => new ConfigurationType(
                             $this->encryptor,
-                            $this->securityFacade,
+                            $this->tokenAccessor,
                             $this->translator
                         ),
                         'oro_email_email_folder_tree' => new EmailFolderTreeType(),

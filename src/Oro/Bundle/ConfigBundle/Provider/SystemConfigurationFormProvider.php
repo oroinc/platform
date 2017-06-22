@@ -4,13 +4,13 @@ namespace Oro\Bundle\ConfigBundle\Provider;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SystemConfigurationFormProvider extends Provider
 {
@@ -20,23 +20,23 @@ class SystemConfigurationFormProvider extends Provider
     /** @var FormFactoryInterface */
     protected $factory;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param ConfigBag            $configBag
-     * @param FormFactoryInterface $factory
-     * @param SecurityFacade       $securityFacade
+     * @param ConfigBag                     $configBag
+     * @param FormFactoryInterface          $factory
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         ConfigBag $configBag,
         FormFactoryInterface $factory,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         parent::__construct($configBag);
 
-        $this->factory        = $factory;
-        $this->securityFacade = $securityFacade;
+        $this->factory = $factory;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -121,7 +121,7 @@ class SystemConfigurationFormProvider extends Provider
      */
     protected function checkIsGranted($resourceName)
     {
-        return $this->securityFacade->isGranted($resourceName);
+        return $this->authorizationChecker->isGranted($resourceName);
     }
 
     /**
