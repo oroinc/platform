@@ -48,11 +48,12 @@ class MultiAttemptsClientDecoratorFactory extends AbstractRestClientDecoratorFac
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function createRestClient($baseUrl, array $defaultOptions)
     {
         $client = $this->getRestClientFactory()->createRestClient($baseUrl, $defaultOptions);
+
         return new MultiAttemptsClientDecorator(
             $client,
             $this->logger,

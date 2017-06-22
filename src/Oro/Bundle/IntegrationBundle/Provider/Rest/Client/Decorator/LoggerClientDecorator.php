@@ -19,7 +19,7 @@ class LoggerClientDecorator implements RestClientInterface
     protected $logger;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __construct(RestClientInterface $client, LoggerInterface $logger)
     {
@@ -28,7 +28,7 @@ class LoggerClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function get($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -37,7 +37,7 @@ class LoggerClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -46,7 +46,7 @@ class LoggerClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getXML($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -55,7 +55,7 @@ class LoggerClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function post($resource, $data, array $headers = array(), array $options = array())
     {
@@ -64,7 +64,7 @@ class LoggerClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function delete($resource, array $headers = array(), array $options = array())
     {
@@ -73,7 +73,7 @@ class LoggerClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function put($resource, $data, array $headers = array(), array $options = array())
     {
@@ -82,7 +82,7 @@ class LoggerClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getLastResponse()
     {

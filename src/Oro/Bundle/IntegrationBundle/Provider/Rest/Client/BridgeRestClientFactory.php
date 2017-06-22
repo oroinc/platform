@@ -39,7 +39,9 @@ abstract class BridgeRestClientFactory
      * Get REST client base url
      *
      * @param ParameterBag $parameterBag
+     *
      * @return string
+     *
      * @throws InvalidConfigurationException
      */
     abstract protected function getClientBaseUrl(ParameterBag $parameterBag);
@@ -48,7 +50,9 @@ abstract class BridgeRestClientFactory
      * Get REST client options
      *
      * @param ParameterBag $parameterBag
+     *
      * @return array
+     *
      * @throws InvalidConfigurationException
      */
     abstract protected function getClientOptions(ParameterBag $parameterBag);

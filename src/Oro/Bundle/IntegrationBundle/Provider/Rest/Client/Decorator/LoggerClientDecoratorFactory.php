@@ -8,12 +8,14 @@ use Psr\Log\LoggerAwareInterface;
 class LoggerClientDecoratorFactory extends AbstractRestClientDecoratorFactory implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function createRestClient($baseUrl, array $defaultOptions)
     {
         $client = $this->getRestClientFactory()->createRestClient($baseUrl, $defaultOptions);
+
         return new LoggerClientDecorator($client, $this->logger);
     }
 }

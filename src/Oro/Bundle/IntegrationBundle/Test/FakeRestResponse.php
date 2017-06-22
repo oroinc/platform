@@ -31,7 +31,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __toString()
     {
@@ -39,7 +39,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getRequestUrl()
     {
@@ -47,7 +47,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getBodyAsString()
     {
@@ -55,7 +55,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getStatusCode()
     {
@@ -63,7 +63,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getMessage()
     {
@@ -71,7 +71,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getHeader($header)
     {
@@ -79,7 +79,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getHeaders()
     {
@@ -87,7 +87,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function hasHeader($header)
     {
@@ -95,7 +95,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isClientError()
     {
@@ -103,7 +103,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isError()
     {
@@ -111,7 +111,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isInformational()
     {
@@ -119,7 +119,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isRedirect()
     {
@@ -127,7 +127,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isServerError()
     {
@@ -135,7 +135,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isSuccessful()
     {
@@ -143,7 +143,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function json()
     {
@@ -161,7 +161,7 @@ class FakeRestResponse implements RestResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getReasonPhrase()
     {

@@ -15,7 +15,7 @@ class FakeRestClientFactory implements RestClientFactoryInterface
     protected $fixtureFile;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function createRestClient($baseUrl, array $defaultOptions)
     {
@@ -63,6 +63,7 @@ class FakeRestClientFactory implements RestClientFactoryInterface
      * Returns array of fixtures from provided YAML file
      *
      * @param $fixtureFileName
+     *
      * @return array
      */
     public static function getFixturesFromFile($fixtureFileName)

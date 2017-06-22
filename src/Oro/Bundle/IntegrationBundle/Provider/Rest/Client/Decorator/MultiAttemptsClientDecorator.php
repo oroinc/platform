@@ -12,13 +12,19 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
 class MultiAttemptsClientDecorator implements RestClientInterface
 {
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $attempted = 0;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $multipleAttemptsEnabled;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $sleepBetweenAttempt;
 
     /**
@@ -32,7 +38,7 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     protected $logger;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __construct(
         RestClientInterface $client,
@@ -60,7 +66,7 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function get($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -75,11 +81,12 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         }
 
         $this->resetAttemptsCount();
+
         return $response;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function post($resource, $data, array $headers = array(), array $options = array())
     {
@@ -94,11 +101,12 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         }
 
         $this->resetAttemptsCount();
+
         return $response;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function delete($resource, array $headers = array(), array $options = array())
     {
@@ -113,11 +121,12 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         }
 
         $this->resetAttemptsCount();
+
         return $response;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function put($resource, $data, array $headers = array(), array $options = array())
     {
@@ -132,11 +141,12 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         }
 
         $this->resetAttemptsCount();
+
         return $response;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -151,11 +161,12 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         }
 
         $this->resetAttemptsCount();
+
         return $response;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getXML($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -170,11 +181,12 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         }
 
         $this->resetAttemptsCount();
+
         return $response;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getLastResponse()
     {
@@ -183,6 +195,7 @@ class MultiAttemptsClientDecorator implements RestClientInterface
 
     /**
      * @param RestException $exception
+     *
      * @return bool
      */
     protected function canMakeNewAttempt(RestException $exception)
@@ -190,6 +203,7 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         $response = $exception->getResponse();
         if ($response instanceof RestResponseInterface && $this->isNewAttemptAvailable($response)) {
             $this->nextAttempt();
+
             return true;
         }
 

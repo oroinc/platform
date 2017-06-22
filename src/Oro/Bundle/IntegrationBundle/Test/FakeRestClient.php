@@ -18,7 +18,7 @@ class FakeRestClient implements RestClientInterface
     protected $lastResponse;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function get($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -26,7 +26,7 @@ class FakeRestClient implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array())
     {
@@ -34,7 +34,7 @@ class FakeRestClient implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function post($resource, $data, array $headers = array(), array $options = array())
     {
@@ -42,7 +42,7 @@ class FakeRestClient implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function delete($resource, array $headers = array(), array $options = array())
     {
@@ -50,7 +50,7 @@ class FakeRestClient implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function put($resource, $data, array $headers = array(), array $options = array())
     {
@@ -58,7 +58,7 @@ class FakeRestClient implements RestClientInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getLastResponse()
     {
@@ -91,6 +91,7 @@ class FakeRestClient implements RestClientInterface
      * Creates fake response for all CRUD methods
      *
      * @param string $url
+     *
      * @return RestResponseInterface
      */
     protected function createFakeResponse($url)

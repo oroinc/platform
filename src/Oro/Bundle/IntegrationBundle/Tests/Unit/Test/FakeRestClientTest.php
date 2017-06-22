@@ -18,7 +18,7 @@ class FakeRestClientTest extends \PHPUnit_Framework_TestCase
     protected $client;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
