@@ -14,7 +14,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -30,6 +30,7 @@ class OroNavigationBundleInstaller implements Installation
         $this->createOroNavigationMenuUpdateTable($schema);
         $this->createOroNavigationMenuUpdateTitleTable($schema);
         $this->createOroNavigationMenuUpdateDescriptionTable($schema);
+        $this->createOroMenuUserAgentConditionTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroNavigationHistoryForeignKeys($schema);
@@ -39,6 +40,7 @@ class OroNavigationBundleInstaller implements Installation
         $this->addOroNavigationMenuUpdateTitleForeignKeys($schema);
         $this->addOroNavigationMenuUpdateDescriptionForeignKeys($schema);
         $this->addOroNavigationMenuUpdateForeignKeys($schema);
+        $this->addOroMenuUserAgentConditionForeignKeys($schema);
     }
 
     /**
@@ -177,6 +179,22 @@ class OroNavigationBundleInstaller implements Installation
     }
 
     /**
+     * Create `oro_menu_user_agent_condition` table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroMenuUserAgentConditionTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_menu_user_agent_condition');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('condition_group_identifier', 'integer', []);
+        $table->addColumn('operation', 'string', ['length' => 255]);
+        $table->addColumn('value', 'string', ['length' => 255]);
+        $table->addColumn('menu_update_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
      * Add oro_navigation_history foreign keys.
      *
      * @param Schema $schema
@@ -308,6 +326,22 @@ class OroNavigationBundleInstaller implements Installation
             $schema->getTable('oro_scope'),
             ['scope_id'],
             ['id']
+        );
+    }
+
+    /**
+     * Add `oro_menu_user_agent_condition` foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroMenuUserAgentConditionForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_menu_user_agent_condition');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_navigation_menu_upd'),
+            ['menu_update_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }
