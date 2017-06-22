@@ -1,18 +1,19 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-
 use Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
-
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 
 class RecordOwnerDataListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,26 +21,17 @@ class RecordOwnerDataListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContext;
+    protected $tokenStorage;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
     protected function setUp()
     {
-        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $serviceLink->expects($this->any())->method('getService')
-            ->will($this->returnValue($this->securityContext));
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
-        $this->listener = new RecordOwnerDataListener($serviceLink, $this->configProvider);
+        $this->listener = new RecordOwnerDataListener($this->tokenStorage, $this->configProvider);
     }
 
     /**
@@ -48,7 +40,7 @@ class RecordOwnerDataListenerTest extends \PHPUnit_Framework_TestCase
     public function testPrePersistUser($token, $securityConfig, $expect)
     {
         $entity = new Entity();
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 

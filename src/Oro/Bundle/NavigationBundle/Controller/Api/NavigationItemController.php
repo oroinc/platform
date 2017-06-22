@@ -41,7 +41,7 @@ class NavigationItemController extends FOSRestController
 
         /** @var $repo NavigationRepositoryInterface */
         $repo = $this->getDoctrine()->getRepository(ClassUtils::getClass($entity));
-        $organization = $this->container->get('security.context')->getToken()->getOrganizationContext();
+        $organization = $this->container->get('security.token_storage')->getToken()->getOrganizationContext();
         $items = $repo->getNavigationItems($this->getUser(), $organization, $type);
 
         return $this->handleView(
@@ -75,7 +75,7 @@ class NavigationItemController extends FOSRestController
 
         $params['user'] = $this->getUser();
         $params['url']  = $this->getStateUrl($params['url']);
-        $params['organization'] = $this->container->get('security.context')->getToken()->getOrganizationContext();
+        $params['organization'] = $this->container->get('security.token_storage')->getToken()->getOrganizationContext();
 
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
         $entity = $this->getFactory()->createItem($type, $params);

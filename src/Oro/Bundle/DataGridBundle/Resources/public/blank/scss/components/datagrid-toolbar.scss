@@ -12,12 +12,9 @@
     &__side,
     &__rightside {
         display: flex;
-        // 0px value for fix bug in IE11
-        flex: 1 0 0px;
+        flex: 1 0 200px;
         flex-wrap: wrap;
         align-items: center;
-
-        min-width: 200px;
     }
 
     &__rightside {
@@ -28,6 +25,10 @@
         display: flex;
         flex: 0 0 auto;
         align-items: center;
+    }
+
+    &__panel {
+        width: 100%;
     }
 
     &.extended {
@@ -59,15 +60,13 @@
     }
 
     .page-size {
-        font-size: $base-font-size - 2px;
-
         flex-grow: 0;
     }
 
 }
 
 .datagrid-tool {
-    margin: 3px 0;
+    margin: 3px 5px 3px 0;
 
     &:not(:first-child) {
         margin-left: $offset-x-s;
@@ -115,6 +114,14 @@
     }
 }
 
+@include breakpoint('mobile-landscape') {
+    .form-horizontal { //Platform override
+        .oro-items-counter {
+            display: none;
+        }
+    }
+}
+
 @include breakpoint('mobile') {
     .datagrid-toolbar {
         justify-content: space-between;
@@ -126,6 +133,10 @@
 
             min-width: 0;
         }
+
+        &__rightside {
+            margin-left: auto;
+        }
     }
 
     .grid-toolbar {
@@ -133,12 +144,6 @@
 
         .action-selectbox_custom_in-pager {
             margin-right: $offset-x-s;
-        }
-    }
-
-    .form-horizontal { //Platform override
-        .oro-items-counter {
-            display: none;
         }
     }
 }

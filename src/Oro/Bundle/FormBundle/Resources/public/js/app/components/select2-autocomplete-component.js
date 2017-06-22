@@ -49,6 +49,25 @@ define(function(require) {
             return '<%= ' + labelTpl + ' %><% if (id === null) { %>' +
                 '<span class="select2__result-entry-info"> (' + __('oro.form.add_new') + ') </span><% } %>';
         }
+    }, {
+        setSelect2ValueById: function(self, config, element, callback, id) {
+            if (config.allowCreateNew) {
+                // when it's needed to show not stored new item in the control (e.g. after failed save of form) it
+                // processes id and extracts user input value
+                var json;
+                try {
+                    json = JSON.parse(id);
+                } catch (ex) {}
+                if (_.isObject(json) && 'value' in json) {
+                    var propName = config.renderedPropertyName || 'name';
+                    var item = {id: null};
+                    item[propName] = json.value;
+                    self.handleResults(self, config, callback, [item]);
+                    return;
+                }
+            }
+            Select2AutocompleteComponent.__super__.constructor.setSelect2ValueById(self, config, element, callback, id);
+        }
     });
 
     return Select2AutocompleteComponent;

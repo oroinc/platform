@@ -6,6 +6,7 @@ use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
+use Oro\Component\MessageQueue\Job\Job;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -96,9 +97,31 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
             $integrations = $integrationRepository->getConfiguredChannelsForSync(null, true);
         }
 
+        $jobProcessor = $this->container->get('oro_message_queue.job.processor');
+        $translator = $this->container->get('translator');
+
         /* @var Integration $integration */
         foreach ($integrations as $integration) {
             $output->writeln(sprintf('Schedule sync for "%s" integration.', $integration->getName()));
+
+            // check if the integration job with `new` or `in progress` status already exists.
+            // @todo: Temporary solution. should be refacored during BAP-14803.
+            $jobName = 'oro_integration:sync_integration:'.$integration->getId();
+            $existingJob = $jobProcessor->findRootJobByJobNameAndStatuses(
+                $jobName,
+                [Job::STATUS_NEW, Job::STATUS_RUNNING]
+            );
+            if ($existingJob) {
+                $output->writeln(
+                    sprintf(
+                        'Skip new sync for "%s" integration because such job already exists with "%s" status',
+                        $integration->getName(),
+                        $translator->trans($existingJob->getStatus())
+                    )
+                );
+
+                continue;
+            }
 
             $this->getSyncScheduler()->schedule($integration->getId(), $connector, $connectorParameters);
         }

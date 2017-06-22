@@ -111,6 +111,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             'Extend\Entity\EV_Rfp_Internal_Status',
             'Oro\Bundle\WarehouseBundle\Entity\Warehouse',
             'Oro\Bundle\WebsiteBundle\Entity\Website',
+            'Extend\Entity\EV_Variant_Field_Code'
         ];
 
         return

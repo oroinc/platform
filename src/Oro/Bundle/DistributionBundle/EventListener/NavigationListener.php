@@ -5,37 +5,38 @@ namespace Oro\Bundle\DistributionBundle\EventListener;
 use Knp\Menu\ItemInterface;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
 class NavigationListener
 {
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var Request
-     */
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
+
+    /** @var Request */
     protected $request;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $entryPoint;
 
     /**
-     * @param SecurityContextInterface $securityContext
-     * @param null|string              $entryPoint
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenStorageInterface         $tokenStorage
+     * @param string|null                   $entryPoint
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage,
         $entryPoint = null
     ) {
-        $this->securityContext = $securityContext;
-        $this->entryPoint      = $entryPoint;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
+        $this->entryPoint = $entryPoint;
     }
 
     /**
@@ -52,8 +53,8 @@ class NavigationListener
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->entryPoint
-            || !$this->securityContext->getToken()
-            || !$this->securityContext->isGranted('ROLE_ADMINISTRATOR')
+            || !$this->tokenStorage->getToken()
+            || !$this->authorizationChecker->isGranted('ROLE_ADMINISTRATOR')
         ) {
             return;
         }

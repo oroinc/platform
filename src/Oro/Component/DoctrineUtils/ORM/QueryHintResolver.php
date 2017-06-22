@@ -102,7 +102,7 @@ class QueryHintResolver implements QueryHintResolverInterface
     public function addHint(Query $query, $name, $value)
     {
         if (Query::HINT_CUSTOM_TREE_WALKERS === $name) {
-            return QueryUtils::addTreeWalker($query, $value);
+            return QueryUtil::addTreeWalker($query, $value);
         }
 
         $result = false;

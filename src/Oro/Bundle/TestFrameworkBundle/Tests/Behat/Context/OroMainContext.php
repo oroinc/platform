@@ -11,19 +11,13 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-
-use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
-use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -99,7 +93,7 @@ class OroMainContext extends MinkContext implements
         }
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
+        if (preg_match('/^(?:|I )should see .+(flash message|error message)$/', $scope->getStep()->getText())) {
             return;
         }
 
@@ -245,7 +239,7 @@ class OroMainContext extends MinkContext implements
     /**
      * @param \Closure $lambda
      * @param int $timeLimit in seconds
-     * @return false|mixed Return false if closure throw error or return not true value.
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     public function spin(\Closure $lambda, $timeLimit = 60)
@@ -265,7 +259,7 @@ class OroMainContext extends MinkContext implements
             $time -= 0.25;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -372,6 +366,17 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Hover on element on page
+     * Example: When I hover on "Help Icon"
+     *
+     * @When /^(?:|I )hover on "(?P<element>[\w\s]+)"$/
+     */
+    public function iHoverOn($element)
+    {
+        $this->createElement($element)->mouseOver();
+    }
+
+    /**
      * Assert popup with large image on page
      *
      * @Then /^(?:|I )should see large image$/
@@ -427,6 +432,24 @@ class OroMainContext extends MinkContext implements
             $text,
             $element->getText(),
             sprintf('Element %s does not contains text %s', $elementName, $text)
+        );
+    }
+
+    /**
+     * Example: Then I should see that "Header" does not contain "Some Text"
+     * @Then /^I should see that "(?P<elementName>[^"]*)" does not contain "(?P<text>[^"]*)"$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementNotContainsText($elementName, $text)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement($elementName);
+        self::assertNotContains(
+            $text,
+            $element->getText(),
+            sprintf('Element %s contains text %s', $elementName, $text)
         );
     }
 
@@ -522,17 +545,13 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Assert modal window with given caption is visible
-     * Example: Then I should see "Changing Page URLs" modal window
-     *
-     * @Then /^(?:|I )should see "(?P<caption>(?:[^"]|\\")*)" modal window$/
+     * {@inheritdoc}
      */
-    public function iShouldSeeModalWindow($caption)
+    public function assertElementContainsText($element, $text)
     {
-        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
-        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
-
-        self::assertElementContainsText('div.modal .modal-header', $caption);
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+        self::assertContains($text, $elementObject->getText());
     }
 
     /**
@@ -543,8 +562,8 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
-        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
-        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         try {
             $button = $this->fixStepArgument($button);
             $modalWindow->pressButton($button);
@@ -1100,5 +1119,29 @@ class OroMainContext extends MinkContext implements
         $field->focus();
         $field->keyDown(13);
         $this->waitForAjax();
+    }
+
+    /**
+     * Use this action only for debugging
+     *
+     * This method should be used only for debug
+     * @When /^I wait for action$/
+     */
+    public function iWait()
+    {
+        fwrite(STDOUT, "Press [RETURN] to continue...");
+        fgets(STDIN, 1024);
+    }
+
+    /**
+     * Example: Given I set window size to 320x640
+     *
+     * @Given /^(?:|I )set window size to (?P<width>\d+)x(?P<height>\d+)$/
+     * @param int $width
+     * @param int $height
+     */
+    public function iSetWindowSize($width, $height)
+    {
+        $this->getSession()->resizeWindow((int)$width, (int)$height, 'current');
     }
 }

@@ -93,7 +93,7 @@ Params are:
 app/console oro:translation:load --languages=en --languages=ru --rebuild-cache
 ```
 
-oro:language:load
+oro:language:update
 --------------------
 Command  used to load translations data from CROWDIN service to DB.
 Params are:

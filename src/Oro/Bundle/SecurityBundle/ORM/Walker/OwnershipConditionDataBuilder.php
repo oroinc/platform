@@ -5,7 +5,8 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 use Doctrine\ORM\Query\AST\PathExpression;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -18,15 +19,17 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OwnershipConditionDataBuilder
 {
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var ObjectIdAccessor */
     protected $objectIdAccessor;
@@ -50,7 +53,8 @@ class OwnershipConditionDataBuilder
     protected $user = null;
 
     /**
-     * @param ServiceLink                    $securityContextLink
+     * @param AuthorizationCheckerInterface  $authorizationChecker
+     * @param TokenStorageInterface          $tokenStorage
      * @param ObjectIdAccessor               $objectIdAccessor
      * @param EntitySecurityMetadataProvider $entityMetadataProvider
      * @param MetadataProviderInterface      $metadataProvider
@@ -58,19 +62,21 @@ class OwnershipConditionDataBuilder
      * @param AclVoter                       $aclVoter
      */
     public function __construct(
-        ServiceLink $securityContextLink,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage,
         ObjectIdAccessor $objectIdAccessor,
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
         AclVoter $aclVoter = null
     ) {
-        $this->securityContextLink    = $securityContextLink;
-        $this->aclVoter               = $aclVoter;
-        $this->objectIdAccessor       = $objectIdAccessor;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
+        $this->aclVoter = $aclVoter;
+        $this->objectIdAccessor = $objectIdAccessor;
         $this->entityMetadataProvider = $entityMetadataProvider;
-        $this->metadataProvider       = $metadataProvider;
-        $this->treeProvider           = $treeProvider;
+        $this->metadataProvider = $metadataProvider;
+        $this->treeProvider = $treeProvider;
     }
 
     /**
@@ -84,8 +90,8 @@ class OwnershipConditionDataBuilder
     /**
      * Get data for query acl access level check
      *
-     * @param $entityClassName
-     * @param $permissions
+     * @param string $entityClassName
+     * @param string $permissions
      *
      * @return array Returns empty array if entity has full access,
      *               array with null values if user does't have access to the entity
@@ -119,12 +125,8 @@ class OwnershipConditionDataBuilder
                 $groupedEntityClassName = sprintf('%s@%s', $this->aclGroupProvider->getGroup(), $entityClassName);
             }
         }
-        $isGranted = $this->getSecurityContext()->isGranted(
-            $permissions,
-            new ObjectIdentity('entity', $groupedEntityClassName)
-        );
 
-        if ($isGranted) {
+        if ($this->isEntityGranted($permissions, $groupedEntityClassName)) {
             $condition = $this->buildConstraintIfAccessIsGranted(
                 $entityClassName,
                 $observer->getAccessLevel(),
@@ -135,6 +137,20 @@ class OwnershipConditionDataBuilder
         }
 
         return $condition;
+    }
+
+    /**
+     * @param string $permissions
+     * @param string $entityType
+     *
+     * @return bool
+     */
+    protected function isEntityGranted($permissions, $entityType)
+    {
+        return $this->authorizationChecker->isGranted(
+            $permissions,
+            new ObjectIdentity('entity', $entityType)
+        );
     }
 
     /**
@@ -221,7 +237,7 @@ class OwnershipConditionDataBuilder
      */
     protected function getOrganizationId(OwnershipMetadataInterface $metadata = null)
     {
-        $token = $this->getSecurityContext()->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
             return $token->getOrganizationContext()->getId();
         }
@@ -425,14 +441,6 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * @return SecurityContextInterface
-     */
-    protected function getSecurityContext()
-    {
-        return $this->securityContextLink->getService();
-    }
-
-    /**
      * @return OwnerTree
      */
     protected function getTree()
@@ -451,7 +459,7 @@ class OwnershipConditionDataBuilder
             return $this->user;
         }
 
-        $token = $this->getSecurityContext()->getToken();
+        $token = $this->tokenStorage->getToken();
         if (!$token) {
             return null;
         }

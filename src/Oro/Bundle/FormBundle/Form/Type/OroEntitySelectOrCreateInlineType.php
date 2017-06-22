@@ -13,20 +13,19 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OroEntitySelectOrCreateInlineType extends AbstractType
 {
     const NAME = 'oro_entity_create_or_select_inline';
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -38,20 +37,20 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     protected $searchRegistry;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param ConfigManager  $configManager
-     * @param EntityManager  $entityManager
-     * @param SearchRegistry $searchRegistry
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ConfigManager                 $configManager
+     * @param EntityManager                 $entityManager
+     * @param SearchRegistry                $searchRegistry
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,
         EntityManager $entityManager,
         SearchRegistry $searchRegistry
     ) {
-        $this->securityFacade = $securityFacade;
-        $this->configManager  = $configManager;
-        $this->entityManager  = $entityManager;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->configManager = $configManager;
+        $this->entityManager = $entityManager;
         $this->searchRegistry = $searchRegistry;
     }
 
@@ -177,9 +176,9 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $aclName = $options->offsetGet('create_acl');
         if (empty($aclName)) {
             $aclObjectName = 'Entity:' . $options->offsetGet('entity_class');
-            $createEnabled = $this->securityFacade->isGranted('CREATE', $aclObjectName);
+            $createEnabled = $this->authorizationChecker->isGranted('CREATE', $aclObjectName);
         } else {
-            $createEnabled = $this->securityFacade->isGranted($aclName);
+            $createEnabled = $this->authorizationChecker->isGranted($aclName);
         }
 
         return $createEnabled;

@@ -39,7 +39,7 @@ services:
     oro_tag.form.type.tag_select:
         class: %oro_tag.form.type.tag_select.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_tag.form.transformer.tag_select'
             - '@oro_tag.form.subscriber.tag_select'
         tags:
@@ -85,7 +85,7 @@ services:
         arguments:
             - %oro_tag.tag.entity.class%
             - ["name"]
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
 

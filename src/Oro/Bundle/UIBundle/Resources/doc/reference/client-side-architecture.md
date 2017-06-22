@@ -61,7 +61,7 @@ require({
 It's placed in a twig-template in order to get access to backend variables in runtime. Which is impossible to do in `requirejs.yml` file.
 
 
-##App Modules
+## App Modules
 App modules are atomic parts of general application, responsible for:
 
  * defining global view (which live beside active controller);
@@ -121,14 +121,14 @@ define([
 });
 ```
 
-##Page Controller
+## Page Controller
 Page Controller is a central part of platform's architecture. After [Chaplin.Dispatcher](http://docs.chaplinjs.org/chaplin.dispatcher.html) call the target method (which is `page#index`), Page Controller executes whole stack of page loading and triggers proper events on each stage. Page Model (`oroui/js/app/models/page-model`) is used as container for page's data and performs interactions with server (loads data on navigation, posts data on form submit). Page Controller also works with pages cache component and declares some [navigation handlers](./mediator-handlers.md#page-controller).
 
 ![Page loading flow](./page-controller.png)
 
-###Events
+### Events
 
-####Page loading stages
+#### Page loading stages
 
 Event Name | Arguments
 ---------- | ---------
@@ -138,7 +138,7 @@ Event Name | Arguments
 `'page:afterChange'` | no arguments
 `'page:redirect'` | no arguments
 
-####Page error handling
+#### Page error handling
 
 Event Name | Arguments
 ---------- | ---------

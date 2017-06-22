@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
+
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
+/**
+ * @method OroSelenium2Driver getDriver()
+ */
 class Element extends NodeElement
 {
     use AssertTrait;
@@ -97,7 +99,7 @@ class Element extends NodeElement
     /**
      * Finds label with specified locator.
      *
-     * @param string $locator label text
+     * @param string $text label text
      *
      * @return Element|null
      */
@@ -166,13 +168,17 @@ class Element extends NodeElement
     }
 
     /**
-     * Returns element's driver.
+     * Click on button or link
      *
-     * @return OroSelenium2Driver
+     * @param string $button
      */
-    protected function getDriver()
+    public function clickOrPress($button)
     {
-        return parent::getDriver();
+        if ($this->hasButton($button)) {
+            $this->pressButton($button);
+        } else {
+            $this->clickLink($button);
+        }
     }
 
     /**
@@ -197,7 +203,7 @@ class Element extends NodeElement
     /**
      * @param \Closure $lambda
      * @param int $timeLimit
-     * @return null|mixed Return false if closure throw error or return not true value.
+     * @return null|mixed Return null if closure throw error or return not true value.
      *                     Return value that return closure
      */
     protected function spin(\Closure $lambda, $timeLimit = 60)

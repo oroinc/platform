@@ -11,6 +11,10 @@ class TestBundle implements BundleInterface
 {
     protected $name;
 
+    protected $parent;
+
+    protected $path;
+
     public function __construct($name)
     {
         $this->name = $name;
@@ -70,6 +74,11 @@ class TestBundle implements BundleInterface
     {
     }
 
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+    }
+
     /**
      * Returns the bundle name that this bundle overrides.
      *
@@ -81,6 +90,12 @@ class TestBundle implements BundleInterface
      */
     public function getParent()
     {
+        return $this->parent;
+    }
+
+    public function setPath($path)
+    {
+        $this->path = $path;
     }
 
     /**
@@ -92,6 +107,7 @@ class TestBundle implements BundleInterface
      */
     public function getPath()
     {
+        return $this->path;
     }
 
     /**

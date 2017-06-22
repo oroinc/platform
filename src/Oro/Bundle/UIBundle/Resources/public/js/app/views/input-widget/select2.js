@@ -28,6 +28,10 @@ define(function(require) {
             }
         },
 
+        events: {
+            'select2-opening': 'disableKeyboard'
+        },
+
         widgetFunctionName: 'select2',
 
         destroyOptions: 'destroy',
@@ -41,7 +45,6 @@ define(function(require) {
                 var data = this.$el.data(this.widgetFunctionName);
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
-                this.disableKeyboard();
             }
         },
 
@@ -113,7 +116,7 @@ define(function(require) {
             var optionsLength = select.find('option').length;
 
             if (tools.isMobile() && (isSearchHidden || optionsLength < minimumResultsForSearch)) {
-                selectContainer.find('input').hide();
+                selectContainer.find('.select2-search, .select2-focusser').hide();
             }
         }
     });

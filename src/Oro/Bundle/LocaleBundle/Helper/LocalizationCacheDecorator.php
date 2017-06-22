@@ -144,10 +144,11 @@ class LocalizationCacheDecorator extends CacheProvider
      */
     private function serializeLocalizations($localizations)
     {
-        return array_map(function ($element) {
+        return array_map(function (Localization $element) {
             $context = SerializationContext::create()
                 ->enableMaxDepthChecks()
                 ->setSerializeNull(true);
+
             return $this->serializer->serialize($element, static::SERIALIZATION_FORMAT, $context);
         }, $localizations);
     }

@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityBundle\Event\OroEventManager;
+use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
@@ -12,18 +15,19 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Doctrine\ORM\EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $em;
 
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
+    protected $tokenStorage;
 
     /**
      * @var ResponseHistoryListener
@@ -36,7 +40,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
     protected $item;
 
     /**
-     * @var \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var ItemFactory|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $factory;
 
@@ -57,8 +61,8 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->factory         = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->factory = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $user = new User();
         $user->setEmail('some@email.com');
@@ -67,7 +71,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->any())->method('getUser')
             ->will($this->returnValue($user));
 
-        $this->securityContext->expects($this->any())->method('getToken')
+        $this->tokenStorage->expects($this->any())->method('getToken')
             ->will($this->returnValue($token));
 
         $this->item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
@@ -87,7 +91,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getDefaultRepositoryMock($this->item);
         $em         = $this->getEntityManager($repository, $eventManager);
 
-        $listener = $this->getListener($this->factory, $this->securityContext, $em);
+        $listener = $this->getListener($this->factory, $this->tokenStorage, $em);
         $listener->onResponse($this->getEventMock($this->getRequest(), $response));
     }
 
@@ -109,7 +113,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getDefaultRepositoryMock($this->item);
         $em         = $this->getEntityManager($repository);
 
-        $listener = $this->getListener($this->factory, $this->securityContext, $em);
+        $listener = $this->getListener($this->factory, $this->tokenStorage, $em);
         $listener->onResponse($this->getEventMock($this->getRequest(), $response));
     }
 
@@ -125,7 +129,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getDefaultRepositoryMock(null);
         $em         = $this->getEntityManager($repository);
 
-        $listener = $this->getListener($this->factory, $this->securityContext, $em);
+        $listener = $this->getListener($this->factory, $this->tokenStorage, $em);
         $response = $this->getResponse();
 
         $listener->onResponse($this->getEventMock($this->getRequest(), $response));
@@ -149,7 +153,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
 
         $titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
 
-        $listener = new ResponseHistoryListener($this->factory, $this->securityContext, $registry, $titleService);
+        $listener = new ResponseHistoryListener($this->factory, $this->tokenStorage, $registry, $titleService);
         $listener->onResponse($event);
     }
 
@@ -178,7 +182,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $registry->expects($this->never())->method('getManagerForClass');
 
         $titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
-        $listener = new ResponseHistoryListener($this->factory, $this->securityContext, $registry, $titleService);
+        $listener = new ResponseHistoryListener($this->factory, $this->tokenStorage, $registry, $titleService);
         $listener->onResponse($event);
     }
 
@@ -204,7 +208,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($this->item));
 
-        $listener = $this->getListener($this->factory, $this->securityContext, $em);
+        $listener = $this->getListener($this->factory, $this->tokenStorage, $em);
         $listener->onResponse($this->getEventMock($request, $response));
     }
 
@@ -290,13 +294,13 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory   $factory
-     * @param  \Symfony\Component\Security\Core\SecurityContextInterface $securityContext
-     * @param  \Doctrine\ORM\EntityManager                               $entityManager
+     * @param ItemFactory           $factory
+     * @param TokenStorageInterface $tokenStorage
+     * @param EntityManager         $entityManager
      *
      * @return ResponseHistoryListener
      */
-    private function getListener($factory, $securityContext, $entityManager)
+    private function getListener($factory, $tokenStorage, $entityManager)
     {
         $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->once())
@@ -304,7 +308,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->with('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')
             ->will($this->returnValue($entityManager));
 
-        $listener = new ResponseHistoryListener($factory, $securityContext, $registry, $this->getTitleService());
+        $listener = new ResponseHistoryListener($factory, $tokenStorage, $registry, $this->getTitleService());
         $listener->setHistoryItemEntityFQCN('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
         $listener->setUserEntityFQCN('Oro\Bundle\UserBundle\Entity\User');
         $listener->setNavigationHistoryItemType('history');

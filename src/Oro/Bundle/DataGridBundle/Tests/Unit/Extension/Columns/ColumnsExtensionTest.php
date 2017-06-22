@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Columns;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +18,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
     protected $extension;
 
     /** @var \PHPUnit_Framework_MockObject_MockBuilder */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockBuilder */
     protected $registry;
@@ -22,33 +26,19 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockBuilder */
     protected $aclHelper;
 
-    /** @var   ColumnsHelper*/
+    /** @var ColumnsHelper*/
     protected $columnsHelper;
 
     protected function setUp()
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade
-            ->expects(static::any())
-            ->method('isGranted')
-            ->will(static::returnValue(true));
-
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
         $this->columnsHelper = new ColumnsHelper();
 
         $this->extension = new ColumnsExtension(
             $this->registry,
-            $this->securityFacade,
+            $this->tokenAccessor,
             $this->aclHelper,
             $this->columnsHelper
         );
@@ -123,9 +113,8 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade
-            ->expects(static::any())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects(static::any())
+            ->method('getUser')
             ->willReturn($user);
 
         $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
@@ -208,8 +197,8 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testVisitMetadataNotCurrentUser()
     {
-        $this->securityFacade->expects($this->exactly(3))
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->exactly(3))
+            ->method('getUser')
             ->will($this->returnValue(null));
 
         $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')

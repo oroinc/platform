@@ -138,28 +138,29 @@ class WorkflowDefinitionController extends Controller
             throw new AccessDeniedException();
         }
 
-        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
-        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $form = $this->createForm(WorkflowVariablesType::NAME, null, [
-            'workflow' => $workflow,
-        ]);
+        $form = $this->createForm(WorkflowVariablesType::NAME, null, ['workflow' => $workflow]);
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
-                $translator = $this->get('translator');
                 $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
-                $this->addFlash('success', $translator->trans('oro.workflow.variable.save.success_message'));
+
+                $this->addFlash(
+                    'success',
+                    $this->get('translator')->trans('oro.workflow.variable.save.success_message')
+                );
 
                 return $this->get('oro_ui.router')->redirect($workflowDefinition);
             }
         }
 
+        $translateLinksProvider = $this->getTranslationsDatagridLinksProvider();
+
         return [
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
-            'translateLinks' => $translateLinks,
+            'translateLinks' => $translateLinksProvider->getWorkflowTranslateLinks($workflowDefinition),
         ];
     }
 

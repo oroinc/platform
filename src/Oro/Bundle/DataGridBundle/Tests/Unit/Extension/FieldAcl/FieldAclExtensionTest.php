@@ -5,50 +5,33 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\FieldAcl;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 
 class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProvider */
-    protected $ownershipMetadataProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
-    protected $entityClassResolver;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
-    protected $configProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    protected $configManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipQueryHelper */
+    protected $ownershipQueryHelper;
 
     /** @var FieldAclExtension */
     protected $extension;
 
     public function setUp()
     {
-        $this->ownershipMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->authorizationChecker = $this
-            ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
-
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->ownershipQueryHelper = $this->createMock(OwnershipQueryHelper::class);
 
         $this->extension = new FieldAclExtension(
-            $this->ownershipMetadataProvider,
-            $this->entityClassResolver,
             $this->authorizationChecker,
-            $this->configProvider
+            $this->configManager,
+            $this->ownershipQueryHelper
         );
     }
 

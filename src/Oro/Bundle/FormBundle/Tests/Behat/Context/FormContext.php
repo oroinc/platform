@@ -66,6 +66,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
+        $possibleElementName = $this->fixStepArgument($fieldName);
+        if ($this->elementFactory->hasElement($possibleElementName)) {
+            $value = $this->elementFactory->createElement($possibleElementName)->getValue();
+            self::assertEquals($fieldValue, $value);
+
+            return;
+        }
+
         $page = $this->getSession()->getPage();
         $labels = $page->findAll('css', 'label');
 
@@ -283,6 +291,28 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
         $form->uncheckUseDefaultCheckbox($label);
+    }
+
+    /**
+     * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
+     */
+    public function iUncheckElement($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isIsset(), sprintf('Element "%s" not found', $elementName));
+
+        $element->uncheck();
+    }
+
+    /**
+     * @Given /^(?:|I )check "(?P<value>[^"]*)" element$/
+     */
+    public function iCheckElement($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isIsset(), sprintf('Element "%s" not found', $elementName));
+
+        $element->check();
     }
 
     /**.

@@ -10,13 +10,26 @@ parameters:
     oro_datagrid.extension.mass_action.type.widget.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WidgetMassAction
     oro_datagrid.extension.mass_action.type.window.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WindowMassAction
     oro_datagrid.extension.mass_action.type.frontend.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\FrontendMassAction
+
 services:
+    oro_datagrid.extension.mass_action.factory:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory
+        public: false
+        arguments:
+            - '@service_container'
+
+    oro_datagrid.extension.mass_action.metadata_factory:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory
+        public: false
+        arguments:
+            - '@oro_datagrid.extension.action.metadata_factory'
+
     oro_datagrid.extension.mass_action.handler.delete:
         class: %oro_datagrid.extension.mass_action.handler.delete.class%
         arguments:
             - '@doctrine'
             - '@translator'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter'
             - '@request_stack'
             - '@oro_platform.optional_listeners.manager'

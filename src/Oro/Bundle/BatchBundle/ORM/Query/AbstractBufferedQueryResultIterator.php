@@ -5,7 +5,7 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker;
 
 abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResultIteratorInterface
@@ -154,7 +154,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
             }
 
             // make sure the query has ORDER BY clause
-            QueryUtils::addTreeWalker($this->query, PreciseOrderByWalker::class);
+            QueryUtil::addTreeWalker($this->query, PreciseOrderByWalker::class);
 
             $this->initializeQuery($this->query);
         }
@@ -176,7 +176,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
      */
     protected function cloneQuery(Query $query)
     {
-        return QueryUtils::cloneQuery($query);
+        return QueryUtil::cloneQuery($query);
     }
 
     /**

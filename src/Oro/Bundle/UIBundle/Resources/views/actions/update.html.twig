@@ -92,10 +92,10 @@
                                         <ul class="inline">
                                             {% block stats %}
                                                 {% if breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.updatedAt is defined %}
-                                                    {% if  resource_granted('VIEW', breadcrumbs.entity, 'createdAt') %}
+                                                    {% if is_granted('VIEW', breadcrumbs.entity, 'createdAt') %}
                                                         <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
                                                     {% endif %}
-                                                    {% if  resource_granted('VIEW', breadcrumbs.entity, 'updatedAt') %}
+                                                    {% if is_granted('VIEW', breadcrumbs.entity, 'updatedAt') %}
                                                         <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
                                                     {% endif %}
                                                 {% endif %}

@@ -31,7 +31,31 @@ oro_behat_extension:
       selector: 'ul li'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    MenuTree:
+      selector: 'div.jstree-wrapper'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Menu Form:
+      selector: 'div#container'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Title: 'menu_update[titles][values][default]'
+          URI: 'menu_update[uri]'
+          Icon: 'menu_update[icon]'
+          Description: 'menu_update[descriptions][values][default]'
+
   pages:
     Shortcut Actionslist:
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Page\ShortcutActionslist
       route: 'oro_shortcut_actionslist'
+
+  suites:
+    OroCommerceMenuBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+      paths:
+        - '@OroCommerceMenuBundle/Tests/Behat/Features'

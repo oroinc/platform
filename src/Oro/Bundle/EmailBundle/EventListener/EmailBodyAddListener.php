@@ -5,14 +5,15 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailBodyAddListener
 {
@@ -27,8 +28,11 @@ class EmailBodyAddListener
     /** @var EmailActivityListProvider */
     protected $activityListProvider;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var ActivityListChainProvider */
     protected $chainProvider;
@@ -37,25 +41,28 @@ class EmailBodyAddListener
     protected $entityManager;
 
     /**
-     * @param EmailAttachmentManager $attachmentManager
-     * @param ConfigProvider $configProvider
-     * @param EmailActivityListProvider $activityListProvider
-     * @param ServiceLink $securityFacadeLink
-     * @param ActivityListChainProvider $chainProvider
-     * @param EntityManager $entityManager
+     * @param EmailAttachmentManager        $attachmentManager
+     * @param ConfigProvider                $configProvider
+     * @param EmailActivityListProvider     $activityListProvider
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenStorageInterface         $tokenStorage
+     * @param ActivityListChainProvider     $chainProvider
+     * @param EntityManager                 $entityManager
      */
     public function __construct(
         EmailAttachmentManager $attachmentManager,
         ConfigProvider $configProvider,
         EmailActivityListProvider $activityListProvider,
-        ServiceLink $securityFacadeLink,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage,
         ActivityListChainProvider $chainProvider,
         EntityManager $entityManager
     ) {
         $this->attachmentManager = $attachmentManager;
         $this->configProvider = $configProvider;
         $this->activityListProvider = $activityListProvider;
-        $this->securityFacade = $securityFacadeLink->getService();
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
         $this->chainProvider = $chainProvider;
         $this->entityManager = $entityManager;
     }
@@ -65,11 +72,12 @@ class EmailBodyAddListener
      */
     public function linkToScope(EmailBodyAdded $event)
     {
-        if ($this->securityFacade->getToken() !== null
-            && !$this->securityFacade->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)
+        if (null !== $this->tokenStorage->getToken()
+            && !$this->authorizationChecker->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)
         ) {
             return;
         }
+
         $email = $event->getEmail();
         $entities = $this->activityListProvider->getTargetEntities($email);
         foreach ($entities as $entity) {

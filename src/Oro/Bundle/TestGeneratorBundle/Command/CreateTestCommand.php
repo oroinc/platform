@@ -12,6 +12,13 @@ class CreateTestCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:generate:test';
 
+    const DEFAUT_PHP_VERSION = 5.5;
+
+    const SUCCESS_MESSAGE = '<info>Test was generated successful</info>';
+
+    const CLASS_AUTOLOAD_ERROR_MESSAGE = '<error>Class not found. Please, make sure that class name is correct and '.
+    'package in which the class is declared is in the composer "require" section of current application</error>';
+
     /**
      * {@inheritdoc}
      */
@@ -44,7 +51,7 @@ class CreateTestCommand extends ContainerAwareCommand
                 sprintf('Type "%s" is not known. Supported types are: unit, entity, functional', $type)
             );
         }
-        $phpVersion = (float)$input->getArgument('php_version') ?: 5.5;
+        $phpVersion = (float)$input->getArgument('php_version') ?: self::DEFAUT_PHP_VERSION;
         /** @var AbstractTestGenerator $generator */
         $generator = $this->getContainer()->get('oro_test_generator.generator.test.'.$type);
         $generator->setPhpVersion($phpVersion);
@@ -53,7 +60,12 @@ class CreateTestCommand extends ContainerAwareCommand
             $class = str_replace('.php', '', $class);
             $class = str_replace('/', '\\', substr($class, strripos($class, '/src/') + 5));
         }
-        $generator->generate($class);
-        $output->writeln('<info>Test was generated successful</info>');
+        if (class_exists($class)) {
+            $generator->generate($class);
+            $message = self::SUCCESS_MESSAGE;
+        } else {
+            $message = self::CLASS_AUTOLOAD_ERROR_MESSAGE;
+        }
+        $output->writeln($message);
     }
 }

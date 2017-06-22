@@ -7,9 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 
 class MultipleEntityType extends AbstractType
@@ -17,17 +17,19 @@ class MultipleEntityType extends AbstractType
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param SecurityFacade $securityFacade
+     * @param DoctrineHelper                $doctrineHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(DoctrineHelper $doctrineHelper, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        AuthorizationCheckerInterface $authorizationChecker
+    ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -96,7 +98,7 @@ class MultipleEntityType extends AbstractType
         if (empty($options['add_acl_resource'])) {
             $options['allow_action'] = true;
         } else {
-            $options['allow_action'] = $this->securityFacade->isGranted($options['add_acl_resource']);
+            $options['allow_action'] = $this->authorizationChecker->isGranted($options['add_acl_resource']);
         }
 
         $this->setOptionToView($view, $options, 'allow_action');

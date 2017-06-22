@@ -10,7 +10,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 /**
  * Transforms between entity and id
@@ -23,8 +23,8 @@ class OriginTransformer implements DataTransformerInterface
     /** @var string */
     protected $className;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
@@ -32,19 +32,19 @@ class OriginTransformer implements DataTransformerInterface
     /**
      * OriginTransformer constructor.
      *
-     * @param EntityManager $em
-     * @param SecurityFacade $securityFacade
-     * @param EmailOriginHelper $emailOriginHelper
+     * @param EntityManager          $em
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param EmailOriginHelper      $emailOriginHelper
      *
      * @throws UnexpectedTypeException When $queryBuilderCallback is set and not callable
      */
     public function __construct(
         EntityManager $em,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         EmailOriginHelper $emailOriginHelper
     ) {
         $this->em = $em;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->emailOriginHelper = $emailOriginHelper;
         $this->className = EmailOrigin::class;
     }
@@ -73,18 +73,18 @@ class OriginTransformer implements DataTransformerInterface
         if (!$value) {
             return null;
         }
-        $values =  explode('|', $value);
-        if (!array_key_exists(0, $values) || !$values[0]) {
-            $origin = $this->findByOwner($this->securityFacade->getLoggedUser());
+        list($id, $email) =  array_pad(explode('|', $value), 2, null);
+        if (!$id) {
+            $origin = $this->findByOwner($this->tokenAccessor->getUser());
 
             if (!$origin) {
-                $origin = $this->createInternalOrigin($values[1]);
+                $origin = $this->createInternalOrigin($email);
             }
 
             return $origin;
         }
 
-        return $this->loadEntityById($value);
+        return $this->loadEntityById($id);
     }
 
     /**
@@ -97,8 +97,7 @@ class OriginTransformer implements DataTransformerInterface
      */
     protected function loadEntityById($id)
     {
-        $repository = $this->em->getRepository($this->className);
-        $result = $repository->find($id);
+        $result = $this->em->find($this->className, $id);
         if (!$result) {
             throw new TransformationFailedException(sprintf('The value "%s" does not exist or not unique.', $id));
         }

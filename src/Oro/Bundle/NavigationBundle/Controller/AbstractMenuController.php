@@ -32,7 +32,7 @@ abstract class AbstractMenuController extends Controller
      */
     protected function checkAcl(array $context)
     {
-        if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
+        if (!$this->isGranted('oro_navigation_manage_menus')) {
             throw $this->createAccessDeniedException();
         }
     }
@@ -292,7 +292,8 @@ abstract class AbstractMenuController extends Controller
     {
         $options = [
             MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context,
-            BuilderChainProvider::IGNORE_CACHE_OPTION => true
+            BuilderChainProvider::IGNORE_CACHE_OPTION => true,
+            BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];
         $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
         if (!count($menu->getChildren())) {
@@ -350,6 +351,6 @@ abstract class AbstractMenuController extends Controller
      */
     protected function getSavedSuccessMessage()
     {
-        return $this->get('translator')->trans('oro.navigation.menuupdate.saved_message');
+        return $this->renderView('@OroNavigation/menuUpdate/savedSuccessMessage.html.twig');
     }
 }

@@ -39,6 +39,7 @@ Feature: Show "Update Schema" button for entity fields
 
   Scenario: Update schema
     Given I click update schema
+    And I should see Schema updated flash message
     And I move backward one page
     And I should not see "Update Schema"
 
