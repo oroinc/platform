@@ -1270,9 +1270,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
-     * Hide all columns in grid except mentioned
+     * Hide all columns in datagrid except mentioned
      *
-     * @When /^I hide all columns in "(?P<datagridName>([\w\s]+))" grid except "(?P<exceptions>(?:[^"]|\\")*)" on frontend$/
+     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)" except "(?P<exceptions>(?:[^"]|\\")*)" on frontend grid$/
      *
      * @param string $exceptions
      * @param string|null $gridName
@@ -1393,7 +1393,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $gridName
      * @param string $gridColumnManager
      */
-    private function hideAllColumnsInGrid($exceptions = '', $gridName = null, $gridColumnManager = null) {
+    private function hideAllColumnsInGrid($exceptions = '', $gridName = null, $gridColumnManager = 'GridColumnManager') {
         $exceptions = explode(',', $exceptions);
         $exceptions = array_map('trim', $exceptions);
         $exceptions = array_filter($exceptions);
