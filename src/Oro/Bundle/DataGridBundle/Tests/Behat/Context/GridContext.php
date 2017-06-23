@@ -1393,7 +1393,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $gridName
      * @param string $gridColumnManager
      */
-    private function hideAllColumnsInGrid($exceptions = '', $gridName = null, $gridColumnManager = 'GridColumnManager') {
+    private function hideAllColumnsInGrid($exceptions = '', $gridName = null, $gridColumnManager = null)
+    {
+        if ($gridColumnManager === null) {
+            $gridColumnManager = 'GridColumnManager'
+        }
+
         $exceptions = explode(',', $exceptions);
         $exceptions = array_map('trim', $exceptions);
         $exceptions = array_filter($exceptions);
