@@ -87,7 +87,9 @@ class SuiteController implements Controller
             }
 
             $this->registry->registerSuiteConfiguration(
-                $name, $config['type'], $config['settings']
+                $name,
+                $config['type'],
+                $config['settings']
             );
         }
     }
@@ -101,10 +103,11 @@ class SuiteController implements Controller
         $suiteConfigurations = [];
 
         foreach ($this->suiteConfigurations as $name => $config) {
-            foreach ($this->divider->divideSuite($name, $config['settings']['paths'], $divideNumber) as $name => $paths) {
+            $dividedConfiguration = $this->divider->divideSuite($name, $config['settings']['paths'], $divideNumber);
+            foreach ($dividedConfiguration as $generatedSuiteName => $paths) {
                 $suiteConfig = $config;
                 $suiteConfig['settings']['paths'] = $paths;
-                $suiteConfigurations[$name] = $suiteConfig;
+                $suiteConfigurations[$generatedSuiteName] = $suiteConfig;
             }
         }
 
