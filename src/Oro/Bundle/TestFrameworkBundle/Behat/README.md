@@ -373,7 +373,7 @@ See [TestFrameworkBundle/Behat/ServiceContainer/config/isolators.yml](../../../B
 ##### Disable feature isolation
 
 You can disable feature isolation by adding ```--skip-isolators=database,cache``` option to behat console command.
-In this case the combination of the feature tests might run much faster, but the test logics should care about the database and cache consistency.
+In this case, the combination of the feature tests might run much faster, but the test logics should care about the database and cache consistency.
 
 ## Page Object
 
@@ -382,7 +382,7 @@ In this case the combination of the feature tests might run much faster, but the
 Elements is a service layer in behat tests. They wrap the complex business logic.
 Take a minute to investigate base Mink [NodeElement](https://github.com/minkphp/Mink/blob/9ea1cebe3dc529ba3861d87c818f045362c40484/src/Element/NodeElement.php).
 It has many public methods, some of them are applicable only to some elements.
-Every Bundle tests may contain particluar number of elements. All elements must be discribed in ```{BundleName}/Tests/Behat/behat.yml``` in a following way:
+Every Bundle tests may contain particular number of elements. All elements must be described in ```{BundleName}/Tests/Behat/behat.yml``` in the following way:
 
 ```yml
 oro_behat_extension:
@@ -397,14 +397,14 @@ oro_behat_extension:
 ```
 where:
 1. ```Login``` is an element name that MUST be unique.
- Element can be created in context by ```OroElementFactory``` by its name:
+ The element can be created in context by ```OroElementFactory``` by its name:
 
  ```php
     $this->elementFactory->createElement('Login')
  ```
 
 2. ```selector``` defines how selenium driver shall find the element on the page.
-By default, whe the selector tpe is not specified, the [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector) is used.  XPath selector is also supported and may be provided with the following configuration:
+By default, when the selector type is not specified, the [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector) is used.  XPath selector is also supported and may be provided with the following configuration:
 
  ```yml
     selector:
@@ -412,7 +412,7 @@ By default, whe the selector tpe is not specified, the [css selector](http://min
         locator: //span[id='mySpan']/ancestor::form/
  ```
 
-3. ```class``` namespace for element's class that must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```.
+3. the ```class``` namespace for element's class (must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```).
 When omitted, the ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` class is used by default.
 
 4. ```options``` is an array of additional options that will be stored in ```options``` property of Element class.
@@ -420,7 +420,7 @@ It is highly recommended to supply a class with options mapping for the form ele
 
 ### Mapping Form Fields
 
-By default, tests use the [named field selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#named-selectors) to map form fields. Name field selector searched for the field by its id, name, label or placeholder. You are free to use any selector for form fields mapping, or wrap an element into the particular behat element.
+By default, tests use the [named field selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#named-selectors) to map form fields. Name field selector searched for the field by its id, name, label or placeholder. You are free to use any selector for form fields mapping or wrap an element into the particular behat element.
 
 behat.yml
 ```yml
@@ -547,7 +547,7 @@ Now you can use several meaningful steps:
 
 Every time when behat runs a new feature, application state is reset to default 
 (see [Feature isolation](./behat-tests.md#feature-isolation) for more information): 
-there is only one admin user, one organization, one business unit and default roles in database.
+there is only one admin user, one organization, one business unit and default roles in the database.
 
 The feature tests must rely on data that is available in the application after the oro:install command execution.
 In most cases, this is not enough.
@@ -556,8 +556,8 @@ Thereby you have two ways to get more data in the system: using inline fixtures,
 ### Inline fixtures
 
 You can create any number of any entities in the feature tests.
-The ```FixtureContext``` guesses the entity class, creates the necessary number of objects
-and uses [faker](https://github.com/fzaninotto/faker) to fill in the required fields when their value was not specified explicitely.
+The ```FixtureContext``` guesses the entity class, creates the necessary number of objects,
+and uses [faker](https://github.com/fzaninotto/faker) to fill in the required fields when their value was not specified explicitly.
 You use both [faker](https://github.com/fzaninotto/faker) and [entity references](#Entity references) in inline fixtures.
 
 ```yml
@@ -579,7 +579,7 @@ You use both [faker](https://github.com/fzaninotto/faker) and [entity references
 ### Alice fixtures
 
 Sometimes you need many different entities with complex relationships.
-In such cases you can use alice fixtures.
+In such cases, you can use alice fixtures.
 Alice is a library that allows you easily create fixtures in yml format.
 See [Alice Documentation](https://github.com/nelmio/alice/blob/2.x/README.md).
 
@@ -631,7 +631,7 @@ A feature starts with the following:
 * The ```Feature:``` keyword and feature name (these should stay on the same line),
 * An optional description (can be formatted as multiple lines). Having meaningful description is highly recommended. 
 
-Next goes the feature scenario - specific example that illustrates a business rule and consists of a sequential steps.
+Next goes the feature scenario - specific example that illustrates a business rule and consists of sequential steps.
 In addition to being a test specification and test documentation, a scenario defines the test steps and serves as an executable specification of the system.
 
 Normally, a step starts with ***Given***, ***When***, or ***Then***.
@@ -676,7 +676,7 @@ Scenario Outline: Fail login
 3. The line ```Scenario: Success login``` starts the scenario and provides a description of the scenario.
 4. The next 6 lines are the scenario steps. Every step is matched to a regular expression that is defined in the Context.
 5. The line ```Scenario Outline: Fail login``` starts the next scenario.
-  In the scenario outline, the placeholders are used instead of the actual values, and the values for scenario execution are provided as a set of examples below he outline. Scenario Outlines helps you run these steps several time, iterating through the values provided in the ```Examples:``` section and thus testing the same flow with different input.  
+  In the scenario outline, the placeholders are used instead of the actual values, and the values for scenario execution are provided as a set of examples below the outline. Scenario Outlines helps you run these steps several times, iterating through the values provided in the ```Examples:``` section and thus testing the same flow with different input.  
   The Scenario Outline is a template which is never run on its own.
   Instead, a Scenario that follows an outline runs once for each row in the Examples section beneath it (except for the first header row that is skipped).
   Think of a placeholder as of a variable.
@@ -688,11 +688,11 @@ Scenario Outline: Fail login
 ### Increase application performance (Ubuntu)
 
 In behat we have such isolators ([see Feature isolation](#Feature isolation)) to make behat features independent to each other.
-One of that isolator is database.
-It create database dump before start execution, then drop and restore from dump after each feature.
-This can take a while. In modern PC it can take up to 2 minutes.
+One of those isolators is a database.
+It creates database dump before start execution, then drops it and restores it from dump after each feature.
+This can take a while (up to 2 minutes).
 If you run behat tests often you would like to decrease this time.
-To boost database isolator you can mount database directory to ram.
+To boost database isolator you can mount database directory to RAM.
 We will use [tmpfs](https://en.wikipedia.org/wiki/Tmpfs)
 
 Create a tmpfs directory:
@@ -741,7 +741,7 @@ sudo service mysql start
 
 #### (optional) Create startup script
 
-After you restart the applicance, all the data and the database structure is lost. You should copy data directory manually after every start. Alternatively, you can create a startup script that may be launched automatically as a systemd service.
+After you restart the application, all the data and the database structure is lost. You should copy data directory manually after every start. Alternatively, you can create a startup script that may be launched automatically as a systemd service.
 
 To prepare for auto-recovery using a startup script:
 
@@ -811,22 +811,22 @@ Oro\Bundle\UserBundle\Entity\User:
 ### Append snippets
 
 The feature development consists of the following design stages:
-- Create a feature draft - implement a high level scenario that covers the story.
-  At this stage, you should have clear understanding of the business outcome that is achieved by the feature test automation.
+- Create a feature draft - implement a high-level scenario that covers the story.
+  At this stage, you should have a clear understanding of the business outcome that is achieved by the feature test automation.
 - Specify all the scenarios that may happen when using the feature. Exact steps are steel not necessary.
 - Finalize the big picture of the implementation and plan the individual steps.
 
-Some of steps may be already fully automated. Ideally, you should automate the missing steps after you plan using them in your feature test scenarios. If feature functionality is already implemented, it is necessary to implement the behat steps involved in the feature testing. However, sometimes it is impossible to do right away (because of the incomplete feature implementation, blocking issues or missing imformation).
+Some of the steps may be already fully automated. Ideally, you should automate the missing steps after you plan using them in your feature test scenarios. If feature functionality is already implemented, it is necessary to implement the behat steps involved in the feature testing. However, sometimes it is impossible to do right away (because of the incomplete feature implementation, blocking issues or missing information).
 
-In this case you can temporarily mock the steps that are missing implementation. 
+In this case, you can temporarily mock the steps that are missing implementation. 
 
-A quick way to do so is to do a dry-run of your feature tests. In console, run the following command:
+A quick way to do so is to do a dry-run of your feature tests. In the console, run the following command:
 
 ```bash
 bin/behat path/to/your.feature --dry-run --append-snippets --snippets-type=regex
 ```
 
-The featue is executed in the *--dry-run* mode, and at the final stage of execution you are prompted to add undefined steps mock implementation to one of existing contexts.
+The featue is executed in the *--dry-run* mode, and at the final stage of execution you are prompted to add undefined steps mock implementation to one of the existing contexts.
 
 ### How to find the necessary step
 
@@ -852,7 +852,7 @@ Get the list of implemented contexts and find the necessary one by name.
 ![Context implements interface](./doc/images/context_implements_interface.png)
 ![Find context file](./doc/images/find_context.png)
 
-Usually the name of context is self explanatory, e.g. GridContext, FormContext, ACLContext etc.
+Usually, the name of context is self-explanatory, e.g. GridContext, FormContext, ACLContext etc.
 
 #### Use Grep in Console
 
