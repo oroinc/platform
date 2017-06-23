@@ -186,6 +186,9 @@ NavigationBundle
     - changed the constructor signature: parameter `Router $router` was replaced with `RouterInterface $router`
 - Class `Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder`
     - method `setOptions` was renamed to `setConfigManager`
+- Service `oro_navigation.item.pinbar.post_persist_listener` was changed from `doctrine.event_listener` to `doctrine.orm.entity_listener`
+    - method `setClassName` was removed.
+    - method `postPersist` had additional argument `AbstractPinbarTab $pinbarTab`
 
 OrganizationBundle
 ------------------
