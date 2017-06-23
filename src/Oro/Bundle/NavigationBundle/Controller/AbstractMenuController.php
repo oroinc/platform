@@ -292,7 +292,8 @@ abstract class AbstractMenuController extends Controller
     {
         $options = [
             MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context,
-            BuilderChainProvider::IGNORE_CACHE_OPTION => true
+            BuilderChainProvider::IGNORE_CACHE_OPTION => true,
+            BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];
         $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
         if (!count($menu->getChildren())) {
