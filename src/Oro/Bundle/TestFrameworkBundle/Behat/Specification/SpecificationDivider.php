@@ -38,7 +38,6 @@ class SpecificationDivider
 
         $featureFiles = $this->getFeaturesList($paths);
         $chunks = array_chunk((array) $featureFiles, $divider);
-
         foreach ($chunks as $index => $chunk) {
             $generatedSuiteName = $suiteName.'#'.$index;
             $generatedSuites[$generatedSuiteName] = $chunk;
@@ -53,10 +52,16 @@ class SpecificationDivider
      */
     private function getFeaturesList(array $paths)
     {
+        if (!$paths) {
+            return [];
+        }
+
         $finder = Finder::create()->files()->name('*.feature');
 
         foreach ($paths as $path) {
-            $finder->in($path);
+            if (is_dir($path) || is_file($path)) {
+                $finder->in($path);
+            }
         }
 
         $files = [];

@@ -4,6 +4,7 @@ services:
         arguments:
             - '@suite.registry'
             - '%suite.configurations%'
+            - '@oro_behat_extension.specification.specification_divider'
         tags:
             - { name: cli.controller, priority: 1100 }
 

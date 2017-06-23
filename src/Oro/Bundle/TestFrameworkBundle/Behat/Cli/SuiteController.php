@@ -106,6 +106,7 @@ class SuiteController implements Controller
             $dividedConfiguration = $this->divider->divideSuite($name, $config['settings']['paths'], $divideNumber);
             foreach ($dividedConfiguration as $generatedSuiteName => $paths) {
                 $suiteConfig = $config;
+                $suiteConfig['type'] = null;
                 $suiteConfig['settings']['paths'] = $paths;
                 $suiteConfigurations[$generatedSuiteName] = $suiteConfig;
             }
