@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 class Configuration implements ConfigurationInterface
 {
@@ -131,6 +130,9 @@ class Configuration implements ConfigurationInterface
         $configTreeBuilder = new TreeBuilder();
         $configNode = $configTreeBuilder->root('config');
         $configNode->info('Layout theme additional config')->end();
+        // Allow extra configuration keys to be present in this configuration node.
+        // This is needed to give other bundles ability to declare and add custom configuration.
+        $configNode->ignoreExtraKeys(false);
 
         $node
             ->useAttributeAsKey('theme-identifier')
