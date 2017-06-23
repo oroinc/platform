@@ -6,12 +6,10 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,11 +28,6 @@ class StorageDataCollector
     protected $doctrineHelper;
 
     /**
-     * @var AclHelper
-     */
-    protected $aclHelper;
-
-    /**
      * @var EntityPaginationStorage
      */
     protected $storage;
@@ -47,21 +40,18 @@ class StorageDataCollector
     /**
      * @param ServiceLink $dataGridManagerLink Link Used instead of manager because of performance reasons
      * @param DoctrineHelper $doctrineHelper
-     * @param AclHelper $aclHelper
      * @param EntityPaginationStorage $storage
      * @param EntityPaginationManager $paginationManager
      */
     public function __construct(
         ServiceLink $dataGridManagerLink,
         DoctrineHelper $doctrineHelper,
-        AclHelper $aclHelper,
         EntityPaginationStorage $storage,
         EntityPaginationManager $paginationManager
     ) {
         $this->datagridManagerLink = $dataGridManagerLink;
-        $this->doctrineHelper    = $doctrineHelper;
-        $this->aclHelper         = $aclHelper;
-        $this->storage           = $storage;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->storage = $storage;
         $this->paginationManager = $paginationManager;
     }
 
@@ -79,23 +69,14 @@ class StorageDataCollector
         $isDataCollected = false;
 
         foreach ($this->getGridNames($request) as $gridName) {
-            try {
-                // datagrid manager automatically extracts all required parameters from request
-                $dataGrid = $this->datagridManagerLink
-                    ->getService()
-                    ->getDatagridByRequestParams(
-                        $gridName,
-                        [
-                            Manager::REQUIRE_ALL_EXTENSIONS => false,
-                            self::PAGINGATION_PARAM => true
-                        ]
-                    );
-            } catch (\RuntimeException $e) {
-                // processing of invalid grid names
-                continue;
-            }
-
-            if (!$this->paginationManager->isDatagridApplicable($dataGrid)) {
+            $dataGrid = $this->getGrid(
+                $gridName,
+                [
+                    Manager::REQUIRE_ALL_EXTENSIONS => false,
+                    self::PAGINGATION_PARAM => true
+                ]
+            );
+            if (null === $dataGrid || !$this->paginationManager->isDatagridApplicable($dataGrid)) {
                 continue;
             }
 
@@ -104,19 +85,25 @@ class StorageDataCollector
 
             // if entities are not in storage
             if (!$this->storage->hasData($entityName, $stateHash, $scope)) {
-                $entitiesLimit = $this->getEntitiesLimit();
-                $totalCount = $this->getTotalCount($dataGrid, $scope);
+                $initialScope = $dataGrid->getScope();
+                $dataGrid->setScope($scope);
+                try {
+                    $entitiesLimit = $this->getEntitiesLimit();
+                    $totalCount = $this->getTotalCount($dataGrid, $scope);
 
-                // if grid contains allowed number of entities
-                if ($totalCount <= $entitiesLimit) {
-                    /** @var OrmDatasource $dataSource */
-                    $dataSource = $dataGrid->getDatasource();
-                    // collect and set entity IDs
-                    $entityIds = $this->getAllEntityIds($dataSource, $scope);
-                    $this->storage->setData($entityName, $stateHash, $entityIds, $scope);
-                } else {
-                    // set empty array as a sign that data is collected, but pagination itself must be disabled
-                    $this->storage->setData($entityName, $stateHash, [], $scope);
+                    // if grid contains allowed number of entities
+                    if ($totalCount <= $entitiesLimit) {
+                        /** @var OrmDatasource $dataSource */
+                        $dataSource = $dataGrid->getDatasource();
+                        // collect and set entity IDs
+                        $entityIds = $this->getAllEntityIds($dataSource, $scope);
+                        $this->storage->setData($entityName, $stateHash, $entityIds, $scope);
+                    } else {
+                        // set empty array as a sign that data is collected, but pagination itself must be disabled
+                        $this->storage->setData($entityName, $stateHash, [], $scope);
+                    }
+                } finally {
+                    $dataGrid->setScope($initialScope);
                 }
             }
 
@@ -133,7 +120,6 @@ class StorageDataCollector
      */
     protected function getAllEntityIds(OrmDatasource $dataSource, $scope)
     {
-        $permission = EntityPaginationManager::getPermission($scope);
         $entityName = $this->getEntityName($dataSource);
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
 
@@ -141,13 +127,11 @@ class StorageDataCollector
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults($this->getEntitiesLimit());
 
-        $query = $this->aclHelper->apply($queryBuilder, $permission);
-        $results = $query->execute();
+        $results = $dataSource->getResults();
 
         $entityIds = [];
         foreach ($results as $result) {
-            $record = new ResultRecord($result);
-            $entityIds[] = $record->getValue($entityIdentifier);
+            $entityIds[] = $result->getValue($entityIdentifier);
         }
 
         return $entityIds;
@@ -210,6 +194,28 @@ class StorageDataCollector
     protected function getEntitiesLimit()
     {
         return $this->paginationManager->getLimit();
+    }
+
+    /**
+     * @param string $name
+     * @param array  $parameters
+     *
+     * @return DatagridInterface|null
+     */
+    protected function getGrid($name, array $parameters)
+    {
+        /** @var Manager $manager */
+        $manager = $this->datagridManagerLink->getService();
+
+        $dataGrid = null;
+        try {
+            // datagrid manager automatically extracts all required parameters from request
+            $dataGrid = $manager->getDatagridByRequestParams($name, $parameters);
+        } catch (\RuntimeException $e) {
+            // processing of invalid grid names
+        }
+
+        return $dataGrid;
     }
 
     /**
