@@ -72,6 +72,14 @@ oro_behat_extension:
       selector: 'div.filter-container div.datagrid-manager div.dropdown-menu'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager
 
+    FrontendGridColumnManagerButton:
+      selector: 'div.datagrid-manager.dropdown a'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    FrontendGridColumnManager:
+      selector: 'div.datagrid-manager div.dropdown-menu'
+      class: Oro\Bundle\CustomerBundle\Tests\Behat\Element\FrontendGridColumnManager
+
     GridColumnManagerTable:
       selector: 'div.column-manager-table'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table

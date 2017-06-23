@@ -1258,21 +1258,29 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I) hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in grid$/
-     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"/
+     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"$/
      *
      * @param string $exceptions
      * @param string|null $gridName
      */
     public function iHideAllColumnsInGrid($exceptions = '', $gridName = null)
     {
-        $exceptions = explode(',', $exceptions);
-        $exceptions = array_map('trim', $exceptions);
-        $exceptions = array_filter($exceptions);
+        $this->hideAllColumnsInGrid($exceptions, $gridName);
+    }
 
-        $columnManager = $this->getGridColumnManager($this->getGrid($gridName));
-        $columnManager->open();
-        $columnManager->hideAllColumns($exceptions);
-        $columnManager->close();
+    //@codingStandardsIgnoreStart
+    /**
+     * Hide all columns in grid except mentioned
+     *
+     * @When /^I hide all columns in "(?P<datagridName>([\w\s]+))" grid except "(?P<exceptions>(?:[^"]|\\")*)" on frontend$/
+     *
+     * @param string $exceptions
+     * @param string|null $gridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iHideAllColumnsInFrontendDatagrid($exceptions = '', $gridName = null)
+    {
+        $this->hideAllColumnsInGrid($exceptions, $gridName, 'FrontendGridColumnManager');
     }
 
     /**
@@ -1380,6 +1388,23 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Hide columns in column manager for datagrid
+     * @param string $exceptions
+     * @param string $gridName
+     * @param string $gridColumnManager
+     */
+    private function hideAllColumnsInGrid($exceptions = '', $gridName = null, $gridColumnManager = null) {
+        $exceptions = explode(',', $exceptions);
+        $exceptions = array_map('trim', $exceptions);
+        $exceptions = array_filter($exceptions);
+
+        $columnManager = $this->getGridColumnManager($this->getGrid($gridName), $gridColumnManager);
+        $columnManager->open();
+        $columnManager->hideAllColumns($exceptions);
+        $columnManager->close();
+    }
+
+    /**
      * @param string $stringNumber
      *
      * @return int
@@ -1432,9 +1457,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param GridInterface|Element $grid
      * @return GridColumnManager|Element
      */
-    private function getGridColumnManager($grid)
+    private function getGridColumnManager($grid, $element = 'GridColumnManager')
     {
-        return $this->createElement($grid->getMappedChildElementName('GridColumnManager'));
+        return $this->createElement($grid->getMappedChildElementName($element));
     }
 
     /**
