@@ -1396,7 +1396,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     private function hideAllColumnsInGrid($exceptions = '', $gridName = null, $gridColumnManager = null)
     {
         if ($gridColumnManager === null) {
-            $gridColumnManager = 'GridColumnManager'
+            $gridColumnManager = 'GridColumnManager';
         }
 
         $exceptions = explode(',', $exceptions);
