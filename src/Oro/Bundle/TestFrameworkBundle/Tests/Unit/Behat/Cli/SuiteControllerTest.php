@@ -23,7 +23,6 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
      */
     public static function initialClassSetup()
     {
-        var_dump('before class');
         mkdir(sys_get_temp_dir().self::$featuresDir);
 
         self::createFeatures(10, sys_get_temp_dir().self::$featuresDir10);
@@ -44,7 +43,6 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
      */
     public static function finalClassTeardown()
     {
-        var_dump('afterTest');
         $dir = sys_get_temp_dir().self::$featuresDir;
         self::delTree($dir);
     }
