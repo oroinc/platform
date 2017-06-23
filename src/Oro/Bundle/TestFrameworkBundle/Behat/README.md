@@ -113,12 +113,12 @@ This section summarizes limitations and agreements that are important for shared
   ```gherkin
       And I open User Index page
   ```
-- **Avoid scenario redundancy** (e.g. repeating same sequence of steps, like login, in multiple scenarios). Cover the feature with the sequential scenarios where every following scenario reuses outcomes (the states and data) prepared by their predecessors. This path was chosen because of the following benefits:
+- **Avoid scenario redundancy** (e.g. repeating the same sequence of steps, like login, in multiple scenarios). Cover the feature with the sequential scenarios where every following scenario reuses outcomes (the states and data) prepared by their predecessors. This path was chosen because of the following benefits:
 
-  - Faster scenario execution due to the shared user session and smart data preparation. The login action in the initial scenario opens the session that is reusable by the following scenarios. Preliminary scenraios (e.g. create) prepare data for the following scenarios (e.g. delete).
+  - Faster scenario execution due to the shared user session and smart data preparation. The login action in the initial scenario opens the session that is reusable by the following scenarios. Preliminary scenarios (e.g. create) prepare data for the following scenarios (e.g. delete).
   - Feature level isolation boosts execution speed, especially in the slow test environments.
   - Minimized routine development actions (e.g. you don't have to load fixtures for every scenario; instead, you reuse the available outcomes of the previous scenarios).
-  - Easily handle the application states that is difficult to emulate with data fixtures only (e.g. when adding new entity fields in the UI).
+  - Easy handling of the application states that are difficult to emulate with data fixtures only (e.g. when adding new entity fields in the UI).
 
   By coupling scenarios, the ease of debugging and bug localization get sacrificed. It is difficult to debug UI features and the scenarios that happen after several preliminary scenarios. The longer the line, the harder it is to isolate the issue. See [Feature debugging](#feature-debugging) for more information. Once the issue occurs, you have to spend additional time to localize it and identify the root cause (e.g. the delete scenario may be malfunctioning vs the delete scenario may fail due to the issues in the preliminary scenario, for example, create). The good point is that the most critical actions/scenarios usually precede the less critical. Who cares about the delete if the create does not work in the first place? ;)
 
@@ -139,13 +139,13 @@ This section summarizes limitations and agreements that are important for shared
 #### Application Configuration
 
 Use default configuration for the application installed in production mode.
-If you don't have any mail server configured locally, set ```mailer_transport``` setting in *parameters.yml* to ```null```.
+If you don't have any mail server configured locally, set the ```mailer_transport``` setting in *parameters.yml* to ```null```.
 
 #### Behat Configuration
 
-Base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
+The base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
 Every application has its own behat.yml.dist file in the root of the application directory.
-Create your ```behat.yml```(it is ignored by git automatically and is never commited to the remote repository), import base configuration and change it to fit your environment:
+Create your ```behat.yml```(it is ignored by git automatically and is never committed to the remote repository), import base configuration and change it to fit your environment:
 
 ```yaml
 imports:
@@ -180,11 +180,11 @@ composer install
 
 #### Application Initial State
 
-In Oro application, initial state is the one application enters after installation without demo data.
+In Oro application, the initial state is the one application enters after installation without demo data.
 
 Scenarios that test features should rely on this state and should create any data that is necessary for additional verifications.
 
-Data may be created by the steps of the sceario or as [fixtures](#fixtures).
+Data may be created by the steps of the scenario or as [fixtures](#fixtures).
 
 Install application without demo data in production mode using the following command:
 
@@ -210,7 +210,7 @@ sudo ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/p
 
 **Note:** These commands create a subdirector for phantomjs in your home directory, downloads phantomjs into directory that you just created, uncompress files, creates symbolic link.
 
-After the command execution is complete, you can use ```phantomjs``` in terminal.
+After the command execution is complete, you can use ```phantomjs``` in the terminal.
 
 To install Selenium Web Driver, use the following commands:
 
@@ -247,9 +247,9 @@ java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-se
 
 #### Run tests
 
-Before you begin, it is highly recommended to make yourself familiar with behat arguments and options. Run ```bin/behat --help``` for detailed description.
+Before you begin, it is highly recommended to make yourself familiar with behat arguments and options. Run ```bin/behat --help``` for a detailed description.
 
-When the Oro application is installed without demo data and is running, and the PhantomJs or Selenium Server is running, you can start runing the behat tests by feature from the root of the application.
+When the Oro application is installed without demo data and is running, and the PhantomJs or Selenium Server is running, you can start running the behat tests by feature from the root of the application.
 
 You may use one of the following commands.
 
@@ -287,7 +287,7 @@ bin/behat -s OroUserBundle
 
 ### DI Containers
 
-Behat is a symfony console application with it's own container and services. Behat container may be configured through Extensions using *behat.yml* in the root of the application directory.
+Behat is a symfony console application with its own container and services. Behat container may be configured through Extensions using *behat.yml* in the root of the application directory.
 
 Application container may be used by injected Kernel in your Context after you implement ```KernelAwareContext``` and use ```KernelDictionary``` trait.
 
@@ -323,8 +323,8 @@ oro_behat_extension:
 
 ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used for building testing suites.
 
-During initialization, extension creates test suite with a bundle name if any ```Tests/Behat/Features``` directory exits in a bundle.
-Thus, if bundle has no Features directory - no test suite would be created for it.
+During initialization, extension creates a test suite with a bundle name if any ```Tests/Behat/Features``` directory exists in a bundle.
+Thus, if the bundle has no Features directory - no test suite would be created for it.
 
 If you need some specific feature steps for your bundle, create the ```AcmeDemoBundle\Tests\Behat\Context\FeatureContext``` class.
 This context is added to the suite with other common contexts.
@@ -365,26 +365,24 @@ Manually configured test suits are not autoloaded by the extension.
 
 ### Feature isolation
 
-Every feature can interact with application, perform CRUD operation and thereby the database can be modified.
-So, it is why features are isolated to each other.
-The isolation is reached by dumping the database and cache dir before tests execution
-and restoring the cache and database after execution of each feature.
+Every feature can interact with the application and perform CRUD operations. As a result, the database may be modified. To avoid data collisions, the features are isolated: the database and cache directories are dumped before running the feature tests; they are restored after the feature tests execution is complete.
+
 Every isolator must implement ```Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface``` and ```oro_behat.isolator``` tag with priority.
 See [TestFrameworkBundle/Behat/ServiceContainer/config/isolators.yml](../../../Behat/ServiceContainer/config/isolators.yml)
 
 ##### Disable feature isolation
 
-You can disable feature isolation by adding ```--skip-isolators=database,cache``` option to behat console command
-In this case feature should run much faster, but you should care by yourself about database and cache consistency.
+You can disable feature isolation by adding ```--skip-isolators=database,cache``` option to behat console command.
+In this case the combination of the feature tests might run much faster, but the test logics should care about the database and cache consistency.
 
 ## Page Object
 
 ### Elements
 
-Elements is a service layer in behat tests. They wrap all difficult business logic.
+Elements is a service layer in behat tests. They wrap the complex business logic.
 Take a minute to investigate base Mink [NodeElement](https://github.com/minkphp/Mink/blob/9ea1cebe3dc529ba3861d87c818f045362c40484/src/Element/NodeElement.php).
-It has many public methods, not all of that is applicable for any element.
-Every Bundle can have own number of elements. All elements must be discribed in ```{BundleName}/Tests/Behat/behat.yml``` in a way:
+It has many public methods, some of them are applicable only to some elements.
+Every Bundle tests may contain particluar number of elements. All elements must be discribed in ```{BundleName}/Tests/Behat/behat.yml``` in a following way:
 
 ```yml
 oro_behat_extension:
@@ -397,17 +395,16 @@ oro_behat_extension:
           Username: '_username'
           Password: '_password'
 ```
-
+where:
 1. ```Login``` is an element name that MUST be unique.
- Element can be created in context by ```OroElementFactory``` by it's name:
+ Element can be created in context by ```OroElementFactory``` by its name:
 
  ```php
     $this->elementFactory->createElement('Login')
  ```
 
-2. ```selector``` this is how selenium driver can found element on the page.
-By default it use [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector),
-but it also can use xpath:
+2. ```selector``` defines how selenium driver shall find the element on the page.
+By default, whe the selector tpe is not specified, the [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector) is used.  XPath selector is also supported and may be provided with the following configuration:
 
  ```yml
     selector:
@@ -415,17 +412,15 @@ but it also can use xpath:
         locator: //span[id='mySpan']/ancestor::form/
  ```
 
-3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
-You can omit class, if so ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` will use by default.
-4. ```options``` it's an array of extra options that will be set in options property of Element class
-5. For the forms you can, and obviously should, add mapping option.
-   It will increase test speed and map form more accurately.
+3. ```class``` namespace for element's class that must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```.
+When omitted, the ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` class is used by default.
 
-### Form Mappings
+4. ```options``` is an array of additional options that will be stored in ```options``` property of Element class.
+It is highly recommended to supply a class with options mapping for the form elements. This will increase test speed and ensure more accurate fields mapping.
 
-By default for mapping forms [named field selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#named-selectors) used,
-that search fields by its id, name, label or placeholder.
-You free to use any of selectors for form mappings, as well as wrap element into concrete behat element
+### Mapping Form Fields
+
+By default, tests use the [named field selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#named-selectors) to map form fields. Name field selector searched for the field by its id, name, label or placeholder. You are free to use any selector for form fields mapping, or wrap an element into the particular behat element.
 
 behat.yml
 ```yml
@@ -443,7 +438,7 @@ oro_behat_extension:
             locator: '//div[@id[starts-with(.,"uniform-oro_payment_methods_configs_rule_method")]]'
             element: Payment Method Config Type Field
 ```
-Now you should implement Element ```setValue``` method
+Now you should implement the element's ```setValue``` method:
 
 ```php
 <?php
@@ -469,7 +464,8 @@ class PaymentMethodConfigType extends Element
 }
 ```
 
-Now you can just use it in standard step:
+Now you can use it in a standard step:
+
 ```gherkin
 Feature: Payment Rules CRUD
   Scenario: Creating Payment Rule
@@ -482,9 +478,10 @@ Feature: Payment Rules CRUD
 
 ### Embedded Form Mappings
 
-It's common happens that form appears in iframe.
-Behat can switch to iframe by it's id.
-For the appropriate filling the form in iframe you should to specify iframe id in form options:
+Sometimes, a form appears in the iframe.
+Behat can switch to the iframe by its id.
+To fill in the form in the iframe correctly, specify iframe id in the form options:
+
 ```yml
 oro_behat_extension:
   elements:
@@ -500,9 +497,11 @@ oro_behat_extension:
 
 ### Page element
 
-Page element encapsulate whole web page with it's url and path to this page.
-Every Page element should extends from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Page```
-Typical Page config is looks like:
+Page element encapsulates entire web page with its url and path to the page.
+Every Page element should extend from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Page```.
+
+Typical Page configuration:
+
 ```yml
 oro_behat_extension:
   pages:
@@ -510,7 +509,9 @@ oro_behat_extension:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
       route: 'oro_user_profile_view'
 ```
-And Page class:
+
+Sample Page class:
+
 ```php
 <?php
 
@@ -533,7 +534,7 @@ class UserProfileView extends Page
 }
 ```
 
-Now you can use several useful steps:
+Now you can use several meaningful steps:
 
 ```gherkin
     And I open User Profile View page
@@ -544,20 +545,20 @@ Now you can use several useful steps:
 
 ### Feature fixtures
 
-Every time when behat run new feature, application state will reset to default.
-(See [Feature isolation](./behat-tests.md#feature-isolation))
-This mean that there are only one admin user, organization, business unit and default roles in database.
-Your feature must based on data that has application after oro:install command.
-But this is not enough in most cases.
-Thereby you have two ways to get more data in the system - inline fixtures and alice fixtures.
+Every time when behat runs a new feature, application state is reset to default 
+(see [Feature isolation](./behat-tests.md#feature-isolation) for more information): 
+there is only one admin user, one organization, one business unit and default roles in database.
+
+The feature tests must rely on data that is available in the application after the oro:install command execution.
+In most cases, this is not enough.
+Thereby you have two ways to get more data in the system: using inline fixtures, or alice fixtures.
 
 ### Inline fixtures
 
-You can create any number of any entities right in the feature.
-```FixtureContext``` will guess entity class, create necessary number of objects
-and fill required fields, that was not specified, by [faker](https://github.com/fzaninotto/faker).
-You can use [faker](https://github.com/fzaninotto/faker)
-and [entity references](#Entity references) in inline fixtures.
+You can create any number of any entities in the feature tests.
+The ```FixtureContext``` guesses the entity class, creates the necessary number of objects
+and uses [faker](https://github.com/fzaninotto/faker) to fill in the required fields when their value was not specified explicitely.
+You use both [faker](https://github.com/fzaninotto/faker) and [entity references](#Entity references) in inline fixtures.
 
 ```yml
   Given the following contacts:
@@ -577,41 +578,43 @@ and [entity references](#Entity references) in inline fixtures.
 
 ### Alice fixtures
 
-Sometimes you need create too much different entities with complex relationships.
+Sometimes you need many different entities with complex relationships.
 In such cases you can use alice fixtures.
 Alice is a library that allows you easily create fixtures in yml format.
 See [Alice Documentation](https://github.com/nelmio/alice/blob/2.x/README.md).
 
-Fixtures should be located in ```{BundleName}/Tests/Behat/Features/Fixtures``` directory.
-For load fixture before feature add tag with fixture file name and ```@fixture-``` prefix e.g. ```@fixture-mass_action.yml```
+Fixtures should be located in the ```{BundleName}/Tests/Behat/Features/Fixtures``` directory.
+For load a fixture before the feature tests execution, add a tag (annotation) that is constructed using the following convention: prefix the fixture file name with ```@fixture-```, e.g. ```@fixture-mass_action.yml```.
 
 ```gherkin
 @fixture-mass_action.yml
 Feature: Mass Delete records
 ```
 
-Also it is possible to load fixtures for other bundles using shortcut syntax ```@fixture-OroOrganizationBundle:BusinessUnit.yml```
+It is also possible to load fixtures for other bundles using the following shortcut syntax: ```@fixture-OroOrganizationBundle:BusinessUnit.yml```
 
+For example:
 ```gherkin
 @fixture-OroUserBundle:user.yml
 @fixture-OroOrganizationBundle:BusinessUnit.yml
 Feature: Adding attributes for workflow transition
 ```
 
-Additional to alice native [including files](https://github.com/nelmio/alice/blob/a060587f3c90edd92a65c6c0d163972f49bc4e21/doc/fixtures-refactoring.md#including-files),
-extension provide the way to import files from other bundles
+Additionally, Alice allows you to [include files](https://github.com/nelmio/alice/blob/a060587f3c90edd92a65c6c0d163972f49bc4e21/doc/fixtures-refactoring.md#including-files) via
+extension, so you can import files from other bundles:
+
 ```yaml
 include:
     - OroPricingBundle::Pricelists.yml
 ```
 
-**Moreover, you should always include fixtures from other bundles with entities that was declared within that bundle [see Conventions](#conventions).**
+**You should always include fixtures from other bundles with entities that were declared within that bundle [see Conventions](#conventions).**
 
 ### Entity references
 
-In both type of fixtures you can use references to entities.
+You can use references to the entities in both inline and alice fixtures.
 [See Alice documentation about References](https://github.com/nelmio/alice/blob/2.x/doc/relations-handling.md#handling-relations).
-You can use default references that was created by ```ReferenceRepositoryInitializer``` before tests run:
+You can use default references that were created by ```ReferenceRepositoryInitializer``` before the tests run:
 
 - ```@admin``` - Admin user
 - ```@adminRole``` - Administrator role
@@ -620,22 +623,22 @@ You can use default references that was created by ```ReferenceRepositoryInitial
 
 ## Write your first feature
 
-Every bundle should hold its own features at ```{BundleName}/Tests/Behat/Features/``` directory
-Every feature it's a single file with ```.feature``` extension and some specific syntax
-(See more at [Cucumber doc reference](https://cucumber.io/docs/reference))
+Every bundle should contain its own behat tests for features in the ```{BundleName}/Tests/Behat/Features/``` directory.
+Every feature is a separate file with the ```.feature``` extension and some specific syntax
+(See more at [Cucumber doc reference](https://cucumber.io/docs/reference)).
 
-A feature has three basic elements—the Feature: keyword, a name (on the same line)
-and an optional (but highly recommended) description that can span multiple lines.
+A feature starts with the following:
+* The ```Feature:``` keyword and feature name (these should stay on the same line),
+* An optional description (can be formatted as multiple lines). Having meaningful description is highly recommended. 
 
-A scenario is a concrete example that illustrates a business rule. It consists of a list of steps.
-In addition to being a specification and documentation, a scenario is also a test.
-As a whole, your scenarios are an executable specification of the system.
+Next goes the feature scenario - specific example that illustrates a business rule and consists of a sequential steps.
+In addition to being a test specification and test documentation, a scenario defines the test steps and serves as an executable specification of the system.
 
-A step typically starts with ***Given***, ***When*** or ***Then***.
-If there are multiple Given or When steps underneath each other, you can use ***And*** or ***But***.
+Normally, a step starts with ***Given***, ***When***, or ***Then***.
+If there are multiple Given or When steps underneath each other, you can use ***And*** or ***But*** to organize them into logical groups.
 Cucumber does not differentiate between the keywords, but choosing the right one is important for the readability of the scenario as a whole.
 
-Get look at login.feature in OroUserBundle - [UserBundle/Tests/Behat/Features/login.feature](../../../../UserBundle/Tests/Behat/Features/login.feature)
+Please,take a look at the login.feature in OroUserBundle: [UserBundle/Tests/Behat/Features/login.feature](../../../../UserBundle/Tests/Behat/Features/login.feature)
 
 ```gherkin
 Feature: User login
@@ -666,20 +669,19 @@ Scenario Outline: Fail login
   | user2 | pass2    |
 ```
 
-1. ```Feature: User login``` starts the feature and gives it a title.
+1. The line ```Feature: User login``` starts the feature and gives it a title.
 2. Behat does not parse the next 3 lines of text. (In order to... As an... I need to...).
-  These lines simply provide context to the people reading your feature,
-  and describe the business value derived from the inclusion of the feature in your software.
-3. ```Scenario: Success login``` starts the scenario,
-  and contains a description of the scenario.
-4. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context.
-5. ```Scenario Outline: Fail login``` starts the next scenario.
-  Scenario Outlines allow express examples through the use of a template with placeholders
-  The Scenario Outline steps provide a template which is never directly run.
-  A Scenario Outline is run once for each row in the Examples section beneath it (except for the first header row).
-  Think of a placeholder like a variable.
-  It is replaced with a real value from the Examples: table row,
-  where the text between the placeholder angle brackets matches that of the table column header.
+  These lines provide a human-readable context to the people who will review or modify this feature. They 
+  describe the business value derived from the inclusion of the feature in the software.
+3. The line ```Scenario: Success login``` starts the scenario and provides a description of the scenario.
+4. The next 6 lines are the scenario steps. Every step is matched to a regular expression that is defined in the Context.
+5. The line ```Scenario Outline: Fail login``` starts the next scenario.
+  In the scenario outline, the placeholders are used instead of the actual values, and the values for scenario execution are provided as a set of examples below he outline. Scenario Outlines helps you run these steps several time, iterating through the values provided in the ```Examples:``` section and thus testing the same flow with different input.  
+  The Scenario Outline is a template which is never run on its own.
+  Instead, a Scenario that follows an outline runs once for each row in the Examples section beneath it (except for the first header row that is skipped).
+  Think of a placeholder as of a variable.
+  It is replaced with a real value from the ``Examples:`` table row,
+  where the text between the placeholder angle brackets (e.g., <login>) matches the text of the table column header (e.g., | login |).
 
 ## Troubleshooting
 
