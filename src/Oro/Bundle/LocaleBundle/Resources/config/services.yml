@@ -145,6 +145,8 @@ services:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.name'
             - '@property_accessor'
+        calls:
+            - [setPhoneProvider, ['@oro_address.provider.phone']]
 
     oro_locale.formatter.date_time:
         class: %oro_locale.formatter.date_time.class%

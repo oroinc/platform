@@ -54,7 +54,8 @@ define([
             'postalCode': 'postal_code',
             'region': 'region',
             'regionText': 'region',
-            'regionCode': 'region_code'
+            'regionCode': 'region_code',
+            'phone': 'phone'
         },
 
         options: {
