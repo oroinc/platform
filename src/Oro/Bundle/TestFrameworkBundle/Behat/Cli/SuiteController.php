@@ -5,6 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 use Behat\Testwork\Cli\Controller;
 use Behat\Testwork\Suite\Exception\SuiteNotFoundException;
 use Behat\Testwork\Suite\SuiteRegistry;
+use Behat\Testwork\Suite\SuiteRepository;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,22 +25,21 @@ class SuiteController implements Controller
     private $suiteConfigurations = [];
 
     /**
-     * @var array
+     * @var SpecificationDivider
      */
-    private $applicationSuites = [];
+    private $divider;
 
     /**
      * Initializes controller.
      *
      * @param SuiteRegistry $registry
      * @param array $suiteConfigurations
-     * @param array $applicationSuites
      */
-    public function __construct(SuiteRegistry $registry, array $suiteConfigurations, array $applicationSuites)
+    public function __construct(SuiteRegistry $registry, array $suiteConfigurations, SpecificationDivider $divider)
     {
         $this->registry = $registry;
         $this->suiteConfigurations = $suiteConfigurations;
-        $this->applicationSuites = $applicationSuites;
+        $this->divider = $divider;
     }
 
     /**
@@ -54,11 +55,15 @@ class SuiteController implements Controller
                 'Only execute a specific suite.'
             )
             ->addOption(
-                '--applicable-suites',
-                null,
-                InputOption::VALUE_NONE,
-                'Run test suites that was configured with application_suites config option'
-            );
+                '--suite-divider',
+                '-sd',
+                InputOption::VALUE_REQUIRED,
+                'Divide suite to several.'.PHP_EOL.
+                'e.g. if AcmeDemo suite has 13 features, and suites-divider is 5, so 3 suites will be created'.PHP_EOL.
+                'AcmeDemo#1 and AcmeDemo#2 suites with 5 features, and AcmeDemo#3 with 3 features'.PHP_EOL.
+                'Original AcmeDemo suite will be excluded from list.'
+            )
+        ;
     }
 
     /**
@@ -66,54 +71,43 @@ class SuiteController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        foreach ($this->getRequestedSuites($input) as $name => $config) {
+        $exerciseSuiteName = $input->getOption('suite');
+        $suiteConfigurations = $this->getSuiteConfigurations($input->getOption('suite-divider'));
+
+        if (null !== $exerciseSuiteName && !isset($suiteConfigurations[$exerciseSuiteName])) {
+            throw new SuiteNotFoundException(sprintf(
+                '`%s` suite is not found or has not been properly registered.',
+                $exerciseSuiteName
+            ), $exerciseSuiteName);
+        }
+
+        foreach ($suiteConfigurations as $name => $config) {
+            if (null !== $exerciseSuiteName && $exerciseSuiteName !== $name) {
+                continue;
+            }
+
             $this->registry->registerSuiteConfiguration(
-                $name,
-                $config['type'],
-                $config['settings']
+                $name, $config['type'], $config['settings']
             );
         }
     }
 
-    /**
-     * Get suites list according to parameters from console e.g. --suite, --applicable-suites
-     *
-     * @param InputInterface $input
-     * @return array
-     */
-    protected function getRequestedSuites(InputInterface $input)
+    private function getSuiteConfigurations($divideNumber)
     {
-        $onlyApplicable = $input->getOption('applicable-suites');
-        $exerciseSuiteName = $input->getOption('suite');
-
-        if (null !== $exerciseSuiteName) {
-            return $this->getSuitesByNames([$exerciseSuiteName]);
-        } elseif ($onlyApplicable) {
-            return $this->getSuitesByNames($this->applicationSuites);
-        } else {
+        if (null === $divideNumber) {
             return $this->suiteConfigurations;
         }
-    }
 
-    /**
-     * @param array $suitesNames
-     * @return array
-     */
-    protected function getSuitesByNames(array $suitesNames)
-    {
-        $suites = [];
+        $suiteConfigurations = [];
 
-        foreach ($suitesNames as $suitesName) {
-            if (!isset($this->suiteConfigurations[$suitesName])) {
-                throw new SuiteNotFoundException(sprintf(
-                    '`%s` suite is not found or has not been properly registered.',
-                    $suitesName
-                ), $suitesName);
+        foreach ($this->suiteConfigurations as $name => $config) {
+            foreach ($this->divider->divideSuite($name, $config['settings']['paths'], $divideNumber) as $name => $paths) {
+                $suiteConfig = $config;
+                $suiteConfig['settings']['paths'] = $paths;
+                $suiteConfigurations[$name] = $suiteConfig;
             }
-
-            $suites[$suitesName] = $this->suiteConfigurations[$suitesName];
         }
 
-        return $suites;
+        return $suiteConfigurations;
     }
 }
