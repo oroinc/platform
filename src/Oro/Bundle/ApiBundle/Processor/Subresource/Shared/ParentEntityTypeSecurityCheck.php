@@ -27,19 +27,25 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
     /** @var string */
     protected $permission;
 
+    /** @var bool */
+    protected $forcePermissionUsage;
+
     /**
      * @param DoctrineHelper                $doctrineHelper
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param string                        $permission
+     * @param bool                          $forcePermissionUsage
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AuthorizationCheckerInterface $authorizationChecker,
-        $permission
+        $permission,
+        $forcePermissionUsage = false
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->authorizationChecker = $authorizationChecker;
         $this->permission = $permission;
+        $this->forcePermissionUsage = $forcePermissionUsage;
     }
 
     /**
@@ -55,20 +61,35 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
         if ($parentConfig && $parentConfig->hasAclResource()) {
             $aclResource = $parentConfig->getAclResource();
             if ($aclResource) {
-                $isGranted = $this->authorizationChecker->isGranted($aclResource);
+                if ($this->forcePermissionUsage) {
+                    $isGranted = $this->isPermissionGranted($context->getParentClassName());
+                } else {
+                    $isGranted = $this->authorizationChecker->isGranted($aclResource);
+                }
             }
         } else {
-            $parentEntityClass = $context->getParentClassName();
-            if ($this->doctrineHelper->isManageableEntityClass($parentEntityClass)) {
-                $isGranted = $this->authorizationChecker->isGranted(
-                    $this->permission,
-                    new ObjectIdentity('entity', $parentEntityClass)
-                );
-            }
+            $isGranted = $this->isPermissionGranted($context->getParentClassName());
         }
 
         if (!$isGranted) {
             throw new AccessDeniedException();
         }
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return bool
+     */
+    protected function isPermissionGranted($entityClass)
+    {
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            return true;
+        }
+
+        return $this->authorizationChecker->isGranted(
+            $this->permission,
+            new ObjectIdentity('entity', $entityClass)
+        );
     }
 }
