@@ -286,9 +286,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Phone   | +1 415-731-9375     |
      *            | Country | Ukraine             |
      *            | State   | Kharkivs'ka Oblast' |
+     * Example: Then I should see Charlie Sheen in Frontend Grid with following data:
+     *            | Email   | charlie@gmail.com   |
+     *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in grid with following data:$/
+     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in (grid|(?P<name>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(@)]+))" in (grid|(?P<name>[\s\w]+)) with following data:$/
      */
     public function assertRowValues($content, TableNode $table)
     {
@@ -308,6 +311,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table->getRows() as list($header, $value)) {
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = trim($columns[$columnNumber-1]->text());
+            // removing multiple spaces, newlines, tabs
+            $actualValue = trim(preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue));
 
             self::assertEquals(
                 $value,
