@@ -1016,7 +1016,7 @@
                 {{ _self.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true, scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null) }}
             {% endfor %}
             {% if data.hiddenData is defined or isForm %}
-                <div class="hide">
+                <div class="hide" data-skip-input-widgets>
                     {% if data.hiddenData is defined %}
                         {{ data.hiddenData|raw }}
                     {% endif %}
