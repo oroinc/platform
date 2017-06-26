@@ -25,16 +25,6 @@ services:
         tags:
             - { name: cli.controller, priority: 710 }
 
-    mink.listener.sessions:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
-        arguments:
-            - '@mink'
-            - '%mink.default_session%'
-            - '%mink.javascript_session%'
-            - '%mink.available_javascript_sessions%'
-        tags:
-            - { name: event_dispatcher.subscriber, priority: 0 }
-
     oro_test.listener.messagequeue_run_check_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueRunCheckSubscriber
         tags:
@@ -79,6 +69,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
         arguments:
             - '@oro_behat_extension.isolation.test_isolation_subscriber'
+            - '@oro_test.listener.messagequeue_run_check_subscriber'
         tags:
             - { name: 'cli.controller', priority: 100 }
 

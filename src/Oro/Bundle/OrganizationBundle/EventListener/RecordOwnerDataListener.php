@@ -9,27 +9,26 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class RecordOwnerDataListener
 {
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var ConfigProvider */
     protected $configProvider;
 
     /**
-     * @param ServiceLink    $securityContextLink
-     * @param ConfigProvider $configProvider
+     * @param TokenStorageInterface $tokenStorage
+     * @param ConfigProvider        $configProvider
      */
-    public function __construct(ServiceLink $securityContextLink, ConfigProvider $configProvider)
+    public function __construct(TokenStorageInterface $tokenStorage, ConfigProvider $configProvider)
     {
-        $this->securityContextLink = $securityContextLink;
-        $this->configProvider  = $configProvider;
+        $this->tokenStorage = $tokenStorage;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -40,7 +39,7 @@ class RecordOwnerDataListener
      */
     public function prePersist(LifecycleEventArgs $args)
     {
-        $token = $this->getSecurityContext()->getToken();
+        $token = $this->tokenStorage->getToken();
         if (!$token) {
             return;
         }
@@ -85,15 +84,6 @@ class RecordOwnerDataListener
                 );
             }
         }
-    }
-
-
-    /**
-     * @return SecurityContextInterface
-     */
-    protected function getSecurityContext()
-    {
-        return $this->securityContextLink->getService();
     }
 
     /**

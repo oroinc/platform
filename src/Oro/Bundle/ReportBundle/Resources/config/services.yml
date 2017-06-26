@@ -26,7 +26,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity_config.provider.entity'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -62,7 +62,8 @@ services:
     oro_report.grid.extension.store_sql:
         class: Oro\Bundle\ReportBundle\Grid\StoreSqlExtension
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
         tags:
             - { name: oro_datagrid.extension }
 

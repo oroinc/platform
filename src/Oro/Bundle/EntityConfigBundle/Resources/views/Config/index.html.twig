@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_entityconfig_manage') %}
+    {% if is_granted('oro_entityconfig_manage') %}
         {% for button in buttonConfig %}
             {{ UI.addButton({
                 'path': path(button.route, button.args|default({})),

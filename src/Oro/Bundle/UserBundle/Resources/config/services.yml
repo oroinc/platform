@@ -73,7 +73,8 @@ services:
         arguments:
             - %oro_user.entity.class%
             - '@doctrine.orm.entity_manager'
-            - '@security.context'
+            - '@security.authorization_checker'
+            - '@security.token_storage'
             - '@oro_security.acl.extension_selector'
 
     oro_user.listener.password_changed_subscriber:
@@ -101,8 +102,6 @@ services:
 
     oro_user.user_menu:
         class:                        %oro_user.user_menu.builder.class%
-        arguments:
-            - '@security.context'
         tags:
             - { name: oro_menu.builder, alias: usermenu }
 
@@ -172,7 +171,8 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.manager'
             - %oro_user.entity.class%
-            - '@oro_entity_config.link.security_context'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
             - "@?security.acl.voter.basic_permissions"
         calls:
@@ -206,6 +206,9 @@ services:
             - '@oro_attachment.manager'
             - %oro_user.entity.class%
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+        calls:
+            - [setTokenAccessor, ['@oro_security.token_accessor']]
+            - [setSearchUserCriteria, ['@oro_user.autocomplete.search_user_criteria']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_users, acl_resource: oro_user_user_view }
 
@@ -214,15 +217,19 @@ services:
         class: %oro_user.autocomplete.user.organization_search_handler.class%
         parent: oro_user.autocomplete.user.search_handler
         calls:
-           - [setSecurityFacade,  ['@oro_security.security_facade']]
+           - [setTokenAccessor,  ['@oro_security.token_accessor']]
+           - [setSearchUserCriteria, ['@oro_user.autocomplete.search_user_criteria']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: organization_users, acl_resource: oro_user_user_view }
+
+    oro_user.autocomplete.search_user_criteria:
+        class: Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchUserCriteria
 
     oro_user.autocomplete.user.search_without_current_handler:
         class: %oro_user.autocomplete.user.search_without_current_handler.class%
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_attachment.manager'
             - %oro_user.entity.class%
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
@@ -280,13 +287,13 @@ services:
         class: %oro_user.change_password.subscriber.class%
         arguments:
             - '@form.factory'
-            - '@security.context'
+            - '@oro_security.token_accessor'
 
     oro_user.handler.delete:
         class: %oro_user.handler.delete.class%
         parent: oro_soap.handler.delete.abstract
         calls:
-            - [ setSecurityFacade,  ['@oro_security.security_facade'] ]
+            - [ setTokenAccessor,  ['@oro_security.token_accessor'] ]
 
     oro_user.role.handler.delete:
         class: %oro_user.role.handler.delete.class%
@@ -317,7 +324,8 @@ services:
         class: %oro_user.event_listener.owner_user_grid_listener.class%
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '@oro_entity_config.link.security_context'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
             - "@?security.acl.voter.basic_permissions"
         tags:
@@ -335,7 +343,7 @@ services:
     oro_user.placeholder.filter:
         class: %oro_user.placeholder.filter.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
 
     oro_user.password_change.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract
@@ -349,7 +357,7 @@ services:
     security.user_checker:
         class: %oro_user.security.user_checker.class%
         arguments:
-            - '@security.context.link'
+            - '@security.token_storage'
             - '@session.flash_bag'
             - '@translator'
 
@@ -406,7 +414,7 @@ services:
     oro_user.validator.user_custom_grid_field_validator:
         class: %oro_user.validator.user_custom_grid_field_validator.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - {name: oro_entity.custom_grid_field_validator, entity_name: Oro_Bundle_UserBundle_Entity_User }
 
@@ -454,7 +462,7 @@ services:
         arguments:
             - '@oro_config.config_bag'
             - '@form.factory'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
@@ -466,7 +474,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@request_stack'
-            - '@security.context'
+            - '@oro_security.token_accessor'
 
     oro_user.forced_password_reset.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract
@@ -509,4 +517,4 @@ services:
     oro_user.datagrid.action_checker:
         class: Oro\Bundle\UserBundle\Datagrid\ActionChecker
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'

@@ -66,8 +66,6 @@ define(function(require) {
             }
 
             options.collection = this.collection;
-            options.el = $('<div/>').prependTo($filterContainer);
-
             if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
                 options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
             } else {
@@ -77,8 +75,11 @@ define(function(require) {
                     options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo($filterContainer);
                 }
             }
+
             filtersList = new FiltersManager(options);
             filtersList.render();
+            filtersList.$el.prependTo($filterContainer);
+
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {

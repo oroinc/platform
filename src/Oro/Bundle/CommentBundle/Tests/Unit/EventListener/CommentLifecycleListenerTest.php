@@ -6,8 +6,8 @@ use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
@@ -15,32 +15,19 @@ class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
     /** @var CommentLifecycleListener */
     protected $subscriber;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->setMethods(['getLoggedUser'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $securityFacadeLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->setMethods(['getService'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $securityFacadeLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($this->securityFacade));
-
-        $this->subscriber = new CommentLifecycleListener($securityFacadeLink);
+        $this->subscriber = new CommentLifecycleListener($this->tokenAccessor);
     }
 
     protected function tearDown()
     {
-        unset($this->securityFacade);
+        unset($this->tokenAccessor);
         unset($this->subscriber);
     }
 
@@ -148,8 +135,8 @@ class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockSecurityContext($user = null)
     {
-        $this->securityFacade->expects($this->any())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
             ->will($this->returnValue($user));
     }
 

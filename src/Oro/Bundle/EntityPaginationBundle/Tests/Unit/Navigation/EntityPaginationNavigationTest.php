@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Navigation;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
+use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 
 class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,7 +19,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $storage;
@@ -31,21 +35,13 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('\Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->storage = $this->createMock(EntityPaginationStorage::class);
 
         $this->navigation = new EntityPaginationNavigation(
             $this->doctrineHelper,
-            $this->securityFacade,
+            $this->authorizationChecker,
             $this->storage
         );
         $this->entity = new \stdClass();
@@ -508,7 +504,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($this->entity));
         }
 
-        $this->securityFacade->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->will($this->returnValue($isGranted));
 

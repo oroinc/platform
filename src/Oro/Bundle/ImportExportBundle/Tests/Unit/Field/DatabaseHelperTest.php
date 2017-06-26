@@ -7,51 +7,35 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestEntity;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestOrganization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
 class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_CLASS = 'stdClass';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadata;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipMetadataProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $fieldHelperService;
 
-
-    /**
-     * @var DatabaseHelper
-     */
+    /** @var DatabaseHelper */
     protected $helper;
 
     protected function setUp()
@@ -99,27 +83,16 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getService')
             ->willReturn($this->fieldHelperService);
 
-        $securityFacadeLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+
         $ownershipMetadataProviderLink = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $securityFacadeLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->securityFacade);
         $ownershipMetadataProviderLink->expects($this->any())
             ->method('getService')
             ->willReturn($this->ownershipMetadataProvider);
@@ -128,7 +101,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             $registry,
             $this->doctrineHelper,
             $fieldHelper,
-            $securityFacadeLink,
+            $this->tokenAccessor,
             $ownershipMetadataProviderLink
         );
     }
@@ -160,10 +133,10 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
 
         $currentOrganization = new TestOrganization();
         $currentOrganization->setId(1);
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
             ->willReturn($currentOrganization);
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganizationId')
             ->willReturn($currentOrganization->getId());
 

@@ -40,7 +40,7 @@ datagrids:
                             alias: i
                 where:
                     and:
-                        - o.id = @oro_security.security_facade->getOrganizationId
+                        - o.id = @oro_security.token_accessor->getOrganizationId
                 groupBy: a.id, o.name, author
         columns:
             action:

@@ -6,3 +6,6 @@ oro_behat_extension:
       options:
         mapping:
           Use Default Language: 'language_settings[oro_locale___language][use_parent_scope_value]'
+
+    Use Organization:
+      selector: 'language_settings[oro_locale___language][use_parent_scope_value]'

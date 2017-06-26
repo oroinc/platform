@@ -28,7 +28,7 @@ class AmqpMessageQueueIsolator extends AbstractMessageQueueIsolator
     /**
      * {@inheritdoc}
      */
-    public function waitWhileProcessingMessages($timeLimit = 60)
+    public function waitWhileProcessingMessages($timeLimit = 600)
     {
         $queue = $this->createAmqpQueue();
         $channel = $this->createAmqpStreamConnection()->channel();

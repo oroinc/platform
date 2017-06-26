@@ -46,7 +46,7 @@ define(function(require) {
                 data.fileSize = numeral(data.fileSize).format('b');
             }
             if ('modified' in data) {
-                data.modified = datetime.formatDateTime(data.modified);
+                data.modified = datetime.formatDateTime(data.modified.date);
             }
             return data;
         },

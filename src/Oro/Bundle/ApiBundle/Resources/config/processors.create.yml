@@ -52,7 +52,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - CREATE
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }
@@ -65,8 +65,9 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - VIEW
+            - true
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
 

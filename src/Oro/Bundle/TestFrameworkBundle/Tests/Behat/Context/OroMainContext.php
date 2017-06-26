@@ -93,7 +93,7 @@ class OroMainContext extends MinkContext implements
         }
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see .+(flash message|error message)$/', $scope->getStep()->getText())) {
+        if (preg_match('/^(?:|I )should see ".+"( flash message| error message|)$/', $scope->getStep()->getText())) {
             return;
         }
 
@@ -366,6 +366,17 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Hover on element on page
+     * Example: When I hover on "Help Icon"
+     *
+     * @When /^(?:|I )hover on "(?P<element>[\w\s]+)"$/
+     */
+    public function iHoverOn($element)
+    {
+        $this->createElement($element)->mouseOver();
+    }
+
+    /**
      * Assert popup with large image on page
      *
      * @Then /^(?:|I )should see large image$/
@@ -534,17 +545,13 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Assert modal window with given caption is visible
-     * Example: Then I should see "Changing Page URLs" modal window
-     *
-     * @Then /^(?:|I )should see "(?P<caption>(?:[^"]|\\")*)" modal window$/
+     * {@inheritdoc}
      */
-    public function iShouldSeeModalWindow($caption)
+    public function assertElementContainsText($element, $text)
     {
-        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
-        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
-
-        self::assertElementContainsText('div.modal .modal-header', $caption);
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+        self::assertContains($text, $elementObject->getText());
     }
 
     /**
@@ -1124,5 +1131,17 @@ class OroMainContext extends MinkContext implements
     {
         fwrite(STDOUT, "Press [RETURN] to continue...");
         fgets(STDIN, 1024);
+    }
+
+    /**
+     * Example: Given I set window size to 320x640
+     *
+     * @Given /^(?:|I )set window size to (?P<width>\d+)x(?P<height>\d+)$/
+     * @param int $width
+     * @param int $height
+     */
+    public function iSetWindowSize($width, $height)
+    {
+        $this->getSession()->resizeWindow((int)$width, (int)$height, 'current');
     }
 }

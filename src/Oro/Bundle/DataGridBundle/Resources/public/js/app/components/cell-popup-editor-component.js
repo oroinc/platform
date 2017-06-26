@@ -554,7 +554,7 @@ define(function(require) {
                     }
                 });
                 if (_.isArray(responseErrors.errors)) {
-                    mediator.execute('showMessage', 'error', responseErrors.errors[0]);
+                    mediator.execute('showMessage', 'error', __(responseErrors.errors[0]));
                 }
                 fieldErrors = _.result(responseErrors.children, this.options.cell.column.get('name'));
                 if (!fieldErrors && this.options.viewOptions !== 'undefined' &&
@@ -564,9 +564,9 @@ define(function(require) {
                 }
 
                 if (fieldErrors && _.isArray(fieldErrors.errors)) {
-                    backendErrors = {value: fieldErrors.errors[0]};
+                    backendErrors = {value: __(fieldErrors.errors[0])};
                 } else if (_.isArray(responseErrors.errors)) {
-                    backendErrors = {value: responseErrors.errors[0]};
+                    backendErrors = {value: __(responseErrors.errors[0])};
                 }
                 this.errorHolderView.setErrorMessages(backendErrors);
             } else if (_.isArray(jqXHR.responseJSON)) {

@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class OriginFolderFilterProvider
 {
     const EMAIL_ORIGIN = 'OroEmailBundle:EmailOrigin';
     const EMAIL_MAILBOX = 'OroEmailBundle:Mailbox';
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    /** @var Registry */
+    /** @var ManagerRegistry */
     private $doctrine;
 
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
+
     /**
-     * @param Registry            $doctrine
-     * @param SecurityFacade      $securityFacade
+     * @param ManagerRegistry        $doctrine
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
-        Registry $doctrine,
-        SecurityFacade $securityFacade
+        ManagerRegistry $doctrine,
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->doctrine = $doctrine;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -61,8 +61,8 @@ class OriginFolderFilterProvider
                 ->andWhere('eo.organization = :organization')
                 ->andWhere('eo.isActive = :isActive')
                 ->setParameters([
-                    'owner' => $this->securityFacade->getLoggedUser(),
-                    'organization' => $this->securityFacade->getOrganization(),
+                    'owner' => $this->tokenAccessor->getUser(),
+                    'organization' => $this->tokenAccessor->getOrganization(),
                     'isActive' => true,
                 ])
                 ->getQuery()
@@ -78,8 +78,8 @@ class OriginFolderFilterProvider
 
         /** @var Mailbox[] $systemMailboxes */
         return $repo->findAvailableMailboxes(
-            $this->securityFacade->getLoggedUser(),
-            $this->securityFacade->getOrganization()
+            $this->tokenAccessor->getUser(),
+            $this->tokenAccessor->getOrganization()
         );
     }
 

@@ -3,11 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class OriginTransformerTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,12 +28,12 @@ class OriginTransformerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $securiryFacadeMock = $this->createMock('Oro\Bundle\SecurityBundle\SecurityFacade');
+        $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $emailOriginHelperMock = $this->createMock('Oro\Bundle\EmailBundle\Tools\EmailOriginHelper');
 
         $this->transformer = new OriginTransformer(
             $this->entityManagerMock,
-            $securiryFacadeMock,
+            $tokenAccessor,
             $emailOriginHelperMock
         );
     }

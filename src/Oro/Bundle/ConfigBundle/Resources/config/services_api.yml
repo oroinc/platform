@@ -26,7 +26,7 @@ services:
         class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\LoadConfigurationSections
         arguments:
             - '@oro_config.api.repository'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
 

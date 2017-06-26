@@ -13,8 +13,8 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Symfony\Component\Templating\EngineInterface;
 
@@ -41,9 +41,9 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     protected $entityNameResolver;
 
     /**
-     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /**
      * @var EmailAddressManager|\PHPUnit_Framework_MockObject_MockObject
@@ -77,9 +77,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()
@@ -103,7 +101,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             $this->entityRoutingHelper,
             $this->emailAddressHelper,
             $this->entityNameResolver,
-            $this->securityFacade,
+            $this->tokenAccessor,
             $this->emailAddressManager,
             $this->entityManager,
             $this->emailCacheManager,
@@ -163,17 +161,14 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
         $ownerId    = 1;
         $owner      = $this->createMock($ownerClass);
-        $ownerName  = 'Admin';
 
         $this->entityRoutingHelper->expects($this->once())
             ->method('getEntity')
             ->with($ownerClass, $ownerId)
             ->willReturn($owner);
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($owner);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
@@ -246,10 +241,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->entityManager)
             ->willReturn($repo);
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($otherOwner);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
@@ -361,8 +354,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUserTokenIsNull()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn(null);
 
         $result = $this->helper->getUser();
@@ -377,8 +370,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUser($user)
     {
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($user);
 
         $result = $this->helper->getUser();

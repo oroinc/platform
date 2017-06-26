@@ -4,6 +4,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -18,7 +20,6 @@ use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,8 +29,8 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ActionMetadataFactory|\PHPUnit_Framework_MockObject_MockObject */
     protected $actionMetadataFactory;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
     /** @var OwnershipQueryHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipQueryHelper;
@@ -44,13 +45,13 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->actionFactory = $this->createMock(ActionFactory::class);
         $this->actionMetadataFactory = $this->createMock(ActionMetadataFactory::class);
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->ownershipQueryHelper = $this->createMock(OwnershipQueryHelper::class);
 
         $this->extension = new ActionExtension(
             $this->actionFactory,
             $this->actionMetadataFactory,
-            $this->securityFacade,
+            $this->authorizationChecker,
             $this->ownershipQueryHelper
         );
         $this->extension->setParameters(new ParameterBag());
@@ -138,7 +139,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
         $this->actionMetadataFactory->expects(self::once())
             ->method('createActionMetadata')
@@ -184,7 +185,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(true);
@@ -228,7 +229,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(false);
@@ -288,7 +289,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
         $this->actionMetadataFactory->expects(self::once())
             ->method('createActionMetadata')
@@ -335,7 +336,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(true);
@@ -380,7 +381,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($actionConfig['acl_resource'])
             ->willReturn(false);
@@ -426,7 +427,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('createAction')
             ->with($actionName, $actionConfig)
             ->willReturn($action);
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
         $this->actionMetadataFactory->expects(self::once())
             ->method('createActionMetadata')
@@ -545,7 +546,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->actionFactory->expects(self::never())
             ->method('createAction');
-        $this->securityFacade->expects(self::never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         $this->setOwnershipFields(
@@ -568,7 +569,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             new ResultRecord(['id' => 1, 't_owner_id' => 123, 't_organization_id' => 456]),
         ];
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->willReturnCallback(function ($resource, DomainObjectReference $object = null) {
                 self::assertEquals('update_acl_resource', $resource);
@@ -606,7 +607,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             new ResultRecord(['id' => 1, 't_owner_id' => 123, 't_organization_id' => 456]),
         ];
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->willReturnCallback(function ($resource, DomainObjectReference $object = null) {
                 self::assertEquals('update_acl_resource', $resource);
@@ -639,7 +640,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             new ResultRecord(['id' => 1, 't_owner_id' => null, 't_organization_id' => 456]),
         ];
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->willReturnCallback(function ($resource, DomainObjectReference $object = null) {
                 self::assertEquals('update_acl_resource', $resource);
@@ -676,7 +677,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             new ResultRecord(['id' => 1, 't_owner_id' => 123, 't_organization_id' => 456]),
         ];
 
-        $this->securityFacade->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->willReturn(false);
 
