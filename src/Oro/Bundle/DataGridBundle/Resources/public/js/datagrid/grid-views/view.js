@@ -421,7 +421,6 @@ define(function(require) {
         _onRenameSaveModel: function(model) {
             var self = this;
 
-
             model.save(
                 null, {
                 wait: true,
@@ -440,7 +439,7 @@ define(function(require) {
 
                     model.set({
                         'label': savedModel.get('label')
-                    })
+                    });
 
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 },
