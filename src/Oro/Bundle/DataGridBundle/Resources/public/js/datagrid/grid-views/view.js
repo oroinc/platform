@@ -176,6 +176,7 @@ define(function(require) {
             this.listenTo(this.viewsCollection, 'add', this._onModelAdd);
             this.listenTo(this.viewsCollection, 'remove', this._onModelRemove);
             this.listenTo(this.viewsCollection, 'change', this._onModelChange, this);
+            this.listenTo(this.viewsCollection, 'sync', this._onModelChange, this);
 
             this.listenTo(mediator, 'datagrid:' + this.gridName + ':views:add', function(model) {
                 this.viewsCollection.add(model);
@@ -420,6 +421,7 @@ define(function(require) {
         _onRenameSaveModel: function(model) {
             var self = this;
 
+
             model.save(
                 null, {
                 wait: true,
@@ -438,7 +440,7 @@ define(function(require) {
 
                     model.set({
                         'label': savedModel.get('label')
-                    });
+                    })
 
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 },
