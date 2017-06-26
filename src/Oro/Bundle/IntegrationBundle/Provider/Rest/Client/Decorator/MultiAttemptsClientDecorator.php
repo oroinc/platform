@@ -18,11 +18,6 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     protected $attempted = 0;
 
     /**
-     * @var bool
-     */
-    protected $multipleAttemptsEnabled;
-
-    /**
      * @var array
      */
     protected $sleepBetweenAttempt;
@@ -43,12 +38,10 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     public function __construct(
         RestClientInterface $client,
         LoggerInterface $logger,
-        $multipleAttemptsEnabled,
-        $sleepBetweenAttempt
+        array $sleepBetweenAttempt
     ) {
         $this->client = $client;
         $this->logger = $logger;
-        $this->multipleAttemptsEnabled = $multipleAttemptsEnabled;
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;
     }
 
@@ -58,11 +51,6 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     public function setSleepBetweenAttempt(array $sleepBetweenAttempt)
     {
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;
-    }
-
-    public function setMultipleAttemptsEnabled($enabled)
-    {
-        $this->multipleAttemptsEnabled = $enabled;
     }
 
     /**
@@ -168,26 +156,6 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     /**
      * {@inheritdoc}
      */
-    public function getXML($resource, array $params = array(), array $headers = array(), array $options = array())
-    {
-        try {
-            $response = $this->client->getXML($resource, $params, $headers, $options);
-        } catch (RestException $exception) {
-            if ($this->canMakeNewAttempt($exception)) {
-                return $this->client->getXML($resource, $params, $headers, $options);
-            }
-
-            throw $exception;
-        }
-
-        $this->resetAttemptsCount();
-
-        return $response;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getLastResponse()
     {
         $this->client->getLastResponse();
@@ -234,8 +202,7 @@ class MultiAttemptsClientDecorator implements RestClientInterface
      */
     protected function isNewAttemptAvailable(RestResponseInterface $response)
     {
-        return $this->multipleAttemptsEnabled &&
-            ($this->attempted < count($this->sleepBetweenAttempt) - 1) &&
+        return ($this->attempted < count($this->sleepBetweenAttempt) - 1) &&
             in_array($response->getStatusCode(), $this->getHttpStatusesForAttempt());
     }
 

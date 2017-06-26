@@ -48,15 +48,6 @@ class LoggerClientDecorator implements RestClientInterface
     /**
      * {@inheritdoc}
      */
-    public function getXML($resource, array $params = array(), array $headers = array(), array $options = array())
-    {
-        $this->logRequest('getXML', $resource, $params);
-        return $this->client->getXML($resource, $params, $headers, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function post($resource, $data, array $headers = array(), array $options = array())
     {
         $this->logRequest('post', $resource);

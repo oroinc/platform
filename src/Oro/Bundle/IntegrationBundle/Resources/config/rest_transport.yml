@@ -1,49 +1,19 @@
-parameters:
-    oro_integration.transport.rest.guzzle.client_factory.class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClientFactory
-    oro_integration.transport.rest.abstract_transport.class:    Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\AbstractRestTransport
-
 services:
     oro_integration.transport.rest.guzzle.client_factory:
-        class: %oro_integration.transport.rest.guzzle.client_factory.class%
+        public: false
+        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClientFactory
 
     oro_integration.transport.rest.client_factory:
         alias: oro_integration.transport.rest.guzzle.client_factory
 
-    oro_integration.transport.rest.bridge.client_factory:
-        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\BridgeRestClientFactory
-        abstract: true
+    oro_integration.transport.rest.event_dispatchable_client_factory:
+        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\EventDispatchableRestClientFactory
         arguments:
             - '@oro_integration.transport.rest.client_factory'
-
-    oro_integration.transport.rest.bridge.decorated_client_factory:
-        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\BridgeRestClientFactory
-        abstract: true
-        arguments:
-            - '@oro_integration.transport.rest.client_factory.decorated'
+            - '@event_dispatcher'
 
     oro_integration.transport.rest.abstract_transport:
-        class: %oro_integration.transport.rest.abstract_transport.class%
+        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\AbstractRestTransport
         abstract: true
         calls:
             - [setRestClientFactory, ['@oro_integration.transport.rest.client_factory']]
-
-    # Client decorator
-    oro_integration.transport.rest.client_factory.decorated:
-        alias: oro_integration.transport.rest.guzzle.client_factory
-
-    oro_integration.provider.rest_client.multi_attempts_decorator_factory:
-        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\MultiAttemptsClientDecoratorFactory
-        public: false
-        decorates: oro_integration.transport.rest.client_factory.decorated
-        arguments: ['@oro_integration.provider.rest_client.multi_attempts_decorator_factory.inner']
-        calls:
-            - [setLogger, ["@oro_integration.logger.strategy"]]
-
-    oro_integration.provider.rest_client.logger_decorator_factory:
-        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDecoratorFactory
-        public: false
-        decorates: oro_integration.transport.rest.client_factory.decorated
-        arguments: ['@oro_integration.provider.rest_client.logger_decorator_factory.inner']
-        decoration_priority: 255
-        calls:
-            - [setLogger, ["@oro_integration.logger.strategy"]]
