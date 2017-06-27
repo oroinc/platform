@@ -131,7 +131,7 @@ class AclHelper
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
             if ($this->checkRootEntity) {
-                list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
+                list($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
                 if (!$checkRelations) {
                     $joinConditions = [];
                 }
@@ -233,7 +233,7 @@ class AclHelper
      */
     protected function processSubselect(Subselect $subSelect, $permission)
     {
-        list ($whereConditions, $joinConditions) = $this->processSelect($subSelect, $permission);
+        list($whereConditions, $joinConditions) = $this->processSelect($subSelect, $permission);
 
         return new SubRequestAclConditionStorage($whereConditions, $joinConditions);
     }

@@ -55,7 +55,7 @@ abstract class AbstractConfigType extends BaseAbstractConfigType
             },
             $builder->getEventDispatcher()->getListeners(FormEvents::POST_SUBMIT)
         )) {
-                return;
+            return;
         }
 
         $builder->addEventSubscriber(

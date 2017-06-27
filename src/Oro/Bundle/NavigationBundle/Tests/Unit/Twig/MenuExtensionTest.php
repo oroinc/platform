@@ -95,7 +95,6 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testWrongBredcrumbs()
     {
-
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
             ->getMock();

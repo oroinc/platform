@@ -72,8 +72,9 @@ class DatabasePlatformMock extends \Doctrine\DBAL\Platforms\AbstractPlatform
 
     /** @override */
     // @codingStandardsIgnoreStart
-    protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef) {
-    // @codingStandardsIgnoreEnd
+    protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef)
+    {
+        // @codingStandardsIgnoreEnd
     }
 
     /** @override */

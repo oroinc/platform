@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 class ConfigurationTest extends Selenium2TestCase
 {
-     /**
+    /**
      * @return string
      */
     public function testOpenConfiguration()

@@ -164,7 +164,7 @@ class EmailQueryFactory
         $threadedExpressions = null;
         $threadedExpressionsParameters = null;
         if ($datagrid && $filters) {
-            list (
+            list(
                 $threadedExpressions,
                 $threadedExpressionsParameters
             ) = $this->prepareSearchFilters($datagrid, $filters, 'mm');
@@ -179,7 +179,7 @@ class EmailQueryFactory
                 ->innerJoin('OroEmailBundle:Email', 'mm', 'WITH', 'uu.email = mm.id')
                 ->where($filterExpressions);
 
-            list (
+            list(
                 $notThreadedExpressions,
                 $notThreadedExpressionsParameters
             ) = $this->prepareSearchFilters($datagrid, $filters, 'e');

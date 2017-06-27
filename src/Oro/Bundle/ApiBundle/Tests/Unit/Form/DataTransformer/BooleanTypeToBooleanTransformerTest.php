@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\BooleanToStringTransformer;
 
-class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class BooleanTypeToBooleanTransformerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider transformDataProvider

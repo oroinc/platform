@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -6,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class MessageQueueBundle implements Migration
+class OroMessageQueueBundle implements Migration
 {
     /**
      * {@inheritdoc}

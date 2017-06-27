@@ -10,7 +10,7 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Yaml\Yaml;
 
-class DashboardConfigurationFormProviderTest extends FormIntegrationTestCase
+class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
 {
     protected function setUp()
     {
