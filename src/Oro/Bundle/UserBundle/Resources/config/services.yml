@@ -196,6 +196,18 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
 
+    oro_user.autocomplete.assigned_to_organization_users.handler:
+        class: Oro\Bundle\UserBundle\Autocomplete\AssignedToOrganizationUsersHandler
+        parent: oro_form.autocomplete.full_name.search_handler
+        arguments:
+            - '@oro_attachment.manager'
+            - %oro_user.entity.class%
+            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+        calls:
+            - [setSecurityFacade, ['@oro_security.security_facade']]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: assigned_to_organization_users }
+
     # Autocomplete search handler
     oro_user.autocomplete.widget_user.search_handler:
         class: Oro\Bundle\UserBundle\Autocomplete\WidgetUserSearchHandler
