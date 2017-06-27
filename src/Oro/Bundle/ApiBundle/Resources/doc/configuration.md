@@ -242,6 +242,17 @@ This section describes entity fields' configuration.
 * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 * **depends_on** *string[]* A list of fields on which this field depends on. Also `.` can be used to specify a path to an association field. This option can be helpful for computed fields. These fields will be loaded from the database even if they are excluded.
 
+Special data types:
+
+As described above, the **data_type** attribute can be used to specify a data type of a field, but it can be used to configure some special types of fields as well. The following table contains details of such types.
+
+| Data Type | Description |
+| --- | --- |
+| nestedObject | Used to configure nested objects. For details see [Configure nested object](./how_to.md#configure-nested-object). |
+| nestedAssociation | Used to configure nested associations. For details see [Configure nested association](./how_to.md#configure-nested-association). |
+| association:relationType\[:associationKind\] | Used to configure extended associations. For details see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association) and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
+
+
 Examples:
 
 ```yaml

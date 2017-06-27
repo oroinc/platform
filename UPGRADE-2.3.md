@@ -111,7 +111,7 @@ DataGridBundle
     - method `getSecurityFacade` was replaced with `getAuthorizationChecker`
 
 CronBundle
----------------
+----------
 - Class `Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor`
     - removed property `$commandRunner`
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
@@ -137,6 +137,12 @@ EntityExtendBundle
 - Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
 - Class `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker`
+
+EntityPaginationBundle
+----------------------
+- Class `Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector`
+    - removed property `aclHelper`
+    - changed constructor signature: removed parameter `AclHelper $aclHelper`
 
 ImportExportBundle
 ------------------
@@ -180,6 +186,9 @@ NavigationBundle
     - changed the constructor signature: parameter `Router $router` was replaced with `RouterInterface $router`
 - Class `Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder`
     - method `setOptions` was renamed to `setConfigManager`
+- Service `oro_navigation.item.pinbar.post_persist_listener` was changed from `doctrine.event_listener` to `doctrine.orm.entity_listener`
+    - method `setClassName` was removed.
+    - method `postPersist` had additional argument `AbstractPinbarTab $pinbarTab`
 
 OrganizationBundle
 ------------------
@@ -244,6 +253,13 @@ TestFrameworkBundle
 -------------------
 - Class `TestListener` namespace added, use `Oro\Bundle\TestFrameworkBundle\Test\TestListener` instead
 
+TranslationBundle
+-----------------
+- Class `Oro\Bundle\TranslationBundle\Provider\PackagesProvider`
+    - property `pmLink` was replaced with `pm`
+    - changed the constructor signature: parameter `ServiceLink $pmLink` was replaced with `PackageManager $pm`
+- Removed service `oro_translation.distribution.package_manager.link`
+
 WorkflowBundle
 --------------
 - Class `Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension`
@@ -262,7 +278,13 @@ WorkflowBundle
 UIBundle
 --------
 - Updated ChaplinJS to 1.2.0 version
+- Updated Autolinker.js to 1.4.* version
+- Updated jQuery-Form to 4.2.1 version
+- Updated jQuery.Numeric to 1.5.0 version
+- Updated Lightgallery.js to 1.4.0 version
+- Updated RequireJS test.js plugin to 2.0.* version
 
 LocaleBundle
 ------------
 - Updated Moment.js to 2.18.* version
+- Updated Numeral.js to 2.0.6 version
