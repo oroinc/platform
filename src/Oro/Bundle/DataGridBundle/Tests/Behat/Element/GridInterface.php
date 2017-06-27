@@ -57,12 +57,6 @@ interface GridInterface extends GridMappedChildInterface
 
     /**
      * @param string $title
-     * @return NodeElement|null
-     */
-    public function getSelectAllMassActionLink($title);
-
-    /**
-     * @param string $title
      * @throws \Exception
      */
     public function massCheck($title);
