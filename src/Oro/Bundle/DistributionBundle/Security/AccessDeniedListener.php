@@ -7,35 +7,30 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Security;
 
 class AccessDeniedListener
 {
-    /**
-     * @var \Symfony\Component\HttpFoundation\Session\Session
-     */
+    /** @var Session */
     protected $session;
 
-    /**
-     * @var \Symfony\Component\Routing\Router
-     */
+    /** @var Router */
     protected $router;
 
-    /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface
-     */
-    protected $securityContext;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /**
-     * @param Session $session
-     * @param Router $router
-     * @param SecurityContextInterface $securityContext
+     * @param Session               $session
+     * @param Router                $router
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(Session $session, Router $router, SecurityContextInterface $securityContext)
+    public function __construct(Session $session, Router $router, TokenStorageInterface $tokenStorage)
     {
         $this->session = $session;
         $this->router = $router;
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -45,8 +40,8 @@ class AccessDeniedListener
     {
         if ($event->getException() instanceof AccessDeniedHttpException) {
             $this->session->invalidate();
-            $this->session->set(SecurityContextInterface::ACCESS_DENIED_ERROR, ['message' => 'You are not allowed']);
-            $this->securityContext->setToken(null);
+            $this->session->set(Security::ACCESS_DENIED_ERROR, ['message' => 'You are not allowed']);
+            $this->tokenStorage->setToken(null);
 
             $route = $this->router->generate('oro_distribution_security_login');
 

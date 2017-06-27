@@ -3,11 +3,10 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -17,8 +16,8 @@ use Oro\Bundle\UserBundle\Exception\OrganizationException;
 
 class UserChecker extends BaseUserChecker
 {
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var FlashBagInterface */
     protected $flashBag;
@@ -27,18 +26,18 @@ class UserChecker extends BaseUserChecker
     protected $translator;
 
     /**
-     * @param ServiceLink         $securityContextLink
-     * @param FlashBagInterface   $flashBag
-     * @param TranslatorInterface $translator
+     * @param TokenStorageInterface $tokenStorage
+     * @param FlashBagInterface     $flashBag
+     * @param TranslatorInterface   $translator
      */
     public function __construct(
-        ServiceLink $securityContextLink,
+        TokenStorageInterface $tokenStorage,
         FlashBagInterface $flashBag,
         TranslatorInterface $translator
     ) {
-        $this->securityContextLink = $securityContextLink;
-        $this->flashBag            = $flashBag;
-        $this->translator          = $translator;
+        $this->tokenStorage = $tokenStorage;
+        $this->flashBag = $flashBag;
+        $this->translator = $translator;
     }
 
     /**
@@ -69,7 +68,7 @@ class UserChecker extends BaseUserChecker
             return;
         }
 
-        if (null !== $this->securityContextLink->getService()->getToken()
+        if (null !== $this->tokenStorage->getToken()
             && null !== $user->getPasswordChangedAt()
             && null !== $user->getLastLogin()
             && $user->getPasswordChangedAt() > $user->getLastLogin()

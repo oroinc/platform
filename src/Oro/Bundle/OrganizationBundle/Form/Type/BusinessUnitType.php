@@ -4,13 +4,10 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class BusinessUnitType extends AbstractType
 {
@@ -19,19 +16,19 @@ class BusinessUnitType extends AbstractType
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param BusinessUnitManager $businessUnitManager
-     * @param SecurityFacade      $securityFacade
+     * @param BusinessUnitManager    $businessUnitManager
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
         BusinessUnitManager $businessUnitManager,
-        SecurityFacade $securityFacade
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->businessUnitManager = $businessUnitManager;
-        $this->securityFacade      = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -147,6 +144,6 @@ class BusinessUnitType extends AbstractType
      */
     protected function getOrganizationId()
     {
-        return $this->securityFacade->getOrganizationId();
+        return $this->tokenAccessor->getOrganizationId();
     }
 }

@@ -5,17 +5,17 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailAddressFromType extends AbstractType
 {
     const NAME = 'oro_email_email_address_from';
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
@@ -24,16 +24,16 @@ class EmailAddressFromType extends AbstractType
     protected $mailboxManager;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param RelatedEmailsProvider $relatedEmailsProvider
-     * @param MailboxManager $mailboxManager
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param RelatedEmailsProvider  $relatedEmailsProvider
+     * @param MailboxManager         $mailboxManager
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         RelatedEmailsProvider $relatedEmailsProvider,
         MailboxManager $mailboxManager
     ) {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
         $this->mailboxManager = $mailboxManager;
     }
@@ -56,14 +56,14 @@ class EmailAddressFromType extends AbstractType
      */
     protected function createChoices()
     {
-        $user = $this->securityFacade->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
         if (!$user instanceof User) {
             return [];
         }
 
         $emails = array_merge(
             array_values($this->relatedEmailsProvider->getEmails($user, 1, true)),
-            $this->mailboxManager->findAvailableMailboxEmails($user, $this->securityFacade->getOrganization())
+            $this->mailboxManager->findAvailableMailboxEmails($user, $this->tokenAccessor->getOrganization())
         );
 
         return array_combine($emails, $emails);

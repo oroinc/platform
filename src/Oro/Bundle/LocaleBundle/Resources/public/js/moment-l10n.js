@@ -6,7 +6,7 @@ define(function(require) {
     var locale = localeSettings.getLocale();
     require('moment-timezone');
 
-    moment.locale(locale, {
+    moment.updateLocale(locale, {
         months: localeSettings.getCalendarMonthNames('wide', true),
         monthsShort: localeSettings.getCalendarMonthNames('abbreviated', true),
         weekdays: localeSettings.getCalendarDayOfWeekNames('wide', true),

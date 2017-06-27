@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,10 +30,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
     protected $emailOwnerProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacadeLink;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var  EmailAddressHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $emailAddressHelper;
@@ -61,22 +59,8 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacadeLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->setMethods(['getService'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->setMethods(['getLoggedUser', 'getOrganization'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacadeLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($this->securityFacade));
-
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
             ->will($this->returnValue($this->getTestOrganization()));
 
@@ -84,7 +68,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->emailOriginHelper = new EmailOriginHelper(
             $this->doctrineHelper,
-            $this->securityFacadeLink,
+            $this->tokenAccessor,
             $this->emailOwnerProvider,
             $this->emailAddressHelper
         );

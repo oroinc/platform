@@ -2,10 +2,13 @@ define(['underscore', 'translator', 'module', 'json'],
 function(_, Translator, module) {
     'use strict';
 
+    window.Translator = Translator; // add global variable for translations JSONP-loader Translator.fromJSON({...})
+
     var dict = {};
     var debug = false;
     var add = Translator.add;
-    var get = Translator.get;
+    var trans = Translator.trans;
+    var transChoice = Translator.transChoice;
     var fromJSON = Translator.fromJSON;
     var config = module.config();
 
@@ -38,14 +41,11 @@ function(_, Translator, module) {
         if (typeof placeholders !== 'undefined') {
             placeholders = _.clone(placeholders);
         }
-        var string = get.call(Translator, id, placeholders, number);
-
-        //#TODO remove those 2 conditions after updating lib/translator.js in scope of BAP-14788.
-        if (string === undefined) {
-            string = get.call(Translator, id, placeholders, 1);
-        }
-        if (string === undefined) {
-            string = id;
+        var string;
+        if (typeof number === 'undefined') {
+            string = trans.call(Translator, id, placeholders);
+        } else {
+            string = transChoice.call(Translator, id, number, placeholders);
         }
 
         var hasTranslation = checkTranslation(id);

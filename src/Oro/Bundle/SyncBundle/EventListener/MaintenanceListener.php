@@ -2,41 +2,35 @@
 
 namespace Oro\Bundle\SyncBundle\EventListener;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-
 use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 
 class MaintenanceListener
 {
-    /**
-     * @var TopicPublisher
-     */
+    /** @var TopicPublisher */
     protected $publisher;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $logger;
 
     /**
-     * @param TopicPublisher $publisher
-     * @param SecurityFacade $securityFacade
-     * @param LoggerInterface $logger
+     * @param TopicPublisher         $publisher
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param LoggerInterface        $logger
      */
     public function __construct(
         TopicPublisher $publisher,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         LoggerInterface $logger
     ) {
-        $this->publisher      = $publisher;
-        $this->securityFacade = $securityFacade;
-        $this->logger         = $logger;
+        $this->publisher = $publisher;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->logger = $logger;
     }
 
     public function onModeOn()
@@ -54,7 +48,7 @@ class MaintenanceListener
      */
     protected function onMode($isOn)
     {
-        $userId = $this->securityFacade->getLoggedUserId();
+        $userId = $this->tokenAccessor->getUserId();
 
         try {
             $this->publisher->send('oro/maintenance', array('isOn' => (bool)$isOn, 'userId' => $userId));

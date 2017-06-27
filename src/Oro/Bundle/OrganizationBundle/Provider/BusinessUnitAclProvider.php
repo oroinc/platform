@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 class BusinessUnitAclProvider
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var AclVoter */
     protected $aclVoter;
@@ -26,19 +31,22 @@ class BusinessUnitAclProvider
     protected $accessLevel;
 
     /**
-     * @param SecurityFacade    $securityFacade
-     * @param AclVoter          $aclVoter
-     * @param OwnerTreeProvider $treeProvider
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param AclVoter                      $aclVoter
+     * @param OwnerTreeProvider             $treeProvider
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         AclVoter $aclVoter,
         OwnerTreeProvider $treeProvider
     ) {
-        $this->securityFacade      = $securityFacade;
-        $this->aclVoter            = $aclVoter;
-        $this->treeProvider        = $treeProvider;
-        $this->observer            = new OneShotIsGrantedObserver();
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->aclVoter = $aclVoter;
+        $this->treeProvider = $treeProvider;
+        $this->observer = new OneShotIsGrantedObserver();
     }
 
     /**
@@ -53,7 +61,7 @@ class BusinessUnitAclProvider
         $ids = [];
 
         $this->accessLevel = $this->getAccessLevel($permission, 'entity:' . $dataClassName);
-        $currentUser = $this->securityFacade->getLoggedUser();
+        $currentUser = $this->tokenAccessor->getUser();
 
         if (!$currentUser || !$this->accessLevel) {
             return $ids;
@@ -98,7 +106,7 @@ class BusinessUnitAclProvider
     protected function getAccessLevel($permission, $object)
     {
         $this->aclVoter->addOneShotIsGrantedObserver($this->observer);
-        if ($this->securityFacade->isGranted($permission, $object)) {
+        if ($this->authorizationChecker->isGranted($permission, $object)) {
             return $this->observer->getAccessLevel();
         }
 
@@ -110,6 +118,6 @@ class BusinessUnitAclProvider
      */
     protected function getOrganizationContextId()
     {
-        return $this->securityFacade->getOrganization()->getId();
+        return $this->tokenAccessor->getOrganization()->getId();
     }
 }

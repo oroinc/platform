@@ -166,7 +166,7 @@ class SearchHandler implements SearchHandlerInterface
         }
 
         foreach ($this->getProperties() as $property) {
-            $result[$property] = $this->getPropertyValue($property, $item);
+            $result[$property] = (string)$this->getPropertyValue($property, $item);
         }
 
         return $result;

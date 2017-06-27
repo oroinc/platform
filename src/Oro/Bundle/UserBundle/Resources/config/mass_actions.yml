@@ -10,7 +10,7 @@ services:
         arguments:
             - '@oro_user.handler.reset_password_handler'
             - '@translator'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
 
     oro_datagrid.mass_action.disable_users:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction

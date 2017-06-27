@@ -43,27 +43,31 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
         $connectionMQ->executeQuery('DELETE FROM oro_message_queue_job_unique');
 
         $this->getFilesystem()
-            ->remove(rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'oro-message-queue');
+            ->remove(rtrim($this->kernel->getContainer()->getParameter('oro_message_queue.dbal.pid_file_dir')));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function waitWhileProcessingMessages($timeLimit = 60)
+    public function waitWhileProcessingMessages($timeLimit = 600)
     {
-        try {
-            $result = $this->getMessageQueueState();
-        } catch (TableNotFoundException $e) {
-            // Schema is not initialized yet
-            return;
-        }
-
-        while (0 !== $result) {
+        $result = 0;
+        while ($result < 3) {
             if ($timeLimit <= 0) {
+                $this->isQueueEmpty();
+
                 throw new RuntimeException('Message Queue was not process messages during time limit');
             }
 
-            $result = $this->getMessageQueueState();
+            try {
+                if ($this->isQueueEmpty()) {
+                    $result++;
+                } else {
+                    $result = 0;
+                }
+            } catch (TableNotFoundException $e) {
+                $this->logger->error($e->getMessage(), ['exception' => $e]);
+            }
 
             sleep(1);
             $timeLimit -= 1;
@@ -71,9 +75,9 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    private function getMessageQueueState()
+    private function isQueueEmpty()
     {
         /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
@@ -82,7 +86,7 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
         /** @var Connection $connectionMQ */
         $connectionMQ = $doctrine->getManager('message_queue_job')->getConnection();
 
-        return $connection->executeQuery('SELECT * FROM oro_message_queue')->rowCount() +
+        return false == $connection->executeQuery('SELECT * FROM oro_message_queue')->rowCount() +
             $connectionMQ->executeQuery(
                 sprintf(
                     "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s')",

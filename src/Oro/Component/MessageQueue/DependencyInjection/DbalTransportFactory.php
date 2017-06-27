@@ -37,7 +37,7 @@ class DbalTransportFactory implements TransportFactoryInterface
             ->children()
                 ->scalarNode('connection')->defaultValue('default')->cannotBeEmpty()->end()
                 ->scalarNode('table')->defaultValue('oro_message_queue')->cannotBeEmpty()->end()
-                ->integerNode('pid_file_dir')->defaultValue($pidFileDir)->cannotBeEmpty()->end()
+                ->scalarNode('pid_file_dir')->defaultValue($pidFileDir)->cannotBeEmpty()->end()
                 ->integerNode('consumer_process_pattern')
                     ->defaultValue(':consume')
                     ->cannotBeEmpty()
@@ -53,6 +53,7 @@ class DbalTransportFactory implements TransportFactoryInterface
     {
         $pidFileManager = new Definition(DbalPidFileManager::class);
         $pidFileManager->setPublic(false);
+        $container->setParameter('oro_message_queue.dbal.pid_file_dir', $config['pid_file_dir']);
         $pidFileManager->setArguments([
             $config['pid_file_dir'],
         ]);

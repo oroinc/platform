@@ -2,14 +2,21 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider;
 
 class AclProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrine;
@@ -19,14 +26,15 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->provider = new AclProvider($this->securityFacade, $this->doctrine);
+        $this->provider = new AclProvider(
+            $this->authorizationChecker,
+            $this->tokenAccessor,
+            $this->doctrine
+        );
     }
 
     public function testIsGrantedByAclAnnotationId()
@@ -34,7 +42,15 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $attributes = 'acme_product_view';
         $expectedResult = true;
 
-        $this->setupSecurityFacade($attributes, null, $expectedResult);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->with()
+            ->will($this->returnValue(true));
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, null)
+            ->will($this->returnValue($expectedResult));
 
         $this->assertEquals($expectedResult, $this->provider->isGranted($attributes));
     }
@@ -45,7 +61,15 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $entity = 'entity:Acme/DemoBundle/Entity/AcmeEntity';
         $expectedResult = true;
 
-        $this->setupSecurityFacade($attributes, $entity, $expectedResult);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->with()
+            ->will($this->returnValue(true));
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, $entity)
+            ->will($this->returnValue($expectedResult));
 
         $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
@@ -61,7 +85,15 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue(null));
 
-        $this->setupSecurityFacade($attributes, $this->identicalTo($entity), $expectedResult);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->with()
+            ->will($this->returnValue(true));
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, $this->identicalTo($entity))
+            ->will($this->returnValue($expectedResult));
 
         $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
@@ -95,7 +127,15 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue($em));
 
-        $this->setupSecurityFacade($attributes, $this->identicalTo($entity), $expectedResult);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->with()
+            ->will($this->returnValue(true));
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, $this->identicalTo($entity))
+            ->will($this->returnValue($expectedResult));
 
         $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
@@ -127,7 +167,15 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue($em));
 
-        $this->setupSecurityFacade($attributes, 'entity:'.ClassUtils::getRealClass($entity), $expectedResult);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->with()
+            ->will($this->returnValue(true));
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, 'entity:' . ClassUtils::getRealClass($entity))
+            ->will($this->returnValue($expectedResult));
 
         $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
@@ -161,7 +209,15 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($entity))
             ->will($this->returnValue($em));
 
-        $this->setupSecurityFacade($attributes, 'entity:'.ClassUtils::getRealClass($entity), $expectedResult);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->with()
+            ->will($this->returnValue(true));
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, 'entity:' . ClassUtils::getRealClass($entity))
+            ->will($this->returnValue($expectedResult));
 
         $this->assertEquals($expectedResult, $this->provider->isGranted($attributes, $entity));
     }
@@ -170,32 +226,14 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     {
         $attributes = 'acme_product_view';
 
-        $this->securityFacade->expects($this->once())
-            ->method('hasLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
             ->with()
             ->will($this->returnValue(false));
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $this->assertFalse($this->provider->isGranted($attributes));
-    }
-
-    /**
-     * @param string|string[] $attributes
-     * @param mixed           $object
-     * @param bool            $expectedResult
-     */
-    protected function setupSecurityFacade($attributes, $object, $expectedResult)
-    {
-        $this->securityFacade->expects($this->once())
-            ->method('hasLoggedUser')
-            ->with()
-            ->will($this->returnValue(true));
-
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with($attributes, $object)
-            ->will($this->returnValue($expectedResult));
     }
 }

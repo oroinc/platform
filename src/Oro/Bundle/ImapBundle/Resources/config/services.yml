@@ -101,7 +101,7 @@ services:
         class: %oro_imap.form.type.configuration.class%
         arguments:
             - '@oro_security.encoder.mcrypt'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@translator'
         tags:
              - { name: form.type, alias: oro_imap_configuration }
@@ -123,7 +123,7 @@ services:
         arguments:
              - '@translator'
              - '@oro_config.user'
-             - '@oro_security.security_facade'
+             - '@oro_security.token_accessor'
         tags:
              - { name: form.type, alias: oro_imap_configuration_gmail }
 

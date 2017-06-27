@@ -112,7 +112,6 @@ register it as a service with `oro_config.configuration_provider` tag:
           arguments:
               - []
               - @form.factory
-              - @oro_security.security_facade
           tags:
               -  { name: oro_config.configuration_provider }
           lazy: true
