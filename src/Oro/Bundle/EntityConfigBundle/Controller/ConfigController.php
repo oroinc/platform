@@ -156,7 +156,7 @@ class ConfigController extends Controller
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
 
         list(, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
-        list ($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
+        list($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
 
         return [
             'entity'        => $entity,
@@ -187,7 +187,7 @@ class ConfigController extends Controller
             ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->find($id);
 
-        list ($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
+        list($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
 
         return [
             'buttonConfig' => $layoutActions,

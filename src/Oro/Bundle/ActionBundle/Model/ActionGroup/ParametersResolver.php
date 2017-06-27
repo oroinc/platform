@@ -87,7 +87,7 @@ class ParametersResolver
         if ((function_exists($isFunction = 'is_' . $type) && $isFunction($value)) ||
             ($value instanceof $type)
         ) {
-                return true;
+            return true;
         }
 
         $message = sprintf(

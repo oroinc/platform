@@ -15,7 +15,7 @@ class RestInvalidUsersTest extends WebTestCase
     public function testInvalidKey()
     {
         $request = array(
-            "user" => array (
+            "user" => array(
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => 'true',
@@ -40,7 +40,7 @@ class RestInvalidUsersTest extends WebTestCase
     public function testInvalidUser()
     {
         $request = array(
-            "user" => array (
+            "user" => array(
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => 'true',
