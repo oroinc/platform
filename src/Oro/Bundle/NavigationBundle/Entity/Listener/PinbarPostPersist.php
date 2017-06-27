@@ -4,41 +4,22 @@ namespace Oro\Bundle\NavigationBundle\Entity\Listener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Oro\Bundle\NavigationBundle\Entity\AbstractPinbarTab;
 
 class PinbarPostPersist
 {
     /**
-     * @var string
+     * @param $pinbarTab
+     * @param LifecycleEventArgs $args
      */
-    protected $className;
-
-    /**
-     * @param string $className
-     *
-     * @return PinbarPostPersist
-     */
-    public function setClassName($className)
+    public function postPersist(AbstractPinbarTab $pinbarTab, LifecycleEventArgs $args)
     {
-        $this->className = $className;
-
-        return $this;
-    }
-
-    public function postPersist(LifecycleEventArgs $args)
-    {
-        /** @var $entity \Oro\Bundle\NavigationBundle\Entity\PinbarTab */
-        $entity = $args->getEntity();
-        $entityManager = $args->getEntityManager();
-
-        // perhaps you only want to act on some "PinbarTab" entity
-        if (is_a($entity, $this->className, true)) {
-            /** @var $repo \Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository */
-            $repo = $entityManager->getRepository(ClassUtils::getClass($entity));
-            $repo->incrementTabsPositions(
-                $entity->getItem()->getUser(),
-                $entity->getItem()->getId(),
-                $entity->getItem()->getOrganization()
-            );
-        }
+        /** @var $repo \Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository */
+        $repo = $args->getEntityManager()->getRepository(ClassUtils::getClass($pinbarTab));
+        $repo->incrementTabsPositions(
+            $pinbarTab->getItem()->getUser(),
+            $pinbarTab->getItem()->getId(),
+            $pinbarTab->getItem()->getOrganization()
+        );
     }
 }

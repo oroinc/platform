@@ -21,6 +21,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TestIsolationSubscriber implements EventSubscriberInterface
 {
+    use SkipIsolatorsTrait;
+
     const YES_PATTERN = '/^Y/i';
 
     /** @var IsolatorInterface[] */
@@ -34,12 +36,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     /** @var InputInterface */
     protected $input;
-
-    /** @var  bool */
-    protected $skip;
-
-    /** @var  null|array */
-    protected $skipIsolators;
 
     /**
      * @param IsolatorInterface[] $isolators
@@ -192,21 +188,5 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     public function setInput(InputInterface $input)
     {
         $this->input = $input;
-    }
-
-    /**
-     * @param bool $skip
-     */
-    public function setSkip($skip)
-    {
-        $this->skip = $skip;
-    }
-
-    /**
-     * @param null|array $skipIsolators
-     */
-    public function setSkipIsolators($skipIsolators)
-    {
-        $this->skipIsolators = $skipIsolators;
     }
 }

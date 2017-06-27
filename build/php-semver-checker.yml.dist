@@ -16,11 +16,11 @@ level:
     V014: PATCH # Class added
     V015: PATCH # Class public method added
     V016: PATCH # Class protected method added
-    V017: MINOR # *Final class public method added*
-    V018: MINOR # *Final class protected method added*
+    V017: PATCH # *Final class public method added*
+    V018: PATCH # *Final class protected method added*
     V019: PATCH # Class public property added
     V020: PATCH # Class protected property added
-    V021: MINOR # *Final class protected method parameter added*
+    V021: PATCH # *Final class protected method parameter added*
     V022: PATCH # *Final class protected method removed*
     V023: PATCH # [Final] Class public class method implementation changed
     V024: PATCH # [Final] Class protected class method implementation changed
@@ -57,7 +57,7 @@ level:
     V056: MAJOR # Trait private property removed
     V057: PATCH # Trait private method added
     V058: MAJOR # Trait private method removed
-    V059: PATCH # Trait private method parameter added
+    V059: MINOR # Trait private method parameter added
     V060: PATCH # Class public method parameter name changed
     V061: PATCH # Class protected method parameter name changed
     V062: PATCH # Class private method parameter name changed
@@ -77,7 +77,7 @@ level:
     V076: MAJOR # Interface method parameter typing removed
     V077: MINOR # Interface method parameter default added
     V078: MAJOR # Interface method parameter default removed
-    V079: MAJOR # Interface method parameter default removed
+    V079: MAJOR # Interface method parameter default value changed
     V082: MAJOR # Class public method parameter removed
     V083: MAJOR # Class protected method parameter removed
     V084: PATCH # Class private method parameter removed
