@@ -131,6 +131,11 @@ EmailBundle
     - removed method `setSecurityContextLink`
 - Class `Oro\Bundle\EmailBundle\Twig\EmailExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker` and `getTokenAccessor`
+- Class `Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber`
+    - Changed constructor signature
+        - first argument was changed from `Symfony\Component\Security\Core\SecurityContextInterface` to `Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface`
+- Class ` Oro\Bundle\EmailBundle\Provider\EmailRenderer`, changed constructor signature
+    - added eighth argument `Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry`
 
 EntityExtendBundle
 ------------------
@@ -274,6 +279,9 @@ WorkflowBundle
         - `getEntityRepository`
 - Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
 - Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
+- Added Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter`
+- Updated Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter`
+    - changed namespace
 
 UIBundle
 --------
@@ -288,3 +296,19 @@ LocaleBundle
 ------------
 - Updated Moment.js to 2.18.* version
 - Updated Numeral.js to 2.0.6 version
+
+NoteBundle
+----------
+- Added new action `create_note` related class `Oro\Bundle\NoteBundle\Action\CreateNoteAction`
+
+NotificationBundle
+------------------
+- Entity `Oro\Bundle\NotificationBundle\Model\EmailNotification` became Extend
+- Updated Class `Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler` 
+    - implements `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface`
+    - constructor signature changed, accepts only one argument instance of `Doctrine\Common\Persistence\ManagerRegistry`
+    - signature of method `process` changed, now it accepts:
+        - `mixed` $data
+        - `FormInterface` $form
+        - `Request` $request
+    
