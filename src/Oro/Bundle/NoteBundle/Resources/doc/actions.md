@@ -5,10 +5,17 @@ Actions
 
 **Alias:** create_note
 
-**Description:** Creates an activity note with for a target
+**Description:** Creates an activity note with for a target entity
 
-**Options:**
- - result - (optional) property path where where to put action group execution context value
- - results - (optional) mapping result values PropertyPaths from action-group-context to current context keys
- - action_group - action group name
- - parameters_mapping - map of parameters to be passed to action_group context from current one
+**Parameters:**
+ - message - property path to message body  
+ - target_entity - property path where to instance of entity for adding note
+ - attribute - (optional) target path where created Note entity will be saved
+
+**Configuration Example**
+```
+- @create_note:
+    message: $.comment
+    target_entity: $.entity
+    attribute: $.result.note
+```

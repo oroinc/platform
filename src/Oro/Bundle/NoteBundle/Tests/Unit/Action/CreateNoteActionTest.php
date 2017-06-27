@@ -13,9 +13,6 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class CreateNoteActionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
