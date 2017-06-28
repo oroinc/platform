@@ -16,7 +16,7 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
+class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DateFilterSubscriber */
     protected $subscriber;

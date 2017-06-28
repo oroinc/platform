@@ -8,7 +8,6 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class CommandRunnerTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testShouldBeConstructedWithAllRequiredArguments()
     {
         new  CommandRunner($this->createProducerMock());

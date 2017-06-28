@@ -37,7 +37,12 @@ define([
             ColumnFormListener.__super__.initialize.apply(this, arguments);
 
             this.selectRows();
-            this.listenTo(options.grid.collection, 'sync', this.selectRows);
+            this.listenTo(options.grid.collection, {
+                'sync': this.selectRows,
+                'excludeRow': this._excludeRow,
+                'includeRow': this._includeRow,
+                'setState': this.setState
+            });
         },
 
         /**
@@ -70,30 +75,55 @@ define([
         _processValue: function(id, model) {
             id = String(id);
 
-            var included = this.get('included');
-            var excluded = this.get('excluded');
-
             var isActive = model.get(this.columnName);
 
             if (isActive) {
-                if (_.contains(excluded, id)) {
-                    excluded = _.without(excluded, id);
-                } else {
-                    included = _.union(included, [id]);
-                }
+                this._includeRow(id);
             } else {
-                if (_.contains(included, id)) {
-                    included = _.without(included, id);
-                } else {
-                    excluded = _.union(excluded, [id]);
-                }
+                this._excludeRow(id);
             }
 
             model.trigger('backgrid:selected', model, isActive);
+        },
+
+        _excludeRow: function(id) {
+            var included = this.get('included');
+            var excluded = this.get('excluded');
+
+            if (_.contains(included, id)) {
+                included = _.without(included, id);
+            } else {
+                excluded = _.union(excluded, [id]);
+            }
 
             this.set('included', included);
             this.set('excluded', excluded);
 
+            this._synchronizeState();
+        },
+
+        _includeRow: function(id) {
+            var included = this.get('included');
+            var excluded = this.get('excluded');
+
+            if (_.contains(excluded, id)) {
+                excluded = _.without(excluded, id);
+            } else {
+                included = _.union(included, [id]);
+            }
+
+            this.set('included', included);
+            this.set('excluded', excluded);
+
+            this._synchronizeState();
+        },
+
+        /**
+         * Sets included and excluded elements ids using provided arrays
+         */
+        setState: function(included, excluded) {
+            this.set('included', included);
+            this.set('excluded', excluded);
             this._synchronizeState();
         },
 

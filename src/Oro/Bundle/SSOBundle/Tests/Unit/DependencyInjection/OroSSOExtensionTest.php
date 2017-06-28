@@ -8,7 +8,6 @@ use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
 class OroSSOExtensionTest extends ExtensionTestCase
 {
-
     public function testLoad()
     {
         $this->loadExtension(new OroSSOExtension());

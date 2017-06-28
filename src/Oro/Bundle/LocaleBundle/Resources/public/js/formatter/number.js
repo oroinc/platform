@@ -38,13 +38,13 @@ define(function(require) {
 
         var formatters = {
             numeralFormat: function(value, options) {
-                var originLanguage = numeral.language();
-                numeral.language(localeSettings.getLocale());
+                var originLocale = numeral.locale();
+                numeral.locale(localeSettings.getLocale());
                 var result = numeral(value).format(createFormat(options));
                 if (result === '0') {
                     result = options.zero_digit_symbol;
                 }
-                numeral.language(originLanguage);
+                numeral.locale(originLocale);
                 return result;
             },
             addPrefixSuffix: function(formattedNumber, options, originalNumber) {
@@ -214,10 +214,10 @@ define(function(require) {
             },
             unformat: function(value) {
                 var result = String(value);
-                var originLanguage = numeral.language();
-                numeral.language(localeSettings.getLocale());
-                result = numeral().unformat(result);
-                numeral.language(originLanguage);
+                var originLocale = numeral.locale();
+                numeral.locale(localeSettings.getLocale());
+                result = numeral(result).value();
+                numeral.locale(originLocale);
 
                 return result;
             },
