@@ -48,53 +48,54 @@ define(function(require) {
         });
 
         describe('check rule editor validation', function() {
-            var checks = {};
-            checks['product'] = false;
-            checks['product.'] = false;
-            checks['product.id'] = true;
-            checks['product.category.id'] = true;
-            checks['product.id == 1.234'] = true;
-            checks['product.id in [1, 2, 3, 4, 5]'] = true;
-            checks['product.sku matches test'] = false;
-            checks['product.sku matches "test"'] = true;
-            checks['product.id matches "test"'] = false;
-            checks['product.id not in [1, 2, 3, 4, 5]'] = true;
-            checks['product.id == product.id'] = true;
-            checks['product.id != product.id'] = true;
-            checks['product.id > product.id'] = true;
-            checks['product.id < product.id'] = true;
-            checks['someStr == 4'] = false;
-            checks['product.someStr == 4'] = false;
-            checks['(product.id == 5 and product.id == 10('] = false;
-            checks['(product.id == 5 and product.id == 10()'] = false;
-            checks['(product.id == 5((((  and product.id == 10()'] = false;
-            checks[')product.id == 5 and product.id == 10('] = false;
-            checks['(product.id == 5() and product.id == 10)'] = false;
-            checks['{product.id == 5 and product.id == 10}'] = false;
-            checks['(product.id == 5 and product.id == 10) or (product.sku in ["sku1", "sku2", "sku3"])'] = true;
-            checks['pricelist'] = false;
-            checks['pricelist.'] = false;
-            checks['pricelist.id'] = false;
-            checks['pricelist[]'] = false;
-            checks['pricelist[].'] = false;
-            checks['pricelist[].id'] = false;
-            checks['pricelist[1]'] = false;
-            checks['pricelist[1].'] = false;
-            checks['pricelist[1].id'] = true;
-            checks['pricelist[1].prices.value == 1.234'] = true;
-            checks['window.category = {id: 1}; true and category.id'] = false;
-            checks['"1string" ==' + ' \'string\''] = true;
-            checks['"2string\\" ==' + ' \'string\''] = false;
-            checks['"3string\\\\" ==' + ' \'string\''] = true;
-            checks['"4string" ==' + ' \'string\\\''] = false;
-            checks['"5string" ==' + ' \'string\\\\\''] = true;
-            checks['"6str\\"ing" ==' + ' \'st\\\'ring\''] = true;
+            var checks = {
+                'product': false,
+                'product.': false,
+                'product.id': true,
+                'product.category.id': true,
+                'product.id == 1.234': true,
+                'product.id in [1, 2, 3, 4, 5]': true,
+                'product.sku matches test': false,
+                'product.sku matches "test"': true,
+                'product.id matches "test"': false,
+                'product.id not in [1, 2, 3, 4, 5]': true,
+                'product.id == product.id': true,
+                'product.id != product.id': true,
+                'product.id > product.id': true,
+                'product.id < product.id': true,
+                'someStr == 4': false,
+                'product.someStr == 4': false,
+                '(product.id == 5 and product.id == 10(': false,
+                '(product.id == 5 and product.id == 10()': false,
+                '(product.id == 5((((  and product.id == 10()': false,
+                ')product.id == 5 and product.id == 10(': false,
+                '(product.id == 5() and product.id == 10)': false,
+                '{product.id == 5 and product.id == 10}': false,
+                '(product.id == 5 and product.id == 10) or (product.sku in ["sku1", "sku2", "sku3"])': true,
+                'pricelist': false,
+                'pricelist.': false,
+                'pricelist.id': false,
+                'pricelist[]': false,
+                'pricelist[].': false,
+                'pricelist[].id': false,
+                'pricelist[1]': false,
+                'pricelist[1].': false,
+                'pricelist[1].id': true,
+                'pricelist[1].prices.value == 1.234': true,
+                'window.category = {id: 1}; true and category.id': false,
+                '"1string" == \'string\'': true,
+                '"2string\\" == \'string\'': false,
+                '"3string\\\\" == \'string\'': true,
+                '"4string" == \'string\\\'': false,
+                '"5string" == \'string\\\\\'': true,
+                '"6str\\"ing" == \'st\\\'ring\'': true
+            };
 
             _.each(checks, function(result, check) {
                 it('should' + (!result ? ' not' : '') + ' be valid when "' + check + '"', function() {
                     expect(expressionEditorUtil.validate(check)).toEqual(result);
                 });
-            })
+            });
         });
 
         describe('check autocomplete logic', function() {

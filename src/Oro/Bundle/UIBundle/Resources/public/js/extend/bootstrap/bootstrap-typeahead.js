@@ -13,7 +13,8 @@ define(function(require) {
     var origFnTypeahead = $.fn.typeahead;
 
     var typeaheadPatches = {
-        show: function() { // fix for dropdown menu position that placed inside scrollable containers
+        show: function() {
+            // fix for dropdown menu position that placed inside scrollable containers
             var pos = $.extend({}, this.$element.position(), {
                 height: this.$element[0].offsetHeight
             });
@@ -29,7 +30,8 @@ define(function(require) {
             this.shown = true;
             return this;
         },
-        scrollOffset: function($el) { // calculates additional offset of all scrolled on parents, except body and html
+        scrollOffset: function($el) {
+            // calculates additional offset of all scrolled on parents, except body and html
             var offset = 0;
             var stopProcess = false;
 
@@ -43,9 +45,7 @@ define(function(require) {
             return offset;
         },
         keypress: function() {
-            if (this.suppressKeyPressRepeat) {
-                return;
-            }
+            //do nothing;
         }
     };
 
