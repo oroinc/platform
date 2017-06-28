@@ -2,7 +2,5 @@ api:
     entities:
         Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue:
             actions:
-                create: false
                 delete_list: false
                 delete: false
-                update: false
