@@ -1,3 +1,4 @@
+/*jshint -W054 *///ignore The Function constructor is a form of eval
 define(function(require) {
     'use strict';
 
