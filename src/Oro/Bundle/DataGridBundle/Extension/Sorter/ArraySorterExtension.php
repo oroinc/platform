@@ -52,12 +52,12 @@ class ArraySorterExtension extends AbstractSorterExtension
         usort(
             $data,
             function ($currentRow, $nextRow) use ($sortingKey, $direction) {
-                $compareIndex =  strnatcmp(
+                $compareIndex = strnatcmp(
                     $this->safeStringConvert($currentRow[$sortingKey]),
                     $this->safeStringConvert($nextRow[$sortingKey])
                 );
                 if ($direction === self::DESC_SORTING && $compareIndex !== 0) {
-                    $compareIndex =  $compareIndex > 0 ? -1 :1;
+                    $compareIndex = $compareIndex > 0 ? -1 : 1;
                 }
 
                 return $compareIndex;
@@ -66,7 +66,6 @@ class ArraySorterExtension extends AbstractSorterExtension
 
         return $data;
     }
-
 
     /**
      * @param mixed $value

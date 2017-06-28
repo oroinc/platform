@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\AttributeFilter\AttributesMovingFilterInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
-use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 
 class AttributeFormViewListener
@@ -20,25 +17,11 @@ class AttributeFormViewListener
     private $attributeManager;
 
     /**
-     * @var AttributesMovingFilterInterface
-     */
-    private $attributeFormViewFilter;
-
-    /**
-     * @var AttributeFamilyAwareInterface
-     */
-    private $entity;
-
-    /**
      * @param AttributeManager $attributeManager
-     * @param AttributesMovingFilterInterface|null $filter
      */
-    public function __construct(
-        AttributeManager $attributeManager,
-        AttributesMovingFilterInterface $filter = null
-    ) {
+    public function __construct(AttributeManager $attributeManager)
+    {
         $this->attributeManager = $attributeManager;
-        $this->attributeFormViewFilter = $filter;
     }
 
     /**
@@ -46,13 +29,15 @@ class AttributeFormViewListener
      */
     public function onEdit(BeforeListRenderEvent $event)
     {
-        if (!$this->entity) {
+        $entity = $event->getEntity();
+
+        if (!$entity instanceof AttributeFamilyAwareInterface) {
             return;
         }
 
         $scrollData = $event->getScrollData();
         $formView = $event->getFormView();
-        $groupsData = $this->attributeManager->getGroupsWithAttributes($this->entity->getAttributeFamily());
+        $groupsData = $this->attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
         $this->addNotEmptyGroupBlocks($scrollData, $groupsData);
 
         foreach ($groupsData as $groupsDatum) {
@@ -65,13 +50,13 @@ class AttributeFormViewListener
 
                 if (!$attributeView->isRendered()) {
                     $html = $event->getEnvironment()->render('OroEntityConfigBundle:Attribute:row.html.twig', [
-                        'child' => $attributeView
+                        'child' => $attributeView,
                     ]);
 
                     $subblockId = $scrollData->addSubBlock($group->getCode());
                     $scrollData->addSubBlockData($group->getCode(), $subblockId, $html, $fieldId);
                 } else {
-                    $scrollData->moveFieldToBlock($attribute->getFieldName(), $group->getCode());
+                    $this->moveFieldToBlock($scrollData, $attribute->getFieldName(), $group->getCode());
                 }
             }
         }
@@ -124,13 +109,18 @@ class AttributeFormViewListener
         }
     }
 
+    /**
+     * @param BeforeListRenderEvent $event
+     */
     public function onViewList(BeforeListRenderEvent $event)
     {
-        if (!$this->entity) {
+        $entity = $event->getEntity();
+
+        if (!$entity instanceof AttributeFamilyAwareInterface) {
             return;
         }
 
-        $groups = $this->attributeManager->getGroupsWithAttributes($this->entity->getAttributeFamily());
+        $groups = $this->attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
         $scrollData = $event->getScrollData();
         $this->addNotEmptyGroupBlocks($scrollData, $groups);
 
@@ -143,19 +133,15 @@ class AttributeFormViewListener
             foreach ($groupData['attributes'] as $attribute) {
                 $fieldName = $attribute->getFieldName();
                 if ($scrollData->hasNamedField($fieldName)) {
-                    if (!$this->attributeFormViewFilter ||
-                        !$this->attributeFormViewFilter->isRestrictedToMove($fieldName)
-                    ) {
-                        $scrollData->moveFieldToBlock($fieldName, $group->getCode());
-                    }
+                    $this->moveFieldToBlock($scrollData, $fieldName, $group->getCode());
                     continue;
                 }
 
                 $html = $event->getEnvironment()->render(
                     'OroEntityConfigBundle:Attribute:attributeView.html.twig',
                     [
-                        'entity' => $this->entity,
-                        'field' => $attribute
+                        'entity' => $entity,
+                        'field' => $attribute,
                     ]
                 );
 
@@ -168,28 +154,12 @@ class AttributeFormViewListener
     }
 
     /**
-     * @param BeforeFormRenderEvent $event
+     * @param ScrollData $scrollData
+     * @param string $fieldName
+     * @param string $blockId
      */
-    public function onFormRender(BeforeFormRenderEvent $event)
+    protected function moveFieldToBlock(ScrollData $scrollData, $fieldName, $blockId)
     {
-        $this->setEntity($event->getEntity());
-    }
-
-    /**
-     * @param BeforeViewRenderEvent $event
-     */
-    public function onViewRender(BeforeViewRenderEvent $event)
-    {
-        $this->setEntity($event->getEntity());
-    }
-
-    /**
-     * @param object $entity
-     */
-    private function setEntity($entity)
-    {
-        if ($entity instanceof AttributeFamilyAwareInterface) {
-            $this->entity = $entity;
-        }
+        $scrollData->moveFieldToBlock($fieldName, $blockId);
     }
 }

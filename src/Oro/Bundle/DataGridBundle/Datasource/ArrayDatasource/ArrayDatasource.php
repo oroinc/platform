@@ -15,8 +15,6 @@ class ArrayDatasource implements DatasourceInterface
 {
     const TYPE = 'array';
 
-    const DATA_SOURCE_KEY = 'source';
-
     /**
      * @var array
      */

@@ -20,30 +20,33 @@ class ArraySorterExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var  ArrayDatasource */
     protected $arrayDatasource;
 
+    /**
+     * @var array
+     */
+    protected $arraySource = [
+        [
+            'priceListId' => 256,
+            'priceListName' => 'A',
+        ],
+        [
+            'priceListId' => 5,
+            'priceListName' => 'B',
+        ],
+        [
+            'priceListId' => 34,
+            'priceListName' => 'C',
+        ],
+        [
+            'priceListId' => 41,
+            'priceListName' => 'D',
+        ],
+    ];
+
     protected function setUp()
     {
-        $arraySource = [
-            [
-                'priceListId' => 256,
-                'priceListName' => 'A',
-            ],
-            [
-                'priceListId' => 5,
-                'priceListName' => 'B',
-            ],
-            [
-                'priceListId' => 34,
-                'priceListName' => 'C',
-            ],
-            [
-                'priceListId' => 41,
-                'priceListName' => 'D',
-            ],
-        ];
-
         $this->config = $this->createMock(DatagridConfiguration::class);
         $this->arrayDatasource = new ArrayDatasource();
-        $this->arrayDatasource->setArraySource($arraySource);
+        $this->arrayDatasource->setArraySource($this->arraySource);
         $this->arraySorterExtension = new ArraySorterExtension();
     }
 
@@ -112,6 +115,9 @@ class ArraySorterExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function sortingDataProvider()
     {
         return [

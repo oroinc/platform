@@ -7,8 +7,19 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
 class ArrayPager implements PagerInterface
 {
+    /**
+     * @var int
+     */
     protected $maxPerPage = 0;
+
+    /**
+     * @var int
+     */
     protected $page = 1;
+
+    /**
+     * @var int
+     */
     protected $nbResults = 0;
 
     /**
