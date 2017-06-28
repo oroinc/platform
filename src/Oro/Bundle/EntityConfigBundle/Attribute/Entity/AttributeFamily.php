@@ -119,6 +119,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
      *     orphanRemoval=true,
      *     indexBy="code"
      * )
+     * @ORM\OrderBy({"id" = "ASC"})
      */
     private $attributeGroups;
 
