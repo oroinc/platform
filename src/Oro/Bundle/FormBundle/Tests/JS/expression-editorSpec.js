@@ -83,12 +83,12 @@ define(function(require) {
             checks['pricelist[1].id'] = true;
             checks['pricelist[1].prices.value == 1.234'] = true;
             checks['window.category = {id: 1}; true and category.id'] = false;
-            checks['"1string" ==' + " 'string'"] = true;
-            checks['"2string\\" ==' + " 'string'"] = false;
-            checks['"3string\\\\" ==' + " 'string'"] = true;
-            checks['"4string" ==' + " 'string\\'"] = false;
-            checks['"5string" ==' + " 'string\\\\'"] = true;
-            checks['"6str\\"ing" ==' + " 'st\\'ring'"] = true;
+            checks['"1string" ==' + ' \'string\''] = true;
+            checks['"2string\\" ==' + ' \'string\''] = false;
+            checks['"3string\\\\" ==' + ' \'string\''] = true;
+            checks['"4string" ==' + ' \'string\\\''] = false;
+            checks['"5string" ==' + ' \'string\\\\\''] = true;
+            checks['"6str\\"ing" ==' + ' \'st\\\'ring\''] = true;
 
             _.each(checks, function(result, check) {
                 it('should' + (!result ? ' not' : '') + ' be valid when "' + check + '"', function() {
@@ -99,13 +99,13 @@ define(function(require) {
 
         describe('check autocomplete logic', function() {
             it('chain select', function() {
-                el.value = '';
+                el.value = 'pro';
                 typeahead.lookup();
-                for (var i = 0; i < 6; i++) {
+                for (var i = 0; i < 5; i++) {
                     typeahead.select();
                 }
 
-                expect(el.value).toEqual('product.featured + product.featured + ');
+                expect(el.value).toEqual('product.attributeFamily.code != pricelist[].');
             });
 
             it('check suggested items for "product.category."', function() {
@@ -113,13 +113,13 @@ define(function(require) {
                 el.selectionStart = el.value.length;
 
                 expect(typeahead.source()).toEqual([
+                    'createdAt',
                     'id',
                     'left',
                     'level',
                     'materializedPath',
                     'right',
                     'root',
-                    'createdAt',
                     'updatedAt'
                 ]);
             });
@@ -132,12 +132,22 @@ define(function(require) {
                     typeahead.lookup();
 
                     expect(typeahead.source()).toEqual([
-                        '+', '-', '%', '*', '/',
-                        'and', 'or',
-                        '==', '!=',
-                        '>', '<', '<=', '>=',
-                        'in', 'not in',
-                        'matches'
+                        '!=',
+                        '%',
+                        '*',
+                        '+',
+                        '-',
+                        '/',
+                        '<',
+                        '<=',
+                        '==',
+                        '>',
+                        '>=',
+                        'and',
+                        'in',
+                        'matches',
+                        'not in',
+                        'or'
                     ]);
                 });
             });
@@ -150,8 +160,8 @@ define(function(require) {
                     typeahead.lookup();
 
                     expect(typeahead.source()).toEqual([
-                        'product',
-                        'pricelist'
+                        'pricelist',
+                        'product'
                     ]);
                 });
             });
@@ -200,7 +210,7 @@ define(function(require) {
             it('inserting in the field start', function() {
                 var checks = [];
                 checks.push([2, 'pro', 'product.']);
-                checks.push([8, 'product. == 10', 'product.featured  == 10']);
+                checks.push([8, 'product. == 10', 'product.attributeFamily. == 10']);
                 checks.push([12, 'product.id !', 'product.id != ']);
 
                 _.each(checks, function(check) {

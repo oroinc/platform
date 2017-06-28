@@ -158,7 +158,7 @@ define(function(require) {
             this._toggleDataSource();
             this.typeahead.query = this.autocompleteData.itemLastChild;
 
-            return _.keys(this.autocompleteData.items);
+            return _.sortBy(_.keys(this.autocompleteData.items));
         },
 
         /**
@@ -194,7 +194,7 @@ define(function(require) {
         _typeaheadHighlighter: function(item) {
             var original = Typeahead.prototype.highlighter;
             var hasChild = !!this.autocompleteData.items[item].child;
-            var suffix = hasChild ? '&hellip;' : '';
+            var suffix = hasChild ? '...' : '';
             return original.call(this.typeahead, item) + suffix;
         },
 
@@ -255,7 +255,10 @@ define(function(require) {
                 }
 
                 this.util.updateDataSourceValue(this.autocompleteData, dataSource.$field.val());
-                this.$el.val(this.autocompleteData.expression).change();
+                this.$el.val(this.autocompleteData.expression)
+                    .change().focus();
+
+                this.el.selectionStart = this.el.selectionEnd = this.autocompleteData.position;
             }, this));
 
             return dataSource;
@@ -301,7 +304,7 @@ define(function(require) {
          */
         _hideDataSource: function(dataSource) {
             dataSource.active = false;
-            dataSource.$widget.hide();
+            dataSource.$widget.hide().removeClass('active');
         },
 
         /**
@@ -311,7 +314,7 @@ define(function(require) {
          * @private
          */
         _showDataSource: function(dataSource) {
-            dataSource.$widget.show();
+            dataSource.$widget.show().addClass('active');
             dataSource.active = true;
         }
     });

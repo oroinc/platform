@@ -66,13 +66,16 @@ define(function(require) {
             'or': '||',
             'boolean': 'true',
             'relation': 'true',
+            'datetime': '0',
             'integer': '0',
             'float': '0',
             'standalone': '""',
             'string': '""',
             'in': '$next.indexOf($prev) != -1',
             'not in': '$next.indexOf($prev) == -1',
-            'matches': '$prev.indexOf($next) != -1'
+            'matches': '$prev.indexOf($next) != -1',
+            'enum': '[]',
+            'collection': '[]'
         },
 
         /**
@@ -160,7 +163,7 @@ define(function(require) {
          */
         _convertItemToNativeJS: function(item, i, items) {
             if (item.length === 0) {
-                return ;
+                return item;
             }
             var prevSeparator = i - 1;
             var prevItem = prevSeparator - 1;
@@ -181,7 +184,7 @@ define(function(require) {
             var nativeJS = this._getNativeJS(item);
             if (nativeJS === item) {
                 items[i] = nativeJS;
-                return ;
+                return nativeJS;
             }
 
             if (nativeJS.indexOf('$prev') !== -1 && items[prevItem]) {
@@ -191,12 +194,13 @@ define(function(require) {
             }
 
             if (nativeJS.indexOf('$next') !== -1 && items[nextItem]) {
-                nativeJS = nativeJS.replace('$next', items[nextItem]);
+                nativeJS = nativeJS.replace('$next', this._convertItemToNativeJS(items[nextItem], nextItem, items));
                 items[nextItem] = '';
                 items[nextSeparator] = '';
             }
 
             items[i] = nativeJS;
+            return nativeJS;
         },
 
         /**
@@ -228,12 +232,12 @@ define(function(require) {
             }
 
             var items = expression.split(this.regex.splitExpressionToItems);
-            var i, j, item;
+            var item;
             //check all items
-            for (i = 0; i < items.length; i++) {
+            for (var i = 0; i < items.length; i++) {
                 item = items[i];
                 //check all data sources in item
-                for (j = 0; j < dataSources.length; j++) {
+                for (var j = 0; j < dataSources.length; j++) {
                     item = item.split(new RegExp('(' + dataSources[j] + ')'));
                     if (item.length < 2 || item[0] !== '') {
                         //data source not found in item or not in item beginning
@@ -412,6 +416,8 @@ define(function(require) {
                 .itemCursorChild.replace(this.regex.cutDataSourceId, '[' + dataSourceValue + ']');
 
             this._updateAutocompleteExpression(autocompleteData);
+
+            autocompleteData.position = autocompleteData.expression.length - autocompleteData.afterItem.length;
         },
 
         /**

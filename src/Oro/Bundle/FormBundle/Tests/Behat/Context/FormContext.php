@@ -68,7 +68,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         $possibleElementName = $this->fixStepArgument($fieldName);
         if ($this->elementFactory->hasElement($possibleElementName)) {
-            $value = $this->elementFactory->createElement($possibleElementName)->getValue();
+            $value = $this->createElement($possibleElementName)->getValue();
             self::assertEquals($fieldValue, $value);
 
             return;
@@ -247,7 +247,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $driver = $this->getSession()->getDriver();
 
         if (null === $field) {
-            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $locator);
+            //try to find field into defined elements
+            $field = $this->createElement($locator);
+        }
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $driver,
+                'form field',
+                'id|name|label|value|placeholder|element',
+                $locator
+            );
         }
 
         self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
