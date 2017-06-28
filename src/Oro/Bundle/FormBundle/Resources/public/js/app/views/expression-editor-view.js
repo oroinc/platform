@@ -74,6 +74,7 @@ define(function(require) {
             });
 
             this.typeahead = this.$el.data('typeahead');
+            this.typeahead.$menu.addClass('expression-editor-autocomplete');
         },
 
         /**
@@ -241,7 +242,8 @@ define(function(require) {
         _initializeDataSource: function(dataSourceKey) {
             var dataSource = this.dataSourceInstances[dataSourceKey] = {};
 
-            dataSource.$widget = $(this.dataSource[dataSourceKey]);
+            dataSource.$widget = $('<div>').addClass('expression-editor-data-source')
+                .html(this.dataSource[dataSourceKey]);
             dataSource.$field = dataSource.$widget.find(':input[name]:first');
             dataSource.active = false;
 
