@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\IntegrationBundle\Event\ClientCreatedAfterEvent;
-use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
 
 /**
@@ -23,15 +21,15 @@ class EventDispatchableRestClientFactory implements FactoryInterface
     protected $legacyClientFactory;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
     /**
      * @param RestClientFactoryInterface $clientFactory
-     * @param EventDispatcher            $dispatcher
+     * @param EventDispatcherInterface   $dispatcher
      */
-    public function __construct(RestClientFactoryInterface $clientFactory, EventDispatcher $dispatcher)
+    public function __construct(RestClientFactoryInterface $clientFactory, EventDispatcherInterface $dispatcher)
     {
         $this->legacyClientFactory = $clientFactory;
         $this->dispatcher = $dispatcher;
