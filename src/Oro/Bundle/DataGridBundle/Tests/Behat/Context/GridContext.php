@@ -1041,7 +1041,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $list = $grid->getElement($grid->getMappedChildElementName('GridViewList'));
         }
         self::assertTrue($list->isValid(), 'Grid view list not found on the page');
-        $list->find('css', '.dropdown-toggle')->press();
+        $list->press();
     }
 
     /**
