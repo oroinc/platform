@@ -34,6 +34,13 @@ define(function(require) {
         filters: null,
 
         /**
+         * State of sticky filters
+         *
+         * @type {boolean}
+         */
+        isStickyFilters: false,
+
+        /**
          * Template selector
          */
         templateSelector: '#filter-container',
@@ -132,6 +139,8 @@ define(function(require) {
             if (options.filters) {
                 _.extend(this.filters, options.filters);
             }
+
+            this.isStickyFilters = options.collection.options.toolbarOptions.isStickyFilters === true;
 
             var filterListeners = {
                 'update': this._onFilterUpdated,
@@ -348,7 +357,7 @@ define(function(require) {
          */
         render: function() {
             this.setElement(
-                $(this.template({filters: this.filters}))
+                $(this.template({filters: this.filters, isStickyFilters: this.isStickyFilters}))
             );
 
             this.dropdownContainer = this.$el.find('.filter-container');

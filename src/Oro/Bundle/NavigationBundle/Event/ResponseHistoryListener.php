@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityBundle\Event\OroEventManager;
@@ -38,8 +38,8 @@ class ResponseHistoryListener
     /** @var ItemFactory */
     protected $navItemFactory;
 
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var ManagerRegistry */
     protected $registry;
@@ -48,21 +48,21 @@ class ResponseHistoryListener
     protected $titleService;
 
     /**
-     * @param ItemFactory              $navigationItemFactory
-     * @param SecurityContextInterface $securityContext
-     * @param ManagerRegistry          $registry
-     * @param TitleServiceInterface    $titleService
+     * @param ItemFactory           $navigationItemFactory
+     * @param TokenStorageInterface $tokenStorage
+     * @param ManagerRegistry       $registry
+     * @param TitleServiceInterface $titleService
      */
     public function __construct(
         ItemFactory $navigationItemFactory,
-        SecurityContextInterface $securityContext,
+        TokenStorageInterface $tokenStorage,
         ManagerRegistry $registry,
         TitleServiceInterface $titleService
     ) {
-        $this->navItemFactory  = $navigationItemFactory;
-        $this->securityContext = $securityContext;
-        $this->registry        = $registry;
-        $this->titleService    = $titleService;
+        $this->navItemFactory = $navigationItemFactory;
+        $this->tokenStorage = $tokenStorage;
+        $this->registry = $registry;
+        $this->titleService = $titleService;
     }
 
     /**
@@ -82,7 +82,7 @@ class ResponseHistoryListener
         $em       = $this->registry->getManagerForClass($this->historyItemFQCN);
         $request  = $event->getRequest();
         $response = $event->getResponse();
-        $token    = $this->securityContext->getToken();
+        $token    = $this->tokenStorage->getToken();
         $user     = $organization = null;
         if ($token instanceof TokenInterface) {
             $user = $token->getUser();

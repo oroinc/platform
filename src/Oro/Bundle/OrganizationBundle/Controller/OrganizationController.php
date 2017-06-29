@@ -29,7 +29,7 @@ class OrganizationController extends Controller
     public function updateCurrentAction()
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get('security.context')->getToken();
+        $token = $this->get('security.token_storage')->getToken();
         $organization = $token->getOrganizationContext();
 
         return $this->update($organization);

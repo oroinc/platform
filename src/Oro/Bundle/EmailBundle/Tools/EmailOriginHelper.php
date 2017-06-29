@@ -17,15 +17,10 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
- * Class EmailOriginHelper
- *
- * @package Oro\Bundle\EmailBundle\Tools
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailOriginHelper
@@ -36,8 +31,8 @@ class EmailOriginHelper
     /** @var EntityManager */
     protected $em;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var  EmailOwnerProvider */
     protected $emailOwnerProvider;
@@ -49,19 +44,19 @@ class EmailOriginHelper
     protected $origins = [];
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ServiceLink $serviceLink
-     * @param EmailOwnerProvider $emailOwnerProvider
-     * @param EmailAddressHelper $emailAddressHelper
+     * @param DoctrineHelper         $doctrineHelper
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param EmailOwnerProvider     $emailOwnerProvider
+     * @param EmailAddressHelper     $emailAddressHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        ServiceLink $serviceLink,
+        TokenAccessorInterface $tokenAccessor,
         EmailOwnerProvider $emailOwnerProvider,
         EmailAddressHelper $emailAddressHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $serviceLink->getService();
+        $this->tokenAccessor = $tokenAccessor;
         $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailAddressHelper = $emailAddressHelper;
     }
@@ -116,8 +111,8 @@ class EmailOriginHelper
         $secured = false
     ) {
         $originKey = $originName . $email . $enableUseUserEmailOrigin;
-        if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
-            $organization = $this->securityFacade->getOrganization();
+        if (!$organization && $this->tokenAccessor->getOrganization()) {
+            $organization = $this->tokenAccessor->getOrganization();
         }
         if (!array_key_exists($originKey, $this->origins)) {
             $emailOwners = $this->emailOwnerProvider
@@ -179,7 +174,7 @@ class EmailOriginHelper
     {
         $access = false;
         if ($emailOwner instanceof User
-            && $this->securityFacade->getLoggedUserId() === $emailOwner->getId()) {
+            && $this->tokenAccessor->getUserId() === $emailOwner->getId()) {
             $access = true;
         } elseif ($emailOwner instanceof Mailbox) {
             $ownerIds = [];
@@ -199,7 +194,7 @@ class EmailOriginHelper
                 }
             }
 
-            if (in_array($this->securityFacade->getLoggedUserId(), $ownerIds, true)) {
+            if (in_array($this->tokenAccessor->getUserId(), $ownerIds, true)) {
                 $access = true;
             }
         }

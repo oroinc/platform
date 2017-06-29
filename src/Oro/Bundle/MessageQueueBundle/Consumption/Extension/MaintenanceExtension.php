@@ -115,6 +115,6 @@ class MaintenanceExtension extends AbstractExtension
      */
     private function isMaintenanceServer()
     {
-         return file_exists($this->filePathServerLock);
+        return file_exists($this->filePathServerLock);
     }
 }

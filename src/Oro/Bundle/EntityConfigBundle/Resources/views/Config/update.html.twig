@@ -12,13 +12,13 @@
 {% set audit_show_change_history = true %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_entityconfig_manage') %}
+    {% if is_granted('oro_entityconfig_manage') %}
         {{ UI.cancelButton(path('oro_entityconfig_view', {id: entity.id})) }}
         {% set html = UI.saveAndCloseButton({
             'route': 'oro_entityconfig_view',
             'params': {'id': '$id'}
         }) %}
-        {% if resource_granted('oro_entityextend_entity_create') %}
+        {% if is_granted('oro_entityextend_entity_create') %}
             {% set html = html ~ UI.saveAndNewButton({
                 'route': 'oro_entityextend_entity_create'
             }) %}

@@ -11,7 +11,8 @@ services:
             - '@translator'
             - '@oro_entity.helper.field_helper'
             - '@oro_user.importexport.data_converter'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
         calls:
             - [setConfigProvider, ['@oro_entity_config.provider.extend']]
 

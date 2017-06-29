@@ -17,7 +17,6 @@ class SearchNumberRangeFilter extends SearchNumberFilter
      */
     protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data)
     {
-
         $value = $data['value'];
         $valueEnd = $data['value_end'];
         $fieldName = $this->getFieldName($data);

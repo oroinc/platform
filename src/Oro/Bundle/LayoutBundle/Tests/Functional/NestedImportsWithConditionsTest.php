@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
-class NestedImportWithConditionsTest extends AbstractLayoutBuilderTest
+class NestedImportsWithConditionsTest extends AbstractLayoutBuilderTest
 {
     public function testLayoutTree()
     {

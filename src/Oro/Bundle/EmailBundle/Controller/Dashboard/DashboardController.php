@@ -5,8 +5,6 @@ namespace Oro\Bundle\EmailBundle\Controller\Dashboard;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use Oro\Bundle\EmailBundle\Model\FolderType;
-
 class DashboardController extends Controller
 {
     /**
@@ -33,10 +31,10 @@ class DashboardController extends Controller
         if ($contentType === 'tab') {
             return $activeTabContent;
         } else {
-            $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
+            $currentOrganization = $this->get('oro_security.token_accessor')->getOrganization();
 
             $unreadMailCount = 0;
-            if ($this->get('oro_security.security_facade')->isGranted('oro_email_email_user_view')) {
+            if ($this->isGranted('oro_email_email_user_view')) {
                 $unreadMailCount = $this
                     ->get('oro_email.manager.notification')
                     ->getCountNewEmails($loggedUser, $currentOrganization);

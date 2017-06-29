@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Dashboard\Converters;
 
-use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
-
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
 class WidgetUserSelectConverter extends WidgetEntitySelectConverter
@@ -19,9 +16,17 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
     /** @var OwnerHelper */
     protected $ownerHelper;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
+    /**
+     * @param OwnerHelper        $ownerHelper
+     * @param AclHelper          $aclHelper
+     * @param EntityNameResolver $entityNameResolver
+     * @param DoctrineHelper     $doctrineHelper
+     * @param EntityManager      $entityManager
+     * @param string             $entityClass
+     */
     public function __construct(
         OwnerHelper $ownerHelper,
         AclHelper $aclHelper,
@@ -63,16 +68,16 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
 
         $qb->leftJoin('e.organizations', 'org')
             ->andWhere('org.id = :org')
-            ->setParameter('org', $this->securityFacade->getOrganizationId());
+            ->setParameter('org', $this->tokenAccessor->getOrganizationId());
 
         return $qb->getQuery()->getResult();
     }
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
+    public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 }

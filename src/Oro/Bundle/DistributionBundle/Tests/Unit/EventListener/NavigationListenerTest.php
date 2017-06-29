@@ -14,9 +14,9 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldBeConstructedWithSecurityFacade()
+    public function shouldBeConstructedWithSecurityContext()
     {
-        new NavigationListener($this->createSecurityContextMock());
+        new NavigationListener($this->createAuthorizationCheckerMock(), $this->createTokenStorageMock());
     }
 
     /**
@@ -24,7 +24,11 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function couldBeConstructedWithEntryPoint()
     {
-        new NavigationListener($this->createSecurityContextMock(), self::ENTRY_POINT);
+        new NavigationListener(
+            $this->createAuthorizationCheckerMock(),
+            $this->createTokenStorageMock(),
+            self::ENTRY_POINT
+        );
     }
 
     /**
@@ -32,13 +36,15 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfEntryPointWasNotDefined()
     {
-        $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security);
+        $authorizationChecker = $this->createAuthorizationCheckerMock();
+        $tokenStorage = $this->createTokenStorageMock();
 
-        $security->expects($this->never())
+        $tokenStorage->expects($this->never())
             ->method('getToken');
-        $security->expects($this->never())
+        $authorizationChecker->expects($this->never())
             ->method('isGranted');
+
+        $listener = new NavigationListener($authorizationChecker, $tokenStorage);
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -47,15 +53,16 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfNoLoggedInUser()
     {
-        $security = $this->createSecurityContextMock();
+        $authorizationChecker = $this->createAuthorizationCheckerMock();
+        $tokenStorage = $this->createTokenStorageMock();
 
-        $security->expects($this->once())
+        $tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(null));
-        $security->expects($this->never())
+        $authorizationChecker->expects($this->never())
             ->method('isGranted');
 
-        $listener = new NavigationListener($security, self::ENTRY_POINT);
+        $listener = new NavigationListener($authorizationChecker, $tokenStorage, self::ENTRY_POINT);
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -64,17 +71,18 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfNotUserDoesNotHaveRoleAdministrator()
     {
-        $security = $this->createSecurityContextMock();
+        $authorizationChecker = $this->createAuthorizationCheckerMock();
+        $tokenStorage = $this->createTokenStorageMock();
 
-        $security->expects($this->once())
+        $tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(true));
-        $security->expects($this->once())
+        $authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('ROLE_ADMINISTRATOR')
             ->will($this->returnValue(false));
 
-        $listener = new NavigationListener($security, self::ENTRY_POINT);
+        $listener = new NavigationListener($authorizationChecker, $tokenStorage, self::ENTRY_POINT);
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -83,13 +91,13 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfMenuDoesNotHaveSystemTab()
     {
-        $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security, self::ENTRY_POINT);
+        $authorizationChecker = $this->createAuthorizationCheckerMock();
+        $tokenStorage = $this->createTokenStorageMock();
 
-        $security->expects($this->once())
+        $tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(true));
-        $security->expects($this->once())
+        $authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->will($this->returnValue(true));
 
@@ -105,6 +113,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->with('system_tab')
             ->will($this->returnValue(false));
 
+        $listener = new NavigationListener($authorizationChecker, $tokenStorage, self::ENTRY_POINT);
         $listener->onNavigationConfigure($event);
     }
 
@@ -113,13 +122,13 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldAddMenuItem()
     {
-        $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security, self::ENTRY_POINT);
+        $authorizationChecker = $this->createAuthorizationCheckerMock();
+        $tokenStorage = $this->createTokenStorageMock();
 
-        $security->expects($this->once())
+        $tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(true));
-        $security->expects($this->once())
+        $authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->will($this->returnValue(true));
 
@@ -149,6 +158,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($systemTab));
 
+        $listener = new NavigationListener($authorizationChecker, $tokenStorage, self::ENTRY_POINT);
         $listener->onNavigationConfigure($event);
     }
 
@@ -157,22 +167,20 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldAddMenuItemForSubdirectory()
     {
-        $security = $this->createSecurityContextMock();
+        $authorizationChecker = $this->createAuthorizationCheckerMock();
+        $tokenStorage = $this->createTokenStorageMock();
 
-        $listener = new NavigationListener($security, self::ENTRY_POINT);
+        $listener = new NavigationListener($authorizationChecker, $tokenStorage, self::ENTRY_POINT);
 
-        $security
-            ->expects($this->once())
+        $tokenStorage->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(true));
-        $security
-            ->expects($this->once())
+        $authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->will($this->returnValue(true));
 
         $request = $this->createRequestMock();
-        $request
-            ->expects($this->once())
+        $request->expects($this->once())
             ->method('getBasePath')
             ->will($this->returnValue('/subdir'));
 
@@ -181,20 +189,17 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->createEventMock();
 
         $menu = $this->createMenuItemMock();
-        $event
-            ->expects($this->once())
+        $event->expects($this->once())
             ->method('getMenu')
             ->will($this->returnValue($menu));
 
         $systemTab = $this->createMenuItemMock();
-        $menu
-            ->expects($this->once())
+        $menu->expects($this->once())
             ->method('getChild')
             ->with('system_tab')
             ->will($this->returnValue($systemTab));
 
-        $systemTab
-            ->expects($this->once())
+        $systemTab->expects($this->once())
             ->method('addChild')
             ->with(
                 'package_manager',
@@ -229,9 +234,17 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createSecurityContextMock()
+    protected function createAuthorizationCheckerMock()
     {
-        return $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        return $this->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createTokenStorageMock()
+    {
+        return $this->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
     }
 
     /**

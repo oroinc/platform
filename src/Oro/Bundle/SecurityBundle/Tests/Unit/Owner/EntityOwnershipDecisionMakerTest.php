@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
@@ -25,20 +26,14 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
  */
 class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDecisionMakerTest
 {
-    /**
-     * @var EntityOwnershipDecisionMaker
-     */
+    /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    protected $tokenAccessor;
 
     protected function setUp()
     {
@@ -67,49 +62,19 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [
-                            'oro_security.ownership_tree_provider.chain',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $treeProvider,
-                        ],
-                        [
-                            'oro_security.owner.metadata_provider.chain',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->metadataProvider,
-                        ],
-                        [
-                            'oro_security.security_facade',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->securityFacade,
-                        ],
-                        [
-                            'oro_security.acl.object_id_accessor',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            new ObjectIdAccessor($doctrineHelper),
-                        ],
-                        [
-                            'oro_security.owner.entity_owner_accessor',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            new EntityOwnerAccessor($this->metadataProvider),
-                        ],
-                    ]
-                )
-            );
+        $this->container = TestContainerBuilder::create()
+            ->add('oro_security.ownership_tree_provider.chain', $treeProvider)
+            ->add('oro_security.owner.metadata_provider.chain', $this->metadataProvider)
+            ->add('oro_security.token_accessor', $this->tokenAccessor)
+            ->add('oro_security.acl.object_id_accessor', new ObjectIdAccessor($doctrineHelper))
+            ->add('oro_security.owner.entity_owner_accessor', new EntityOwnerAccessor($this->metadataProvider))
+            ->getContainer($this);
 
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProvider,
@@ -122,7 +87,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
 
     protected function tearDown()
     {
-        unset($this->decisionMaker, $this->container, $this->securityFacade);
+        unset($this->decisionMaker, $this->container, $this->tokenAccessor);
     }
 
     public function testIsOrganization()
@@ -623,9 +588,8 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
      */
     public function testSupports($user, $expectedResult)
     {
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($user);
 
         $this->assertEquals($expectedResult, $this->decisionMaker->supports());
@@ -637,15 +601,15 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     public function supportsDataProvider()
     {
         return [
-            'without security facade' => [
+            'without user' => [
                 'user' => null,
                 'expectedResult' => false,
             ],
-            'security facade with incorrect user class' => [
+            'unsupported user' => [
                 'user' => new \stdClass(),
                 'expectedResult' => false,
             ],
-            'security facade with user class' => [
+            'supported user' => [
                 'user' => new User(),
                 'expectedResult' => true,
             ],

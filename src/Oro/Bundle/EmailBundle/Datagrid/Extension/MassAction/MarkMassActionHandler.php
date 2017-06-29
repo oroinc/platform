@@ -5,17 +5,15 @@ namespace Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\SecurityContext;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class MarkMassActionHandler implements MassActionHandlerInterface
 {
@@ -23,61 +21,45 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     const MARK_UNREAD = 2;
     const FLUSH_BATCH_SIZE = 100;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var SecurityContext
-     */
-    protected $securityContext;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var User
-     */
-    protected $user;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $needToProcessThreadIds = [];
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $responseMessage = 'oro.email.datagrid.mark.success_message';
-
-    /** @var SecurityFacade */
-    protected $securityFacade;
 
     /** @var EmailManager */
     protected $emailManager;
 
     /**
-     * @param EntityManager $entityManager
-     * @param TranslatorInterface $translator
-     * @param SecurityContext $securityContext
-     * @param ServiceLink $securityFacadeLink
-     * @param EmailManager $emailManager
+     * @param EntityManager                 $entityManager
+     * @param TranslatorInterface           $translator
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param EmailManager                  $emailManager
      */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
-        SecurityContext $securityContext,
-        ServiceLink $securityFacadeLink,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         EmailManager $emailManager
     ) {
         $this->entityManager = $entityManager;
         $this->translator = $translator;
-        $this->securityContext = $securityContext;
-        $this->user = $this->securityContext->getToken()->getUser();
-        $this->securityFacade = $securityFacadeLink->getService();
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
         $this->emailManager = $emailManager;
     }
 
@@ -126,17 +108,15 @@ class MarkMassActionHandler implements MassActionHandlerInterface
                 $folderType = $data['filters']['folder']['value'];
             }
 
-            $organization = $this->securityFacade->getOrganization();
-
             $queryBuilder = $this
                 ->entityManager
                 ->getRepository('OroEmailBundle:EmailUser')
                 ->getEmailUserBuilderForMassAction(
                     $emailUserIds,
-                    $this->user,
+                    $this->tokenAccessor->getUser(),
                     $folderType,
                     $isAllSelected,
-                    $organization
+                    $this->tokenAccessor->getOrganization()
                 );
             $iteration = $this->process($queryBuilder, $markType, $iteration);
         }
@@ -159,13 +139,13 @@ class MarkMassActionHandler implements MassActionHandlerInterface
         $queryBuilder = $this
             ->entityManager
             ->getRepository('OroEmailBundle:EmailUser')
-            ->getEmailUserByThreadId($this->needToProcessThreadIds, $this->user);
+            ->getEmailUserByThreadId($this->needToProcessThreadIds, $this->tokenAccessor->getUser());
 
         $result = $queryBuilder->getQuery()->iterate();
         foreach ($result as $entity) {
             $entity = $entity[0];
 
-            if ($this->securityFacade->isGranted('EDIT', $entity)) {
+            if ($this->authorizationChecker->isGranted('EDIT', $entity)) {
                 $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
             }
             $this->entityManager->persist($entity);
@@ -226,7 +206,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
             /** @var EmailUser $entity */
             $entity = $entity[0];
 
-            if ($this->securityFacade->isGranted('EDIT', $entity)) {
+            if ($this->authorizationChecker->isGranted('EDIT', $entity)) {
                 $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
             }
 

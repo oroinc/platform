@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\SecurityBundle\Layout\DataProvider;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class CurrentUserProvider
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -22,6 +22,6 @@ class CurrentUserProvider
      */
     public function getCurrentUser()
     {
-        return $this->securityFacade->getLoggedUser();
+        return $this->tokenAccessor->getUser();
     }
 }

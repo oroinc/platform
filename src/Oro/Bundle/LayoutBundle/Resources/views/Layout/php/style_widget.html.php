@@ -1,8 +1,16 @@
-<?php //@codingStandardsIgnoreFile ?>
-<?php if (!empty($type)) $attr['type'] = $type; ?>
-<?php if (!empty($media)) $attr['media'] = $media; ?>
-<?php if (!empty($scoped)) $attr['scoped'] = 'scoped'; ?>
-<?php if (!empty($crossorigin)) $attr['crossorigin'] = $crossorigin; ?>
+<?php //@codingStandardsIgnoreFile?>
+<?php if (!empty($type)) {
+    $attr['type'] = $type;
+} ?>
+<?php if (!empty($media)) {
+    $attr['media'] = $media;
+} ?>
+<?php if (!empty($scoped)) {
+    $attr['scoped'] = 'scoped';
+} ?>
+<?php if (!empty($crossorigin)) {
+    $attr['crossorigin'] = $crossorigin;
+} ?>
 <?php if (!empty($src)): ?>
     <?php $attr['href'] = $src; ?>
     <?php $attr = array_merge(['rel' => 'stylesheet'], $attr); ?>

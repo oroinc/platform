@@ -20,7 +20,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -28,67 +28,49 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailModelBuilderHelper
 {
-    /**
-     * @var EntityRoutingHelper
-     */
+    /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /**
-     * @var EmailAddressHelper
-     */
+    /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
-    /**
-     * @var EntityNameResolver
-     */
+    /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    /**
-     * @var EmailAddressManager
-     */
+    /** @var EmailAddressManager */
     protected $emailAddressManager;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var EmailCacheManager
-     */
+    /** @var EmailCacheManager */
     protected $emailCacheManager;
 
-    /**
-     * @var EngineInterface
-     */
+    /** @var EngineInterface */
     protected $templating;
 
-    /**
-     * @var MailboxManager
-     */
+    /** @var MailboxManager */
     protected $mailboxManager;
 
     /**
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param EmailAddressHelper  $emailAddressHelper
-     * @param EntityNameResolver  $entityNameResolver
-     * @param SecurityFacade      $securityFacade
-     * @param EmailAddressManager $emailAddressManager
-     * @param EntityManager       $entityManager
-     * @param EmailCacheManager   $emailCacheManager
-     * @param EngineInterface     $engineInterface
-     * @param MailboxManager      $mailboxManager
+     * @param EntityRoutingHelper    $entityRoutingHelper
+     * @param EmailAddressHelper     $emailAddressHelper
+     * @param EntityNameResolver     $entityNameResolver
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param EmailAddressManager    $emailAddressManager
+     * @param EntityManager          $entityManager
+     * @param EmailCacheManager      $emailCacheManager
+     * @param EngineInterface        $engineInterface
+     * @param MailboxManager         $mailboxManager
      */
     public function __construct(
         EntityRoutingHelper $entityRoutingHelper,
         EmailAddressHelper $emailAddressHelper,
         EntityNameResolver $entityNameResolver,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         EmailAddressManager $emailAddressManager,
         EntityManager $entityManager,
         EmailCacheManager $emailCacheManager,
@@ -96,14 +78,14 @@ class EmailModelBuilderHelper
         MailboxManager $mailboxManager
     ) {
         $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->emailAddressHelper  = $emailAddressHelper;
-        $this->entityNameResolver  = $entityNameResolver;
-        $this->securityFacade      = $securityFacade;
-        $this->emailAddressManager = $emailAddressManager;
-        $this->entityManager       = $entityManager;
-        $this->emailCacheManager   = $emailCacheManager;
-        $this->templating          = $engineInterface;
-        $this->mailboxManager      = $mailboxManager;
+        $this->emailAddressHelper = $emailAddressHelper;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->emailAddressManager= $emailAddressManager;
+        $this->entityManager = $entityManager;
+        $this->emailCacheManager = $emailCacheManager;
+        $this->templating = $engineInterface;
+        $this->mailboxManager = $mailboxManager;
     }
 
     /**
@@ -178,7 +160,7 @@ class EmailModelBuilderHelper
      */
     public function getUser()
     {
-        return $this->securityFacade->getLoggedUser();
+        return $this->tokenAccessor->getUser();
     }
 
     /**
@@ -188,7 +170,7 @@ class EmailModelBuilderHelper
      */
     public function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
+        return $this->tokenAccessor->getOrganization();
     }
 
     /**

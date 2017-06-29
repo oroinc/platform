@@ -89,7 +89,7 @@ services:
     oro_integration.form.subscriber.default_owner_subscriber:
         class: %oro_integration.form.subscriber.default_owner_subscriber.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_integration.manager.types_registry'
 
     oro_integration.form.handler.integration:

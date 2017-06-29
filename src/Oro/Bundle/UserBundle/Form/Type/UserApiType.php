@@ -13,7 +13,7 @@ use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class UserApiType extends UserType
 {
-     /** ConfigManager */
+    /** ConfigManager */
     protected $userConfigManager;
 
     /**

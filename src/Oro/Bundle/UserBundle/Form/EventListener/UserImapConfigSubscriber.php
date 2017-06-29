@@ -2,45 +2,40 @@
 
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserImapConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $manager;
-
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $security;
+    /** @var EntityManager */
+    protected $entityManager;
 
     /** @var RequestStack */
     protected $requestStack;
 
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
+
     /**
-     * @param ObjectManager $manager
-     * @param RequestStack $requestStack
-     * @param SecurityContextInterface  $security
+     * @param EntityManager          $entityManager
+     * @param RequestStack           $requestStack
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
-        ObjectManager $manager,
+        EntityManager $entityManager,
         RequestStack $requestStack,
-        SecurityContextInterface $security
+        TokenAccessorInterface $tokenAccessor
     ) {
-        $this->manager = $manager;
+        $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
-        $this->security = $security;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -65,8 +60,8 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
         /** @var User $user */
         $user = $event->getData();
         if ($user) {
-            $this->manager->persist($user);
-            $this->manager->flush();
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
         }
     }
 
@@ -108,19 +103,17 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     {
         $request = $this->getRequest();
         $user = null;
-        /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->security->getToken();
         if ($request) {
             $currentRoute = $request->attributes->get('_route');
             if ($currentRoute === 'oro_user_config') {
                 $id = $request->attributes->getInt('id');
-                $user = $this->manager->find('OroUserBundle:User', $id);
+                $user = $this->entityManager->find('OroUserBundle:User', $id);
             } elseif ($currentRoute === 'oro_user_profile_configuration') {
-                $user = $token ? $token->getUser() : null;
+                $user = $this->tokenAccessor->getUser();
             }
         }
         if ($user && $user->getCurrentOrganization() === null) {
-            $user->setCurrentOrganization($token->getOrganizationContext());
+            $user->setCurrentOrganization($this->tokenAccessor->getOrganization());
         }
 
         return $user;
