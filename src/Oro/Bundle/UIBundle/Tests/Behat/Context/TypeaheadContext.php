@@ -14,16 +14,13 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * Assert number of typeahead suggestions after typing in input area
      * Example: When I focus on "Text" field
-     *          And I should see 3 typeahead suggestions for "Text"
+     *          Then I should see 3 typeahead suggestions for "Text"
      *
      * @Given /^I should see (?P<number>\d+) typeahead suggestions for "(?P<field>[^"]+)"$/
      */
     public function iShouldSeeTypeaheadSuggestionsNumber($number, $field)
     {
         $suggestions = $this->getSuggestionsElement($field);
-        $this->spin(function () use ($suggestions) {
-            return $suggestions->isVisible();
-        });
         self::assertTrue($suggestions->isValid(), 'Typeahead suggestions not found');
         self::assertCount(
             (int) $number,
@@ -34,15 +31,23 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * Assert suggestion in typeahead suggestions after typing in input area
      * Example: When I focus on "Text" field
-     *          And I should see "users" in typeahead suggestions for "Text"
+     *          Then I should see "users" in typeahead suggestions for "Text"
      *
      * @Given /^I should see "(?P<suggestion>[^"]+)" in typeahead suggestions for "(?P<field>[^"]+)"$/
      */
     public function iShouldSeeTypeaheadSuggestion($suggestion, $field)
     {
         $suggestions = $this->getSuggestionsElement($field);
-        $link = $suggestions->find('css', "li a:contains('$suggestion')");
-        self::assertTrue($link && $link->isValid(), "Suggestion '$suggestion' not found in typeahead");
+        $link = $suggestions->find(
+            'css',
+            sprintf('li a:contains("%s")', $suggestion)
+        );
+        self::assertTrue(
+            $link && $link->isValid(),
+            sprintf('Suggestion "%s" not found in typeahead', $suggestion)
+        );
+
+        return $link;
     }
 
     /**
@@ -54,9 +59,7 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iSelectTypeaheadSuggestion($suggestion, $field)
     {
-        $suggestions = $this->getSuggestionsElement($field);
-        $link = $suggestions->find('css', "li a:contains('$suggestion')");
-        self::assertTrue($link && $link->isValid(), "Type '$suggestion' not found in select entities type");
+        $link = $this->iShouldSeeTypeaheadSuggestion($suggestion, $field);
 
         if ($link) {
             $link->click();
@@ -70,6 +73,11 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
     protected function getSuggestionsElement($field)
     {
         $field = $this->createElement($field);
-        return $this->createElement('TypeaheadSuggestionsDropdown', $field->getParent());
+        $suggestions = $this->createElement('TypeaheadSuggestionsDropdown', $field->getParent());
+        $this->spin(function () use ($suggestions) {
+            return $suggestions->isVisible();
+        });
+
+        return $suggestions;
     }
 }

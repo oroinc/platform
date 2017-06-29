@@ -78,4 +78,3 @@ oro_behat_extension:
 
     TypeaheadSuggestionsDropdown:
       selector: '.typeahead.dropdown-menu'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

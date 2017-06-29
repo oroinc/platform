@@ -247,7 +247,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $driver = $this->getSession()->getDriver();
 
         if (null === $field) {
-            //try to find field into defined elements
+            // try to find field among defined elements
             $field = $this->createElement($locator);
         }
         if (null === $field) {

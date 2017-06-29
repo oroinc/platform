@@ -195,7 +195,7 @@ define(function(require) {
         _typeaheadHighlighter: function(item) {
             var original = Typeahead.prototype.highlighter;
             var hasChild = !!this.autocompleteData.items[item].child;
-            var suffix = hasChild ? '...' : '';
+            var suffix = hasChild ? '&hellip;' : '';
             return original.call(this.typeahead, item) + suffix;
         },
 
