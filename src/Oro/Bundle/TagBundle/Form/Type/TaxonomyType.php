@@ -16,7 +16,7 @@ class TaxonomyType extends AbstractType
         $builder->add(
             'name',
             'text',
-            array (
+            array(
                 'label'    => 'oro.taxonomy.name.label',
                 'required' => true,
             )
@@ -41,7 +41,7 @@ class TaxonomyType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array (
+            array(
                 'data_class' => 'Oro\Bundle\TagBundle\Entity\Taxonomy',
                 'intention'  => 'taxonomy',
                 'grid_name' => 'taxonomy-grid',

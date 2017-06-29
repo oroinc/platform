@@ -45,7 +45,6 @@ class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
         $detachedUser = null,
         $reloadUser = null
     ) {
-
         $oldUser = new User();
         $oldUser->setFirstName('oldUser');
 

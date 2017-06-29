@@ -80,11 +80,9 @@ class AttributeMultiSelectType extends AbstractType
                 'attributeEntityClass' => '',
                 'attributeGroup' => null,
                 'choices' => function (Options $options) {
-
                     return $this->getChoices($options['attributeEntityClass']);
                 },
                 'choice_attr' => function ($choice) {
-
                     return [
                         'locked' => ($this->isSystem($choice)) ? 'locked' : ''
                     ];

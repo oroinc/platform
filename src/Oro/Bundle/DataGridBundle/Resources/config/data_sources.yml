@@ -13,6 +13,11 @@ services:
         tags:
             - { name: oro_datagrid.datasource, type: orm }
 
+    oro_datagrid.datasource.array:
+        class: 'Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource'
+        tags:
+            - { name: oro_datagrid.datasource, type: array }
+
     oro_datagrid.datasource.orm.parameter_binder:
         class: %oro_datagrid.datasource.orm.parameter_binder.class%
 

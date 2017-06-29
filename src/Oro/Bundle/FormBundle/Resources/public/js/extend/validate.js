@@ -375,7 +375,7 @@ define([
         },
         // ignore all invisible elements except input type=hidden
         ignore: ':hidden:not([type=hidden])',
-        onfocusout: function(element, event) {
+        onfocusout: function(element) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
                     var $selectContainer = $(element).closest('.select2-container');
@@ -508,12 +508,6 @@ define([
         }
 
         return addMethod.call(this, name, method, message);
-    });
-
-    $.fn.validateDelegate = _.wrap($.fn.validateDelegate, function(validateDelegate, delegate, type, handler) {
-        return validateDelegate.call(this, delegate, type, function() {
-            return this[0] && this[0].form && $.data(this[0].form, 'validator') && handler.apply(this, arguments);
-        });
     });
 
     /**
