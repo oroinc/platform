@@ -54,7 +54,9 @@ define([
             if (this.disposed) {
                 return;
             }
-            this.$gridContainer.off(this.gridEvents);
+            if (!_.isUndefined(this.$gridContainer)) {
+                this.$gridContainer.off(this.gridEvents);
+            }
             delete this.$gridContainer;
             delete this.gridEvents;
             AbstractListener.__super__.dispose.call(this);

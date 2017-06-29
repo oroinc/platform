@@ -281,7 +281,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                         'created' => '2012-12-12 12:12:12',
                     ),
                     'shortScalar' => array('name' => 'asdfgh'),
-                    'innerRelation' => array('identityRelation' => array ('name' => 'test123')),
+                    'innerRelation' => array('identityRelation' => array('name' => 'test123')),
                 ),
                 'expected' => array(
                     'ID' => '1',
@@ -337,7 +337,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                                 'created' => '2012-12-12 12:12:12',
                             ),
                             'shortScalar' => array('name' => 'asdfgh'),
-                            'innerRelation' => array('identityRelation' => array ('name' => 'test123')),
+                            'innerRelation' => array('identityRelation' => array('name' => 'test123')),
                         )
                     ),
                     'dictionaryEntities' => array(
@@ -453,7 +453,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                         'name' => 'asdfgh',
                     ),
                     'innerRelation' => array(
-                        'identityRelation' => array (
+                        'identityRelation' => array(
                             'name' => 'test123'
                         )
                     ),

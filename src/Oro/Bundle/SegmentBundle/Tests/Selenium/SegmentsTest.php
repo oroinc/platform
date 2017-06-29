@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 class SegmentsTest extends Selenium2TestCase
 {
-     /**
+    /**
      * Test to check that Segment can be created and it returns correct data
      * @return string
      */

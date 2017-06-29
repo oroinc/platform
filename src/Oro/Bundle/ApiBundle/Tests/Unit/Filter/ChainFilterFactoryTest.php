@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\Filter\ChainFilterFactory;
 
 class ChainFilterFactoryTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testChainFactory()
     {
         $chainFactory = new ChainFilterFactory();
