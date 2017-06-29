@@ -112,7 +112,10 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             'Oro\Bundle\WarehouseBundle\Entity\Warehouse',
             'Oro\Bundle\WebsiteBundle\Entity\Website',
             'Extend\Entity\EV_Variant_Field_Code',
-            'Oro\Bundle\ProductBundle\Entity\Brand'
+            'Oro\Bundle\ProductBundle\Entity\Brand',
+            'Oro\Bundle\PricingBundle\Entity\PriceList',
+            'Oro\Bundle\PricingBundle\Entity\PriceListSchedule',
+            'Oro\Bundle\PricingBundle\Entity\PriceRule',
         ];
 
         return
