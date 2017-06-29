@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class ChoiceFieldHelper
 {
-     /** @var DoctrineHelper */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /** @var AclHelper */

@@ -9,7 +9,6 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 class Configuration implements ConfigurationInterface
 {
-
     const DEFAULT_LIMIT = 1000;
     /**
      * {@inheritdoc}

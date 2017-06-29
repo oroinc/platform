@@ -7,7 +7,6 @@ use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class ScopeTest extends \PHPUnit_Framework_TestCase
 {
-
     use EntityTestCaseTrait;
 
     /**

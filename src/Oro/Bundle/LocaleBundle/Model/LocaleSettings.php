@@ -22,7 +22,7 @@ class LocaleSettings
     /**
      * @var string[]
      */
-    static protected $locales;
+    protected static $locales;
 
     /**
      * @var string

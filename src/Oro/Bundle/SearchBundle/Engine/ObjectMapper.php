@@ -171,7 +171,7 @@ class ObjectMapper extends AbstractMapper
         $result = [];
 
         foreach ($dataFields as $column => $dataField) {
-            list ($type, $columnName) = Criteria::explodeFieldTypeName($column);
+            list($type, $columnName) = Criteria::explodeFieldTypeName($column);
 
             $value = '';
 

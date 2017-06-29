@@ -156,7 +156,6 @@ class FormIntegrationTestCase extends BaseTestCase
         $factory->expects($this->any())
             ->method('getInstance')
             ->will($this->returnCallback(function (Constraint $constraint) {
-
                 $className = $constraint->validatedBy();
 
                 if (!isset($this->validators[$className])

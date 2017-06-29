@@ -24,7 +24,7 @@ class LoadExtendedAssociation extends LoadCustomAssociation
      */
     protected function loadAssociationData(SubresourceContext $context, $associationName, $dataType)
     {
-        list($associationType,) = DataType::parseExtendedAssociation($dataType);
+        list($associationType, ) = DataType::parseExtendedAssociation($dataType);
         $this->saveAssociationDataToContext(
             $context,
             $this->loadData($context, $associationName, $this->isCollection($associationType))

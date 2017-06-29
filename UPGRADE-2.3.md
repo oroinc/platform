@@ -117,6 +117,10 @@ CronBundle
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
 - Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
 
+FormBundle
+----------
+- Updated Jquery.validate.js to 1.16.0 version
+
 EmailBundle
 -----------
 - Class `Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList`
