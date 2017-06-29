@@ -34,11 +34,13 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         $this->logger = $this->kernel->getContainer()->get('logger');
 
         $command = sprintf(
-            'php %s/console oro:message-queue:consume --env=%s %s',
+            'php %s/console oro:message-queue:consume -vvv --env=%s %s >> %s/mq.log',
             realpath($this->kernel->getRootDir()),
             $this->kernel->getEnvironment(),
-            $this->kernel->isDebug() ? '' : '--no-debug'
+            $this->kernel->isDebug() ? '' : '--no-debug',
+            realpath($this->kernel->getLogDir())
         );
+
         $this->process = new Process($command);
     }
 
@@ -83,23 +85,30 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
             );
     }
 
-    protected function killProcess($idleTime = 20)
+    protected function killProcess()
     {
         if (self::WINDOWS_OS === $this->getOs()) {
             $killCommand = sprintf('TASKKILL /PID %d /T /F', $this->process->getPid());
         } else {
-            $pattern = '[p]hp'.substr($this->process->getCommandLine(), strlen('php'));
-            $killCommand = sprintf('pkill -15 -f "%s"', $pattern);
+            $killCommand = sprintf('pkill -9 -f %s/[c]onsole', realpath($this->kernel->getRootDir()));
         }
 
-        // Process::stop() might not work as expected
-        // See https://github.com/symfony/symfony/issues/5030
-        $process = new Process($killCommand);
-        $process->run();
+        try {
+            // Process::stop() might not work as expected
+            // See https://github.com/symfony/symfony/issues/5030
+            $process = new Process($killCommand);
+            $process->run();
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            /**
+             * Update origin process status, mark it terminated to disable
+             * \Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueRunCheckSubscriber
+             */
+            $this->process->stop();
 
-        sleep($idleTime);
-
-        $this->cleanUp();
+            $this->cleanUp();
+        }
     }
 
     abstract protected function cleanUp();
@@ -107,7 +116,7 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
     /**
      * {@inheritdoc}
      */
-    public function waitWhileProcessingMessages($timeLimit = 60)
+    public function waitWhileProcessingMessages($timeLimit = 600)
     {
         $isIdleOutput = 0;
 
@@ -173,8 +182,13 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
      */
     public function restoreState(RestoreStateEvent $event)
     {
-        $this->waitWhileProcessingMessages();
-        $this->killProcess();
+        try {
+            $this->waitWhileProcessingMessages();
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            $this->killProcess();
+        }
     }
 
     /**

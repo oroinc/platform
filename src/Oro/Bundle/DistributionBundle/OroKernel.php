@@ -31,43 +31,38 @@ abstract class OroKernel extends Kernel
      */
     protected function initializeBundles()
     {
+        // clear state of CumulativeResourceManager
+        CumulativeResourceManager::getInstance()->clear();
+
         parent::initializeBundles();
 
-        // pass bundles to CumulativeResourceManager
+        // initialize CumulativeResourceManager
         $bundles = array();
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
-
-        CumulativeResourceManager::getInstance()->setBundles($bundles)
-                                                ->setAppRootDir($this->rootDir);
+        CumulativeResourceManager::getInstance()
+            ->setBundles($bundles)
+            ->setAppRootDir($this->rootDir);
     }
 
     /**
-     * Get the list of all "autoregistered" bundles
-     *
-     * @return array List ob bundle objects
+     * {@inheritdoc}
      */
     public function registerBundles()
     {
-        // clear state of CumulativeResourceManager
-        CumulativeResourceManager::getInstance()->clear();
-
         $bundles = array();
-
-        if (!$this->getCacheDir()) {
+        $cacheDir = $this->getCacheDir();
+        if (!$cacheDir) {
             foreach ($this->collectBundles() as $class => $params) {
                 $bundles[] = $params['kernel']
                     ? new $class($this)
                     : new $class;
             }
         } else {
-            $file  = $this->getCacheDir() . '/bundles.php';
-            $cache = new ConfigCache($file, false);
-
-            if (!$cache->isFresh($file)) {
+            $cache = new ConfigCache($cacheDir . '/bundles.php', false);
+            if (!$cache->isFresh()) {
                 $dumper = new PhpBundlesDumper($this->collectBundles());
-
                 $cache->write($dumper->dump());
             }
 
@@ -139,10 +134,10 @@ abstract class OroKernel extends Kernel
             )
         );
 
-        $bundles    = array();
+        $bundles = array();
         $exclusions = array();
         foreach ($files as $file) {
-            $import  = Yaml::parse(file_get_contents($file));
+            $import = Yaml::parse(file_get_contents($file));
             if (!empty($import)) {
                 if (!empty($import['bundles'])) {
                     $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
@@ -198,30 +193,11 @@ abstract class OroKernel extends Kernel
      */
     public function compareBundles($a, $b)
     {
-        // @todo: this is preliminary algorithm. we need to implement more sophisticated one,
-        // for example using bundle dependency info from composer.json
         $p1 = (int)$a['priority'];
         $p2 = (int)$b['priority'];
-
-        if ($p1 == $p2) {
-            $n1 = (string)$a['name'];
-            $n2 = (string)$b['name'];
-
-            // make sure OroCRM bundles follow Oro bundles
-            if (strpos($n1, 'Oro') === 0 && strpos($n2, 'Oro') === 0) {
-                if ((strpos($n1, 'OroCRM') === 0) && (strpos($n2, 'OroCRM') === 0)) {
-                    return strcasecmp($n1, $n2);
-                }
-                if (strpos($n1, 'OroCRM') === 0) {
-                    return 1;
-                }
-                if (strpos($n2, 'OroCRM') === 0) {
-                    return -1;
-                }
-            }
-
-            // bundles with the same priorities are sorted alphabetically
-            return strcasecmp($n1, $n2);
+        if ($p1 === $p2) {
+            // bundles with the same priority are sorted alphabetically
+            return strcasecmp((string)$a['name'], (string)$b['name']);
         }
 
         // sort be priority

@@ -33,7 +33,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     const SYNC_CODE_IN_PROCESS_FORCE = 4;
 
     /** @var string */
-    static protected $messageQueueTopic;
+    protected static $messageQueueTopic;
 
     /** @var ManagerRegistry */
     protected $doctrine;

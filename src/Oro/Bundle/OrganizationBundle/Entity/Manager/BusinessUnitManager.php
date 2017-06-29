@@ -9,9 +9,9 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class BusinessUnitManager
@@ -19,22 +19,24 @@ class BusinessUnitManager
     /** @var EntityManager */
     protected $em;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var AclHelper */
     protected $aclHelper;
 
     /**
-     * @param EntityManager $em
+     * @param EntityManager          $em
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param AclHelper              $aclHelper
      */
     public function __construct(
         EntityManager $em,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         AclHelper $aclHelper
     ) {
         $this->em = $em;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->aclHelper = $aclHelper;
     }
 
@@ -177,7 +179,7 @@ class BusinessUnitManager
                 $organization->getId()
             );
         } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-            $businessUnits = $this->getBusinessUnitIds($this->getOrganizationContextId());
+            $businessUnits = $this->getBusinessUnitIds($this->tokenAccessor->getOrganizationId());
         }
 
         return in_array($entityOwner->getId(), $businessUnits, true);
@@ -308,13 +310,5 @@ class BusinessUnitManager
                 return $result;
             }
         }
-    }
-
-    /**
-     * @return int
-     */
-    protected function getOrganizationContextId()
-    {
-        return $this->securityFacade->getOrganization()->getId();
     }
 }

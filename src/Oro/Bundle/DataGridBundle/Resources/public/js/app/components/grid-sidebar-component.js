@@ -78,7 +78,7 @@ define(function(require) {
                 this._getDatagridParams(),
                 data.params
             );
-            data = _.extend({reload: true, updateUrl: true, ignoreVisibility: false}, data);
+            data = _.extend({reload: true, updateUrl: true}, data);
             var widgetParams = _.extend(
                 _.omit(this.options.widgetRouteParameters, this.options.gridParam),
                 params
@@ -90,9 +90,6 @@ define(function(require) {
 
             this._patchGridCollectionUrl(params);
 
-            if (_.has(this.gridCollection, 'state')) {
-                this.gridCollection.state.currentPage = 1;
-            }
             if (data.reload) {
                 if (data.widgetReload) {
                     var self = this;
@@ -104,7 +101,7 @@ define(function(require) {
                         }
                     );
                 } else {
-                    mediator.trigger('datagrid:doRefresh:' + widgetParams.gridName, data.ignoreVisibility);
+                    this.gridCollection.getPage(1);
                 }
             }
         },

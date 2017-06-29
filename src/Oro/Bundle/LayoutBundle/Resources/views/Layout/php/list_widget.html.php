@@ -1,4 +1,4 @@
-<?php //@codingStandardsIgnoreFile ?>
+<?php //@codingStandardsIgnoreFile?>
 <ul <?php echo $view['layout']->block($block, 'block_attributes') ?>>
 <?php foreach ($block as $child) : ?>
     <?php if ($child->vars['visible']): ?>

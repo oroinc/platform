@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -26,28 +26,28 @@ class Manager
     protected $entityManager;
 
     /**
-     * @var SecurityContextInterface
+     * @var TokenStorageInterface
      */
-    protected $securityContext;
+    protected $tokenStorage;
 
     /**
      * Constructor
      *
-     * @param Factory                  $factory
-     * @param EntityManager            $entityManager
-     * @param AclHelper                $aclHelper
-     * @param SecurityContextInterface $securityContext
+     * @param Factory               $factory
+     * @param EntityManager         $entityManager
+     * @param AclHelper             $aclHelper
+     * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         Factory $factory,
         EntityManager $entityManager,
         AclHelper $aclHelper,
-        SecurityContextInterface $securityContext
+        TokenStorageInterface $tokenStorage
     ) {
-        $this->factory         = $factory;
-        $this->entityManager   = $entityManager;
-        $this->aclHelper       = $aclHelper;
-        $this->securityContext = $securityContext;
+        $this->factory = $factory;
+        $this->entityManager = $entityManager;
+        $this->aclHelper = $aclHelper;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -155,7 +155,7 @@ class Manager
     public function createDashboardModel()
     {
         $dashboard = new Dashboard();
-        $token     = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
             $dashboard->setOrganization($token->getOrganizationContext());
         }
@@ -228,9 +228,9 @@ class Manager
     public function findUserActiveDashboard(User $user)
     {
         /** @var OrganizationContextTokenInterface $token */
-        $token        = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganizationContext();
-        $dashboard    = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
+        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
             ->findOneBy(array('user' => $user, 'organization' => $organization));
 
         if ($dashboard) {
@@ -248,9 +248,9 @@ class Manager
     public function findDefaultDashboard()
     {
         /** @var OrganizationContextTokenInterface $token */
-        $token        = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganizationContext();
-        $dashboard    = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
             ->findDefaultDashboard($organization);
 
         if ($dashboard) {
@@ -283,8 +283,8 @@ class Manager
     public function setUserActiveDashboard(DashboardModel $dashboard, User $user, $flush = false)
     {
         /** @var OrganizationContextTokenInterface $token */
-        $token           = $this->securityContext->getToken();
-        $organization    = $token->getOrganizationContext();
+        $token = $this->tokenStorage->getToken();
+        $organization = $token->getOrganizationContext();
         $activeDashboard = $this->entityManager
             ->getRepository('OroDashboardBundle:ActiveDashboard')
             ->findOneBy(array('user' => $user, 'organization' => $organization));

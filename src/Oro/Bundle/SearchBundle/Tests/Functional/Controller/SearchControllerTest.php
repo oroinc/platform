@@ -11,7 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class SearchControllerTest extends SearchBundleWebTestCase
 {
-
     protected function setUp()
     {
         parent::setUp();

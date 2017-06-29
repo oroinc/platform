@@ -66,9 +66,12 @@ define([
      */
     return {
             /**
-             * Shows notification message
+             * Shows notification message.
+             * By default, the message is displayed until an user close it.
+             * If you want to close the message you can specify 'flash' or 'delay' option.
+             * Also in this case you can use `notificationFlashMessage` method.
              *
-             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} type 'error'|'success'|'warning'
              * @param {string} message text of message
              * @param {Object=} options
              *
@@ -103,9 +106,11 @@ define([
             },
 
             /**
-             * Shows flash notification message
+             * Shows flash notification message.
+             * By default, the message is displayed for 5 seconds.
+             * To change this you can use `delay` option.
              *
-             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} type 'error'|'success'|'warning'
              * @param {string} message text of message
              * @param {Object=} options
              *

@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class DatabaseHelper
 {
@@ -36,9 +37,9 @@ class DatabaseHelper
     protected $entities = [];
 
     /**
-     * @var ServiceLink
+     * @var TokenAccessorInterface
      */
-    protected $securityFacadeLink;
+    protected $tokenAccessor;
 
     /**
      * @var ServiceLink
@@ -51,23 +52,23 @@ class DatabaseHelper
     protected $organizationLimitsByEntity = [];
 
     /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     * @param ServiceLink $fieldHelperLink
-     * @param ServiceLink $securityFacadeLink
-     * @param ServiceLink $ownershipMetadataProviderLink
+     * @param ManagerRegistry        $registry
+     * @param DoctrineHelper         $doctrineHelper
+     * @param ServiceLink            $fieldHelperLink
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param ServiceLink            $ownershipMetadataProviderLink
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ServiceLink $fieldHelperLink,
-        ServiceLink $securityFacadeLink,
+        TokenAccessorInterface $tokenAccessor,
         ServiceLink $ownershipMetadataProviderLink
     ) {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->fieldHelperLink = $fieldHelperLink;
-        $this->securityFacadeLink = $securityFacadeLink;
+        $this->tokenAccessor = $tokenAccessor;
         $this->ownershipMetadataProviderLink = $ownershipMetadataProviderLink;
     }
 
@@ -109,7 +110,7 @@ class DatabaseHelper
                 $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
                 $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
                 $queryBuilder->andWhere('e.' . $organizationField . ' = :organization')
-                    ->setParameter('organization', $this->securityFacadeLink->getService()->getOrganization());
+                    ->setParameter('organization', $this->tokenAccessor->getOrganization());
             }
 
             $this->entities[$entityName][$storageKey] = $queryBuilder->getQuery()->getOneOrNullResult();
@@ -187,7 +188,7 @@ class DatabaseHelper
             $fieldHelper = $this->fieldHelperLink->getService();
             $entityOrganization = $fieldHelper->getObjectValue($entity, $organizationField);
             if (!$entityOrganization
-                || $entityOrganization->getId() !== $this->securityFacadeLink->getService()->getOrganizationId()
+                || $entityOrganization->getId() !== $this->tokenAccessor->getOrganizationId()
             ) {
                 return null;
             }
@@ -304,9 +305,7 @@ class DatabaseHelper
     protected function shouldBeAddedOrganizationLimits($entityName)
     {
         if (!array_key_exists($entityName, $this->organizationLimitsByEntity)) {
-            $this->organizationLimitsByEntity[$entityName] = $this->securityFacadeLink
-                    ->getService()
-                    ->getOrganization()
+            $this->organizationLimitsByEntity[$entityName] = $this->tokenAccessor->getOrganization()
                 && $this->ownershipMetadataProviderLink
                     ->getService()
                     ->getMetadata($entityName)

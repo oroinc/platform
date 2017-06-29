@@ -163,6 +163,6 @@ class EmailController extends RestController
      */
     protected function assertEmailAccessGranted($attribute, Email $email)
     {
-        return $this->get('oro_security.security_facade')->isGranted($attribute, $email);
+        return $this->isGranted($attribute, $email);
     }
 }

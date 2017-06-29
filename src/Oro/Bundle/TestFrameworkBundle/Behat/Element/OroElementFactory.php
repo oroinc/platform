@@ -166,13 +166,49 @@ class OroElementFactory implements SuiteAwareInterface
     }
 
     /**
-     * @param string       $name    Element name
-     * @param string       $text    Text that is contained in element node
+     * @param string $name Element name
+     * @param string $text Text that is contained in element node
      * @param Element|null $context The parent element
      *
      * @return Element
      */
     public function findElementContains($name, $text, Element $context = null)
+    {
+        $configName = $this->guessElement($name);
+
+        if (!$configName) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not find element with "%s" name',
+                $name
+            ));
+        }
+
+        $selector = $this->configuration[$configName]['selector'];
+        $selectorType = is_array($selector) ? $selector['type'] : 'css';
+
+        switch ($selectorType) {
+            case 'css':
+                return $this->findElementContainsByCss($name, $text, $context);
+                break;
+            case 'xpath':
+                return $this->findElementContainsByXPath($name, $text, $context);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf(
+                    'Selector type "%s" is not supported',
+                    $selectorType
+                ));
+        }
+    }
+
+    /**
+     * @param string $name Element name
+     * @param string $text Text that is contained in element node
+     * @param Element|null $context The parent element
+     *
+     * @return Element
+     */
+    public function findElementContainsByCss($name, $text, Element $context = null)
     {
         return $this->findElement(
             $name,
@@ -184,11 +220,11 @@ class OroElementFactory implements SuiteAwareInterface
     }
 
     /**
-     * @param string       $name        Element name
-     * @param string       $text        Text that is directly contained in element node
-     *                                  (or it's children nodes if $useChildren argument is true)
-     * @param bool         $useChildren Whether to use children nodes to search string
-     * @param Element|null $context     The parent element
+     * @param string $name Element name
+     * @param string $text Text that is directly contained in element node
+     *                     (or it's children nodes if $useChildren argument is true)
+     * @param bool $useChildren Whether to use children nodes to search string
+     * @param Element|null $context The parent element
      *
      * @return Element
      */
@@ -255,10 +291,10 @@ class OroElementFactory implements SuiteAwareInterface
     }
 
     /**
-     * @param string       $name             Element name
-     * @param callable     $selectorCallback Function that should be used to build selector
-     *                                       function ($selector) : string|array
-     * @param Element|null $context          The parent element
+     * @param string $name Element name
+     * @param callable $selectorCallback Function that should be used to build selector
+     *                                   function ($selector) : string|array
+     * @param Element|null $context The parent element
      *
      * @return Element
      */

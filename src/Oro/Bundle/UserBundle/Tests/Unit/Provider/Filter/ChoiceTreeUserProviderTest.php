@@ -13,9 +13,6 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
     protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $aclHelper;
 
     public function setUp()

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\TagBundle\Grid;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
@@ -9,7 +12,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TagsExtension extends AbstractTagsExtension
 {
@@ -24,28 +26,34 @@ class TagsExtension extends AbstractTagsExtension
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /**
-     * @param TagManager          $tagManager
-     * @param EntityClassResolver $entityClassResolver
-     * @param TaggableHelper      $helper
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param SecurityFacade      $securityFacade
+     * @param TagManager                    $tagManager
+     * @param EntityClassResolver           $entityClassResolver
+     * @param TaggableHelper                $helper
+     * @param EntityRoutingHelper           $entityRoutingHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenStorageInterface         $tokenStorage
      */
     public function __construct(
         TagManager $tagManager,
         EntityClassResolver $entityClassResolver,
         TaggableHelper $helper,
         EntityRoutingHelper $entityRoutingHelper,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage
     ) {
         parent::__construct($tagManager, $entityClassResolver);
 
-        $this->taggableHelper      = $helper;
+        $this->taggableHelper = $helper;
         $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->securityFacade      = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -67,7 +75,8 @@ class TagsExtension extends AbstractTagsExtension
             !$this->isUnsupportedGridPrefix($config) &&
             $this->isGridRootEntityTaggable($config) &&
             null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
-            $this->isAccessGranted();
+            null !== $this->tokenStorage->getToken() &&
+            $this->authorizationChecker->isGranted('oro_tag_view');
     }
 
     /**
@@ -92,16 +101,6 @@ class TagsExtension extends AbstractTagsExtension
         $className = $this->getEntity($configuration);
 
         return $className && $this->taggableHelper->isTaggable($className);
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isAccessGranted()
-    {
-        return
-            null !== $this->securityFacade->getToken() &&
-            $this->securityFacade->isGranted('oro_tag_view');
     }
 
     /**
@@ -134,7 +133,7 @@ class TagsExtension extends AbstractTagsExtension
         $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
 
         $permissions = [
-            'oro_tag_create'          => $this->securityFacade->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY)
+            'oro_tag_create' => $this->authorizationChecker->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY)
         ];
 
         return [
@@ -148,7 +147,7 @@ class TagsExtension extends AbstractTagsExtension
             'translatable'   => true,
             'renderable'     => $this->taggableHelper->isEnableGridColumn($className),
             'inline_editing' => [
-                'enable'                    => $this->securityFacade->isGranted(
+                'enable'                    => $this->authorizationChecker->isGranted(
                     TagManager::ACL_RESOURCE_ASSIGN_ID_KEY
                 ),
                 'editor'                    => [

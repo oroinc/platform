@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -35,8 +35,11 @@ class TagManager
     /** @var string */
     protected $taggingClass;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var Router */
     protected $router;
@@ -45,24 +48,27 @@ class TagManager
     protected $storage = [];
 
     /**
-     * @param EntityManager  $em
-     * @param string         $tagClass     - FQCN
-     * @param string         $taggingClass - FQCN
-     * @param SecurityFacade $securityFacade
-     * @param Router         $router
+     * @param EntityManager                 $em
+     * @param string                        $tagClass     - FQCN
+     * @param string                        $taggingClass - FQCN
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param Router                        $router
      */
     public function __construct(
         EntityManager $em,
         $tagClass,
         $taggingClass,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         Router $router
     ) {
-        $this->em             = $em;
-        $this->tagClass       = $tagClass;
-        $this->taggingClass   = $taggingClass;
-        $this->securityFacade = $securityFacade;
-        $this->router         = $router;
+        $this->em = $em;
+        $this->tagClass = $tagClass;
+        $this->taggingClass = $taggingClass;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->router = $router;
     }
 
     /**
@@ -361,7 +367,7 @@ class TagManager
     protected function persistDeleteTags($entity, Collection $tags)
     {
         if (!$tags->isEmpty()) {
-            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
+            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
                 throw new AccessDeniedException("User does not have access to assign/unassign tags.");
             }
             $this->deleteTagging($entity, $tags);
@@ -428,12 +434,12 @@ class TagManager
      */
     protected function persistTags($entity, $tags)
     {
-        if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
+        if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
             throw new AccessDeniedException("User does not have access to assign/unassign tags.");
         }
 
         foreach ($tags as $tag) {
-            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()) {
+            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()) {
                 throw new AccessDeniedException("User does not have access to create tags.");
             }
 
@@ -512,7 +518,7 @@ class TagManager
      */
     protected function getUser()
     {
-        return $this->securityFacade->getLoggedUser();
+        return $this->tokenAccessor->getUser();
     }
 
     /**
@@ -522,9 +528,9 @@ class TagManager
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization()
-                ? $this->securityFacade->getOrganization()
-                : $this->getOrganizationByUser();
+        return $this->tokenAccessor->getOrganization()
+            ? $this->tokenAccessor->getOrganization()
+            : $this->getOrganizationByUser();
     }
 
     /**

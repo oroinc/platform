@@ -34,6 +34,13 @@ define(function(require) {
         filters: null,
 
         /**
+         * State of sticky filters
+         *
+         * @type {boolean}
+         */
+        isStickyFilters: false,
+
+        /**
          * Template selector
          */
         templateSelector: '#filter-container',
@@ -125,7 +132,6 @@ define(function(require) {
         initialize: function(options) {
             var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
             this.template = _.template($(this.templateSelector).html());
-
             this.filters = {};
 
             _.extend(this, _.pick(options, prop));
@@ -133,6 +139,8 @@ define(function(require) {
             if (options.filters) {
                 _.extend(this.filters, options.filters);
             }
+
+            this.isStickyFilters = options.collection.options.toolbarOptions.isStickyFilters === true;
 
             var filterListeners = {
                 'update': this._onFilterUpdated,
@@ -348,9 +356,10 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            this.$el.html(
-                this.template({filters: this.filters})
+            this.setElement(
+                $(this.template({filters: this.filters, isStickyFilters: this.isStickyFilters}))
             );
+
             this.dropdownContainer = this.$el.find('.filter-container');
             var $filterItems = this.dropdownContainer.find('.filter-items');
 
@@ -533,7 +542,7 @@ define(function(require) {
          */
         _onDropdownToggle: function(e) {
             e.preventDefault();
-            this.$('.filter-box > .dropdown').toggleClass('open');
+            this.$el.find('> .dropdown').toggleClass('open');
         },
 
         /**

@@ -2,34 +2,28 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Placeholder;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var PlaceholderFilter
-     */
+    /** @var PlaceholderFilter */
     protected $placeholderFilter;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    protected $tokenAccessor;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $this->placeholderFilter = new PlaceholderFilter($this->securityFacade);
+        $this->placeholderFilter = new PlaceholderFilter($this->tokenAccessor);
     }
 
     protected function tearDown()
     {
-        unset($this->placeholderFilter, $this->securityFacade);
+        unset($this->placeholderFilter, $this->tokenAccessor);
     }
 
     /**
@@ -70,8 +64,8 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsUserApplicable($user, $expected)
     {
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($user);
 
         $this->assertEquals($expected, $this->placeholderFilter->isUserApplicable());

@@ -233,7 +233,8 @@ class RelationType extends AbstractType
 
         // if reusing relation ("Reuse existing relation" option on UI) or for one2many relation
         // we would have always bidirectional relations
-        if ($this->config->get('relation_key') || $fieldConfigId->getFieldType() === RelationTypeBase::ONE_TO_MANY) {
+        $reusedExistingRelation = $this->config->get('state') === 'New' && $this->config->get('relation_key');
+        if ($reusedExistingRelation || $fieldConfigId->getFieldType() === RelationTypeBase::ONE_TO_MANY) {
             $readOnly = true;
             $data['bidirectional'] = true;
         }

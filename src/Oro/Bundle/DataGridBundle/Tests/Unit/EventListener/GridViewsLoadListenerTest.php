@@ -2,63 +2,67 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
+use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
+use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $gridViewRepository;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $registry;
-    private $securityFacade;
 
-    private $gridViewsLoadListener;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $authorizationChecker;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $tokenAccessor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $appearanceTypeManager;
+
+    /** @var GridViewsLoadListener */
+    private $gridViewsLoadListener;
 
     public function setUp()
     {
-        $this->gridViewRepository = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->gridViewRepository = $this->createMock(GridViewRepository::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $aclHelper = $this->createMock(AclHelper::class);
+        $gridViewManager = $this->createMock(GridViewManager::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $this->appearanceTypeManager = $this->createMock(AppearanceTypeManager::class);
 
-        $gridViewManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-
-        $this->registry
-            ->expects($this->any())
+        $this->registry->expects($this->any())
             ->method('getRepository')
             ->with('OroDataGridBundle:GridView')
             ->will($this->returnValue($this->gridViewRepository));
-        $this->securityFacade
-            ->expects($this->any())
+
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->will($this->returnValue(true));
 
-        $this->appearanceTypeManager = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->gridViewsLoadListener = new GridViewsLoadListener(
             $this->registry,
-            $this->securityFacade,
+            $this->authorizationChecker,
+            $this->tokenAccessor,
             $aclHelper,
             $translator,
             $gridViewManager,
@@ -70,11 +74,9 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
     {
         $currentUser = new User();
 
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($currentUser));
-
 
         $systemView = new View('first');
         $view1 = new GridView();

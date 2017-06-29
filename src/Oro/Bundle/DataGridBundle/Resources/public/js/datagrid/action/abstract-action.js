@@ -286,11 +286,18 @@ define([
             if (_.isUndefined(parameters)) {
                 parameters = {};
             }
+
+            // Add original query parameters as them may be valuable for backend logic
+            var originalUrl = this.datagrid.collection.url;
+            var originalRequestParameters = tools.unpackFromQueryString(
+                originalUrl.substring(originalUrl.indexOf('?'), originalUrl.length)
+            );
+
             return routing.generate(
                 this.route,
                 _.extend(
                     _.extend([], this.route_parameters),
-                    parameters
+                    $.extend(true, {}, originalRequestParameters, parameters)
                 )
             );
         },

@@ -4,7 +4,7 @@ namespace Oro\Bundle\SyncBundle\Content;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -19,28 +19,28 @@ class TopicSender
     /** @var ServiceLink */
     protected $generatorLink;
 
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var LoggerInterface */
     protected $logger;
 
     /**
-     * @param TopicPublisher $publisher
-     * @param ServiceLink $generatorLink
-     * @param ServiceLink $securityContextLink
-     * @param LoggerInterface $logger
+     * @param TopicPublisher        $publisher
+     * @param ServiceLink           $generatorLink
+     * @param TokenStorageInterface $tokenStorage
+     * @param LoggerInterface       $logger
      */
     public function __construct(
         TopicPublisher $publisher,
         ServiceLink $generatorLink,
-        ServiceLink $securityContextLink,
+        TokenStorageInterface $tokenStorage,
         LoggerInterface $logger
     ) {
-        $this->publisher           = $publisher;
-        $this->generatorLink       = $generatorLink;
-        $this->securityContextLink = $securityContextLink;
-        $this->logger              = $logger;
+        $this->publisher = $publisher;
+        $this->generatorLink = $generatorLink;
+        $this->tokenStorage = $tokenStorage;
+        $this->logger = $logger;
     }
 
     /**
@@ -50,10 +50,9 @@ class TopicSender
      */
     public function send(array $tags)
     {
-        /** @var SecurityContextInterface $securityContext */
-        $securityContext = $this->securityContextLink->getService();
-        $userName        = $securityContext->getToken() && is_object($securityContext->getToken()->getUser())
-            ? $securityContext->getToken()->getUser()->getUserName() : null;
+        $userName = $this->tokenStorage->getToken() && is_object($this->tokenStorage->getToken()->getUser())
+            ? $this->tokenStorage->getToken()->getUser()->getUserName()
+            : null;
 
         if (!empty($tags)) {
             $tags = array_map(

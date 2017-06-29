@@ -29,7 +29,7 @@ services:
         arguments:
             - '@doctrine'
             - '@translator'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter'
             - '@request_stack'
             - '@oro_platform.optional_listeners.manager'

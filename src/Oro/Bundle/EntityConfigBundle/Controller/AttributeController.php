@@ -197,7 +197,7 @@ class AttributeController extends Controller
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
         $this->ensureEntityConfigSupported($entityConfigModel);
-        list ($layoutActions) = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
+        list($layoutActions) = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
 
         $response = [
             'entity' => $entityConfigModel,

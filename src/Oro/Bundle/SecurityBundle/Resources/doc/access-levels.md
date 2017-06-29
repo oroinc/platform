@@ -53,12 +53,12 @@ As result, $query will be marked as ACL protected and it will automatically dele
 
 ### Manual access check on object.
 
-Developer can check access to the given entity record by using isGranted method of Security facade service:
+Developer can check access to the given entity record by using `isGranted` method of the [Authorization Checker](https://symfony.com/doc/current/components/security/authorization.html#authorization-checker):
 
 ``` php
 $entity = $repository->findOneBy('id' => 10);
 
-if (!$this->securityFacade->isGranted('VIEW', $entity)) {
+if (!$this->authorizationChecker->isGranted('VIEW', $entity)) {
     throw new AccessDeniedException('Access denied');
 } else {
     // access is granted
@@ -67,12 +67,12 @@ if (!$this->securityFacade->isGranted('VIEW', $entity)) {
 
 ### Manual access check on object field.
 
-Developer can check access to the given entity record by using isGranted method of Security facade service:
+Developer can check access to the given entity field by passing instance `FieldVote` class to `isGranted` method of the [Authorization Checker](https://symfony.com/doc/current/components/security/authorization.html#authorization-checker):
 
 ``` php
 $entity = $repository->findOneBy('id' => 10);
 
-if (!$this->securityFacade->isGranted('VIEW', new FieldVote($entity, '_field_name_'))) {
+if (!$this->authorizationChecker->isGranted('VIEW', new FieldVote($entity, '_field_name_'))) {
     throw new AccessDeniedException('Access denided');
 } else {
     // access is granted

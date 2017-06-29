@@ -7,9 +7,13 @@
     background: $datagrid-header-cell-background;
 
     .table & {
-        padding: $datagrid-header-cell-offset;
+        padding: $datagrid-header-cell-offset-inner;
 
         vertical-align: $datagrid-header-cell-vertical-align;
+
+        &:first-child {
+            padding-left: $datagrid-header-cell-first-offset-inner-left;
+        }
     }
 
     .table-bordered & {
@@ -48,18 +52,20 @@
 
         text-align: $datagrid-header-cell-action-column-text-align;
 
-        &:before {
-            height: 10px;
-            
-            display: inline-block;
-            vertical-align: middle;
+        &:empty {
+            &:before {
+                height: 10px;
 
-            font-size: 24px;
-            line-height: 0;
+                display: inline-block;
+                vertical-align: middle;
 
-            color: get-color('additional', 'middle');
+                font-size: $base-font-size--m;
+                line-height: 0;
 
-            content: '...';
+                color: get-color('additional', 'middle');
+
+                content: '...';
+            }
         }
     }
     &__link {

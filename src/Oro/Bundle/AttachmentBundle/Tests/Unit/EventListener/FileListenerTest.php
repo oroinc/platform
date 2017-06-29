@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class FileListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +22,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     protected $fileManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject  */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject  */
     protected $em;
@@ -31,25 +34,11 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fileManager = $this->createMock(FileManager::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->em = $this->createMock(EntityManager::class);
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityFacadeLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityFacadeLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->securityFacade);
-
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->listener = new FileListener($this->fileManager, $securityFacadeLink);
+        $this->listener = new FileListener($this->fileManager, $this->tokenAccessor);
     }
 
     public function testPrePersistForNotFileEntity()
@@ -86,8 +75,8 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
         $this->fileManager->expects($this->once())
             ->method('preUpload')
             ->with($entity);
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($loggedUser);
 
         $this->listener->prePersist(new LifecycleEventArgs($entity, $this->em));
@@ -128,8 +117,8 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
         $this->fileManager->expects($this->once())
             ->method('preUpload')
             ->with($entity);
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($loggedUser);
 
         $this->listener->preUpdate(new LifecycleEventArgs($entity, $this->em));

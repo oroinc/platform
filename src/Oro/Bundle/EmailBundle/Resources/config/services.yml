@@ -226,7 +226,7 @@ services:
             - '@oro_entity.routing_helper'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_email.email.address.manager'
             - '@doctrine.orm.entity_manager'
             - '@oro_email.email.cache.manager'
@@ -557,7 +557,7 @@ services:
         lazy: true
         arguments:
             - '@translator'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_entity.entity_name_resolver'
             - '@oro_config.user'
         lazy: true
@@ -600,7 +600,7 @@ services:
             - '@oro_email.email.owner.provider.storage'
             - '@oro_entity.entity_name_resolver'
             - '@oro_email.mailbox.manager'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@form.factory'
             - '@oro_filter.filter_utility'
 
@@ -678,7 +678,7 @@ services:
         class: %oro_email.listener.datagrid.email.class%
         arguments:
             - '@oro_email.datagrid_query_factory'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_datagrid.grid_view.manager'
             - '@oro_config.manager'
         tags:
@@ -763,7 +763,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_email.email.thread.manager'
             - '@oro_email.email.thread.provider'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_email.mailbox.manager'
 
     oro_email.twig.extension.email:
@@ -797,12 +797,11 @@ services:
            - '@oro_entity_config.config_manager'
            - '@oro_email.email.thread.provider'
            - '@oro_ui.html_tag_helper'
-           - '@oro_security.security_facade.link'
+           - '@security.authorization_checker'
+           - '@oro_security.token_accessor'
            - '@oro_email.mailbox.process_storage.link'
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
-        calls:
-           - [ setSecurityContextLink, ['@security.context.link'] ]
         tags:
            - { name: oro_activity_list.provider, priority: 30 }
            - { name: oro_featuretogle.feature, feature: email }
@@ -812,7 +811,8 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_entity_config.config_manager'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@oro_locale.formatter.name'
             - '@oro_email.email.address.helper'
             - '@oro_email.provider.email_recipients.helper'
@@ -831,7 +831,7 @@ services:
     oro_email.recent_email_recipients.provider:
         class: %oro_email.recent_email_recipients.provider.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_email.related_emails.provider'
             - '@oro_security.acl_helper'
             - '@doctrine'
@@ -886,7 +886,8 @@ services:
             - '@oro_email.manager.email_attachment_manager'
             - '@oro_entity_config.provider.attachment'
             - '@oro_email.activity_list.provider'
-            - '@oro_security.security_facade.link'
+            - '@security.authorization_checker'
+            - '@security.token_storage'
             - '@oro_activity_list.provider.chain'
             - '@doctrine.orm.entity_manager'
         tags:
@@ -995,7 +996,7 @@ services:
         class: %oro_email.datagrid.origin_folder.provider.class%
         arguments:
             - '@doctrine'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
 
     oro_email.mailbox.process_storage:
         class: %oro_email.mailbox.process_storage.class%
@@ -1010,8 +1011,7 @@ services:
     oro_email.mailbox_choice_list:
         class: %oro_email.mailbox_choice_list.class%
         arguments:
-            - '@doctrine'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_email.mailbox.manager'
 
     oro_email.mailbox.manager.api:
@@ -1065,7 +1065,8 @@ services:
         class: %oro_email.listener.mailbox.authorization.class%
         arguments:
             - '@doctrine'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
@@ -1146,7 +1147,7 @@ services:
         class: %oro_email.tools.email_origin_helper.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.security_facade.link'
+            - '@oro_security.token_accessor'
             - '@oro_email.email.owner.provider'
             - '@oro_email.email.address.helper'
 

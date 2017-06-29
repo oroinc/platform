@@ -2,12 +2,25 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
+use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
+use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivityList;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
@@ -16,7 +29,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     protected $activityListManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityNameResolver;
@@ -53,38 +66,21 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
-        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
-            ->disableOriginalConstructor()->getMock();
-        $this->config             = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper     = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()->getMock();
-        $this->provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()->getMock();
-        $this->activityListFilterHelper = $this
-            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper')
-            ->disableOriginalConstructor()->getMock();
-        $this->em             = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->commentManager = $this->getMockBuilder('Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper')
-            ->disableOriginalConstructor()->getMock();
-        $this->inheritanceHelper = $this
-            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper')
-            ->disableOriginalConstructor()->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->workflowHelper = $this->getMockBuilder(WorkflowDataHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $this->config = $this->createMock(ConfigManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->provider = $this->createMock(ActivityListChainProvider::class);
+        $this->activityListFilterHelper = $this->createMock(ActivityListFilterHelper::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->commentManager = $this->createMock(CommentApiManager::class);
+        $this->aclHelper = $this->createMock(ActivityListAclCriteriaHelper::class);
+        $this->inheritanceHelper = $this->createMock(ActivityInheritanceTargetsHelper::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->workflowHelper = $this->createMock(WorkflowDataHelper::class);
 
         $this->activityListManager = new ActivityListManager(
-            $this->securityFacade,
+            $this->authorizationChecker,
             $this->entityNameResolver,
             $this->config,
             $this->provider,
@@ -153,7 +149,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
         $repo->expects($this->once())->method('find')->with(105)->willReturn($testItem);
 
-        $this->securityFacade->expects($this->any())->method('isGranted')->willReturn(true);
+        $this->authorizationChecker->expects($this->any())->method('isGranted')->willReturn(true);
 
         $provider = new TestActivityProvider();
         $this->provider->expects($this->once())->method('getProviderForEntity')->willReturn($provider);

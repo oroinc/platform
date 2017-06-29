@@ -2,33 +2,31 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
 use Oro\Component\Layout\LayoutContext;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator;
 
 class IsLoggedInContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var IsLoggedInContextConfigurator */
     protected $contextConfigurator;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
-        $this->contextConfigurator = new IsLoggedInContextConfigurator($this->securityFacade);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->contextConfigurator = new IsLoggedInContextConfigurator($this->tokenAccessor);
     }
 
     public function testConfigureContextLoggedIn()
     {
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('hasLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
             ->will($this->returnValue(true));
 
         $context = new LayoutContext();
@@ -40,9 +38,8 @@ class IsLoggedInContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureContextLoggedOut()
     {
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('hasLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
             ->will($this->returnValue(false));
 
         $context = new LayoutContext();

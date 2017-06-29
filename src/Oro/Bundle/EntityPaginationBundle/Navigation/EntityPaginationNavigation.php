@@ -4,10 +4,11 @@ namespace Oro\Bundle\EntityPaginationBundle\Navigation;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EntityPaginationNavigation
 {
@@ -19,8 +20,8 @@ class EntityPaginationNavigation
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var EntityPaginationStorage */
     protected $storage;
@@ -29,17 +30,17 @@ class EntityPaginationNavigation
     protected $paginationManager;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param SecurityFacade $securityFacade
-     * @param EntityPaginationStorage $storage
+     * @param DoctrineHelper                $doctrineHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param EntityPaginationStorage       $storage
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         EntityPaginationStorage $storage
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
         $this->storage = $storage;
     }
 
@@ -144,11 +145,11 @@ class EntityPaginationNavigation
                     if (!$navigationEntity) {
                         $this->storage->unsetIdentifier($identifier, $entity, $scope);
                         $result->setAvailable(false);
-                    } elseif (!$this->securityFacade->isGranted($permission, $navigationEntity)) {
+                    } elseif (!$this->authorizationChecker->isGranted($permission, $navigationEntity)) {
                         $this->storage->unsetIdentifier($identifier, $entity, $scope);
                         $result->setAccessible(false);
                     }
-                } while (!$navigationEntity || !$this->securityFacade->isGranted($permission, $navigationEntity));
+                } while (!$navigationEntity || !$this->authorizationChecker->isGranted($permission, $navigationEntity));
 
                 $result->setId($identifier);
             }

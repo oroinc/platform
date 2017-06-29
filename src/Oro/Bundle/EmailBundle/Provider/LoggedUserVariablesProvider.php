@@ -10,8 +10,8 @@ use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -21,8 +21,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var EntityNameResolver */
     protected $entityNameResolver;
@@ -31,21 +31,21 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     protected $configManager;
 
     /**
-     * @param TranslatorInterface $translator
-     * @param SecurityFacade      $securityFacade
-     * @param EntityNameResolver  $entityNameResolver
-     * @param ConfigManager       $configManager
+     * @param TranslatorInterface    $translator
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param EntityNameResolver     $entityNameResolver
+     * @param ConfigManager          $configManager
      */
     public function __construct(
         TranslatorInterface $translator,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         EntityNameResolver $entityNameResolver,
         ConfigManager $configManager
     ) {
-        $this->translator         = $translator;
-        $this->securityFacade     = $securityFacade;
+        $this->translator = $translator;
+        $this->tokenAccessor = $tokenAccessor;
         $this->entityNameResolver = $entityNameResolver;
-        $this->configManager      = $configManager;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -73,8 +73,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     {
         $result = [];
 
-        $organization = $this->securityFacade->getOrganization();
-        $user         = $this->securityFacade->getLoggedUser();
+        $organization = $this->tokenAccessor->getOrganization();
+        $user = $this->tokenAccessor->getUser();
 
         $this->addOrganizationName($result, $organization, $addValue);
         $this->addUserName($result, $user, $addValue);

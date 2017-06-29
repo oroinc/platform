@@ -215,7 +215,7 @@ abstract class AbstractScopeManager
             $config->setScopedEntity($entity)->setRecordId($entityId);
         }
 
-        list ($updated, $removed) = $this->calculateChangeSet($settings, $entityId);
+        list($updated, $removed) = $this->calculateChangeSet($settings, $entityId);
         foreach ($removed as $name) {
             list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
             $config->removeValue($section, $key);

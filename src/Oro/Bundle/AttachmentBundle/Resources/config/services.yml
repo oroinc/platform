@@ -72,7 +72,7 @@ services:
         arguments:
             - %oro_attachment.entity.class%
             - '@doctrine.orm.entity_manager'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_attachment.manager'
             - '@oro_entity.doctrine_helper'
 
@@ -82,7 +82,7 @@ services:
         arguments:
             - %oro_attachment.file.entity.class%
             - '@doctrine.orm.entity_manager'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_attachment.file_manager'
             - '@oro_attachment.manager'
 
@@ -90,7 +90,7 @@ services:
         class: %oro_attachment.listener.file_listener.class%
         arguments:
             - '@oro_attachment.file_manager'
-            - '@oro_security.security_facade.link'
+            - '@oro_security.token_accessor'
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
