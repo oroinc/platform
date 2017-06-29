@@ -12,6 +12,22 @@ oro_behat_extension:
       selector: '#search-dropdown ul'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Search Form:
+      selector: '#oro_website_search_search'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Query: 'search'
+
+    Theme Form:
+      selector: 'div#container'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          ThemeUseDefault: 'theme[oro_frontend___frontend_theme][use_parent_scope_value]'
+          Theme: 'theme[oro_frontend___frontend_theme][value]'
+
+
   pages:
     Search Result:
       class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
@@ -21,6 +37,7 @@ oro_behat_extension:
     OroSearchBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
         - OroDataGridBundle::GridContext
         - OroFormBundle::FormContext
         - OroSearchBundle::SearchContext
