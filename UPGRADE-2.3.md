@@ -109,6 +109,10 @@ DataGridBundle
     - changed the constructor signature: parameter `RegistryInterface $registry` was replaced with `ManagerRegistry $registry`
 - Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
     - method `getSecurityFacade` was replaced with `getAuthorizationChecker`
+- Class `Oro\Bundle\DataGridBundle\Extension\Pager\AbstractPagerExtension`
+    - changed the constructor signature: `AbstractPager $pager` replaced on `PagerInterface $pager`
+- Interface `Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface`
+    - method `init` was removed
 
 CronBundle
 ----------
@@ -135,6 +139,12 @@ EmailBundle
     - removed method `setSecurityContextLink`
 - Class `Oro\Bundle\EmailBundle\Twig\EmailExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker` and `getTokenAccessor`
+
+EntityConfigBundle
+------------------
+ - Class `Oro\Bundle\EntityConfigBundle\EventListener\AttributeFormViewListener`
+    - method `onFormRender` was removed
+    - method `onViewRender` was removed
 
 EntityExtendBundle
 ------------------

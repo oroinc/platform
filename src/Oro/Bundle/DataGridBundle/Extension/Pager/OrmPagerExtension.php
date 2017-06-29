@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
+use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 /**
@@ -13,6 +14,9 @@ use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
  */
 class OrmPagerExtension extends AbstractPagerExtension
 {
+    /** @var Pager */
+    protected $pager;
+
     /**
      * {@inheritDoc}
      */
