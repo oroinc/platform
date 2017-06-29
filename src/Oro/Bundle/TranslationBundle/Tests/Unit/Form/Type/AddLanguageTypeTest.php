@@ -93,7 +93,7 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm(array $currentCodes, array $crowdinLangs, array $codesExpected)
     {
-//        IntlTestHelper::requireIntl($this);
+        //        IntlTestHelper::requireIntl($this);
 
         $this->repository->expects($this->once())->method('getAvailableLanguageCodes')->willReturn($currentCodes);
         $this->localeSettings->expects($this->once())->method('getLanguage')->willReturn('de');

@@ -727,10 +727,16 @@ class OroMainContext extends MinkContext implements
 
             /** @var NodeElement $labelElement */
             foreach ($labels as $labelElement) {
+                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
+
+                if ($controlLabel === null) {
+                    continue;
+                }
+
                 /** @var ControlGroup $controlLabel */
                 $controlLabel = $this->elementFactory->wrapElement(
                     'ControlGroup',
-                    $labelElement->getParent()->find('css', 'div.controls div.control-label')
+                    $controlLabel
                 );
 
                 if (true === $controlLabel->compareValues(Form::normalizeValue($value, $label))) {
@@ -798,7 +804,7 @@ class OroMainContext extends MinkContext implements
         $section = $this->fixStepArgument($section);
         $page = $this->getSession()->getPage();
 
-        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]/..')->getParent();
 
         if ($sectionContainer->hasButton($button)) {
             $sectionContainer->pressButton($button);
@@ -824,6 +830,15 @@ class OroMainContext extends MinkContext implements
     {
         $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
         $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
+    }
+
+    /**
+     * @Then /^"([^"]*)" button is disabled$/
+     */
+    public function buttonIsDisabled($button)
+    {
+        $button = $this->getSession()->getPage()->findButton($button);
+        self::assertTrue($button->hasClass('disabled'));
     }
 
     /**

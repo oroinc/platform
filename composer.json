@@ -98,7 +98,7 @@
         "bower-asset/base64": "1.0.*",
         "bower-asset/flotr2": "dev-master",
         "bower-asset/bean": "1.0.6",
-        "bower-asset/jquery-validate": "1.11.1",
+        "bower-asset/jquery-validate": "1.16.0",
         "bower-asset/jquery": "3.1.1",
         "npm-asset/bootstrap": "3.0.3",
         "npm-asset/bootbox": "4.1.0",

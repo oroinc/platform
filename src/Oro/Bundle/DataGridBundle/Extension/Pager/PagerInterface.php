@@ -25,13 +25,6 @@ interface PagerInterface
     const TOTAL_PATH_PARAM = '[options][totalRecords]';
 
     /**
-     * Initialize the pager.
-     *
-     * @return void
-     */
-    public function init();
-
-    /**
      * Set max records per page
      *
      * @param  int $maxPerPage

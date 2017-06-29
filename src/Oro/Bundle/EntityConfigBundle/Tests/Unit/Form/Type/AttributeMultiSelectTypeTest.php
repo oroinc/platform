@@ -15,7 +15,7 @@ use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AttributeMultiselectTypeTest extends FormIntegrationTestCase
+class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 

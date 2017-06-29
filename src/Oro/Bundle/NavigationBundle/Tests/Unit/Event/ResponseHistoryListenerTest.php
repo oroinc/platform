@@ -284,7 +284,6 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
 
     public function getTitleService()
     {
-
         $this->titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
         $this->titleService->expects($this->once())
             ->method('getSerialized')

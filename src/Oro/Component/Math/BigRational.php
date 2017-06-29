@@ -153,7 +153,7 @@ final class BigRational extends BigNumber
         }
 
         // Create the "targetObject" - BrickBigRational instance
-        list ($numerator, $denominator) = explode('/', $serialized);
+        list($numerator, $denominator) = explode('/', $serialized);
         $numerator   = BrickBigInteger::of($numerator);
         $denominator = BrickBigInteger::of($denominator);
         $targetClass = static::$targetClass;
