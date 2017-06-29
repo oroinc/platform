@@ -109,13 +109,13 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
      */
     protected function assertSameById(QueryBuilder $queryBuilder)
     {
-        list ($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
+        list($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
         static::assertThat($actual, new IsEqualById($expected));
 
-        list ($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
+        list($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
         static::assertThat($actual, new IsEqualById($expected));
 
-        list ($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
+        list($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
         static::assertThat($actual, new IsEqualById($expected));
     }
 
@@ -126,13 +126,13 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
      */
     protected function assertSameResult(QueryBuilder $queryBuilder)
     {
-        list ($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
+        list($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
         $this->assertEquals($expected, $actual);
 
-        list ($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
+        list($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
         $this->assertEquals($expected, $actual);
 
-        list ($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
+        list($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
         $this->assertEquals($expected, $actual);
     }
 

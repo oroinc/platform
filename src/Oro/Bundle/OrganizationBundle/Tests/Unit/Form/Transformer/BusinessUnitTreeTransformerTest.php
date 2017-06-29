@@ -44,7 +44,6 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testReverseTransform()
     {
-
         $testResult = new ArrayCollection();
         $bu1 = new BusinessUnit();
         $bu1->setId(1);

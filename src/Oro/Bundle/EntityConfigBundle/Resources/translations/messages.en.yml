@@ -98,7 +98,7 @@ oro:
             records_count.label: 'Number of records: %count%'
 
         form:
-            default_group_label: Default group
+            default_group_label: General
             name.label: Name
             type.label: Type
 
