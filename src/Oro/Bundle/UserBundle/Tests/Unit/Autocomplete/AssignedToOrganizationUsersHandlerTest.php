@@ -4,16 +4,9 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Autocomplete;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\Value;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Autocomplete\AssignedToOrganizationUsersHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -36,23 +29,37 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $attachmentManager = $this->createMock(AttachmentManager::class);
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
-        $this->searchIndexer = $this->createMock(Indexer::class);
-        $this->repository = $this->createMock(EntityRepository::class);
-        $metadata = $this->createMock(ClassMetadata::class);
+        $attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->searchIndexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
 
-        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
         $metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(User::class)
             ->will($this->returnValue($metadata));
 
-        $this->manager = $this->createMock(ObjectManager::class);
+        $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->manager->expects($this->any())
             ->method('getRepository')
             ->with(User::class)
@@ -61,9 +68,16 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
-        $this->handler = new AssignedToOrganizationUsersHandler($attachmentManager, User::class, []);
+        $this->handler = new AssignedToOrganizationUsersHandler(
+            $attachmentManager,
+            'Oro\Bundle\UserBundle\Entity\User',
+            []
+        );
         $this->handler->setSecurityFacade($this->securityFacade);
-        $this->handler->initSearchIndexer($this->searchIndexer, [User::class => ['alias' => 'user']]);
+        $this->handler->initSearchIndexer(
+            $this->searchIndexer,
+            ['Oro\Bundle\UserBundle\Entity\User' => ['alias' => 'user']]
+        );
         $this->handler->initDoctrinePropertiesByEntityManager($this->manager);
     }
 
