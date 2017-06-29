@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Config\Tests\Unit;
+namespace Oro\Component\Config\Tests\Unit\Loader;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
@@ -9,7 +9,7 @@ use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 
-class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
+class FolderContentsCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testResourceName()
     {

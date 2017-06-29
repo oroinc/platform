@@ -7,25 +7,16 @@ use Composer\Package\Package;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\TranslationBundle\Provider\PackageProviderInterface;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 class PackagesProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var PackageManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $pm;
 
-    /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
-    protected $pml;
-
     protected function setUp()
     {
         $this->pm = $this->getMockBuilder('Oro\Bundle\DistributionBundle\Manager\PackageManager')
             ->disableOriginalConstructor()->getMock();
-        $this->pml = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->pml->expects($this->any())->method('getService')
-            ->will($this->returnValue($this->pm));
     }
 
     protected function tearDown()
@@ -47,7 +38,7 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
         array $providers = [],
         array $expectedResult = []
     ) {
-        $provider = new PackagesProvider($this->pml, $bundles, 'rootDir', 'rootDir/cache/composer', $providers);
+        $provider = new PackagesProvider($this->pm, $bundles, 'rootDir', 'rootDir/cache/composer', $providers);
         $this->pm->expects($this->once())->method('getInstalled')
             ->will($this->returnValue($packages));
 

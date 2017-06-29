@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener;
 
-class SelectCellListenerTest extends \PHPUnit_Framework_TestCase
+class CellSelectionListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \Oro\Bundle\DataGridBundle\Event\BuildAfter|\PHPUnit_Framework_MockObject_MockObject

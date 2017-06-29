@@ -270,7 +270,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $criteria = Criteria::create();
 
         foreach ($filters as $filterName => $data) {
-            list ($operator, $value) = $data;
+            list($operator, $value) = $data;
 
             $normaliser = isset($normalisers[$filterName]) ? $normalisers[$filterName] : false;
             if ($normaliser) {

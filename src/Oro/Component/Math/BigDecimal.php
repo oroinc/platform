@@ -203,7 +203,7 @@ final class BigDecimal extends BigNumber
             throw new \LogicException('unserialize() must not be called directly.');
         }
 
-        list ($value, $scale) = explode(':', $serialized);
+        list($value, $scale) = explode(':', $serialized);
         /** @var BrickBigDecimal $brickBigDecimal */
         $targetClass = static::$targetClass;
         $brickBigDecimal = $targetClass::of($value)->toScale($scale);

@@ -585,7 +585,7 @@ class Query
         $result  = [];
 
         foreach ($this->select as $select) {
-            list ($fieldType, $fieldName) = Criteria::explodeFieldTypeName($select);
+            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($select);
             if (isset($aliases[$fieldName])) {
                 $resultName = $aliases[$fieldName];
             } elseif (isset($aliases[$select])) {

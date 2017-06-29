@@ -157,7 +157,6 @@ class EmailOwnerManager
         EmailOwnerInterface $owner,
         array $changeSet
     ) {
-
         if (!array_key_exists($emailField, $changeSet)) {
             return;
         }
