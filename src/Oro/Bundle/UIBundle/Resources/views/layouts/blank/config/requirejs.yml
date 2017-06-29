@@ -89,6 +89,8 @@ config:
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
 
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
+        'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
+
         'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
         'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
 
@@ -100,6 +102,7 @@ config:
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
 
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view'
+        'jquery.select2': 'bundles/bowerassets/select2/select2.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/blank/js/app/modules/views-module

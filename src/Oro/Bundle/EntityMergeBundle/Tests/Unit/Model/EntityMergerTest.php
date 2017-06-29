@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 
-class StrategyTest extends \PHPUnit_Framework_TestCase
+class EntityMergerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var EntityMerger

@@ -187,7 +187,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSave($scopeIdentifier, $idValue)
     {
-
         $greetingKey = 'oro_user.greeting';
         $levelKey = 'oro_user.level';
 

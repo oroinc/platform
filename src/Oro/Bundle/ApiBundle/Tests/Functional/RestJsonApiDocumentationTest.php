@@ -118,7 +118,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
         return
             in_array($entityClass, $temporarySkipEntities, true)
             || is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || ( // any entity from "Extend\Entity" namespace, except enums
+            || (// any entity from "Extend\Entity" namespace, except enums
                 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE)
                 && 0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
             );

@@ -1,2 +1,2 @@
-<?php //@codingStandardsIgnoreFile ?>
+<?php //@codingStandardsIgnoreFile?>
 <?php echo '' ?>

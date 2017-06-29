@@ -508,7 +508,7 @@ class ExtendHelper
      */
     public static function updatedPendingValue($currentVal, array $changeSet)
     {
-        list ($oldVal, $newVal) = $changeSet;
+        list($oldVal, $newVal) = $changeSet;
         if (!is_array($oldVal) || !is_array($newVal) || !is_array($currentVal)) {
             return $newVal;
         }

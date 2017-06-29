@@ -91,7 +91,7 @@ class UserAclHandler implements SearchHandlerInterface
      */
     public function search($query, $page, $perPage, $searchById = false)
     {
-        list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
+        list($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
         $entityClass = $this->decodeClassName($entityClass);
 
         $hasMore  = false;
@@ -337,7 +337,7 @@ class UserAclHandler implements SearchHandlerInterface
                     $organization->getId()
                 );
             } else {
-            // AccessLevel::DEEP_LEVEL
+                // AccessLevel::DEEP_LEVEL
                 $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()

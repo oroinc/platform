@@ -208,16 +208,10 @@ define(function(require) {
             this.render();
         },
 
-        adoptErrorMessage: function() {
+        parseValidatorErrors: function(errorList) {
             var errors = {};
-            _.each(this.getErrorMessageElements(), function(label) {
-                var name = label.getAttribute('for');
-                var $input = this.$('#' + name);
-                // if 'for' attribute reference to an input's ID, map it into its name
-                if ($input.length) {
-                    name = $input[0].getAttribute('name');
-                }
-                errors[name] = $(label).text();
+            _.each(errorList, function(errorItem) {
+                errors[errorItem.element.getAttribute('name')] = errorItem.message;
             }, this);
             this._errors = errors;
         },
