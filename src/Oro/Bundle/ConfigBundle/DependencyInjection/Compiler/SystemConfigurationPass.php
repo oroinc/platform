@@ -135,11 +135,35 @@ class SystemConfigurationPass implements CompilerPassInterface
                     throw new \LogicException('Direct passed "settings" are not allowed');
                 }
 
-                $settings[$name] = $config['settings'];
+                $settings[$name] = $this->replaceServiceIdsWithDefinitions($container, $config['settings']);
             }
         }
 
         return $settings;
+    }
+
+    /**
+     * @param ContainerBuilder $containerBuilder
+     * @param array            $configSettings
+     *
+     * @return array
+     */
+    protected function replaceServiceIdsWithDefinitions(ContainerBuilder $containerBuilder, array $configSettings)
+    {
+        foreach ($configSettings as &$configSetting) {
+            if (isset($configSetting['value'])
+                && is_string($configSetting['value'])
+                && strpos($configSetting['value'], '@') === 0
+            ) {
+                $serviceId = substr($configSetting['value'], 1);
+
+                if ($containerBuilder->hasDefinition($serviceId)) {
+                    $configSetting['value'] = $containerBuilder->getDefinition($serviceId);
+                }
+            }
+        }
+
+        return $configSettings;
     }
 
     /**

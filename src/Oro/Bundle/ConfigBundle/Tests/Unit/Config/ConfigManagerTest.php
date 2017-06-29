@@ -2,15 +2,18 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
+use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
-use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
+use Oro\Bundle\ConfigBundle\Provider\Value\ValueProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigManager */
@@ -28,34 +31,44 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $userScopeManager;
 
+    /** @var ValueProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $defaultValueProvider;
+
     /**
      * @var array
      */
-    protected $settings = array(
-        'oro_user' => array(
-            'greeting' => array(
+    protected $settings = [
+        'oro_user' => [
+            'greeting' => [
                 'value' => true,
-                'type'  => 'boolean',
-            ),
-            'level'    => array(
+                'type' => 'boolean',
+            ],
+            'level' => [
                 'value' => 20,
-                'type'  => 'scalar',
-            )
-        ),
-        'oro_test' => array(
-            'anysetting'  => array(
+                'type' => 'scalar',
+            ],
+        ],
+        'oro_test' => [
+            'anysetting' => [
                 'value' => 'anyvalue',
-                'type'  => 'scalar',
-            ),
-            'emptystring' => array(
+                'type' => 'scalar',
+            ],
+            'servicestring' => [
+                'value' => '@oro_config.default_value_provider',
+            ],
+            'emptystring' => [
                 'value' => '',
-                'type'  => 'scalar',
-            ),
-        ),
-    );
+                'type' => 'scalar',
+            ],
+        ],
+    ];
 
     public function setUp()
     {
+        $this->defaultValueProvider = $this->createMock(ValueProviderInterface::class);
+
+        $this->settings['oro_test']['servicestring']['value'] = $this->defaultValueProvider;
+
         $this->bag        = new ConfigDefinitionImmutableBag($this->settings);
         $this->dispatcher = $this->createMock(EventDispatcher::class);
 
@@ -514,5 +527,36 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             [2, 2],
             [new \stdClass(), 123]
         ];
+    }
+
+    /**
+     * @dataProvider scopeIdentifierDataProvider
+     *
+     * @param int|null|object $scopeIdentifier
+     */
+    public function testGetDefaultSettingsFromProvider($scopeIdentifier)
+    {
+        $parameterName = 'oro_test.servicestring';
+
+        $this->userScopeManager->expects($this->once())
+            ->method('getSettingValue')
+            ->with($parameterName, false, $scopeIdentifier)
+            ->willReturn(null);
+
+        $this->globalScopeManager->expects($this->once())
+            ->method('getSettingValue')
+            ->with($parameterName, false, $scopeIdentifier)
+            ->willReturn(null);
+
+        $value = 1;
+
+        $this->defaultValueProvider->expects(static::once())
+            ->method('getValue')
+            ->willReturn($value);
+
+        $this->assertEquals(
+            $value,
+            $this->manager->get($parameterName, false, false, $scopeIdentifier)
+        );
     }
 }
