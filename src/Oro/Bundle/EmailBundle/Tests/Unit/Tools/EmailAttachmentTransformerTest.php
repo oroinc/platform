@@ -97,7 +97,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
             ->method('isImageType')
             ->willReturn(true);
 
-         $this->manager->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('getAttachmentIconClass')
             ->willReturn('fa-class');
 

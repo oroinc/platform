@@ -7,7 +7,6 @@ use Genemu\Bundle\FormBundle\Form\JQuery\Type;
 
 class TestFormExtension extends AbstractExtension
 {
-
     protected function loadTypes()
     {
         return array(

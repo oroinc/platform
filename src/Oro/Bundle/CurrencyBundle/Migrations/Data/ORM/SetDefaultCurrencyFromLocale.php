@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\CurrencyBundle\Migrations\Data\ORM;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -19,33 +20,29 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
      */
     public function load(ObjectManager $manager)
     {
-        /**@var ConfigManager $configManager **/
+        /** @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_config.global');
+        $currencyConfigKey = CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_DEFAULT_CURRENCY);
 
-        $connection = $this->container->get('doctrine')->getConnection();
+        $currentCurrency = $configManager->get($currencyConfigKey);
 
-        $currencies = $connection->fetchAll('
-                                              SELECT 
-                                                oro_config_value.text_value
-                                              FROM
-                                                oro_config_value
-                                              WHERE
-                                                oro_config_value.name = \'default_currency\'
-         ');
+        if (!$currentCurrency) {
+            $configManager->set($currencyConfigKey, $this->getDefaultCurrency());
 
-        /**
-         * If currency already set
-         * do nothing
-         */
-        if (count($currencies)) {
-            return;
+            $configManager->flush();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultCurrency()
+    {
+        /** TODO: Should be properly fixed in BAP-14914 */
+        if ($this->container->hasParameter('currency')) {
+            return $this->container->getParameter('currency');
         }
 
-        $configManager->set(
-            CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_DEFAULT_CURRENCY),
-            CurrencyConfig::DEFAULT_CURRENCY
-        );
-
-        $configManager->flush();
+        return CurrencyConfig::DEFAULT_CURRENCY;
     }
 }
