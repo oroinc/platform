@@ -8,6 +8,7 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -1346,12 +1347,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('GridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
         /** @var GridFilterManager $filterManager */
-        $filterManager = $grid->getElement('GridFilterManager');
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
         $filterManager->close();
     }
@@ -1368,12 +1369,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('GridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
         /** @var GridFilterManager $filterManager */
-        $filterManager = $grid->getElement('GridFilterManager');
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
         $filterManager->close();
     }
