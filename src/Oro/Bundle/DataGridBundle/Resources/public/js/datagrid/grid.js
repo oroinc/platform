@@ -756,7 +756,7 @@ define(function(require) {
                     if (ignoreVisibility || this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
-                }, 100));
+                }, 100, true));
 
                 this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);
@@ -783,7 +783,7 @@ define(function(require) {
                     if (this.$el.is(':visible')) {
                         this.resetAction.execute();
                     }
-                }, 100));
+                }, 100, true));
 
                 this.listenTo(this.resetAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:reset:' + this.name, [action, options]);
@@ -1160,10 +1160,12 @@ define(function(require) {
          *
          * @private
          */
-        _onRemove: function(model) {
+        _onRemove: function(model, reset) {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.name, model);
 
-            this.collection.fetch({reset: true});
+            if (reset !== false) {
+                this.collection.fetch({reset: true});
+            }
 
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
         },

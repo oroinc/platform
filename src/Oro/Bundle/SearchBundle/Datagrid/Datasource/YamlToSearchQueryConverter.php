@@ -57,14 +57,14 @@ class YamlToSearchQueryConverter
         if (isset($config['where'])) {
             if (isset($config['where']['and'])) {
                 foreach ((array)$config['where']['and'] as $where) {
-                    list ($field, $operator, $value) = explode(' ', $where, 3);
+                    list($field, $operator, $value) = explode(' ', $where, 3);
                     $query->addWhere(new Comparison($field, $operator, $value), AbstractSearchQuery::WHERE_AND);
                 }
             }
 
             if (isset($config['where']['or'])) {
                 foreach ((array)$config['where']['or'] as $where) {
-                    list ($field, $operator, $value) = explode(' ', $where, 3);
+                    list($field, $operator, $value) = explode(' ', $where, 3);
                     $query->addWhere(new Comparison($field, $operator, $value), AbstractSearchQuery::WHERE_OR);
                 }
             }

@@ -7,7 +7,7 @@ namespace Oro\Bundle\ChartBundle\Utils;
  */
 class ColorUtils
 {
-   /**
+    /**
      * Insert number of shaded colors after each color in the input
      *
      * @param mixed $colors Array or comma separated string with six symbol hex colors

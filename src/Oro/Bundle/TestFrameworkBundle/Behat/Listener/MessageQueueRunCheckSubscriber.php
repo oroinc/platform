@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\SkipIsolatorsTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Process;
 
 class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, MessageQueueIsolatorAwareInterface
 {
@@ -47,6 +48,10 @@ class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, Messag
         $mqProcess = $this->messageQueueIsolator->getProcess();
 
         if (!$mqProcess || $mqProcess->isRunning()) {
+            return;
+        }
+
+        if ($mqProcess->getStatus() !== Process::STATUS_TERMINATED) {
             return;
         }
 

@@ -273,7 +273,7 @@ define(function(require) {
          */
         exitEditMode: function(withDispose) {
             if (this.view) {
-                this.errorHolderView.adoptErrorMessage();
+                this.errorHolderView.parseValidatorErrors(this.view.validator.errorList);
                 if (!this.options.cell.disposed) {
                     this.options.cell.$el.removeClass('edit-mode').addClass('view-mode');
                 }

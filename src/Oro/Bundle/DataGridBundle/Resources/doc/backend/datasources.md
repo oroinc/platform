@@ -8,6 +8,7 @@ Datagrid can retrieve data from different datasource types (e.g orm, dql, array,
 Here's list of currently implemented datasource adapters:
 
  - [ORM](datasources/orm.md)
+ - [array](datasources/array.md)
 
 Datasource could be secured by adding `acl_resource` node under source tree.
 

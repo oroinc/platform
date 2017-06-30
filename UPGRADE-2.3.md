@@ -109,6 +109,10 @@ DataGridBundle
     - changed the constructor signature: parameter `RegistryInterface $registry` was replaced with `ManagerRegistry $registry`
 - Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
     - method `getSecurityFacade` was replaced with `getAuthorizationChecker`
+- Class `Oro\Bundle\DataGridBundle\Extension\Pager\AbstractPagerExtension`
+    - changed the constructor signature: `AbstractPager $pager` replaced on `PagerInterface $pager`
+- Interface `Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface`
+    - method `init` was removed
 
 CronBundle
 ----------
@@ -116,6 +120,10 @@ CronBundle
     - removed property `$commandRunner`
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
 - Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
+
+FormBundle
+----------
+- Updated Jquery.validate.js to 1.16.0 version
 
 EmailBundle
 -----------
@@ -131,6 +139,12 @@ EmailBundle
     - removed method `setSecurityContextLink`
 - Class `Oro\Bundle\EmailBundle\Twig\EmailExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker` and `getTokenAccessor`
+
+EntityConfigBundle
+------------------
+ - Class `Oro\Bundle\EntityConfigBundle\EventListener\AttributeFormViewListener`
+    - method `onFormRender` was removed
+    - method `onViewRender` was removed
 
 EntityExtendBundle
 ------------------
@@ -186,6 +200,9 @@ NavigationBundle
     - changed the constructor signature: parameter `Router $router` was replaced with `RouterInterface $router`
 - Class `Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder`
     - method `setOptions` was renamed to `setConfigManager`
+- Service `oro_navigation.item.pinbar.post_persist_listener` was changed from `doctrine.event_listener` to `doctrine.orm.entity_listener`
+    - method `setClassName` was removed.
+    - method `postPersist` had additional argument `AbstractPinbarTab $pinbarTab`
 
 OrganizationBundle
 ------------------
