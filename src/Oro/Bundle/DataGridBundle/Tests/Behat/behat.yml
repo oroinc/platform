@@ -123,10 +123,6 @@ oro_behat_extension:
       selector: '.dropdown-menu__floating'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    GridActionsMassActionMenu:
-      selector: 'th.action-column .datagrid-massaction__dropdown-menu'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-
     MassActionHeadCheckbox:
       selector: 'th.grid-header-cell-massAction div.btn-group .btn i'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

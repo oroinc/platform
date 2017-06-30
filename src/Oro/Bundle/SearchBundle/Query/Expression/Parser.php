@@ -549,11 +549,11 @@ class Parser
                 }
                 break;
             case Token::STRING_TYPE:
-                list ($type, $expr) = $this->parseSimpleCondition();
+                list($type, $expr) = $this->parseSimpleCondition();
                 $this->query->getCriteria()->{$type}($expr);
                 break;
             case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
-                list ($type, $expr) = $this->parseSimpleCondition($token->value);
+                list($type, $expr) = $this->parseSimpleCondition($token->value);
                 $this->query->getCriteria()->{$type}($expr);
                 break;
             case Token::KEYWORD_TYPE:
@@ -577,7 +577,6 @@ class Parser
      */
     private function getComparisonForOtherOperators(Token $operatorToken, ExpressionBuilder $expr, $fieldName)
     {
-
         switch ($operatorToken->value) {
             case Query::OPERATOR_CONTAINS:
                 $expr = $expr->contains($fieldName, $this->stream->current->value);

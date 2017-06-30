@@ -1410,6 +1410,35 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^I select following records in "(?P<name>[\s\w]+)" grid:$/
+     * @When /^I select following records in grid:$/
+     * @param TableNode $table
+     * @param string $name
+     */
+    public function iSelectFollowingRecordsInGrid(TableNode $table, $name = 'Grid')
+    {
+        $grid = $this->getGrid($name);
+
+        foreach ($table->getRows() as $index => $record) {
+            $grid->getRowByContent(reset($record))
+                ->checkMassActionCheckbox();
+        }
+    }
+
+    /**
+     * @Given /^I should not see "(?P<gridName>[\s\w]+)" grid$/
+     */
+    public function iShouldNotSeeGrid($gridName = 'Grid')
+    {
+        $grid = $this->elementFactory->createElement($gridName);
+
+        self::assertFalse(
+            $grid->isIsset(),
+            sprintf('Grid "%s" was found on page, but it should not.', $gridName)
+        );
+    }
+
+    /**
      * @param string $stringNumber
      *
      * @return int

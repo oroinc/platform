@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Scope;
 use Oro\Bundle\AsseticBundle\Command\Proxy\KernelProxy;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class KernelProxyTest extends \PHPUnit_Framework_TestCase
+class KernerProxyTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

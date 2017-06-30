@@ -39,7 +39,6 @@ class PasswordComplexityExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-
         $constraints = $this->constraintsProvider->getFormConstraints($form);
 
         foreach ($constraints as $constraint) {

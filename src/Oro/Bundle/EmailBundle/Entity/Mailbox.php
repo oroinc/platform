@@ -333,7 +333,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function getFirstName()
     {
-         return $this->getLabel();
+        return $this->getLabel();
     }
 
     /**

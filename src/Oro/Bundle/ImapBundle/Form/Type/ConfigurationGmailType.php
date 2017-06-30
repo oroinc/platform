@@ -104,7 +104,6 @@ class ConfigurationGmailType extends AbstractType
         $builder->get('accessTokenExpiresAt')
             ->addModelTransformer(new CallbackTransformer(
                 function ($originalAccessTokenExpiresAt) {
-
                     if ($originalAccessTokenExpiresAt === null) {
                         return '';
                     }

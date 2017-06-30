@@ -1160,10 +1160,12 @@ define(function(require) {
          *
          * @private
          */
-        _onRemove: function(model) {
+        _onRemove: function(model, reset) {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.name, model);
 
-            this.collection.fetch({reset: true});
+            if (reset !== false) {
+                this.collection.fetch({reset: true});
+            }
 
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
         },

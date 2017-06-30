@@ -12,7 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class RestSearchApiTest extends SearchBundleWebTestCase
 {
-
     protected function setUp()
     {
         parent::setUp();

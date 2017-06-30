@@ -16,7 +16,6 @@ class QueryStringExpressionVisitor extends ExpressionVisitor
      */
     public function walkComparison(Comparison $comparison)
     {
-
         list($type, $field) = Criteria::explodeFieldTypeName($comparison->getField());
 
         $value = $comparison->getValue()->getValue();
