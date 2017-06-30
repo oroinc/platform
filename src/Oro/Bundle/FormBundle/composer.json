@@ -19,7 +19,8 @@
         "oro/ui-bundle": "dev-master",
         "oro/entity-config-bundle": "dev-master",
         "oro/form-bundle": "dev-master",
-        "bower-asset/jquery-validate": "1.11.1"
+        "bower-asset/jquery-validate": "1.16.0",
+        "tinymce/tinymce": "4.6.*"
     },
     "autoload": {
         "psr-0": {"Oro\\Bundle\\FormBundle": ""}

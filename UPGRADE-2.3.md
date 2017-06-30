@@ -109,6 +109,10 @@ DataGridBundle
     - changed the constructor signature: parameter `RegistryInterface $registry` was replaced with `ManagerRegistry $registry`
 - Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
     - method `getSecurityFacade` was replaced with `getAuthorizationChecker`
+- Class `Oro\Bundle\DataGridBundle\Extension\Pager\AbstractPagerExtension`
+    - changed the constructor signature: `AbstractPager $pager` replaced on `PagerInterface $pager`
+- Interface `Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface`
+    - method `init` was removed
 
 CronBundle
 ----------
@@ -132,6 +136,12 @@ EmailBundle
 - Class `Oro\Bundle\EmailBundle\Twig\EmailExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker` and `getTokenAccessor`
 
+EntityConfigBundle
+------------------
+ - Class `Oro\Bundle\EntityConfigBundle\EventListener\AttributeFormViewListener`
+    - method `onFormRender` was removed
+    - method `onViewRender` was removed
+
 EntityExtendBundle
 ------------------
 - Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
@@ -143,6 +153,11 @@ EntityPaginationBundle
 - Class `Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector`
     - removed property `aclHelper`
     - changed constructor signature: removed parameter `AclHelper $aclHelper`
+
+FormBundle
+----------
+- Updated jQuery Validation plugin to 1.6.0 version
+- Updated TinyMCE to 4.6.* version
 
 ImportExportBundle
 ------------------
@@ -172,6 +187,11 @@ IntegrationBundle
 - Removed translation label `oro.integration.progress`
 - Updated translation label `oro.integration.sync_error`
 - Updated translation label `oro.integration.sync_error_integration_deactivated`
+
+LocaleBundle
+------------
+- Updated Moment.js to 2.18.* version
+- Updated Numeral.js to 2.0.6 version
 
 MigrationBundle
 ---------------
@@ -229,6 +249,15 @@ TagBundle
 - Class `Oro\Bundle\UIBundle\Twig\TabExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker`
 
+UIBundle
+--------
+- Updated ChaplinJS to 1.2.0 version
+- Updated Autolinker.js to 1.4.* version
+- Updated jQuery-Form to 4.2.1 version
+- Updated jQuery.Numeric to 1.5.0 version
+- Updated Lightgallery.js to 1.4.0 version
+- Updated RequireJS test.js plugin to 2.0.* version
+
 UserBundle
 ----------
 - Class `Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler`
@@ -274,17 +303,3 @@ WorkflowBundle
         - `getEntityRepository`
 - Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
 - Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
-
-UIBundle
---------
-- Updated ChaplinJS to 1.2.0 version
-- Updated Autolinker.js to 1.4.* version
-- Updated jQuery-Form to 4.2.1 version
-- Updated jQuery.Numeric to 1.5.0 version
-- Updated Lightgallery.js to 1.4.0 version
-- Updated RequireJS test.js plugin to 2.0.* version
-
-LocaleBundle
-------------
-- Updated Moment.js to 2.18.* version
-- Updated Numeral.js to 2.0.6 version

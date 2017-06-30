@@ -35,7 +35,7 @@
         "bower-asset/lightgallery": "1.4.0",
         "bower-asset/less": "2.5.*",
         "bower-asset/jquery-ui-multiselect-widget": "1.14",
-        "bower-asset/Autolinker.js": "1.4.*",
+        "bower-asset/autolinker.js": "1.4.*",
         "bower-asset/font-awesome": "4.7.*",
         "bower-asset/bootstrap": "2.3.0",
         "bower-asset/json2": "dev-master",

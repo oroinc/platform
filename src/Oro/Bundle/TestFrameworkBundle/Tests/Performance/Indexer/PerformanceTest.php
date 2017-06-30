@@ -9,7 +9,6 @@ use Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand;
 
 class PerformanceTest extends WebTestCase
 {
-
     protected $client;
 
     protected function setUp()

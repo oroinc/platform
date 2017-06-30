@@ -63,7 +63,7 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
             ->method('trans')
             ->will($this->returnCallback(function ($id) {
-                    return $id;
+                return $id;
             }));
 
         $this->autoResponseManager = new AutoResponseManager(
