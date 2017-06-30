@@ -121,10 +121,6 @@ CronBundle
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
 - Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
 
-FormBundle
-----------
-- Updated Jquery.validate.js to 1.16.0 version
-
 EmailBundle
 -----------
 - Class `Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList`
@@ -163,6 +159,11 @@ EntityPaginationBundle
     - removed property `aclHelper`
     - changed constructor signature: removed parameter `AclHelper $aclHelper`
 
+FormBundle
+----------
+- Updated jQuery Validation plugin to 1.6.0 version
+- Updated TinyMCE to 4.6.* version
+
 ImportExportBundle
 ------------------
 - Added a possibility to change aggregation strategy for a job summary. An aggregator should implement `Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface`
@@ -192,6 +193,11 @@ IntegrationBundle
 - Updated translation label `oro.integration.sync_error`
 - Updated translation label `oro.integration.sync_error_integration_deactivated`
 
+LocaleBundle
+------------
+- Updated Moment.js to 2.18.* version
+- Updated Numeral.js to 2.0.6 version
+
 MigrationBundle
 ---------------
 - Added event `oro_migration.data_fixtures.pre_load` that is raised before data fixtures are loaded
@@ -208,6 +214,21 @@ NavigationBundle
 - Service `oro_navigation.item.pinbar.post_persist_listener` was changed from `doctrine.event_listener` to `doctrine.orm.entity_listener`
     - method `setClassName` was removed.
     - method `postPersist` had additional argument `AbstractPinbarTab $pinbarTab`
+
+NoteBundle
+----------
+- Added new action `create_note` related class `Oro\Bundle\NoteBundle\Action\CreateNoteAction`
+
+NotificationBundle
+------------------
+- Entity `Oro\Bundle\NotificationBundle\Model\EmailNotification` became Extend
+- Updated Class `Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler` 
+    - implements `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface`
+    - constructor signature changed, accepts only one argument instance of `Doctrine\Common\Persistence\ManagerRegistry`
+    - signature of method `process` changed, now it accepts:
+        - `mixed` $data
+        - `FormInterface` $form
+        - `Request` $request
 
 OrganizationBundle
 ------------------
@@ -247,6 +268,15 @@ TagBundle
     - removed method `isAccessGranted`
 - Class `Oro\Bundle\UIBundle\Twig\TabExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker`
+
+UIBundle
+--------
+- Updated ChaplinJS to 1.2.0 version
+- Updated Autolinker.js to 1.4.* version
+- Updated jQuery-Form to 4.2.1 version
+- Updated jQuery.Numeric to 1.5.0 version
+- Updated Lightgallery.js to 1.4.0 version
+- Updated RequireJS test.js plugin to 2.0.* version
 
 UserBundle
 ----------
@@ -296,33 +326,3 @@ WorkflowBundle
 - Added Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter`
 - Updated Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter`
     - changed namespace
-
-UIBundle
---------
-- Updated ChaplinJS to 1.2.0 version
-- Updated Autolinker.js to 1.4.* version
-- Updated jQuery-Form to 4.2.1 version
-- Updated jQuery.Numeric to 1.5.0 version
-- Updated Lightgallery.js to 1.4.0 version
-- Updated RequireJS test.js plugin to 2.0.* version
-
-LocaleBundle
-------------
-- Updated Moment.js to 2.18.* version
-- Updated Numeral.js to 2.0.6 version
-
-NoteBundle
-----------
-- Added new action `create_note` related class `Oro\Bundle\NoteBundle\Action\CreateNoteAction`
-
-NotificationBundle
-------------------
-- Entity `Oro\Bundle\NotificationBundle\Model\EmailNotification` became Extend
-- Updated Class `Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler` 
-    - implements `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface`
-    - constructor signature changed, accepts only one argument instance of `Doctrine\Common\Persistence\ManagerRegistry`
-    - signature of method `process` changed, now it accepts:
-        - `mixed` $data
-        - `FormInterface` $form
-        - `Request` $request
-    

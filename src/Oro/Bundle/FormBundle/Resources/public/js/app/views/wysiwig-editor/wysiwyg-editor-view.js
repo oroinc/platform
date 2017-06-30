@@ -4,7 +4,7 @@ define(function(require) {
     var WysiwygEditorView;
     var BaseView = require('oroui/js/app/views/base/view');
     var _ = require('underscore');
-    var $ = require('tinymce/jquery.tinymce.min');
+    var $ = require('tinymce/jquery.tinymce');
     var tools = require('oroui/js/tools');
     var txtHtmlTransformer = require('./txt-html-transformer');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
@@ -24,7 +24,7 @@ define(function(require) {
 
         defaults: {
             enabled: true,
-            plugins: ['textcolor', 'code', 'bdesk_photo', 'paste'],
+            plugins: ['textcolor', 'code', 'bdesk_photo', 'paste', 'lists', 'advlist'],
             menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar: false,
@@ -183,7 +183,7 @@ define(function(require) {
         },
 
         findFirstQuoteLine: function() {
-            var quote = $('<div>').html(this.$el.val()).find('.quote').html();
+            var quote = $('<div>').html(this.$el[0].value).find('.quote').html();
             if (quote) {
                 quote = txtHtmlTransformer.html2text(quote);
                 this.firstQuoteLine = _.find(quote.split(/(\n\r?|\r\n?)/g), function(line) {
