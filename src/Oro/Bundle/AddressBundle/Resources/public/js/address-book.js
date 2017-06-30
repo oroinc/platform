@@ -7,7 +7,8 @@ define([
     'oro/dialog-widget',
     'oroaddress/js/mapservice/googlemaps',
     'oroaddress/js/address/view',
-    'oroaddress/js/address/collection'
+    'oroaddress/js/address/collection',
+    'oroui/js/delete-confirmation'
 ], function(
     $,
     _,
@@ -18,7 +19,8 @@ define([
     DialogWidget,
     Googlemaps,
     AddressView,
-    AddressCollection
+    AddressCollection,
+    deleteConfirmation
 ) {
     'use strict';
 
@@ -44,8 +46,8 @@ define([
             'mapView': Googlemaps,
             'addressMapOptions': {},
             'allowToRemovePrimary': false,
-            'confirmRemove': false,
-            'confirmRemoveComponent': null
+            'confirmRemove': true,
+            'confirmRemoveComponent': deleteConfirmation
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {

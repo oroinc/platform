@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MassActionExtension extends AbstractExtension
 {
@@ -21,25 +22,25 @@ class MassActionExtension extends AbstractExtension
     /** @var MassActionMetadataFactory */
     protected $actionMetadataFactory;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var bool */
     protected $isMetadataVisited = false;
 
     /**
-     * @param MassActionFactory         $actionFactory
-     * @param MassActionMetadataFactory $actionMetadataFactory
-     * @param SecurityFacade            $securityFacade
+     * @param MassActionFactory             $actionFactory
+     * @param MassActionMetadataFactory     $actionMetadataFactory
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         MassActionFactory $actionFactory,
         MassActionMetadataFactory $actionMetadataFactory,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->actionFactory = $actionFactory;
         $this->actionMetadataFactory = $actionMetadataFactory;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -133,7 +134,7 @@ class MassActionExtension extends AbstractExtension
         $action = $this->actionFactory->createAction($actionName, $actionConfig);
 
         $aclResource = $action->getAclResource();
-        if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
+        if ($aclResource && !$this->authorizationChecker->isGranted($aclResource)) {
             $action = null;
         }
 

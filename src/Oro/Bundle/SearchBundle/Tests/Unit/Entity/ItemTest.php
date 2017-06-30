@@ -168,7 +168,7 @@ class ItemTest extends \PHPUnit_Framework_TestCase
     {
         $this->item->saveItemData(
             array(
-                'text' => array (
+                'text' => array(
                     'test_field' => 'test text'
                 ),
                 'integer' => array(

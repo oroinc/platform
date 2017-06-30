@@ -43,8 +43,8 @@ More details about these elements you can find in the [Creating new action](#cre
 
 The following table shows all actions provided out of the box:
 
-| Action Name           | Description |
-| ---                   | --- |
+| Action Name | Description |
+| --- | --- |
 | [get](#get-action) | Returns an entity by its identifier |
 | [get_list](#get_list-action) | Returns a list of entities |
 | [delete](#delete-action) | Deletes an entity by its identifier |

@@ -7,7 +7,7 @@ use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 
-class MergeFieldsStepTest extends \PHPUnit_Framework_TestCase
+class MergerFieldsStepTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var MergeFieldsStep
@@ -35,7 +35,7 @@ class MergeFieldsStepTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->createEntityData();
 
-                $fooField = $this->createFieldData();
+        $fooField = $this->createFieldData();
         $barField = $this->createFieldData();
 
         $data->expects($this->once())

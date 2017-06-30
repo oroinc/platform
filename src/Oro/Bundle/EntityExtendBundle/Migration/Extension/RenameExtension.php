@@ -39,7 +39,7 @@ class RenameExtension extends BaseRenameExtension
                 }
             } else {
                 // handle field name
-                list ($tableName, $columnName) = explode('!', $name, 2);
+                list($tableName, $columnName) = explode('!', $name, 2);
 
                 // replace table name in combined field name column
                 if ($tableName === $oldTableName) {

@@ -30,7 +30,7 @@ class UserManagerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         /** @var User $loggedUser */
-        $loggedUser = $this->getContainer()->get('oro_security.security_facade')->getLoggedUser();
+        $loggedUser = $this->getContainer()->get('oro_security.token_accessor')->getUser();
         $originalId = $loggedUser->getId();
         $this->assertInstanceOf(User::class, $loggedUser);
         $this->assertSame(LoadUserData::SIMPLE_USER, $loggedUser->getUsername(), 'logged user username');
@@ -57,7 +57,7 @@ class UserManagerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         /** @var User $loggedUser */
-        $loggedUser = $this->getContainer()->get('oro_security.security_facade')->getLoggedUser();
+        $loggedUser = $this->getContainer()->get('oro_security.token_accessor')->getUser();
         $em = $this->getContainer()->get('doctrine')->getManagerForClass(ClassUtils::getClass($loggedUser));
 
         $originalId = $loggedUser->getId();

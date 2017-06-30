@@ -3,7 +3,7 @@
 {% oro_title_set({params : {"%process_definition.label%": entity.label} }) %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_process_definition_update') %}
+    {% if is_granted('oro_process_definition_update') %}
         {% set idButton = entity.name ~ '-process-deactivate-btn' %}
         {% if entity.enabled %}
             {{ UI.button({

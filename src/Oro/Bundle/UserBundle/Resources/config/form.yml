@@ -80,8 +80,8 @@ services:
         scope: request
         class: Oro\Bundle\UserBundle\Form\Type\UserType
         arguments:
-            - '@security.context'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@request'
             - '@oro_user.form.provider.password_field_options_provider'
         tags:
@@ -91,8 +91,8 @@ services:
         scope: request
         class: Oro\Bundle\UserBundle\Form\Type\UserApiType
         arguments:
-            - '@security.context'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@request'
             - '@oro_user.form.provider.password_field_options_provider'
         calls:
@@ -337,7 +337,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\UserBundle\Entity\User'
         calls:
-            - [setSecurityFacade, ['@oro_security.security_facade']]
+            - [setTokenAccessor, ['@oro_security.token_accessor']]
         tags:
             - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_user_select' }
 

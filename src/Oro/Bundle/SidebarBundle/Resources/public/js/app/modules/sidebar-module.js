@@ -12,7 +12,7 @@ define([
                 compose: function() {
                     var $sourceElement = $(elem);
                     var options = $sourceElement.data('pageComponentOptions');
-                    $sourceElement.removeAttrs('data-page-component-options');
+                    $sourceElement.removeAttr('data-page-component-options');
                     options._sourceElement = $sourceElement;
                     this.component = new SidebarComponent(options);
                 }

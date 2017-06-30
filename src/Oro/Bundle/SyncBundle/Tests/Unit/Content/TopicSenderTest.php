@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\SyncBundle\Content\TopicSender;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-
-use Psr\Log\LoggerInterface;
 
 class TopicSenderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,8 +24,8 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
     /** @var TagGeneratorChain */
     protected $generator;
 
-    /** @var SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContext;
+    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
 
     /** @var TopicSender */
     protected $sender;
@@ -35,25 +35,24 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->publisher       = $this->createMock('Oro\Bundle\SyncBundle\Wamp\TopicPublisher');
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->logger          = $this->createMock('Psr\Log\LoggerInterface');
-        $this->generator       = new TagGeneratorChain();
-        $container             = new Container();
+        $this->publisher = $this->createMock(TopicPublisher::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->generator = new TagGeneratorChain();
+        $container = new Container();
         $container->set('generator', $this->generator);
-        $container->set('security', $this->securityContext);
 
         $this->sender = new TopicSender(
             $this->publisher,
             new ServiceLink($container, 'generator'),
-            new ServiceLink($container, 'security'),
+            $this->tokenStorage,
             $this->logger
         );
     }
 
     protected function tearDown()
     {
-        unset($this->publisher, $this->generator, $this->securityContext, $this->sender);
+        unset($this->publisher, $this->generator, $this->tokenStorage, $this->sender);
     }
 
     public function testGetGenerator()
@@ -69,7 +68,7 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
         $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())->method('getUser')->will($this->returnValue($user));
 
-        $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
 
         $that = $this;
         $this->publisher->expects($this->once())->method('send')

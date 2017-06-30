@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -23,7 +24,7 @@ use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -54,8 +55,11 @@ class OwnerFormExtension extends AbstractTypeExtension
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var string */
     protected $fieldName;
@@ -85,30 +89,33 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected $entityOwnerAccessor;
 
     /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param OwnershipMetadataProvider $ownershipMetadataProvider
-     * @param BusinessUnitManager       $businessUnitManager
-     * @param SecurityFacade            $securityFacade
-     * @param AclVoter                  $aclVoter
-     * @param OwnerTreeProvider         $treeProvider
-     * @param EntityOwnerAccessor       $entityOwnerAccessor
+     * @param DoctrineHelper                $doctrineHelper
+     * @param OwnershipMetadataProvider     $ownershipMetadataProvider
+     * @param BusinessUnitManager           $businessUnitManager
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param AclVoter                      $aclVoter
+     * @param OwnerTreeProvider             $treeProvider
+     * @param EntityOwnerAccessor           $entityOwnerAccessor
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         OwnershipMetadataProvider $ownershipMetadataProvider,
         BusinessUnitManager $businessUnitManager,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         AclVoter $aclVoter,
         OwnerTreeProvider $treeProvider,
         EntityOwnerAccessor $entityOwnerAccessor
     ) {
-        $this->doctrineHelper            = $doctrineHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
-        $this->businessUnitManager       = $businessUnitManager;
-        $this->securityFacade            = $securityFacade;
-        $this->aclVoter                  = $aclVoter;
-        $this->treeProvider              = $treeProvider;
-        $this->entityOwnerAccessor       = $entityOwnerAccessor;
+        $this->businessUnitManager = $businessUnitManager;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->aclVoter = $aclVoter;
+        $this->treeProvider = $treeProvider;
+        $this->entityOwnerAccessor = $entityOwnerAccessor;
     }
 
     /**
@@ -395,7 +402,7 @@ class OwnerFormExtension extends AbstractTypeExtension
              * If assign permission is granted, and user able to see business units, showing all available.
              * If not able to see, render default in hidden field.
              */
-            if ($this->securityFacade->isGranted('VIEW', 'entity:' . BusinessUnit::class)) {
+            if ($this->authorizationChecker->isGranted('VIEW', 'entity:' . BusinessUnit::class)) {
                 $builder->add(
                     $this->fieldName,
                     'oro_type_business_unit_select_autocomplete',
@@ -487,7 +494,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getCurrentUser()
     {
         if (null === $this->currentUser) {
-            $user = $this->securityFacade->getLoggedUser();
+            $user = $this->tokenAccessor->getUser();
             if ($user && is_object($user) && $user instanceof User) {
                 $this->currentUser = $user;
             }
@@ -527,7 +534,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     {
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $this->isAssignGranted = $this->securityFacade->isGranted($permission, $object);
+        $this->isAssignGranted = $this->authorizationChecker->isGranted($permission, $object);
         $this->accessLevel = $observer->getAccessLevel();
     }
 
@@ -592,12 +599,12 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
-     * Get organization from security facade
+     * Gets organization from the current security token
      *
      * @return bool|Organization
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
+        return $this->tokenAccessor->getOrganization();
     }
 }

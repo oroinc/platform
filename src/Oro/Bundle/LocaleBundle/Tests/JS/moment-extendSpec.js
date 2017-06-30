@@ -63,8 +63,7 @@ define(function(require) {
                     .tz('America/Los_Angeles', true).format(dateTimeTZFormat)).toBe('2016-11-06T02:00:00-0800');
             });
 
-            // suite temporary is excluded because it failed in PhantomJS and FireFox
-            xit('of Ukraine', function() {
+            it('of Ukraine', function() {
                 expect(moment('2016-03-27T02:00:00', dateTimeFormat, true)
                     .tz('Europe/Kiev', true).format(dateTimeTZFormat)).toBe('2016-03-27T02:00:00+0200');
                 expect(moment('2016-03-27T03:00:00', dateTimeFormat, true)
