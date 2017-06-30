@@ -121,10 +121,6 @@ CronBundle
     - changed constructor signature from `__construct(CommandRunnerInterface $commandRunner, JobRunner $jobRunner, LoggerInterface $logger)` to `__construct(JobRunner $jobRunner, LoggerInterface $logger, MessageProducerInterface $producer)`
 - Added class `Oro\Bundle\CronBundle\Async\CommandRunnerProcessor`
 
-FormBundle
-----------
-- Updated Jquery.validate.js to 1.16.0 version
-
 EmailBundle
 -----------
 - Class `Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList`
@@ -158,6 +154,11 @@ EntityPaginationBundle
     - removed property `aclHelper`
     - changed constructor signature: removed parameter `AclHelper $aclHelper`
 
+FormBundle
+----------
+- Updated jQuery Validation plugin to 1.6.0 version
+- Updated TinyMCE to 4.6.* version
+
 ImportExportBundle
 ------------------
 - Added a possibility to change aggregation strategy for a job summary. An aggregator should implement `Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface`
@@ -186,6 +187,11 @@ IntegrationBundle
 - Removed translation label `oro.integration.progress`
 - Updated translation label `oro.integration.sync_error`
 - Updated translation label `oro.integration.sync_error_integration_deactivated`
+
+LocaleBundle
+------------
+- Updated Moment.js to 2.18.* version
+- Updated Numeral.js to 2.0.6 version
 
 MigrationBundle
 ---------------
@@ -243,6 +249,15 @@ TagBundle
 - Class `Oro\Bundle\UIBundle\Twig\TabExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker`
 
+UIBundle
+--------
+- Updated ChaplinJS to 1.2.0 version
+- Updated Autolinker.js to 1.4.* version
+- Updated jQuery-Form to 4.2.1 version
+- Updated jQuery.Numeric to 1.5.0 version
+- Updated Lightgallery.js to 1.4.0 version
+- Updated RequireJS test.js plugin to 2.0.* version
+
 UserBundle
 ----------
 - Class `Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler`
@@ -288,17 +303,3 @@ WorkflowBundle
         - `getEntityRepository`
 - Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
 - Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
-
-UIBundle
---------
-- Updated ChaplinJS to 1.2.0 version
-- Updated Autolinker.js to 1.4.* version
-- Updated jQuery-Form to 4.2.1 version
-- Updated jQuery.Numeric to 1.5.0 version
-- Updated Lightgallery.js to 1.4.0 version
-- Updated RequireJS test.js plugin to 2.0.* version
-
-LocaleBundle
-------------
-- Updated Moment.js to 2.18.* version
-- Updated Numeral.js to 2.0.6 version

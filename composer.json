@@ -60,7 +60,7 @@
         "ocramius/proxy-manager": "0.5.*",
         "knplabs/knp-gaufrette-bundle": "0.3.*",
         "oro/doctrine-extensions": "1.1.*",
-        "tinymce/tinymce": "4.1.*",
+        "tinymce/tinymce": "4.6.*",
         "ezyang/htmlpurifier": "4.8.0",
         "hwi/oauth-bundle": "0.5.*",
         "components/jquery": "3.1.*",
