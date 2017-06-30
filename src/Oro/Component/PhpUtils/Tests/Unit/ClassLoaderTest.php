@@ -47,18 +47,13 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
         self::assertFalse($loader->loadClass($className));
     }
 
-    public function testRegisterAndUnregister()
+    public function testRegister()
     {
         $loader = new ClassLoader(
             'PhpUtilsTestNamespace\\',
             __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures'
         );
         $loader->register();
-        try {
-            self::assertTrue(class_exists('PhpUtilsTestNamespace\Baz'), 'class_exists after loader->register()');
-        } finally {
-            $loader->unregister();
-        }
-        self::assertFalse(class_exists('PhpUtilsTestNamespace\Quux'), 'class_exists after loader->unregister()');
+        self::assertTrue(class_exists('PhpUtilsTestNamespace\Baz'), 'class_exists after loader->register()');
     }
 }

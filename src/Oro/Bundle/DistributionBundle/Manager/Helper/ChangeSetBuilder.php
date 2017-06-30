@@ -65,7 +65,6 @@ class ChangeSetBuilder
      */
     protected function equalsByName(PackageInterface $package1, PackageInterface $package2)
     {
-
         return $package1->getName() == $package2->getName();
     }
 
@@ -77,7 +76,6 @@ class ChangeSetBuilder
      */
     protected function equalsBySourceReference(PackageInterface $package1, PackageInterface $package2)
     {
-
         return $package1->getSourceReference() == $package2->getSourceReference();
     }
 }

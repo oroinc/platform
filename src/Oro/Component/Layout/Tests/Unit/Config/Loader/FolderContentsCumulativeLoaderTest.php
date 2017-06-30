@@ -1,14 +1,13 @@
 <?php
 
-namespace Oro\Component\Config\Tests\Unit;
+namespace Oro\Component\Layout\Tests\Unit\Config\Loader;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
-use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Bundle\TestBundle\TestBundle;
 
-class LayoutUpdateCumulativeResourceLoaderTest extends \PHPUnit_Framework_TestCase
+class FolderContentsCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testIsResourceFreshFileWasAdded()
     {

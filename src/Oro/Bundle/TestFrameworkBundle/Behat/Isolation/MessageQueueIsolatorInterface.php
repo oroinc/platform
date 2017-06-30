@@ -9,7 +9,7 @@ interface MessageQueueIsolatorInterface extends IsolatorInterface
     /**
      * @param int $timeLimit Limit queue processing, seconds
      */
-    public function waitWhileProcessingMessages($timeLimit = 60);
+    public function waitWhileProcessingMessages($timeLimit = 600);
 
     /**
      * @return Process|null

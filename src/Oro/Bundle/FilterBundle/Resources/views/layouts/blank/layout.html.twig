@@ -1,15 +1,4 @@
 {% block _filter_container_tpl_widget %}
-    {% set attr = attr|merge({
-        'data-grid-toolbar': 'top',
-        'data-sticky-target': 'top-sticky-panel',
-        'data-proxy-data': 'true',
-        'data-sticky': {
-            'isSticky': true,
-            'autoWidth': true,
-            'toggleClass': 'toolbar-sticky-container',
-            'placeholderId': 'sticky_element_toolbar'
-        }
-    }) %}
     <script type="text/html" id="filter-container">
         <% if (!_.isEmpty(filters)) { %>
         {% if isMobileVersion() %}

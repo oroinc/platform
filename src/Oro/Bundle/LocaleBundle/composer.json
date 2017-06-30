@@ -14,7 +14,7 @@
         "oro/config-bundle": "dev-master",
         "bower-asset/moment": "2.18.*",
         "bower-asset/moment-timezone": "0.5.*",
-        "bower-asset/numeral": "1.5.2"
+        "bower-asset/numeral": "2.0.6"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\LocaleBundle": "" }

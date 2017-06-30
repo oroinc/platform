@@ -57,7 +57,7 @@ config:
         'json': 'bundles/bowerassets/json2/json2.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui.js'
-        'jquery.form': 'bundles/bowerassets/jquery-form/jquery.form.js'
+        'jquery.form': 'bundles/bowerassets/jquery-form/src/jquery.form.js'
         'bootstrap-affix': 'bowerassets/bootstrap/docs/assets/js/bootstrap-affix.js'
         'bootstrap-alert': 'bowerassets/bootstrap/docs/assets/js/bootstrap-alert.js'
         'bootstrap-button': 'bowerassets/bootstrap/docs/assets/js/bootstrap-button.js'
@@ -78,7 +78,7 @@ config:
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
-        'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
+        'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
         'xregexp': 'bundles/npmassets/xregexp/xregexp-all.js'
 
@@ -89,6 +89,8 @@ config:
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
 
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
+        'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
+
         'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
         'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
 
@@ -100,6 +102,7 @@ config:
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
 
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view'
+        'jquery.select2': 'bundles/bowerassets/select2/select2.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/blank/js/app/modules/views-module

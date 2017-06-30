@@ -135,7 +135,7 @@ config:
         'base64': 'oroui/js/extend/base64.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui.js'
-        'jquery.form': 'bundles/bowerassets/jquery-form/jquery.form.js'
+        'jquery.form': 'bundles/bowerassets/jquery-form/src/jquery.form.js'
         'jquery.mousewheel': 'bundles/bowerassets/jquery-mousewheel/jquery.mousewheel.js'
         'jquery.numeric': 'bundles/bowerassets/jquery.numeric/jquery.numeric.js'
         'jquery.uniform': 'bundles/bowerassets/uniform/jquery.uniform.js'
@@ -147,7 +147,6 @@ config:
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
-        'jquery.form': 'bundles/bowerassets/jquery-form/jquery.form.js'
         'bootstrap-affix': 'bowerassets/bootstrap/js/bootstrap-affix.js'
         'bootstrap-alert': 'bowerassets/bootstrap/js/bootstrap-alert.js'
         'bootstrap-button': 'bowerassets/bootstrap/js/bootstrap-button.js'
@@ -176,7 +175,7 @@ config:
         'cryptojs/sha1': 'bundles/bowerassets/crypto-js/sha1.js'
         'cryptojs/hmac': 'bundles/bowerassets/crypto-js/hmac.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
-        'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
+        'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
         'xregexp': 'bundles/npmassets/xregexp/xregexp-all.js'
 
@@ -269,7 +268,7 @@ config:
         'oroui/js/app/models/widget-picker/widget-picker-filter-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-filter-model.js'
         'oroui/js/app/models/widget-picker/widget-picker-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-model.js'
 
-        'autolinker': 'bundles/bowerassets/Autolinker.js/dist/Autolinker.js'
+        'autolinker': 'bundles/bowerassets/autolinker.js/dist/Autolinker.js'
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
 
