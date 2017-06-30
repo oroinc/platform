@@ -8,7 +8,6 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -1265,22 +1264,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iHideAllColumnsInGrid($exceptions = '', $gridName = null)
     {
-        $this->hideAllColumnsInGrid($exceptions, $gridName);
-    }
+        $exceptions = explode(',', $exceptions);
+        $exceptions = array_map('trim', $exceptions);
+        $exceptions = array_filter($exceptions);
 
-    //@codingStandardsIgnoreStart
-    /**
-     * Hide all columns in datagrid except mentioned
-     *
-     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)" except "(?P<exceptions>(?:[^"]|\\")*)" on frontend grid$/
-     *
-     * @param string $exceptions
-     * @param string|null $gridName
-     */
-    //@codingStandardsIgnoreEnd
-    public function iHideAllColumnsInFrontendDatagrid($exceptions = '', $gridName = null)
-    {
-        $this->hideAllColumnsInGrid($exceptions, $gridName, 'FrontendGridColumnManager');
+        $columnManager = $this->getGridColumnManager($this->getGrid($gridName));
+        $columnManager->open();
+        $columnManager->hideAllColumns($exceptions);
+        $columnManager->close();
     }
 
     /**
@@ -1356,11 +1347,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid = $this->getGrid($gridName);
 
         $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $filterButton = $grid->getElement('GridFilterManagerButton');
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement('GridFilterManager');
         $filterManager->checkColumnFilter($filter);
         $filterManager->close();
     }
@@ -1378,35 +1369,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid = $this->getGrid($gridName);
 
         $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $filterButton = $grid->getElement('GridFilterManagerButton');
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement('GridFilterManager');
         $filterManager->uncheckColumnFilter($filter);
         $filterManager->close();
-    }
-
-    /**
-     * Hide columns in column manager for datagrid
-     * @param string $exceptions
-     * @param string $gridName
-     * @param string $gridColumnManager
-     */
-    private function hideAllColumnsInGrid($exceptions = '', $gridName = null, $gridColumnManager = null)
-    {
-        if ($gridColumnManager === null) {
-            $gridColumnManager = 'GridColumnManager';
-        }
-
-        $exceptions = explode(',', $exceptions);
-        $exceptions = array_map('trim', $exceptions);
-        $exceptions = array_filter($exceptions);
-
-        $columnManager = $this->getGridColumnManager($this->getGrid($gridName), $gridColumnManager);
-        $columnManager->open();
-        $columnManager->hideAllColumns($exceptions);
-        $columnManager->close();
     }
 
     /**
@@ -1491,9 +1460,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param GridInterface|Element $grid
      * @return GridColumnManager|Element
      */
-    private function getGridColumnManager($grid, $element = 'GridColumnManager')
+    private function getGridColumnManager($grid)
     {
-        return $this->createElement($grid->getMappedChildElementName($element));
+        return $this->createElement($grid->getMappedChildElementName('GridColumnManager'));
     }
 
     /**
