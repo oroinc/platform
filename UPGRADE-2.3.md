@@ -326,3 +326,31 @@ WorkflowBundle
 - Added Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter`
 - Updated Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter`
     - changed namespace
+- Class `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider`:
+    - it does not extend `Oro\Bundle\WorkflowBundle\Configuration\AbstractConfigurationProvider` anymore
+    - completely changed signature of constructor, now it accepts four parameters:
+        - `Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration $configuration`
+        - `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder $finderBuilder`
+        - `Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface $reader`
+        - `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationImportsProcessor $configurationImportsProcessor`
+    - removed next methods:
+        - `protected function loadConfigFile(\SplFileInfo $file)`
+        - `protected function processImports(\SplFileInfo $file, array $imports, array $configData)`
+        - `protected function applyWorkflowImports(array $configData, $recipient, array &$imports, \SplFileInfo $sourceFile)`
+        - `protected function getConfigFilePattern()`
+- Removed service container parameters:
+    - `oro_workflow.configuration.config.workflow_sole.class`
+    - `oro_workflow.configuration.config.workflow_list.class`
+    - `oro_workflow.configuration.handler.step.class`
+    - `oro_workflow.configuration.handler.attribute.class`
+    - `oro_workflow.configuration.handler.transition.class`
+    - `oro_workflow.configuration.handler.workflow.class`
+    - `oro_workflow.configuration.config.process_definition_sole.class`
+    - `oro_workflow.configuration.config.process_definition_list.class`
+    - `oro_workflow.configuration.config.process_trigger_sole.class`
+    - `oro_workflow.configuration.config.process_trigger_list.class`
+    - `oro_workflow.configuration.provider.workflow_config.class`
+    - `oro_workflow.configuration.provider.process_config.class`
+    - `oro_workflow.configuration.builder.workflow_definition.class`
+    - `oro_workflow.configuration.builder.workflow_definition.handle.class`
+    - `oro_workflow.configuration.builder.process_configuration.class`
