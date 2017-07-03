@@ -2,66 +2,67 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Stub;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\Common\Cache\CacheProvider;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
 
 class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $metadata = [];
+
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    private $configManagerMock;
+
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $tokenAccessorMock;
+
+    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    private $cacheMock;
 
     /**
      * @param \PHPUnit_Framework_TestCase $testCase
      *
-     * @param array $classes
+     * @param array                       $classes
      */
     public function __construct(\PHPUnit_Framework_TestCase $testCase, array $classes = [])
     {
-        $configProvider = $testCase->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configManagerMock = $testCase->getMockBuilder(ConfigManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityClassResolverMock = $testCase->getMockBuilder(EntityClassResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->tokenAccessorMock = $testCase->getMockBuilder(TokenAccessorInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->cacheMock = $testCase->getMockBuilder(CacheProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityClassResolver = $testCase->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityClassResolver->expects($testCase->any())->method('getEntityClass')->willReturnArgument(0);
-
-        $container = $testCase->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container->expects($testCase->any())
-            ->method('get')
-            ->will(
-                $testCase->returnValueMap(
-                    [
-                        [
-                            'oro_entity_config.provider.ownership',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $configProvider,
-                        ],
-                        [
-                            'oro_entity.orm.entity_class_resolver',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $entityClassResolver,
-                        ],
-                    ]
-                )
-            );
+        $entityClassResolverMock->expects($testCase->any())
+            ->method('getEntityClass')
+            ->willReturnArgument(0);
 
         parent::__construct(
             array_merge(
                 [
-                    'organization' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization',
-                    'business_unit' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit',
-                    'user' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User',
+                    'organization'  => Entity\Organization::class,
+                    'business_unit' => Entity\BusinessUnit::class,
+                    'user'          => Entity\User::class,
                 ],
                 $classes
-            )
+            ),
+            $this->configManagerMock,
+            $entityClassResolverMock,
+            $this->tokenAccessorMock,
+            $this->cacheMock
         );
-        $this->setContainer($container);
     }
 
     /**
@@ -69,13 +70,11 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
      */
     public function getMetadata($className)
     {
-        return isset($this->metadata[$className])
-            ? $this->metadata[$className]
-            : parent::getMetadata($className);
+        return $this->metadata[$className] ?? parent::getMetadata($className);
     }
 
     /**
-     * @param string $className
+     * @param string            $className
      * @param OwnershipMetadata $metadata
      */
     public function setMetadata($className, OwnershipMetadata $metadata)
@@ -89,5 +88,29 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     public function getMaxAccessLevel($accessLevel, $className = null)
     {
         return $accessLevel;
+    }
+
+    /**
+     * @return ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    public function getConfigManagerMock()
+    {
+        return $this->configManagerMock;
+    }
+
+    /**
+     * @return TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    public function getTokenAccessorMock()
+    {
+        return $this->tokenAccessorMock;
+    }
+
+    /**
+     * @return CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    public function getCacheMock()
+    {
+        return $this->cacheMock;
     }
 }

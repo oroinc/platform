@@ -268,7 +268,7 @@ config:
         'oroui/js/app/models/widget-picker/widget-picker-filter-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-filter-model.js'
         'oroui/js/app/models/widget-picker/widget-picker-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-model.js'
 
-        'autolinker': 'bundles/bowerassets/Autolinker.js/dist/Autolinker.js'
+        'autolinker': 'bundles/bowerassets/autolinker.js/dist/Autolinker.js'
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
 

@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class OwnerDeletionManager
 {
@@ -17,7 +17,7 @@ class OwnerDeletionManager
     protected $ownershipProvider;
 
     /**
-     * @var OwnershipMetadataProvider
+     * @var OwnershipMetadataProviderInterface
      */
     protected $ownershipMetadata;
 
@@ -44,24 +44,24 @@ class OwnerDeletionManager
     /**
      * Constructor
      *
-     * @param OwnerAssignmentCheckerInterface $defaultChecker
-     * @param ConfigProvider                  $ownershipProvider
-     * @param OwnershipMetadataProvider       $ownershipMetadata
-     * @param EntityManager                   $em
-     * @param ObjectIdAccessor                $objectIdAccessor
+     * @param OwnerAssignmentCheckerInterface    $defaultChecker
+     * @param ConfigProvider                     $ownershipProvider
+     * @param OwnershipMetadataProviderInterface $ownershipMetadata
+     * @param EntityManager                      $em
+     * @param ObjectIdAccessor                   $objectIdAccessor
      */
     public function __construct(
         OwnerAssignmentCheckerInterface $defaultChecker,
         ConfigProvider $ownershipProvider,
-        OwnershipMetadataProvider $ownershipMetadata,
+        OwnershipMetadataProviderInterface $ownershipMetadata,
         EntityManager $em,
         ObjectIdAccessor $objectIdAccessor
     ) {
-        $this->defaultChecker    = $defaultChecker;
+        $this->defaultChecker = $defaultChecker;
         $this->ownershipProvider = $ownershipProvider;
         $this->ownershipMetadata = $ownershipMetadata;
-        $this->em                = $em;
-        $this->objectIdAccessor  = $objectIdAccessor;
+        $this->em = $em;
+        $this->objectIdAccessor = $objectIdAccessor;
     }
 
     /**
@@ -135,7 +135,7 @@ class OwnerDeletionManager
                 $entityClassName = $config->getId()->getClassName();
                 $organizationFieldName = $this->ownershipMetadata
                     ->getMetadata($entityClassName)
-                    ->getGlobalOwnerFieldName();
+                    ->getOrganizationFieldName();
                 $findResult = $this->em->getRepository($entityClassName)
                     ->createQueryBuilder('entity')
                     ->select('organization.id')

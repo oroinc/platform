@@ -27,7 +27,7 @@ use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
@@ -49,7 +49,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /** @var BusinessUnitManager */
@@ -89,18 +89,18 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected $entityOwnerAccessor;
 
     /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param OwnershipMetadataProvider     $ownershipMetadataProvider
-     * @param BusinessUnitManager           $businessUnitManager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param AclVoter                      $aclVoter
-     * @param OwnerTreeProvider             $treeProvider
-     * @param EntityOwnerAccessor           $entityOwnerAccessor
+     * @param DoctrineHelper                     $doctrineHelper
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
+     * @param BusinessUnitManager                $businessUnitManager
+     * @param AuthorizationCheckerInterface      $authorizationChecker
+     * @param TokenAccessorInterface             $tokenAccessor
+     * @param AclVoter                           $aclVoter
+     * @param OwnerTreeProvider                  $treeProvider
+     * @param EntityOwnerAccessor                $entityOwnerAccessor
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        OwnershipMetadataProvider $ownershipMetadataProvider,
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         BusinessUnitManager $businessUnitManager,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -150,7 +150,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         $metadata = $this->getMetadata($dataClassName);
-        if (!$metadata || $metadata->isGlobalLevelOwned()) {
+        if (!$metadata || $metadata->isOrganizationOwned()) {
             return;
         }
 
@@ -159,10 +159,10 @@ class OwnerFormExtension extends AbstractTypeExtension
         $this->checkIsGranted('CREATE', 'entity:' . $dataClassName);
         $defaultOwner = null;
 
-        if ($metadata->isBasicLevelOwned() && $this->isAssignGranted) {
+        if ($metadata->isUserOwned() && $this->isAssignGranted) {
             $this->addUserOwnerField($builder, $dataClassName);
             $defaultOwner = $user;
-        } elseif ($metadata->isLocalLevelOwned()) {
+        } elseif ($metadata->isBusinessUnitOwned()) {
             $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
             if (!$this->checkIsBusinessUnitEntity($dataClassName)) {
                 $defaultOwner = $this->getCurrentBusinessUnit(
@@ -246,7 +246,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             $metadata = $this->getMetadata($form->getNormData());
             if ($metadata instanceof OwnershipMetadata) {
                 $isCorrect = true;
-                if ($metadata->isBasicLevelOwned()) {
+                if ($metadata->isUserOwned()) {
                     $isCorrect = $this->businessUnitManager->canUserBeSetAsOwner(
                         $this->getCurrentUser(),
                         $newOwner,
@@ -254,7 +254,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                         $this->treeProvider,
                         $this->getOrganization()
                     );
-                } elseif ($metadata->isLocalLevelOwned()) {
+                } elseif ($metadata->isBusinessUnitOwned()) {
                     $isCorrect = $this->isBusinessUnitAvailableForCurrentUser($newOwner);
                 }
 
@@ -296,9 +296,9 @@ class OwnerFormExtension extends AbstractTypeExtension
                     $form->remove($this->fieldName);
                 }
                 if ($this->isAssignGranted) {
-                    if ($metadata->isBasicLevelOwned()) {
+                    if ($metadata->isUserOwned()) {
                         $this->addUserOwnerField($form, $dataClassName, $permission, $owner, $entity->getId());
-                    } elseif ($metadata->isLocalLevelOwned()) {
+                    } elseif ($metadata->isBusinessUnitOwned()) {
                         $this->addBusinessUnitOwnerField($form, $this->getCurrentUser(), $dataClassName);
                     }
                 }

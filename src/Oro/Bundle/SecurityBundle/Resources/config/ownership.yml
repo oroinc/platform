@@ -1,11 +1,11 @@
 parameters:
     oro_security.entity.owners:
-        organization: "OroOrganizationBundle:Organization"
-        business_unit: "OroOrganizationBundle:BusinessUnit"
-        user: "OroUserBundle:User"
+        organization: '%oro_organization.organization.entity.class%'
+        business_unit: '%oro_organization.business_unit.entity.class%'
+        user: '%oro_user.entity.class%'
 
     oro_security.owner.entity_owner_accessor.class:                       Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor
-    oro_security.owner.metadata_provider.chain.class:                     Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider
+    oro_security.owner.metadata_provider.chain.class:                     Oro\Bundle\SecurityBundle\Owner\Metadata\ChainOwnershipMetadataProvider
     oro_security.owner.ownership_metadata_provider.class:                 Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider
     oro_security.owner.ownership_metadata_provider.cache.warmer.class:    Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheWarmer
     oro_security.owner.ownership_metadata_provider.cache.clearer.class:   Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheClearer
@@ -29,12 +29,11 @@ services:
     oro_security.owner.ownership_metadata_provider:
         class: %oro_security.owner.ownership_metadata_provider.class%
         arguments:
-            - %oro_security.entity.owners%
-            - '@oro_entity_config.provider.ownership'
+            - '%oro_security.entity.owners%'
+            - '@oro_entity_config.config_manager'
             - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_security.token_accessor'
             - '@oro_security.owner.ownership_metadata_provider.cache'
-        calls:
-            - [ setContainer, [ '@service_container' ] ]
         tags:
             - { name: oro_security.owner.metadata_provider, alias: default }
 
@@ -43,8 +42,8 @@ services:
             - { name: oro_service_link, service: oro_security.owner.ownership_metadata_provider }
 
     oro_security.owner.ownership_metadata_provider.cache:
-        public: false
         parent: oro.cache.abstract
+        public: false
         calls:
             - [ setNamespace, [ 'oro_acl_entity_ownership' ] ]
 

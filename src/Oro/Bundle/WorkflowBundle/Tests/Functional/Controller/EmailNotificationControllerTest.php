@@ -22,6 +22,7 @@ class EmailNotificationControllerTest extends WebTestCase
 
     const ENTITY_NAME = WorkflowAwareEntity::class;
     const EVENT_NAME = 'oro.workflow.event.notification.workflow_transition';
+    const TRANSITION_NAME = 'starting_point_transition';
 
     /** @var  Registry */
     protected $doctrine;
@@ -34,6 +35,9 @@ class EmailNotificationControllerTest extends WebTestCase
         $this->loadFixtures([LoadWorkflowDefinitions::class, LoadWorkflowEmailTemplates::class]);
     }
 
+    /**
+     * @return string
+     */
     public function testCreate()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_create'));
@@ -43,27 +47,29 @@ class EmailNotificationControllerTest extends WebTestCase
         $event = $this->getEvent(self::EVENT_NAME);
 
         $this->assertFormSubmission($event, $crawler);
-    }
-
-    /**
-     * @depends testCreate
-     */
-    public function testUpdate()
-    {
         $response = $this->client->requestGrid(
             'email-notification-grid',
             [
-                'email-notification-grid[_pager][_page]' => 1,
-                'email-notification-grid[_pager][_per_page]' => 1,
+                'email-notification-grid[_filter][workflow_transition_name][value]' => self::TRANSITION_NAME
             ]
         );
 
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
+        return $result['id'];
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param string $id
+     */
+    public function testUpdate($id)
+    {
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_notification_emailnotification_update', ['id' => $result['id']])
+            $this->getUrl('oro_notification_emailnotification_update', ['id' => $id])
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
@@ -75,23 +81,14 @@ class EmailNotificationControllerTest extends WebTestCase
 
     /**
      * @depends testCreate
+     *
+     * @param $id
      */
-    public function testDelete()
+    public function testDelete($id)
     {
-        $response = $this->client->requestGrid(
-            'email-notification-grid',
-            [
-                'email-notification-grid[_pager][_page]' => 1,
-                'email-notification-grid[_pager][_per_page]' => 1,
-            ]
-        );
-
-        $result = $this->getJsonResponseContent($response, 200);
-        $result = reset($result['data']);
-
         $this->client->request(
             'DELETE',
-            $this->getUrl('oro_api_delete_emailnotication', ['id' => $result['id']])
+            $this->getUrl('oro_api_delete_emailnotication', ['id' => $id])
         );
 
         $result = $this->client->getResponse();
@@ -134,7 +131,7 @@ class EmailNotificationControllerTest extends WebTestCase
         $formValues['emailnotification']['recipientList']['groups'][0] = 1;
         $formValues['emailnotification']['recipientList']['email'] = 'admin@example.com';
         $formValues['emailnotification']['workflow_definition'] = 'test_multistep_flow';
-        $formValues['emailnotification']['workflow_transition_name'] = 'starting_point_transition';
+        $formValues['emailnotification']['workflow_transition_name'] = self::TRANSITION_NAME;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);
