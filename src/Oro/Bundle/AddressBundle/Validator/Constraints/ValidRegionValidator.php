@@ -21,9 +21,8 @@ class ValidRegionValidator extends ConstraintValidator
             // do not allow saving text region in case when region was checked from list
             // except when in base data region text existed
             // another way region_text field will be null, logic are placed in form listener
-            $propertyPath = $this->context->getPropertyPath() . '.region';
             $this->context->addViolationAt(
-                $propertyPath,
+                'region',
                 $constraint->message,
                 ['{{ country }}' => $entity->getCountry()->getName()]
             );

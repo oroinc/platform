@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserACLData;
 
-class UserControllerTest extends WebTestCase
+class UserControllerACLTest extends WebTestCase
 {
     protected function setUp()
     {

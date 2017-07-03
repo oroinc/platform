@@ -1,0 +1,9 @@
+services:
+    oro_note.action.create_note:
+        class: Oro\Bundle\NoteBundle\Action\CreateNoteAction
+        arguments:
+            - '@doctrine'
+            - '@oro_activity.manager'
+            - '@oro_action.expression.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: create_note }

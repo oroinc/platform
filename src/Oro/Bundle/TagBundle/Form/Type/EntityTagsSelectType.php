@@ -54,8 +54,6 @@ class EntityTagsSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $choices = function (Options $options) {
-
-
             $queryBuilder = $this->doctrine->getRepository('OroTagBundle:Tag')
                 ->createQueryBuilder('t')
                 ->distinct(true)

@@ -114,4 +114,48 @@ class EntityTypeSecurityCheckTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
     }
+
+    public function testForcePermissionUsage()
+    {
+        $this->processor = new EntityTypeSecurityCheck(
+            $this->doctrineHelper,
+            $this->authorizationChecker,
+            'VIEW',
+            true
+        );
+
+        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource('acme_product_test');
+
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('VIEW', new ObjectIdentity('entity', $className))
+            ->willReturn(true);
+
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+    }
+
+    public function testForcePermissionUsageWhenAclCheckIsDisabled()
+    {
+        $this->processor = new EntityTypeSecurityCheck(
+            $this->doctrineHelper,
+            $this->authorizationChecker,
+            'VIEW',
+            true
+        );
+
+        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource(null);
+
+        $this->authorizationChecker->expects($this->never())
+            ->method('isGranted');
+
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+    }
 }

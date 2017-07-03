@@ -67,6 +67,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
             - VIEW
+            - true
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
 

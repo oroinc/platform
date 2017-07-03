@@ -64,6 +64,14 @@ class StartedWorkflowsBag
 
     /**
      * @param string $workflowName
+     */
+    public function removeWorkflow($workflowName)
+    {
+        $this->startedWorkflows->set($workflowName, []);
+    }
+
+    /**
+     * @param string $workflowName
      * @return array
      */
     protected function getEntities($workflowName)

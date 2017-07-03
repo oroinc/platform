@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider\Filter;
 
 use Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 
 class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -76,16 +77,13 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetList($userBUIds, $result)
     {
-        $treeOwner = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTree')
-            ->setMethods(['getUserSubordinateBusinessUnitIds'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ownerTree = $this->createMock(OwnerTreeInterface::class);
 
         $this->treeProvider->expects($this->once())
             ->method('getTree')
-            ->willReturn($treeOwner);
+            ->willReturn($ownerTree);
 
-        $treeOwner
+        $ownerTree
             ->expects($this->once())
             ->method('getUserSubordinateBusinessUnitIds')
             ->willReturn($userBUIds);

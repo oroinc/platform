@@ -33,7 +33,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     const PROPERTY_TYPE = 'bigint';
 
-    static private $entityConfig = [
+    private static $entityConfig = [
         'label' => self::SOME_LABEL
     ];
 
