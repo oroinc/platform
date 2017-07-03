@@ -35,16 +35,30 @@
     &__link {
         color: $primary-menu-link-color;
 
-        &--current {
-            color: $primary-menu-link-color-current;
+        @include element-state('hover') {
+            color: $primary-menu-link-color-hover;
         }
 
-        &:hover {
-            color: $primary-menu-link-color-hover;
+        &--current {
+            color: $primary-menu-link-color-current;
+
+            @include element-state('hover') {
+                color: $primary-menu-link-color-current;
+            }
         }
     }
 
     &--vertical {
         display: block;
+    }
+}
+
+@include breakpoint('desktop') {
+    .primary-menu {
+        &--vertical {
+            .primary-menu__item {
+                padding: $primary-menu-vertical-item-inner-offset;
+            }
+        }
     }
 }
