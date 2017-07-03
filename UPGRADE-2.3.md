@@ -119,6 +119,46 @@ DataGridBundle
 - Interface `Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface`
     - method `init` was removed
 
+IntegrationBundle
+-----------------
+- Interface `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface` was changed:
+  - Methods `getRawHeaders`, `xml`, `getRedirectCount`, `getEffectiveUrl` were completely removed
+  - Methods `getContentEncoding`, `getContentLanguage`, `getContentLength`, `getContentLocation`, `getContentDisposition`, `getContentMd5`, `getContentRange`, `getContentType`, `isContentType` were superseded by `getHeader` method 
+- Interface `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface` was changed:
+  - Method `getXML` was completely removed
+
+- Class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient` method `getXML` was removed, please use a simple `get` method instead and convert its result to XML
+- Class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse`:
+  - Methods `getRawHeaders`, `xml`, `getRedirectCount`, `getEffectiveUrl` were removed, in case you need them just use the construction such as `$response->getSourceResponse()->xml()`
+  - Methods `getContentEncoding`, `getContentLanguage`, `getContentLength`, `getContentLocation`, `getContentDisposition`, `getContentMd5`, `getContentRange`, `getContentType`, `isContentType` were removed, but you can get the same values if you use `$response->getHeader('Content-Type')` or `$response->getHeader('Content-MD5')`, for example.
+- Class `Oro\Bundle\IntegrationBundle\Manager\TypesRegistry` was changed
+  - public method `getIntegrationByType(string $typeName)` was added
+- Abstract class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\BridgeRestClientFactory` and its services `oro_integration.transport.rest.bridge.client_factory`, `oro_integration.transport.rest.bridge.decorated_client_factory` were added
+  - construction signature:
+     - RestClientFactoryInterface $clientFactory
+  - public method `createRestClient(Transport $transportEntity)` was added
+  - abstract protected method `getClientBaseUrl(ParameterBag $parameterBag)` was added
+  - abstract protected method `getClientOptions(ParameterBag $parameterBag)` was added
+- Abstract class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\AbstractRestClientDecoratorFactory` was added
+  - construction signature:
+     - RestClientFactoryInterface $restClientFactory
+  - public method `getRestClientFactory()` was added
+- Class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDecorator` was added. Implements `RestClientInterface`. Use it for logging client.
+  - construction signature:
+     - RestClientFactoryInterface $restClientFactory
+     - LoggerInterface $logger
+- Class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDecoratorFactory` and its service `oro_integration.provider.rest_client.logger_decorator_factory` were added. Implements `LoggerAwareInterface`.
+  - public method `createRestClient($baseUrl, array $defaultOptions)` was added
+- Class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDecorator` was added. Implements `RestClientInterface`. Add the ability to make additional requests to the server.
+  - construction signature:
+    - RestClientFactoryInterface $restClientFactory
+    - LoggerInterface $logger
+    - bool $multipleAttemptsEnabled
+    - array $sleepBetweenAttempt
+- Class `Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\MultiAttemptsClientDecoratorFactory` and its service `oro_integration.provider.rest_client.multi_attempts_decorator_factory` were added. Implements `LoggerAwareInterface`.
+- Class `Oro\Bundle\IntegrationBundle\Provider\TransportCacheClearInterface` was added
+  - public method `cacheClear($resource = null))` was added
+
 CronBundle
 ----------
 - Class `Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor`
