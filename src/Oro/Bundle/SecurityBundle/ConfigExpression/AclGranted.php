@@ -123,9 +123,6 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
      */
     protected function isConditionAllowed($context)
     {
-        if (!$this->tokenAccessor->hasUser()) {
-            return false;
-        }
         $attributes = $this->resolveValue($context, $this->attributes);
         $object     = $this->resolveValue($context, $this->object);
 
