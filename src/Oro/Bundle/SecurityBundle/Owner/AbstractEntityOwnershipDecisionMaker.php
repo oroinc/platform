@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
 /**
@@ -20,111 +18,100 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class AbstractEntityOwnershipDecisionMaker implements
-    AccessLevelOwnershipDecisionMakerInterface,
-    ContainerAwareInterface
+abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionMakerInterface
 {
-    /**
-     * @var OwnerTreeProvider
-     */
-    private $treeProvider;
+    /** @var OwnerTreeProviderInterface */
+    protected $treeProvider;
+
+    /** @var ObjectIdAccessor */
+    protected $objectIdAccessor;
+
+    /** @var EntityOwnerAccessor */
+    protected $entityOwnerAccessor;
+
+    /** @var OwnershipMetadataProviderInterface */
+    protected $ownershipMetadataProvider;
 
     /**
-     * @var ObjectIdAccessor
+     * @param OwnerTreeProviderInterface         $treeProvider
+     * @param ObjectIdAccessor                   $objectIdAccessor
+     * @param EntityOwnerAccessor                $entityOwnerAccessor
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
      */
-    private $objectIdAccessor;
-
-    /**
-     * @var EntityOwnerAccessor
-     */
-    private $entityOwnerAccessor;
-
-    /**
-     * @var OwnershipMetadataProvider
-     */
-    private $metadataProvider;
-
-    /**
-     * @var ContainerAwareInterface
-     */
-    private $container;
-
-    /**
-     * @return OwnershipMetadataProvider
-     */
-    public function getMetadataProvider()
-    {
-        if (!$this->metadataProvider) {
-            $this->metadataProvider = $this->getContainer()->get('oro_security.owner.metadata_provider.chain');
-        }
-
-        return $this->metadataProvider;
-    }
-
-    /**
-     * @return OwnerTreeProvider
-     */
-    public function getTreeProvider()
-    {
-        if (!$this->treeProvider) {
-            $this->treeProvider = $this->getContainer()->get('oro_security.ownership_tree_provider.chain');
-        }
-
-        return $this->treeProvider;
-    }
-
-    /**
-     * @return ObjectIdAccessor
-     */
-    public function getObjectIdAccessor()
-    {
-        if (!$this->objectIdAccessor) {
-            $this->objectIdAccessor = $this->getContainer()->get('oro_security.acl.object_id_accessor');
-        }
-
-        return $this->objectIdAccessor;
-    }
-
-    /**
-     * @return EntityOwnerAccessor
-     */
-    public function getEntityOwnerAccessor()
-    {
-        if (!$this->entityOwnerAccessor) {
-            $this->entityOwnerAccessor = $this->getContainer()->get('oro_security.owner.entity_owner_accessor');
-        }
-
-        return $this->entityOwnerAccessor;
+    public function __construct(
+        OwnerTreeProviderInterface $treeProvider,
+        ObjectIdAccessor $objectIdAccessor,
+        EntityOwnerAccessor $entityOwnerAccessor,
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider
+    ) {
+        $this->treeProvider = $treeProvider;
+        $this->objectIdAccessor = $objectIdAccessor;
+        $this->entityOwnerAccessor = $entityOwnerAccessor;
+        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
     /**
      * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
-    {
-        if (!$this->container) {
-            throw new \InvalidArgumentException('ContainerInterface is not injected');
-        }
-
-        return $this->container;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @deprecated since 2.3. Use isOrganization instead
      */
     public function isGlobalLevelEntity($domainObject)
     {
+        return $this->isOrganization($domainObject);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3. Use isBusinessUnit instead
+     */
+    public function isLocalLevelEntity($domainObject)
+    {
+        return $this->isBusinessUnit($domainObject);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3. Use isUser instead
+     */
+    public function isBasicLevelEntity($domainObject)
+    {
+        return $this->isUser($domainObject);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3. Use isAssociatedWithOrganization instead
+     */
+    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
+    {
+        return $this->isAssociatedWithOrganization($user, $domainObject, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3. Use isAssociatedWithBusinessUnit instead
+     */
+    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
+    {
+        return $this->isAssociatedWithBusinessUnit($user, $domainObject, $deep, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3. Use isAssociatedWithUser instead
+     */
+    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
+    {
+        return $this->isAssociatedWithUser($user, $domainObject, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isOrganization($domainObject)
+    {
         return is_a(
             $domainObject instanceof DomainObjectReference ? $domainObject->getType() : $domainObject,
-            $this->getMetadataProvider()->getGlobalLevelClass(),
+            $this->ownershipMetadataProvider->getOrganizationClass(),
             true
         );
     }
@@ -132,11 +119,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     /**
      * {@inheritdoc}
      */
-    public function isLocalLevelEntity($domainObject)
+    public function isBusinessUnit($domainObject)
     {
         return is_a(
             $domainObject instanceof DomainObjectReference ? $domainObject->getType() : $domainObject,
-            $this->getMetadataProvider()->getLocalLevelClass(),
+            $this->ownershipMetadataProvider->getBusinessUnitClass(),
             true
         );
     }
@@ -145,11 +132,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * {@inheritdoc}
      * @return bool
      */
-    public function isBasicLevelEntity($domainObject)
+    public function isUser($domainObject)
     {
         return is_a(
             $domainObject instanceof DomainObjectReference ? $domainObject->getType() : $domainObject,
-            $this->getMetadataProvider()->getBasicLevelClass(),
+            $this->ownershipMetadataProvider->getUserClass(),
             true
         );
     }
@@ -160,9 +147,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
+    public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
     {
-        $tree = $this->getTreeProvider()->getTree();
+        $tree = $this->treeProvider->getTree();
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
@@ -180,7 +167,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
         $allowedOrganizationIds = $organizationId ? [$organizationId] : $userOrganizationIds;
 
-        if ($this->isGlobalLevelEntity($domainObject)) {
+        if ($this->isOrganization($domainObject)) {
             return in_array(
                 $this->getObjectId($domainObject),
                 $allowedOrganizationIds,
@@ -188,14 +175,14 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             );
         }
 
-        if ($this->isLocalLevelEntity($domainObject)) {
+        if ($this->isBusinessUnit($domainObject)) {
             return in_array(
                 $tree->getBusinessUnitOrganizationId($this->getObjectId($domainObject)),
                 $allowedOrganizationIds
             );
         }
 
-        if ($this->isBasicLevelEntity($domainObject)) {
+        if ($this->isUser($domainObject)) {
             $userId = $this->getObjectId($user);
             $objId = $this->getObjectId($domainObject);
             if ($userId === $objId) {
@@ -212,20 +199,18 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         }
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
-        if ($metadata->isGlobalLevelOwned()) {
+        if ($metadata->isOrganizationOwned()) {
             return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds, true);
         }
 
-        $ownerOrganization = $this->getEntityOwnerAccessor()->getOrganization($domainObject);
+        $ownerOrganization = $this->entityOwnerAccessor->getOrganization($domainObject);
 
         // in case when entity has no owner yet (e.g. checking for new object)
         $noOwnerExistsYet = is_null($ownerOrganization);
 
-        return $noOwnerExistsYet || in_array(
-            $this->getObjectId($ownerOrganization),
-            $allowedOrganizationIds,
-            true
-        );
+        return
+            $noOwnerExistsYet
+            || in_array($this->getObjectId($ownerOrganization), $allowedOrganizationIds, true);
     }
 
     /**
@@ -234,9 +219,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
+    public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
-        $tree = $this->getTreeProvider()->getTree();
+        $tree = $this->treeProvider->getTree();
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
@@ -245,7 +230,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             $organizationId = $this->getObjectId($organization);
         }
 
-        if ($this->isLocalLevelEntity($domainObject)) {
+        if ($this->isBusinessUnit($domainObject)) {
             return $this->isUserBusinessUnit(
                 $this->getObjectId($user),
                 $this->getObjectId($domainObject),
@@ -254,7 +239,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             );
         }
 
-        if ($this->isBasicLevelEntity($domainObject)) {
+        if ($this->isUser($domainObject)) {
             $userId = $this->getObjectId($user);
             if ($userId === $this->getObjectId($domainObject) && $tree->getUserBusinessUnitId($userId) !== null) {
                 return true;
@@ -269,9 +254,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         $ownerId = $domainObject instanceof DomainObjectReference ?
             $domainObject->getOwnerId() :
             $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
-        if ($metadata->isLocalLevelOwned()) {
+        if ($metadata->isBusinessUnitOwned()) {
             return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep, $organizationId);
-        } elseif ($metadata->isBasicLevelOwned()) {
+        } elseif ($metadata->isUserOwned()) {
             $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($ownerId, $organizationId);
             if (empty($ownerBusinessUnitIds)) {
                 return false;
@@ -291,13 +276,13 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     /**
      * {@inheritdoc}
      */
-    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
+    public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
         $userId = $this->getObjectId($user);
         if ($organization
             && !in_array(
                 $this->getObjectId($organization),
-                $this->getTreeProvider()->getTree()->getUserOrganizationIds($userId),
+                $this->treeProvider->getTree()->getUserOrganizationIds($userId),
                 true
             )
         ) {
@@ -307,12 +292,12 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
-        if ($this->isBasicLevelEntity($domainObject)) {
+        if ($this->isUser($domainObject)) {
             return $this->getObjectId($domainObject) === $this->getObjectId($user);
         }
 
         $metadata = $this->getObjectMetadata($domainObject);
-        if ($metadata->isBasicLevelOwned()) {
+        if ($metadata->isUserOwned()) {
             $ownerId = $domainObject instanceof DomainObjectReference
                 ? $domainObject->getOwnerId()
                 : $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
@@ -330,11 +315,12 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * @param  int|string|null $ownerBusinessUnitIds
      * @param  bool            $deep Specify whether subordinate business units should be checked. Defaults to false.
      * @param  int|null        $organizationId
+     *
      * @return bool
      */
     protected function isUserBusinessUnits($userId, $ownerBusinessUnitIds, $deep = false, $organizationId = null)
     {
-        $userBusinessUnitIds = $this->getTreeProvider()->getTree()->getUserBusinessUnitIds($userId, $organizationId);
+        $userBusinessUnitIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId);
         $familiarBusinessUnits = array_intersect($userBusinessUnitIds, $ownerBusinessUnitIds);
         if (!empty($familiarBusinessUnits)) {
             return true;
@@ -342,7 +328,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         if ($deep) {
             foreach ($userBusinessUnitIds as $buId) {
                 $familiarBusinessUnits = array_intersect(
-                    $this->getTreeProvider()->getTree()->getSubordinateBusinessUnitIds($buId),
+                    $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),
                     $ownerBusinessUnitIds
                 );
                 if (!empty($familiarBusinessUnits)) {
@@ -361,6 +347,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * @param  int|string|null $businessUnitId
      * @param  bool            $deep Specify whether subordinate business units should be checked. Defaults to false.
      * @param  int|null        $organizationId
+     *
      * @return bool
      */
     protected function isUserBusinessUnit($userId, $businessUnitId, $deep = false, $organizationId = null)
@@ -369,7 +356,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return false;
         }
 
-        $businessUnits = $this->getTreeProvider()->getTree()->getUserBusinessUnitIds($userId, $organizationId);
+        $businessUnits = $this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId);
         foreach ($businessUnits as $buId) {
             if ($businessUnitId === $buId) {
                 return true;
@@ -377,7 +364,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             if ($deep
                 && in_array(
                     $businessUnitId,
-                    $this->getTreeProvider()->getTree()->getSubordinateBusinessUnitIds($buId),
+                    $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),
                     true
                 )
             ) {
@@ -392,15 +379,16 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * Check that the given object is a user
      *
      * @param  object $user
+     *
      * @throws InvalidDomainObjectException
      */
     protected function validateUserObject($user)
     {
-        if (!is_object($user) || !$this->isBasicLevelEntity($user)) {
+        if (!is_object($user) || !$this->isUser($user)) {
             throw new InvalidDomainObjectException(
                 sprintf(
                     '$user must be an instance of %s.',
-                    $this->getMetadataProvider()->getBasicLevelClass()
+                    $this->ownershipMetadataProvider->getUserClass()
                 )
             );
         }
@@ -410,6 +398,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * Check that the given object is a domain object
      *
      * @param  object $domainObject
+     *
      * @throws InvalidDomainObjectException
      */
     protected function validateObject($domainObject)
@@ -423,6 +412,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * Gets id for the given domain object
      *
      * @param  object $domainObject
+     *
      * @return int|string
      * @throws InvalidDomainObjectException
      */
@@ -430,7 +420,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     {
         return $domainObject instanceof DomainObjectReference
             ? $domainObject->getIdentifier()
-            : $this->getObjectIdAccessor()->getId($domainObject);
+            : $this->objectIdAccessor->getId($domainObject);
     }
 
     /**
@@ -438,6 +428,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * Returns null when the given domain object is null
      *
      * @param  object|null $domainObject
+     *
      * @return int|string|null
      * @throws InvalidDomainObjectException
      */
@@ -449,46 +440,49 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
         return $domainObject instanceof DomainObjectReference
             ? $domainObject->getIdentifier()
-            : $this->getObjectIdAccessor()->getId($domainObject);
+            : $this->objectIdAccessor->getId($domainObject);
     }
 
     /**
      * Gets the real class name for the given domain object or the given class name that could be a proxy
      *
      * @param  object|string $domainObjectOrClassName
+     *
      * @return string
      */
     protected function getObjectClass($domainObjectOrClassName)
     {
         return ClassUtils::getRealClass(
             $domainObjectOrClassName instanceof DomainObjectReference
-            ? $domainObjectOrClassName->getType()
-            : $domainObjectOrClassName
+                ? $domainObjectOrClassName->getType()
+                : $domainObjectOrClassName
         );
     }
 
     /**
      * Gets metadata for the given domain object
      *
-     * @param  object $domainObject
-     * @return OwnershipMetadata
+     * @param object $domainObject
+     *
+     * @return OwnershipMetadataInterface
      */
     protected function getObjectMetadata($domainObject)
     {
-        return $this->getMetadataProvider()->getMetadata($this->getObjectClass($domainObject));
+        return $this->ownershipMetadataProvider->getMetadata($this->getObjectClass($domainObject));
     }
 
     /**
      * Gets owner of the given domain object
      *
      * @param  object $domainObject
+     *
      * @return object
      * @throws InvalidDomainObjectException
      */
     protected function getOwner($domainObject)
     {
         try {
-            return $this->getEntityOwnerAccessor()->getOwner($domainObject);
+            return $this->entityOwnerAccessor->getOwner($domainObject);
         } catch (InvalidEntityException $ex) {
             throw new InvalidDomainObjectException($ex->getMessage(), 0, $ex);
         }
@@ -496,6 +490,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
     /**
      * @param null $organization
+     *
      * @return int|null|string
      */
     protected function getOrganizationId($organization = null)

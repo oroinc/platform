@@ -19,7 +19,8 @@ class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected $expectedParameters = [
-        'oro_workflow.configuration.provider.workflow_config.class',
+        'oro_workflow.configuration.default_subdirectory',
+        'oro_workflow.configuration.default_filename'
     ];
 
     public function testLoad()

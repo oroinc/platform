@@ -6,7 +6,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface as OwnershipMetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class OwnershipQueryHelper
 {
@@ -56,7 +56,7 @@ class OwnershipQueryHelper
                 continue;
             }
 
-            $organizationFieldName = $metadata->getGlobalOwnerFieldName();
+            $organizationFieldName = $metadata->getOrganizationFieldName();
             $organizationIdFieldAlias = null;
             if ($organizationFieldName) {
                 $organizationIdFieldAlias = $entityAlias . '_organization_id';
