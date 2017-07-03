@@ -382,19 +382,11 @@ services:
         calls:
           - [ setDefaultManager, [ '@oro_navigation.breadcrumb_manager' ]]
 
-    oro_navigation.menu_update.builder.abstract:
+    oro_navigation.menu_update.builder.menu_default_visibility:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
-        abstract: true
         arguments:
             - '@oro_locale.helper.localization'
-            - '@oro_scope.scope_manager'
-            - '@doctrine'
-
-    oro_navigation.menu_update.builder.menu_default_visibility:
-        parent: oro_navigation.menu_update.builder.abstract
-        calls:
-          - [setClassName, ['%oro_navigation.entity.menu_update.class%']]
-          - [setScopeType, ['%oro_navigation.menu_update.scope_type%']]
+            - '@oro_navigation.provider.menu_update_provider'
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
@@ -540,3 +532,9 @@ services:
         class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBuild }
+
+    oro_navigation.provider.menu_update_provider:
+        class: 'Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider'
+        arguments:
+            - '@oro_scope.scope_manager'
+            - '@oro_navigation.manager.menu_update'
