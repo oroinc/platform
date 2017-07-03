@@ -20,9 +20,6 @@ Oro\Bundle\CurrencyBundle\Entity\Price:
 Oro\Bundle\CurrencyBundle\Entity\MultiCurrency:
     properties:
         value:
-            - NotBlank:
-                groups: [ValueRequired]
-                message: 'oro.currency.multi_currency.value.blank'
             - Type:
                 groups: [Default, Optional]
                 type: numeric
