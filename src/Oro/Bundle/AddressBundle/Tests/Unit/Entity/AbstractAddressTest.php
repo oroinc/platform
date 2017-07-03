@@ -323,12 +323,9 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
 
         $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->once())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('test'));
-        $context->expects($this->once())
             ->method('addViolationAt')
             ->with(
-                'test.region',
+                'region',
                 'State is required for country {{ country }}',
                 ['{{ country }}' => 'Country']
             );
