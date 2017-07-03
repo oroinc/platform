@@ -294,7 +294,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->willReturn($this->createRelationConfigObject([]));
 
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-            new ClassMetadata(self::TEST_CLASS_NAME);
+        new ClassMetadata(self::TEST_CLASS_NAME);
         $metadata->associationMappings = [
             'customerAssociation' => [
                 'fieldName'    => 'customerAssociation',

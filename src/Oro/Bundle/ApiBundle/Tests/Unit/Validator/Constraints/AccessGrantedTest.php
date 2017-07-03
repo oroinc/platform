@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 
-class AssociationTest extends \PHPUnit_Framework_TestCase
+class AccessGrantedTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetStatusCode()
     {

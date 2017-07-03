@@ -232,7 +232,6 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetProcessorsByType(array $processors, $type, array $expected)
     {
-
         foreach ($processors as $processorType => $processorsByType) {
             foreach ($processorsByType as $processorName => $processor) {
                 $this->registry->registerProcessor($processor, $processorType, '\stdClass', $processorName);

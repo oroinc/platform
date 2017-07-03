@@ -173,6 +173,10 @@ define([
          * @param isSelected
          */
         onBackgridSelected: function(model, isSelected) {
+            if (_.isUndefined(isSelected)) {
+                isSelected = false;
+            }
+
             this.$el.toggleClass('row-selected', isSelected);
         },
 

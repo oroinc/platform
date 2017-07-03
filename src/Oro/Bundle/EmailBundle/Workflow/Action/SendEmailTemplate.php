@@ -128,7 +128,7 @@ class SendEmailTemplate extends AbstractSendEmail
         }
         $templateData = $this->renderer->compileMessage($emailTemplate, ['entity' => $entity]);
 
-        list ($subjectRendered, $templateRendered) = $templateData;
+        list($subjectRendered, $templateRendered) = $templateData;
 
         $emailModel->setSubject($subjectRendered);
         $emailModel->setBody($templateRendered);

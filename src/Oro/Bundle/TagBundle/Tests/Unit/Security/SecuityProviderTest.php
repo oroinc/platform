@@ -4,7 +4,7 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Security;
 
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
-class SecurityProviderTest extends \PHPUnit_Framework_TestCase
+class SecuityProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider aclDataProvider
