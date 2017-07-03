@@ -387,6 +387,8 @@ UIBundle
 - Updated jQuery.Numeric to 1.5.0 version
 - Updated Lightgallery.js to 1.4.0 version
 - Updated RequireJS test.js plugin to 2.0.* version
+- Updated Timepicker.js plugin to 1.11.* version
+- Updated Datepair.js plugin to 0.4.* version
 
 UserBundle
 ----------
