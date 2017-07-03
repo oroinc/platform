@@ -23,7 +23,7 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->metadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
 

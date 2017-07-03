@@ -8,7 +8,6 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -103,9 +102,8 @@ class ChoiceTreeBusinessUnitProvider
      */
     protected function getBusinessUnitIds()
     {
-        /** @var OwnerTree $tree */
-        $tree   = $this->treeProvider->getTree();
-        $user   = $this->tokenAccessor->getUser();
+        $tree = $this->treeProvider->getTree();
+        $user = $this->tokenAccessor->getUser();
         $result = [];
 
         $organizations = $user->getOrganizations();

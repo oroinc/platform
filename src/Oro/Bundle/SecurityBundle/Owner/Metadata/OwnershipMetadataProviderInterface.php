@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
-interface MetadataProviderInterface
+interface OwnershipMetadataProviderInterface
 {
     /**
      * @return bool
@@ -19,7 +19,29 @@ interface MetadataProviderInterface
     public function getMetadata($className);
 
     /**
+     * Gets the class name of the user entity
+     *
      * @return string
+     */
+    public function getUserClass();
+
+    /**
+     * Gets the class name of the business unit entity
+     *
+     * @return string
+     */
+    public function getBusinessUnitClass();
+
+    /**
+     * Gets the class name of the organization entity
+     *
+     * @return string
+     */
+    public function getOrganizationClass();
+
+    /**
+     * @return string
+     * @deprecated since 2.3, use getUserClass instead
      */
     public function getBasicLevelClass();
 
@@ -27,11 +49,13 @@ interface MetadataProviderInterface
      * @param bool $deep
      *
      * @return string
+     * @deprecated since 2.3, use getBusinessUnitClass instead
      */
     public function getLocalLevelClass($deep = false);
 
     /**
      * @return string
+     * @deprecated since 2.3, use getOrganizationClass instead
      */
     public function getGlobalLevelClass();
 

@@ -2,46 +2,31 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException;
 
-class ChainMetadataProvider implements MetadataProviderInterface
+class ChainOwnershipMetadataProvider implements OwnershipMetadataProviderInterface
 {
-    /**
-     * @var ArrayCollection|MetadataProviderInterface[]
-     */
-    protected $providers;
+    /** @var OwnershipMetadataProviderInterface[] */
+    protected $providers = [];
 
-    /**
-     * @var MetadataProviderInterface
-     */
+    /** @var OwnershipMetadataProviderInterface */
     protected $supportedProvider;
 
-    /**
-     * @var MetadataProviderInterface
-     */
+    /** @var OwnershipMetadataProviderInterface */
     protected $defaultProvider;
 
-    /**
-     * @var MetadataProviderInterface
-     */
+    /** @var OwnershipMetadataProviderInterface */
     protected $emulatedProvider;
-
-    public function __construct()
-    {
-        $this->providers = new ArrayCollection();
-    }
 
     /**
      * Adds all providers that marked by tag: oro_security.owner.metadata_provider
      *
      * @param string $alias
-     * @param MetadataProviderInterface $provider
+     * @param OwnershipMetadataProviderInterface $provider
      */
-    public function addProvider($alias, MetadataProviderInterface $provider)
+    public function addProvider($alias, OwnershipMetadataProviderInterface $provider)
     {
-        $this->providers->set($alias, $provider);
+        $this->providers[$alias] = $provider;
     }
 
     /**
@@ -71,7 +56,32 @@ class ChainMetadataProvider implements MetadataProviderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getUserClass()
+    {
+        return $this->getSupportedProvider()->getUserClass();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBusinessUnitClass()
+    {
+        return $this->getSupportedProvider()->getBusinessUnitClass();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganizationClass()
+    {
+        return $this->getSupportedProvider()->getOrganizationClass();
+    }
+
+    /**
      * {@inheritDoc}
+     * @deprecated since 2.3, use getUserClass instead
      */
     public function getBasicLevelClass()
     {
@@ -80,6 +90,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
 
     /**
      * {@inheritDoc}
+     * @deprecated since 2.3, use getBusinessUnitClass instead
      */
     public function getLocalLevelClass($deep = false)
     {
@@ -88,6 +99,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
 
     /**
      * {@inheritDoc}
+     * @deprecated since 2.3, use getOrganizationClass instead
      */
     public function getGlobalLevelClass()
     {
@@ -107,11 +119,11 @@ class ChainMetadataProvider implements MetadataProviderInterface
      */
     public function startProviderEmulation($providerAlias)
     {
-        if (!$this->providers->containsKey($providerAlias)) {
+        if (!isset($this->providers[$providerAlias])) {
             throw new \InvalidArgumentException(sprintf('Provider with "%s" alias not registered', $providerAlias));
         }
 
-        $this->emulatedProvider = $this->providers->get($providerAlias);
+        $this->emulatedProvider = $this->providers[$providerAlias];
     }
 
     public function stopProviderEmulation()
@@ -120,7 +132,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
     }
 
     /**
-     * @return MetadataProviderInterface
+     * @return OwnershipMetadataProviderInterface
      */
     protected function getSupportedProvider()
     {
@@ -176,7 +188,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
     }
 
     /**
-     * @param MetadataProviderInterface $defaultProvider
+     * @param OwnershipMetadataProviderInterface $defaultProvider
      */
     public function setDefaultProvider($defaultProvider)
     {

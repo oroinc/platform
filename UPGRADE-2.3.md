@@ -50,6 +50,11 @@ ActivityBundle
 - Class `Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandler`
     - method `setSecurityFacade` was replaced with `setAuthorizationChecker`
 
+ApiBundle
+---------
+- Class `Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
+
 DashboardBundle
 ---------------
 - Class `Oro\Bundle\DashboardBundle\Controller\DashboardController`
@@ -147,6 +152,11 @@ EntityConfigBundle
     - method `onFormRender` was removed
     - method `onViewRender` was removed
 
+EntityBundle
+------------
+- Class `Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
+
 EntityExtendBundle
 ------------------
 - Class `Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoader` was removed. The `Oro\Component\PhpUtils\ClassLoader` is used instead of it
@@ -174,6 +184,8 @@ ImportExportBundle
     - changed the constructor signature: added parameter `ContextAggregatorRegistry $contextAggregatorRegistry`
     - added constant `JOB_CONTEXT_AGGREGATOR_TYPE`
 - Added trait `Oro\Bundle\ImportExportBundle\Job\Step\AddToJobSummaryStepTrait` that can be used in steps support `add_to_job_summary` parameter.
+- Class `Oro\Bundle\ImportExportBundle\Reader\EntityReader`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadata` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadata`
 
 IntegrationBundle
 ---------------
@@ -192,6 +204,8 @@ IntegrationBundle
 - Removed translation label `oro.integration.progress`
 - Updated translation label `oro.integration.sync_error`
 - Updated translation label `oro.integration.sync_error_integration_deactivated`
+- Class `Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
 
 LocaleBundle
 ------------
@@ -242,6 +256,16 @@ OrganizationBundle
     - removed method `getSecurityContext`
 - Class `Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider`
     - removed method `getUser`
+- Class `Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
+- Class `Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadata` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadata`
+- Class `Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
+- Class `Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
 
 SecurityBundle
 --------------
@@ -252,10 +276,96 @@ SecurityBundle
     - removed method `getSecurityContext`
 - Class `Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension`
     - method `getSecurityFacade` was replaces with `getAuthorizationChecker` and `getTokenAccessor`
+- Interface `Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface`
+    - method `isGlobalLevelEntity` was marked ad deprecated, use method `isOrganization` instead
+    - method `isLocalLevelEntity` was marked ad deprecated, use method `isBusinessUnit` instead
+    - method `isBasicLevelEntity` was marked ad deprecated, use method `isUser` instead
+    - method `isAssociatedWithGlobalLevelEntity` was marked ad deprecated, use method `isAssociatedWithOrganization` instead
+    - method `isAssociatedWithLocalLevelEntity` was marked ad deprecated, use method `isAssociatedWithBusinessUnit` instead
+    - method `isAssociatedWithBasicLevelEntity` was marked ad deprecated, use method `isAssociatedWithUser` instead
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\AbstractAccessLevelAclExtension`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheClearer`
+    - changed the constructor signature: parameter `MetadataProviderInterface $provider` was replaced with `OwnershipMetadataProviderInterface $provider`
+- Class `Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheWarmer`
+    - changed the constructor signature: parameter `MetadataProviderInterface $provider` was replaced with `OwnershipMetadataProviderInterface $provider`
+- Class `Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigListener`
+    - changed the constructor signature: parameter `MetadataProviderInterface $provider` was replaced with `OwnershipMetadataProviderInterface $provider`
+- Class `Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener`
+    - removed property `container`
+    - removed method `setContainer`
+    - removed method `getTreeProvider`
+    - changed the constructor signature: new signature is `__construct(OwnerTreeProviderInterface $treeProvider)`
+- Class `Oro\Bundle\SecurityBundle\EventListener\SearchListener`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+    - removed deprecated method `fillOrganizationBusinessUnitIds`
+    - removed deprecated method `fillOrganizationUserIds`
+- Interface `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface`
+    - method `isBasicLevelOwned` was marked ad deprecated, use method `isUserOwned` instead
+    - method `isLocalLevelOwned` was marked ad deprecated, use method `isBusinessUnitOwned` instead
+    - method `isGlobalLevelOwned` was marked ad deprecated, use method `isOrganizationOwned` instead
+    - method `isSystemLevelOwned` was marked ad deprecated
+    - method `getGlobalOwnerColumnName` was marked ad deprecated, use method `getOrganizationColumnName` instead
+    - method `getGlobalOwnerFieldName` was marked ad deprecated, use method `getOrganizationFieldName` instead
+- Interface `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface` was renamed to `OwnershipMetadataProviderInterface`
+    - method `getBasicLevelClass` was marked ad deprecated, use method `getUserClass` instead
+    - method `getLocalLevelClass` was marked ad deprecated, use method `getBusinessUnitClass` instead
+    - method `getGlobalLevelClass` was marked ad deprecated, use method `getOrganizationClass` instead
+- Class `Oro\Bundle\SecurityBundle\Owner\Metadata\AbstractMetadataProvider` was renamed to `AbstractOwnershipMetadataProvider`
+    - changed the constructor signature: old signature was `__construct(array $owningEntityNames)`, new signature is `__construct(ConfigManager $configManager)`
+    - removed property `localCache`
+    - removed property `owningEntityNames`
+    - removed method `setContainer`
+    - removed method `getContainer`
+    - removed method `getConfigProvider`
+    - removed method `getEntityClassResolver`
+    - removed method `setAccessLevelClasses`
+- Class `Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider` was renamed to `ChainOwnershipMetadataProvider`
+- Class `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider`
+    - removed property `configProvider`
+    - removed property `organizationClass`
+    - removed property `businessUnitClass`
+    - removed property `userClass`
+    - changed the constructor signature: new signature is `__construct(array $owningEntityNames, ConfigManager $configManager, EntityClassResolver $entityClassResolver, TokenAccessorInterface $tokenAccessor, CacheProvider $cache)`
+- Interface `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` was renamed to `OwnerTreeBuilderInterface`
+    - method `addBasicEntity` was marked ad deprecated, use method `addUser` instead
+    - method `addGlobalEntity` was marked ad deprecated, use method `addUserOrganization` instead
+    - method `addLocalEntityToBasic` was marked ad deprecated, use method `addUserBusinessUnit` instead
+    - method `addDeepEntity` was marked ad deprecated, use method `addBusinessUnitRelation` instead
+    - method `addLocalEntity` was marked ad deprecated, use method `addBusinessUnit` instead
+- Added new interface `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface`
+- Class `Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker`
+    - changed the constructor signature: new signature is `__construct(OwnerTreeProviderInterface $treeProvider, ObjectIdAccessor $objectIdAccessor, EntityOwnerAccessor $entityOwnerAccessor, OwnershipMetadataProviderInterface $ownershipMetadataProvider)`
+    - removed method `getMetadataProvider`
+    - removed method `getTreeProvider`
+    - removed method `getObjectIdAccessor`
+    - removed method `getEntityOwnerAccessor`
+    - removed method `setContainer`
+    - removed method `getContainer`
+- Class `Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker`
+    - changed the constructor signature: new signature is `__construct(OwnerTreeProviderInterface $treeProvider, ObjectIdAccessor $objectIdAccessor, EntityOwnerAccessor $entityOwnerAccessor, OwnershipMetadataProviderInterface $ownershipMetadataProvider, TokenAccessorInterface $tokenAccessor)`
+- Class `Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider`
+    - changed the constructor signature: parameter `MetadataProviderInterface $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
+- Removed DI container parameter `oro_security.owner.tree.class`
+- Removed DI container parameter `oro_security.owner.decision_maker.abstract.class`
+- Removed service `oro_security.owner.tree`
+- Removed service `oro_security.owner.decision_maker.abstract`
+- Removed service `oro_security.link.ownership_tree_provider`
 
 SegmentBundle
 -------------
-* The `Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager::__construct(EntityManager $em, SegmentQueryBuilderRegistry $builderRegistry)` method was changed to `Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager::__construct(EntityManager $em, SegmentQueryBuilderRegistry $builderRegistry, SubQueryLimitHelper $subQueryLimitHelper)`
+- Class `Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager`
+    - changed the constructor signature: added parameter `SubQueryLimitHelper $subQueryLimitHelper`
+- Class `Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager`
+    - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
 
 SearchBundle
 ------------
@@ -323,6 +433,12 @@ WorkflowBundle
         - `getEntityRepository`
 - Added provider `oro_workflow.provider.workflow_definition` to manage cached instances of `WorkflowDefinitions`.
 - Added cache provider `oro_workflow.cache.provider.workflow_definition` to hold cached instances of `WorkflowDefinitions`.
+- Class `Oro\Bundle\WorkflowBundle\Acl\Extension\AbstractWorkflowAclExtension`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
+- Class `Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionAclExtension`
+    - changed the constructor signature: parameter `MetadataProviderInterface $metadataProvider` was replaced with `OwnershipMetadataProviderInterface $metadataProvider`
 - Added Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter`
 - Updated Datagrid filter `Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter`
     - changed namespace
@@ -354,3 +470,17 @@ WorkflowBundle
     - `oro_workflow.configuration.builder.workflow_definition.class`
     - `oro_workflow.configuration.builder.workflow_definition.handle.class`
     - `oro_workflow.configuration.builder.process_configuration.class`
+
+UIBundle
+--------
+- Updated ChaplinJS to 1.2.0 version
+- Updated Autolinker.js to 1.4.* version
+- Updated jQuery-Form to 4.2.1 version
+- Updated jQuery.Numeric to 1.5.0 version
+- Updated Lightgallery.js to 1.4.0 version
+- Updated RequireJS test.js plugin to 2.0.* version
+
+LocaleBundle
+------------
+- Updated Moment.js to 2.18.* version
+- Updated Numeral.js to 2.0.6 version

@@ -357,11 +357,11 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
     {
         $tree = new OwnerTree();
 
-        $tree->addLocalEntityToBasic(1, 1, 1);
-        $tree->addLocalEntityToBasic(1, 2, 1);
-        $tree->addLocalEntityToBasic(2, 3, 1);
-        $tree->addLocalEntityToBasic(3, 3, 1);
-        $tree->addLocalEntityToBasic(4, 3, 1);
+        $tree->addUserBusinessUnit(1, 1, 1);
+        $tree->addUserBusinessUnit(1, 1, 2);
+        $tree->addUserBusinessUnit(2, 1, 3);
+        $tree->addUserBusinessUnit(3, 1, 3);
+        $tree->addUserBusinessUnit(4, 1, 3);
 
         $this->assertEquals($expectedOwnerIds, $tree->getUsersAssignedToBusinessUnits($businessUnitIds));
     }

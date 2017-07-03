@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
@@ -32,7 +32,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     /** @var ObjectIdAccessor */
     protected $objectIdAccessor;
 
-    /** @var MetadataProviderInterface */
+    /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;
 
     /** @var EntityOwnerAccessor */
@@ -43,13 +43,13 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param MetadataProviderInterface                  $metadataProvider
+     * @param OwnershipMetadataProviderInterface         $metadataProvider
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
-        MetadataProviderInterface $metadataProvider,
+        OwnershipMetadataProviderInterface $metadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker
     ) {
@@ -113,14 +113,14 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
 
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-            $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
+            $result = $this->decisionMaker->isAssociatedWithUser(
                 $user,
                 $object,
                 $organization
             );
         } else {
-            if ($metadata->isBasicLevelOwned()) {
-                $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
+            if ($metadata->isUserOwned()) {
+                $result = $this->decisionMaker->isAssociatedWithUser(
                     $user,
                     $object,
                     $organization
@@ -128,21 +128,21 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
             }
             if (!$result) {
                 if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
+                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
                         $user,
                         $object,
                         false,
                         $organization
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
+                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
                         $user,
                         $object,
                         true,
                         $organization
                     );
                 } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithGlobalLevelEntity(
+                    $result = $this->decisionMaker->isAssociatedWithOrganization(
                         $user,
                         $object,
                         $organization
