@@ -329,10 +329,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
         return [
             'json' => [
                 'format' => 'json',
-            ],
-            'xml' => [
-                'format' => 'xml',
-            ],
+            ]
         ];
     }
 }

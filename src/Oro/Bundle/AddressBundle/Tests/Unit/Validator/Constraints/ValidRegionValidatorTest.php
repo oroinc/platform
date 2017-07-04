@@ -92,12 +92,9 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('Country'));
 
         $this->context->expects($this->once())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('test'));
-        $this->context->expects($this->once())
             ->method('addViolationAt')
             ->with(
-                'test.region',
+                'region',
                 $this->constraint->message,
                 ['{{ country }}' => 'Country']
             );
