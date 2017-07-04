@@ -56,3 +56,16 @@ UPGRADE FROM 1.2 to 1.3
 *	Windows bundle has been modified:
 	* Default forbidden error handler has been added for `oro.DialogWidget`.
 
+FormBundle
+----------
+ - `oro/select2-component` - added `showIcon` option
+
+UIBundle
+--------
+ - `oroui/js/widget/collapse-group-widget` - created
+ - `oroui/js/widget/collapse-widget` - changed options, functions, functionality
+  
+IntegrationBundle
+-----------------
+ - `\Oro\Bundle\ShippingBundle\Form\Type\ShippingMethodSelectType` - use `showIcon` option instead of `result_template_twig` and `selection_template_twig`
+ - `OroIntegrationBundle:Autocomplete:type/result.html.twig` and `OroIntegrationBundle:Autocomplete:type/selection.html.twig` - removed

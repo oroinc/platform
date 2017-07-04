@@ -5,7 +5,7 @@
 {% set pageTitle = attributeFamiliesLabel|trans %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_attribute_family_create') %}
+    {% if is_granted('oro_attribute_family_create') %}
         <div class="btn-group pull-right">
             {{ UI.addButton({
                 'path':  path('oro_attribute_family_create', { 'alias': alias }),

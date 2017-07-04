@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
@@ -67,7 +66,6 @@ class EmailController extends Controller
      */
     public function purgeEmailsAttachmentsAction()
     {
-
         $this->getMessageProducer()->send(Topics::PURGE_EMAIL_ATTACHMENTS, []);
 
         return new JsonResponse([
@@ -112,8 +110,8 @@ class EmailController extends Controller
             'emails' => []
         ];
 
-        if ($this->get('oro_security.security_facade')->isGranted('oro_email_email_user_view')) {
-            $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        if ($this->isGranted('oro_email_email_user_view')) {
+            $currentOrganization = $this->get('oro_security.token_accessor')->getOrganization();
             $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
             $emailNotificationManager = $this->get('oro_email.manager.notification');
 
@@ -147,7 +145,7 @@ class EmailController extends Controller
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $maxEmailsDisplay = (int)$request->get('limit');
         $folderId = (int)$request->get('folderId');
-        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $currentOrganization = $this->get('oro_security.token_accessor')->getOrganization();
         if (!$maxEmailsDisplay) {
             $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         }
@@ -157,7 +155,7 @@ class EmailController extends Controller
             'emails' => []
         ];
 
-        if ($this->get('oro_security.security_facade')->isGranted('oro_email_email_user_view')) {
+        if ($this->isGranted('oro_email_email_user_view')) {
             $emailNotificationManager = $this->get('oro_email.manager.notification');
             $result = [
                 'count' => $emailNotificationManager
@@ -202,7 +200,7 @@ class EmailController extends Controller
         }
 
         $emails = array_filter($emails, function ($email) {
-            return $this->get('security.context')->isGranted('VIEW', $email);
+            return $this->isGranted('VIEW', $email);
         });
         $this->loadEmailBody($emails);
 
@@ -257,7 +255,7 @@ class EmailController extends Controller
         }
 
         $emails = array_filter($emails, function ($email) {
-            return $this->get('security.context')->isGranted('VIEW', $email);
+            return $this->isGranted('VIEW', $email);
         });
         $this->loadEmailBody($emails);
 
@@ -286,7 +284,7 @@ class EmailController extends Controller
         $this->loadEmailBody($emails);
 
         $items = array_filter($emails, function ($email) {
-            return $this->get('security.context')->isGranted('VIEW', $email);
+            return $this->isGranted('VIEW', $email);
         });
 
         return [
@@ -335,7 +333,7 @@ class EmailController extends Controller
     public function activityAction($entityClass, $entityId)
     {
         $entity = $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId);
-        if (!$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
+        if (!$this->isGranted('VIEW', $entity)) {
             throw new AccessDeniedException();
         }
 
@@ -585,7 +583,7 @@ class EmailController extends Controller
         try {
             $this->get('oro_email.email_synchronization_manager')->syncOrigins(
                 $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
-                    $this->get('oro_security.security_facade')->getLoggedUserId()
+                    $this->get('oro_security.token_accessor')->getUserId()
                 ),
                 true
             );
@@ -649,8 +647,8 @@ class EmailController extends Controller
      */
     public function markAllEmailsAsSeenAction()
     {
-        $loggedUser = $this->get('oro_security.security_facade')->getLoggedUser();
-        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $loggedUser = $this->get('oro_security.token_accessor')->getUser();
+        $currentOrganization = $this->get('oro_security.token_accessor')->getOrganization();
         $ids = $this->container->get('request_stack')->getCurrentRequest()->query->get('ids', []);
         $result = false;
 
@@ -905,8 +903,7 @@ class EmailController extends Controller
                 $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
             }
         }
-        $createGrant = $this->get('oro_security.security_facade')
-            ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
+        $createGrant = $this->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
     }

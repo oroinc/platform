@@ -10,7 +10,7 @@
 {% endblock breadcrumb %}
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
-{% set allowEdit = resource_granted('EDIT', dashboard.entity) %}
+{% set allowEdit = is_granted('EDIT', dashboard.entity) %}
 <div class="layout-content dashboard-container-wrapper">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
@@ -36,9 +36,9 @@
                             </a>
                         {% endif %}
 
-                        {% if resource_granted('DELETE', dashboard.entity) or resource_granted('oro_dashboard_create') or resource_granted('EDIT', dashboard.entity) %}
+                        {% if is_granted('DELETE', dashboard.entity) or is_granted('oro_dashboard_create') or is_granted('EDIT', dashboard.entity) %}
                             {% set html %}
-                                {% if resource_granted('EDIT', dashboard.entity) %}
+                                {% if is_granted('EDIT', dashboard.entity) %}
                                     {{ UI.dropdownItem({
                                         'path': path('oro_dashboard_update', {id:dashboard.id}),
                                         'title': 'oro.dashboard.edit_dashboard_link.title'|trans,
@@ -46,7 +46,7 @@
                                         'iCss': 'fa-pencil-square-o'
                                     }) }}
                                 {% endif %}
-                                {% if resource_granted('oro_dashboard_create') %}
+                                {% if is_granted('oro_dashboard_create') %}
                                     {{ UI.dropdownItem({
                                         'path': path('oro_dashboard_create'),
                                         'title': 'oro.dashboard.create_dashboard_link.title'|trans,
@@ -54,7 +54,7 @@
                                         'iCss': 'fa-plus'
                                     }) }}
                                 {% endif %}
-                                {% if resource_granted('DELETE', dashboard.entity) %}
+                                {% if is_granted('DELETE', dashboard.entity) %}
                                     <li>
                                         {{  UI.deleteLink({
                                             'dataUrl': path('oro_api_delete_dashboard', {id:dashboard.id}),
@@ -139,7 +139,7 @@
 
     {% set availableWidgets = [] %}
     {% for widgetName, widget in widgets %}
-        {% if widget.acl is not defined or resource_granted(widget.acl) %}
+        {% if widget.acl is not defined or is_granted(widget.acl) %}
             {% set icon = asset("bundles/orodashboard/img/no_icon.png") %}
             {% if widget.icon is defined %}
                 {% set icon = asset(widget.icon) %}
@@ -165,7 +165,7 @@
             function(dashboardContainer) {
                 {% set widgetIds = [] %}
                 {% for widget in dashboard.widgets %}
-                    {% if widget.config.acl is not defined or resource_granted(widget.config.acl) %}
+                    {% if widget.config.acl is not defined or is_granted(widget.config.acl) %}
                         {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.id]) %}
                     {% endif %}
                 {% endfor %}
@@ -191,7 +191,7 @@
 {% macro renderWidgetsColumn(options) %}
     <div id="{{ options.columnElementId }}" class="responsive-cell dashboard-column">
         {% for widget in options.widgets %}
-            {% if widget.config.acl is not defined or resource_granted(widget.config.acl) %}
+            {% if widget.config.acl is not defined or is_granted(widget.config.acl) %}
                 {{
                     oro_widget_render({
                         'widgetType': 'dashboard-item',

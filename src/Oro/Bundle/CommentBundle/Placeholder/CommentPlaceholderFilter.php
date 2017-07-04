@@ -4,9 +4,10 @@ namespace Oro\Bundle\CommentBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class CommentPlaceholderFilter
 {
@@ -16,22 +17,22 @@ class CommentPlaceholderFilter
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param CommentAssociationHelper $commentAssociationHelper
-     * @param DoctrineHelper           $doctrineHelper
-     * @param SecurityFacade           $securityFacade
+     * @param CommentAssociationHelper      $commentAssociationHelper
+     * @param DoctrineHelper                $doctrineHelper
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         CommentAssociationHelper $commentAssociationHelper,
         DoctrineHelper $doctrineHelper,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->commentAssociationHelper = $commentAssociationHelper;
-        $this->doctrineHelper           = $doctrineHelper;
-        $this->securityFacade           = $securityFacade;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -45,7 +46,7 @@ class CommentPlaceholderFilter
     {
         if (!is_object($entity)
             || !$this->doctrineHelper->isManageableEntity($entity)
-            || !$this->securityFacade->isGranted('oro_comment_view')
+            || !$this->authorizationChecker->isGranted('oro_comment_view')
         ) {
             return false;
         }

@@ -13,11 +13,6 @@ class HistoryItemBuilderTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface
-     */
-    protected $securityContext;
-
-    /**
      * @var HistoryItemBuilder
      */
     protected $builder;
@@ -29,7 +24,6 @@ class HistoryItemBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -42,7 +36,6 @@ class HistoryItemBuilderTest extends \PHPUnit_Framework_TestCase
         $itemBuilder = $this->builder;
         $itemBuilder->setClassName('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
 
-        //$user = $this->securityContext->getToken()->getUser();
         $user = $this->createMock('\Oro\Bundle\UserBundle\Entity\User');
         $params = array(
             'title' => 'kldfjs;jasf',

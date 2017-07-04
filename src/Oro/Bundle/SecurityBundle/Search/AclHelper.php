@@ -6,33 +6,33 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\EventListener\SearchListener;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AclHelper
 {
     /** @var SearchMappingProvider */
     protected $mappingProvider;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var OwnershipConditionDataBuilder */
     protected $ownershipDataBuilder;
 
     /**
      * @param SearchMappingProvider         $mappingProvider
-     * @param SecurityFacade                $securityFacade
+     * @param TokenAccessorInterface        $tokenAccessor
      * @param OwnershipConditionDataBuilder $ownershipDataBuilder
      */
     public function __construct(
         SearchMappingProvider $mappingProvider,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         OwnershipConditionDataBuilder $ownershipDataBuilder
     ) {
-        $this->securityFacade       = $securityFacade;
-        $this->mappingProvider      = $mappingProvider;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->mappingProvider = $mappingProvider;
         $this->ownershipDataBuilder = $ownershipDataBuilder;
     }
 
@@ -98,7 +98,7 @@ class AclHelper
      */
     protected function getOrganizationId()
     {
-        return $this->securityFacade->getOrganizationId();
+        return $this->tokenAccessor->getOrganizationId();
     }
 
     /**

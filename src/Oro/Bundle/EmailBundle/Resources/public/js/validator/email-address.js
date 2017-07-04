@@ -18,14 +18,19 @@ define(function(require) {
     return [
         'Oro\\Bundle\\EmailBundle\\Validator\\Constraints\\EmailAddress',
         function(value, element) {
-            if (_.isEmpty(value)) {
+            var $el = $(element);
+
+            if ($el.parent().is(':hidden')) {
                 return true;
+            }
+
+            if (_.isEmpty(value)) {
+                return false;
             }
 
             // @TODO add support of MX check action
             // original email validator is too slow for some values
             // return $.validator.methods.email.apply(this, arguments);
-            var $el = $(element);
 
             var values = null;
             if ($el.data('select2')) {

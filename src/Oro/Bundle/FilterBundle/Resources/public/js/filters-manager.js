@@ -125,7 +125,6 @@ define(function(require) {
         initialize: function(options) {
             var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
             this.template = _.template($(this.templateSelector).html());
-
             this.filters = {};
 
             _.extend(this, _.pick(options, prop));
@@ -348,9 +347,10 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            this.$el.html(
-                this.template({filters: this.filters})
+            this.setElement(
+                $(this.template({filters: this.filters}))
             );
+
             this.dropdownContainer = this.$el.find('.filter-container');
             var $filterItems = this.dropdownContainer.find('.filter-items');
 
@@ -426,11 +426,14 @@ define(function(require) {
                 multiselectDefaults,
                 {
                     selectedText: this.addButtonHint,
-                    open: $.proxy(function() {
+                    beforeopen: _.bind(function() {
+                        this.selectWidget.onBeforeOpenDropdown();
+                    }, this),
+                    open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                     }, this),
-                    refresh: $.proxy(function() {
+                    refresh: _.bind(function() {
                         this.selectWidget.onRefresh();
                     }, this),
                     appendTo: this.dropdownContainer
@@ -483,9 +486,8 @@ define(function(require) {
          */
         _setButtonReset: function() {
             var $footerContainer = this._createButtonReset();
-            var $checkboxContainer = this.selectWidget.multiselect('instance').checkboxContainer;
-
-            $footerContainer.insertAfter($checkboxContainer);
+            var instance = this.selectWidget.multiselect('instance');
+            instance.menu.append($footerContainer);
         },
 
         /**
@@ -533,7 +535,7 @@ define(function(require) {
          */
         _onDropdownToggle: function(e) {
             e.preventDefault();
-            this.$('.filter-box > .dropdown').toggleClass('open');
+            this.$el.find('> .dropdown').toggleClass('open');
         },
 
         /**

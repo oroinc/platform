@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Validator\Constraints;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -13,15 +14,15 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OwnerValidator extends ConstraintValidator
 {
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /** @var EntityOwnerAccessor */
@@ -33,8 +34,11 @@ class OwnerValidator extends ConstraintValidator
     /** @var AclVoter */
     protected $aclVoter;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var OwnerTreeProvider */
     protected $treeProvider;
@@ -46,20 +50,22 @@ class OwnerValidator extends ConstraintValidator
     protected $object;
 
     /**
-     * @param ManagerRegistry           $doctrine
-     * @param BusinessUnitManager       $businessUnitManager
-     * @param OwnershipMetadataProvider $ownershipMetadataProvider
-     * @param EntityOwnerAccessor       $ownerAccessor
-     * @param SecurityFacade            $securityFacade
-     * @param OwnerTreeProvider         $treeProvider
-     * @param AclVoter                  $aclVoter
+     * @param ManagerRegistry                    $doctrine
+     * @param BusinessUnitManager                $businessUnitManager
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
+     * @param EntityOwnerAccessor                $ownerAccessor
+     * @param AuthorizationCheckerInterface      $authorizationChecker
+     * @param TokenAccessorInterface             $tokenAccessor
+     * @param OwnerTreeProvider                  $treeProvider
+     * @param AclVoter                           $aclVoter
      */
     public function __construct(
         ManagerRegistry $doctrine,
         BusinessUnitManager $businessUnitManager,
-        OwnershipMetadataProvider $ownershipMetadataProvider,
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         EntityOwnerAccessor $ownerAccessor,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
         AclVoter $aclVoter
     ) {
@@ -68,7 +74,8 @@ class OwnerValidator extends ConstraintValidator
         $this->ownerAccessor = $ownerAccessor;
         $this->businessUnitManager = $businessUnitManager;
         $this->aclVoter = $aclVoter;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
         $this->treeProvider = $treeProvider;
     }
 
@@ -134,26 +141,26 @@ class OwnerValidator extends ConstraintValidator
      */
     protected function isValidOwner(OwnershipMetadataInterface $metadata, $owner, $accessLevel)
     {
-        if ($metadata->isBasicLevelOwned()) {
+        if ($metadata->isUserOwned()) {
             return $this->businessUnitManager->canUserBeSetAsOwner(
-                $this->securityFacade->getLoggedUser(),
+                $this->tokenAccessor->getUser(),
                 $owner,
                 $accessLevel,
                 $this->treeProvider,
                 $this->getOrganization()
             );
-        } elseif ($metadata->isLocalLevelOwned()) {
+        } elseif ($metadata->isBusinessUnitOwned()) {
             return $this->businessUnitManager->canBusinessUnitBeSetAsOwner(
-                $this->securityFacade->getLoggedUser(),
+                $this->tokenAccessor->getUser(),
                 $owner,
                 $accessLevel,
                 $this->treeProvider,
                 $this->getOrganization()
             );
-        } elseif ($metadata->isGlobalLevelOwned()) {
+        } elseif ($metadata->isOrganizationOwned()) {
             return in_array(
                 $owner->getId(),
-                $this->treeProvider->getTree()->getUserOrganizationIds($this->securityFacade->getLoggedUserId()),
+                $this->treeProvider->getTree()->getUserOrganizationIds($this->tokenAccessor->getUserId()),
                 true
             );
         }
@@ -171,7 +178,7 @@ class OwnerValidator extends ConstraintValidator
     {
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        if ($this->securityFacade->isGranted($permission, $object)) {
+        if ($this->authorizationChecker->isGranted($permission, $object)) {
             return $observer->getAccessLevel();
         }
 
@@ -185,6 +192,6 @@ class OwnerValidator extends ConstraintValidator
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
+        return $this->tokenAccessor->getOrganization();
     }
 }

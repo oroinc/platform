@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActivityBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 
 class ActivityWidgetProvider implements WidgetProviderInterface
@@ -18,8 +18,8 @@ class ActivityWidgetProvider implements WidgetProviderInterface
     /** @var ActivityManager */
     protected $activityManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -31,23 +31,23 @@ class ActivityWidgetProvider implements WidgetProviderInterface
     protected $entityRoutingHelper;
 
     /**
-     * @param ActivityManager     $activityManager
-     * @param SecurityFacade      $securityFacade
-     * @param TranslatorInterface $translator
-     * @param EntityIdAccessor    $entityIdAccessor
-     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param ActivityManager               $activityManager
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TranslatorInterface           $translator
+     * @param EntityIdAccessor              $entityIdAccessor
+     * @param EntityRoutingHelper           $entityRoutingHelper
      */
     public function __construct(
         ActivityManager $activityManager,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         TranslatorInterface $translator,
         EntityIdAccessor $entityIdAccessor,
         EntityRoutingHelper $entityRoutingHelper
     ) {
-        $this->activityManager     = $activityManager;
-        $this->securityFacade      = $securityFacade;
-        $this->translator          = $translator;
-        $this->entityIdAccessor    = $entityIdAccessor;
+        $this->activityManager = $activityManager;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->translator = $translator;
+        $this->entityIdAccessor = $entityIdAccessor;
         $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
@@ -71,7 +71,7 @@ class ActivityWidgetProvider implements WidgetProviderInterface
 
         $items = $this->activityManager->getActivityAssociations($entityClass);
         foreach ($items as $item) {
-            if (empty($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
+            if (empty($item['acl']) || $this->authorizationChecker->isGranted($item['acl'])) {
                 $url    = $this->entityRoutingHelper->generateUrl($item['route'], $entityClass, $entityId);
                 $alias  = sprintf(
                     '%s_%s_%s',

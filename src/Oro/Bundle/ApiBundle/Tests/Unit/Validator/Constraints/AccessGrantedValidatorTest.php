@@ -2,28 +2,27 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;
 
 class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         parent::setUp();
     }
 
     protected function createValidator()
     {
-        return new AccessGrantedValidator($this->securityFacade);
+        return new AccessGrantedValidator($this->authorizationChecker);
     }
 
     public function testNullIsValid()
@@ -38,7 +37,7 @@ class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new AccessGranted();
         $entity = new \stdClass();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($entity))
             ->willReturn(true);
@@ -53,7 +52,7 @@ class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new AccessGranted();
         $entity = new \stdClass();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', $this->identicalTo($entity))
             ->willReturn(false);

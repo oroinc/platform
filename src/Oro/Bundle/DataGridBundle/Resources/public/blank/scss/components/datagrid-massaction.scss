@@ -1,0 +1,76 @@
+// @theme: blank;
+
+.datagrid-massaction {
+    &__toggle {
+        @extend %base-transition;
+
+        position: relative;
+
+        display: inline-block;
+        padding: $datagrid-massaction-toggle-offset-inner;
+
+        font-size: $datagrid-massaction-toggle-font-size;
+        font-weight: $datagrid-massaction-toggle-font-weight;
+        line-height: $datagrid-massaction-toggle-font-size;
+        white-space: nowrap;
+
+        color: $datagrid-massaction-toggle-color;
+        background-color: $datagrid-massaction-toggle-background-color;
+        border: $datagrid-massaction-toggle-border;
+
+        border-radius: $datagrid-massaction-toggle-border-radius;
+        white-space: nowrap;
+
+        @include caret();
+
+        @include element-state('active') {
+            box-shadow: $datagrid-massaction-toggle-hover-box-shadow;
+        }
+    }
+
+    &__invisible {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        opacity: 0;
+    }
+
+    &__dots {
+        display: inline-block;
+        vertical-align: middle;
+        height: 12px;
+
+        font-size: 20px;
+        line-height: 0;
+    }
+
+    &__dropdown-menu {
+        min-width: 0;
+
+        .action {
+            display: block;
+            padding: $datagrid-massaction-dropdown-menu-action-offset-inner;
+
+            text-decoration: none;
+
+            color: $datagrid-massaction-dropdown-menu-action-color;
+
+            white-space: nowrap;
+
+            @include element-state('hover') {
+                text-decoration: none;
+
+                background-color: $datagrid-massaction-dropdown-menu-action-hover-bg;
+                color: $datagrid-massaction-dropdown-menu-action-color;
+            }
+        }
+    }
+
+    .dropdown-menu__placeholder {
+        display: none;
+    }
+}

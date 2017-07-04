@@ -9,7 +9,7 @@ use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 
-class FormTypeTest extends BlockTypeTestCase
+class EmbedFormTypeTest extends BlockTypeTestCase
 {
     public function testBuildBlock()
     {

@@ -37,7 +37,6 @@ class UpdateEmailOriginTableQuery extends ParametrizedMigrationQuery
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-
         $dbDriver = $this->connection->getDriver()->getName();
         switch ($dbDriver) {
             case DatabaseDriverInterface::DRIVER_POSTGRESQL:

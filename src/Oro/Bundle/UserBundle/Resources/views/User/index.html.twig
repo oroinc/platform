@@ -9,7 +9,7 @@
         exportTemplateProcessor: 'oro_user'
     } %}
 
-    {% if resource_granted('oro_user_user_create') %}
+    {% if is_granted('oro_user_user_create') %}
         <div class="btn-group">
             {{ UI.addButton({
             'path': path('oro_user_create'),

@@ -39,7 +39,7 @@ services:
     oro_email.form.subscriber.autoresponserule:
         class: %oro_email.form.subscriber.autoresponserule.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
 
     oro_email.form.type.autoresponserule:
         class: %oro_email.form.type.autoresponserule.class%
@@ -61,7 +61,7 @@ services:
     oro_email.form.type.autoresponse_template_choice:
         class: %oro_email.form.type.autoresponse_template_choice.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@translator'
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
@@ -140,7 +140,8 @@ services:
     oro_email.form.type.email:
         class: %oro_email.form.type.email.class%
         arguments:
-            - '@security.context'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@oro_email.email_renderer'
             - '@oro_email.email.model.builder.helper'
             - '@oro_config.user'
@@ -155,7 +156,7 @@ services:
             - '@request'
             - '@doctrine.orm.entity_manager'
             - "@oro_email.email.entity.builder="
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@event_dispatcher'
             - '@oro_email.email_importance_transformer'
             - '@oro_email.email_body_type_transformer'
@@ -257,7 +258,7 @@ services:
     oro_email.form.type.email_address_from:
         class: %oro_email.form.type.email_address_from.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_email.related_emails.provider'
             - '@oro_email.mailbox.manager'
         tags:
@@ -266,7 +267,7 @@ services:
     oro_email.form.type.email_origin_from:
         class: 'Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType'
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_email.related_emails.provider'
             - '@oro_email.email.model.builder.helper'
             - '@oro_email.mailbox.manager'

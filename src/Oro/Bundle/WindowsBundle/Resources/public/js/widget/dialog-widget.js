@@ -75,7 +75,7 @@ define(function(require) {
             _.defaults(dialogOptions, {
                 title: options.title,
                 limitTo: '#container',
-                minWidth: 360,
+                minWidth: 320,
                 minHeight: 150
             });
             if (tools.isMobile()) {
@@ -489,7 +489,7 @@ define(function(require) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
             } else {
-                if (!this.widgetIsResizable()) {
+                if (!this.widgetIsResizable() && !this.options.dialogOptions.autoResize) {
                     dialog.css('width', this.options.dialogOptions.width);
                 }
             }
@@ -497,6 +497,10 @@ define(function(require) {
 
         topAndHeightAdjustments: function(dialog, containerEl) {
             // containerEl.offsetTop will only work if offsetParent is document.body
+
+            // Set auto height for dialog before calc
+            dialog.css('height', 'auto');
+
             var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
             var height = parseFloat(dialog.css('height'));
             var minHeight = parseFloat(dialog.css('min-height'));

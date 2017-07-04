@@ -74,7 +74,7 @@ class IntegrationControllerTest extends WebTestCase
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         /** @var User $user */
-        $user    = $this->getContainer()->get('security.context')->getToken()->getUser();
+        $user    = $this->getContainer()->get('security.token_storage')->getToken()->getUser();
         $newUser = clone $user;
         $newUser->setUsername('new username');
         $newUser->setEmail(mt_rand() . $user->getEmail());

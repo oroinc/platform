@@ -10,22 +10,23 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class DefaultOwnerSubscriber implements EventSubscriberInterface
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
+
     /** @var TypesRegistry */
     protected $typesRegistry;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param TypesRegistry  $typesRegistry
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param TypesRegistry          $typesRegistry
      */
-    public function __construct(SecurityFacade $securityFacade, TypesRegistry $typesRegistry)
+    public function __construct(TokenAccessorInterface $tokenAccessor, TypesRegistry $typesRegistry)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->typesRegistry = $typesRegistry;
     }
 
@@ -53,7 +54,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
 
         if ($data && !$data->getId() && !$data->getDefaultUserOwner() || null === $data) {
             if ($form->has('defaultUserOwner')) {
-                $form->get('defaultUserOwner')->setData($this->securityFacade->getLoggedUser());
+                $form->get('defaultUserOwner')->setData($this->tokenAccessor->getUser());
             }
         }
     }

@@ -4,16 +4,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -21,145 +19,94 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
-     */
-    protected $configProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    protected $configManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    protected $tokenAccessor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
     protected $cache;
 
-    /**
-     * @var OwnershipMetadataProvider
-     */
+    /** @var OwnershipMetadataProvider */
     protected $provider;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    protected $securityFacade;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['fetch', 'save'])
-            ->getMockForAbstractClass();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [
-                            'oro_entity_config.provider.ownership',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->configProvider,
-                        ],
-                        [
-                            'oro_security.owner.ownership_metadata_provider.cache',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->cache,
-                        ],
-                        [
-                            'oro_entity.orm.entity_class_resolver',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->entityClassResolver,
-                        ],
-                        [
-                            'oro_security.security_facade',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->securityFacade,
-                        ],
-                    ]
-                )
-            );
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->cache = $this->createMock(CacheProvider::class);
 
         $this->provider = new OwnershipMetadataProvider(
             [
                 'organization' => 'AcmeBundle:Organization',
                 'business_unit' => 'AcmeBundle:BusinessUnit',
                 'user' => 'AcmeBundle:User',
-            ]
-        );
-        $this->provider->setContainer($this->container);
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->configProvider,
+            ],
+            $this->configManager,
             $this->entityClassResolver,
-            $this->cache,
-            $this->provider,
-            $this->container,
-            $this->securityFacade
+            $this->tokenAccessor,
+            $this->cache
         );
     }
 
-    public function testOwnerClassesConfig()
+    public function testGetUserClass()
     {
         $this->entityClassResolver->expects($this->exactly(3))
             ->method('getEntityClass')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['AcmeBundle:Organization', 'AcmeBundle\Entity\Organization'],
-                        ['AcmeBundle:BusinessUnit', 'AcmeBundle\Entity\BusinessUnit'],
-                        ['AcmeBundle:User', 'AcmeBundle\Entity\User'],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['AcmeBundle:User', 'AcmeBundle\Entity\User'],
+                ['AcmeBundle:BusinessUnit', 'AcmeBundle\Entity\BusinessUnit'],
+                ['AcmeBundle:Organization', 'AcmeBundle\Entity\Organization'],
+            ]);
 
-        $provider = new OwnershipMetadataProvider(
-            [
-                'organization' => 'AcmeBundle:Organization',
-                'business_unit' => 'AcmeBundle:BusinessUnit',
-                'user' => 'AcmeBundle:User',
-            ]
-        );
-        $provider->setContainer($this->container);
+        $this->assertEquals('AcmeBundle\Entity\User', $this->provider->getUserClass());
+        // test that the class is cached in a local property
+        $this->assertEquals('AcmeBundle\Entity\User', $this->provider->getUserClass());
+    }
 
-        $this->assertEquals('AcmeBundle\Entity\Organization', $provider->getGlobalLevelClass());
-        $this->assertEquals('AcmeBundle\Entity\Organization', $provider->getOrganizationClass());
-        $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $provider->getLocalLevelClass());
-        $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $provider->getBusinessUnitClass());
-        $this->assertEquals('AcmeBundle\Entity\User', $provider->getBasicLevelClass());
-        $this->assertEquals('AcmeBundle\Entity\User', $provider->getUserClass());
+    public function testGetBusinessUnitClass()
+    {
+        $this->entityClassResolver->expects($this->exactly(3))
+            ->method('getEntityClass')
+            ->willReturnMap([
+                ['AcmeBundle:User', 'AcmeBundle\Entity\User'],
+                ['AcmeBundle:BusinessUnit', 'AcmeBundle\Entity\BusinessUnit'],
+                ['AcmeBundle:Organization', 'AcmeBundle\Entity\Organization'],
+            ]);
+
+        $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $this->provider->getBusinessUnitClass());
+        // test that the class is cached in a local property
+        $this->assertEquals('AcmeBundle\Entity\BusinessUnit', $this->provider->getBusinessUnitClass());
+    }
+
+    public function testGetOrganizationClass()
+    {
+        $this->entityClassResolver->expects($this->exactly(3))
+            ->method('getEntityClass')
+            ->willReturnMap([
+                ['AcmeBundle:User', 'AcmeBundle\Entity\User'],
+                ['AcmeBundle:BusinessUnit', 'AcmeBundle\Entity\BusinessUnit'],
+                ['AcmeBundle:Organization', 'AcmeBundle\Entity\Organization'],
+            ]);
+
+        $this->assertEquals('AcmeBundle\Entity\Organization', $this->provider->getOrganizationClass());
+        // test that the class is cached in a local property
+        $this->assertEquals('AcmeBundle\Entity\Organization', $this->provider->getOrganizationClass());
     }
 
     public function testGetMetadataUndefinedClassWithoutCache()
     {
-        $this->configProvider->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($this->equalTo('UndefinedClass'))
             ->willReturn(false);
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
+        $this->configManager->expects($this->never())
+            ->method('getEntityConfig');
 
         $this->entityClassResolver = null;
         $this->cache = null;
@@ -174,13 +121,13 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $config->set('owner_field_name', 'test_field');
         $config->set('owner_column_name', 'test_column');
 
-        $this->configProvider->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($this->equalTo(\stdClass::class))
             ->will($this->returnValue(true));
-        $this->configProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($this->equalTo(\stdClass::class))
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('ownership', $this->equalTo(\stdClass::class))
             ->will($this->returnValue($config));
 
         $this->entityClassResolver = null;
@@ -199,13 +146,13 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $config->set('owner_field_name', 'test_field');
         $config->set('owner_column_name', 'test_column');
 
-        $this->configProvider->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($this->equalTo(\stdClass::class))
             ->will($this->returnValue(true));
-        $this->configProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($this->equalTo(\stdClass::class))
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('ownership', $this->equalTo(\stdClass::class))
             ->will($this->returnValue($config));
 
         $this->entityClassResolver = null;
@@ -219,12 +166,12 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMetadataUndefinedClassWithCache()
     {
-        $this->configProvider->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($this->equalTo('UndefinedClass'))
             ->will($this->returnValue(false));
-        $this->configProvider->expects($this->never())
-            ->method('getConfig');
+        $this->configManager->expects($this->never())
+            ->method('getEntityConfig');
 
         $this->cache->expects($this->at(0))
             ->method('fetch')
@@ -261,9 +208,8 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports($user, $expectedResult)
     {
-        $this->securityFacade
-            ->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->willReturn($user);
 
         $this->assertEquals($expectedResult, $this->provider->supports());
@@ -275,16 +221,16 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function supportsDataProvider()
     {
         return [
-            'without security facade' => [
-                'securityFacade' => null,
+            'without user' => [
+                'user' => null,
                 'expectedResult' => false,
             ],
-            'security facade with incorrect user class' => [
-                'securityFacade' => new \stdClass(),
+            'unsupported user' => [
+                'user' => new \stdClass(),
                 'expectedResult' => false,
             ],
-            'security facade with user class' => [
-                'securityFacade' => new User(),
+            'supported user' => [
+                'user' => new User(),
                 'expectedResult' => true,
             ],
         ];
@@ -294,14 +240,20 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
      * @dataProvider owningEntityNamesDataProvider
      *
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $owningEntityNames must contains `organization`, `business_unit` and `user` keys
+     * @expectedExceptionMessage The $owningEntityNames must contains "organization", "business_unit" and "user" keys.
      *
      * @param array $owningEntityNames
      */
-    public function testSetAccessLevelClassesException(array $owningEntityNames)
+    public function testInvalidOwningEntityNames(array $owningEntityNames)
     {
-        $provider = new OwnershipMetadataProvider($owningEntityNames);
-        $provider->setContainer($this->container);
+        $provider = new OwnershipMetadataProvider(
+            $owningEntityNames,
+            $this->configManager,
+            $this->entityClassResolver,
+            $this->tokenAccessor,
+            $this->cache
+        );
+        $provider->getUserClass();
     }
 
     /**
@@ -359,13 +311,13 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
                 ->set('owner_field_name', 'test_field')
                 ->set('owner_column_name', 'test_column');
 
-            $this->configProvider->expects($this->once())
+            $this->configManager->expects($this->once())
                 ->method('hasConfig')
                 ->with(\stdClass::class)
                 ->willReturn(true);
-            $this->configProvider->expects($this->once())
-                ->method('getConfig')
-                ->with(\stdClass::class)
+            $this->configManager->expects($this->once())
+                ->method('getEntityConfig')
+                ->with('ownership', \stdClass::class)
                 ->willReturn($config);
         }
 

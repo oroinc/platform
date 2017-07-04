@@ -1,7 +1,7 @@
 require({
     shim: {
         'oro/translations': {
-            deps: ['orotranslation/js/translator', 'translator'],
+            deps: ['orotranslation/js/translator'],
             init: function(__) {
                 return __;
             }
@@ -16,7 +16,7 @@ require({
         }
     },
     paths: {
-        'oro/translations': '{{ url('oro_translation_jstranslation')[0:-3] }}'
+        'oro/translations': '{{ path('oro_translation_jstranslation')[0:-3] }}'
     },
     config: {
         'orotranslation/js/translator': {

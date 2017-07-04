@@ -189,7 +189,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $kernel->getContainer()->set(
             'oro_security.owner.metadata_provider.chain',
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
                 ->disableOriginalConstructor()
                 ->getMock()
         );
