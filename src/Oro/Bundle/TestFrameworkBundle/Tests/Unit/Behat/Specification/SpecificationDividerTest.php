@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification;
 
+use Behat\Testwork\Specification\SpecificationFinder;
 use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
+use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification\Stub\SpecificationLocatorStub;
 use Symfony\Component\Filesystem\Filesystem;
 
 class SpecificationDividerTest extends \PHPUnit_Framework_TestCase
@@ -42,7 +44,10 @@ class SpecificationDividerTest extends \PHPUnit_Framework_TestCase
             touch($this->featureDir.'/'.$i.'.feature');
         }
 
-        $suiteDivider = new SpecificationDivider();
+        $specFinder = new SpecificationFinder();
+        $specFinder->registerSpecificationLocator(new SpecificationLocatorStub($featureCount));
+
+        $suiteDivider = new SpecificationDivider($specFinder);
         $generatedSuites = $suiteDivider->divideSuite(self::SUITE_STUB_NAME, [$this->featureDir], $divider);
 
         $this->assertTrue(is_array($generatedSuites));
@@ -63,8 +68,16 @@ class SpecificationDividerTest extends \PHPUnit_Framework_TestCase
                 'Expected feature count' => [
                     self::SUITE_STUB_NAME.'#0' => 3,
                     self::SUITE_STUB_NAME.'#1' => 3,
-                    self::SUITE_STUB_NAME.'#2' => 3,
-                    self::SUITE_STUB_NAME.'#3' => 1,
+                    self::SUITE_STUB_NAME.'#2' => 2,
+                    self::SUITE_STUB_NAME.'#3' => 2,
+                ],
+            ],
+            [
+                'Suite feature count' => 4,
+                'Suite divider' => 3,
+                'Expected feature count' => [
+                    self::SUITE_STUB_NAME.'#0' => 2,
+                    self::SUITE_STUB_NAME.'#1' => 2,
                 ],
             ],
             [

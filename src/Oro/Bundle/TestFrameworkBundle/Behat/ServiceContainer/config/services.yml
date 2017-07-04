@@ -112,6 +112,8 @@ services:
 
     oro_behat_extension.specification.specification_divider:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider
+        arguments:
+          - '@specifications.finder'
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
