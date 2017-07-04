@@ -29,6 +29,11 @@ class ProcessLocalizedFields implements ProcessorInterface
     /** @var  PropertyAccess */
     protected $propertyAccessor;
 
+    /**
+     * ProcessLocalizedFields constructor.
+     * @param LocalizationHelper $localizationHelper
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(LocalizationHelper $localizationHelper, DoctrineHelper $doctrineHelper)
     {
         $this->localizationHelper = $localizationHelper;
