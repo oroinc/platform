@@ -10,6 +10,8 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_ADAPTER = 'crowdin';
+    const DEFAULT_CROWDIN_API_URL = 'https://api.crowdin.com/api';
+    const DEFAULT_PROXY_API_URL = 'http://translations.orocrm.com/api';
 
     /**
      * {@inheritDoc}
@@ -24,7 +26,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('domains')
                             ->requiresAtLeastOneElement()
-                            ->defaultValue(array('jsmessages', 'validators'))
+                            ->defaultValue(['jsmessages', 'validators'])
                             ->prototype('scalar')
                             ->end()
                         ->end()
@@ -40,14 +42,14 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('endpoint')
-                                    ->defaultValue('http://api.crowdin.net/api')
+                                    ->defaultValue(self::DEFAULT_CROWDIN_API_URL)
                                 ->end()
                             ->end()
                         ->end()
                         ->arrayNode('oro_service')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('endpoint')->defaultValue('http://translations.orocrm.com/api')->end()
+                                ->scalarNode('endpoint')->defaultValue(self::DEFAULT_PROXY_API_URL)->end()
                                 ->scalarNode('key')->defaultValue('')->end()
                             ->end()
                         ->end()
