@@ -142,6 +142,13 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: finalize, requestType: rest, priority: -10 }
 
+    oro_api.create.process_localized_values:
+        class: Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ProcessLocalizedFields
+        arguments:
+            - '@oro_locale.helper.localization'
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: finalize, requestType: json_api, priority: -5 }
     #
     # normalize_result
     #
