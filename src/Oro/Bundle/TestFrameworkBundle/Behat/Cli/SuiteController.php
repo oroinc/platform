@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
+use Behat\Testwork\Suite\Exception\SuiteConfigurationException;
 use Behat\Testwork\Suite\Exception\SuiteNotFoundException;
 use Behat\Testwork\Suite\SuiteRegistry;
 use Behat\Testwork\Suite\SuiteRepository;
@@ -68,6 +69,8 @@ class SuiteController implements Controller
 
     /**
      * {@inheritdoc}
+     * @throws SuiteNotFoundException in case when suite name provided by suite option is not configured
+     * @throws SuiteConfigurationException It should be never happen until someone configure suite with <bundle>#0 name
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -94,6 +97,10 @@ class SuiteController implements Controller
         }
     }
 
+    /**
+     * @param int $divideNumber
+     * @return array
+     */
     private function getSuiteConfigurations($divideNumber)
     {
         if (null === $divideNumber) {

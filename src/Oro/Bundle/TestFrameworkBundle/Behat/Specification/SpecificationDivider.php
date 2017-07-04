@@ -40,8 +40,6 @@ class SpecificationDivider
      *                 'AcmeSuite#0' => ['/path/to/first.feature', '/path/to/second.feature],
      *                 'AcmeSuite#1' => ['/path/to/third.feature'],
      *               ]
-     *
-     * @throws SuiteConfigurationException It should be never happen until someone call suite with <bundle>#1
      */
     public function divideSuite($suiteName, array $paths, $divider)
     {
@@ -91,10 +89,10 @@ class SpecificationDivider
         foreach ($iterators as $iterator) {
             /** @var FeatureNode $featureNode */
             foreach ($iterator as $featureNode) {
-                $features[] = $featureNode->getFile();
+                $features[$featureNode->getFile()] = null;
             }
         }
 
-        return $features;
+        return array_keys($features);
     }
 }

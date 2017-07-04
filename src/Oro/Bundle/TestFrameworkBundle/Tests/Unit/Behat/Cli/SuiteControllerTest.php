@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli;
 
+use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
 use Behat\Testwork\Suite\Suite;
 use Behat\Testwork\Suite\SuiteRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
+use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification\Stub\SpecificationLocatorFilesystemStub;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Filesystem\Filesystem;
@@ -86,10 +88,14 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
     {
         $suiteRegistry = new SuiteRegistry();
         $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
+        $specFinder = new SpecificationFinder();
+        $specFinder->registerSpecificationLocator(new SpecificationLocatorFilesystemStub(array_merge(array_map(function($config) {
+            return $config['settings']['paths'];
+        }, $suiteConfigs))));
         $controller = new SuiteController(
             $suiteRegistry,
             $suiteConfigs,
-            new SpecificationDivider()
+            new SpecificationDivider($specFinder)
         );
 
         $input = new InputStub('', [], ['suite-divider' => $divider]);
@@ -120,8 +126,8 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
                 'expectedSuites' => [
                     'AcmeSuite#0' => 5,
                     'AcmeSuite#1' => 5,
-                    'AcmeSuite#2' => 5,
-                    'AcmeSuite#3' => 3,
+                    'AcmeSuite#2' => 4,
+                    'AcmeSuite#3' => 4,
                 ],
             ],
             '18/5 with duplicated features' => [
@@ -142,8 +148,8 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
                 'expectedSuites' => [
                     'AcmeSuite#0' => 5,
                     'AcmeSuite#1' => 5,
-                    'AcmeSuite#2' => 5,
-                    'AcmeSuite#3' => 3,
+                    'AcmeSuite#2' => 4,
+                    'AcmeSuite#3' => 4,
                 ],
             ],
             '3/1' => [

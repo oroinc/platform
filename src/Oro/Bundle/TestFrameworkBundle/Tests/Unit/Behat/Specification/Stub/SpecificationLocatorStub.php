@@ -35,9 +35,12 @@ class SpecificationLocatorStub implements SpecificationLocator
      */
     public function locateSpecifications(Suite $suite, $locator = null)
     {
-        return new SpecificationArrayIterator(
-            $suite,
-            array_fill(0, $this->featureCount, new FeatureNode(null, null, [], null, [], '', '', 'fake.feature', 0))
-        );
+        $features = [];
+
+        for ($i = 0; $i < $this->featureCount; $i++) {
+            $features[] = new FeatureNode(null, null, [], null, [], '', '', uniqid('', true).'.feature', 0);
+        }
+
+        return new SpecificationArrayIterator($suite, $features);
     }
 }
