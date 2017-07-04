@@ -32,6 +32,11 @@ class Entity1
     protected $createdAt;
 
     /**
+     * @var bool
+     */
+    protected $bool = false;
+
+    /**
      * @param int $id
      */
     public function __construct($id)
@@ -103,5 +108,13 @@ class Entity1
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getBool()
+    {
+        return $this->bool;
     }
 }

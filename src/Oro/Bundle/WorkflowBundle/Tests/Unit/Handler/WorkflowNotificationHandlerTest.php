@@ -11,6 +11,7 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
@@ -80,11 +81,23 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
             $expected
         );
 
+        $record = $this->getTransitionRecord();
+        $user = new User();
+
         $this->manager->expects($expected ? $this->once() : $this->never())
             ->method('process')
-            ->with($this->entity, $expected);
+            ->with(
+                $this->entity,
+                $expected,
+                null,
+                [
+                    'transitionRecord' => $record,
+                    'transitionUser' => $user
+                ]
+            );
 
-        $this->event->expects($this->once())->method('getTransitionRecord')->willReturn($this->getTransitionRecord());
+        $this->event->expects($this->once())->method('getTransitionRecord')->willReturn($record);
+        $this->event->expects($this->any())->method('getTransitionUser')->willReturn($user);
         $this->event->expects($this->once())->method('stopPropagation');
 
         $this->handler->handle($this->event, $notifications);

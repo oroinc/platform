@@ -17,12 +17,12 @@ use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 class OwnerValidator extends ConstraintValidator
 {
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /** @var EntityOwnerAccessor */
@@ -50,19 +50,19 @@ class OwnerValidator extends ConstraintValidator
     protected $object;
 
     /**
-     * @param ManagerRegistry               $doctrine
-     * @param BusinessUnitManager           $businessUnitManager
-     * @param OwnershipMetadataProvider     $ownershipMetadataProvider
-     * @param EntityOwnerAccessor           $ownerAccessor
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param OwnerTreeProvider             $treeProvider
-     * @param AclVoter                      $aclVoter
+     * @param ManagerRegistry                    $doctrine
+     * @param BusinessUnitManager                $businessUnitManager
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
+     * @param EntityOwnerAccessor                $ownerAccessor
+     * @param AuthorizationCheckerInterface      $authorizationChecker
+     * @param TokenAccessorInterface             $tokenAccessor
+     * @param OwnerTreeProvider                  $treeProvider
+     * @param AclVoter                           $aclVoter
      */
     public function __construct(
         ManagerRegistry $doctrine,
         BusinessUnitManager $businessUnitManager,
-        OwnershipMetadataProvider $ownershipMetadataProvider,
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         EntityOwnerAccessor $ownerAccessor,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -141,7 +141,7 @@ class OwnerValidator extends ConstraintValidator
      */
     protected function isValidOwner(OwnershipMetadataInterface $metadata, $owner, $accessLevel)
     {
-        if ($metadata->isBasicLevelOwned()) {
+        if ($metadata->isUserOwned()) {
             return $this->businessUnitManager->canUserBeSetAsOwner(
                 $this->tokenAccessor->getUser(),
                 $owner,
@@ -149,7 +149,7 @@ class OwnerValidator extends ConstraintValidator
                 $this->treeProvider,
                 $this->getOrganization()
             );
-        } elseif ($metadata->isLocalLevelOwned()) {
+        } elseif ($metadata->isBusinessUnitOwned()) {
             return $this->businessUnitManager->canBusinessUnitBeSetAsOwner(
                 $this->tokenAccessor->getUser(),
                 $owner,
@@ -157,7 +157,7 @@ class OwnerValidator extends ConstraintValidator
                 $this->treeProvider,
                 $this->getOrganization()
             );
-        } elseif ($metadata->isGlobalLevelOwned()) {
+        } elseif ($metadata->isOrganizationOwned()) {
             return in_array(
                 $owner->getId(),
                 $this->treeProvider->getTree()->getUserOrganizationIds($this->tokenAccessor->getUserId()),

@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -28,9 +25,6 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
 {
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
-
-    /** @var ContainerInterface */
-    protected $container;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
@@ -68,26 +62,13 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = TestContainerBuilder::create()
-            ->add('oro_security.ownership_tree_provider.chain', $treeProvider)
-            ->add('oro_security.owner.metadata_provider.chain', $this->metadataProvider)
-            ->add('oro_security.token_accessor', $this->tokenAccessor)
-            ->add('oro_security.acl.object_id_accessor', new ObjectIdAccessor($doctrineHelper))
-            ->add('oro_security.owner.entity_owner_accessor', new EntityOwnerAccessor($this->metadataProvider))
-            ->getContainer($this);
-
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProvider,
             new ObjectIdAccessor($doctrineHelper),
             new EntityOwnerAccessor($this->metadataProvider),
-            $this->metadataProvider
+            $this->metadataProvider,
+            $this->tokenAccessor
         );
-        $this->decisionMaker->setContainer($this->container);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->decisionMaker, $this->container, $this->tokenAccessor);
     }
 
     public function testIsOrganization()

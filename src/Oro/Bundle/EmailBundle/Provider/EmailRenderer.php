@@ -340,7 +340,7 @@ class EmailRenderer extends \Twig_Environment
      *
      * @return string
      */
-    private function processVariables($content, array $templateParams)
+    protected function processVariables($content, array $templateParams)
     {
         $variableDefinitions = (array)$this->variablesProvider->getEntityVariableDefinitions(
             DoctrineClassUtils::getClass($templateParams['entity'])

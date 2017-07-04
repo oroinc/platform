@@ -1258,7 +1258,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I) hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in grid$/
-     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"/
+     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"$/
      *
      * @param string $exceptions
      * @param string|null $gridName
@@ -1347,12 +1347,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
         $filterManager->close();
     }
@@ -1369,12 +1369,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
         $filterManager->close();
     }

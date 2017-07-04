@@ -6,147 +6,114 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * This class provides access to the ownership metadata of a domain object
  */
-class OwnershipMetadataProvider extends AbstractMetadataProvider
+class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
 {
-    /**
-     * @deprecated since 1.8, use getConfigProvider method instead
-     *
-     * @var ConfigProvider
-     */
-    protected $configProvider;
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
+
+    /** @var CacheProvider */
     private $cache;
 
-    /**
-     * @var string
-     */
-    protected $organizationClass;
+    /** @var array */
+    private $owningEntityNames;
+
+    /** @var string */
+    private $organizationClass;
+
+    /** @var string */
+    private $businessUnitClass;
+
+    /** @var string */
+    private $userClass;
 
     /**
-     * @var string
-     */
-    protected $businessUnitClass;
-
-    /**
-     * @var string
-     */
-    protected $userClass;
-
-    /**
-     * @param array               $owningEntityNames
-     * @param ConfigProvider      $configProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param CacheProvider|null  $cache
-     *
-     * @deprecated since 1.8. $configProvider, $entityClassResolver will be removed
-     *      use getConfigProvider, getCache, getEntityClassResolver methods instead
+     * @param array                  $owningEntityNames [owning entity type => entity class name, ...]
+     * @param ConfigManager          $configManager
+     * @param EntityClassResolver    $entityClassResolver
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param CacheProvider          $cache
      */
     public function __construct(
         array $owningEntityNames,
-        ConfigProvider $configProvider = null,
-        EntityClassResolver $entityClassResolver = null,
-        CacheProvider $cache = null
+        ConfigManager $configManager,
+        EntityClassResolver $entityClassResolver,
+        TokenAccessorInterface $tokenAccessor,
+        CacheProvider $cache
     ) {
-        parent::__construct($owningEntityNames);
-
-        $this->configProvider = $configProvider;
+        parent::__construct($configManager);
+        $this->owningEntityNames = $owningEntityNames;
+        $this->entityClassResolver = $entityClassResolver;
+        $this->tokenAccessor = $tokenAccessor;
         $this->cache = $cache;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setAccessLevelClasses(array $owningEntityNames, EntityClassResolver $entityClassResolver = null)
+    public function getUserClass()
     {
-        if (!isset($owningEntityNames['organization'], $owningEntityNames['business_unit'], $owningEntityNames['user'])
-        ) {
-            throw new \InvalidArgumentException(
-                'Array parameter $owningEntityNames must contains `organization`, `business_unit` and `user` keys'
-            );
-        }
+        $this->ensureOwningEntityClassesInitialized();
 
-        $this->organizationClass = $this->getEntityClassResolver()->getEntityClass($owningEntityNames['organization']);
-        $this->businessUnitClass = $this->getEntityClassResolver()->getEntityClass($owningEntityNames['business_unit']);
-        $this->userClass = $this->getEntityClassResolver()->getEntityClass($owningEntityNames['user']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createNoOwnershipMetadata()
-    {
-        return new OwnershipMetadata();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGlobalLevelClass()
-    {
-        return $this->organizationClass;
-    }
-
-    /**
-     * Gets the class name of the organization entity
-     *
-     * @return string
-     *
-     * @deprecated since 1.8, use getGlobalLevelClass instead
-     */
-    public function getOrganizationClass()
-    {
-        return $this->getGlobalLevelClass();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLocalLevelClass($deep = false)
-    {
-        return $this->businessUnitClass;
-    }
-
-    /**
-     * Gets the class name of the business unit entity
-     *
-     * @return string
-     *
-     * @deprecated since 1.8, use getLocalLevelClass instead
-     */
-    public function getBusinessUnitClass()
-    {
-        return $this->getLocalLevelClass();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBasicLevelClass()
-    {
         return $this->userClass;
     }
 
     /**
-     * Gets the class name of the user entity
-     *
-     * @return string
-     *
-     * @deprecated since 1.8, use getBasicLevelClass instead
+     * {@inheritdoc}
      */
-    public function getUserClass()
+    public function getBusinessUnitClass()
     {
-        return $this->getBasicLevelClass();
+        $this->ensureOwningEntityClassesInitialized();
+
+        return $this->businessUnitClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganizationClass()
+    {
+        $this->ensureOwningEntityClassesInitialized();
+
+        return $this->organizationClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3, use getUserClass instead
+     */
+    public function getBasicLevelClass()
+    {
+        return $this->getUserClass();
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3, use getBusinessUnitClass instead
+     */
+    public function getLocalLevelClass($deep = false)
+    {
+        return $this->getBusinessUnitClass();
+    }
+
+    /**
+     * {@inheritdoc}
+     * @deprecated since 2.3, use getOrganizationClass instead
+     */
+    public function getGlobalLevelClass()
+    {
+        return $this->getOrganizationClass();
     }
 
     /**
@@ -154,32 +121,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     public function supports()
     {
-        return $this->getContainer()->get('oro_security.token_accessor')->getUser() instanceof User;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getOwnershipMetadata(ConfigInterface $config)
-    {
-        $ownerType              = $config->get('owner_type');
-        $ownerFieldName         = $config->get('owner_field_name');
-        $ownerColumnName        = $config->get('owner_column_name');
-        $organizationFieldName  = $config->get('organization_field_name');
-        $organizationColumnName = $config->get('organization_column_name');
-
-        if (!$organizationFieldName && $ownerType === OwnershipType::OWNER_TYPE_ORGANIZATION) {
-            $organizationFieldName  = $ownerFieldName;
-            $organizationColumnName = $ownerColumnName;
-        }
-
-        return new OwnershipMetadata(
-            $ownerType,
-            $ownerFieldName,
-            $ownerColumnName,
-            $organizationFieldName,
-            $organizationColumnName
-        );
+        return $this->tokenAccessor->getUser() instanceof User;
     }
 
     /**
@@ -215,10 +157,73 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     protected function getCache()
     {
-        if (!$this->cache) {
-            $this->cache = $this->getContainer()->get('oro_security.owner.ownership_metadata_provider.cache');
+        return $this->cache;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createNoOwnershipMetadata()
+    {
+        return new OwnershipMetadata();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getOwnershipMetadata(ConfigInterface $config)
+    {
+        $ownerType = $config->get('owner_type');
+        $ownerFieldName = $config->get('owner_field_name');
+        $ownerColumnName = $config->get('owner_column_name');
+        $organizationFieldName = $config->get('organization_field_name');
+        $organizationColumnName = $config->get('organization_column_name');
+
+        if (!$organizationFieldName && $ownerType === OwnershipType::OWNER_TYPE_ORGANIZATION) {
+            $organizationFieldName  = $ownerFieldName;
+            $organizationColumnName = $ownerColumnName;
         }
 
-        return $this->cache;
+        return new OwnershipMetadata(
+            $ownerType,
+            $ownerFieldName,
+            $ownerColumnName,
+            $organizationFieldName,
+            $organizationColumnName
+        );
+    }
+
+    /**
+     * Makes sure that the owning entity classes are initialized.
+     */
+    private function ensureOwningEntityClassesInitialized()
+    {
+        if (null === $this->owningEntityNames) {
+            // already initialized
+            return;
+        }
+
+        if (!isset(
+            $this->owningEntityNames['organization'],
+            $this->owningEntityNames['business_unit'],
+            $this->owningEntityNames['user']
+        )) {
+            throw new \InvalidArgumentException(
+                'The $owningEntityNames must contains "organization", "business_unit" and "user" keys.'
+            );
+        }
+
+        $this->organizationClass = $this->entityClassResolver->getEntityClass(
+            $this->owningEntityNames['organization']
+        );
+        $this->businessUnitClass = $this->entityClassResolver->getEntityClass(
+            $this->owningEntityNames['business_unit']
+        );
+        $this->userClass = $this->entityClassResolver->getEntityClass(
+            $this->owningEntityNames['user']
+        );
+
+        // remove source data to mark that the initialization passed
+        $this->owningEntityNames = null;
     }
 }
