@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Create\JsonApi;
+namespace Oro\Bundle\LocaleBundle\Processor;
 
 use Symfony\Component\PropertyAccess\StringUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
