@@ -132,6 +132,14 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
+     * @param array $sleepBetweenAttempt
+     */
+    public function setSleepBetweenAttempt(array $sleepBetweenAttempt)
+    {
+        $this->sleepBetweenAttempt = $sleepBetweenAttempt;
+    }
+
+    /**
      * @param string $wsdlUrl
      *
      * @param array $options

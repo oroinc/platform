@@ -552,7 +552,13 @@ class WorkflowManager implements LoggerAwareInterface
      */
     public function deactivateWorkflow($workflowName)
     {
-        return $this->setWorkflowStatus($workflowName, false);
+        $result = $this->setWorkflowStatus($workflowName, false);
+
+        if ($result) {
+            $this->startedWorkflowsBag->removeWorkflow($workflowName);
+        }
+
+        return $result;
     }
 
     /**
@@ -600,6 +606,7 @@ class WorkflowManager implements LoggerAwareInterface
     public function resetWorkflowData($workflowName)
     {
         $this->getWorkflowItemRepository()->resetWorkflowData($workflowName);
+        $this->startedWorkflowsBag->removeWorkflow($workflowName);
     }
 
     /**

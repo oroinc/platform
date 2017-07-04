@@ -5,9 +5,9 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
-          To:
-            type: 'named'
-            locator: ['field', 'To']
+          ToField:
+            type: 'xpath'
+            locator: '//input[contains(@id, "oro_email_email_to")]'
             element: Select2Choices
           From:
             type: 'named'
@@ -33,6 +33,9 @@ oro_behat_extension:
     ReadUnreadIcon:
       selector: 'i.fa-envelope'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    RemoveEmail:
+      selector: '.select2-search-choice-close'
 
   pages:
     User Emails:

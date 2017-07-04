@@ -2,18 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValidationHelper;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 /**
  * For "create" action adds NotNull validation constraint for "owner" field.
@@ -25,20 +21,20 @@ class AddOwnerValidator implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /** @var ValidationHelper */
     protected $validationHelper;
 
     /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param OwnershipMetadataProvider $ownershipMetadataProvider
-     * @param ValidationHelper          $validationHelper
+     * @param DoctrineHelper                     $doctrineHelper
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
+     * @param ValidationHelper                   $validationHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        OwnershipMetadataProvider $ownershipMetadataProvider,
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         ValidationHelper $validationHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
