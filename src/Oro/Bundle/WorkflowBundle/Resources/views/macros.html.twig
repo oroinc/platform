@@ -61,20 +61,18 @@
 
     {% set label = transition.buttonLabel|trans({},'workflows') %}
     {% set title = transition.buttonTitle|trans({},'workflows') %}
-    
-    {% set frontendMessage = transition.frontendOptions.message %}
-    {% set transitionMessage = null %}
 
-    {% if frontendMessage.content is defined %}
+    {% if transition.frontendOptions.message is defined and transition.frontendOptions.message.content is defined %}
+        {% set frontendMessage = transition.frontendOptions.message %}
+
         {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
-    {% endif %}
-
-    {% if transitionMessage and transitionMessage != frontendMessage.content %}
-        {# if no translation for message then do not show message #}
-        {% set message = frontendMessage|merge({
-            content: transitionMessage|nl2br,
-            title: frontendMessage.title|default(title),
-        }) %}
+        {% if transitionMessage and transitionMessage != frontendMessage.content %}
+            {# if no translation for message then do not show message #}
+            {% set message = frontendMessage|merge({
+                content: transitionMessage|nl2br,
+                title: frontendMessage.title|default(title),
+            }) %}
+        {% endif %}
     {% endif %}
     
     {% set data = data|merge({

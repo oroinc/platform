@@ -2,37 +2,22 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException;
 
 class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
 {
-    /**
-     * @var ArrayCollection|OwnerTreeProviderInterface[]
-     */
-    protected $providers;
+    /** @var OwnerTreeProviderInterface[] */
+    protected $providers = [];
 
-    /**
-     * @var OwnerTreeProviderInterface
-     */
+    /** @var OwnerTreeProviderInterface */
     protected $defaultProvider;
-
-    public function __construct()
-    {
-        $this->providers = new ArrayCollection();
-    }
 
     /**
      * @param OwnerTreeProviderInterface $provider
      */
     public function addProvider(OwnerTreeProviderInterface $provider)
     {
-        if ($this->providers->contains($provider)) {
-            return;
-        }
-
-        $this->providers->add($provider);
+        $this->providers[] = $provider;
     }
 
     /**
@@ -62,7 +47,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     }
 
     /**
-     * @return OwnerTree
+     * @return OwnerTreeInterface
      */
     public function getTree()
     {

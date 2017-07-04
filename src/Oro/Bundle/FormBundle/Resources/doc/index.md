@@ -9,3 +9,4 @@ OroFormBundle Documentation
 - [Client side form validation](./reference/js_validation.md)
 - [Update Handler](./reference/update_handler.md)
 - [Inline Editable Views](./reference/inline-editable-view-component.md)
+- [Expression editor](./reference/expression-editor.md)

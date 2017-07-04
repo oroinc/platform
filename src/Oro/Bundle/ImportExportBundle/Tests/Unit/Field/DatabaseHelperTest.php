@@ -90,7 +90,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $ownershipMetadataProviderLink->expects($this->any())
