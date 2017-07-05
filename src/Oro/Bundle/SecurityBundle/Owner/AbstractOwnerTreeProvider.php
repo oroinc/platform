@@ -30,16 +30,16 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
     }
 
     /**
-     * @param OwnerTreeInterface $tree
+     * @param OwnerTreeBuilderInterface $tree
      */
-    abstract protected function fillTree(OwnerTreeInterface $tree);
+    abstract protected function fillTree(OwnerTreeBuilderInterface $tree);
 
     /**
-     * Returns empty instance of OwnerTree object
+     * Returns empty instance of the owner tree builder
      *
-     * @return OwnerTreeInterface
+     * @return OwnerTreeBuilderInterface
      */
-    protected function createTreeObject()
+    protected function createTreeBuilder()
     {
         return new OwnerTree();
     }
@@ -92,17 +92,17 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
     }
 
     /**
-     * Loads tree data and save them in cache
+     * Loads tree data
      *
      * @return OwnerTreeInterface
      */
     protected function loadTree()
     {
-        $tree = $this->createTreeObject();
+        $treeBuilder = $this->createTreeBuilder();
         if ($this->databaseChecker->checkDatabase()) {
-            $this->fillTree($tree);
+            $this->fillTree($treeBuilder);
         }
 
-        return $tree;
+        return $treeBuilder->getTree();
     }
 }

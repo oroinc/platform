@@ -12,10 +12,11 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class TestHelper
@@ -39,13 +40,13 @@ class TestHelper
     }
 
     /**
-     * @param OwnershipMetadataProvider $metadataProvider
+     * @param OwnershipMetadataProviderInterface $metadataProvider
      * @param OwnerTree $ownerTree
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @return AclExtensionSelector
      */
     public function createAclExtensionSelector(
-        OwnershipMetadataProvider $metadataProvider = null,
+        OwnershipMetadataProviderInterface $metadataProvider = null,
         OwnerTree $ownerTree = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
     ) {
@@ -73,7 +74,7 @@ class TestHelper
     }
 
     /**
-     * @param OwnershipMetadataProvider $metadataProvider
+     * @param OwnershipMetadataProviderInterface $metadataProvider
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
@@ -86,7 +87,7 @@ class TestHelper
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function createEntityAclExtension(
-        OwnershipMetadataProvider $metadataProvider = null,
+        OwnershipMetadataProviderInterface $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
@@ -121,7 +122,8 @@ class TestHelper
                 $treeProviderMock,
                 $idAccessor,
                 new EntityOwnerAccessor($metadataProvider),
-                $metadataProvider
+                $metadataProvider,
+                $this->testCase->getMockBuilder(TokenAccessorInterface::class)->getMock()
             );
         }
 
@@ -191,7 +193,7 @@ class TestHelper
     }
 
     /**
-     * @param OwnershipMetadataProvider $metadataProvider
+     * @param OwnershipMetadataProviderInterface $metadataProvider
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
@@ -199,7 +201,7 @@ class TestHelper
      * @return FieldAclExtension
      */
     public function createFieldAclExtension(
-        OwnershipMetadataProvider $metadataProvider = null,
+        OwnershipMetadataProviderInterface $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
@@ -234,7 +236,8 @@ class TestHelper
                 $treeProviderMock,
                 $idAccessor,
                 $entityOwnerAccessor,
-                $metadataProvider
+                $metadataProvider,
+                $this->testCase->getMockBuilder(TokenAccessorInterface::class)->getMock()
             );
         }
 

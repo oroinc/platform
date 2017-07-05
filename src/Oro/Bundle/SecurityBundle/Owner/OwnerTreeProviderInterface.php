@@ -10,21 +10,19 @@ interface OwnerTreeProviderInterface
     public function supports();
 
     /**
-     * Get ACL tree
+     * Gets the owner tree
      *
      * @return OwnerTreeInterface
-     *
-     * @throws \Exception If ACL tree cache not warmed
      */
     public function getTree();
 
     /**
-     * Clear the owner tree cache
+     * Clears the owner tree cache
      */
     public function clear();
 
     /**
-     * Warmup owner tree cache
+     * Warmups the owner tree cache
      */
     public function warmUpCache();
 }
