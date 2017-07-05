@@ -17,6 +17,8 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
  */
 class OroUIExtension extends Extension
 {
+    const ALIAS = 'oro_ui';
+
     /**
      * {@inheritDoc}
      */
