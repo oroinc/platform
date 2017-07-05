@@ -17,7 +17,7 @@ entity_config:
                     options:
                         default_value: 'Demo'  # sets the default value for 'demo_attr' attribute
 ```
-This configuration adds 'demo_attr' attribute with 'Demo' value to all configurable entities. The configurable entity is an entity marked with @Config annotation. Also this code automatically adds a service named **oro_entity_config.provider.acme** into DI container. You can use this service to get a value of 'demo_attr' attribute for particular entity.
+This configuration adds 'demo_attr' attribute with 'Demo' value to all configurable entities. The configurable entity is an entity marked with `@Config` annotation. Also this code automatically adds a service named **oro_entity_config.provider.acme** into DI container. You can use this service to get a value of 'demo_attr' attribute for particular entity.
 To apply this changes execute **oro:entity-config:update** command:
 ```bash
 php app/console oro:entity-config:update
@@ -32,7 +32,7 @@ An example how to get a value of a configuration attribute:
     // the value of $demoAttr variable will be 'Demo'
     $demoAttr = $acmeConfigProvider->getConfig('AcmeBundle\Entity\SomeEntity')->get('demo_attr');
 ```
-If you want to set a value different than the default one for some entity just write it in @config annotation for this entity. For example:
+If you want to set a value different than the default one for some entity just write it in `@Config` annotation for this entity. For example:
 ``` php
 <?php
 /**
