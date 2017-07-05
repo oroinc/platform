@@ -50,9 +50,13 @@ class ProcessLocalizedFields implements ProcessorInterface
             return;
         }
 
-        $em = $this->doctrinHelper->getEntityManagerForClass(LocalizedFallbackValue::class);
         /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getMetadata();
+        if (!$entityMetadata instanceof EntityMetadata) {
+            return;
+        }
+
+        $em = $this->doctrinHelper->getEntityManagerForClass(LocalizedFallbackValue::class);
         $associations = $entityMetadata->getAssociations();
         $entity = $context->getForm()->getData();
 
