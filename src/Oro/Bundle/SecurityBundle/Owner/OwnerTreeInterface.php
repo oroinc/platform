@@ -3,60 +3,115 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 /**
- * Purpose of interface is to build tree for AccessLevel level entity representation
- *
- * @internal Should cover most of OwnerTree methods, BC break possible
+ * Provides an interface for owner tree
  */
 interface OwnerTreeInterface
 {
     /**
-     * Add the given basic entity with local owner to the tree
+     * Gets the owning organization id for the given user id
      *
-     * @param int|string $basicLevelEntityId
-     * @param int|string|null $localLevelEntityId
+     * @param int|string $userId
+     *
+     * @return int|string|null
      */
-    public function addBasicEntity($basicLevelEntityId, $localLevelEntityId = null);
+    public function getUserOrganizationId($userId);
 
     /**
-     * Add a global entity to the basic one to the tree
+     * Gets all organization ids assigned to the given user id
      *
-     * @param int|string $basicLevelEntityId
-     * @param int|string $globalLevelEntityId
+     * @param int|string $userId
+     *
+     * @return int[]|string[]
      */
-    public function addGlobalEntity($basicLevelEntityId, $globalLevelEntityId);
+    public function getUserOrganizationIds($userId);
 
     /**
-     * Add local entity to local-global entities combination to the tree
+     * Gets the owning business unit id for the given user id
      *
-     * @param int|string $basicLevelEntityId
-     * @param int|string $localLevelEntityId
-     * @param int|string $globalLevelEntityId
+     * @param int|string $userId
+     *
+     * @return int|string|null
      */
-    public function addLocalEntityToBasic($basicLevelEntityId, $localLevelEntityId, $globalLevelEntityId);
+    public function getUserBusinessUnitId($userId);
 
     /**
-     * Add local entity to local-global entities combination to the tree
+     * Gets all business unit ids assigned to the given user id
      *
-     * @param int|string $localLevelEntityId
-     * @param int|string $deepLevelEntityId Parent entity
+     * @param int|string      $userId
+     * @param int|string|null $organizationId
+     *
+     * @return array of int|string
      */
-    public function addDeepEntity($localLevelEntityId, $deepLevelEntityId);
+    public function getUserBusinessUnitIds($userId, $organizationId = null);
 
     /**
-     * Add the given local entity to the tree
+     * Gets ids of all users assigned to the given business unit
      *
-     * @param int|string $localLevelEntityId
-     * @param int|string|null $globalLevelEntityId
+     * @param int|string $businessUnitId
+     *
+     * @return array of int|string
      */
-    public function addLocalEntity($localLevelEntityId, $globalLevelEntityId = null);
+    public function getUsersAssignedToBusinessUnit($businessUnitId);
 
     /**
-     * Calculate subordinated entity ids.
+     * Gets ids of all users assigned to the given business units
      *
-     * The main aim is to remove such calculations inside each "addDeepEntity" as it has performance impact in case of
-     * huge amount of entities.
+     * @param int[]|string[] $businessUnitIds
      *
-     * Should be called only once after all "addDeepEntity".
+     * @return int[]|string[]
      */
-    public function buildTree();
+    public function getUsersAssignedToBusinessUnits(array $businessUnitIds);
+
+    /**
+     * Gets the owning organization id for the given business unit id
+     *
+     * @param int|string $businessUnitId
+     *
+     * @return int|string|null
+     */
+    public function getBusinessUnitOrganizationId($businessUnitId);
+
+    /**
+     * Gets all business unit ids for the given organization id
+     *
+     * @param int|string $organizationId
+     *
+     * @return array of int|string
+     */
+    public function getOrganizationBusinessUnitIds($organizationId);
+
+    /**
+     * Gets all subordinate business unit ids for the given business unit id
+     *
+     * @param int|string $businessUnitId
+     *
+     * @return array of int|string
+     */
+    public function getSubordinateBusinessUnitIds($businessUnitId);
+
+    /**
+     * Gets all user business unit ids with subordinate business unit ids
+     *
+     * @param int        $userId
+     * @param int|string $organizationId
+     *
+     * @return array of int|string
+     */
+    public function getUserSubordinateBusinessUnitIds($userId, $organizationId = null);
+
+    /**
+     * Gets all user business unit ids by user organization ids
+     *
+     * @param int $userId
+     *
+     * @return array of int|string
+     */
+    public function getBusinessUnitsIdByUserOrganizations($userId);
+
+    /**
+     * Get all business units in system
+     *
+     * @return array of int|string
+     */
+    public function getAllBusinessUnitIds();
 }

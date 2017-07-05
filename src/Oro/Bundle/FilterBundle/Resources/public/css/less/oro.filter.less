@@ -178,8 +178,17 @@
 
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes li {
     padding: 0;
+    &:after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+    &.hidden-item {
+      height: 0;
+    }
 }
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label {
+    white-space: nowrap;
     margin: 0;
     float: left;
 }

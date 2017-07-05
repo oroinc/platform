@@ -34,7 +34,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $this->validationHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\ValidationHelper')

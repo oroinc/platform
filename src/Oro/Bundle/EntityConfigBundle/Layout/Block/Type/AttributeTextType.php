@@ -54,7 +54,7 @@ class AttributeTextType extends AbstractType
         $resolver->setDefaults(
             [
                 'value' => '=data["property_accessor"].getValue(entity, fieldName)',
-                'visible' => '=data["attribute_config"].getConfig(className,fieldName).is("visible") && value'
+                'visible' => '=data["attribute_config"].getConfig(className,fieldName).is("visible") && value !== null'
             ]
         );
     }

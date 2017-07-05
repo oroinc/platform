@@ -37,7 +37,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->ownershipMetadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
 

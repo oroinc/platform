@@ -41,8 +41,10 @@ class ScriptHandler extends SensioScriptHandler
         $filesystem = new Filesystem();
 
         foreach ($config as $item) {
-            $filesystem->remove($item['to']);
-            $filesystem->mirror($item['from'], $item['to']);
+            if ($filesystem->exists($item['from'])) {
+                $filesystem->remove($item['to']);
+                $filesystem->mirror($item['from'], $item['to']);
+            }
         }
     }
 

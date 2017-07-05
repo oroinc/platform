@@ -85,11 +85,11 @@
         "bower-asset/jquery.numeric": "1.5.0",
         "bower-asset/uniform": "2.1.1",
         "bower-asset/malihu-custom-scrollbar-plugin": "3.1.5",
-        "bower-asset/timepicker": "1.4.13",
-        "bower-asset/datepair": "0.4.4",
+        "bower-asset/timepicker": "1.11.*",
+        "bower-asset/datepair": "0.4.*",
         "bower-asset/lightgallery": "1.4.0",
         "bower-asset/less": "2.5.*",
-        "bower-asset/jquery-ui-multiselect-widget": "1.14",
+        "bower-asset/jquery-ui-multiselect-widget": "2.0.1",
         "bower-asset/autolinker.js": "1.4.*",
         "bower-asset/font-awesome": "4.7.*",
         "bower-asset/bootstrap": "2.3.0",
@@ -123,13 +123,15 @@
         "behat/symfony2-extension": "2.1.1",
         "nelmio/alice": "2.2.*",
         "phpunit/phpunit": "5.7.*",
+        "phpunit/phpunit-selenium": "3.0.*",
         "johnkary/phpunit-speedtrap": "1.0.*",
         "mybuilder/phpunit-accelerator": "1.2.*",
         "squizlabs/php_codesniffer": "2.8.*",
         "phpmd/phpmd": "2.6.*",
         "sebastian/phpcpd": "dev-master#cff7f36c2ae89d59987de25d14fd41a72dd4a703 as 3.1.0",
         "phpunit/phpcov": "3.1.*",
-        "symfony/phpunit-bridge": "3.2.*"
+        "symfony/phpunit-bridge": "3.2.*",
+        "friendsofphp/php-cs-fixer": "2.1.*"
     },
     "repositories": {
         "oro": {

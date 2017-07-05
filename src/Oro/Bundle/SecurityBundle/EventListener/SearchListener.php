@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SearchListener
@@ -16,16 +16,16 @@ class SearchListener
     const EMPTY_ORGANIZATION_ID = 0;
     const EMPTY_OWNER_ID        = 0;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
     /**
-     * @param OwnershipMetadataProvider $metadataProvider
+     * @param OwnershipMetadataProviderInterface $metadataProvider
      */
-    public function __construct(OwnershipMetadataProvider $metadataProvider)
+    public function __construct(OwnershipMetadataProviderInterface $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
     }
@@ -118,11 +118,11 @@ class SearchListener
         $organizationId = self::EMPTY_ORGANIZATION_ID;
 
         $organizationField = null;
-        if ($metadata->getGlobalOwnerFieldName()) {
-            $organizationField = $metadata->getGlobalOwnerFieldName();
+        if ($metadata->getOrganizationFieldName()) {
+            $organizationField = $metadata->getOrganizationFieldName();
         }
 
-        if ($metadata->isGlobalLevelOwned()) {
+        if ($metadata->isOrganizationOwned()) {
             $organizationField = $metadata->getOwnerFieldName();
         }
 

@@ -265,11 +265,11 @@ Example:
 
 #### get_subresource
 
-Get full information about records to which the note associated.
+Retrieve records to which the note associated.
 
 #### get_relationship
 
-Get records to which the note associated.
+Retrieve the IDs of records to which the note associated.
 
 #### add_relationship
 

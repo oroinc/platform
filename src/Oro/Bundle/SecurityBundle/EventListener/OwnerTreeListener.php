@@ -6,14 +6,11 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 
-class OwnerTreeListener implements ContainerAwareInterface
+class OwnerTreeListener
 {
     /** @var array [class name => [[field name, ...], [association name, ...]], ...] */
     protected $securityClasses = [];
@@ -21,28 +18,15 @@ class OwnerTreeListener implements ContainerAwareInterface
     /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
 
-    /** @var ContainerInterface */
-    protected $container;
-
     /** @var bool */
     protected $isCacheOutdated = false;
 
     /**
-     * {@inheritdoc}
+     * @param OwnerTreeProviderInterface $treeProvider
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(OwnerTreeProviderInterface $treeProvider)
     {
-        $this->container = $container;
-    }
-
-    /**
-     * @param ServiceLink $treeProviderLink
-     *
-     * @deprecated 1.8.0:2.1.0 use $container property instead
-     */
-    public function __construct(ServiceLink $treeProviderLink = null)
-    {
-        $this->treeProviderLink = $treeProviderLink;
+        $this->treeProvider = $treeProvider;
     }
 
     /**
@@ -73,7 +57,7 @@ class OwnerTreeListener implements ContainerAwareInterface
             || $this->checkToManyRelations($uow->getScheduledCollectionDeletions());
 
         if ($this->isCacheOutdated) {
-            $this->getTreeProvider()->clear();
+            $this->treeProvider->clear();
         }
     }
 
@@ -142,21 +126,5 @@ class OwnerTreeListener implements ContainerAwareInterface
         }
 
         return false;
-    }
-
-    /**
-     * @return OwnerTreeProviderInterface
-     */
-    protected function getTreeProvider()
-    {
-        if (!$this->container) {
-            throw new \InvalidArgumentException('ContainerInterface not injected');
-        }
-
-        if (!$this->treeProvider) {
-            $this->treeProvider = $this->container->get('oro_security.ownership_tree_provider.chain');
-        }
-
-        return $this->treeProvider;
     }
 }

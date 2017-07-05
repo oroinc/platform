@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
 {
@@ -31,7 +31,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param MetadataProviderInterface                  $metadataProvider
+     * @param OwnershipMetadataProviderInterface         $metadataProvider
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param ConfigManager                              $configManager
@@ -39,7 +39,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
-        MetadataProviderInterface $metadataProvider,
+        OwnershipMetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         EntityOwnerAccessor $entityOwnerAccessor,
         ConfigManager $configManager,
