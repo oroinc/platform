@@ -962,7 +962,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $actions = array_map(
             function (Element $action) {
-                return $action->getText();
+                return $action->getText() ?: $action->getAttribute('title');
             },
             $row->getActionLinks()
         );
