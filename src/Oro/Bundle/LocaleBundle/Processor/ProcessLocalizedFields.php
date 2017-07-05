@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -30,7 +31,6 @@ class ProcessLocalizedFields implements ProcessorInterface
     protected $propertyAccessor;
 
     /**
-     * ProcessLocalizedFields constructor.
      * @param LocalizationHelper $localizationHelper
      * @param DoctrineHelper $doctrineHelper
      */
@@ -46,6 +46,10 @@ class ProcessLocalizedFields implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
+        if (!$context instanceof CreateContext) {
+            return;
+        }
+
         $em = $this->doctrinHelper->getEntityManagerForClass(LocalizedFallbackValue::class);
         /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getMetadata();
@@ -54,8 +58,8 @@ class ProcessLocalizedFields implements ProcessorInterface
 
         foreach ($associations as $relationName => $association) {
             /** @var AssociationMetadata $association */
-            if ($association->getAssociationType() === RelationType::MANY_TO_MANY &&
-                $association->getTargetClassName() === LocalizedFallbackValue::class
+            if ($association->getAssociationType() === RelationType::MANY_TO_MANY
+                && $association->getTargetClassName() === LocalizedFallbackValue::class
             ) {
                 $this->addMissingLocalizedValues($entity, $relationName, $em);
             }
@@ -68,7 +72,7 @@ class ProcessLocalizedFields implements ProcessorInterface
      * @param object $entity
      * @param string $relationName
      */
-    protected function addMissingLocalizedValues(&$entity, $relationName, $em)
+    protected function addMissingLocalizedValues($entity, $relationName, $em)
     {
         $localizations = $this->localizationHelper->getLocalizations();
         $localizedValues = $this->propertyAccessor->getValue($entity, $relationName);
@@ -118,7 +122,7 @@ class ProcessLocalizedFields implements ProcessorInterface
      * @param Localization|null $localization
      */
     protected function createLocalizedFallbackValue(
-        &$entity,
+        $entity,
         $relationName,
         EntityManager $em,
         Localization $localization = null
