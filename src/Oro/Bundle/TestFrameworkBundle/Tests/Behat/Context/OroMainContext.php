@@ -1133,6 +1133,7 @@ class OroMainContext extends MinkContext implements
         $field = $this->createOroForm()->findField($fieldName);
         $field->focus();
         $field->keyDown(13);
+        $field->keyUp(13);
         $this->waitForAjax();
     }
 

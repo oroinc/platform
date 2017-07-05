@@ -1,0 +1,20 @@
+imports:
+    - { resource: './other_workflow_parts/attributes.yml' }
+    - { resource: './other_workflow_parts/attributes.yml', workflow: with_split_parts, as: destination_of_split_parts, replace: [] }
+workflows:
+    destination_of_split_parts:
+        entity: Some\Entity
+        steps:
+            step_a: ~
+        transitions:
+            start:
+                step_to: step_a
+                is_start: true
+    with_split_parts:
+        entity: Some\Entity
+        steps:
+            step_b: ~
+        transitions:
+            start:
+                step_to: step_b
+                is_start: true

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -69,11 +69,6 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     /** @var OwnershipMetadataProviderStub */
     private $metadataProvider;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
     protected function setUp()
     {
         if (!class_exists('Doctrine\DBAL\DriverManager')) {
@@ -94,52 +89,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $treeProviderMock->expects($this->any())->method('getTree')->will($this->returnValue($this->ownerTree));
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()->getMock();
-        $configProvider->expects($this->any())->method('hasConfig')->willReturn(false);
-
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [
-                            'oro_security.ownership_tree_provider.chain',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $treeProviderMock,
-                        ],
-                        [
-                            'oro_security.owner.metadata_provider.chain',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->metadataProvider,
-                        ],
-                        [
-                            'oro_security.acl.object_id_accessor',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $objectIdAccessor,
-                        ],
-                        [
-                            'oro_security.owner.entity_owner_accessor',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            new EntityOwnerAccessor($this->metadataProvider),
-                        ],
-                        [
-                            'oro_entity_config.provider.security',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $configProvider
-                        ],
-                    ]
-                )
-            );
-
         $decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             $objectIdAccessor,
             new EntityOwnerAccessor($this->metadataProvider),
-            $this->metadataProvider
+            $this->metadataProvider,
+            $this->createMock(TokenAccessorInterface::class)
         );
-        $decisionMaker->setContainer($this->container);
 
         $this->strategy = new PermissionGrantingStrategy($decisionMaker, $this->metadataProvider);
         $this->selector = TestHelper::get($this)->createAclExtensionSelector(

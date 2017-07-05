@@ -4,17 +4,17 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class OwnershipConfigListener
 {
-    /** @var MetadataProviderInterface */
+    /** @var OwnershipMetadataProviderInterface */
     protected $provider;
 
     /**
-     * @param MetadataProviderInterface $provider
+     * @param OwnershipMetadataProviderInterface $provider
      */
-    public function __construct(MetadataProviderInterface $provider)
+    public function __construct(OwnershipMetadataProviderInterface $provider)
     {
         $this->provider = $provider;
     }
