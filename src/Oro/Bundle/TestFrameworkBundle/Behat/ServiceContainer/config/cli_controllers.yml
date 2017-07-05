@@ -5,6 +5,7 @@ services:
             - '@suite.registry'
             - '%suite.configurations%'
             - '@oro_behat_extension.specification.specification_divider'
+            - '@symfony2_extension.kernel'
         tags:
             - { name: cli.controller, priority: 1100 }
 

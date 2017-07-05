@@ -12,6 +12,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class SuiteController implements Controller
 {
@@ -31,16 +32,26 @@ class SuiteController implements Controller
     private $divider;
 
     /**
+     * @var KernelInterface
+     */
+    protected $kernel;
+
+    /**
      * Initializes controller.
      *
      * @param SuiteRegistry $registry
      * @param array $suiteConfigurations
      */
-    public function __construct(SuiteRegistry $registry, array $suiteConfigurations, SpecificationDivider $divider)
-    {
+    public function __construct(
+        SuiteRegistry $registry,
+        array $suiteConfigurations,
+        SpecificationDivider $divider,
+        KernelInterface $kernel
+    ) {
         $this->registry = $registry;
         $this->suiteConfigurations = $suiteConfigurations;
         $this->divider = $divider;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -110,11 +121,20 @@ class SuiteController implements Controller
         $suiteConfigurations = [];
 
         foreach ($this->suiteConfigurations as $name => $config) {
+            try {
+                $this->kernel->getBundle($name);
+                $type = 'symfony_bundle';
+                $bundleName = $name;
+            } catch (\InvalidArgumentException $e) {
+                $type = null;
+                $bundleName = null;
+            }
             $dividedConfiguration = $this->divider->divideSuite($name, $config['settings']['paths'], $divideNumber);
             foreach ($dividedConfiguration as $generatedSuiteName => $paths) {
                 $suiteConfig = $config;
-                $suiteConfig['type'] = null;
+                $suiteConfig['type'] = $type;
                 $suiteConfig['settings']['paths'] = $paths;
+                $suiteConfig['settings']['bundle'] = $bundleName;
                 $suiteConfigurations[$generatedSuiteName] = $suiteConfig;
             }
         }
