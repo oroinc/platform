@@ -181,7 +181,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of the business unit which is the owner of a specific business unit.
+Retrieve the records of the business unit which is the owner of a specific business unit record.
 
 #### get_relationship
 

@@ -11,7 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
@@ -21,21 +21,21 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
     /** @var RelationBuilder */
     protected $relationBuilder;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /**
-     * @param ConfigManager             $configManager
-     * @param RelationBuilder           $relationBuilder
-     * @param OwnershipMetadataProvider $ownershipMetadataProvider
+     * @param ConfigManager                      $configManager
+     * @param RelationBuilder                    $relationBuilder
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
      */
     public function __construct(
         ConfigManager $configManager,
         RelationBuilder $relationBuilder,
-        OwnershipMetadataProvider $ownershipMetadataProvider
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider
     ) {
-        $this->configManager             = $configManager;
-        $this->relationBuilder           = $relationBuilder;
+        $this->configManager = $configManager;
+        $this->relationBuilder = $relationBuilder;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 

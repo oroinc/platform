@@ -34,13 +34,6 @@ define(function(require) {
         filters: null,
 
         /**
-         * State of sticky filters
-         *
-         * @type {boolean}
-         */
-        isStickyFilters: false,
-
-        /**
          * Template selector
          */
         templateSelector: '#filter-container',
@@ -139,8 +132,6 @@ define(function(require) {
             if (options.filters) {
                 _.extend(this.filters, options.filters);
             }
-
-            this.isStickyFilters = options.collection.options.toolbarOptions.isStickyFilters === true;
 
             var filterListeners = {
                 'update': this._onFilterUpdated,
@@ -357,7 +348,7 @@ define(function(require) {
          */
         render: function() {
             this.setElement(
-                $(this.template({filters: this.filters, isStickyFilters: this.isStickyFilters}))
+                $(this.template({filters: this.filters}))
             );
 
             this.dropdownContainer = this.$el.find('.filter-container');
@@ -435,11 +426,14 @@ define(function(require) {
                 multiselectDefaults,
                 {
                     selectedText: this.addButtonHint,
-                    open: $.proxy(function() {
+                    beforeopen: _.bind(function() {
+                        this.selectWidget.onBeforeOpenDropdown();
+                    }, this),
+                    open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                     }, this),
-                    refresh: $.proxy(function() {
+                    refresh: _.bind(function() {
                         this.selectWidget.onRefresh();
                     }, this),
                     appendTo: this.dropdownContainer
@@ -492,9 +486,8 @@ define(function(require) {
          */
         _setButtonReset: function() {
             var $footerContainer = this._createButtonReset();
-            var $checkboxContainer = this.selectWidget.multiselect('instance').checkboxContainer;
-
-            $footerContainer.insertAfter($checkboxContainer);
+            var instance = this.selectWidget.multiselect('instance');
+            instance.menu.append($footerContainer);
         },
 
         /**
