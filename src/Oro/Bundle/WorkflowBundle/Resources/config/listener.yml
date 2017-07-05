@@ -38,6 +38,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener'
         arguments:
             - '@event_dispatcher'
+            - '@security.token_storage'
         tags:
             - { name: doctrine.event_listener, event: postPersist }
 

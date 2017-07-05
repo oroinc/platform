@@ -12,6 +12,7 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 
@@ -58,7 +59,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityOwnerAccessor = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor')
@@ -873,7 +874,7 @@ class OwnerValidatorTest extends AbstractConstraintValidatorTest
 
     protected function getUserOrganizationIdsExpectation(array $organizationIds)
     {
-        $ownerTree = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTree')
+        $ownerTree = $this->getMockBuilder(OwnerTreeInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
         $ownerTree->expects($this->once())

@@ -9,7 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
@@ -18,7 +18,7 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 class EntityOwnerAccessor
 {
     /**
-     * @var MetadataProviderInterface
+     * @var OwnershipMetadataProviderInterface
      */
     protected $metadataProvider;
 
@@ -30,9 +30,9 @@ class EntityOwnerAccessor
     /**
      * Constructor
      *
-     * @param MetadataProviderInterface $metadataProvider
+     * @param OwnershipMetadataProviderInterface $metadataProvider
      */
-    public function __construct(MetadataProviderInterface $metadataProvider)
+    public function __construct(OwnershipMetadataProviderInterface $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
     }
@@ -74,8 +74,8 @@ class EntityOwnerAccessor
         }
 
         $metadata = $this->metadataProvider->getMetadata(ClassUtils::getRealClass($object));
-        if ($metadata->getGlobalOwnerFieldName()) {
-            return $this->getValue($object, $metadata->getGlobalOwnerFieldName());
+        if ($metadata->getOrganizationFieldName()) {
+            return $this->getValue($object, $metadata->getOrganizationFieldName());
         }
 
         return null;

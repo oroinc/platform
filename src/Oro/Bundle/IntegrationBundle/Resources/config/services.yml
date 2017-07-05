@@ -336,3 +336,17 @@ services:
             - '@oro_integration.manager.types_registry.link'
         public: false
         lazy: true
+
+    oro_integration.event_listener.client_created.multi_attempts_client_decorator:
+        class: Oro\Bundle\IntegrationBundle\EventListener\MultiAttemptsClientDecoratorListener
+        calls:
+            - [setLogger, ["@oro_integration.logger.strategy"]]
+        tags:
+            - { name: kernel.event_listener, priority: -100, event: oro_integration.client_created_after, method: onClientCreated }
+
+    oro_integration.event_listener.client_created.logger_client_decorator:
+        class: Oro\Bundle\IntegrationBundle\EventListener\LoggerClientDecoratorListener
+        calls:
+            - [setLogger, ["@oro_integration.logger.strategy"]]
+        tags:
+           - { name: kernel.event_listener, event: oro_integration.client_created_after, method: onClientCreated }
