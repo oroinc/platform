@@ -135,8 +135,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($greetingKey, false)
-            ->willReturn('old value');
+            ->with($greetingKey)
+            ->willReturn(['value' => 'old value']);
 
         $singleKeyBeforeEvent = new ConfigSettingsUpdateEvent($this->manager, $greetingValue);
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $changes);
@@ -223,8 +223,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getSettingValue')
             ->willReturnMap(
                 [
-                    [$greetingKey, false, $scopeIdentifier, 'old value'],
-                    [$levelKey, false, $scopeIdentifier, 2000]
+                    [$greetingKey, true, $scopeIdentifier, ['value' => 'old value']],
+                    [$levelKey, true, $scopeIdentifier, ['value' => 2000]]
                 ]
             );
 
@@ -304,27 +304,21 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, $full)
+            ->with($parameterName)
             ->willReturn(null);
 
         $this->globalScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, $full)
-            ->willReturnCallback(function ($name, $full) {
+            ->with($parameterName)
+            ->willReturnCallback(function ($name) {
                 if ($name === 'oro_test.someArrayValue') {
-                    $value = ['foo' => 'bar'];
-                    if ($full) {
-                        $value = [
-                            'scope'                  => 'global',
-                            'value'                  => ['foo' => 'bar'],
-                            'use_parent_scope_value' => false
-                        ];
-                    }
+                    $value = [
+                        'scope'                  => 'global',
+                        'value'                  => ['foo' => 'bar'],
+                        'use_parent_scope_value' => false
+                    ];
                 } else {
-                    $value = 1;
-                    if ($full) {
-                        $value = ['scope' => 'global', 'value' => 1, 'use_parent_scope_value' => true];
-                    }
+                    $value = ['scope' => 'global', 'value' => 1, 'use_parent_scope_value' => true];
                 }
 
                 return $value;
@@ -380,8 +374,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, false, $scopeIdentifier)
-            ->willReturn(2);
+            ->with($parameterName, true, $scopeIdentifier)
+            ->willReturn(['value' => 2]);
 
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');
@@ -400,12 +394,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, false, $scopeIdentifier)
+            ->with($parameterName, true, $scopeIdentifier)
             ->willReturn(null);
 
         $this->globalScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, false, $scopeIdentifier)
+            ->with($parameterName, true, $scopeIdentifier)
             ->willReturn(null);
 
         $this->assertEquals(
@@ -420,8 +414,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, false)
-            ->willReturn('');
+            ->with($parameterName, true)
+            ->willReturn(['value' => '']);
 
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');
@@ -499,14 +493,10 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->exactly(2))
             ->method('getSettingValue')
-            ->withConsecutive(
-                [$parameterName, false, $entity1],
-                [$parameterName, false, $entity2]
-            )
             ->willReturnMap(
                 [
-                    [$parameterName, false, $entity1, 'val1'],
-                    [$parameterName, false, $entity2, 'val2']
+                    [$parameterName, true, $entity1, ['value' => 'val1']],
+                    [$parameterName, true, $entity2, ['value' => 'val2']]
                 ]
             );
 
@@ -539,12 +529,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, false, $scopeIdentifier)
+            ->with($parameterName, true, $scopeIdentifier)
             ->willReturn(null);
 
         $this->globalScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($parameterName, false, $scopeIdentifier)
+            ->with($parameterName, true, $scopeIdentifier)
             ->willReturn(null);
 
         $value = 1;

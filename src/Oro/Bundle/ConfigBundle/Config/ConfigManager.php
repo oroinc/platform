@@ -326,6 +326,8 @@ class ConfigManager
 
         if ($setting[static::VALUE_KEY] instanceof ValueProviderInterface) {
             $setting[static::VALUE_KEY] = $setting[static::VALUE_KEY]->getValue();
+            // replace provider with value that it returns
+            $this->settings[$section][$key][static::VALUE_KEY] = $setting[static::VALUE_KEY];
         }
 
         if (!$full) {
@@ -389,16 +391,22 @@ class ConfigManager
         $value = null;
         $scopeId = $this->resolveIdentifier($scopeIdentifier);
         $managers = $this->getScopeManagersToGetValue($default);
+        $settingValue = null;
         foreach ($managers as $scopeName => $manager) {
-            $value = $manager->getSettingValue($name, $full, $scopeIdentifier);
-            if (null !== $value) {
+            $settingValue = $manager->getSettingValue($name, true, $scopeIdentifier);
+            if (null !== $settingValue) {
                 // in case if we get value not from current scope,
                 // we should mark value that it was get from another scope
-                if ($full && $this->scope !== $scopeName) {
-                    $value[static::USE_PARENT_SCOPE_VALUE_KEY] = true;
+                if ($this->scope !== $scopeName) {
+                    $settingValue[static::USE_PARENT_SCOPE_VALUE_KEY] = true;
                 }
                 break;
             }
+        }
+
+        $value = $settingValue;
+        if ($settingValue !== null && !$full) {
+            $value = $settingValue[self::VALUE_KEY];
         }
 
         $event = new ConfigGetEvent($this, $name, $value, $full, $scopeId);
@@ -407,7 +415,7 @@ class ConfigManager
 
         $value = $event->getValue();
 
-        if (null === $value) {
+        if (null === $value && $settingValue === null) {
             return $this->getSettingsDefaults($name, $full);
         }
 
