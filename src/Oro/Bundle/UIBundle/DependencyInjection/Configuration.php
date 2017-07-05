@@ -8,6 +8,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 /**
@@ -18,6 +19,9 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
  */
 class Configuration implements ConfigurationInterface
 {
+    const ORGANIZATION_NAME_KEY = 'organization_name';
+    const APPLICATION_URL_KEY = 'application_url';
+
     /**
      * {@inheritDoc}
      */
@@ -45,8 +49,8 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'organization_name'  => ['value' => 'ORO'],
-                'application_url'   => ['value' => 'http://localhost/oro/'],
+                self::ORGANIZATION_NAME_KEY  => ['value' => 'ORO'],
+                self::APPLICATION_URL_KEY   => ['value' => 'http://localhost'],
                 'navbar_position'   => ['value' => 'top'],
             ]
         );
@@ -205,5 +209,16 @@ class Configuration implements ConfigurationInterface
         ArrayUtil::sortBy($items, false, 'order');
 
         return array_keys($items);
+    }
+
+    /**
+     * Get full configuration key
+     *
+     * @param string $key
+     * @return string
+     */
+    public static function getFullConfigKey($key)
+    {
+        return OroUIExtension::ALIAS . ConfigManager::SECTION_MODEL_SEPARATOR . $key;
     }
 }

@@ -73,6 +73,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
+    oro_ui.config_settings.listener:
+        class: Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
+        tags:
+            - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onBeforeSave }
+
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
         arguments:

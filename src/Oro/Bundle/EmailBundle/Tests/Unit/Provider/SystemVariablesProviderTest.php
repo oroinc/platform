@@ -54,17 +54,22 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVariableValues()
     {
-        $this->configManager->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['oro_ui.application_name', false, false, ''],
-                        ['oro_ui.application_title', false, false, ''],
-                        ['oro_ui.application_url', false, false, 'http://localhost/'],
-                    ]
-                )
-            );
+        $this->configManager
+             ->expects($this->any())
+             ->method('get')
+             ->willReturnCallback(function ($arg) {
+                switch ($arg) {
+                    case 'oro_ui.application_name':
+                        return '';
+                    case 'oro_ui.application_title':
+                        return '';
+                    case 'oro_ui.application_url':
+                        return 'http://localhost';
+                    default:
+                        return null;
+                }
+             });
+
         $this->dateTimeFormatter->expects($this->once())
             ->method('formatDate')
             ->with($this->isInstanceOf('\DateTime'))
@@ -79,7 +84,7 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'appShortName' => '',
                 'appFullName'  => '',
-                'appURL'       => 'http://localhost/',
+                'appURL'       => 'http://localhost',
                 'currentDate'  => 'date',
                 'currentTime'  => 'time',
             ],
