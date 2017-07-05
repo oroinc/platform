@@ -4,7 +4,7 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Checker;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\CronBundle\Checker\ScheduleIntervalChecker;
-use Oro\Bundle\CronBundle\Tests\Unit\Checker\Stub\ScheduleIntervalStub;
+use Oro\Bundle\CronBundle\Tests\Unit\Stub\ScheduleIntervalStub;
 
 /**
  * {@inheritDoc}

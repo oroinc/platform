@@ -10,38 +10,85 @@ use Symfony\Component\Validator\ConstraintValidator;
 class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
 {
     /**
-     * @param ScheduleIntervalInterface[] $scheduleIntervals The value that should be validated
+     * @param ScheduleIntervalInterface|mixed $value The value that should be validated
      * @param Constraint|ScheduleIntervalsIntersection $constraint The constraint for the validation
      */
-    public function validate($scheduleIntervals, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
-        if (!$this->isIterable($scheduleIntervals)) {
-            throw new \InvalidArgumentException('Constraint value should be iterable');
+        if (!$value instanceof ScheduleIntervalInterface) {
+            throw new \InvalidArgumentException(
+                'Constraint value should be of type ' . ScheduleIntervalInterface::class
+            );
         }
 
-        foreach ($scheduleIntervals as $index => $scheduleInterval) {
-            if ($this->hasIntersection($scheduleIntervals, $scheduleInterval)) {
-                $path = sprintf('[%d].%s', $index, ScheduleIntervalType::ACTIVE_AT_FIELD);
-                $this->context
-                    ->buildViolation($constraint->message, [])
-                    ->atPath($path)
-                    ->addViolation();
-            }
-        }
+        $this->validateSchedules($value, $constraint);
     }
 
     /**
-     * @param ScheduleIntervalInterface[] $scheduleIntervals
-     * @param ScheduleIntervalInterface $scheduleInterval
+     * @param ScheduleIntervalInterface $validatedSchedule
+     * @param Constraint $constraint
+     */
+    protected function validateSchedules(ScheduleIntervalInterface $validatedSchedule, Constraint $constraint)
+    {
+        if (null === $validatedSchedule->getScheduleIntervalsHolder()) {
+            return;
+        }
+
+        $schedules = $validatedSchedule->getScheduleIntervalsHolder()->getSchedules();
+
+        if (false === $this->hasIntersection($schedules, $validatedSchedule)) {
+            return;
+        }
+
+        $form = $this->context->getRoot();
+
+        /**
+         * This is here to provide proper validation for API request on schedule PATCH
+         * https://github.com/symfony/symfony/pull/10567
+         */
+        if ($form instanceof \Symfony\Component\Form\Form
+            && $form->getConfig()->hasOption('api_context')) {
+            $this->buildViolationOnApiForm($constraint);
+
+            return;
+        }
+
+        $this->buildDefaultViolation($constraint);
+    }
+
+    /**
+     * @param Constraint $constraint
+     */
+    protected function buildDefaultViolation(Constraint $constraint)
+    {
+        $this->context
+            ->buildViolation($constraint->message)
+            ->atPath(ScheduleIntervalType::ACTIVE_AT_FIELD)
+            ->addViolation();
+    }
+
+    /**
+     * @param Constraint $constraint
+     */
+    protected function buildViolationOnApiForm(Constraint $constraint)
+    {
+        $this->context
+            ->buildViolation($constraint->message)
+            ->addViolation();
+    }
+
+    /**
+     * @param ScheduleIntervalInterface[] $collection
+     * @param ScheduleIntervalInterface $schedule
      * @return bool
      */
-    protected function hasIntersection($scheduleIntervals, ScheduleIntervalInterface $scheduleInterval)
+    protected function hasIntersection($collection, ScheduleIntervalInterface $schedule)
     {
-        $aLeft = $scheduleInterval->getActiveAt();
-        $aRight = $scheduleInterval->getDeactivateAt();
+        $aLeft = $schedule->getActiveAt();
+        $aRight = $schedule->getDeactivateAt();
 
-        foreach ($scheduleIntervals as $item) {
-            if ($item === $scheduleInterval) {
+        foreach ($collection as $item) {
+            if ($item === $schedule) {
                 continue;
             }
 
@@ -78,14 +125,5 @@ class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
         }
 
         return ((null === $aLeft || $aLeft <= $bRight) && (null === $bRight || $aRight >= $bLeft));
-    }
-
-    /**
-     * @param mixed $var
-     * @return bool
-     */
-    protected function isIterable($var)
-    {
-        return is_array($var) || $var instanceof \Traversable;
     }
 }

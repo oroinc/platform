@@ -28,4 +28,9 @@ interface ScheduleIntervalInterface
      * @return $this
      */
     public function setDeactivateAt(\DateTime $deactivateAt = null);
+
+    /**
+     * @return ScheduleIntervalsAwareInterface
+     */
+    public function getScheduleIntervalsHolder();
 }

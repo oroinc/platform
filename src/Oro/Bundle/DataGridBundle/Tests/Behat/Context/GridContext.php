@@ -625,9 +625,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Email   | charlie@gmail.com   |
      *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\@]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\@\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\@\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
+     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\-\@]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
      */
     //@codingStandardsIgnoreEnd
     public function assertRowValues($content, TableNode $table, $gridName = null)
