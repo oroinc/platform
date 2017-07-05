@@ -1,4 +1,4 @@
-@fixture-Users.yml
+@fixture-OroWorkflowBundle:Users.yml
 Feature: Transition button titles
 
   Scenario: Prepare Test Workflow

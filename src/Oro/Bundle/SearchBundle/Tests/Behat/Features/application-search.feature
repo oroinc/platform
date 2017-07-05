@@ -1,6 +1,6 @@
 @ticket-BAP-11236
 @automatically-ticket-tagged
-@fixture-searchEntities.yml
+@fixture-OroSearchBundle:searchEntities.yml
 Feature: Application search
   In order to decrease time for search some common entities
   As a user
