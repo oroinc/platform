@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 
 interface MenuUpdateProviderInterface
 {
@@ -11,7 +11,7 @@ interface MenuUpdateProviderInterface
      * @param ItemInterface $menuItem
      * @param array         $options
      *
-     * @return MenuUpdate[]
+     * @return MenuUpdateInterface[]
      */
     public function getMenuUpdatesForMenuItem(ItemInterface $menuItem, array $options = []);
 }

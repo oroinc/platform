@@ -22,14 +22,14 @@ class MenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
     private $menuUpdateManager;
 
     /**
+     * @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $menuItem;
+
+    /**
      * @var MenuUpdateProvider
      */
     private $menuUpdateProvider;
-
-    /**
-     * @var ItemInterface
-     */
-    private $menuItem;
 
     protected function setUp()
     {
