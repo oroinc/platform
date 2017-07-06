@@ -1,16 +1,19 @@
-parameters:
-    oro_integration.transport.rest.guzzle.client_factory.class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClientFactory
-    oro_integration.transport.rest.abstract_transport.class:    Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\AbstractRestTransport
-
 services:
     oro_integration.transport.rest.guzzle.client_factory:
-        class: %oro_integration.transport.rest.guzzle.client_factory.class%
+        public: false
+        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClientFactory
 
     oro_integration.transport.rest.client_factory:
         alias: oro_integration.transport.rest.guzzle.client_factory
 
+    oro_integration.transport.rest.event_dispatchable_client_factory:
+        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\EventDispatchableRestClientFactory
+        arguments:
+            - '@oro_integration.transport.rest.client_factory'
+            - '@event_dispatcher'
+
     oro_integration.transport.rest.abstract_transport:
-        class: %oro_integration.transport.rest.abstract_transport.class%
+        class: Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\AbstractRestTransport
         abstract: true
         calls:
             - [setRestClientFactory, ['@oro_integration.transport.rest.client_factory']]

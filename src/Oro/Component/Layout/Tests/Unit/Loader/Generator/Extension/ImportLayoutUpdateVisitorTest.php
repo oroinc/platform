@@ -14,7 +14,6 @@ class ImportLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     public function testVisit()
     {
-
         $condition = new ImportLayoutUpdateVisitor();
         $phpClass = PhpClass::create('ImportedLayoutUpdate');
         $visitContext = new VisitContext($phpClass);

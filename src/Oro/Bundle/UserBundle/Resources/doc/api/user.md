@@ -485,15 +485,15 @@ Remove the organizations that a specific user has access to.
 
 #### get_subresource
 
-Retrieve the record of the business unit that is the owner of a specific user.
+Retrieve the record of the business unit that is the owner of a specific user record.
 
 #### get_relationship
 
-Retrieve the ID of the business unit that is the owner of a specific user.
+Retrieve the ID of the business unit that is the owner of a specific user record.
 
 #### update_relationship
 
-Replace the owner of a specific user.
+Replace the owner of a specific user record.
 
 {@request:json_api}
 Example:

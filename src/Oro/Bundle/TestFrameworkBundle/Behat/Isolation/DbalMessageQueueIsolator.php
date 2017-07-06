@@ -49,31 +49,33 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
     /**
      * {@inheritdoc}
      */
-    public function waitWhileProcessingMessages($timeLimit = 60)
+    public function waitWhileProcessingMessages($timeLimit = 600)
     {
-        try {
-            $result = $this->getMessageQueueState();
-        } catch (TableNotFoundException $e) {
-            // Schema is not initialized yet
-            return;
-        }
-
-        while (0 !== $result) {
-            if ($timeLimit <= 0) {
-                throw new RuntimeException('Message Queue was not process messages during time limit');
+        $result = 0;
+        while ($result < 3) {
+            try {
+                if ($this->isQueueEmpty()) {
+                    $result++;
+                } else {
+                    $result = 0;
+                }
+            } catch (TableNotFoundException $e) {
+                $this->logger->error($e->getMessage(), ['exception' => $e]);
+                return;
             }
-
-            $result = $this->getMessageQueueState();
 
             sleep(1);
             $timeLimit -= 1;
+            if ($timeLimit <= 0) {
+                throw new RuntimeException('Message Queue was not process messages during time limit');
+            }
         }
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    private function getMessageQueueState()
+    private function isQueueEmpty()
     {
         /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
@@ -82,7 +84,7 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
         /** @var Connection $connectionMQ */
         $connectionMQ = $doctrine->getManager('message_queue_job')->getConnection();
 
-        return $connection->executeQuery('SELECT * FROM oro_message_queue')->rowCount() +
+        return false == $connection->executeQuery('SELECT * FROM oro_message_queue')->rowCount() +
             $connectionMQ->executeQuery(
                 sprintf(
                     "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s')",

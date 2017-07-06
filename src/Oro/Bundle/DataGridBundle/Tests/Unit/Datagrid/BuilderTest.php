@@ -219,7 +219,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($expectedException !== null) {
-            list ($name, $message) = $expectedException;
+            list($name, $message) = $expectedException;
 
             $this->expectException($name);
             $this->expectExceptionMessage($message);

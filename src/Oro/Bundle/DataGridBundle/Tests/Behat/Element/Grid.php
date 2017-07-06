@@ -41,14 +41,6 @@ class Grid extends Table implements GridInterface
     /**
      * {@inheritdoc}
      */
-    public function getSelectAllMassActionLink($title)
-    {
-        return $this->getElement('GridActionsMassActionMenu')->findLink($title);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function clickMassActionLink($title)
     {
         $massActionsButton = $this->getMassActionButton();
@@ -69,7 +61,7 @@ class Grid extends Table implements GridInterface
         $massActionsButton = $this->getMassActionButton();
         $massActionsButton->press();
 
-        $massActionLink = $this->getSelectAllMassActionLink($title);
+        $massActionLink = $this->getMassActionLink($title);
         self::assertNotNull($massActionLink, 'Mass action link not found on the page');
         self::assertTrue($massActionLink->isVisible(), 'Mass action link is not visible');
 

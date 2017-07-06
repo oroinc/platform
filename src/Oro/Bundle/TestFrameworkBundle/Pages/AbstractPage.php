@@ -146,7 +146,6 @@ JS;
      */
     public function waitForAjax()
     {
-
         $this->test->waitUntil(
             function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
                 $jsAppActiveCheck = <<<JS

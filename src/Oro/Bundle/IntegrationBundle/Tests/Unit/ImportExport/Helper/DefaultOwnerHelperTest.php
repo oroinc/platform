@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /** @var OwnershipMetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
 
     /** @var UnitOfWork|\PHPUnit_Framework_MockObject_MockObject */
@@ -35,7 +35,7 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
         $this->uow              = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()->getMock();
         $this->metadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
                 ->disableOriginalConstructor()->getMock();
 
         $this->em->expects($this->any())->method('getUnitOfWork')

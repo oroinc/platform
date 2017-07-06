@@ -105,7 +105,7 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
 
         /** Generate table oro_search_index_text **/
         $table = $schema->createTable('oro_search_index_text');
-        $table->addOption('engine' , 'MyISAM');
+        $table->addOption('engine', 'MyISAM');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('item_id', 'integer', []);
         $table->addColumn('field', 'string', ['length' => 250]);

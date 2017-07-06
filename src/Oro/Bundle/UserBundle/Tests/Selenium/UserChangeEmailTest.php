@@ -7,7 +7,7 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 class UserChangeEmailTest extends Selenium2TestCase
 {
-     /**
+    /**
      * @return string
      */
     public function testCreateUser()

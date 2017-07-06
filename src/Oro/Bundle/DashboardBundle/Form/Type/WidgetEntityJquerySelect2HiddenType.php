@@ -39,7 +39,6 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
         ConfigProvider $configProvider,
         DoctrineHelper $doctrineHelper
     ) {
-
         parent::__construct($entityManager, $registry, $configProvider);
         $this->doctrineHelper = $doctrineHelper;
     }

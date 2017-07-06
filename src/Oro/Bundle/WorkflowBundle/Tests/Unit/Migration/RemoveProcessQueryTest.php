@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\WorkflowBundle\Migration\RemoveProcessesQuery;
 
-class RemoveProcessesQueryTest extends \PHPUnit_Framework_TestCase
+class RemoveProcessQueryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Connection|\PHPUnit_Framework_MockObject_MockObject

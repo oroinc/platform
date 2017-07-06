@@ -625,9 +625,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Email   | charlie@gmail.com   |
      *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\@]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\@\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\@\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
+     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\-\@]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
      */
     //@codingStandardsIgnoreEnd
     public function assertRowValues($content, TableNode $table, $gridName = null)
@@ -1258,7 +1258,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I) hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in grid$/
-     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"/
+     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"$/
      *
      * @param string $exceptions
      * @param string|null $gridName
@@ -1347,12 +1347,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
         $filterManager->close();
     }
@@ -1369,14 +1369,43 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
         $filterManager->close();
+    }
+
+    /**
+     * @When /^I select following records in "(?P<name>[\s\w]+)" grid:$/
+     * @When /^I select following records in grid:$/
+     * @param TableNode $table
+     * @param string $name
+     */
+    public function iSelectFollowingRecordsInGrid(TableNode $table, $name = 'Grid')
+    {
+        $grid = $this->getGrid($name);
+
+        foreach ($table->getRows() as $index => $record) {
+            $grid->getRowByContent(reset($record))
+                ->checkMassActionCheckbox();
+        }
+    }
+
+    /**
+     * @Given /^I should not see "(?P<gridName>[\s\w]+)" grid$/
+     */
+    public function iShouldNotSeeGrid($gridName = 'Grid')
+    {
+        $grid = $this->elementFactory->createElement($gridName);
+
+        self::assertFalse(
+            $grid->isIsset(),
+            sprintf('Grid "%s" was found on page, but it should not.', $gridName)
+        );
     }
 
     /**

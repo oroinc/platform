@@ -18,7 +18,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Product;
 */
 class LoadProductData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     const DEFAULT_COUNTER_VALUE = 90;
     /**
      * @var ContainerInterface

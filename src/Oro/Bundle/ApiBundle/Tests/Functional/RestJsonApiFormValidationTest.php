@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class RestJsonApiFormValidationTest extends RestJsonApiTestCase
 {
@@ -13,7 +13,7 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /** @var  OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;
 
     /**
@@ -58,12 +58,12 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
                 foreach ($content['errors'] as $error) {
                     if (isset($error['source']['pointer'])) {
                         $this->assertNotEquals(
-                            "/data/relationships/{$classMetadata->getOwnerFieldName()}/data",
+                            '/data/relationships/' . $classMetadata->getOwnerFieldName() . '/data',
                             $error['source']['pointer'],
                             "Entity {$entityClass} should not have '{$error['title']}' constraint for 'Owner'"
                         );
                         $this->assertNotEquals(
-                            "/data/relationships/{$classMetadata->getGlobalOwnerFieldName()}/data",
+                            '/data/relationships/' . $classMetadata->getOrganizationFieldName() . '/data',
                             $error['source']['pointer'],
                             "Entity {$entityClass} should not have '{$error['title']}' constraint for 'Organization'"
                         );

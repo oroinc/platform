@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension;
 
-class ResetPasswordExtensionTest extends \PHPUnit_Framework_TestCase
+class ResetPasswordExtentionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  \PHPUnit_Framework_MockObject_MockObject|DatagridConfiguration */
     protected $configuration;
