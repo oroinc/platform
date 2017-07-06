@@ -23,6 +23,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table->getRows() as $row) {
             list($filter, $column, $type, $value) = array_pad($row, 4, null);
             $this->addFilter($filter, $column, $type, $value);
+            $this->waitForAjax();
         }
     }
 

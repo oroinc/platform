@@ -4,10 +4,10 @@ namespace Oro\Bundle\SecurityBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
@@ -27,11 +27,19 @@ class OroSecurityExtension extends \Twig_Extension
     }
 
     /**
-     * @return SecurityFacade
+     * @return AuthorizationCheckerInterface
      */
-    protected function getSecurityFacade()
+    protected function getAuthorizationChecker()
     {
-        return $this->container->get('oro_security.security_facade');
+        return $this->container->get('security.authorization_checker');
+    }
+
+    /**
+     * @return TokenAccessorInterface
+     */
+    protected function getTokenAccessor()
+    {
+        return $this->container->get('oro_security.token_accessor');
     }
 
     /**
@@ -48,7 +56,11 @@ class OroSecurityExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('resource_granted', [$this, 'checkResourceIsGranted']),
+            new \Twig_SimpleFunction(
+                'resource_granted',
+                [$this, 'checkResourceIsGranted'],
+                ['deprecated' => true, 'alternative' => 'is_granted']
+            ),
             new \Twig_SimpleFunction('get_enabled_organizations', [$this, 'getOrganizations']),
             new \Twig_SimpleFunction('get_current_organization', [$this, 'getCurrentOrganization']),
             new \Twig_SimpleFunction('acl_permission', [$this, 'getPermission']),
@@ -64,14 +76,15 @@ class OroSecurityExtension extends \Twig_Extension
      * @param string          $fieldName  Field name in case if Field ACL check should be used
      *
      * @return bool
+     * @deprecated since 2.3. Use Symfony "is_granted" function instead
      */
     public function checkResourceIsGranted($attributes, $object = null, $fieldName = null)
     {
         if ($fieldName) {
-            return $this->getSecurityFacade()->isGranted($attributes, new FieldVote($object, $fieldName));
+            return $this->getAuthorizationChecker()->isGranted($attributes, new FieldVote($object, $fieldName));
         }
 
-        return $this->getSecurityFacade()->isGranted($attributes, $object);
+        return $this->getAuthorizationChecker()->isGranted($attributes, $object);
     }
 
     /**
@@ -81,12 +94,7 @@ class OroSecurityExtension extends \Twig_Extension
      */
     public function getOrganizations()
     {
-        $token = $this->getSecurityFacade()->getToken();
-        if (null === $token) {
-            return [];
-        }
-
-        $user = $token->getUser();
+        $user = $this->getTokenAccessor()->getUser();
         if (!$user instanceof User) {
             return [];
         }
@@ -101,12 +109,7 @@ class OroSecurityExtension extends \Twig_Extension
      */
     public function getCurrentOrganization()
     {
-        $token = $this->getSecurityFacade()->getToken();
-        if (!$token instanceof OrganizationContextTokenInterface) {
-            return null;
-        }
-
-        return $token->getOrganizationContext();
+        return $this->getTokenAccessor()->getOrganization();
     }
 
     /**

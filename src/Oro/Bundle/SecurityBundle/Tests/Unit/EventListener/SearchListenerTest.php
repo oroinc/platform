@@ -2,13 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
-
-use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\EventListener\SearchListener;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsOrganization;
 
@@ -24,22 +20,14 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $metadataProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
-
     public function setUp()
     {
         $this->metadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->listener = new SearchListener($this->metadataProvider, $this->securityFacade);
+
+        $this->listener = new SearchListener($this->metadataProvider);
     }
 
     public function testPrepareEntityMapEvent()

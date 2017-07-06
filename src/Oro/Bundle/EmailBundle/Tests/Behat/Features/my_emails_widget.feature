@@ -33,5 +33,5 @@ Feature: My emails widget
     Then I should see an "Email Form" element
     And "Email Form" must contains values:
       | From    | "John Doe" <admin@example.com>        |
-      | To      | ["Charlie Sheen" <charlie@sheen.com>] |
+      | ToField | ["Charlie Sheen" <charlie@sheen.com>] |
       | Subject | Re: Merry Christmas                   |

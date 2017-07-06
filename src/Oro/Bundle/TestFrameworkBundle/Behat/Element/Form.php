@@ -84,6 +84,11 @@ class Form extends Element
         $this->pressActionButton('Save and Close');
     }
 
+    public function saveAndDuplicate()
+    {
+        $this->pressActionButton('Save And Duplicate');
+    }
+
     public function save()
     {
         $this->pressActionButton('Save');
@@ -156,6 +161,10 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
 
+            if ('select' === $field->getTagName()) {
+                return $this->elementFactory->wrapElement('Select', $field);
+            }
+
             return $field;
         }
 
@@ -194,6 +203,8 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif ($sndParent->hasClass('control-group-choice')) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
+            } elseif ($field = $sndParent->find('css', '#'.$label->getAttribute('for'))) {
+                return $field;
             } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
                 return $field;
             } else {
@@ -306,7 +317,7 @@ class Form extends Element
         $fieldId = $field->getAttribute('id');
 
         // This element doesn't count server side validation errors without "for" attribute
-        $errorSpan = $this->find('css', "span.validation-failed[for='$fieldId']");
+        $errorSpan = $this->find('css', "span.validation-failed[id='$fieldId-error']");
 
         if (!$errorSpan) {
             // Get next validation error span after element

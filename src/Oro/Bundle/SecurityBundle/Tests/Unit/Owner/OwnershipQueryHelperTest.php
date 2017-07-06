@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface as OwnershipMetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity;
@@ -73,7 +73,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
             ->method('hasOwner')
             ->willReturn(null !== $organizationFieldName || null !== $ownerFieldName);
         $metadata->expects(self::any())
-            ->method('getGlobalOwnerFieldName')
+            ->method('getOrganizationFieldName')
             ->willReturn($organizationFieldName);
         $metadata->expects(self::any())
             ->method('getOwnerFieldName')

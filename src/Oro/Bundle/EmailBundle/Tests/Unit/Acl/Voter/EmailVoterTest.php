@@ -3,37 +3,28 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Acl\Voter;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailVoterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var EmailVoter
-     */
+    /** @var EmailVoter */
     protected $emailVoter;
 
-    /**
-     * @var Container|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Container|\PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
-    /**
-     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->setMethods(['isGranted'])
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
             ->setMethods(['get'])
@@ -41,8 +32,8 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->any())
             ->method('get')
-            ->with('oro_security.security_facade')
-            ->willReturn($this->securityFacade);
+            ->with('security.authorization_checker')
+            ->willReturn($this->authorizationChecker);
 
         $this->emailVoter = new EmailVoter($this->container);
     }
@@ -106,7 +97,7 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
         $attributes = ['VIEW'];
 
         if ($atLeastOneGranted) {
-            $this->securityFacade->expects($this->once())
+            $this->authorizationChecker->expects($this->once())
                 ->method('isGranted')
                 ->with('VIEW', ${'emailUser' . mt_rand(1, 3)})
                 ->willReturn(true);

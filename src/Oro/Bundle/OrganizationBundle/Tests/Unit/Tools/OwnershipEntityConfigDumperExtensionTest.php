@@ -32,7 +32,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
                 ->disableOriginalConstructor()
                 ->getMock();
 

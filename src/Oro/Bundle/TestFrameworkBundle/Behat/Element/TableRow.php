@@ -32,7 +32,7 @@ class TableRow extends Element
         $columnNumber = $tableHeader->getColumnNumber($header);
 
         return $this->normalizeValueByGuessingType(
-            $this->getCellByNumber($columnNumber)->getText()
+            $this->getCellElementValue($columnNumber)
         );
     }
 
@@ -58,5 +58,28 @@ class TableRow extends Element
         }
 
         return $value;
+    }
+
+    /**
+     * @param int $columnNumber
+     * @return string
+     */
+    protected function getCellElementValue($columnNumber)
+    {
+        $cellElement = $this->getCellByNumber($columnNumber);
+        $input = $cellElement->find('css', 'input');
+        $cellElementValue = $cellElement->getText();
+
+        // if it's simple element, just return text
+        if (!$input) {
+            return $cellElementValue;
+        }
+
+        // if it's a checkbox, use 'checked' attribute rather than text value
+        if ($input->hasAttribute('type') && 'checkbox' === $input->getAttribute('type')) {
+            $cellElementValue = (int) $input->isChecked();
+        }
+
+        return $cellElementValue;
     }
 }

@@ -216,7 +216,7 @@ class ResetController extends Controller
         if ($this->get('oro_user.form.handler.reset')->process($user)) {
             // force user logout
             $session->invalidate();
-            $this->get('security.context')->setToken(null);
+            $this->get('security.token_storage')->setToken(null);
 
             $session->getFlashBag()->add(
                 'success',

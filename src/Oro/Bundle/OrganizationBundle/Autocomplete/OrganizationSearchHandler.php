@@ -7,8 +7,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 
 class OrganizationSearchHandler implements SearchHandlerInterface
@@ -25,31 +25,31 @@ class OrganizationSearchHandler implements SearchHandlerInterface
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var PropertyAccessor */
     protected $accessor;
 
     /**
-     * @param string          $className
-     * @param array           $fields
-     * @param array           $displayFields
-     * @param ManagerRegistry $managerRegistry
-     * @param ServiceLink     $securityContextLink
+     * @param string                 $className
+     * @param array                  $fields
+     * @param array                  $displayFields
+     * @param ManagerRegistry        $managerRegistry
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
         $className,
         $fields,
         $displayFields,
         ManagerRegistry $managerRegistry,
-        ServiceLink $securityContextLink
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->className = $className;
         $this->fields = $fields;
         $this->displayFields = $displayFields;
         $this->managerRegistry = $managerRegistry;
-        $this->securityContextLink = $securityContextLink;
+        $this->tokenAccessor = $tokenAccessor;
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -58,7 +58,7 @@ class OrganizationSearchHandler implements SearchHandlerInterface
      */
     public function search($query, $page, $perPage, $searchById = false)
     {
-        $user = $this->securityContextLink->getService()->getToken()->getUser();
+        $user = $this->tokenAccessor->getUser();
         /** @var OrganizationRepository $repository */
         $repository = $this->managerRegistry->getRepository($this->className);
         if (!$searchById) {

@@ -48,6 +48,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )save and duplicate form$/
+     */
+    public function iSaveAndDuplicateForm()
+    {
+        $this->createOroForm()->saveAndDuplicate();
+    }
+
+    /**
      * @When /^(?:|I )(save|submit) form$/
      */
     public function iSaveForm()
@@ -66,6 +74,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
+        $possibleElementName = $this->fixStepArgument($fieldName);
+        if ($this->elementFactory->hasElement($possibleElementName)) {
+            $value = $this->createElement($possibleElementName)->getValue();
+            self::assertEquals($fieldValue, $value);
+
+            return;
+        }
+
         $page = $this->getSession()->getPage();
         $labels = $page->findAll('css', 'label');
 
@@ -239,7 +255,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $driver = $this->getSession()->getDriver();
 
         if (null === $field) {
-            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $locator);
+            // try to find field among defined elements
+            $field = $this->createElement($locator);
+        }
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $driver,
+                'form field',
+                'id|name|label|value|placeholder|element',
+                $locator
+            );
         }
 
         self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");

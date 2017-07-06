@@ -9,7 +9,7 @@
             ]
 #}
 {% macro sendEmailLink(email, entity, parameters) -%}
-    {% if resource_granted('oro_email_email_create') %}
+    {% if is_granted('oro_email_email_create') %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {{- UI.clientLink({
             'dataUrl': path(
@@ -43,7 +43,7 @@
 {% endmacro -%}
 
 {% macro replyAllButton(emailEntity, parameters = {}) -%}
-    {% if resource_granted('oro_email_email_create') %}
+    {% if is_granted('oro_email_email_create') %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {%- set routeParameters = {
         id: emailEntity.id
@@ -78,7 +78,7 @@
 {% endmacro -%}
 
 {% macro replyButton(emailEntity, parameters = {}) -%}
-    {% if resource_granted('oro_email_email_create') %}
+    {% if is_granted('oro_email_email_create') %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {%- set routeParameters = {
             id: emailEntity.id
@@ -113,7 +113,7 @@
 {% endmacro -%}
 
 {% macro forwardButton(emailEntity, parameters = {}) -%}
-    {% if resource_granted('oro_email_email_create') %}
+    {% if is_granted('oro_email_email_create') %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {%- set routeParameters = {
             id: emailEntity.id
@@ -148,7 +148,7 @@
 {% endmacro -%}
 
 {% macro createEmailButton(parameters = {}) -%}
-    {% if resource_granted('oro_email_email_create') %}
+    {% if is_granted('oro_email_email_create') %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path('oro_email_email_create', parameters),
@@ -175,7 +175,7 @@
 {% endmacro %}
 
 {% macro addMarkUnreadButton(emailEntity) -%}
-    {% if resource_granted('oro_email_email_user_edit', emailEntity) %}
+    {% if is_granted('oro_email_email_user_edit', emailEntity) %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(

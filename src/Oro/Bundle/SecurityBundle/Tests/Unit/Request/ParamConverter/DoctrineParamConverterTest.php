@@ -2,43 +2,36 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Request\ParamConverter;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 
 class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /**
-     * @var DoctrineParamConverter
-     */
+    /** @var DoctrineParamConverter */
     protected $converter;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $requestAuthorizationChecker;
 
     protected function setUp()
     {
-        if (!interface_exists('Doctrine\Common\Persistence\ManagerRegistry')) {
-            $this->markTestSkipped();
-        }
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->requestAuthorizationChecker = $this->createMock(RequestAuthorizationChecker::class);
 
-        $this->registry  = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->converter = new DoctrineParamConverter(
             $this->registry,
-            $this->securityFacade
+            $this->requestAuthorizationChecker
         );
     }
 
@@ -77,14 +70,14 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
                 'permission' => 'EDIT'
             ]
         );
-        $this->securityFacade->expects($this->any())
+        $this->requestAuthorizationChecker->expects($this->any())
             ->method('isRequestObjectIsGranted')
             ->will($this->returnValue($isGranted));
 
         if ($isGranted === -1) {
             $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
             $this->expectExceptionMessage('You do not get EDIT permission for this object');
-            $this->securityFacade->expects($this->any())
+            $this->requestAuthorizationChecker->expects($this->any())
                 ->method('getRequestAcl')
                 ->will($this->returnValue($annotation));
         }

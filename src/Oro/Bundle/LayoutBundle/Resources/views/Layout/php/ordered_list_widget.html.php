@@ -1,6 +1,10 @@
-<?php //@codingStandardsIgnoreFile ?>
-<?php if (!empty($type)) $attr['type'] = $type; ?>
-<?php if (!empty($start)) $attr['start'] = $start; ?>
+<?php //@codingStandardsIgnoreFile?>
+<?php if (!empty($type)) {
+    $attr['type'] = $type;
+} ?>
+<?php if (!empty($start)) {
+    $attr['start'] = $start;
+} ?>
 <ol <?php echo $view['layout']->block($block, 'block_attributes', array('attr' => $attr)) ?>>
 <?php foreach ($block as $child) : ?>
     <?php if ($child->vars['visible']): ?>

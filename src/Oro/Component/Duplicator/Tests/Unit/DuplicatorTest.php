@@ -29,12 +29,14 @@ class DuplicatorTest extends \PHPUnit_Framework_TestCase
     public function testDuplicate()
     {
         $now = new \DateTime();
+        $now = $now->modify('+1 day');
 
         $params = [
             [['collection'], ['propertyType', [Collection::class]]],
             [['setNull'], ['propertyName', ['id']]],
             [['keep'], ['propertyName', ['entity']]],
             [['replaceValue', $now], ['property', [Entity1::class, 'createdAt']]],
+            [['replaceValue', true], ['property', [Entity1::class, 'bool']]],
             [['setNull'], ['property', [EntityItem1::class, 'id']]],
             [['shallowCopy'], ['property', [EntityItem2::class, 'childEntity']]],
         ];
@@ -45,11 +47,14 @@ class DuplicatorTest extends \PHPUnit_Framework_TestCase
         $entityCopy = $duplicator->duplicate($entity, $params);
 
         $this->assertNotSame($entity, $entityCopy);
+        $this->assertNotEquals($now, $entity->getCreatedAt());
         $this->assertSame($entityCopy->getCreatedAt(), $now);
         $this->assertEquals($entityCopy->getId(), null);
         $this->assertEquals($entity->getEmail(), $entityCopy->getEmail());
         $this->assertSame($entity->getEntity(), $entityCopy->getEntity());
         $this->assertSame($entity->getEntity()->getTitle(), $entityCopy->getEntity()->getTitle());
+        $this->assertSame(false, $entity->getBool());
+        $this->assertSame(true, $entityCopy->getBool());
 
         $this->assertNotSame($entityCopy->getItems(), $entity->getItems());
         $this->assertEquals($entityCopy->getItems(), $entity->getItems());

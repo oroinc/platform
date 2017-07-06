@@ -8,8 +8,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
-
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 
 class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +24,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
     protected $userRepo;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $aclHelper;
@@ -64,14 +64,13 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->businessUnitManager = new BusinessUnitManager($this->em, $this->securityFacade, $this->aclHelper);
+        $this->businessUnitManager = new BusinessUnitManager($this->em, $this->tokenAccessor, $this->aclHelper);
     }
 
     public function testGetTreeOptions()

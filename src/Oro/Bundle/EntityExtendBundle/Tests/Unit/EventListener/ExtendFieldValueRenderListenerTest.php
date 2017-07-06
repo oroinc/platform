@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -13,39 +14,25 @@ use Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener;
 
 class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ExtendFieldValueRenderListener
-     */
+    /** @var ExtendFieldValueRenderListener */
     protected $target;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManger;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $facade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityClassNameHelper;
 
     public function setUp()
@@ -63,9 +50,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
-        $this->facade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
@@ -75,7 +60,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             $this->configManger,
             $this->router,
             $this->registry,
-            $this->facade,
+            $this->authorizationChecker,
             $this->entityClassNameHelper
         );
     }
@@ -156,7 +141,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($data['id']));
 
         if (isset($data['permissionsGranted'])) {
-            $this->facade->expects($this->once())
+            $this->authorizationChecker->expects($this->once())
                 ->method('isGranted')
                 ->with('VIEW', $value)
                 ->willReturn(true);
@@ -362,7 +347,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($entity['id']));
             $value->add($item);
         }
-        $this->facade->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->willReturnMap($grantedEntitiesMap);
 

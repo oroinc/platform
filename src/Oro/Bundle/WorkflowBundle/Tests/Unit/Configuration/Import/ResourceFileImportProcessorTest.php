@@ -1,0 +1,81 @@
+<?php
+
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
+
+use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessor;
+use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
+
+class ResourceFileImportProcessorTest extends \PHPUnit_Framework_TestCase
+{
+    /** @var ConfigFileReaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $reader;
+
+    /** @var ConfigImportProcessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $parentProcessor;
+
+    /** @var \SplFileInfo|\PHPUnit_Framework_MockObject_MockObject */
+    private $contentFile;
+
+    /** @var ResourceFileImportProcessor */
+    private $processor;
+
+    protected function setUp()
+    {
+        $this->reader = $this->createMock(ConfigFileReaderInterface::class);
+        $this->contentFile = $this->createMock(\SplFileInfo::class);
+        $this->parentProcessor = $this->createMock(ConfigImportProcessorInterface::class);
+
+        $this->processor = new ResourceFileImportProcessor($this->reader, 'relative path');
+    }
+
+    public function testProcessWithoutParent()
+    {
+        $content = ['a' => ['b' => 'c']];
+
+        $this->contentFile->expects($this->once())->method('getPath')->willReturn('/');
+
+        $importFileStateAssert = function (\SplFileInfo $fileInfo) {
+            $this->assertInstanceOf(\SplFileInfo::class, $fileInfo);
+            $this->assertSame('//relative path', $fileInfo->getPathname());
+
+            return true;
+        };
+
+        $this->reader->expects($this->once())->method('read')
+            ->with($this->callback($importFileStateAssert))
+            ->willReturn(['a' => ['b' => 'd']]);
+
+        $this->parentProcessor->expects($this->never())->method('process');
+
+        $result = $this->processor->process($content, $this->contentFile);
+
+        $this->assertSame(['a' => ['b' => ['c', 'd']]], $result);
+    }
+
+    public function testProcessWithParent()
+    {
+        $content = ['a' => ['b' => 'c']];
+
+        $this->contentFile->expects($this->once())->method('getPath')->willReturn('/');
+
+        $importFileStateAssert = function ($importFile) {
+            $this->assertInstanceOf(\SplFileInfo::class, $importFile);
+            $this->assertSame('//relative path', $importFile->getPathname());
+            return true;
+        };
+
+        $this->reader->expects($this->once())->method('read')
+            ->with($this->callback($importFileStateAssert))
+            ->willReturn(['a' => ['b' => 'd']]);
+
+        $this->parentProcessor->expects($this->once())->method('process')
+            ->with(['a' => ['b' => 'd']], $this->callback($importFileStateAssert))
+            ->willReturn(['a' => ['b' => 'e']]);
+
+        $this->processor->setParent($this->parentProcessor);
+        $result = $this->processor->process($content, $this->contentFile);
+
+        $this->assertSame(['a' => ['b' => ['c', 'e']]], $result);
+    }
+}

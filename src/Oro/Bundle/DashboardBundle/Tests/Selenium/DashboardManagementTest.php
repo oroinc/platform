@@ -10,7 +10,7 @@ use Oro\Bundle\DashboardBundle\Tests\Selenium\Pages\Dashboards;
  *
  * @package Oro\Bundle\DashboardBundle\Tests\Selenium
  */
-class DashboardsManagementTest extends Selenium2TestCase
+class DashboardManagementTest extends Selenium2TestCase
 {
     /**
      * @return string

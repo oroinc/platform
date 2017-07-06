@@ -4,36 +4,30 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 
 class ControllerListener
 {
-    /**
-     * @var SecurityFacade
-     */
-    private $securityFacade;
+    /** @var ClassAuthorizationChecker */
+    private $classAuthorizationChecker;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     /**
-     * Constructor
-     *
-     * @param SecurityFacade  $securityFacade
-     * @param LoggerInterface $logger
+     * @param ClassAuthorizationChecker $classAuthorizationChecker
+     * @param LoggerInterface           $logger
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        ClassAuthorizationChecker $classAuthorizationChecker,
         LoggerInterface $logger
     ) {
-        $this->securityFacade = $securityFacade;
+        $this->classAuthorizationChecker = $classAuthorizationChecker;
         $this->logger = $logger;
     }
 
@@ -42,7 +36,8 @@ class ControllerListener
      *
      * This method is executed just before any controller action.
      *
-     * @param  FilterControllerEvent $event
+     * @param FilterControllerEvent $event
+     *
      * @throws AccessDeniedException
      */
     public function onKernelController(FilterControllerEvent $event)
@@ -62,12 +57,13 @@ class ControllerListener
                         'Invoked controller "%s::%s". (%s)',
                         $className,
                         $method,
-                        $event->getRequestType() ===
-                        HttpKernelInterface::MASTER_REQUEST ? 'MASTER_REQUEST' : 'SUB_REQUEST'
+                        $event->getRequestType() === HttpKernelInterface::MASTER_REQUEST
+                            ? 'MASTER_REQUEST'
+                            : 'SUB_REQUEST'
                     )
                 );
 
-                if (!$this->securityFacade->isClassMethodGranted($className, $method)) {
+                if (!$this->classAuthorizationChecker->isClassMethodGranted($className, $method)) {
                     if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST) {
                         throw new AccessDeniedException(sprintf('Access denied to %s::%s.', $className, $method));
                     }

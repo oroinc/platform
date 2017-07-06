@@ -142,7 +142,7 @@ label, input, button, select, textarea { font-size:13px; color:#777;}
     }
     .control-label.wrap {
       float:left;
-      padding-top: 6px;
+      padding-top: 7px;
       font-weight: normal;
       line-height: 20px;
       text-align: right;
@@ -163,6 +163,7 @@ label, input, button, select, textarea { font-size:13px; color:#777;}
         width: 100%;
         word-wrap: break-word;
         padding-left: 5px; // to get nice hover background
+        padding-top: 7px;
         &.html-property {
           overflow: auto;
         }
@@ -1596,6 +1597,7 @@ footer {
 }
 
 .ui-dialog {
+  position: absolute;
   background-color: #fff;
   -webkit-box-shadow:  0px 2px 32px 1px rgba(0, 0, 0, 0.8);
   box-shadow:  0px 2px 32px 1px rgba(0, 0, 0, 0.8);
@@ -1648,7 +1650,16 @@ footer {
     border-bottom: 1px solid #000;
     background-color: @titleBackgroundStart;
     #gradient > .vertical(@titleBackgroundStart, @titleBackgroundEnd);
-    padding: 6px 15px;
+    padding: 6px 45px 6px 15px;
+    position: absolute;
+    width: 100%;
+    top: 1px;
+    left: 1px;
+    .ui-dialog-titlebar-close{
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
   }
   .ui-dialog-title {
     color: #fff;
@@ -1657,6 +1668,10 @@ footer {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .ui-dialog-content {
+    margin-top: 31px;
+    overflow: auto;
   }
   .ui-dialog-body {
     font-size: 14px;
@@ -2600,6 +2615,7 @@ label.radio.error {
 }
 .input-append .add-on,
 .input-prepend .add-on {
+  float: none;
   height:30px;
   input[type='checkbox'],
   input[type='radio'] {

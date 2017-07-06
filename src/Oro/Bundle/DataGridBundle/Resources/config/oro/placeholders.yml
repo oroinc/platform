@@ -17,6 +17,7 @@ placeholders:
                 template_datagrid_gridview: ~
                 template_datagrid_gridview_label: ~
                 template_datagrid_view_name_modal: ~
+                template_select_row_cell: ~
 
     items:
         template_datagrid_toolbar:
@@ -38,3 +39,6 @@ placeholders:
             template: OroDataGridBundle:js:grid-view-label.html.twig
         template_datagrid_view_name_modal:
             template: OroDataGridBundle:js:view-name-modal.html.twig
+        template_select_row_cell:
+            applicable: "@oro_layout.helper->isTemplateRequest()"
+            template: OroDataGridBundle:js:select-row-cell.html.twig

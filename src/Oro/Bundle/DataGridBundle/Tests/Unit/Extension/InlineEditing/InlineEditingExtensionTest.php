@@ -12,63 +12,32 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
-/**
- * Class InlineEditingExtensionTest
- * @package Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing
- */
 class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|InlineEditColumnOptionsGuesser
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|InlineEditColumnOptionsGuesser */
     protected $guesser;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    protected $securityFacade;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityClassNameHelper
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface
-     */
-    protected $authChecker;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var InlineEditingExtension
-     */
+    /** @var InlineEditingExtension */
     protected $extension;
 
     public function setUp()
     {
-        $guesser = 'Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser';
-        $this->guesser = $this->getMockBuilder($guesser)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->authChecker = $this
-            ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+        $this->guesser = $this->createMock(InlineEditColumnOptionsGuesser::class);
+        $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->extension = new InlineEditingExtension(
             $this->guesser,
-            $this->securityFacade,
             $this->entityClassNameHelper,
-            $this->authChecker
+            $this->authorizationChecker
         );
     }
 
@@ -109,22 +78,24 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessConfigs(array $configValues, array $expectedValues, $entityName)
     {
-        $this->authChecker->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->willReturnCallback(
-                function ($permission, FieldVote $object) {
-                    $fieldName = $object->getField();
-                    return !in_array($fieldName, ['nonAvailable1', 'nonAvailable2']);
+                function ($permission, $object) use ($entityName) {
+                    if ($object instanceof FieldVote) {
+                        return !in_array($object->getField(), ['nonAvailable1', 'nonAvailable2'], true);
+                    } elseif (null === $object) {
+                        if ('resource1' === $permission) {
+                            return false;
+                        } elseif ('resource2' === $permission) {
+                            return true;
+                        } elseif ('EDIT;entity:' . $entityName === $permission) {
+                            return true;
+                        }
+                    }
+                    self::fail(sprintf('Unexpected isGranted call. Permission: %s', $permission));
                 }
             );
-
-        $this->securityFacade->expects($this->any())
-            ->method('isGranted')
-            ->will($this->returnValueMap([
-                ['resource1', null, false],
-                ['resource2', null, true],
-                ['EDIT;entity:' . $entityName, null, true],
-            ]));
 
         $config = DatagridConfiguration::create($configValues);
 

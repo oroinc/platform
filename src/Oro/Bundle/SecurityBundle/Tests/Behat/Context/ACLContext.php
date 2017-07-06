@@ -215,6 +215,17 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
     }
 
     /**
+     * Example: And I uncheck "Access dotmailer statistics" entity permission
+     *
+     * @Then /^(?:|I )uncheck "(?P<name>([\w\s]+))" entity permission$/
+     */
+    public function uncheckEntityPermission($name)
+    {
+        $userRoleForm = $this->getRoleEditFormElement();
+        $userRoleForm->setCheckBoxPermission($name, false);
+    }
+
+    /**
      * Asserts that provided permissions allowed on role view page
      *
      * Example: Then the role has following active permissions:
@@ -300,6 +311,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $page->clickLink('Update schema');
         $this->waitForAjax();
         $page->clickLink('Yes, Proceed');
+        $this->waitForAjax();
     }
 
     /**

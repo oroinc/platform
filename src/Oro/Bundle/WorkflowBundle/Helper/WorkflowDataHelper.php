@@ -6,10 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -23,8 +23,8 @@ class WorkflowDataHelper
     /** @var WorkflowManager */
     protected $workflowManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -33,19 +33,19 @@ class WorkflowDataHelper
     protected $router;
 
     /**
-     * @param WorkflowManager $workflowManager
-     * @param SecurityFacade $securityFacade
-     * @param TranslatorInterface $translator
-     * @param UrlGeneratorInterface $router
+     * @param WorkflowManager               $workflowManager
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TranslatorInterface           $translator
+     * @param UrlGeneratorInterface         $router
      */
     public function __construct(
         WorkflowManager $workflowManager,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         TranslatorInterface $translator,
         UrlGeneratorInterface $router
     ) {
         $this->workflowManager = $workflowManager;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
         $this->translator = $translator;
         $this->router = $router;
     }
@@ -312,6 +312,6 @@ class WorkflowDataHelper
     {
         $domainObject = new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName));
 
-        return $this->securityFacade->isGranted($permission, $domainObject);
+        return $this->authorizationChecker->isGranted($permission, $domainObject);
     }
 }
