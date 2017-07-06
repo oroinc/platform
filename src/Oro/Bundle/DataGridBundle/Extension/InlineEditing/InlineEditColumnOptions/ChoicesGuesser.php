@@ -58,9 +58,12 @@ class ChoicesGuesser implements GuesserInterface
                 $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
                 $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
+
                 if (empty($column[Configuration::CHOICES_KEY])) {
-                    $result[Configuration::CHOICES_KEY] = $this->choiceHelper
-                        ->getChoices($targetEntity, $keyField, $labelField);
+                    $translatable = isset($column['translatable']) && $column['translatable'] === true;
+                    $result[Configuration::CHOICES_KEY] =$result[Configuration::CHOICES_KEY] = $translatable
+                        ? $this->choiceHelper->getTranslatedChoices($targetEntity, $keyField, $labelField)
+                        : $this->choiceHelper->getChoices($targetEntity, $keyField, $labelField);
                 }
 
                 if (array_key_exists(PropertyInterface::DATA_NAME_KEY, $column)

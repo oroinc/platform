@@ -3,6 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\Tools;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
+
+use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -84,6 +87,41 @@ class ChoiceFieldHelper
         }
 
         $result = $this->aclHelper->apply($queryBuilder)->getResult();
+        $choices = [];
+        foreach ($result as $item) {
+            $choices[$item[$keyField]] = $item[$labelField];
+        }
+
+        return $choices;
+    }
+
+    /**
+     * Returns translated choices.
+     *
+     * @param string $entity
+     * @param string $keyField
+     * @param string $labelField
+     * @param null|array $orderBy [field => direction]
+     *
+     * @return array
+     */
+    public function getTranslatedChoices($entity, $keyField, $labelField, $orderBy = null)
+    {
+        $entityManager = $this->doctrineHelper->getEntityManager($entity);
+        $queryBuilder = $entityManager
+            ->getRepository($entity)
+            ->createQueryBuilder('e');
+        //select only id and label fields
+        $queryBuilder->select("e.$keyField, e.$labelField");
+        if (!empty($orderBy)) {
+            $field = array_keys($orderBy)[0];
+            $queryBuilder->orderBy('e.' . $field, $orderBy[$field]);
+        }
+
+        $query = $this->aclHelper->apply($queryBuilder);
+        $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, TranslationWalker::class);
+
+        $result = $query->getResult();
         $choices = [];
         foreach ($result as $item) {
             $choices[$item[$keyField]] = $item[$labelField];
