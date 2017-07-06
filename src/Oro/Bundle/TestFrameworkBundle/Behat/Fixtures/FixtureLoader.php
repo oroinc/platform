@@ -202,8 +202,6 @@ class FixtureLoader
      */
     public function findFile($filename)
     {
-        $suitePaths = $this->suite->getSetting('paths');
-
         if (false === strpos($filename, ':')) {
             throw new \InvalidArgumentException(
                 'Please define a bundle name for fixtures e.g. "BundleName:fixture.yml"'
