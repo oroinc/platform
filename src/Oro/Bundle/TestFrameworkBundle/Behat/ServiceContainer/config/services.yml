@@ -74,7 +74,6 @@ services:
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
         tags:
-            - { name: 'suite_aware' }
             - { name: 'message_queue_isolator_aware' }
 
     oro_test.entity_class_resolver:

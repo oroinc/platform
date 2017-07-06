@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification\Stub\Specifica
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class SuiteControllerTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,23 +60,6 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
 
         return rmdir($dir);
     }
-//    /**
-//     * @expectedException \Behat\Testwork\Suite\Exception\SuiteNotFoundException
-//     * @expectedExceptionMessage `Unregistered` suite is not found or has not been properly registered.
-//     */
-//    public function testSuiteNotFountException()
-//    {
-//        $suiteRegistry = new SuiteRegistry();
-//        $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
-//        $controller = new SuiteController(
-//            $suiteRegistry,
-//            $this->createFakeConfigurations($this->suites),
-//            ['One', 'Two', 'Unregistered']
-//        );
-//
-//        $input = new InputStub('', [], ['applicable-suites' => true]);
-//        $controller->execute($input, new OutputStub());
-//    }
 
     /**
      * @dataProvider testDividingProvider
@@ -89,13 +73,16 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
         $suiteRegistry = new SuiteRegistry();
         $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
         $specFinder = new SpecificationFinder();
-        $specFinder->registerSpecificationLocator(new SpecificationLocatorFilesystemStub(array_merge(array_map(function($config) {
-            return $config['settings']['paths'];
-        }, $suiteConfigs))));
+        $specFinder->registerSpecificationLocator(
+            new SpecificationLocatorFilesystemStub(array_merge(array_map(function ($config) {
+                return $config['settings']['paths'];
+            }, $suiteConfigs)))
+        );
         $controller = new SuiteController(
             $suiteRegistry,
             $suiteConfigs,
-            new SpecificationDivider($specFinder)
+            new SpecificationDivider($specFinder),
+            $this->getMockBuilder(KernelInterface::class)->getMock()
         );
 
         $input = new InputStub('', [], ['suite-divider' => $divider]);

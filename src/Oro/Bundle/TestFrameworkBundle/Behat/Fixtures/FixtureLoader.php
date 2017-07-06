@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class FixtureLoader implements SuiteAwareInterface
+class FixtureLoader
 {
     /**
      * @var AliceLoader
@@ -40,6 +40,10 @@ class FixtureLoader implements SuiteAwareInterface
      */
     protected $entitySupplement;
 
+    /**
+     * @var FileLocator[]
+     */
+    protected $fileLocators;
 
     /**
      * @param KernelInterface $kernel
@@ -192,14 +196,6 @@ class FixtureLoader implements SuiteAwareInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setSuite(Suite $suite)
-    {
-        $this->suite = $suite;
-    }
-
-    /**
      * @param string $filename
      * @return string Real path to file with fuxtures
      * @throws \InvalidArgumentException
@@ -208,11 +204,15 @@ class FixtureLoader implements SuiteAwareInterface
     {
         $suitePaths = $this->suite->getSetting('paths');
 
-        if (false !== strpos($filename, ':')) {
-            list($bundleName, $filename) = explode(':', $filename);
-            $bundlePath = $this->kernel->getBundle('!'.$bundleName)->getPath();
-            $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
+        if (false === strpos($filename, ':')) {
+            throw new \InvalidArgumentException(
+                'Please define a bundle name for fixtures e.g. "BundleName:fixture.yml"'
+            );
         }
+
+        list($bundleName, $filename) = explode(':', $filename);
+        $bundlePath = $this->kernel->getBundle('!'.$bundleName)->getPath();
+        $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
 
         if (!$file = $this->findFileInPath($filename, $suitePaths)) {
             throw new \InvalidArgumentException(sprintf(
