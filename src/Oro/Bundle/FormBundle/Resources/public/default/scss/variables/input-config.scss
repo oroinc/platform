@@ -24,3 +24,6 @@ $input-box-shadow-focus-state: $input-box-shadow-hover-state;
 // Error
 $input-border-color-error-state: get-color('ui', 'error-dark');
 $input-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);
+
+// Disabled
+$input-background-color-disabled-state: #f4f4f4;

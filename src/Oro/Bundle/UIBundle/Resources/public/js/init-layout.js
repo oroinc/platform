@@ -449,7 +449,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         }
         var containerSelector = $(this).data('container') || '.collection-fields-list';
         var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
-        var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+        var rowCountAdd = 1;
+        if ($(this).data('row-add-only-one')) {
+            $(this).removeData('row-add-only-one');
+        } else {
+            rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+        }
+
         var collectionInfo = getOroCollectionInfo($listContainer);
         for (var i = 1; i <= rowCountAdd; i++) {
             var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
