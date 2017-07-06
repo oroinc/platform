@@ -522,9 +522,6 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleUpdateWorksWithRouteCallback()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
-        $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
-
         $entity = $this->getObject();
 
         $handler = $this->getHandlerStub($entity);

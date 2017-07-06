@@ -84,6 +84,11 @@ class Form extends Element
         $this->pressActionButton('Save and Close');
     }
 
+    public function saveAndDuplicate()
+    {
+        $this->pressActionButton('Save And Duplicate');
+    }
+
     public function save()
     {
         $this->pressActionButton('Save');
@@ -312,7 +317,7 @@ class Form extends Element
         $fieldId = $field->getAttribute('id');
 
         // This element doesn't count server side validation errors without "for" attribute
-        $errorSpan = $this->find('css', "span.validation-failed[for='$fieldId']");
+        $errorSpan = $this->find('css', "span.validation-failed[id='$fieldId-error']");
 
         if (!$errorSpan) {
             // Get next validation error span after element

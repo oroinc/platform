@@ -4,13 +4,12 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 
 class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ChainOwnerTreeProvider
-     */
+    /** @var ChainOwnerTreeProvider */
     protected $provider;
 
     protected function setUp()
@@ -32,15 +31,16 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->provider->supports());
     }
 
-    public function testDoNotAddTwice()
+    public function testAddProvider()
     {
         $provider = $this->getProviderMock();
-        $provider->expects($this->once())->method('supports')->willReturn(false);
+        $provider->expects($this->once())->method('supports')->willReturn(true);
 
-        $this->provider->addProvider($provider);
-        $this->provider->addProvider($provider);
-
+        // guard
         $this->assertFalse($this->provider->supports());
+
+        $this->provider->addProvider($provider);
+        $this->assertTrue($this->provider->supports());
     }
 
     public function testSupportsDefault()
@@ -67,7 +67,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->addProvider($provider);
         $this->provider->setDefaultProvider($default);
 
-        $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Owner\OwnerTree', $this->provider->getTree());
+        $this->assertInstanceOf(OwnerTreeInterface::class, $this->provider->getTree());
     }
 
     public function testGetTreeDefault()
@@ -82,7 +82,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->addProvider($provider);
         $this->provider->setDefaultProvider($default);
 
-        $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Owner\OwnerTree', $this->provider->getTree());
+        $this->assertInstanceOf(OwnerTreeInterface::class, $this->provider->getTree());
     }
 
     /**

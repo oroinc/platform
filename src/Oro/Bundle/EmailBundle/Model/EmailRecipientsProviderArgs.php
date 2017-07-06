@@ -6,7 +6,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailRecipientsProviderArgs
 {
-     /** @var object|null */
+    /** @var object|null */
     protected $relatedEntity;
 
     /** @var string */

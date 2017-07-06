@@ -11,13 +11,13 @@ use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 abstract class AbstractPagerExtension extends AbstractExtension
 {
-    /** @var AbstractPager */
+    /** @var PagerInterface */
     protected $pager;
 
     /**
-     * @param AbstractPager $pager
+     * @param PagerInterface $pager
      */
-    public function __construct(AbstractPager $pager)
+    public function __construct(PagerInterface $pager)
     {
         $this->pager = $pager;
     }

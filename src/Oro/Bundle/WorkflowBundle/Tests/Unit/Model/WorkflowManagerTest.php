@@ -54,35 +54,31 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowEntityConnector|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityConnector;
 
+    /** @var StartedWorkflowsBag */
+    protected $startedWorkflowsBag;
+
     /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
     protected function setUp()
     {
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->entityConnector = $this->createMock(WorkflowEntityConnector::class);
 
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()->getMock();
-
-        $this->entityConnector = $this->getMockBuilder(WorkflowEntityConnector::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->startedWorkflowsBag = new StartedWorkflowsBag();
 
         $this->workflowManager = new WorkflowManager(
             $this->workflowRegistry,
             $this->doctrineHelper,
             $this->eventDispatcher,
             $this->entityConnector,
-            new StartedWorkflowsBag()
+            $this->startedWorkflowsBag
         );
+
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->workflowManager->setLogger($this->logger);
     }
 
@@ -1044,10 +1040,17 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 new WorkflowChangesEvent($workflowDefinition)
             );
 
+        $this->startedWorkflowsBag->addWorkflowEntity($workflowName, new \stdClass());
+        $this->startedWorkflowsBag->addWorkflowEntity($workflowName, new \stdClass());
+
+        $this->assertCount(2, $this->startedWorkflowsBag->getWorkflowEntities($workflowName));
+
         $this->assertTrue(
             $this->workflowManager->deactivateWorkflow($workflowName),
             'Returns true if workflow has changed its state.'
         );
+
+        $this->assertCount(0, $this->startedWorkflowsBag->getWorkflowEntities($workflowName));
     }
 
     public function testDeactivateWorkflowSkipIfNotActive()
@@ -1237,7 +1240,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with(WorkflowItem::class)
             ->will($this->returnValue($workflowItemsRepository));
 
+        $this->startedWorkflowsBag->addWorkflowEntity($name, new \stdClass());
+        $this->startedWorkflowsBag->addWorkflowEntity($name, new \stdClass());
+
+        $this->assertCount(2, $this->startedWorkflowsBag->getWorkflowEntities($name));
+
         $this->workflowManager->resetWorkflowData($name);
+
+        $this->assertCount(0, $this->startedWorkflowsBag->getWorkflowEntities($name));
     }
 
     /**

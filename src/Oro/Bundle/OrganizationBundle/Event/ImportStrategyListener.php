@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -138,10 +138,10 @@ class ImportStrategyListener
     {
         $entityName = ClassUtils::getClass($entity);
         if (!array_key_exists($entityName, $this->organizationFieldByEntity)) {
-            /** @var OwnershipMetadataProvider $metadataProvider */
+            /** @var OwnershipMetadataProviderInterface $metadataProvider */
             $metadataProvider = $this->metadataProviderLink->getService();
             $this->organizationFieldByEntity[$entityName] = $metadataProvider->getMetadata($entityName)
-                ->getGlobalOwnerFieldName();
+                ->getOrganizationFieldName();
         }
 
         return $this->organizationFieldByEntity[$entityName];

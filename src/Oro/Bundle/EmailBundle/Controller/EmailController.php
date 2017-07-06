@@ -66,7 +66,6 @@ class EmailController extends Controller
      */
     public function purgeEmailsAttachmentsAction()
     {
-
         $this->getMessageProducer()->send(Topics::PURGE_EMAIL_ATTACHMENTS, []);
 
         return new JsonResponse([

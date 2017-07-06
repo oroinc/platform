@@ -12,7 +12,7 @@ use Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
+class NavigationItemBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
