@@ -4,25 +4,25 @@
 
 - [Before You Begin](#before-you-begin)
 - [Conventions](#conventions)
-- [Getting Started](#cetting-started)
+- [Getting Started](#getting-started)
   - [Configuration](#configuration)
     - [Application Configuration](#application-configuration)
     - [Behat Configuration](#behat-configuration)
-  - [Installation](#installing)
+  - [Installation](#installation)
     - [Install dev dependencies](#install-dev-dependencies)
     - [Application Initial State](#application-initial-state)
-    - [Install browser emulator](#install-browser-emulator)
+    - [Install Test Automation Tools](#install-test-automation-tools)
   - [Test Execution](#test-execution)
-    - [Run browser emulator](#run-browser-emulator)
+    - [Prerequisites](#prerequisites)
     - [Run tests](#run-tests)
 - [Architecture](#architecture)
   - [DI Containers](#di-containers)
-  - [Suites autoload](#suites-autoload)
+  - [Autoload Suites](#autoload-suites)
   - [Feature isolation](#feature-isolation)
 - [Page Object](#page-object)
   - [Elements](#elements)
-  - [Form Mappings](#form-mappings)
-  - [Embedded Form Mappings](#ebedded-form-mappings)
+  - [Mapping Form Fields](#mapping-form-fields)
+  - [Embedded Form Mappings](#embedded-form-mappings)
   - [Page element](#page-element)
 - [Fixtures](#fixtures)
   - [Feature fixtures](#feature-fixtures)
@@ -31,14 +31,14 @@
   - [Entity references](#entity-references)
 - [Write your first feature](#write-your-first-feature)
 - [Troubleshooting](#troubleshooting)
+  - [Increase application performance (Ubuntu)](#increase-application-performance-ubuntu)
+    - [(optional) Create startup script](#optional-create-startup-script)
+  - [Couldn't generate random unique value in 128 tries](#couldnt-generate-random-unique-value-for-orobundleuserbundleentityuser-username-in-128-tries)
   - [Append snippets](#append-snippets)
-  - [Increase application performance](#increase-application-performance)
-    - [Pause feature execution](#pause-feature-execution)
-  - [How to find the right step](#how-to-find-the-right-step)
+  - [How to find the necessary step](#how-to-find-the-necessary-step)
     - [Auto suggestion in PhpStorm](#auto-suggestion-in-phpstorm)
-    - [Find right Context](#find-right-context)
-    - [Grep in console](#grep-in-console)
-  - [Element not visible](#element-not-visible)
+    - [Find the Necessary Context](#find-the-necessary-context)
+    - [Use Grep in Console](#use-grep-in-console)
 
 ## Before You Begin
 
@@ -194,10 +194,10 @@ app/console oro:install  --drop-database --user-name=admin --user-email=admin@ex
   --organization-name=ORO --env=prod --sample-data=n --timeout=3000
 ```
 
-#### Install Browser for Test Automation
+#### Install Test Automation Tools
 
-To execute scenarios that use Oro application features, run browser-automation server (Selenium Web Driver) or browser (PhantomJs).
-PhantomJs is more efficient but is headless and is not observable for a human. However, you can make screenshots when anything goes wrong. Selenium server runs feature tests in a real browser.
+To execute scenarios that use Oro application features, run browser-automation server (Selenium Web Driver) or headless WebKit browser (PhantomJs).
+PhantomJs is more efficient but is headless and is not observable for a human. However, it make screenshots when anything goes wrong. Selenium server runs feature tests in a real browser.
 
 To install PhantomJs, run the following commands:
 
@@ -205,7 +205,7 @@ To install PhantomJs, run the following commands:
 mkdir $HOME/phantomjs
 wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
 tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/phantomjs
-sudo ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
+sudo ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
 ```
 
 **Note:** These commands create a subdirector for phantomjs in your home directory, downloads phantomjs into directory that you just created, uncompress files, creates symbolic link.
