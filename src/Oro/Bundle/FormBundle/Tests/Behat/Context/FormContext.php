@@ -48,6 +48,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )save and duplicate form$/
+     */
+    public function iSaveAndDuplicateForm()
+    {
+        $this->createOroForm()->saveAndDuplicate();
+    }
+
+    /**
      * @When /^(?:|I )(save|submit) form$/
      */
     public function iSaveForm()

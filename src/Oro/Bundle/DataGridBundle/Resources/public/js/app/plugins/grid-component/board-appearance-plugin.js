@@ -261,11 +261,13 @@ define(function(require) {
         processMetadata: function(options, gridConfiguration) {
             _.defaults(options, this.defaultOptions);
 
-            if (!options.save_api_accessor) {
-                options.save_api_accessor = _.extend({}, gridConfiguration.metadata.inline_editing.save_api_accessor);
+            if (!options.default_transition.save_api_accessor) {
+                options.default_transition.save_api_accessor = _.extend(
+                    {}, gridConfiguration.metadata.inline_editing.save_api_accessor
+                );
             }
 
-            _.defaults(options.save_api_accessor, this.saveApiAccessorDefaults);
+            _.defaults(options.default_transition.save_api_accessor, this.saveApiAccessorDefaults);
 
             // prepare transition options
             options.columns.forEach(function(column) {
@@ -273,7 +275,7 @@ define(function(require) {
                     column.transition = options.default_transition;
                 }
                 if (!column.transition.save_api_accessor) {
-                    column.transition.save_api_accessor = options.save_api_accessor;
+                    column.transition.save_api_accessor = options.default_transition.save_api_accessor;
                 }
                 _.extend(column.transition, BoardAppearancePlugin.transitionDefaults);
             });
