@@ -43,8 +43,12 @@
         'strict-mobile': '(max-width: ' + $breakpoint-mobile + ')'
     );
 
-    @media #{map-get($breakpoints, $type)} {
-        @content;
+    @if (map_has_key($breakpoints, $type)) {
+        @media #{map-get($breakpoints, $type)} {
+            @content;
+        }
+    } @else {
+        @warn 'Absent breakpoint type: ' + $type;
     }
 }
 
