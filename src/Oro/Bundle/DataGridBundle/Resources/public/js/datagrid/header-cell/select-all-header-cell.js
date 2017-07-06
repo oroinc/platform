@@ -1,13 +1,14 @@
 define([
+    'jquery',
     'underscore',
     'backgrid',
     '../select-state-model',
-    'backbone'
-], function(_, Backgrid, SelectStateModel, Backbone) {
+    'oroui/js/app/views/base/view',
+    'tpl!orodatagrid/templates/datagrid/select-all-header-cell.html'
+], function($, _, Backgrid, SelectStateModel, BaseView, template) {
     'use strict';
 
     var SelectAllHeaderCell;
-    var $ = Backbone.$;
 
     /**
      * Contains mass-selection logic
@@ -19,9 +20,9 @@ define([
      *
      * @export  orodatagrid/js/datagrid/header-cell/select-all-header-cell
      * @class   orodatagrid.datagrid.headerCell.SelectAllHeaderCell
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    SelectAllHeaderCell = Backbone.View.extend({
+    SelectAllHeaderCell = BaseView.extend({
         keepElement: false,
         /** @property */
         className: 'select-all-header-cell renderable',
@@ -29,7 +30,7 @@ define([
         /** @property */
         tagName: 'th',
 
-        template: '#template-select-all-header-cell',
+        template: template,
 
         selectState: null,
 
@@ -79,7 +80,7 @@ define([
          * @returns {orodatagrid.datagrid.cell.SelectAllHeaderCell}
          */
         render: function() {
-            this.$el.html(_.template($(this.template).text())());
+            this.$el.html(this.getTemplateFunction()(this.getTemplateData()));
             this.delegateEvents();
             return this;
         },

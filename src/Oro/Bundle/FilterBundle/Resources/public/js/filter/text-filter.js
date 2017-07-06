@@ -1,14 +1,15 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './empty-filter',
-    'oroui/js/tools',
-    'oroui/js/mediator'
-], function($, _, __, EmptyFilter, tools, mediator) {
+define(function(require) {
     'use strict';
 
     var TextFilter;
+    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
+    var template = require('tpl!orofilter/templates/filter/text-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var EmptyFilter = require('./empty-filter');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
 
     /**
      * Text grid filter.
@@ -25,8 +26,7 @@ define([
     TextFilter = EmptyFilter.extend({
         wrappable: true,
 
-        wrapperTemplate: '',
-
+        wrapperTemplate: wrapperTemplate,
         wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
@@ -34,6 +34,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#text-filter-template',
 
         /**

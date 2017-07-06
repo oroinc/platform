@@ -112,6 +112,7 @@ oro:
                 </ul>
         mass_action:
             title: Mass Actions
+            button_title: "..."
             delete:
                 selected_message: You have selected {{ selected }} record.<br/> Are you sure you want to delete it?|You have selected {{ selected }} records.<br/> Are you sure you want to delete them?
                 max_limit_message: >

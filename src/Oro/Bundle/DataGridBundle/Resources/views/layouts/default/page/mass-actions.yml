@@ -7,12 +7,6 @@ layout:
             items:
                 select_row_cell_template:
                     blockType: block
-                datagrid_action_header_cell_template:
-                    blockType: block
-                select_all_header_cell_template:
-                    blockType: block
             tree:
                 head:
                     select_row_cell_template: ~
-                    datagrid_action_header_cell_template: ~
-                    select_all_header_cell_template: ~

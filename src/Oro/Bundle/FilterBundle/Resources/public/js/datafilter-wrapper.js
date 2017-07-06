@@ -14,7 +14,10 @@ define([
 
         _getWrapperTemplate: function() {
             if (!this.wrapperTemplate) {
-                var wrapperTemplateSrc = $(this.wrapperTemplateSelector).text();
+                var wrapperTemplateSrc = '';
+                if (this.wrapperTemplateSelector) {
+                    wrapperTemplateSrc = $(this.wrapperTemplateSelector).text();
+                }
                 this.wrapperTemplate = _.template(wrapperTemplateSrc);
             }
             return this.wrapperTemplate;

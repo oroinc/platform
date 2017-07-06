@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var DateFilter;
+    var template = require('tpl!orofilter/templates/filter/date-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
@@ -26,6 +27,7 @@ define(function(require) {
          *
          * @property
          */
+        template: template,
         templateSelector: '#date-filter-template',
 
         /**
@@ -33,6 +35,7 @@ define(function(require) {
          *
          * @property
          */
+        fieldTemplate: require('tpl!orofilter/templates/filter/select-field.html'),
         fieldTemplateSelector: '#select-field-template',
 
         /**
@@ -40,6 +43,7 @@ define(function(require) {
          *
          * @property
          */
+        dropdownTemplate: require('tpl!orofilter/templates/filter/date-filter-dropdown.html'),
         dropdownTemplateSelector: '#date-filter-dropdown-template',
 
         /**
@@ -270,9 +274,9 @@ define(function(require) {
                 }
 
                 this.$(this.criteriaValueSelectors.date_type)
-                 .closest('.dropdown')
-                 .find('.dropdown-toggle')
-                 .html(this.$(this.criteriaValueSelectors.date_type + ' :selected').text());
+                    .closest('.dropdown')
+                    .find('.dropdown-toggle')
+                    .html(this.$(this.criteriaValueSelectors.date_type + ' :selected').text());
             } else {
                 // it's part
                 this.subview('start').setPart(value);
@@ -334,7 +338,7 @@ define(function(require) {
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
             var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
-            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var datePartTemplate = this._getTemplate('fieldTemplate');
             var parts = [];
 
             // add date parts only if embed template used
@@ -406,7 +410,7 @@ define(function(require) {
                     'placeholder': __('oro.form.choose_date')
                 },
                 datePickerOptions: this.dateWidgetOptions,
-                dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector),
+                dropdownTemplate: this._getTemplate('dropdownTemplate'),
                 backendFormat: datetimeFormatter.getDateFormat(),
                 dayFormats: this.dayFormats.slice()
             });

@@ -15,7 +15,7 @@ define(function(require) {
     return Modal.extend({
 
         /** @property {String} */
-        template: require('text!oroui/templates/standart-confirmation.html'),
+        template: require('tpl!oroui/templates/standart-confirmation.html'),
 
         /** @property {String} */
         className: 'modal oro-modal-normal',
@@ -24,17 +24,10 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            //Set custom template settings
-            var interpolate = {
-                interpolate: /\{\{(.+?)\}\}/g,
-                evaluate: /<%([\s\S]+?)%>/g
-            };
-
             options = _.extend({
                 title: __('Confirmation'),
                 okText: __('Yes'),
-                cancelText: __('Cancel'),
-                template: _.template(this.template, interpolate)
+                cancelText: __('Cancel')
             }, options);
 
             arguments[0] = options;
