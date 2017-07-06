@@ -3,6 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Voter;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Model\AclProviderInterface;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Permission\PermissionMapInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -29,18 +33,14 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->permissionMap = $this->createMock('Symfony\Component\Security\Acl\Permission\PermissionMapInterface');
-
-        $this->extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->groupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $this->permissionMap = $this->createMock(PermissionMapInterface::class);
+        $this->extensionSelector = $this->createMock(AclExtensionSelector::class);
+        $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
 
         $this->voter = new AclVoter(
-            $this->createMock('Symfony\Component\Security\Acl\Model\AclProviderInterface'),
-            $this->createMock('Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface'),
-            $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface'),
+            $this->createMock(AclProviderInterface::class),
+            $this->createMock(ObjectIdentityRetrievalStrategyInterface::class),
+            $this->createMock(SecurityIdentityRetrievalStrategyInterface::class),
             $this->permissionMap
         );
         $this->voter->setAclExtensionSelector($this->extensionSelector);
@@ -63,8 +63,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testVote($object, $expectedObject, $expected, array $permissions = ['test'], $group = '')
     {
-        /** @var TokenInterface $token */
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getToken();
 
         $inVoteToken = null;
         $inVoteObject = null;
@@ -159,6 +158,26 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
                 'group' => 'test_group'
             ]
         ];
+    }
+
+    public function testVoteWithInvalidObject()
+    {
+        $object = new \stdClass();
+
+        $this->extensionSelector->expects($this->once())
+            ->method('select')
+            ->with($object)
+            ->willThrowException(new InvalidDomainObjectException());
+
+        $this->assertEquals(AclVoter::ACCESS_ABSTAIN, $this->voter->vote($this->getToken(), $object, []));
+    }
+
+    /**
+     * @return TokenInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getToken()
+    {
+        return $this->createMock(TokenInterface::class);
     }
 
     /**

@@ -123,7 +123,9 @@ define([
         /**
          * Action on multiselect widget refresh
          */
-        onRefresh: function() {},
+        onRefresh: function() {
+            this.getWidget().find('.ui-multiselect-checkboxes').addClass('fixed-li');
+        },
 
         /**
          * Get minimum width of dropdown menu

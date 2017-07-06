@@ -84,6 +84,11 @@ class Form extends Element
         $this->pressActionButton('Save and Close');
     }
 
+    public function saveAndDuplicate()
+    {
+        $this->pressActionButton('Save And Duplicate');
+    }
+
     public function save()
     {
         $this->pressActionButton('Save');

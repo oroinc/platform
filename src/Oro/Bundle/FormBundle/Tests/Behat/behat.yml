@@ -51,3 +51,6 @@ oro_behat_extension:
 
     Select:
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select
+
+    PrettyCheckbox:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\PrettyCheckbox

@@ -56,13 +56,21 @@ class AvailableSuitesController implements Controller
             return;
         }
 
+        $suites = [];
+
         foreach ($this->suiteRepository->getSuites() as $suite) {
             $iterators = $this->specificationFinder->findSuitesSpecifications([$suite]);
             $countFeatures = array_sum(array_map('iterator_count', $iterators));
 
             if (0 !== $countFeatures) {
-                $output->writeln($suite->getName());
+                $suites[$suite->getName()] = $countFeatures;
             }
+        }
+
+        arsort($suites);
+
+        foreach (array_keys($suites) as $suite) {
+            $output->writeln($suite);
         }
 
         return 0;
