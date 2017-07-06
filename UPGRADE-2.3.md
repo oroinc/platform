@@ -454,6 +454,8 @@ UserBundle
 TestFrameworkBundle
 -------------------
 - Class `TestListener` namespace added, use `Oro\Bundle\TestFrameworkBundle\Test\TestListener` instead
+- Removed `--applicable-suites` parameter from behat.
+Now every bundle should provide only features that applicable to any application that include that bundle.
 
 TranslationBundle
 -----------------
