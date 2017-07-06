@@ -19,6 +19,11 @@ datagrids:
                     card_view: demobundle/js/app/views/board/your-entity-card-view
 ```
 
+*Note:* board appearance using `save_api_accessor` internally, so please check that at least one of the following options is configured properly:
+ * `save_api_accessor` for column transition option (check [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md))
+ * `save_api_accessor` for default transition (check `default_transition` configuration option below)
+ * `save_api_accessor` for inline editing (check this [article](./inline_editing.md#sample-usage-of-the-save_api_accessor-with-full-options-provided))
+
 ## Datagrid configuration details
 
  - label (Optional)
