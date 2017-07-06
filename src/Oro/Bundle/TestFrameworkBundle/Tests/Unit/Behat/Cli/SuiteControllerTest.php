@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli;
 
+use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
-use Behat\Testwork\Suite\Suite;
 use Behat\Testwork\Suite\SuiteRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification\Stub\SpecificationLocatorFilesystemStub;
+use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class SuiteControllerTest extends \PHPUnit_Framework_TestCase
@@ -70,19 +70,25 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDividing($divider, array $suiteConfigs, array $expectedSuites)
     {
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel->method('getBundle')->willReturn(new TestBundle('TestBundle'));
+
         $suiteRegistry = new SuiteRegistry();
         $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
+        $suiteRegistry->registerSuiteGenerator(new SymfonySuiteGenerator($kernel));
+
         $specFinder = new SpecificationFinder();
         $specFinder->registerSpecificationLocator(
             new SpecificationLocatorFilesystemStub(array_merge(array_map(function ($config) {
                 return $config['settings']['paths'];
             }, $suiteConfigs)))
         );
+
         $controller = new SuiteController(
             $suiteRegistry,
             $suiteConfigs,
             new SpecificationDivider($specFinder),
-            $this->getMockBuilder(KernelInterface::class)->getMock()
+            $kernel
         );
 
         $input = new InputStub('', [], ['suite-divider' => $divider]);
