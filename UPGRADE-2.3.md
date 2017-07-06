@@ -55,6 +55,10 @@ ApiBundle
 - Class `Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator`
     - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
 
+ConfigBundle
+------------------
+ - Interface `Oro\Bundle\ConfigBundle\Provider\Value\ValueProviderInterface` was added. Now services can be used for fetching default value of config setting. For details, see `Oro/Bundle/ConfigBundle/Resources/doc/config_management.md`.
+
 DashboardBundle
 ---------------
 - Class `Oro\Bundle\DashboardBundle\Controller\DashboardController`
