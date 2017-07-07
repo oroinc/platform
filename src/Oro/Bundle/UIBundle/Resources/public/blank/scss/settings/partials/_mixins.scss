@@ -449,6 +449,7 @@
     }
 
     @else if $state == 'disabled' {
+        &--disabled,
         &.disabled,
         &:disabled {
             @content;
