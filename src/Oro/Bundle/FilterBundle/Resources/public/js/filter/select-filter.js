@@ -240,6 +240,9 @@ define(function(require) {
                         collision: 'fit none',
                         within: $dropdownContainer
                     },
+                    beforeopen: _.bind(function() {
+                        this.selectWidget.onBeforeOpenDropdown();
+                    }, this),
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this.trigger('showCriteria', this);

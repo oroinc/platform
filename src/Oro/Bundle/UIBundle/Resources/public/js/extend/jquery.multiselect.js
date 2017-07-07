@@ -7,8 +7,6 @@ define([
 ], function($, _, mask) {
     'use strict';
 
-    var oldRefresh = $.ech.multiselect.prototype.refresh;
-
     $.widget('orofilter.multiselect', $.ech.multiselect, {
         options: _.extend({}, $.ech.multiselect.prototype.options, {
             refreshNotOpened: true
@@ -60,7 +58,9 @@ define([
 
         refresh: function(init) {
             if (this.hasBeenOpened || this.options.refreshNotOpened) {
-                oldRefresh.call(this, init);
+                var scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
+                this._super(init);
+                this.menu.find('.ui-multiselect-checkboxes').scrollTop(scrollTop);
             }
         },
 
@@ -70,6 +70,13 @@ define([
 
         getUnchecked: function() {
             return this.menu.find('input').not('[type=search]').not(':checked');
+        },
+
+        _setMenuHeight: function() {
+            this.menu.find('.ui-multiselect-checkboxes li:hidden, .ui-multiselect-checkboxes a:hidden')
+                .addClass('hidden-item');
+            this._super();
+            this.menu.find('.hidden-item').removeClass('hidden-item');
         }
     });
 

@@ -53,12 +53,6 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
     {
         $result = 0;
         while ($result < 3) {
-            if ($timeLimit <= 0) {
-                $this->isQueueEmpty();
-
-                throw new RuntimeException('Message Queue was not process messages during time limit');
-            }
-
             try {
                 if ($this->isQueueEmpty()) {
                     $result++;
@@ -67,10 +61,14 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
                 }
             } catch (TableNotFoundException $e) {
                 $this->logger->error($e->getMessage(), ['exception' => $e]);
+                return;
             }
 
             sleep(1);
             $timeLimit -= 1;
+            if ($timeLimit <= 0) {
+                throw new RuntimeException('Message Queue was not process messages during time limit');
+            }
         }
     }
 

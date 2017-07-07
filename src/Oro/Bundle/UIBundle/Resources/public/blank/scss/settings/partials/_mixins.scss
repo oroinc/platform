@@ -43,8 +43,12 @@
         'strict-mobile': '(max-width: ' + $breakpoint-mobile + ')'
     );
 
-    @media #{map-get($breakpoints, $type)} {
-        @content;
+    @if (map_has_key($breakpoints, $type)) {
+        @media #{map-get($breakpoints, $type)} {
+            @content;
+        }
+    } @else {
+        @warn 'Absent breakpoint type: ' + $type;
     }
 }
 
@@ -206,6 +210,14 @@
     }
 }
 
+// Wrap element
+@mixin fullscreen-mode {
+    @at-root {
+        .fullscreen-mode {
+            @content;
+        }
+    }
+}
 // Mixin for border, if need to use shorthand property, set $use-shorthand to true
 // Null property doesn't render
 @mixin border(
@@ -437,6 +449,7 @@
     }
 
     @else if $state == 'disabled' {
+        &--disabled,
         &.disabled,
         &:disabled {
             @content;

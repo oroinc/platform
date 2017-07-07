@@ -92,21 +92,6 @@ class GuzzleRestClient implements RestClientInterface
     /**
      * {@inheritdoc}
      */
-    public function getXML($resource, array $params = array(), array $headers = array(), array $options = array())
-    {
-        $response = $this->get($resource, $params, $headers, $options);
-        if (!$response->isSuccessful()) {
-            throw GuzzleRestException::createFromException(
-                BadResponseException::factory($this->lastGuzzleRequest, $response->getSourceResponse())
-            );
-        }
-
-        return $response->xml();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function post($resource, $data, array $headers = [], array $options = [])
     {
         return $this->performRequest('post', $resource, [], $data, $headers, $options);
