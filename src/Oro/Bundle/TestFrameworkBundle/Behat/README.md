@@ -311,7 +311,8 @@ bin/behat -s OroUserBundle
 
 ### DI Containers
 
-Behat is a symfony console application with its own container and services. Behat container may be configured through Extensions using *behat.yml* in the root of the application directory.
+Behat is a symfony console application with its own container and services.
+Behat container may be configured through Extensions using *behat.yml* in the root of the application directory.
 
 Application container may be used by injected Kernel in your Context after you implement ```KernelAwareContext``` and use ```KernelDictionary``` trait.
 
@@ -352,7 +353,7 @@ Thus, if the bundle has no Features directory - no test suite would be created f
 
 If you need some specific feature steps for your bundle, create the ```AcmeDemoBundle\Tests\Behat\Context\FeatureContext``` class.
 This context is added to the suite with other common contexts.
-The complete list of common context is configured in the behat configuration file under the ```shared_contexts```. See [behat.yml.dist](../../config/behat.yml.dist#L29-L39).
+The complete list of common context is configured in the behat configuration file under the ```shared_contexts```.
 
 You can manually configure test suite for a bundle in the application behat configuration:
 
@@ -389,10 +390,13 @@ Manually configured test suits are not autoloaded by the extension.
 
 ### Feature isolation
 
-Every feature can interact with the application and perform CRUD operations. As a result, the database may be modified. To avoid data collisions, the features are isolated: the database and cache directories are dumped before running the feature tests; they are restored after the feature tests execution is complete.
+Every feature can interact with the application and perform CRUD operations.
+As a result, the database may be modified.
+To avoid data collisions, the features are isolated: the database and cache directories are dumped before running the feature tests;
+they are restored after the feature tests execution is complete.
 
 Every isolator must implement ```Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface``` and ```oro_behat.isolator``` tag with priority.
-See [TestFrameworkBundle/Behat/ServiceContainer/config/isolators.yml](../../../Behat/ServiceContainer/config/isolators.yml)
+See [isolators.yml](ServiceContainer/config/isolators.yml)
 
 ##### Disable feature isolation
 
