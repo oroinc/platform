@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\AclVoter as BaseAclVoter;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -97,13 +96,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        try {
-            $extension = $this->extensionSelector->select($object, false);
-        } catch (InvalidDomainObjectException $e) {
-            //abstain if the passed object is not a domain object
-            return self::ACCESS_ABSTAIN;
-        }
-
+        $extension = $this->extensionSelector->select($object, false);
         if (null === $extension) {
             return self::ACCESS_ABSTAIN;
         }
