@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension\Stub\DomainObjectStub;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
@@ -26,7 +26,7 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ObjectIdAccessor|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectIdAccessor;
 
-    /** @var MetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
 
     /** @var EntityOwnerAccessor|\PHPUnit_Framework_MockObject_MockObject */
@@ -55,7 +55,7 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->objectIdAccessor = $this->getMockBuilder(ObjectIdAccessor::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->metadataProvider = $this->createMock(MetadataProviderInterface::class);
+        $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->entityOwnerAccessor = $this->getMockBuilder(EntityOwnerAccessor::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -297,7 +297,7 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(get_class($object))
             ->willReturn(new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org'));
         $this->decisionMaker->expects(self::once())
-            ->method('isAssociatedWithBasicLevelEntity')
+            ->method('isAssociatedWithUser')
             ->willReturn(true);
 
         self::assertTrue(

@@ -48,7 +48,7 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->ownershipMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -91,7 +91,7 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
 
         $metaDataOwnerShip = $this->getMetaDataOwnerShip([
             'hasOwner' => true,
-            'isGlobalLevelOwned' => false,
+            'isOrganizationOwned' => false,
             'getOwnerFieldName' => 'owner'
         ]);
         $this->ownershipMetadataProvider->expects($this->any())->method('getMetaData')->willReturn($metaDataOwnerShip);
@@ -119,7 +119,7 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
 
         $metaDataOwnerShip = $this->getMetaDataOwnerShip([
             'hasOwner' => true,
-            'isGlobalLevelOwned' => false,
+            'isOrganizationOwned' => false,
             'getOwnerFieldName' => 'owner'
         ]);
         $this->ownershipMetadataProvider->expects($this->any())->method('getMetaData')->willReturn($metaDataOwnerShip);
@@ -142,31 +142,15 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMetaDataOwnerShip($options)
     {
-        $metadataConfig = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface')
-            ->setMethods([
-                'hasOwner',
-                'isGlobalLevelOwned',
-                'getOwnerFieldName',
-                'hasField',
-                'getOwnerType',
-                'isBasicLevelOwned',
-                'isLocalLevelOwned',
-                'isSystemLevelOwned',
-                'getOwnerColumnName',
-                'getGlobalOwnerColumnName',
-                'getGlobalOwnerFieldName',
-                'getAccessLevelNames'
-            ])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadataConfig = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface');
 
         $metadataConfig
             ->expects($this->any())->method('hasOwner')
             ->willReturn($options['hasOwner']);
 
         $metadataConfig->expects($this->any())
-            ->method('isGlobalLevelOwned')
-            ->willReturn($options['isGlobalLevelOwned']);
+            ->method('isOrganizationOwned')
+            ->willReturn($options['isOrganizationOwned']);
 
         $metadataConfig->expects($this->any())
             ->method('getOwnerFieldName')
@@ -184,7 +168,7 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
         $metadata = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata')
             ->setMethods([
                 'hasField',
-                'isGlobalLevelOwned',
+                'isOrganizationOwned',
                 'getOwnerFieldName',
                 'getFieldMapping',
                 'hasAssociation'
@@ -193,23 +177,33 @@ class EntityFieldManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         if (array_key_exists('getFieldMapping', $options)) {
-            $metadata->expects($this->any())->method('hasField')->willReturn($options['getFieldMapping']);
+            $metadata->expects($this->any())
+                ->method('hasField')
+                ->willReturn($options['getFieldMapping']);
         }
 
         if (array_key_exists('hasField', $options)) {
-            $metadata->expects($this->any())->method('hasField')->willReturn($options['hasField']);
+            $metadata->expects($this->any())
+                ->method('hasField')
+                ->willReturn($options['hasField']);
         }
 
         if (array_key_exists('hasAssociation', $options)) {
-            $metadata->expects($this->any())->method('hasField')->willReturn($options['hasAssociation']);
+            $metadata->expects($this->any())
+                ->method('hasField')
+                ->willReturn($options['hasAssociation']);
         }
 
-        if (array_key_exists('isGlobalLevelOwned', $options)) {
-            $metadata->expects($this->any())->method('isGlobalLevelOwned')->willReturn($options['isGlobalLevelOwned']);
+        if (array_key_exists('isOrganizationOwned', $options)) {
+            $metadata->expects($this->any())
+                ->method('isOrganizationOwned')
+                ->willReturn($options['isOrganizationOwned']);
         }
 
         if (array_key_exists('getOwnerFieldName', $options)) {
-            $metadata->expects($this->any())->method('getOwnerFieldName')->willReturn($options['getOwnerFieldName']);
+            $metadata->expects($this->any())
+                ->method('getOwnerFieldName')
+                ->willReturn($options['getOwnerFieldName']);
         }
 
         return $metadata;

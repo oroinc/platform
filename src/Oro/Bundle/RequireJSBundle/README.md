@@ -8,14 +8,6 @@ This bundle provides an easy way to:
 For details of configuration options see [RequireJS API].<br />
 For details of build options see [example.build.js].
 
-### Requirement
-OroRequireJSBundle requires [fxpio/composer-asset-plugin][composer-asset-plugin] to manage dependency in third-party asset libraries. The plugin has to be installed globally (per user):
- 
-```bash
-    composer self-update
-    composer global require "fxp/composer-asset-plugin"
-```
-
 ## Require.js config generation
 ### Configuration
 Common options for require.js config are placed in ```app/config.yml```:
@@ -145,4 +137,3 @@ It will:
 
 [RequireJS API]: <http://requirejs.org/docs/api.html#config>
 [example.build.js]: <https://github.com/jrburke/r.js/blob/master/build/example.build.js>
-[composer-asset-plugin]:  https://github.com/fxpio/composer-asset-plugin/blob/master/Resources/doc/index.md

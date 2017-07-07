@@ -45,7 +45,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iHaveNewEmails()
     {
-        $this->fixtureLoader->loadFixtureFile('emails.yml');
+        $this->fixtureLoader->loadFixtureFile('OroEmailBundle:emails.yml');
     }
 
     /**

@@ -4,6 +4,7 @@
     animation-name: fade-in-up;
     animation-duration: $fade-in-up-duration;
     animation-fill-mode: both;
+    visibility: visible;
 }
 
 // Remove -webkit- version after fix scss builder

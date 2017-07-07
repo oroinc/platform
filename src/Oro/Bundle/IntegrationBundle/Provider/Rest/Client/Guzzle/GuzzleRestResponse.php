@@ -85,14 +85,6 @@ class GuzzleRestResponse implements RestResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function getRawHeaders()
-    {
-        return $this->response->getRawHeaders();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getHeader($header)
     {
         return $this->response->getHeader($header);
@@ -120,78 +112,6 @@ class GuzzleRestResponse implements RestResponseInterface
     public function getReasonPhrase()
     {
         return $this->response->getReasonPhrase();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentEncoding()
-    {
-        return $this->response->getContentEncoding();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentLanguage()
-    {
-        return $this->response->getContentLanguage();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentLength()
-    {
-        return $this->response->getContentLength();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentLocation()
-    {
-        return $this->response->getContentLocation();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentDisposition()
-    {
-        return $this->response->getContentDisposition();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentMd5()
-    {
-        return $this->response->getContentMd5();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentRange()
-    {
-        return $this->response->getContentRange();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentType()
-    {
-        return $this->response->getContentType();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isContentType($type)
-    {
-        return $this->response->isContentType($type);
     }
 
     /**
@@ -253,35 +173,6 @@ class GuzzleRestResponse implements RestResponseInterface
             throw GuzzleRestException::createFromException($exception);
         }
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function xml()
-    {
-        try {
-            $result = $this->response->xml();
-        } catch (\Exception $exception) {
-            throw GuzzleRestException::createFromException($exception);
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRedirectCount()
-    {
-        return $this->response->getRedirectCount();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEffectiveUrl()
-    {
-        return $this->response->getEffectiveUrl();
     }
 
     /**

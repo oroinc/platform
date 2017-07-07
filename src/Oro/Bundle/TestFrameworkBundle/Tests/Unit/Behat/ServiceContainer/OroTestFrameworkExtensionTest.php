@@ -52,11 +52,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
-        $applicableSuites = ['OroUserBundle'];
 
         $config = ['oro_test' => [
             'shared_contexts' => $sharedContexts,
-            'application_suites' => $applicableSuites,
         ]];
 
         $config = $this->processConfig($config);
@@ -65,7 +63,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->load($containerBuilder, $config);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
-        $this->assertEquals($applicableSuites, $containerBuilder->getParameter('oro_test.application_suites'));
     }
 
     public function testGetConfigKey()
@@ -189,7 +186,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $kernel->getContainer()->set(
             'oro_security.owner.metadata_provider.chain',
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
                 ->disableOriginalConstructor()
                 ->getMock()
         );

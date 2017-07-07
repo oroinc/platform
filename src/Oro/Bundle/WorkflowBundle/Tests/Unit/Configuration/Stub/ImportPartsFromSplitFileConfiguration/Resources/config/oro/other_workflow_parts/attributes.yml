@@ -1,0 +1,7 @@
+workflows:
+    with_split_parts:
+        attributes:
+            first_attribute:
+                type: object
+                options:
+                    class: DateTime

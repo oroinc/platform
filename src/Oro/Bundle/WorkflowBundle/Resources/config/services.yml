@@ -589,3 +589,10 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: postRemove, method: invalidateCache }
             - { name: oro_workflow.changes.listener, event: oro.workflow.activated, method: invalidateCache }
             - { name: oro_workflow.changes.listener, event: oro.workflow.deactivated, method: invalidateCache }
+
+    oro_workflow.emailtemplate.variable_provider.entity:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\EntityVariablesProvider'
+        lazy: true
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }

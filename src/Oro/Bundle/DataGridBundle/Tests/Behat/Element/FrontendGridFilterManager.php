@@ -69,7 +69,7 @@ class FrontendGridFilterManager extends Element
         if ($this->isVisible()) {
             return;
         }
-        $button = $this->elementFactory->createElement('FrontendGridFilterManagerButton');
+        $button = $this->elementFactory->createElement('GridFilterManagerButton');
         $button->click();
 
         self::assertTrue($this->isVisible(), 'Can not open grid filter manager dropdown');

@@ -1108,7 +1108,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^Page title equals to "(?P<pageTitle>[\w\s]+)"$/
+     * @Then /^Page title equals to "(?P<pageTitle>[\w\s-]+)"$/
      *
      * @param string $pageTitle
      */
@@ -1134,6 +1134,7 @@ class OroMainContext extends MinkContext implements
         $field = $this->createOroForm()->findField($fieldName);
         $field->focus();
         $field->keyDown(13);
+        $field->keyUp(13);
         $this->waitForAjax();
     }
 
