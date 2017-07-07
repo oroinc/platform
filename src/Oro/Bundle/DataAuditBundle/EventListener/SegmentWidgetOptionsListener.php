@@ -51,7 +51,7 @@ class SegmentWidgetOptionsListener
      */
     public function onLoad(WidgetOptionsLoadEvent $event)
     {
-        if (!$this->authorizationChecker->isGranted('oro_dataaudit_history')) {
+        if (!$this->authorizationChecker->isGranted('oro_dataaudit_view')) {
             return;
         }
         $widgetOptions = $event->getWidgetOptions();
