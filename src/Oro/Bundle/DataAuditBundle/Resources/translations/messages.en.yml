@@ -67,6 +67,36 @@ oro:
             criteria:
                 data_audit: Data audit
 
-        acl:
-            action:
-                history.label: Access data audit
+        abstractaudit:
+            entity_label: Audit
+            entity_plural_label: Audits
+            action.label: Audit action
+            id.label: Id
+            logged_at.label: Logged at
+            object_class.label: Audit class
+            object_id.label: Id
+            object_name.label: Audit
+            owner_description.label: Audit owner description
+            transaction_id.label: Audit transaction id
+            version.label: Audit version
+            fields.label: Audit fields
+            impersonation.label: Audit impersonation
+            organization.label: Audit organization
+            user.label: Audit user
+
+        audit:
+            entity_label: Audit
+            entity_plural_label: Audits
+            action.label: Audit action
+            id.label: Id
+            logged_at.label: Logged at
+            object_class.label: Audit class
+            object_id.label: Id
+            object_name.label: Audit
+            owner_description.label: Audit owner description
+            transaction_id.label: Audit transaction id
+            version.label: Audit version
+            fields.label: Audit fields
+            impersonation.label: Audit impersonation
+            organization.label: Audit organization
+            user.label: Audit user

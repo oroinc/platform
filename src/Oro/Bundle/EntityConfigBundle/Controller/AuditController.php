@@ -26,7 +26,7 @@ class AuditController extends Controller
      *      defaults={"entity"="entity", "id"=0, "_format" = "html"}
      * )
      * @Template("OroDataAuditBundle:Audit/widget:history.html.twig")
-     * @AclAncestor("oro_dataaudit_history")
+     * @AclAncestor("oro_dataaudit_view")
      *
      * @param $entity
      * @param $id
@@ -49,7 +49,7 @@ class AuditController extends Controller
      *      defaults={"entity"="entity", "id"=0, "_format" = "html"}
      * )
      * @Template("OroDataAuditBundle:Audit/widget:history.html.twig")
-     * @AclAncestor("oro_dataaudit_history")
+     * @AclAncestor("oro_dataaudit_view")
      *
      * @param $entity
      * @param $id
