@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
+use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Testwork\Suite\Suite;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class FileField extends Element implements SuiteAwareInterface
 {
@@ -37,6 +39,12 @@ class FileField extends Element implements SuiteAwareInterface
     protected function getFilePath($filename)
     {
         $suitePaths = $this->suite->getSetting('paths');
+
+        if (SymfonyBundleSuite::class === get_class($this->suite)) {
+            /** @var BundleInterface $bundle */
+            $bundle = $this->suite->getBundle();
+            $suitePaths[] = sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundle->getPath(), DIRECTORY_SEPARATOR);
+        }
 
         foreach ($suitePaths as $suitePath) {
             $path = $suitePath.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;

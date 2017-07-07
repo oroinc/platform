@@ -311,6 +311,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $page->clickLink('Update schema');
         $this->waitForAjax();
         $page->clickLink('Yes, Proceed');
+        $this->waitForAjax();
     }
 
     /**

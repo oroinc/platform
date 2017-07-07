@@ -1,30 +1,4 @@
 services:
-    cli.controller.suite:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
-        arguments:
-            - '@suite.registry'
-            - '%suite.configurations%'
-            - '%oro_test.application_suites%'
-        tags:
-            - { name: cli.controller, priority: 1100 }
-
-    cli.controller.available_suites:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
-        arguments:
-            - '@suite.registry'
-            - '@specifications.finder'
-        tags:
-            - { name: cli.controller, priority: 700 }
-
-    cli.controller.available_suites_group:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController
-        arguments:
-            - '@suite.registry'
-            - '@specifications.finder'
-            - '%oro_test.suite_groups%'
-        tags:
-            - { name: cli.controller, priority: 710 }
-
     oro_test.listener.messagequeue_run_check_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueRunCheckSubscriber
         tags:
@@ -45,33 +19,6 @@ services:
             - ~
         tags:
             - { name: 'event_dispatcher.subscriber' }
-
-    oro_test.listener.interactive_execution_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
-
-    cli.controller.mesure_execution_time:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
-        arguments:
-            - '@oro_test.listener.step_duration_measure_subscriber'
-            - '@event_dispatcher'
-        tags:
-            - { name: 'cli.controller' }
-
-    cli.controller.interactive_execution:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InteractiveExecutionController
-        arguments:
-            - '@oro_test.listener.interactive_execution_subscriber'
-            - '@event_dispatcher'
-        tags:
-            - { name: 'cli.controller', priority: 500 }
-
-    cli.controller.input_output_conyroller:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
-        arguments:
-            - '@oro_behat_extension.isolation.test_isolation_subscriber'
-            - '@oro_test.listener.messagequeue_run_check_subscriber'
-        tags:
-            - { name: 'cli.controller', priority: 100 }
 
     oro_element_factory:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory'
@@ -127,7 +74,6 @@ services:
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
         tags:
-            - { name: 'suite_aware' }
             - { name: 'message_queue_isolator_aware' }
 
     oro_test.entity_class_resolver:
@@ -162,6 +108,11 @@ services:
             - '@oro_test.alice_loader'
         calls:
             - [setKernel, ['@symfony2_extension.kernel']]
+
+    oro_behat_extension.specification.specification_divider:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider
+        arguments:
+          - '@specifications.finder'
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
