@@ -1107,7 +1107,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^Page title equals to "(?P<pageTitle>[\w\s\-]+)"$/
+     * @Then /^Page title equals to "(?P<pageTitle>[\w\s-]+)"$/
      *
      * @param string $pageTitle
      */

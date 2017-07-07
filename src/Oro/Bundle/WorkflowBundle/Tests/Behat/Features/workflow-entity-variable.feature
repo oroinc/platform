@@ -1,5 +1,5 @@
-@fixture-Users.yml
-@fixture-TestWorkflow.yml
+@fixture-OroWorkflowBundle:Users.yml
+@fixture-OroWorkflowBundle:TestWorkflow.yml
 Feature: Workflow entity attribute
   Scenario: Set up workflow variable configuration
     Given I login as administrator

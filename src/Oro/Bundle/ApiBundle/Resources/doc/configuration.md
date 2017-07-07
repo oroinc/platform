@@ -130,7 +130,7 @@ Example:
 api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
-            sorter:
+            sorters:
                 fields:
                     field1:
                         exclude: true

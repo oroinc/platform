@@ -55,6 +55,10 @@ ApiBundle
 - Class `Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator`
     - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
 
+ConfigBundle
+------------------
+ - Interface `Oro\Bundle\ConfigBundle\Provider\Value\ValueProviderInterface` was added. Now services can be used for fetching default value of config setting. For details, see `Oro/Bundle/ConfigBundle/Resources/doc/config_management.md`.
+
 DashboardBundle
 ---------------
 - Class `Oro\Bundle\DashboardBundle\Controller\DashboardController`
@@ -454,6 +458,8 @@ UserBundle
 TestFrameworkBundle
 -------------------
 - Class `TestListener` namespace added, use `Oro\Bundle\TestFrameworkBundle\Test\TestListener` instead
+- Removed `--applicable-suites` parameter from behat.
+Now every bundle should provide only features that applicable to any application that include that bundle.
 
 TranslationBundle
 -----------------
@@ -522,6 +528,7 @@ UIBundle
 - Updated jQuery.Numeric to 1.5.0 version
 - Updated Lightgallery.js to 1.4.0 version
 - Updated RequireJS test.js plugin to 2.0.* version
+- Updated jQuery.Uniform to 4.2.0 version
 
 LocaleBundle
 ------------

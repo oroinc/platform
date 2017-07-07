@@ -7,3 +7,30 @@
         {{ block_widget(block) }}
     </footer>
 {% endblock %}
+
+{% block _page_footer_container_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': " page-footer-container"
+    }) %}
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_footer_base_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': " page-footer-container__base"
+    }) %}
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_footer_side_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': " page-footer-container__side"
+    }) %}
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}

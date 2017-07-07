@@ -21,6 +21,7 @@ define([
     var queue = [];
     var groupedMessages = {};
     var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
+    var noFlashTags = ['a'];
 
     var resolveContainer = function(options) {
         if ($(options.container).is(defaults.container) && $(defaults.temporaryContainer).length) {
@@ -125,7 +126,7 @@ define([
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                var isFlash = notFlashTypes.indexOf(type) === -1;
+                var isFlash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
                 var namespace = (options || {}).namespace;
 
                 if (!namespace) {
@@ -218,6 +219,18 @@ define([
 
             removeTemporaryContainer: function() {
                 $(defaults.container).append($(this).children());
+            },
+
+            /**
+             * Check if given string contains no flash tags
+             *
+             * @param {string} string
+             * @return {boolean}
+             */
+            _containsNoFlashTags: function(string) {
+                return _.some(noFlashTags, function(tag) {
+                    return $('<div>').append(string).find(tag).length > 0;
+                });
             }
         };
 });

@@ -42,6 +42,7 @@ class Form extends Element
 
             $field = $this->wrapField($label, $field);
             $field->setValue($value);
+            $field->blur();
         }
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToWindow();
@@ -54,7 +55,7 @@ class Form extends Element
             list($label, $value) = $row;
             $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
-            self::assertNotNull($field, "Field with not found");
+            self::assertNotNull($field, sprintf("Field `%s` not found", $label));
 
             $field = $this->wrapField($label, $field);
             echo $field->getOuterHtml();

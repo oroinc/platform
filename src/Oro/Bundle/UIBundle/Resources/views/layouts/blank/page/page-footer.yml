@@ -3,8 +3,20 @@ layout:
         - '@setBlockTheme':
             themes: 'page-footer.html.twig'
 
-        - '@add':
-            id: page_footer
-            parentId: page_container
-            blockType: container
-            prepend: false
+        - '@addTree':
+            items:
+                page_footer:
+                    blockType: container
+                    prepend: false
+                page_footer_container:
+                    blockType: container
+                page_footer_base:
+                    blockType: container
+                page_footer_side:
+                    blockType: container
+            tree:
+                page_container:
+                    page_footer:
+                        page_footer_container:
+                            page_footer_base: ~
+                            page_footer_side: ~
