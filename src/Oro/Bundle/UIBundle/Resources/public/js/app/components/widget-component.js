@@ -103,6 +103,9 @@ define(function(require) {
                 // defines module name and load the module, before open widget
                 widgetModuleName = mapWidgetModuleName(this.options.type);
                 tools.loadModules(widgetModuleName, function(Widget) {
+                    if (this.disposed) {
+                        return;
+                    }
                     this.widget = Widget;
                     this._openWidget(deferredOpen);
                 }, this);

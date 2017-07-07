@@ -218,8 +218,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $this->getEntityManager()->clear();
 
         $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'post relationship');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'post relationship');
 
         return $response;
     }

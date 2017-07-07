@@ -199,7 +199,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         // trigger refresh of current page if active dropdown is clicked, despite the Backbone router limitations
         $(activeDropdownsSelector).on('click', $('li.active a'), function(e) {
             var $target = $(e.target).closest('a');
-            if (!$target.hasClass('unclickable') && $target[0] !== undefined && 'pathname' in $target[0]) {
+            if (!$target.hasClass('unclickable') && $target[0] !== undefined && $target[0].pathname !== undefined) {
                 if (mediator.execute('compareUrl', $target[0].pathname)) {
                     mediator.execute('refreshPage');
                     return false;
@@ -449,7 +449,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         }
         var containerSelector = $(this).data('container') || '.collection-fields-list';
         var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
-        var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+        var rowCountAdd = 1;
+        if ($(this).data('row-add-only-one')) {
+            $(this).removeData('row-add-only-one');
+        } else {
+            rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+        }
+
         var collectionInfo = getOroCollectionInfo($listContainer);
         for (var i = 1; i <= rowCountAdd; i++) {
             var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
@@ -567,8 +573,12 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
                 showAfterLoad: false,
                 hash: false
             }).on('onCloseAfter.lg', function() {
-                $(this).data('lightGallery').destroy(true); //fully destroy gallery on close
-                $(this).off('onCloseAfter.lg');
+                var $el = $(this);
+                var lightGallery = $el.data('lightGallery');
+                if (lightGallery) {
+                    lightGallery.destroy(true); //fully destroy gallery on close
+                }
+                $el.off('onCloseAfter.lg');
             });
             e.preventDefault();
         }
