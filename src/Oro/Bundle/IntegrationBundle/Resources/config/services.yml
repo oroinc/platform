@@ -139,10 +139,7 @@ services:
 
     oro_integration.reader.entity.by_id:
         class: %oro_integration.reader.entity.by_id.class%
-        arguments:
-            - '@oro_importexport.context_registry'
-            - '@doctrine'
-            - '@oro_security.owner.ownership_metadata_provider'
+        parent: oro_importexport.reader.entity
 
     oro_integration.helper.default_owner_helper:
         class: %oro_integration.helper.default_owner_helper.class%
