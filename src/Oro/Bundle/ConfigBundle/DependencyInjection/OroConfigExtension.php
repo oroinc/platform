@@ -18,5 +18,6 @@ class OroConfigExtension extends Extension
         $loader->load('services.yml');
         $loader->load('services_api.yml');
         $loader->load('layout.yml');
+        $loader->load('value_providers.yml');
     }
 }
