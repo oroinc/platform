@@ -410,7 +410,8 @@ In this case, the combination of the feature tests might run much faster, but th
 Elements is a service layer in behat tests. They wrap the complex business logic.
 Take a minute to investigate base Mink [NodeElement](https://github.com/minkphp/Mink/blob/9ea1cebe3dc529ba3861d87c818f045362c40484/src/Element/NodeElement.php).
 It has many public methods, some of them are applicable only to some elements.
-Every Bundle tests may contain particular number of elements. All elements must be described in ```{BundleName}/Tests/Behat/behat.yml``` in the following way:
+Every Bundle tests may contain particular number of elements.
+All elements must be described in ```{BundleName}/Tests/Behat/behat.yml``` in the following way:
 
 ```yml
 oro_behat_extension:
@@ -432,7 +433,8 @@ where:
  ```
 
 2. ```selector``` defines how selenium driver shall find the element on the page.
-By default, when the selector type is not specified, the [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector) is used.  XPath selector is also supported and may be provided with the following configuration:
+By default, when the selector type is not specified, the [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector) is used.
+XPath selector is also supported and may be provided with the following configuration:
 
  ```yml
     selector:
@@ -440,15 +442,18 @@ By default, when the selector type is not specified, the [css selector](http://m
         locator: //span[id='mySpan']/ancestor::form/
  ```
 
-3. the ```class``` namespace for element's class (must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```).
+3. the ```class``` namespace for element's class (should be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```).
 When omitted, the ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` class is used by default.
 
 4. ```options``` is an array of additional options that will be stored in ```options``` property of Element class.
-It is highly recommended to supply a class with options mapping for the form elements. This will increase test speed and ensure more accurate fields mapping.
+It is highly recommended to supply a class with options mapping for the form elements.
+This will increase test speed and ensure more accurate fields mapping.
 
 ### Mapping Form Fields
 
-By default, tests use the [named field selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#named-selectors) to map form fields. Name field selector searched for the field by its id, name, label or placeholder. You are free to use any selector for form fields mapping or wrap an element into the particular behat element.
+By default, tests use the [named field selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#named-selectors) to map form fields.
+Name field selector searched for the field by its id, name, label or placeholder.
+You are free to use any selector for form fields mapping or wrap an element into the particular behat element.
 
 behat.yml
 ```yml
@@ -456,7 +461,7 @@ oro_behat_extension:
   elements:
     Payment Method Config Type Field:
       class: Oro\Bundle\PaymentBundle\Tests\Behat\Element\PaymentMethodConfigType
-    Payment Rule Form:
+    PaymentRuleForm:
       selector: "form[id^='oro_payment_methods_configs_rule']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
@@ -513,7 +518,7 @@ To fill in the form in the iframe correctly, specify iframe id in the form optio
 ```yml
 oro_behat_extension:
   elements:
-    Magento contact us form:
+    MagentoContactUsForm:
       selector: 'div#page'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
@@ -533,7 +538,7 @@ Typical Page configuration:
 ```yml
 oro_behat_extension:
   pages:
-    User Profile View:
+    UserProfileView:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
       route: 'oro_user_profile_view'
 ```
@@ -574,7 +579,7 @@ Now you can use several meaningful steps:
 ### Feature fixtures
 
 Every time when behat runs a new feature, application state is reset to default 
-(see [Feature isolation](./behat-tests.md#feature-isolation) for more information): 
+(see [Feature isolation](#feature-isolation) for more information):
 there is only one admin user, one organization, one business unit and default roles in the database.
 
 The feature tests must rely on data that is available in the application after the oro:install command execution.
