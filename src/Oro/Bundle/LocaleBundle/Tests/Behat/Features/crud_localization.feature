@@ -1,6 +1,6 @@
 @ticket-BAP-14021
 @automatically-ticket-tagged
-@fixture-japanese-language.yml
+@fixture-OroLocaleBundle:japanese-language.yml
 Feature: Localization Crud
   In order to manage available localizations
   As Administrator

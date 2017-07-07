@@ -97,14 +97,6 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $builder
             ->children()
-                ->arrayNode('application_suites')
-                    ->prototype('scalar')->end()
-                    ->info(
-                        "Suites that applicable for application.\n".
-                        'This suites will be run with --applicable-suites key in console'
-                    )
-                    ->defaultValue([])
-                ->end()
                 ->arrayNode('suite_groups')
                     ->useAttributeAsKey('name')
                     ->prototype('array')
@@ -139,10 +131,10 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('services.yml');
         $loader->load('isolators.yml');
         $loader->load('artifacts.yml');
+        $loader->load('cli_controllers.yml');
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $container->setParameter('oro_test.application_suites', $config['application_suites']);
         $container->setParameter('oro_test.suite_groups', $config['suite_groups']);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);

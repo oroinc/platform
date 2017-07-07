@@ -1,4 +1,4 @@
-@fixture-is_any_of_and_is_not_any_of_number_filters.yml
+@fixture-OroFilterBundle:is_any_of_and_is_not_any_of_number_filters.yml
 Feature: "is any of" and "is not any of" number filters
     In order to filter numbers by list
     As administrator
