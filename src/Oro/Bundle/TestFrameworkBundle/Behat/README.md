@@ -591,7 +591,7 @@ Thereby you have two ways to get more data in the system: using inline fixtures,
 You can create any number of any entities in the feature tests.
 The ```FixtureContext``` guesses the entity class, creates the necessary number of objects,
 and uses [faker](https://github.com/fzaninotto/faker) to fill in the required fields when their value was not specified explicitly.
-You use both [faker](https://github.com/fzaninotto/faker) and [entity references](#Entity references) in inline fixtures.
+You use both [faker](https://github.com/fzaninotto/faker) and [entity references](#entity-references) in inline fixtures.
 
 ```yml
   Given the following contacts:
@@ -634,8 +634,8 @@ For example:
 Feature: Adding attributes for workflow transition
 ```
 
-Additionally, Alice allows you to [include files](https://github.com/nelmio/alice/blob/a060587f3c90edd92a65c6c0d163972f49bc4e21/doc/fixtures-refactoring.md#including-files) via
-extension, so you can import files from other bundles:
+Additionally, Alice allows you to [include files](https://github.com/nelmio/alice/blob/a060587f3c90edd92a65c6c0d163972f49bc4e21/doc/fixtures-refactoring.md#including-files)
+via extension, so you can import files from other bundles:
 
 ```yaml
 include:
@@ -663,7 +663,7 @@ Every feature is a separate file with the ```.feature``` extension and some spec
 
 A feature starts with the following:
 * The ```Feature:``` keyword and feature name (these should stay on the same line),
-* An optional description (can be formatted as multiple lines). Having meaningful description is highly recommended. 
+* An optional description (can be formatted as multiple lines). Having meaningful description is highly recommended.
 
 Next goes the feature scenario - specific example that illustrates a business rule and consists of sequential steps.
 In addition to being a test specification and test documentation, a scenario defines the test steps and serves as an executable specification of the system.
@@ -672,7 +672,8 @@ Normally, a step starts with ***Given***, ***When***, or ***Then***.
 If there are multiple Given or When steps underneath each other, you can use ***And*** or ***But*** to organize them into logical groups.
 Cucumber does not differentiate between the keywords, but choosing the right one is important for the readability of the scenario as a whole.
 
-Please,take a look at the login.feature in OroUserBundle: [UserBundle/Tests/Behat/Features/login.feature](../../../../UserBundle/Tests/Behat/Features/login.feature)
+Please,take a look at the login.feature in OroUserBundle:
+[UserBundle/Tests/Behat/Features/login.feature](https://github.com/orocrm/platform/blob/50047c1d8abc5f811d0db759b501b8d27b0bff65/src/Oro/Bundle/UserBundle/Tests/Behat/Features/login.feature)
 
 ```gherkin
 Feature: User login
@@ -710,7 +711,10 @@ Scenario Outline: Fail login
 3. The line ```Scenario: Success login``` starts the scenario and provides a description of the scenario.
 4. The next 6 lines are the scenario steps. Every step is matched to a regular expression that is defined in the Context.
 5. The line ```Scenario Outline: Fail login``` starts the next scenario.
-  In the scenario outline, the placeholders are used instead of the actual values, and the values for scenario execution are provided as a set of examples below the outline. Scenario Outlines helps you run these steps several times, iterating through the values provided in the ```Examples:``` section and thus testing the same flow with different input.  
+  In the scenario outline, the placeholders are used instead of the actual values,
+  and the values for scenario execution are provided as a set of examples below the outline.
+  Scenario Outlines helps you run these steps several times, iterating through the values provided in the ```Examples:``` section
+  and thus testing the same flow with different input.
   The Scenario Outline is a template which is never run on its own.
   Instead, a Scenario that follows an outline runs once for each row in the Examples section beneath it (except for the first header row that is skipped).
   Think of a placeholder as of a variable.
@@ -721,10 +725,10 @@ Scenario Outline: Fail login
 
 ### Increase application performance (Ubuntu)
 
-In behat we have such isolators ([see Feature isolation](#Feature isolation)) to make behat features independent to each other.
+In behat we have such isolators ([see Feature isolation](#feature-isolation)) to make behat features independent to each other.
 One of those isolators is a database.
 It creates database dump before start execution, then drops it and restores it from dump after each feature.
-This can take a while (up to 2 minutes).
+This can take a while (up to 2 minutes on slow ssd).
 If you run behat tests often you would like to decrease this time.
 To boost database isolator you can mount database directory to RAM.
 We will use [tmpfs](https://en.wikipedia.org/wiki/Tmpfs)
@@ -781,7 +785,7 @@ Alternatively, you can create a startup script that may be launched automaticall
 
 To prepare for auto-recovery using a startup script:
 
-1. Create a bash script in the home directory (e.g. mysql_copy_tmpfs.sh):
+1. Create a mysql_copy_tmpfs.sh in the bin directory (e.g. /usr/local/bin):
 ```bash
 #!/bin/bash
 cp -Rfp /var/lib/mysql /var/tmpfs
@@ -877,7 +881,8 @@ Use the useful tricks below to find the necessary step.
 
 #### Auto Suggestion in PhpStorm
 
-While designing a scenario in feature file, you can start typing a keyword and PhpStorm will offer you hints on the implemented steps that match the keywords, e.g. when you type grid or form, the steps that involve these items pop up in the suggestions block.
+While designing a scenario in feature file, you can start typing a keyword and PhpStorm will offer you hints on the implemented steps that match the keywords,
+e.g. when you type grid or form, the steps that involve these items pop up in the suggestions block.
 
 ![PhpStorm step suggestion](./doc/images/phpstorm_step_suggestion.png)
 
@@ -898,7 +903,8 @@ Usually, the name of context is self-explanatory, e.g. GridContext, FormContext,
 
 #### Use Grep in Console
 
-If for any reason you do not use PhpStorm or behat plugin, you still can find the necessary step by filtering the output of the command that previews all the feature steps (use grep). Just type in your console:
+If for any reason you do not use PhpStorm or behat plugin,
+you still can find the necessary step by filtering the output of the command that previews all the feature steps (use grep). Just type in your console:
 
 ```bash
 bin/behat -dl -s AcmeDemoBundle | grep "flash message"
