@@ -28,7 +28,7 @@
         "bower-asset/crypto-js": "3.1.7",
         "bower-asset/jquery-mousewheel": "3.1.13",
         "bower-asset/jquery.numeric": "1.5.0",
-        "bower-asset/uniform": "2.1.1",
+        "npm-asset/jquery.uniform": "4.2.0",
         "bower-asset/malihu-custom-scrollbar-plugin": "3.1.5",
         "bower-asset/timepicker": "1.11.*",
         "bower-asset/datepair": "0.4.*",

@@ -70,7 +70,9 @@ define([
                     return;
                 }
                 e.preventDefault();
-                this.init(this.initOptions);
+                this.init(this.initOptions).done(function() {
+                    $(e.target).trigger('content:initialized');
+                });
             }, this));
 
             // if the container catches content remove event -- disposes related components
