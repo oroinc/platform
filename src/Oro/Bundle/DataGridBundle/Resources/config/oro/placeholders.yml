@@ -4,12 +4,8 @@ placeholders:
             items:
                 template_datagrid_toolbar:
                     order: 20
-                template_select_row_cell: ~
 
     items:
         template_datagrid_toolbar:
             applicable: "@oro_layout.helper->isTemplateRequest()"
             template: OroDataGridBundle:js:toolbar.html.twig
-        template_select_row_cell:
-            applicable: "@oro_layout.helper->isTemplateRequest()"
-            template: OroDataGridBundle:js:select-row-cell.html.twig
