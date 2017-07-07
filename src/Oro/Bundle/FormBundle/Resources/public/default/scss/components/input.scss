@@ -44,4 +44,10 @@
     @include element-state('error') {
         box-shadow: $input-box-shadow-error-state;
     }
+
+    @include element-state('disabled') {
+        background: $input-background-color-disabled-state;
+        box-shadow: none;
+        border: $input-border;
+    }
 }
