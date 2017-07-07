@@ -69,7 +69,8 @@ See [Driver Feature Support](http://mink.behat.org/en/latest/guides/drivers.html
 
 ***Selenium2*** browser automation tool with object oriented API.
 
-***PhantomJS*** is a headless WebKit scriptable with a JavaScript API that is fast and originally supports various web standards, like DOM handling, CSS selector, JSON, Canvas, and SVG.
+***PhantomJS*** is a headless WebKit scriptable with a JavaScript API that is fast and originally supports various web standards,
+like DOM handling, CSS selector, JSON, Canvas, and SVG.
 
 ## Conventions
 
@@ -113,18 +114,34 @@ This section summarizes limitations and agreements that are important for shared
   ```gherkin
       And I open User Index page
   ```
-- **Avoid scenario redundancy** (e.g. repeating the same sequence of steps, like login, in multiple scenarios). Cover the feature with the sequential scenarios where every following scenario reuses outcomes (the states and data) prepared by their predecessors. This path was chosen because of the following benefits:
+- **Avoid scenario redundancy** (e.g. repeating the same sequence of steps, like login, in multiple scenarios).
+Cover the feature with the sequential scenarios where every following scenario reuses outcomes (the states and data) prepared by their predecessors.
+This path was chosen because of the following benefits:
 
-  - Faster scenario execution due to the shared user session and smart data preparation. The login action in the initial scenario opens the session that is reusable by the following scenarios. Preliminary scenarios (e.g. create) prepare data for the following scenarios (e.g. delete).
+  - Faster scenario execution due to the shared user session and smart data preparation.
+    The login action in the initial scenario opens the session that is reusable by the following scenarios.
+    Preliminary scenarios (e.g. create) prepare data for the following scenarios (e.g. delete).
   - Feature level isolation boosts execution speed, especially in the slow test environments.
-  - Minimized routine development actions (e.g. you don't have to load fixtures for every scenario; instead, you reuse the available outcomes of the previous scenarios).
+  - Minimized routine development actions
+    (e.g. you don't have to load fixtures for every scenario; instead, you reuse the available outcomes of the previous scenarios).
   - Easy handling of the application states that are difficult to emulate with data fixtures only (e.g. when adding new entity fields in the UI).
 
-  By coupling scenarios, the ease of debugging and bug localization get sacrificed. It is difficult to debug UI features and the scenarios that happen after several preliminary scenarios. The longer the line, the harder it is to isolate the issue. See [Feature debugging](#feature-debugging) for more information. Once the issue occurs, you have to spend additional time to localize it and identify the root cause (e.g. the delete scenario may be malfunctioning vs the delete scenario may fail due to the issues in the preliminary scenario, for example, create). The good point is that the most critical actions/scenarios usually precede the less critical. Who cares about the delete if the create does not work in the first place? ;)
+  By coupling scenarios, the ease of debugging and bug localization get sacrificed.
+  It is difficult to debug UI features and the scenarios that happen after several preliminary scenarios.
+  The longer the line, the harder it is to isolate the issue.
+  Once the issue occurs, you have to spend additional time to localize it and identify the root cause
+  (e.g. the delete scenario may be malfunctioning vs the delete scenario may fail due to the issues in the preliminary scenario, for example, create). is
+  The good point is that the most critical actions/scenarios usually precede the less critical.
+  Who cares about the delete if the create does not work in the first place? ;)
 
-- **Use semantical yml fixtures**. Use only the entities that are in the bundle you are testing. Any other entities should be included via import. See [Alice fixtures](#alice-fixtures)
+- **Use semantical yml fixtures**.
+  Use only the entities that are in the bundle you are testing.
+  Any other entities should be included via import.
+  See [Alice fixtures](#alice-fixtures)
 
-- **Name elements in camelCase style without spaces**. You can still refer to it using the camelCase style with spaces in the behat scenarios. For example, an element named ```OroProductForm``` may be mentioned in the step of the scenario as "Oro Product From":
+- **Name elements in camelCase style without spaces**.
+  You can still refer to it using the camelCase style with spaces in the behat scenarios.
+  For example, an element named ```OroProductForm``` may be mentioned in the step of the scenario as "Oro Product From":
   
   ```
   I fill "Oro Product From" with:
@@ -145,7 +162,8 @@ If you don't have any mail server configured locally, set the ```mailer_transpor
 
 The base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
 Every application has its own behat.yml.dist file in the root of the application directory.
-Create your ```behat.yml```(it is ignored by git automatically and is never committed to the remote repository), import base configuration and change it to fit your environment:
+Create your ```behat.yml```(it is ignored by git automatically and is never committed to the remote repository),
+import base configuration and change it to fit your environment:
 
 ```yaml
 imports:
@@ -162,7 +180,7 @@ selenium2:
         <<: *default_extensions
         Behat\MinkExtension:
             browser_name: chrome
-            base_url: "http://your-domain.local/"
+            base_url: "http://your-domain.local"
 
 ```
 
@@ -197,7 +215,9 @@ app/console oro:install  --drop-database --user-name=admin --user-email=admin@ex
 #### Install Test Automation Tools
 
 To execute scenarios that use Oro application features, run browser-automation server (Selenium Web Driver) or headless WebKit browser (PhantomJs).
-PhantomJs is more efficient but is headless and is not observable for a human. However, it make screenshots when anything goes wrong. Selenium server runs feature tests in a real browser.
+PhantomJs is more efficient but is headless and is not observable for a human.
+However, it make screenshots when anything goes wrong.
+Selenium server runs feature tests in a real browser.
 
 To install PhantomJs, run the following commands:
 
@@ -208,7 +228,9 @@ tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/phantomjs
 sudo ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
 ```
 
-**Note:** These commands create a subdirector for phantomjs in your home directory, downloads phantomjs into directory that you just created, uncompress files, creates symbolic link.
+**Note:** These commands create a subdirectory for phantomjs in your home directory,
+          downloads phantomjs into directory that you just created, uncompress files,
+          creates symbolic link.
 
 After the command execution is complete, you can use ```phantomjs``` in the terminal.
 
@@ -219,7 +241,7 @@ mkdir $HOME/selenium-server-standalone-3.4.0
 curl -L https://selenium-release.storage.googleapis.com/3.4/selenium-server-standalone-3.4.0.jar > $HOME/selenium-server-standalone-3.4.0/selenium.jar
 ```
 
-Next, download Chrome Driver from http://chromedriver.storage.googleapis.com/index.html?path=2.29/ and save it into your bin directory as selenium.
+Next, download Chrome Driver from http://chromedriver.storage.googleapis.com/index.html?path=2.29/ and save it into your bin directory e.g. /usr/local/bin.
 
 ### Test Execution
 
@@ -247,9 +269,11 @@ java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-se
 
 #### Run tests
 
-Before you begin, it is highly recommended to make yourself familiar with behat arguments and options. Run ```bin/behat --help``` for a detailed description.
+Before you begin, it is highly recommended to make yourself familiar with behat arguments and options.
+Run ```bin/behat --help``` for a detailed description.
 
-When the Oro application is installed without demo data and is running, and the PhantomJs or Selenium Server is running, you can start running the behat tests by feature from the root of the application.
+When the Oro application is installed without demo data and is running, and the PhantomJs or Selenium Server is running,
+you can start running the behat tests by feature from the root of the application.
 
 You may use one of the following commands.
 
@@ -584,14 +608,15 @@ Alice is a library that allows you easily create fixtures in yml format.
 See [Alice Documentation](https://github.com/nelmio/alice/blob/2.x/README.md).
 
 Fixtures should be located in the ```{BundleName}/Tests/Behat/Features/Fixtures``` directory.
-For load a fixture before the feature tests execution, add a tag (annotation) that is constructed using the following convention: prefix the fixture file name with ```@fixture-```, e.g. ```@fixture-mass_action.yml```.
+For load a fixture before the feature tests execution,
+add a tag (annotation) that is constructed using the following convention ```@fixture-BundleName:fixture_file_name.yml```, e.g.
 
 ```gherkin
-@fixture-mass_action.yml
+@fixture-OroCRMBundle:mass_action.yml
 Feature: Mass Delete records
 ```
 
-It is also possible to load fixtures for other bundles using the following shortcut syntax: ```@fixture-OroOrganizationBundle:BusinessUnit.yml```
+It is also possible to load fixtures for any other bundles available for application.
 
 For example:
 ```gherkin
@@ -741,7 +766,9 @@ sudo service mysql start
 
 #### (optional) Create startup script
 
-After you restart the application, all the data and the database structure is lost. You should copy data directory manually after every start. Alternatively, you can create a startup script that may be launched automatically as a systemd service.
+After you restart the computer, all the data and the database structure will lost.
+You should copy data directory manually after every restart.
+Alternatively, you can create a startup script that may be launched automatically as a systemd service.
 
 To prepare for auto-recovery using a startup script:
 
@@ -798,7 +825,9 @@ Oro\Bundle\UserBundle\Entity\User:
 ```
 
 **Route cause (why this happens?)**
-Alice remembers all the values for the given entity property and tries to generate a unique value, but this causes issues when there is just one value for the entity property. This option still may be used if combined with the autogenerated fake value, like in the following example:
+Alice remembers all the values for the given entity property and tries to generate a unique value,
+but this causes issues when there is just one value for the entity property.
+This option still may be used if combined with the autogenerated fake value, like in the following example:
 
 ```yaml
 Oro\Bundle\UserBundle\Entity\User:
@@ -816,7 +845,10 @@ The feature development consists of the following design stages:
 - Specify all the scenarios that may happen when using the feature. Exact steps are steel not necessary.
 - Finalize the big picture of the implementation and plan the individual steps.
 
-Some of the steps may be already fully automated. Ideally, you should automate the missing steps after you plan using them in your feature test scenarios. If feature functionality is already implemented, it is necessary to implement the behat steps involved in the feature testing. However, sometimes it is impossible to do right away (because of the incomplete feature implementation, blocking issues or missing information).
+Some of the steps may be already fully automated.
+Ideally, you should automate the missing steps after you plan using them in your feature test scenarios.
+If feature functionality is already implemented, it is necessary to implement the behat steps involved in the feature testing.
+However, sometimes it is impossible to do right away (because of the incomplete feature implementation, blocking issues or missing information).
 
 In this case, you can temporarily mock the steps that are missing implementation. 
 
@@ -826,7 +858,8 @@ A quick way to do so is to do a dry-run of your feature tests. In the console, r
 bin/behat path/to/your.feature --dry-run --append-snippets --snippets-type=regex
 ```
 
-The featue is executed in the *--dry-run* mode, and at the final stage of execution you are prompted to add undefined steps mock implementation to one of the existing contexts.
+The featue is executed in the *--dry-run* mode,
+and at the final stage of execution you are prompted to add undefined steps mock implementation to one of the existing contexts.
 
 ### How to find the necessary step
 
