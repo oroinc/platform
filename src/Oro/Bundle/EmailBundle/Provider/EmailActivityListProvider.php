@@ -402,7 +402,7 @@ class EmailActivityListProvider implements
         if ($owners) {
             foreach ($owners as $owner) {
                 if (($owner->getMailboxOwner() && $owner->getOrganization()) ||
-                    (!$owner->getMailboxOwner() && $owner->getOrganization() && $owner->getOwner() )) {
+                    (!$owner->getMailboxOwner() && $owner->getOrganization() && $owner->getOwner())) {
                     $activityOwner = new ActivityOwner();
                     $activityOwner->setActivity($activityList);
                     $activityOwner->setOrganization($owner->getOrganization());

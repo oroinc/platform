@@ -37,7 +37,6 @@ trait WorkflowQueryTrait
         $workflowStepAlias = 'workflowStep',
         $workflowItemAlias = 'workflowItem'
     ) {
-
         if (false === in_array($workflowItemAlias, $queryBuilder->getAllAliases(), true)) {
             $this->joinWorkflowItem($queryBuilder, $workflowItemAlias);
         }

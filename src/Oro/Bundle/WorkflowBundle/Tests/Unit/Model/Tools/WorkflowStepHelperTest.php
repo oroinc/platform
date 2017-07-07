@@ -21,7 +21,7 @@ class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
     use EntityTrait;
 
     /** @var array */
-    static protected $steps;
+    protected static $steps;
 
     /**
      * @dataProvider getStepsAfterDataProvider

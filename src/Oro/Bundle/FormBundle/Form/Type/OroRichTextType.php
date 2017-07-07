@@ -50,7 +50,9 @@ class OroRichTextType extends AbstractType
     /**
      * @var array
      */
-    public static $defaultPlugins = ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste'];
+    public static $defaultPlugins = [
+        'textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'
+    ];
 
     /**
      * @param ConfigManager   $configManager

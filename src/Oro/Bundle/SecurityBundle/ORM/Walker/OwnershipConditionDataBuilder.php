@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
@@ -37,7 +37,7 @@ class OwnershipConditionDataBuilder
     /** @var AclVoter */
     protected $aclVoter;
 
-    /** @var MetadataProviderInterface */
+    /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;
 
     /** @var EntitySecurityMetadataProvider */
@@ -53,20 +53,20 @@ class OwnershipConditionDataBuilder
     protected $user = null;
 
     /**
-     * @param AuthorizationCheckerInterface  $authorizationChecker
-     * @param TokenStorageInterface          $tokenStorage
-     * @param ObjectIdAccessor               $objectIdAccessor
-     * @param EntitySecurityMetadataProvider $entityMetadataProvider
-     * @param MetadataProviderInterface      $metadataProvider
-     * @param OwnerTreeProviderInterface     $treeProvider
-     * @param AclVoter                       $aclVoter
+     * @param AuthorizationCheckerInterface      $authorizationChecker
+     * @param TokenStorageInterface              $tokenStorage
+     * @param ObjectIdAccessor                   $objectIdAccessor
+     * @param EntitySecurityMetadataProvider     $entityMetadataProvider
+     * @param OwnershipMetadataProviderInterface $metadataProvider
+     * @param OwnerTreeProviderInterface         $treeProvider
+     * @param AclVoter                           $aclVoter
      */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenStorageInterface $tokenStorage,
         ObjectIdAccessor $objectIdAccessor,
         EntitySecurityMetadataProvider $entityMetadataProvider,
-        MetadataProviderInterface $metadataProvider,
+        OwnershipMetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
         AclVoter $aclVoter = null
     ) {
@@ -176,7 +176,7 @@ class OwnershipConditionDataBuilder
             $constraint = [];
         } elseif (!$metadata->hasOwner()) {
             if (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getGlobalLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getOrganizationClass() === $targetEntityClassName) {
                     $orgIds     = $tree->getUserOrganizationIds($this->getUserId());
                     $constraint = $this->getCondition($orgIds, $metadata, 'id');
                 } else {
@@ -187,39 +187,39 @@ class OwnershipConditionDataBuilder
             }
         } else {
             if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getBasicLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getUserClass() === $targetEntityClassName) {
                     $constraint = $this->getCondition($this->getUserId(), $metadata, 'id');
-                } elseif ($metadata->isBasicLevelOwned()) {
+                } elseif ($metadata->isUserOwned()) {
                     $constraint = $this->getCondition($this->getUserId(), $metadata);
                 }
             } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getLocalLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getBusinessUnitClass() === $targetEntityClassName) {
                     $buIds      = $tree->getUserBusinessUnitIds($this->getUserId(), $this->getOrganizationId());
                     $constraint = $this->getCondition($buIds, $metadata, 'id');
-                } elseif ($metadata->isLocalLevelOwned()) {
+                } elseif ($metadata->isBusinessUnitOwned()) {
                     $buIds      = $tree->getUserBusinessUnitIds($this->getUserId(), $this->getOrganizationId());
                     $constraint = $this->getCondition($buIds, $metadata);
-                } elseif ($metadata->isBasicLevelOwned()) {
+                } elseif ($metadata->isUserOwned()) {
                     $userIds = [];
                     $this->fillBusinessUnitUserIds($this->getUserId(), $this->getOrganizationId(), $userIds);
                     $constraint = $this->getCondition($userIds, $metadata);
                 }
             } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getLocalLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getBusinessUnitClass() === $targetEntityClassName) {
                     $buIds = [];
                     $this->fillSubordinateBusinessUnitIds($this->getUserId(), $this->getOrganizationId(), $buIds);
                     $constraint = $this->getCondition($buIds, $metadata, 'id');
-                } elseif ($metadata->isLocalLevelOwned()) {
+                } elseif ($metadata->isBusinessUnitOwned()) {
                     $buIds = [];
                     $this->fillSubordinateBusinessUnitIds($this->getUserId(), $this->getOrganizationId(), $buIds);
                     $constraint = $this->getCondition($buIds, $metadata);
-                } elseif ($metadata->isBasicLevelOwned()) {
+                } elseif ($metadata->isUserOwned()) {
                     $userIds = [];
                     $this->fillSubordinateBusinessUnitUserIds($this->getUserId(), $this->getOrganizationId(), $userIds);
                     $constraint = $this->getCondition($userIds, $metadata);
                 }
             } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                if ($metadata->isGlobalLevelOwned()) {
+                if ($metadata->isOrganizationOwned()) {
                     $constraint = $this->getCondition([$this->getOrganizationId()], $metadata, null, true);
                 } else {
                     $constraint = $this->getCondition(null, $metadata, null, true);
@@ -323,44 +323,6 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * Adds all business unit ids within all organizations the given user is associated
-     *
-     * @param int|string $userId
-     * @param array      $result [output]
-     *
-     * @deprecated since 1.10. This method is not used and will be removed
-     */
-    protected function fillOrganizationBusinessUnitIds($userId, array &$result)
-    {
-        foreach ($this->getTree()->getUserOrganizationIds($userId) as $orgId) {
-            $buIds = $this->getTree()->getOrganizationBusinessUnitIds($orgId);
-            if (!empty($buIds)) {
-                $result = array_merge($result, $buIds);
-            }
-        }
-    }
-
-    /**
-     * Adds all user ids within all organizations the given user is associated
-     *
-     * @param int|string $userId
-     * @param array      $result [output]
-     *
-     * @deprecated since 1.10. This method is not used and will be removed
-     */
-    protected function fillOrganizationUserIds($userId, array &$result)
-    {
-        foreach ($this->getTree()->getUserOrganizationIds($userId) as $orgId) {
-            foreach ($this->getTree()->getOrganizationBusinessUnitIds($orgId) as $buId) {
-                $userIds = $this->getTree()->getBusinessUnitUserIds($buId);
-                if (!empty($userIds)) {
-                    $result = array_merge($result, $userIds);
-                }
-            }
-        }
-    }
-
-    /**
      * Gets SQL condition for the given owner id or ids
      *
      * @param int|int[]|null idOrIds
@@ -378,8 +340,8 @@ class OwnershipConditionDataBuilder
     ) {
         $organizationField = null;
         $organizationValue = null;
-        if ($metadata->getGlobalOwnerColumnName() && $this->getOrganizationId($metadata)) {
-            $organizationField = $metadata->getGlobalOwnerFieldName();
+        if ($metadata->getOrganizationColumnName() && $this->getOrganizationId($metadata)) {
+            $organizationField = $metadata->getOrganizationFieldName();
             $organizationValue = $this->getOrganizationId($metadata);
         }
 
@@ -464,7 +426,7 @@ class OwnershipConditionDataBuilder
             return null;
         }
         $user = $token->getUser();
-        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
+        if (!is_object($user) || !is_a($user, $this->metadataProvider->getUserClass())) {
             return null;
         }
 

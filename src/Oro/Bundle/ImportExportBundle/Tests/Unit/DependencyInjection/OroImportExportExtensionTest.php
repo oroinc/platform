@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\OroImportExportExtension;
 
-class OroGridExtensionTest extends \PHPUnit_Framework_TestCase
+class OroImportExportExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoad()
     {

@@ -265,7 +265,7 @@ JS;
         $result = false;
         while (microtime(true) < $end && $attemptsNumber > 0) {
             if ($result = $this->wait($time, $jsAppActiveCheck)) {
-                    $attemptsNumber--;
+                $attemptsNumber--;
             } else {
                 $attemptsNumber = $attempts;
             }

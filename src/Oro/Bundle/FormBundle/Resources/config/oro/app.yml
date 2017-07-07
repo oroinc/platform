@@ -36,6 +36,14 @@ assetic:
             inputs:
                 - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/code/plugin.min.js
             output: bundles/tinymce/plugins/code/plugin.min.js
+        tinymce_lists:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/lists/plugin.min.js
+            output: bundles/tinymce/plugins/lists/plugin.min.js
+        tinymce_advlist:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/advlist/plugin.min.js
+            output: bundles/tinymce/plugins/advlist/plugin.min.js
         tinymce_theme_modern:
             inputs:
                 - %kernel.root_dir%/../vendor/tinymce/tinymce/themes/modern/theme.min.js

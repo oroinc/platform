@@ -45,12 +45,12 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider isLevelEntityDataProvider
+     * @dataProvider isOwnerEntityDataProvider
      *
      * @param string $levelMethod
      * @param bool $result
      */
-    public function testIsLevelEntity($levelMethod, $result)
+    public function testIsOwnerEntity($levelMethod, $result)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
         $maker = $this->createMock(
@@ -72,31 +72,31 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function isLevelEntityDataProvider()
+    public function isOwnerEntityDataProvider()
     {
         return [
-            'positive isGlobalLevelEntity' => [
-               'levelMethod' => 'isGlobalLevelEntity',
+            'positive isOrganization' => [
+               'levelMethod' => 'isOrganization',
                'result' => true
             ],
-            'negative isGlobalLevelEntity' => [
-                'levelMethod' => 'isGlobalLevelEntity',
+            'negative isOrganization' => [
+                'levelMethod' => 'isOrganization',
                 'result' => false
             ],
-            'positive isLocalLevelEntity' => [
-                'levelMethod' => 'isLocalLevelEntity',
+            'positive isBusinessUnit' => [
+                'levelMethod' => 'isBusinessUnit',
                 'result' => true
             ],
-            'negative isLocalLevelEntity' => [
-                'levelMethod' => 'isLocalLevelEntity',
+            'negative isBusinessUnit' => [
+                'levelMethod' => 'isBusinessUnit',
                 'result' => false
             ],
-            'positive isBasicLevelEntity' => [
-                'levelMethod' => 'isBasicLevelEntity',
+            'positive isUser' => [
+                'levelMethod' => 'isUser',
                 'result' => true
             ],
-            'negative isBasicLevelEntity' => [
-                'levelMethod' => 'isBasicLevelEntity',
+            'negative isUser' => [
+                'levelMethod' => 'isUser',
                 'result' => false
             ]
         ];
@@ -111,7 +111,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $maker = $this->getOwnershipDecisionMakerMock(false);
         $chain = new ChainEntityOwnershipDecisionMaker();
         $chain->addOwnershipDecisionMaker($maker);
-        $chain->isGlobalLevelEntity(new \stdClass());
+        $chain->isOrganization(new \stdClass());
     }
 
     /**
@@ -144,28 +144,28 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
     public function isAssociatedWithLevelEntityDataProvider()
     {
         return [
-            'positive isAssociatedWithLocalLevelEntity' => [
-                'levelMethod' => 'isAssociatedWithLocalLevelEntity',
+            'positive isAssociatedWithBusinessUnit' => [
+                'levelMethod' => 'isAssociatedWithBusinessUnit',
                 'result' => true
             ],
-            'negative isAssociatedWithLocalLevelEntity' => [
-                'levelMethod' => 'isAssociatedWithLocalLevelEntity',
+            'negative isAssociatedWithBusinessUnit' => [
+                'levelMethod' => 'isAssociatedWithBusinessUnit',
                 'result' => false
             ],
-            'positive isAssociatedWithBasicLevelEntity' => [
-                'levelMethod' => 'isAssociatedWithBasicLevelEntity',
+            'positive isAssociatedWithUser' => [
+                'levelMethod' => 'isAssociatedWithUser',
                 'result' => true
             ],
-            'negative isAssociatedWithBasicLevelEntity' => [
-                'levelMethod' => 'isAssociatedWithBasicLevelEntity',
+            'negative isAssociatedWithUser' => [
+                'levelMethod' => 'isAssociatedWithUser',
                 'result' => false
             ],
-            'positive isAssociatedWithGlobalLevelEntity' => [
-                'levelMethod' => 'isAssociatedWithGlobalLevelEntity',
+            'positive isAssociatedWithOrganization' => [
+                'levelMethod' => 'isAssociatedWithOrganization',
                 'result' => true
             ],
-            'negative isAssociatedWithGlobalLevelEntity' => [
-                'levelMethod' => 'isAssociatedWithGlobalLevelEntity',
+            'negative isAssociatedWithOrganization' => [
+                'levelMethod' => 'isAssociatedWithOrganization',
                 'result' => false
             ]
         ];

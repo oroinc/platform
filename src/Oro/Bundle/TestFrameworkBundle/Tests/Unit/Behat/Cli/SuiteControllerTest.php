@@ -2,79 +2,184 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli;
 
+use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
+use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
-use Behat\Testwork\Suite\Suite;
 use Behat\Testwork\Suite\SuiteRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
+use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification\Stub\SpecificationLocatorFilesystemStub;
+use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class SuiteControllerTest extends \PHPUnit_Framework_TestCase
 {
-    private $suites = [
-        'One',
-        'Two',
-        'Three',
-        'Four',
-        'Five',
-        'Six',
-    ];
+    private static $featuresDir = '/test_behat_suite_features';
+    private static $featuresDir10 = '/test_behat_suite_features/10';
+    private static $featuresDir5 = '/test_behat_suite_features/5';
+    private static $featuresDir3 = '/test_behat_suite_features/3';
 
     /**
-     * @dataProvider applicableSuitesProvider
-     * @param array $applicableSuites
+     * @beforeClass
      */
-    public function testApplicableSuites(array $applicableSuites)
+    public static function initialClassSetup()
     {
-        $suiteRegistry = new SuiteRegistry();
-        $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
-        $controller = new SuiteController(
-            $suiteRegistry,
-            $this->createFakeConfigurations($this->suites),
-            $applicableSuites
-        );
+        mkdir(sys_get_temp_dir().self::$featuresDir);
 
-        $input = new InputStub('', [], ['applicable-suites' => true]);
-        $controller->execute($input, new OutputStub());
+        self::createFeatures(10, sys_get_temp_dir().self::$featuresDir10);
+        self::createFeatures(5, sys_get_temp_dir().self::$featuresDir5);
+        self::createFeatures(3, sys_get_temp_dir().self::$featuresDir3);
+    }
 
-        self::assertEquals($applicableSuites, $this->getRegisteredSuiteNames($suiteRegistry));
+    private static function createFeatures($count, $dir)
+    {
+        mkdir($dir);
+        for ($i = 1; $i <= $count; $i++) {
+            touch($dir.'/'.$i.'.feature');
+        }
     }
 
     /**
-     * @expectedException \Behat\Testwork\Suite\Exception\SuiteNotFoundException
-     * @expectedExceptionMessage `Unregistered` suite is not found or has not been properly registered.
+     * @afterClass
      */
-    public function testSuiteNotFountException()
+    public static function finalClassTeardown()
     {
-        $suiteRegistry = new SuiteRegistry();
-        $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
-        $controller = new SuiteController(
-            $suiteRegistry,
-            $this->createFakeConfigurations($this->suites),
-            ['One', 'Two', 'Unregistered']
-        );
+        $dir = sys_get_temp_dir().self::$featuresDir;
+        self::delTree($dir);
+    }
 
-        $input = new InputStub('', [], ['applicable-suites' => true]);
-        $controller->execute($input, new OutputStub());
+    private static function delTree($dir)
+    {
+        $files = array_diff(scandir($dir), ['.','..']);
+
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
+        }
+
+        return rmdir($dir);
     }
 
     /**
-     * @return array
+     * @dataProvider testDividingProvider
+     *
+     * @param int $divider
+     * @param array $suiteConfigs
+     * @param array $expectedSuites
      */
-    public function applicableSuitesProvider()
+    public function testDividing($divider, array $suiteConfigs, array $expectedSuites)
+    {
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel->method('getBundle')->willReturn(new TestBundle('TestBundle'));
+
+        $suiteRegistry = new SuiteRegistry();
+        $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
+        $suiteRegistry->registerSuiteGenerator(new SymfonySuiteGenerator($kernel));
+
+        $specFinder = new SpecificationFinder();
+        $specFinder->registerSpecificationLocator(
+            new SpecificationLocatorFilesystemStub(array_merge(array_map(function ($config) {
+                return $config['settings']['paths'];
+            }, $suiteConfigs)))
+        );
+
+        $controller = new SuiteController(
+            $suiteRegistry,
+            $suiteConfigs,
+            new SpecificationDivider($specFinder),
+            $kernel
+        );
+
+        $input = new InputStub('', [], ['suite-divider' => $divider]);
+        $controller->execute($input, new OutputStub());
+
+        $actualSuites = [];
+
+        foreach ($suiteRegistry->getSuites() as $suite) {
+            $actualSuites[$suite->getName()] = count($suite->getSetting('paths'));
+        }
+
+        $this->assertSame($expectedSuites, $actualSuites);
+    }
+
+    public function testDividingProvider()
     {
         return [
-            [[
-                'Three',
-                'Four',
-                'Five',
-            ]],
-            [[
-                'Two',
-                'Three',
-                'Five',
-                'Six',
-            ]],
+            '18/5 in nested directories' => [
+                'divider' => 5,
+                'suiteConfigs' => [
+                    'AcmeSuite' => [
+                        'type' => null,
+                        'settings' => [
+                            'paths' => [sys_get_temp_dir().self::$featuresDir]
+                        ],
+                    ],
+                ],
+                'expectedSuites' => [
+                    'AcmeSuite#0' => 5,
+                    'AcmeSuite#1' => 5,
+                    'AcmeSuite#2' => 4,
+                    'AcmeSuite#3' => 4,
+                ],
+            ],
+            '18/5 with duplicated features' => [
+                'divider' => 5,
+                'suiteConfigs' => [
+                    'AcmeSuite' => [
+                        'type' => null,
+                        'settings' => [
+                            'paths' => [
+                                sys_get_temp_dir().self::$featuresDir,
+                                sys_get_temp_dir().self::$featuresDir3,
+                                sys_get_temp_dir().self::$featuresDir5,
+                                sys_get_temp_dir().self::$featuresDir10,
+                            ]
+                        ],
+                    ],
+                ],
+                'expectedSuites' => [
+                    'AcmeSuite#0' => 5,
+                    'AcmeSuite#1' => 5,
+                    'AcmeSuite#2' => 4,
+                    'AcmeSuite#3' => 4,
+                ],
+            ],
+            '3/1' => [
+                'divider' => 1,
+                'suiteConfigs' => [
+                    'AcmeSuite' => [
+                        'type' => null,
+                        'settings' => [
+                            'paths' => [sys_get_temp_dir().self::$featuresDir3]
+                        ],
+                    ],
+                ],
+                'expectedSuites' => [
+                    'AcmeSuite#0' => 1,
+                    'AcmeSuite#1' => 1,
+                    'AcmeSuite#2' => 1,
+                ],
+            ],
+            '8/3 in two directories' => [
+                'divider' => 3,
+                'suiteConfigs' => [
+                    'AcmeSuite' => [
+                        'type' => null,
+                        'settings' => [
+                            'paths' => [
+                                sys_get_temp_dir().self::$featuresDir3,
+                                sys_get_temp_dir().self::$featuresDir5,
+                            ],
+                        ],
+                    ],
+                ],
+                'expectedSuites' => [
+                    'AcmeSuite#0' => 3,
+                    'AcmeSuite#1' => 3,
+                    'AcmeSuite#2' => 2,
+                ],
+            ],
         ];
     }
 
@@ -90,16 +195,5 @@ class SuiteControllerTest extends \PHPUnit_Framework_TestCase
                 'settings' => [],
             ];
         }, array_flip($availableSuites));
-    }
-
-    /**
-     * @param SuiteRegistry $suiteRegistry
-     * @return array of suites names
-     */
-    private function getRegisteredSuiteNames(SuiteRegistry $suiteRegistry)
-    {
-        return array_map(function (Suite $suite) {
-            return $suite->getName();
-        }, $suiteRegistry->getSuites());
     }
 }

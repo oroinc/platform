@@ -1,6 +1,6 @@
 @ticket-BAP-13787
 @automatically-ticket-tagged
-@fixture-users_group_crud.yml
+@fixture-OroUserBundle:users_group_crud.yml
 Feature: Users groups
   In order to keep organization users organized
   As a Sales Manager

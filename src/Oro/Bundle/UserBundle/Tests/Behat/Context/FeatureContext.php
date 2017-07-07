@@ -64,7 +64,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function charlieUserInTheSystem()
     {
-        $this->fixtureLoader->loadFixtureFile('user.yml');
+        $this->fixtureLoader->loadFixtureFile('OroUserBundle:user.yml');
     }
 
     /**

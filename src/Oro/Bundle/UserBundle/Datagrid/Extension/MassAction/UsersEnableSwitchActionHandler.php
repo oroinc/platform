@@ -80,18 +80,19 @@ class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
             $this->aclHelper->apply($query, 'EDIT');
             $em = $results->getSource()->getEntityManager();
 
+            $processedEntities = [];
             foreach ($results as $result) {
                 if ($this->processUser($result)) {
                     $count++;
                 }
+                $processedEntities[] = $result->getRootEntity();
                 if ($count % self::FLUSH_BATCH_SIZE === 0) {
-                    $this->finishBatch($em);
+                    $this->finishBatch($em, $processedEntities);
+                    $processedEntities = [];
                 }
             }
 
-            if ($count % self::FLUSH_BATCH_SIZE > 0) {
-                $this->finishBatch($em);
-            }
+            $this->finishBatch($em, $processedEntities);
         }
         $this->currentUser = null;
 
@@ -124,12 +125,15 @@ class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
 
     /**
      * @param EntityManager $em
+     * @param User[] $processedEntities
      *
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function finishBatch(EntityManager $em)
+    protected function finishBatch(EntityManager $em, $processedEntities)
     {
-        $em->flush();
-        $em->clear();
+        foreach ($processedEntities as $entity) {
+            $em->flush($entity);
+            $em->detach($entity);
+        }
     }
 }

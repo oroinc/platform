@@ -76,12 +76,12 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_SYSTEM');
                     }
-                } elseif ($metadata->isGlobalLevelOwned()) {
+                } elseif ($metadata->isOrganizationOwned()) {
                     if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_GLOBAL');
                     }
-                } elseif ($metadata->isLocalLevelOwned()) {
+                } elseif ($metadata->isBusinessUnitOwned()) {
                     if ($accessLevel < AccessLevel::LOCAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_LOCAL');
@@ -140,17 +140,17 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
             return $this->getMaskBuilderConst('GROUP_SYSTEM');
         }
 
-        if ($metadata->isGlobalLevelOwned()) {
+        if ($metadata->isOrganizationOwned()) {
             return
                 $this->getMaskBuilderConst('GROUP_SYSTEM')
                 | $this->getMaskBuilderConst('GROUP_GLOBAL');
-        } elseif ($metadata->isLocalLevelOwned()) {
+        } elseif ($metadata->isBusinessUnitOwned()) {
             return
                 $this->getMaskBuilderConst('GROUP_SYSTEM')
                 | $this->getMaskBuilderConst('GROUP_GLOBAL')
                 | $this->getMaskBuilderConst('GROUP_DEEP')
                 | $this->getMaskBuilderConst('GROUP_LOCAL');
-        } elseif ($metadata->isBasicLevelOwned()) {
+        } elseif ($metadata->isUserOwned()) {
             return
                 $this->getMaskBuilderConst('GROUP_SYSTEM')
                 | $this->getMaskBuilderConst('GROUP_GLOBAL')

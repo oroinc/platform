@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder as MaskBuilder;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -19,14 +19,14 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param MetadataProviderInterface                  $metadataProvider
+     * @param OwnershipMetadataProviderInterface         $metadataProvider
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @param WorkflowManager                            $workflowManager
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
-        MetadataProviderInterface $metadataProvider,
+        OwnershipMetadataProviderInterface $metadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         WorkflowManager $workflowManager

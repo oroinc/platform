@@ -11,5 +11,4 @@ namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
  */
 class DeletionIterableResult extends IterableResult
 {
-
 }

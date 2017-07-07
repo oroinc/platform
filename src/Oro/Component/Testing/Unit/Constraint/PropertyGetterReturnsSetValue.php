@@ -66,7 +66,6 @@ class PropertyGetterReturnsSetValue extends \PHPUnit_Framework_Constraint
      */
     protected function matches($other)
     {
-
         $setter = 'set' . ucfirst($this->propertyName);
         if (method_exists($other, $setter)) {
             call_user_func_array([$other, $setter], array($this->testValue));
