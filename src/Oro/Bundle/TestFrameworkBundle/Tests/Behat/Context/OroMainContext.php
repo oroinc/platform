@@ -1059,6 +1059,7 @@ class OroMainContext extends MinkContext implements
         if (!is_null($yOffset)) {
             $moveToOptions['yoffset'] = $xOffset;
         }
+        $this->waitForAjax();
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
     }

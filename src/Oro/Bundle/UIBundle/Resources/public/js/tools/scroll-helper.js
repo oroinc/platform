@@ -23,6 +23,102 @@ define(function(require) {
         _scrollbarWidth: -1,
 
         /**
+         * Select global scrollable container
+         */
+        _scrollableContainerSelector: '#container',
+
+        /**
+         * Store scroll position
+         */
+        _scrollState: null,
+
+        /**
+         * Disable/Enable scroll state
+         */
+        _isBodyTouchScrollDisabled: false,
+
+        /**
+         * Disable body scroll on touch devices
+         * @returns {boolean}
+         */
+        disableBodyTouchScroll: function() {
+            if (this._isBodyTouchScrollDisabled) {
+                return false;
+            }
+
+            this._scrollState = window.scrollY;
+
+            $(this._scrollableContainerSelector)
+                .addClass('disable-touch-scrolling')
+                .css('height', window.innerHeight);
+
+            $(document)
+                .off('touchmove.disableScroll')
+                .on('touchmove.disableScroll', _.bind(this._preventMobileScrolling, this));
+
+            this._isBodyTouchScrollDisabled = true;
+        },
+
+        /**
+         * Enable body scroll on touch devices
+         * @returns {boolean}
+         */
+        enableBodyTouchScroll: function() {
+            if (!this._isBodyTouchScrollDisabled) {
+                return false;
+            }
+
+            $(this._scrollableContainerSelector)
+                .removeClass('disable-touch-scrolling')
+                .css('height', '');
+
+            $(document).off('touchmove.disableScroll');
+
+            window.scrollTo(0, this._scrollState);
+
+            this._isBodyTouchScrollDisabled = false;
+            this._scrollState = null;
+        },
+
+        /**
+         * Block touch move event propagation on body
+         * @param {jQueryEvent} event
+         * @private
+         */
+        _preventMobileScrolling: function(event) {
+            var isTouchMoveAllowed = true;
+            var target = event.target;
+
+            while (target !== null) {
+                if (target.classList && target.classList.contains('disable-scrolling')) {
+                    isTouchMoveAllowed = false;
+                    break;
+                }
+                target = target.parentNode;
+            }
+
+            if (!isTouchMoveAllowed) {
+                event.preventDefault();
+            }
+        },
+
+        /**
+         * Remove bounce effect, when scroll overflow viewport
+         * @param {jQueryEvent} event
+         */
+        removeIOSRubberEffect: function(event) {
+            var element = event.currentTarget;
+            var top = element.scrollTop;
+            var totalScroll = element.scrollHeight;
+            var currentScroll = top + element.offsetHeight;
+
+            if (top === 0) {
+                element.scrollTop = 1;
+            } else if (currentScroll === totalScroll) {
+                element.scrollTop = top - 1;
+            }
+        },
+        /**
          * Try to calculate the scrollbar width for your browser/os
          * @return {Number}
          */
