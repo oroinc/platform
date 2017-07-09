@@ -43,7 +43,7 @@ class DuplicateEntity extends AbstractAction
             $target = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_TARGET]);
         }
         if (isset($this->options[self::OPTION_KEY_SETTINGS])) {
-            $settings = $this->options[self::OPTION_KEY_SETTINGS];
+            $settings = $this->getSettingsWithRealValues($context, $this->options[self::OPTION_KEY_SETTINGS]);
         }
         $copyObject = $this->getDuplicator()->duplicate($target, $settings);
         $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $copyObject);
@@ -105,6 +105,31 @@ class DuplicateEntity extends AbstractAction
             return $context->getEntity();
         } else {
             return $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_ENTITY]);
+        }
+    }
+
+    /**
+     * @param mixed $context
+     * @param array $settings
+     *
+     * @return array
+     */
+    protected function getSettingsWithRealValues($context, array $settings)
+    {
+        array_walk_recursive($settings, 'static::getValue', $context);
+
+        return $settings;
+    }
+
+    /**
+     * @param mixed $value
+     * @param mixed $key
+     * @param mixed $context
+     */
+    protected function getValue(&$value, $key, $context)
+    {
+        if ($value instanceof PropertyPath) {
+            $value = $this->contextAccessor->getValue($context, $value);
         }
     }
 }

@@ -709,6 +709,9 @@ define(function(require) {
 
             if (jqxhr.status === 403) {
                 message = __('oro.ui.forbidden_error');
+            } else if (jqxhr.status === 404) {
+                mediator.execute('refreshPage');
+                return;
             }
 
             var failContent = '<div class="widget-content">' +
