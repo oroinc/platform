@@ -1,0 +1,6 @@
+services:
+    oro_config.provider.value.entity_id:
+        class: 'Oro\Bundle\ConfigBundle\Provider\Value\Entity\EntityIdByCriteriaProvider'
+        public: false
+        lazy: true
+        abstract: true

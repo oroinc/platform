@@ -15,9 +15,10 @@ Feature: User user comment
     And click Edit User in grid
     And select "Yes" from "Enable Comments"
     When I save and close form
-    And click update schema
-    Then I should see Schema updated flash message
-
+    #BAP-15004
+#    And click update schema
+#    Then I should see Schema updated flash message
+@skip
   Scenario: Add comment
     Given I go to System/User Management/Users
     And click view Charlie in grid

@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 abstract class AbstractDateAction extends AbstractAction
 {
@@ -18,13 +17,15 @@ abstract class AbstractDateAction extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $this->contextAccessor->setValue($context, $this->options['attribute'], $this->createDateTime());
+        $this->contextAccessor->setValue($context, $this->options['attribute'], $this->createDateTime($context));
     }
 
     /**
+     * @param mixed $context
+     *
      * @return \DateTime
      */
-    abstract protected function createDateTime();
+    abstract protected function createDateTime($context);
 
     /**
      * {@inheritdoc}

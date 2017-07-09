@@ -103,8 +103,7 @@ define(function(require) {
             var placeholder;
             this.$('tbody').sortable({
                 cursor: 'move',
-                delay: 25,
-                opacity: 0.7,
+                delay: 50,
                 revert: 10,
                 axis: 'y',
                 containment: this.$('tbody'),

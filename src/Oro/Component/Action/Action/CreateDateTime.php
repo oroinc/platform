@@ -3,17 +3,20 @@
 namespace Oro\Component\Action\Action;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CreateDateTime extends AbstractDateAction
 {
     /**
+     * @param $context
+     *
      * @return \DateTime
      */
-    protected function createDateTime()
+    protected function createDateTime($context)
     {
         return new \DateTime(
             $this->getOption($this->options, 'time'),
-            $this->getOption($this->options, 'timezone')
+            $this->getTimeZone($context)
         );
     }
 
@@ -32,17 +35,34 @@ class CreateDateTime extends AbstractDateAction
 
         if (empty($options['timezone'])) {
             $options['timezone'] = new \DateTimeZone('UTC');
-        } elseif (is_string($options['timezone'])) {
-            $options['timezone'] = new \DateTimeZone($options['timezone']);
-        } elseif (!$options['timezone'] instanceof \DateTimeZone) {
+        } elseif (!$options['timezone'] instanceof PropertyPathInterface
+            && !is_string($options['timezone'])
+            && !$options['timezone'] instanceof \DateTimeZone
+        ) {
             throw new InvalidParameterException(
                 sprintf(
-                    'Option "timezone" must be a string or instance of DateTimeZone, %s given.',
+                    'Option "timezone" must be a PropertyPath or string or instance of DateTimeZone, %s given.',
                     $this->getClassOrType($options['timezone'])
                 )
             );
         }
 
         return parent::initialize($options);
+    }
+
+
+    /**
+     * @param mixed $context
+     *
+     * @return \DateTimeZone|string
+     */
+    protected function getTimeZone($context)
+    {
+        $timeZone = $this->contextAccessor->getValue($context, $this->options['timezone']);
+        if (is_string($timeZone)) {
+            $timeZone = new \DateTimeZone($timeZone);
+        }
+
+        return $timeZone;
     }
 }

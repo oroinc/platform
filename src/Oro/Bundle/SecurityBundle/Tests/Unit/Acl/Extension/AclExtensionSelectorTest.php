@@ -3,10 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,13 +24,14 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $actionExtension;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $objectIdAccessor;
+
     protected function setUp()
     {
-        $objectIdAccessor = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
 
-        $this->selector = new AclExtensionSelector($objectIdAccessor);
+        $this->selector = new AclExtensionSelector($this->objectIdAccessor);
 
         $this->entityExtension = $this->getMockExtension('entity');
         $this->actionExtension = $this->getMockExtension('action');
@@ -186,6 +189,34 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull(
             $this->selector->select(new FieldVote(new ObjectIdentity('entity', 'Test\Entity'), 'test'), false)
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException
+     * @expectedExceptionMessage An ACL extension was not found for: stdClass. Type: . Id: .
+     */
+    public function testSelectByInvalidDomainObject()
+    {
+        $val = new \stdClass();
+
+        $this->objectIdAccessor->expects(self::once())
+            ->method('getId')
+            ->with(self::identicalTo($val))
+            ->willThrowException(new InvalidDomainObjectException());
+
+        $this->selector->select($val);
+    }
+
+    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequested()
+    {
+        $val = new \stdClass();
+
+        $this->objectIdAccessor->expects(self::once())
+            ->method('getId')
+            ->with(self::identicalTo($val))
+            ->willThrowException(new InvalidDomainObjectException());
+
+        self::assertNull($this->selector->select($val, false));
     }
 
     public function testAll()
