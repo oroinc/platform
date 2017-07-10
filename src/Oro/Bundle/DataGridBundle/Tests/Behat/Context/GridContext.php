@@ -1217,12 +1217,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I shouldn't see Example column in grid
      *
      * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
-     * @param $columnName
+     * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in "(?P<gridName>[\w\s]+)"$/
+     * @param string $columnName
+     * @param null|string $gridName
      */
-    public function iShouldNotSeeColumnInGrid($columnName)
+    public function iShouldNotSeeColumnInGrid($columnName, $gridName = null)
     {
         self::assertFalse(
-            $this->getGrid()->getHeader()->hasColumn($columnName),
+            $this->getGrid($gridName)->getHeader()->hasColumn($columnName),
             sprintf('"%s" column is in grid', $columnName)
         );
     }
@@ -1232,12 +1234,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I should see Example column in grid
      *
      * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
-     * @param $columnName
+     * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in "(?P<gridName>[\w\s]+)"$/
+     * @param string $columnName
+     * @param null|string $gridName
      */
-    public function iShouldSeeColumnInGrid($columnName)
+    public function iShouldSeeColumnInGrid($columnName, $gridName = null)
     {
         self::assertTrue(
-            $this->getGrid()->getHeader()->hasColumn($columnName),
+            $this->getGrid($gridName)->getHeader()->hasColumn($columnName),
             sprintf('"%s" column is not in grid', $columnName)
         );
     }

@@ -785,6 +785,7 @@ class OroMainContext extends MinkContext implements
 
         if ($this->elementFactory->hasElement($field)) {
             $this->elementFactory->createElement($field)->setValue($value);
+
             return;
         }
 
@@ -1058,9 +1059,9 @@ class OroMainContext extends MinkContext implements
         $element = $this->createElement($elementName);
         $source = $webDriverSession->element('xpath', $element->getXpath());
 
-        $webDriverSession->moveto(array(
+        $webDriverSession->moveto([
             'element' => $source->getID()
-        ));
+        ]);
         $webDriverSession->buttondown();
 
         $dropZone = $this->createElement($dropZoneName);
@@ -1109,7 +1110,7 @@ class OroMainContext extends MinkContext implements
     public function iSeeNodeAfterAnotherOneInTree($nodeTitle, $anotherNodeTitle)
     {
         $page = $this->getSession()->getPage();
-        $resultElement =  $page->find(
+        $resultElement = $page->find(
             'xpath',
             '//a[contains(., "' . $anotherNodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
             . '/following-sibling::li[contains(@class, "jstree-node")]/a[contains(., "' . $nodeTitle . '")]'

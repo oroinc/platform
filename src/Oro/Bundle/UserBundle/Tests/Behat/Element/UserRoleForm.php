@@ -25,7 +25,7 @@ class UserRoleForm extends Form
             $levelCaption = strip_tags($level->getHtml());
             $availableLevels[] = $levelCaption;
 
-            if (preg_match(sprintf('/%s/i', $accessLevel), $levelCaption)) {
+            if (preg_match(sprintf('/%s/i', preg_quote($accessLevel, '\\')), $levelCaption)) {
                 $level->mouseOver();
                 $level->click();
                 return;
