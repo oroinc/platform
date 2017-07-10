@@ -4,9 +4,14 @@ define([
     'orotranslation/js/translator',
     './empty-filter',
     'oroui/js/tools',
-    'oroui/js/mediator'
-], function($, _, __, EmptyFilter, tools, mediator) {
+    'oroui/js/mediator',
+    'module'
+], function($, _, __, EmptyFilter, tools, mediator, module) {
     'use strict';
+    var config = module.config();
+    config = _.extend({
+        notAlignCriteria: tools.isMobile()
+    }, config);
 
     var TextFilter;
 
@@ -24,6 +29,8 @@ define([
      */
     TextFilter = EmptyFilter.extend({
         wrappable: true,
+
+        notAlignCriteria: config.notAlignCriteria,
 
         wrapperTemplate: '',
 
@@ -274,7 +281,7 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            if (tools.isMobile()) {
+            if (this.notAlignCriteria) {
                 // no need to align criteria on mobile version, it is aligned over CSS
                 return;
             }
