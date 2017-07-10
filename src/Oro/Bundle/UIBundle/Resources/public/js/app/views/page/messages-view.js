@@ -13,6 +13,10 @@ define([
          */
         pageItems: ['flashMessages'],
 
+        listen: {
+            'page:afterChange mediator': 'onPageAfterChange'
+        },
+
         /**
          * Current route
          *
@@ -23,32 +27,39 @@ define([
         /**
          * @inheritDoc
          */
+        render: function() {
+            return this;
+        },
+
+        /**
+         * @inheritDoc
+         */
         onPageUpdate: function(pageData, actionArgs, jqXHR, promises) {
-            PageMainMenuView.__super__.onPageUpdate.apply(this, arguments);
+            this.data = _.pick(pageData, this.pageItems);
+            this.actionArgs = actionArgs;
             this.route = actionArgs.route;
         },
 
         /**
-         * Prevents rendering a view without page data
-         *
-         * @override
+         * Shows messages once page is ready to use
          */
-        render: function() {
-            if (!this.actionArgs || !this.data) {
-                return this;
-            }
-
+        onPageAfterChange: function() {
             if (this.route && this.route.previous) {
                 // clear container if it is not the first load of page
                 this.$el.empty();
             }
 
-            // does not show messages from cache
-            if (this.actionArgs.options.fromCache !== true) {
+            // process messages stored in queue or storage
+            messenger.flushStoredMessages();
+
+            // process messages from page data (if the page is not from cache)
+            if (this.data && this.actionArgs && this.actionArgs.options.fromCache !== true) {
                 this._addMessages(this.data.flashMessages);
             }
 
-            return this;
+            this.data = null;
+            this.actionArgs = null;
+            this.route = null;
         },
 
         /**

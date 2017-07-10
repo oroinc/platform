@@ -36,16 +36,16 @@ Feature: Show "Update Schema" button for entity fields
     When I save and close form
     Then I should see "Field saved" flash message
     And I should see "Update Schema"
-
-  Scenario: Update schema
-    Given I click update schema
-    And I should see Schema updated flash message
-    And I move backward one page
-    And I should not see "Update Schema"
-
-  Scenario: Remove Custom Field
-    Given I click Remove some_another_field in grid
-    Then I should see "Delete Confirmation"
-    And I press "Yes"
-    Then I should see some_another_field Boolean some_another_field Custom Deleted in grid
-    And I should see "Update Schema"
+#BAP-15004
+#  Scenario: Update schema
+#    Given I click update schema
+#    And I should see Schema updated flash message
+#    And I move backward one page
+#    And I should not see "Update Schema"
+#
+#  Scenario: Remove Custom Field
+#    Given I click Remove some_another_field in grid
+#    Then I should see "Delete Confirmation"
+#    And I press "Yes"
+#    Then I should see some_another_field Boolean some_another_field Custom Deleted in grid
+#    And I should see "Update Schema"

@@ -17,9 +17,10 @@ use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
  */
 class ImageFilterLoader
 {
-    const IMAGE_QUALITY = 95;
+    const IMAGE_QUALITY = 85;
     const BACKGROUND_COLOR = '#fff';
     const RESIZE_MODE = ImageInterface::THUMBNAIL_INSET;
+    const INTERLACE_MODE = 'line';
 
     /** @var ImageTypeProvider */
     protected $imageTypeProvider;
@@ -80,6 +81,9 @@ class ImageFilterLoader
             'quality' => self::IMAGE_QUALITY,
             'filters' => [
                 'strip' => [],
+                'interlace' => [
+                    'mode' => self::INTERLACE_MODE
+                ]
             ]
         ];
 

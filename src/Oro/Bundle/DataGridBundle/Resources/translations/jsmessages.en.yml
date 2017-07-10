@@ -82,7 +82,7 @@ oro:
             select_all: "Select All"
             unselect_all: "Unselect All"
             deselect_all: "Deselect All"
-            reset: "Reset"
+            reset: "Reset Grid"
             filter:
                 all: 'All'
                 selected: 'Selected'
