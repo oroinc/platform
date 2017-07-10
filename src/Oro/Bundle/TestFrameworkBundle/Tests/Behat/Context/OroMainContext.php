@@ -27,6 +27,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInte
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
+use WebDriver\Exception\NoSuchElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -805,6 +806,23 @@ class OroMainContext extends MinkContext implements
             $isVisible,
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotOnPage($element)
+    {
+        $elementOnPage = $this->createElement($element);
+
+        try {
+            self::assertFalse(
+                $elementOnPage->isVisible(),
+                sprintf('Element "%s" is present when it should not', $element)
+            );
+        } catch (NoSuchElement $e) {
+            return;
+        }
     }
 
     /**
