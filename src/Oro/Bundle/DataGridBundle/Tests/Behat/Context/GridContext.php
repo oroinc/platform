@@ -235,6 +235,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: And I should see following grid with exact columns order:
+     *            | First name | Last name | Primary Email     | Enabled | Status |
+     *            | John       | Doe       | admin@example.com | Enabled | Active |
+     *
+     * @Then /^(?:|I )should see following grid with exact columns order:$/
+     * @Then /^(?:|I )should see following "(?P<gridName>[\w\s]+)" grid with exact columns order:$/
+     */
+    public function iShouldSeeFollowingGridWithOrder(TableNode $table, $gridName = null)
+    {
+        $this->waitForAjax();
+        $grid = $this->getGrid($gridName);
+        $tableHeaders = $table->getRow(0);
+        $gridHeader = $grid->getHeader();
+
+        foreach ($tableHeaders as $tableHeaderIndex => $tableHeaderValue) {
+            self::assertEquals(
+                $tableHeaderIndex + 1,
+                $gridHeader->getColumnNumber($tableHeaderValue),
+                'Wrong order of columns in grid'
+            );
+        }
+
+        $this->iShouldSeeFollowingGrid($table, $gridName);
+    }
+
+    /**
      * Example: When I click "Delete" link from mass action dropdown
      * Example: And click Delete mass action
      *

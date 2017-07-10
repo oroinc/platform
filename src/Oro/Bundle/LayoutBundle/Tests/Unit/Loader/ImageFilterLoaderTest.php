@@ -149,7 +149,10 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
         return [
             'quality' => ImageFilterLoader::IMAGE_QUALITY,
             'filters' => [
-                'strip' => []
+                'strip' => [],
+                'interlace' => [
+                    'mode' => ImageFilterLoader::INTERLACE_MODE
+                ]
             ],
             'customFilterData'
         ];

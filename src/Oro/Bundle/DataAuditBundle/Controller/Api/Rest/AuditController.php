@@ -71,7 +71,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
      *  resource=true
      * )
      *
-     * @AclAncestor("oro_dataaudit_history")
+     * @AclAncestor("oro_dataaudit_view")
      */
     public function cgetAction()
     {
@@ -102,7 +102,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
      *  }
      * )
      *
-     * @AclAncestor("oro_dataaudit_history")
+     * @AclAncestor("oro_dataaudit_view")
      */
     public function getAction($id)
     {
@@ -127,7 +127,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
      *      resource=true
      * )
      *
-     * @AclAncestor("oro_dataaudit_history")
+     * @AclAncestor("oro_dataaudit_view")
      */
     public function getFieldsAction()
     {

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Utils;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class TreeUtils
 {
@@ -76,5 +77,17 @@ class TreeUtils
         }
 
         return null;
+    }
+
+    /**
+     * Returns config key which consists of root node name and config key concated with correct delimiter
+     * @param string $rootNodeName
+     * @param string $configKey
+     * @param string $separator
+     * @return string
+     */
+    public static function getConfigKey($rootNodeName, $configKey, $separator = ConfigManager::SECTION_MODEL_SEPARATOR)
+    {
+        return implode($separator, [$rootNodeName, $configKey]);
     }
 }

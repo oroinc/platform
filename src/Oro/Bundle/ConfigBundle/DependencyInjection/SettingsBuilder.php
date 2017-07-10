@@ -10,6 +10,11 @@ class SettingsBuilder
     const RESOLVED_KEY = 'resolved';
 
     /**
+     * @internal
+     */
+    const ALLOWED_TYPES = ['scalar', 'boolean', 'array'];
+
+    /**
      *
      * @param ArrayNodeDefinition $root     Config root node
      * @param array               $settings
@@ -30,7 +35,7 @@ class SettingsBuilder
                 ->addDefaultsIfNotSet()
                 ->children();
 
-            if (isset($setting['type']) && in_array($setting['type'], array('scalar', 'boolean', 'array'))) {
+            if (isset($setting['type']) && in_array($setting['type'], static::ALLOWED_TYPES)) {
                 $type = $setting['type'];
             } else {
                 $type = 'scalar';

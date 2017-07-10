@@ -315,14 +315,6 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
     }
 
     /**
-     * @Then /^(?:|I )should see (Schema updated) flash message$/
-     */
-    public function iShouldSeeUpdateSchema()
-    {
-        $this->oroMainContext->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
-    }
-
-    /**
      * Click edit entity button on entity view page
      * Example: Given I'm edit entity
      *
