@@ -3,6 +3,7 @@ define(function(require) {
 
     var Modal;
     var module = require('module');
+    var template = require('tpl!oroui/templates/modal-dialog.html');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
@@ -35,7 +36,7 @@ define(function(require) {
      * @extends Backbone.BootstrapModal
      */
     Modal = Backbone.BootstrapModal.extend({
-        template: require('tpl!oroui/templates/modal-dialog.html'),
+        template: template,
 
         events: _.extend(Backbone.BootstrapModal.prototype.events, {
             'click [data-button-id]': 'onButtonClick'

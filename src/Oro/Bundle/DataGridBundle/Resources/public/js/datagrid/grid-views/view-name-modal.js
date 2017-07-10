@@ -4,11 +4,13 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Modal = require('oroui/js/modal');
+    var contentTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-modal.html');
+    var nameErrorTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-error-modal.html');
 
     var ViewNameModal = Modal.extend({
-        contentTemplate: require('tpl!orodatagrid/templates/datagrid/view-name-modal.html'),
+        contentTemplate: contentTemplate,
 
-        nameErrorTemplate: require('tpl!orodatagrid/templates/datagrid/view-name-error-modal.html'),
+        nameErrorTemplate: nameErrorTemplate,
 
         initialize: function(options) {
             options = options || {};

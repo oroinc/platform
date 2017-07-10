@@ -3,6 +3,8 @@ define(function(require) {
 
     var DateFilter;
     var template = require('tpl!orofilter/templates/filter/date-filter.html');
+    var fieldTemplate = require('tpl!orofilter/templates/filter/select-field.html');
+    var dropdownTemplate = require('tpl!orofilter/templates/filter/date-filter-dropdown.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
@@ -35,7 +37,7 @@ define(function(require) {
          *
          * @property
          */
-        fieldTemplate: require('tpl!orofilter/templates/filter/select-field.html'),
+        fieldTemplate: fieldTemplate,
         fieldTemplateSelector: '#select-field-template',
 
         /**
@@ -43,7 +45,7 @@ define(function(require) {
          *
          * @property
          */
-        dropdownTemplate: require('tpl!orofilter/templates/filter/date-filter-dropdown.html'),
+        dropdownTemplate: dropdownTemplate,
         dropdownTemplateSelector: '#date-filter-dropdown-template',
 
         /**

@@ -5,7 +5,6 @@ define(function(require) {
     var template = require('tpl!orofilter/templates/filter/select-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var AbstractFilter = require('./abstract-filter');
     var MultiselectDecorator = require('orofilter/js/multiselect-decorator');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');

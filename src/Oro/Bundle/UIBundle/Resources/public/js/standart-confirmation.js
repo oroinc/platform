@@ -4,6 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Modal = require('oroui/js/modal');
+    var template = require('tpl!oroui/templates/standart-confirmation.html');
 
     /**
      * Standart confirmation dialog
@@ -15,7 +16,7 @@ define(function(require) {
     return Modal.extend({
 
         /** @property {String} */
-        template: require('tpl!oroui/templates/standart-confirmation.html'),
+        template: template,
 
         /** @property {String} */
         className: 'modal oro-modal-normal',
