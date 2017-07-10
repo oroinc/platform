@@ -639,7 +639,7 @@ via extension, so you can import files from other bundles:
 
 ```yaml
 include:
-    - OroPricingBundle::Pricelists.yml
+    - @OroCustomerBundle/Tests/Behat/Features/Fixtures/CustomerUserAmandaRCole.yml
 ```
 
 **You should always include fixtures from other bundles with entities that were declared within that bundle [see Conventions](#conventions).**
