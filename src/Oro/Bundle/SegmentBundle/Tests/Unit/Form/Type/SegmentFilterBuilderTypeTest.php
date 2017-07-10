@@ -423,6 +423,31 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testSubmitExistingWhenNoNameField()
+    {
+        $entityClass = '\stdClass';
+        $options = [
+            'segment_entity' => $entityClass,
+            'segment_columns' => ['id'],
+            'add_name_field' => false
+        ];
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManagerForClass')
+            ->with($entityClass, false)
+            ->willReturn($em);
+
+        $existingName = 'Some name';
+        /** @var Segment $existingEntity */
+        $existingEntity = $this->getEntity(Segment::class, ['id' => 2, 'name' => $existingName]);
+
+        $form = $this->factory->create($this->formType, $existingEntity, $options);
+
+        $form->submit([]);
+        $this->assertEquals($existingName, $existingEntity->getName());
+    }
+
     public function testEventListenersOptions()
     {
         $isCalled = false;
