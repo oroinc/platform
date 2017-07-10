@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Action;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-
 use Oro\Component\Action\Action\AbstractDateAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -27,9 +26,11 @@ class CreateDate extends AbstractDateAction
     }
 
     /**
+     * @param mixed $context
+     *
      * @return \DateTime
      */
-    protected function createDateTime()
+    protected function createDateTime($context)
     {
         $fullDate = new \DateTime($this->getOption($this->options, 'date'), new \DateTimeZone('UTC'));
 
