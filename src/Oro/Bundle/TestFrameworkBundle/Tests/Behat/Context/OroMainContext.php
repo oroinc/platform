@@ -45,6 +45,12 @@ class OroMainContext extends MinkContext implements
     SessionAliasProviderAwareInterface,
     MessageQueueIsolatorAwareInterface
 {
+    const SKIP_WAIT_PATTERN = '/'.
+        '^(?:|I )should see ".+" flash message$|'.
+        '^(?:|I )should see ".+" error message$|'.
+        '^(?:|I )should see Schema updated flash message$'.
+    '/';
+
     use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait;
 
     /**
@@ -93,7 +99,7 @@ class OroMainContext extends MinkContext implements
         }
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see ".+"( flash message| error message|)$/', $scope->getStep()->getText())) {
+        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
             return;
         }
 
@@ -173,6 +179,14 @@ class OroMainContext extends MinkContext implements
         } catch (\Exception $e) {
             //No worries, flash message can disappeared till time next call
         }
+    }
+
+    /**
+     * @Then /^(?:|I )should see (Schema updated) flash message$/
+     */
+    public function iShouldSeeUpdateSchema()
+    {
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
     }
 
     /**
