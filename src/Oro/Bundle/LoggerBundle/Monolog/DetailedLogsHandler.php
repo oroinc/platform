@@ -13,6 +13,8 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInterface
 {
+    const BUFFER_SIZE = 5000;
+
     /** @var HandlerInterface */
     protected $handler;
 
@@ -58,6 +60,9 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
         }
 
         $this->buffer[] = $record;
+        if (count($this->buffer) > self::BUFFER_SIZE) {
+            array_shift($this->buffer);
+        }
 
         return false === $this->bubble;
     }
