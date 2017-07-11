@@ -221,13 +221,4 @@ class BuilderChainProvider implements MenuProviderInterface
 
         return $menu;
     }
-
-    /**
-     * @param array $options
-     * @return bool
-     */
-    private function checkAccess(array $options)
-    {
-        return !isset($options['check_access']) || $options['check_access'] == true;
-    }
 }
