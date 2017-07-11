@@ -486,7 +486,6 @@ define(function(require) {
 
         leftAndWidthAdjustments: function(dialog, containerEl) {
             // containerEl.offsetLeft will only work if offsetParent is document.body
-
             var left = parseFloat(dialog.css('left')) - containerEl.offsetLeft;
             var width = parseFloat(dialog.css('width'));
             var minWidth = parseFloat(dialog.css('min-width'));
