@@ -261,6 +261,9 @@ class SegmentFilterBuilderType extends AbstractType
         if (!$segmentName && !$config->getOption('name_field_required') && empty($segment->getName())) {
             $segmentName = sprintf($config->getOption('segment_name_template'), uniqid('#', false));
         }
-        $segment->setName($segmentName);
+
+        if ($segmentName) {
+            $segment->setName($segmentName);
+        }
     }
 }

@@ -1,0 +1,61 @@
+{% macro scheduleIntervalsInfo(schedules, labels) %}
+    {% set defaultLabels = {
+        wasActivated: 'oro.cron.schedule_interval.was_activated',
+        activeNow: 'oro.cron.schedule_interval.active_now',
+        notActiveNow: 'oro.cron.schedule_interval.not_active_now',
+        willBeActivated: 'oro.cron.schedule_interval.will_be_acitivated',
+        wasDeactivated: 'oro.cron.schedule_interval.was_deactivated',
+        willBeDeactivated: 'oro.cron.schedule_interval.will_be_deacitivated'
+    } %}
+    {% set labels = defaultLabels|merge(labels) %}
+    {% set now = date('now', 'UTC') %}
+    <ul>
+        {% set activityShown = false %}
+        {% for schedule in schedules %}
+            {% if schedule.activeAt < now %}
+                {% if schedule.activeAt %}
+                    <li>
+                        {{ labels.wasActivated|trans({'%date%': schedule.activeAt|oro_format_datetime}) }}
+                    </li>
+                {% endif %}
+
+                {% if not schedule.deactivateAt or schedule.deactivateAt > now %}
+                    {% set activityShown = true %}
+                    <li>
+                        {{ labels.activeNow|trans }}
+                    </li>
+                {% endif %}
+            {% endif %}
+
+            {% if schedule.activeAt > now %}
+                {% if not activityShown %}
+                    {% set activityShown = true %}
+                    <li>
+                        {{ labels.notActiveNow|trans }}
+                    </li>
+                {% endif %}
+                <li>
+                    {{ labels.willBeActivated|trans({'%date%': schedule.activeAt|oro_format_datetime}) }}
+                </li>
+            {% endif %}
+
+            {% if schedule.deactivateAt %}
+                {% if schedule.deactivateAt < now %}
+                    <li>
+                        {{ labels.wasDeactivated|trans({'%date%': schedule.deactivateAt|oro_format_datetime}) }}
+                    </li>
+                {% else %}
+                    <li>
+                        {{ labels.willBeDeactivated|trans({'%date%': schedule.deactivateAt|oro_format_datetime}) }}
+                    </li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        {% if not activityShown %}
+            <li>
+                {{ labels.notActiveNow|trans }}
+            </li>
+        {% endif %}
+    </ul>
+{% endmacro %}

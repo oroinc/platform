@@ -1,5 +1,5 @@
 include:
-    - ../../../../../../../../../platform/src/Oro/Bundle/TranslationBundle/Tests/Behat/Features/Fixtures/LanguageFixture.yml
+    - '@OroTranslationBundle:LanguageFixture.yml'
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     title_localization1:
