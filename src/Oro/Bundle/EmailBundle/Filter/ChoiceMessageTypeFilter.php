@@ -89,7 +89,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
                 $qb->expr()->orX(
                     $qb->expr()->in('f.type', ':incoming_types'),
                     $qb->expr()->andX(
-                        $qb->expr()->notIn('f.type', ':outcoming_types'),
+                        $qb->expr()->notIn('f.type', ':outgoing_types'),
                         $qb->expr()->orX(
                             $qb->expr()->andX(
                                 $qb->expr()->isNull('_cmtf_eo.id'),
@@ -116,7 +116,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
         $newExpr = sprintf('%s = eu.id', $replacedFieldExpr);
         $dql = strtr($dql, [$oldExpr => $newExpr]);
         $qb
-            ->setParameter('outcoming_types', FolderType::outcomingTypes())
+            ->setParameter('outgoing_types', FolderType::outgoingTypes())
             ->setParameter('incoming_types', FolderType::incomingTypes())
             ->andWhere($qb->expr()->exists($dql));
     }
@@ -139,7 +139,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
             ->andWhere('eu.id = eu.id')
             ->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->in('_cmtf_folders.type', ':outcoming_types'),
+                    $qb->expr()->in('_cmtf_folders.type', ':outgoing_types'),
                     $qb->expr()->andX(
                         $qb->expr()->notIn('_cmtf_folders.type', ':incoming_types'),
                         $qb->expr()->isNotNull('_cmtf_eo.id'),
@@ -154,7 +154,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
         $newExpr = sprintf('%s = eu.id', $replacedFieldExpr);
         $dql = strtr($dql, [$oldExpr => $newExpr]);
         $qb
-        ->setParameter('outcoming_types', FolderType::outcomingTypes())
+        ->setParameter('outgoing_types', FolderType::outgoingTypes())
         ->setParameter('incoming_types', FolderType::incomingTypes())
         ->andWhere($qb->expr()->exists($dql));
     }

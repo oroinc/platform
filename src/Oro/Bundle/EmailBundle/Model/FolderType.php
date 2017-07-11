@@ -11,7 +11,18 @@ class FolderType
     const SPAM   = 'spam';
     const OTHER  = 'other';
 
+    /**
+     * @deprecated since 2.3. Use outgoingTypes() instead
+     */
     public static function outcomingTypes()
+    {
+        return self::outgoingTypes();
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function outgoingTypes()
     {
         return [
             static::SENT,
@@ -19,6 +30,9 @@ class FolderType
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function incomingTypes()
     {
         return [

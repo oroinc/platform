@@ -74,3 +74,14 @@ oro:
             arguments.label: 'Arguments'
             arguments_hash.label: 'Arguments Hash'
             definition.label: 'Definition'
+
+        schedule_interval:
+            active_at.label: 'Active At'
+            deactivate_at.label: 'Deactivate At'
+            add: 'Add'
+            was_activated: 'Was activated on %date%.'
+            was_deactivated: 'Was deactivated on %date%.'
+            will_be_acitivated: 'Will become active on %date%.'
+            will_be_deacitivated: 'Will be deactivated on %date%.'
+            active_now: 'Is active now.'
+            not_active_now: 'Is not active now.'
