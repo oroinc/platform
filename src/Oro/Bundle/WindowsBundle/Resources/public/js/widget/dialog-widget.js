@@ -461,14 +461,31 @@ define(function(require) {
             }
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
+            // Set width:100%; for dialog before calc
+            var initialDialogPosition = dialog.css('position');
+            // Manipulating with position to fix stupid iOS bug,
+            // when orientation is changed
+            if (initialDialogPosition === 'fixed') {
+                dialog.css({
+                    position: 'absolute'
+                });
+            }
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
             this.widget.trigger('dialogreposition');
+            // Manipulating with position to fix stupid iOS bug,
+            // when orientation is changed
+            if (initialDialogPosition === 'fixed') {
+                dialog.css({
+                    position: initialDialogPosition
+                });
+            }
         },
 
         leftAndWidthAdjustments: function(dialog, containerEl) {
             // containerEl.offsetLeft will only work if offsetParent is document.body
+
             var left = parseFloat(dialog.css('left')) - containerEl.offsetLeft;
             var width = parseFloat(dialog.css('width'));
             var minWidth = parseFloat(dialog.css('min-width'));
@@ -499,7 +516,9 @@ define(function(require) {
             // containerEl.offsetTop will only work if offsetParent is document.body
 
             // Set auto height for dialog before calc
-            dialog.css('height', 'auto');
+            if (!this.widgetIsResizable()) {
+                dialog.css('height', 'auto');
+            }
 
             var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
             var height = parseFloat(dialog.css('height'));
