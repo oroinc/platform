@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
@@ -48,7 +49,8 @@ class MultiCurrencyType extends PriceType
                     'required' => $isRequired,
                     'scale' => $this->roundingService->getPrecision(),
                     'rounding_mode' => $this->roundingService->getRoundType(),
-                    'attr' => ['data-scale' => $this->roundingService->getPrecision()]
+                    'attr' => ['data-scale' => $this->roundingService->getPrecision()],
+                    'constraints' => $options['value_constraints']
                 ]
             )
             ->add(
@@ -82,6 +84,15 @@ class MultiCurrencyType extends PriceType
                 $event->getForm()->add('baseCurrencyValue', 'oro_money', $options);
             }
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+        $resolver->setDefaults(['value_constraints' => [],]);
     }
 
     /**

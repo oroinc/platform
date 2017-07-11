@@ -27,6 +27,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInte
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
+use WebDriver\Exception\NoSuchElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -45,6 +46,12 @@ class OroMainContext extends MinkContext implements
     SessionAliasProviderAwareInterface,
     MessageQueueIsolatorAwareInterface
 {
+    const SKIP_WAIT_PATTERN = '/'.
+        '^(?:|I )should see ".+" flash message$|'.
+        '^(?:|I )should see ".+" error message$|'.
+        '^(?:|I )should see Schema updated flash message$'.
+    '/';
+
     use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait;
 
     /**
@@ -93,7 +100,7 @@ class OroMainContext extends MinkContext implements
         }
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see ".+"( flash message| error message|)$/', $scope->getStep()->getText())) {
+        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
             return;
         }
 
@@ -173,6 +180,14 @@ class OroMainContext extends MinkContext implements
         } catch (\Exception $e) {
             //No worries, flash message can disappeared till time next call
         }
+    }
+
+    /**
+     * @Then /^(?:|I )should see (Schema updated) flash message$/
+     */
+    public function iShouldSeeUpdateSchema()
+    {
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
     }
 
     /**
@@ -771,6 +786,7 @@ class OroMainContext extends MinkContext implements
 
         if ($this->elementFactory->hasElement($field)) {
             $this->elementFactory->createElement($field)->setValue($value);
+
             return;
         }
 
@@ -790,6 +806,23 @@ class OroMainContext extends MinkContext implements
             $isVisible,
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotOnPage($element)
+    {
+        $elementOnPage = $this->createElement($element);
+
+        try {
+            self::assertFalse(
+                $elementOnPage->isVisible(),
+                sprintf('Element "%s" is present when it should not', $element)
+            );
+        } catch (NoSuchElement $e) {
+            return;
+        }
     }
 
     /**
@@ -1044,9 +1077,9 @@ class OroMainContext extends MinkContext implements
         $element = $this->createElement($elementName);
         $source = $webDriverSession->element('xpath', $element->getXpath());
 
-        $webDriverSession->moveto(array(
+        $webDriverSession->moveto([
             'element' => $source->getID()
-        ));
+        ]);
         $webDriverSession->buttondown();
 
         $dropZone = $this->createElement($dropZoneName);
@@ -1095,7 +1128,7 @@ class OroMainContext extends MinkContext implements
     public function iSeeNodeAfterAnotherOneInTree($nodeTitle, $anotherNodeTitle)
     {
         $page = $this->getSession()->getPage();
-        $resultElement =  $page->find(
+        $resultElement = $page->find(
             'xpath',
             '//a[contains(., "' . $anotherNodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
             . '/following-sibling::li[contains(@class, "jstree-node")]/a[contains(., "' . $nodeTitle . '")]'

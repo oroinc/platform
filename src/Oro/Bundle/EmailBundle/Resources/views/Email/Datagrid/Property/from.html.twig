@@ -1,18 +1,13 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{# Fetch mode is EAGER so no additional request peformed here #}
-{% set email = record.getValue('email') %}
 {% set isNew = record.getValue('is_new') %}
-{% set fromEmailAddress = email.fromEmailAddress %}
+{% set fromEmailAddressOwnerClass = record.getValue('fromEmailAddressOwnerClass') %}
+{% set fromEmailAddressOwnerId = record.getValue('fromEmailAddressOwnerId') %}
 
-{% if isNew == 1 %}
-    <strong>
-{% endif %}
-{% if fromEmailAddress.owner is null -%}
-    {{ value }}
+{% if isNew %}<strong>{% endif %}
+{%- if fromEmailAddressOwnerId -%}
+    {{ EA.renderEmailAddressLink(value, fromEmailAddressOwnerClass, fromEmailAddressOwnerId) }}
 {%- else -%}
-    {{ EA.email_address_link(fromEmailAddress, fromEmailAddress.owner) }}
-{% endif %}
-{% if isNew == 1 %}
-    </strong>
-{% endif %}
+    {{ value }}
+{%- endif -%}
+{% if isNew %}</strong>{% endif %}
