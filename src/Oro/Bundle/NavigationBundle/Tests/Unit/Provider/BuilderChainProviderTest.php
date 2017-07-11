@@ -171,33 +171,37 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeCount(2, 'menus', $this->provider);
     }
 
-    /**
-     * @dataProvider aliasDataProvider
-     * @param string $alias
-     * @param string $menuName
-     */
-    public function testGetWithoutCheck($alias, $menuName)
+    public function testGetOneMenuWithDifferentOptions()
     {
-        $options = ['check_access' => false];
-
-        $item = new MenuItemStub();
+        $menuName = 'menu_name';
 
         $menu = new MenuItemStub();
-        $menu->addChild($item);
+        $menu->addChild(new MenuItemStub());
 
-        $this->factory->expects($this->once())
+        $rebuildMenu = clone $menu;
+        $rebuildMenu->setAttribute('custom', true);
+
+        $this->factory->expects($this->exactly(2))
             ->method('createItem')
             ->with($menuName)
-            ->will($this->returnValue($menu));
+            ->willReturn($menu, $rebuildMenu);
 
         $builder = $this->getMenuBuilderMock();
-        $builder->expects($this->once())
+        $builder->expects($this->exactly(2))
             ->method('build')
-            ->with($menu, $options, $menuName);
-        $this->provider->addBuilder($builder, $alias);
+            ->willReturnMap([
+                [$menu, [], $menuName],
+                [$rebuildMenu, ['foo' => 'bar'], $menuName],
+            ]);
 
-        $this->assertInstanceOf('Knp\Menu\ItemInterface', $this->provider->get($menuName, $options));
-        $this->assertAttributeCount(0, 'menus', $this->provider);
+        $this->provider->addBuilder($builder);
+
+        $this->assertSame($menu, $this->provider->get($menuName, []));
+        $this->assertSame($rebuildMenu, $this->provider->get($menuName, [
+            'foo' => 'bar'
+        ]));
+
+        $this->assertAttributeCount(2, 'menus', $this->provider);
     }
 
     public function testGetCached()
