@@ -163,9 +163,10 @@ define([
 
             setup: function(options) {
                 _.extend(defaults, options);
-
                 $(document).on('remove', defaults.temporaryContainer, this.removeTemporaryContainer);
+            },
 
+            flushStoredMessages: function() {
                 if (window.localStorage) {
                     queue = queue.concat(JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]'));
                     localStorage.removeItem('oroAfterReloadMessages');

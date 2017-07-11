@@ -2,20 +2,25 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
-use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
+use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
+use Oro\Bundle\ConfigBundle\Provider\Value\ValueProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class ConfigManager
 {
     const SECTION_VIEW_SEPARATOR = '___';
     const SECTION_MODEL_SEPARATOR = '.';
+
+    const VALUE_KEY = 'value';
+    const SCOPE_KEY = 'scope';
+    const USE_PARENT_SCOPE_VALUE_KEY = 'use_parent_scope_value';
 
     /** @var array Settings array, initiated with global application settings */
     protected $settings;
@@ -290,8 +295,8 @@ class ConfigManager
             $key             = str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name);
             $settings[$name] = $this->get($key, false, true);
 
-            if (!isset($settings[$name]['use_parent_scope_value'])) {
-                $settings[$name]['use_parent_scope_value'] = true;
+            if (!isset($settings[$name][static::USE_PARENT_SCOPE_VALUE_KEY])) {
+                $settings[$name][static::USE_PARENT_SCOPE_VALUE_KEY] = true;
             }
         }
 
@@ -312,16 +317,24 @@ class ConfigManager
     public function getSettingsDefaults($name, $full = false)
     {
         list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
-        if (!empty($this->settings[$section][$key])) {
-            $setting = $this->settings[$section][$key];
-            if (!$full && is_array($setting) && array_key_exists('value', $setting)) {
-                return $setting['value'];
-            }
 
-            return $setting;
+        if (empty($this->settings[$section][$key])) {
+            return null;
         }
 
-        return null;
+        $setting = $this->settings[$section][$key];
+
+        if ($setting[static::VALUE_KEY] instanceof ValueProviderInterface) {
+            $setting[static::VALUE_KEY] = $setting[static::VALUE_KEY]->getValue();
+            // replace provider with value that it returns
+            $this->settings[$section][$key][static::VALUE_KEY] = $setting[static::VALUE_KEY];
+        }
+
+        if (!$full) {
+            return $setting[static::VALUE_KEY];
+        }
+
+        return $setting;
     }
 
     /**
@@ -378,16 +391,22 @@ class ConfigManager
         $value = null;
         $scopeId = $this->resolveIdentifier($scopeIdentifier);
         $managers = $this->getScopeManagersToGetValue($default);
+        $settingValue = null;
         foreach ($managers as $scopeName => $manager) {
-            $value = $manager->getSettingValue($name, $full, $scopeIdentifier);
-            if (null !== $value) {
+            $settingValue = $manager->getSettingValue($name, true, $scopeIdentifier);
+            if (null !== $settingValue) {
                 // in case if we get value not from current scope,
                 // we should mark value that it was get from another scope
-                if ($full && $this->scope !== $scopeName) {
-                    $value['use_parent_scope_value'] = true;
+                if ($this->scope !== $scopeName) {
+                    $settingValue[static::USE_PARENT_SCOPE_VALUE_KEY] = true;
                 }
                 break;
             }
+        }
+
+        $value = $settingValue;
+        if ($settingValue !== null && !$full) {
+            $value = $settingValue[self::VALUE_KEY];
         }
 
         $event = new ConfigGetEvent($this, $name, $value, $full, $scopeId);
@@ -396,7 +415,7 @@ class ConfigManager
 
         $value = $event->getValue();
 
-        if (null === $value) {
+        if (null === $value && $settingValue === null) {
             return $this->getSettingsDefaults($name, $full);
         }
 
@@ -412,7 +431,7 @@ class ConfigManager
     protected function isArrayValue($value, $full)
     {
         if ($full) {
-            return is_array($value['value']);
+            return is_array($value[static::VALUE_KEY]);
         }
 
         return is_array($value);
@@ -426,7 +445,7 @@ class ConfigManager
      */
     protected function getPlainValue($value, $full)
     {
-        return $full ? $value['value'] : $value;
+        return $full ? $value[static::VALUE_KEY] : $value;
     }
 
     /**
@@ -442,7 +461,7 @@ class ConfigManager
             return $newValue;
         }
 
-        $value['value'] = $newValue;
+        $value[static::VALUE_KEY] = $newValue;
 
         return $value;
     }

@@ -265,6 +265,29 @@ class ScopeManager
         return new ScopeCriteria($criteria, $this->getFields());
     }
 
+
+    /**
+     * @param Scope $scope
+     * @param ScopeCriteria $criteria
+     * @param string $scopeType
+     *
+     * @return bool
+     */
+    public function isScopeMatchCriteria(Scope $scope, ScopeCriteria $criteria, $scopeType)
+    {
+        $criteriaContext = $criteria->toArray();
+        $scopeCriteriaContext = $this->getCriteriaByScope($scope, $scopeType)
+            ->toArray();
+
+        foreach ($scopeCriteriaContext as $field => $value) {
+            if (null !== $value && $criteriaContext[$field] != $value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @return array
      */

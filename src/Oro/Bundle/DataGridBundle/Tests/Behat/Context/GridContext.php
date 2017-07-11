@@ -235,6 +235,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: And I should see following grid with exact columns order:
+     *            | First name | Last name | Primary Email     | Enabled | Status |
+     *            | John       | Doe       | admin@example.com | Enabled | Active |
+     *
+     * @Then /^(?:|I )should see following grid with exact columns order:$/
+     * @Then /^(?:|I )should see following "(?P<gridName>[\w\s]+)" grid with exact columns order:$/
+     */
+    public function iShouldSeeFollowingGridWithOrder(TableNode $table, $gridName = null)
+    {
+        $this->waitForAjax();
+        $grid = $this->getGrid($gridName);
+        $tableHeaders = $table->getRow(0);
+        $gridHeader = $grid->getHeader();
+
+        foreach ($tableHeaders as $tableHeaderIndex => $tableHeaderValue) {
+            self::assertEquals(
+                $tableHeaderIndex + 1,
+                $gridHeader->getColumnNumber($tableHeaderValue),
+                'Wrong order of columns in grid'
+            );
+        }
+
+        $this->iShouldSeeFollowingGrid($table, $gridName);
+    }
+
+    /**
      * Example: When I click "Delete" link from mass action dropdown
      * Example: And click Delete mass action
      *
@@ -1191,12 +1217,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I shouldn't see Example column in grid
      *
      * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
-     * @param $columnName
+     * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in "(?P<gridName>[\w\s]+)"$/
+     * @param string $columnName
+     * @param null|string $gridName
      */
-    public function iShouldNotSeeColumnInGrid($columnName)
+    public function iShouldNotSeeColumnInGrid($columnName, $gridName = null)
     {
         self::assertFalse(
-            $this->getGrid()->getHeader()->hasColumn($columnName),
+            $this->getGrid($gridName)->getHeader()->hasColumn($columnName),
             sprintf('"%s" column is in grid', $columnName)
         );
     }
@@ -1206,12 +1234,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I should see Example column in grid
      *
      * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
-     * @param $columnName
+     * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in "(?P<gridName>[\w\s]+)"$/
+     * @param string $columnName
+     * @param null|string $gridName
      */
-    public function iShouldSeeColumnInGrid($columnName)
+    public function iShouldSeeColumnInGrid($columnName, $gridName = null)
     {
         self::assertTrue(
-            $this->getGrid()->getHeader()->hasColumn($columnName),
+            $this->getGrid($gridName)->getHeader()->hasColumn($columnName),
             sprintf('"%s" column is not in grid', $columnName)
         );
     }
