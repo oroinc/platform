@@ -461,10 +461,10 @@ define(function(require) {
             }
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
-            // Set width:100%; for dialog before calc
-            var initialDialogPosition = dialog.css('position');
+
             // Manipulating with position to fix stupid iOS bug,
             // when orientation is changed
+            var initialDialogPosition = dialog.css('position');
             if (initialDialogPosition === 'fixed') {
                 dialog.css({
                     position: 'absolute'
@@ -474,6 +474,7 @@ define(function(require) {
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
             this.widget.trigger('dialogreposition');
+
             // Manipulating with position to fix stupid iOS bug,
             // when orientation is changed
             if (initialDialogPosition === 'fixed') {
