@@ -8,6 +8,7 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
@@ -330,6 +331,91 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         self::assertTrue($element->isIsset(), sprintf('Element "%s" not found', $elementName));
 
         $element->check();
+    }
+
+    /**
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
+     *
+     * @param string    $field
+     * @param TableNode $options
+     */
+    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    {
+        $this->assertSelectContainsOptions($field, array_merge(...$options->getRows()));
+    }
+
+    /**
+     * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
+     *
+     * @param string $field
+     * @param TableNode $options
+     */
+    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    {
+        $this->assertSelectNotContainsOptions($field, array_merge(...$options->getRows()));
+    }
+
+    /**
+     * @Then /^I should see "([^"]*)" for "([^"]*)" select$/
+     * @param string $label
+     * @param string $field
+     */
+    public function iShouldSeeOptionForSelect($label, $field)
+    {
+        $this->assertSelectContainsOptions($field, [$label]);
+    }
+
+    /**
+     * @Then /^I should not see "([^"]*)" for "([^"]*)" select$/
+     * @param string $label
+     * @param string $field
+     */
+    public function iShouldNotSeeOptionForSelect($label, $field)
+    {
+        $this->assertSelectNotContainsOptions($field, [$label]);
+    }
+
+    /**
+     * @param string $selectField
+     * @param array  $optionLabels
+     */
+    protected function assertSelectContainsOptions($selectField, array $optionLabels)
+    {
+        $selectOptionsText = $this->getSelectOptionsText($selectField);
+
+        foreach ($optionLabels as $optionLabel) {
+            static::assertContains($optionLabel, $selectOptionsText);
+        }
+    }
+
+    /**
+     * @param string $selectField
+     * @param array  $optionLabels
+     */
+    protected function assertSelectNotContainsOptions($selectField, array $optionLabels)
+    {
+        $selectOptionsText = $this->getSelectOptionsText($selectField);
+
+        foreach ($optionLabels as $optionLabel) {
+            static::assertNotContains($optionLabel, $selectOptionsText);
+        }
+    }
+
+    /**
+     * @param string $selectField
+     *
+     * @return array
+     */
+    protected function getSelectOptionsText($selectField)
+    {
+        /** @var Select $element */
+        $element = $this->createElement($selectField);
+        /** @var NodeElement[] $options */
+        $options = $element->findAll('css', 'option');
+
+        return array_map(function (NodeElement $option) {
+            return $option->getText();
+        }, $options);
     }
 
     /**.
