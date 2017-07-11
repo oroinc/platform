@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block oro_multicurrency_row %}
-    <div class="control-group">
+    <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}">
         <div class="control-label wrap">
             {{ form_label(form) }}
         </div>

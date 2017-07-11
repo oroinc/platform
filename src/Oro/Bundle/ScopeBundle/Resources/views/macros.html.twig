@@ -1,0 +1,24 @@
+{% macro renderRestrictionsViewGrid(scopeEntities, scopes) %}
+    <div class="grid-container">
+        <table class="grid table table-bordered table-condensed">
+            <thead>
+                <tr>
+                    {% for entityClass in scopeEntities %}
+                        <th><span>{{ oro_entity_config_value(entityClass, 'label')|trans }}</span></th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for scope in scopes %}
+                <tr>
+                    {% for fieldName, entityClass in scopeEntities %}
+                        <td>
+                            {{ attribute(scope, fieldName) ? : 'Any'|trans }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}

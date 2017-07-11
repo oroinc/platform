@@ -311,9 +311,10 @@ class Form extends Element
      */
     public function getFieldValidationErrors($fieldName)
     {
-        $field = $this->findFieldByLabel($fieldName);
-        if (!$field && isset($this->options['mapping'][$fieldName])) {
+        if (isset($this->options['mapping'][$fieldName])) {
             $field = $this->findField($this->options['mapping'][$fieldName]);
+        } else {
+            $field = $this->findFieldByLabel($fieldName);
         }
         $fieldId = $field->getAttribute('id');
 
