@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
-
 use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
+use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
@@ -61,7 +61,12 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             if ($entityType && $action) {
                 $entityClass = $this->getEntityClass($entityType);
                 if ($entityClass && !$this->isSkippedEntity($entityClass)) {
-                    $resourceMissingDocs = $this->checkApiResource($definition, $entityClass, $action, $association);
+                    $resourceMissingDocs = $this->checkApiResource(
+                        $annotation,
+                        $definition,
+                        $action,
+                        $association
+                    );
                     if (!empty($resourceMissingDocs)) {
                         $resource = sprintf('%s %s', $definition['method'], $definition['uri']);
                         $missingDocs[$entityClass][$resource] = $resourceMissingDocs;
@@ -82,38 +87,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
      */
     protected function isSkippedEntity($entityClass)
     {
-        // @todo: remove this variable after https://magecore.atlassian.net/browse/BB-9312 fix
-        $temporarySkipEntities = [
-            'Oro\Bundle\CustomerBundle\Entity\CustomerGroup',
-            'Oro\Bundle\CustomerBundle\Entity\CustomerUserRole',
-            'Oro\Bundle\CustomerBundle\Entity\CustomerUser',
-            'Oro\Bundle\CustomerBundle\Entity\Customer',
-            'Extend\Entity\EV_Acc_Internal_Rating',
-            'Oro\Bundle\InventoryBundle\Entity\InventoryLevel',
-            'Oro\Bundle\MarketingActivityBundle\Entity\MarketingActivity',
-            'Extend\Entity\EV_Ma_Type',
-            'Oro\Bundle\OrderBundle\Entity\OrderAddress',
-            'Oro\Bundle\OrderBundle\Entity\OrderDiscount',
-            'Oro\Bundle\OrderBundle\Entity\OrderLineItem',
-            'Oro\Bundle\OrderBundle\Entity\Order',
-            'Oro\Bundle\OrderBundle\Entity\OrderShippingTracking',
-            'Extend\Entity\EV_Quote_Customer_Status',
-            'Extend\Entity\EV_Quote_Internal_Status',
-            'Oro\Bundle\ProductBundle\Entity\Product',
-            'Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision',
-            'Oro\Bundle\ProductBundle\Entity\ProductUnit',
-            'Extend\Entity\EV_Prod_Inventory_Status',
-            'Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote',
-            'Oro\Bundle\RFPBundle\Entity\RequestProductItem',
-            'Oro\Bundle\RFPBundle\Entity\RequestProduct',
-            'Oro\Bundle\RFPBundle\Entity\Request',
-            'Extend\Entity\EV_Rfp_Customer_Status',
-            'Extend\Entity\EV_Rfp_Internal_Status',
-            'Oro\Bundle\WarehouseBundle\Entity\Warehouse',
-            'Oro\Bundle\WebsiteBundle\Entity\Website',
-            'Extend\Entity\EV_Variant_Field_Code',
-            'Oro\Bundle\ProductBundle\Entity\Brand',
-        ];
+        $temporarySkipEntities = $this->getSkippedEntities();
 
         return
             in_array($entityClass, $temporarySkipEntities, true)
@@ -125,8 +99,31 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
     }
 
     /**
+     * @param string $action
+     * @param ApiDoc $annotation
+     *
+     * @return bool
+     */
+    protected function isSkippedSubResource(string $action, ApiDoc $annotation)
+    {
+        if ($action !== 'get_subresource') {
+            return false;
+        }
+
+        /** @var ApiDocMetadata $associationMetadata */
+        $associationMetadata = $annotation->getOutput()['options']['metadata'];
+        if (!$associationMetadata) {
+            return false;
+        }
+
+        $associationClassName = $associationMetadata->getMetadata()->getClassName();
+
+        return in_array($associationClassName, $this->getSkippedEntities(), true);
+    }
+
+    /**
+     * @param ApiDoc $annotation
      * @param array  $definition
-     * @param string $entityClass
      * @param string $action
      * @param string $association
      *
@@ -135,7 +132,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function checkApiResource(array $definition, $entityClass, $action, $association)
+    protected function checkApiResource(ApiDoc $annotation, array $definition, $action, $association)
     {
         $missingDocs = [];
         if (empty($definition['description'])) {
@@ -168,7 +165,8 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
                 }
             }
         }
-        if (!empty($definition['response'])) {
+
+        if (!empty($definition['response']) && !$this->isSkippedSubResource($action, $annotation)) {
             foreach ($definition['response'] as $name => $item) {
                 if (empty($item['description'])
                     && 'data_channel' !== $name // @todo: remove this after CRM-8214 fix
@@ -211,5 +209,45 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
         }
 
         return $message;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getSkippedEntities(): array
+    {
+        // @todo: return empty array after https://magecore.atlassian.net/browse/BB-9312 fix
+        return [
+            'Oro\Bundle\CustomerBundle\Entity\CustomerGroup',
+            'Oro\Bundle\CustomerBundle\Entity\CustomerUserRole',
+            'Oro\Bundle\CustomerBundle\Entity\CustomerUser',
+            'Oro\Bundle\CustomerBundle\Entity\Customer',
+            'Extend\Entity\EV_Acc_Internal_Rating',
+            'Oro\Bundle\InventoryBundle\Entity\InventoryLevel',
+            'Oro\Bundle\MarketingActivityBundle\Entity\MarketingActivity',
+            'Extend\Entity\EV_Ma_Type',
+            'Oro\Bundle\OrderBundle\Entity\OrderAddress',
+            'Oro\Bundle\OrderBundle\Entity\OrderDiscount',
+            'Oro\Bundle\OrderBundle\Entity\OrderLineItem',
+            'Oro\Bundle\OrderBundle\Entity\Order',
+            'Oro\Bundle\OrderBundle\Entity\OrderShippingTracking',
+            'Extend\Entity\EV_Quote_Customer_Status',
+            'Extend\Entity\EV_Quote_Internal_Status',
+            'Oro\Bundle\ProductBundle\Entity\Product',
+            'Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision',
+            'Oro\Bundle\ProductBundle\Entity\ProductUnit',
+            'Extend\Entity\EV_Prod_Inventory_Status',
+            'Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote',
+            'Oro\Bundle\RFPBundle\Entity\RequestProductItem',
+            'Oro\Bundle\RFPBundle\Entity\RequestProduct',
+            'Oro\Bundle\RFPBundle\Entity\Request',
+            'Extend\Entity\EV_Rfp_Customer_Status',
+            'Extend\Entity\EV_Rfp_Internal_Status',
+            'Oro\Bundle\WarehouseBundle\Entity\Warehouse',
+            'Oro\Bundle\WebsiteBundle\Entity\Website',
+            'Extend\Entity\EV_Variant_Field_Code',
+            'Oro\Bundle\ProductBundle\Entity\Brand',
+            'Oro\Bundle\PricingBundle\Entity\PriceAttributePriceList',
+        ];
     }
 }
