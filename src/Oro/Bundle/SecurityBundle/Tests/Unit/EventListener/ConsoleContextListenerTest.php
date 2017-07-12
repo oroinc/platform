@@ -366,6 +366,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(null)
             ->getMock();
         $command->setApplication($application);
+        $command->setDefinition($definition);
 
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
