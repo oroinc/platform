@@ -229,7 +229,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     {
         return (
             ! $input->getOption('disabled-listeners') &&
-            $input->getOption('fixtures-type') !== self::MAIN_FIXTURES_TYPE
+            $this->getTypeOfFixtures($input) !== self::MAIN_FIXTURES_TYPE
         );
     }
 
