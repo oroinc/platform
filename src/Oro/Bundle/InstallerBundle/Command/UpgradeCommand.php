@@ -59,7 +59,7 @@ class UpgradeCommand extends AbstractCommand
 
             $updateParams = ['--process-isolation' => true];
             foreach ($input->getOptions() as $key => $value) {
-                if ($value !== '') {
+                if ($value !== '' && $value !== null) {
                     $updateParams['--' . $key] = $value;
                 }
             }
