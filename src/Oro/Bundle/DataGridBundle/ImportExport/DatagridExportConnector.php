@@ -189,5 +189,6 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
     {
         $this->sourceData = null;
         $this->gridDataSource = null;
+        $this->totalCount = null;
     }
 }
