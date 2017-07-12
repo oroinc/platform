@@ -6,13 +6,9 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class RecentEmailGridListener implements FeatureToggleableInterface
+class RecentEmailGridListener
 {
-    use FeatureCheckerHolderTrait;
-
     /** @var EmailGridHelper */
     protected $emailGridHelper;
 
@@ -20,12 +16,12 @@ class RecentEmailGridListener implements FeatureToggleableInterface
     protected $emailQueryFactory;
 
     /**
-     * @param EmailGridHelper        $emailGridHelper
-     * @param EmailQueryFactory|null $emailQueryFactory
+     * @param EmailGridHelper   $emailGridHelper
+     * @param EmailQueryFactory $emailQueryFactory
      */
-    public function __construct(EmailGridHelper $emailGridHelper, EmailQueryFactory $emailQueryFactory = null)
+    public function __construct(EmailGridHelper $emailGridHelper, EmailQueryFactory $emailQueryFactory)
     {
-        $this->emailGridHelper   = $emailGridHelper;
+        $this->emailGridHelper = $emailGridHelper;
         $this->emailQueryFactory = $emailQueryFactory;
     }
 
@@ -34,17 +30,8 @@ class RecentEmailGridListener implements FeatureToggleableInterface
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
-        $datagrid   = $event->getDatagrid();
-        $datasource = $datagrid->getDatasource();
-        if ($datasource instanceof OrmDatasource) {
-            $queryBuilder = $datasource->getQueryBuilder();
-
-            $this->emailQueryFactory->applyAcl($queryBuilder);
-            $this->emailQueryFactory->prepareQuery($queryBuilder);
-        }
+        /** @var OrmDatasource $datasource */
+        $datasource = $event->getDatagrid()->getDatasource();
+        $this->emailQueryFactory->applyAcl($datasource->getQueryBuilder());
     }
 }

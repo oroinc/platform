@@ -13,7 +13,7 @@
             </div>
             <div class="datagrid-manager-table" data-role="column-manager-table"></div>
             <div class="datagrid-manager__footer" data-role="column-manager-footer">
-                <a href="#" class="link" data-role="column-manager-reset">
+                <a href="#" class="link datagrid-manager__reset-btn" data-role="column-manager-reset">
                     <i class="fa fa-refresh"></i>
                     <span><%= _.__('oro.datagrid.column_manager.reset')%></span>
                 </a>
@@ -34,12 +34,16 @@
 
 {% block _commerce_column_manager_collection_widget %}
     <script type="text/template" id="frontend-column-manager-collection-tpl">
-        <div class="table-wrapper" data-role="column-manager-table-wrapper">
+        <div class="table-wrapper"
+             data-role="column-manager-table-wrapper"
+             data-scroll="true">
             <table class="table">
                 <tbody></tbody>
             </table>
         </div>
-        <div class="datagrid-manager__no-columns"><span><%= _.__('oro.datagrid.column_manager.empty_list') %></span></div>
+        <div class="datagrid-manager__no-columns">
+            <span><%= _.__('oro.datagrid.column_manager.empty_list') %></span>
+        </div>
     </script>
 {% endblock %}
 
@@ -59,15 +63,6 @@
                     <span class="custom-checkbox__icon"></span>
                     <span class="custom-checkbox__text"><%= label %></span>
                 </label>
-            </div>
-
-            <div class="datagrid-manager__move">
-                <span class="datagrid-manager__move-btn datagrid-manager__move-up" data-role="moveUp" title="Move column up">
-                    <i class="fa-long-arrow-up"></i>
-                </span>
-                <span class="datagrid-manager__move-btn datagrid-manager__move-down" data-role="moveDown" title="Move column down">
-                    <i class="fa-long-arrow-down"></i>
-                </span>
             </div>
         </div>
     </td>

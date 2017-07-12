@@ -55,6 +55,10 @@ ApiBundle
 - Class `Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator`
     - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
 
+ConfigBundle
+------------------
+ - Interface `Oro\Bundle\ConfigBundle\Provider\Value\ValueProviderInterface` was added. Now services can be used for fetching default value of config setting. For details, see `Oro/Bundle/ConfigBundle/Resources/doc/config_management.md`.
+
 DashboardBundle
 ---------------
 - Class `Oro\Bundle\DashboardBundle\Controller\DashboardController`
@@ -169,9 +173,10 @@ CronBundle
 EmailBundle
 -----------
 - Class `Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList`
-    - changed the constructor signature: unused parameter `Registry $doctrine` was removed
+    - changed the constructor signature: unused parameter `Registry $doctrine` was removed, added parameter `MailboxNameHelper $mailboxNameHelper`
 - Class `Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider`
-    - changed the constructor signature: parameter `Registry $doctrine` was replaced with `ManagerRegistry $doctrine`
+    - removed constants `EMAIL_ORIGIN` and `EMAIL_MAILBOX`
+    - changed the constructor signature: parameter `Registry $doctrine` was replaced with `ManagerRegistry $doctrine`, added parameter `MailboxNameHelper $mailboxNameHelper`
 - Class `Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener`
     - changed the constructor signature: parameter `Registry $doctrine` was replaced with `ManagerRegistry $doctrine`
 - Class `Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType`
@@ -185,6 +190,34 @@ EmailBundle
         - first argument was changed from `Symfony\Component\Security\Core\SecurityContextInterface` to `Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface`
 - Class ` Oro\Bundle\EmailBundle\Provider\EmailRenderer`, changed constructor signature
     - added eighth argument `Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry`
+- Class `Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory`
+    - removed property `fromEmailExpression`
+    - method `prepareQuery` renamed to `addFromEmailAddress`
+    - removed method `getFromEmailExpression`
+- Class `Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository`
+    - method `getThreadUniqueRecipients` was marked as deprecated. Use `EmailGridResultHelper::addEmailRecipients` instead
+- Class `Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener`
+    - changed the constructor signature: added parameter `EmailGridResultHelper $resultHelper`
+- Class `Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener`
+    - changed the constructor signature: parameter `EmailQueryFactory $emailQueryFactory = null` was replaced with `EmailQueryFactory $emailQueryFactory`
+- Class `Oro\Bundle\EmailBundle\Model\FolderType`
+    - method `outcomingTypes` was marked as deprecated. Use `outgoingTypes` instead
+- The performance of following data grids were improved and as result theirs definitions and TWIG templates were significantly changed. The main change is to return only fields required fir the grid, instead return whole entity
+    - `base-email-grid`
+    - `email-grid`
+    - `dashboard-recent-emails-inbox-grid`
+    - `dashboard-recent-emails-sent-grid`
+    - `dashboard-recent-emails-new-grid`
+    - `EmailBundle/Resources/views/Email/Datagrid/Property/contacts.html.twig`
+    - `EmailBundle/Resources/views/Email/Datagrid/Property/date.html.twig`
+    - `EmailBundle/Resources/views/Email/Datagrid/Property/date_long.html.twig`
+    - `EmailBundle/Resources/views/Email/Datagrid/Property/from.html.twig`
+    - `EmailBundle/Resources/views/Email/Datagrid/Property/mailbox.html.twig`
+    - `EmailBundle/Resources/views/Email/Datagrid/Property/recipients.html.twig`
+    - `EmailBundle/Resources/views/Email/Datagrid/Property/subject.html.twig`
+    - TWIG macro `wrapTextToTag` was marked as deprecated
+- Class `Oro\Bundle\EmailBundle\Twig\EmailExtension`
+    - method `getEmailThreadRecipients` was marked as deprecated. Use `EmailGridResultHelper::addEmailRecipients` instead
 
 EntityConfigBundle
 ------------------
