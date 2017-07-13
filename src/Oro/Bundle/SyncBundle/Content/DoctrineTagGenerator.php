@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\SyncBundle\Content;
 
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\UnitOfWork;
 
 use Symfony\Component\Form\FormInterface;
 
 class DoctrineTagGenerator implements TagGeneratorInterface
 {
-    /** @var array */
+    /**
+     * @var array
+     * @deprecated since 2.0
+     */
     protected $generatedTags = [];
 
     /** @var ManagerRegistry */
@@ -56,20 +59,11 @@ class DoctrineTagGenerator implements TagGeneratorInterface
      */
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
-        $cacheKey = $this->getCacheIdentifier($data);
-        if (isset($this->generatedTags[$cacheKey])) {
-            return $this->generatedTags[$cacheKey];
-        }
-
         if ($data instanceof FormInterface) {
             return $this->generate($data->getData(), $includeCollectionTag, $processNestedData);
         }
 
-        $tags = $this->getTags($data, $includeCollectionTag, $processNestedData);
-
-        $this->generatedTags[$cacheKey] = $tags;
-
-        return $tags;
+        return $this->getTags($data, $includeCollectionTag, $processNestedData);
     }
 
     /**
@@ -161,6 +155,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
      * @param mixed $data
      *
      * @return string
+     * @deprecated since 2.0
      */
     protected function getCacheIdentifier($data)
     {
