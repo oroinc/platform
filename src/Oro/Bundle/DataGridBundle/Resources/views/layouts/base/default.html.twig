@@ -28,11 +28,3 @@
         });
     </script>
 {% endblock %}
-
-{% block _datagrid_toolbar_items_counter_template_widget %}
-    <script type="text/template" id="datagrid-items-counter-template">
-        <div class="oro-items-counter">
-            <%= _.__((transTemplate||'oro.datagrid.pagination.totalRecordsShort'), {totalRecords: state.totalRecords}) %>
-        </div>
-    </script>
-{% endblock %}

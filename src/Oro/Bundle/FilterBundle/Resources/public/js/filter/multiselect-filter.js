@@ -1,15 +1,14 @@
-define([
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    './select-filter'
-], function(_, __, tools, SelectFilter) {
+define(function(require) {
     'use strict';
 
     // @const
     var FILTER_EMPTY_VALUE = '';
 
     var MultiSelectFilter;
+    var template = require('tpl!orofilter/templates/filter/multiselect-filter.html');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var SelectFilter = require('./select-filter');
 
     /**
      * Multiple select filter: filter values as multiple select options
@@ -24,6 +23,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#multiselect-filter-template',
 
         /**
