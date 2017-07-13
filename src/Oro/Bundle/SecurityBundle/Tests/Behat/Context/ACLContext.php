@@ -13,6 +13,8 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -23,7 +25,10 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ACLContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
+class ACLContext extends OroFeatureContext implements
+    OroPageObjectAware,
+    KernelAwareContext,
+    MessageQueueIsolatorAwareInterface
 {
     use PageObjectDictionary, KernelDictionary;
 
@@ -31,6 +36,19 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      * @var OroMainContext
      */
     private $oroMainContext;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
 
     /**
      * @BeforeScenario
@@ -306,12 +324,19 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      */
     public function iClickUpdateSchema()
     {
-        $page = $this->getPage();
+        try {
+            $page = $this->getPage();
 
-        $page->clickLink('Update schema');
-        $this->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $this->waitForAjax();
+            $page->clickLink('Update schema');
+            $this->waitForAjax();
+            $page->clickLink('Yes, Proceed');
+            $this->waitForAjax();
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            $this->messageQueueIsolator->stopMessageQueue();
+            $this->messageQueueIsolator->startMessageQueue();
+        }
     }
 
     /**
