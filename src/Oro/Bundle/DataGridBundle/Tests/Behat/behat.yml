@@ -24,6 +24,10 @@ oro_behat_extension:
       selector: 'tbody tr'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
+    GridTable:
+      selector: 'table.grid'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
+
     GridRowAction:
         selector: '.launchers-list a.action'
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

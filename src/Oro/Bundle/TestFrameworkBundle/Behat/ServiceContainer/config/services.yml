@@ -13,6 +13,14 @@ services:
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
 
+    oro_test.listener.js_logger_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\JsLogSubscriber'
+        arguments:
+            - '@mink'
+            - '%kernel.log_dir%'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
     oro_test.listener.suite_aware_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
         arguments:

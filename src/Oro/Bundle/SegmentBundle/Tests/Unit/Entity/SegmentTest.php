@@ -3,9 +3,12 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class SegmentTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTestCaseTrait;
+
     /** @var Segment */
     protected $entity;
 

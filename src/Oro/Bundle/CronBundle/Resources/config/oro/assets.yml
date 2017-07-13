@@ -1,0 +1,4 @@
+assets:
+    css:
+        'orocron':
+            - 'bundles/orocron/css/schedule-intervals.less'

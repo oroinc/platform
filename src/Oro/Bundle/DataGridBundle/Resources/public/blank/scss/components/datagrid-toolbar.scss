@@ -61,6 +61,14 @@
 
     .page-size {
         flex-grow: 0;
+
+        .select2-container {
+            min-width: 64px;
+        }
+
+        .select {
+            min-width: 64px;
+        }
     }
 
 }

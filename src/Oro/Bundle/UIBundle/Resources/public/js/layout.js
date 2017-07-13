@@ -129,6 +129,10 @@ define(function(require) {
             });
 
             $items.popover(options).on('click.popover', function(e) {
+                if ($(this).is('.disabled, :disabled')) {
+                    return;
+                }
+
                 $(this).popover('toggle');
                 e.preventDefault();
             });

@@ -1,5 +1,5 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
-{% set recipients = record.getValue('email.recipients') %}
-{% if (recipients.toArray|length > 0) %}
-    {{ EA.recipient_email_addresses(recipients.toArray, false, true) }}
+{% set recipients = record.getValue('recipients') %}
+{% if (recipients|length > 0) %}
+    {{ EA.recipient_email_addresses(recipients, false, true) }}
 {% endif %}

@@ -281,3 +281,10 @@ services:
             - [setDispatcher, ['@event_dispatcher']]
         tags:
             - { name: oro_action.action, alias: increase_value }
+
+    oro_action.action.substring:
+        class: 'Oro\Component\Action\Action\Substring'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: substring }
