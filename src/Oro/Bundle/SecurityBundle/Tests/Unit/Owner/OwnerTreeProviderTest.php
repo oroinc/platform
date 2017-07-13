@@ -14,7 +14,7 @@ use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -51,7 +51,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
     protected $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
@@ -84,13 +84,13 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->cache->expects($this->any())->method('save');
 
         $this->ownershipMetadataProvider = $this->createMock(
-            'Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface'
+            'Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface'
         );
         $this->ownershipMetadataProvider->expects($this->any())
-            ->method('getBasicLevelClass')
+            ->method('getUserClass')
             ->willReturn(self::ENTITY_NAMESPACE . '\TestUser');
         $this->ownershipMetadataProvider->expects($this->any())
-            ->method('getLocalLevelClass')
+            ->method('getBusinessUnitClass')
             ->willReturn(self::ENTITY_NAMESPACE . '\TestBusinessUnit');
 
         $this->tokenStorage = $this->createMock(

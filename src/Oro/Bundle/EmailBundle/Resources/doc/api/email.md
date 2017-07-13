@@ -18,17 +18,17 @@ Indicates whether the current user should be excluded from the result.
 
 #### get_subresource
 
-Get entities that might be associated with the email.
+Retrieve records that might be associated with the email.
 
 ### activityTargets
 
 #### get_subresource
 
-Get full information about records to which the email associated.
+Retrieve records to which the email associated.
 
 #### get_relationship
 
-Get records to which the email associated.
+Retrieve the IDs of records to which the email associated.
 
 #### add_relationship
 

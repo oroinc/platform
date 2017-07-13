@@ -227,10 +227,11 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     private function killConnections()
     {
         $process = sprintf(
-            'PGPASSWORD="%s" psql -h %s -U %s template1 -t -c "'.
+            'PGPASSWORD="%s" psql -h %s --port=%s -U %s template1 -t -c "'.
             'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = \'%s\'"',
             $this->dbPass,
             $this->dbHost,
+            $this->dbPort,
             $this->dbUser,
             $this->dbName
         );

@@ -426,11 +426,17 @@ define(function(require) {
                 multiselectDefaults,
                 {
                     selectedText: this.addButtonHint,
-                    open: $.proxy(function() {
+                    beforeopen: _.bind(function() {
+                        _.each(this.filters, function(filter) {
+                            filter.close();
+                        });
+                        this.selectWidget.onBeforeOpenDropdown();
+                    }, this),
+                    open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                     }, this),
-                    refresh: $.proxy(function() {
+                    refresh: _.bind(function() {
                         this.selectWidget.onRefresh();
                     }, this),
                     appendTo: this.dropdownContainer
@@ -483,9 +489,8 @@ define(function(require) {
          */
         _setButtonReset: function() {
             var $footerContainer = this._createButtonReset();
-            var $checkboxContainer = this.selectWidget.multiselect('instance').checkboxContainer;
-
-            $footerContainer.insertAfter($checkboxContainer);
+            var instance = this.selectWidget.multiselect('instance');
+            instance.menu.append($footerContainer);
         },
 
         /**

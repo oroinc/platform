@@ -136,7 +136,7 @@ class EmailGridHelper
         $className = $node['className'];
 
         return function (ResultRecordInterface $record) use ($className) {
-            if ($record->getValue('is_new') === '0') {
+            if (!$record->getValue('is_new')) {
                 return $className;
             } else {
                 return '';

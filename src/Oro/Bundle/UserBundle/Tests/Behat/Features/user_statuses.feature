@@ -14,3 +14,14 @@ Feature: User statuses
     When I check "All" in Enabled filter
     And I click Enable charlie in grid
     Then Charlie Sheen user could login to the Dashboard
+
+  Scenario: Disable users mass action doesn't affect current logged in user
+    And check all records in grid
+    And I click "Disable" link from mass action dropdown
+    And I press "Apply"
+    Then I should see "admin@example.com" in grid with following data:
+      |Username   |admin  |
+      |Enabled    |Enabled|
+    And I should see "charlie@example.com" in grid with following data:
+      |Username   |charlie |
+      |Enabled    |Disabled|

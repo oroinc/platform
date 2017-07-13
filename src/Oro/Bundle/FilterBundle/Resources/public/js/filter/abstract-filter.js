@@ -215,6 +215,8 @@ define([
             return this;
         },
 
+        close: function() {},
+
         /**
          * Reset filter elements
          *

@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
+use Oro\Component\Duplicator\Filter\Filter;
+use Oro\Component\Duplicator\Filter\FilterFactory;
+use Oro\Component\Duplicator\Matcher\Matcher;
+use Oro\Component\Duplicator\Matcher\MatcherFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActionBundle\Action\DuplicateEntity;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Duplicator\DuplicatorFactory;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DuplicateEntityTest extends \PHPUnit_Framework_TestCase
 {
@@ -140,12 +145,23 @@ class DuplicateEntityTest extends \PHPUnit_Framework_TestCase
 
         $options = [
             DuplicateEntity::OPTION_KEY_ENTITY => '$.data',
-            DuplicateEntity::OPTION_KEY_ATTRIBUTE => 'copyResult'
+            DuplicateEntity::OPTION_KEY_ATTRIBUTE => 'copyResult',
+            DuplicateEntity::OPTION_KEY_SETTINGS => [
+                [
+                    ['replaceValue', new PropertyPath('$.dataForField1')],
+                    ['propertyName', ['field1']]
+                ],
+            ],
         ];
-        $contextAccessor->expects($this->once())
+        $contextAccessor->expects($this->exactly(2))
             ->method('getValue')
-            ->with($context, $options[DuplicateEntity::OPTION_KEY_ENTITY])
-            ->willReturn($target);
+            ->with()
+            ->willReturnMap(
+                [
+                    [$context, $options[DuplicateEntity::OPTION_KEY_ENTITY], $target],
+                    [$context, '$.dataForField1', 'newValue'],
+                ]
+            );
 
         $action->initialize($options);
         $action->execute($context);
@@ -160,6 +176,14 @@ class DuplicateEntityTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new DuplicatorFactory($container);
+        $duplicatorFactory = new DuplicatorFactory($container);
+        $filterFactory = $this->createMock(FilterFactory::class);
+        $filterFactory->method('create')->willReturn($this->createMock(Filter::class));
+        $duplicatorFactory->setFilterFactory($filterFactory);
+        $matcherFactory = $this->createMock(MatcherFactory::class);
+        $matcherFactory->method('create')->willReturn($this->createMock(Matcher::class));
+        $duplicatorFactory->setMatcherFactory($matcherFactory);
+
+        return $duplicatorFactory;
     }
 }

@@ -19,19 +19,24 @@ datagrids:
                     card_view: demobundle/js/app/views/board/your-entity-card-view
 ```
 
+*Note:* board appearance uses `save_api_accessor` internally, so please check that at least one of the following options is configured properly:
+ * `save_api_accessor` for column transition option (check [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md))
+ * `save_api_accessor` for default transition (check `default_transition` configuration option below)
+ * `save_api_accessor` for inline editing (check this [article](./inline_editing.md#sample-usage-of-the-save_api_accessor-with-full-options-provided))
+
 ## Datagrid configuration details
 
  - label (Optional)
 
- A label to be shown in appearance switcher.
+ A label to be shown in the appearance switcher.
 
  - icon (Optional)
 
- Icon class to be shown in appearance switcher.
+ The icon class to be shown in the appearance switcher.
 
  - group_by (Required)
 
- Configuration array for column groupping property.
+ Configuration array for column grouping property.
 ``` yml
     group_by:
         property: status #required, enum property to be used for board columns
@@ -41,7 +46,7 @@ datagrids:
 
  - default_column (Optional)
 
- Specifies a column id to use for showing entities which don't have any value set for group_by `property`. By default, first column will be used.
+ Specifies a column ID to show entities which do not have any value set for group_by `property`. By default, the first column will be used.
 
  - plugin (Optional)
 
@@ -65,15 +70,15 @@ datagrids:
 
 - acl_resource (Optional)
 
- Acl resource to check for allowing board items transitions. If no permission granted, board will be in readonly mode.
+ Enabled Acl resource checks whether board items transitions are allowed. If no permission is granted to a user, they see the board in read only mode.
 
 - processor (Optional)
 
- Specified the name of board processor. `default` processor is used by default.
+ Specified the name of the board processor. `default` processor is used by default.
 
 - default_transition (Optional)
 
- Section to specify configuration for transition, e.g. update property when card after drag&drop from one column to another
+ Section to specify configuration for the transition, e.g. update property when cards are dragged and dropped from one column to another.
 
 ``` yml
     default_transition:

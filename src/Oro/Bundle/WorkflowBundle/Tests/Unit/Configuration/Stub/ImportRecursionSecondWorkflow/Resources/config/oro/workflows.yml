@@ -1,0 +1,11 @@
+imports:
+    - { workflow: third, as: second, replace: ''}
+workflows:
+    second:
+        entity: Entity2
+        steps:
+            step_two: ~
+        transitions:
+            transition_two:
+                is_start: true
+                step_to: step_two

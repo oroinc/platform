@@ -62,4 +62,12 @@ class TreeUtilsTest extends \PHPUnit_Framework_TestCase
         $result = TreeUtils::getFirstNodeName(new GroupNodeDefinition('some_name'));
         $this->assertNull($result);
     }
+
+    public function testGetConfigKey()
+    {
+        $this->assertEquals(
+            'root.name',
+            TreeUtils::getConfigKey('root', 'name')
+        );
+    }
 }

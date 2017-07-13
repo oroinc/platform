@@ -26,15 +26,6 @@ define([
         element: null,
 
         /**
-         * Default multiselect widget parameters
-         *
-         * @property {Object}
-         */
-        parameters: {
-            height: 'auto'
-        },
-
-        /**
          * @property {Object}
          */
         multiselectFilterParameters: {},
@@ -118,18 +109,23 @@ define([
             widget.find('ul li label').removeClass('ui-corner-all');
         },
 
+        onBeforeOpenDropdown: function() {
+            this._setDropdownDesign();
+        },
+
         /**
          * Action performed on dropdown open
          */
         onOpenDropdown: function() {
-            this._setDropdownDesign();
             this.getWidget().find('input[type="search"]').focus();
         },
 
         /**
          * Action on multiselect widget refresh
          */
-        onRefresh: function() {},
+        onRefresh: function() {
+            this.getWidget().find('.ui-multiselect-checkboxes').addClass('fixed-li');
+        },
 
         /**
          * Get minimum width of dropdown menu
@@ -181,8 +177,8 @@ define([
          * @param functionName
          * @return {Object}
          */
-        multiselect: function(functionName) {
-            return this.element.multiselect(functionName);
+        multiselect: function(parameters) {
+            return this.element.multiselect(parameters);
         },
 
         /**

@@ -3,14 +3,18 @@
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Type;
-
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
  * @ORM\Entity()
+ * @Config(
+ *      defaultValues={
+ *          "security"={}
+ *     }
+ * )
  */
 class Audit extends AbstractAudit
 {
