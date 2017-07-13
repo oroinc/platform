@@ -462,17 +462,15 @@ define(function(require) {
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
 
-            if (tools.isIOS()) {
+            var initialDialogPosition = dialog.css('position');
+            var initialScrollTop = $(window).scrollTop();
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
                 // Manipulating with position to fix stupid iOS bug,
                 // when orientation is changed
-                var initialDialogPosition = dialog.css('position');
-                var initialScrollTop = $(window).scrollTop();
-                if (initialDialogPosition === 'fixed') {
-                    $('html, body').scrollTop(0);
-                    dialog.css({
-                        position: 'absolute'
-                    });
-                }
+                $('html, body').scrollTop(0);
+                dialog.css({
+                    position: 'absolute'
+                });
             }
 
             this.internalSetDialogPosition(position, leftShift, topShift);
@@ -480,15 +478,13 @@ define(function(require) {
             this.topAndHeightAdjustments(dialog, containerEl);
             this.widget.trigger('dialogreposition');
 
-            if (tools.isIOS()) {
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
                 // Manipulating with position to fix stupid iOS bug,
                 // when orientation is changed
-                if (initialDialogPosition === 'fixed') {
-                    dialog.css({
-                        position: initialDialogPosition
-                    });
-                    $('html, body').scrollTop(initialScrollTop);
-                }
+                dialog.css({
+                    position: initialDialogPosition
+                });
+                $('html, body').scrollTop(initialScrollTop);
             }
         },
 
