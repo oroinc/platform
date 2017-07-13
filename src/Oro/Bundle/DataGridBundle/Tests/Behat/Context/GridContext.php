@@ -1459,6 +1459,76 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: I should see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should see following elements in grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertTrue(
+                    $element->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertTrue(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        }
+    }
+
+    /**
+     * Example: I should not see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should not see following elements in grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldNotSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertFalse(
+                    $element->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertFalse(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        }
+    }
+
+    /**
      * @param string $stringNumber
      *
      * @return int
