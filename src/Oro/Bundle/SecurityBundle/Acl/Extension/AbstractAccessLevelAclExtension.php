@@ -111,10 +111,6 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
             return true;
         }
 
-        if (false === $this->decisionMaker->supports()) { // @todo MUST be removed in scope of BB-10751
-            return true;
-        }
-
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
             $result = $this->decisionMaker->isAssociatedWithUser(
