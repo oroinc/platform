@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var FiltersManager;
+    var template = require('tpl!orofilter/templates/filters-container.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -34,14 +35,9 @@ define(function(require) {
         filters: null,
 
         /**
-         * Template selector
-         */
-        templateSelector: '#filter-container',
-
-        /**
          * Template
          */
-        template: null,
+        template: template,
 
         /**
          * Mode of filters displaying
@@ -124,7 +120,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
-            this.template = _.template($(this.templateSelector).html());
+            this.template = this.getTemplateFunction();
             this.filters = {};
 
             _.extend(this, _.pick(options, prop));

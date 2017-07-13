@@ -93,7 +93,9 @@ define(['underscore', 'asap'], function(_, asap) {
         });
         arguments[1] = _.trim(escapedText);
 
-        return original.apply(this, _.rest(arguments));
+        var func = original.apply(this, _.rest(arguments));
+        func._source = arguments[1];
+        return func;
     });
 
     _.defer = asap;
