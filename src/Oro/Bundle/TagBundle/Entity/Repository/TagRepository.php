@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -156,6 +157,27 @@ class TagRepository extends EntityRepository
         $recordId = TaggableHelper::getEntityId($resource);
 
         return $this->getTags(ClassUtils::getClass($resource), $recordId, $createdBy, $all, $organization);
+    }
+
+    /**
+     * @param object $entity
+     * @param Tag $tag
+     *
+     * @return Tagging[]
+     */
+    public function getTaggingByEntityAndTag($entity, Tag $tag)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('tagging')->from('OroTagBundle:Tagging', 'tagging')
+            ->where('tagging.entityName = :entityName')
+            ->andWhere('tagging.recordId = :recordId')
+            ->andWhere('tagging.tag = :tag');
+
+        $qb->setParameter('entityName', ClassUtils::getClass($entity))
+            ->setParameter('tag', $tag->getId())
+            ->setParameter('recordId', TaggableHelper::getEntityId($entity));
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
