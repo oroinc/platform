@@ -46,6 +46,10 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $context = [];
         $expectedResult = true;
 
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
+
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], null)
@@ -60,6 +64,10 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $options = ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity'];
         $context = [];
         $expectedResult = true;
+
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -80,6 +88,10 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue(null));
+
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -119,6 +131,10 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
+
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], $this->identicalTo($options[1]))
@@ -154,6 +170,10 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
+
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -193,6 +213,10 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
+
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
@@ -200,6 +224,22 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+    }
+
+    public function testEvaluateHasNoUser()
+    {
+        $options = ['acme_product_view'];
+        $context = [];
+
+        $this->tokenAccessor->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null));
+
+        $this->authorizationChecker->expects($this->never())
+            ->method('isGranted');
+
+        $this->assertSame($this->condition, $this->condition->initialize($options));
+        $this->assertFalse($this->condition->evaluate($context));
     }
 
     /**
