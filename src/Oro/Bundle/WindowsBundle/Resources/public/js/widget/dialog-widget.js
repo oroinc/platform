@@ -554,7 +554,6 @@ define(function(require) {
                 }
             }
             var posY = dialog.offset().top - $(window).scrollTop();
-            // posY = posY < 0 ? 0 : posY;
             if (posY + height > windowHeight) {
                 if (windowHeight - top < this.options.dialogOptions.minHeight &&
                     this.options.dialogOptions.minHeight <= windowHeight) {
