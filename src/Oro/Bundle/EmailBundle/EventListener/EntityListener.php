@@ -163,7 +163,9 @@ class EntityListener implements OptionalListenerInterface
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
         $entities = $this->emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
-        if (! $entities) {
+        $this->emailActivityUpdates->clearPendingEntities();
+
+        if (!$entities) {
             return;
         }
         
@@ -179,8 +181,6 @@ class EntityListener implements OptionalListenerInterface
                 'ownerIds' => $ids,
             ]);
         }
-
-        $this->emailActivityUpdates->clearPendingEntities();
     }
 
     /**
