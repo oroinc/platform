@@ -1,5 +1,10 @@
 @fixture-OroWorkflowBundle:Users.yml
-Feature: Transition button titles
+@regression
+Feature: Backend workflow configuration
+  In order to provide button title different from the transition name
+  As an Administrator
+  I want to have an optional field (name for transition, label for transition button and
+    title for transition button) in workflow management UI to provide button titles for transitions
 
   Scenario: Prepare Test Workflow
     Given I login as administrator
