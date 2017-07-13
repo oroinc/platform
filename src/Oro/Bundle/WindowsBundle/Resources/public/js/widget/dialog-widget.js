@@ -462,25 +462,33 @@ define(function(require) {
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
 
-            // Manipulating with position to fix stupid iOS bug,
-            // when orientation is changed
-            var initialDialogPosition = dialog.css('position');
-            if (initialDialogPosition === 'fixed') {
-                dialog.css({
-                    position: 'absolute'
-                });
+            if (tools.isIOS()) {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                var initialDialogPosition = dialog.css('position');
+                var initialScrollTop = $(window).scrollTop();
+                if (initialDialogPosition === 'fixed') {
+                    $('html, body').scrollTop(0);
+                    dialog.css({
+                        position: 'absolute'
+                    });
+                }
             }
+
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
             this.widget.trigger('dialogreposition');
 
-            // Manipulating with position to fix stupid iOS bug,
-            // when orientation is changed
-            if (initialDialogPosition === 'fixed') {
-                dialog.css({
-                    position: initialDialogPosition
-                });
+            if (tools.isIOS()) {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                if (initialDialogPosition === 'fixed') {
+                    dialog.css({
+                        position: initialDialogPosition
+                    });
+                    $('html, body').scrollTop(initialScrollTop);
+                }
             }
         },
 
@@ -546,6 +554,7 @@ define(function(require) {
                 }
             }
             var posY = dialog.offset().top - $(window).scrollTop();
+            // posY = posY < 0 ? 0 : posY;
             if (posY + height > windowHeight) {
                 if (windowHeight - top < this.options.dialogOptions.minHeight &&
                     this.options.dialogOptions.minHeight <= windowHeight) {
