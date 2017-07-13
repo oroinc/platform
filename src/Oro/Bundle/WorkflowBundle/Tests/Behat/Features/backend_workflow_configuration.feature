@@ -1,4 +1,5 @@
 @fixture-OroWorkflowBundle:Users.yml
+@regression
 Feature: Backend workflow configuration
   In order to provide button title different from the transition name
   As an Administrator
