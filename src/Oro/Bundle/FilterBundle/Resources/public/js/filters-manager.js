@@ -423,6 +423,9 @@ define(function(require) {
                 {
                     selectedText: this.addButtonHint,
                     beforeopen: _.bind(function() {
+                        _.each(this.filters, function(filter) {
+                            filter.close();
+                        });
                         this.selectWidget.onBeforeOpenDropdown();
                     }, this),
                     open: _.bind(function() {

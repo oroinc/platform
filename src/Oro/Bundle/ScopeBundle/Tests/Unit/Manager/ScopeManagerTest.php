@@ -449,4 +449,45 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $actualScope = $this->manager->findMostSuitable('testScope');
         $this->assertEquals($scope, $actualScope);
     }
+
+    /**
+     * @dataProvider isScopeMatchCriteriaDataProvider
+     *
+     * @param $expectedResult
+     * @param $criteriaContext
+     * @param $scopeFieldValue
+     */
+    public function testIsScopeMatchCriteria($expectedResult, $criteriaContext, $scopeFieldValue)
+    {
+        $criteria = new ScopeCriteria($criteriaContext, []);
+
+        $this->manager->addProvider('some_type', new StubScopeCriteriaProvider());
+        $scope = new StubScope();
+        $scope->setScopeField($scopeFieldValue);
+        $this->entityFieldProvider->method('getRelations')->willReturn([]);
+
+        $result = $this->manager->isScopeMatchCriteria($scope, $criteria, 'some_type');
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function isScopeMatchCriteriaDataProvider()
+    {
+        return [
+            'scope match criteria' => [
+                'expectedResult' => true,
+                'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => 'expected_value'],
+                'scopeFieldValue' => 'expected_value'
+            ],
+            'scope dont match criteria' => [
+                'expectedResult' => false,
+                'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => 'unexpected_value'],
+                'scopeFieldValue' => 'expected_value'
+            ],
+            'scope match criteria with null value' => [
+                'expectedResult' => true,
+                'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => 'unexpected_value'],
+                'scopeFieldValue' => null
+            ],
+        ];
+    }
 }

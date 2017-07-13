@@ -11,6 +11,11 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
 
+    var config = require('module').config();
+    config = _.extend({
+        notAlignCriteria: tools.isMobile()
+    }, config);
+
     /**
      * Text grid filter.
      *
@@ -25,6 +30,8 @@ define(function(require) {
      */
     TextFilter = EmptyFilter.extend({
         wrappable: true,
+
+        notAlignCriteria: config.notAlignCriteria,
 
         wrapperTemplate: wrapperTemplate,
         wrapperTemplateSelector: '#filter-wrapper-template',
@@ -275,7 +282,7 @@ define(function(require) {
          * @private
          */
         _alignCriteria: function() {
-            if (tools.isMobile()) {
+            if (this.notAlignCriteria) {
                 // no need to align criteria on mobile version, it is aligned over CSS
                 return;
             }

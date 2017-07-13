@@ -223,8 +223,24 @@ define(function(require) {
             },
             unformatStrict: function(value) {
                 var numberFormats = localeSettings.getNumberFormats('decimal');
-                value = String(value).split(numberFormats.grouping_separator_symbol).join('');
-                value = value.replace(numberFormats.decimal_separator_symbol, '.');
+                var groupingSeparator = numberFormats.grouping_separator_symbol;
+                var decimalSeparator = numberFormats.decimal_separator_symbol;
+                var defaultDecimalSeparator = '.';
+                value = String(value);
+                if (/^\s+$/.test(groupingSeparator)) {
+                    // to avoid an error when grouping separator of current locale looks like space but has another code
+                    // e.g. no-break space on french locale
+                    value = value.replace(/\s/g, '');
+                } else {
+                    value = value.split(groupingSeparator).join('');
+                }
+                if (decimalSeparator !== defaultDecimalSeparator) {
+                    if (value.indexOf(defaultDecimalSeparator) !== -1) {
+                        // value should not contain default decimal separator if current locale has different one
+                        return NaN;
+                    }
+                    value = value.replace(decimalSeparator, defaultDecimalSeparator);
+                }
                 return Number(value);
             }
         };

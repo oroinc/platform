@@ -61,6 +61,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     public function process(ContainerBuilder $container)
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
+        $this->transferApplicationParameters($container);
         $this->processBundleBehatConfigurations($container);
         $this->processBundleAutoload($container);
         $this->injectMessageQueueIsolator($container);
@@ -141,6 +142,13 @@ class OroTestFrameworkExtension implements TestworkExtension
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
             ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
+    }
+
+    private function transferApplicationParameters(ContainerBuilder $container)
+    {
+        /** @var KernelInterface $kernel */
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $container->setParameter('kernel.log_dir', $kernel->getLogDir());
     }
 
     /**

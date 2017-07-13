@@ -77,6 +77,17 @@ define([
 
         _appendFilter: function($filter) {
             this.$(this.criteriaSelector).append($filter);
+        },
+
+        /**
+         * Close criteria dropdown
+         *
+         * @returns {*}
+         */
+        close: function() {
+            this._hideCriteria();
+
+            return this;
         }
     };
 
