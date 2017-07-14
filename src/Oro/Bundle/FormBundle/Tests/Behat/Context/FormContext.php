@@ -241,6 +241,19 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert that field is not required
+     * Example: Then Opportunity Name is not required field
+     * Example: Then Opportunity Name is not required field
+     *
+     * @Then /^(?P<label>[\w\s]+) is not required field$/
+     */
+    public function fieldIsNotRequired($label)
+    {
+        $labelElement = $this->getPage()->findElementContains('Label', $label);
+        self::assertFalse($labelElement->hasClass('required'));
+    }
+
+    /**
      * Type value in field chapter by chapter. Imitate real user input from keyboard
      * Example: And type "Common" in "search"
      * Example: When I type "Create" in "Enter shortcut action"

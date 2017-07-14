@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception\TableNotFoundException;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -31,6 +30,7 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
 
     protected function cleanUp()
     {
+        $this->kernel->boot();
         /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         /** @var Connection $connection */
@@ -49,27 +49,24 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
     /**
      * {@inheritdoc}
      */
-    public function waitWhileProcessingMessages($timeLimit = 600)
+    public function waitWhileProcessingMessages($timeLimit = self::TIMEOUT)
     {
-        $result = 0;
-        while ($result < 3) {
-            try {
-                if ($this->isQueueEmpty()) {
-                    $result++;
-                } else {
-                    $result = 0;
-                }
-            } catch (TableNotFoundException $e) {
-                $this->logger->error($e->getMessage(), ['exception' => $e]);
+        $isRunning = $this->isOutdatedState();
+        if (!$isRunning) {
+            throw new RuntimeException('Message Queue is not running');
+        }
+
+        while ($timeLimit > 0) {
+            $isQueueEmpty = $this->isQueueEmpty();
+            if ($isQueueEmpty) {
                 return;
             }
 
             sleep(1);
             $timeLimit -= 1;
-            if ($timeLimit <= 0) {
-                throw new RuntimeException('Message Queue was not process messages during time limit');
-            }
         }
+
+        throw new RuntimeException('Message Queue was not process messages during time limit');
     }
 
     /**
@@ -77,6 +74,7 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
      */
     private function isQueueEmpty()
     {
+        $this->kernel->boot();
         /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         /** @var Connection $connection */
@@ -84,7 +82,7 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
         /** @var Connection $connectionMQ */
         $connectionMQ = $doctrine->getManager('message_queue_job')->getConnection();
 
-        return false == $connection->executeQuery('SELECT * FROM oro_message_queue')->rowCount() +
+        $messages = $connection->executeQuery('SELECT * FROM oro_message_queue')->rowCount() +
             $connectionMQ->executeQuery(
                 sprintf(
                     "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s')",
@@ -93,6 +91,8 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
                 )
             )->rowCount() +
             $connectionMQ->executeQuery('SELECT * FROM oro_message_queue_job_unique')->rowCount();
+
+        return false == $messages;
     }
 
     /**

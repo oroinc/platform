@@ -2,8 +2,10 @@ define(function(require) {
     'use strict';
 
     var GridViewsView;
-    var Backbone = require('backbone');
-    var $ = Backbone.$;
+    var template = require('tpl!orodatagrid/templates/datagrid/grid-view.html');
+    var titleTemplate = require('tpl!orodatagrid/templates/datagrid/grid-view-label.html');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var GridViewModel = require('./model');
@@ -17,9 +19,9 @@ define(function(require) {
      *
      * @export  orodatagrid/js/datagrid/grid-views/view
      * @class   orodatagrid.datagrid.GridViewsView
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    GridViewsView = Backbone.View.extend({
+    GridViewsView = BaseView.extend({
         /** @property */
         DEFAULT_GRID_VIEW_ID: '__all__',
 
@@ -40,10 +42,10 @@ define(function(require) {
         },
 
         /** @property */
-        template: '#template-datagrid-grid-view',
+        template: template,
 
         /** @property */
-        titleTemplate: '#template-datagrid-grid-view-label',
+        titleTemplate: titleTemplate,
 
         /** @property */
         title: null,
@@ -118,8 +120,8 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['viewsCollection', 'title', 'appearances']));
 
-            this.template = _.template($(this.template).html());
-            this.titleTemplate = _.template($(this.titleTemplate).html());
+            this.template = this.getTemplateFunction();
+            this.titleTemplate = this.getTemplateFunction('titleTemplate');
 
             if (options.permissions) {
                 this.permissions = _.extend(this.permissions, options.permissions);

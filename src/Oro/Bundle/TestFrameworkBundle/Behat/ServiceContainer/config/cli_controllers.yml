@@ -46,6 +46,5 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
         arguments:
             - '@oro_behat_extension.isolation.test_isolation_subscriber'
-            - '@oro_test.listener.messagequeue_run_check_subscriber'
         tags:
             - { name: 'cli.controller', priority: 100 }
