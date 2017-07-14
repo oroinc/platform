@@ -15,6 +15,9 @@ class EntityFieldFallbackValue
 {
     const FALLBACK_TYPE = 'fallbackType';
     const FALLBACK_LIST = 'fallbackList';
+    const FALLBACK_SCALAR_FIELD = 'scalarValue';
+    const FALLBACK_ARRAY_FIELD = 'arrayValue';
+    const FALLBACK_PARENT_FIELD = 'fallback';
 
     /**
      * @var integer

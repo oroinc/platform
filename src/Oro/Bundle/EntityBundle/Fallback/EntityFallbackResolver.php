@@ -106,13 +106,7 @@ class EntityFallbackResolver
         $fallbackType = $this->getFallbackConfig($object, $objectFieldName, EntityFieldFallbackValue::FALLBACK_TYPE);
 
         if (!in_array($fallbackType, static::$allowedTypes)) {
-            throw new InvalidFallbackTypeException(
-                sprintf(
-                    "Invalid fallback data type '%s' provided. Allowed types: '%s'",
-                    $fallbackType,
-                    implode(',', static::$allowedTypes)
-                )
-            );
+            throw new InvalidFallbackTypeException($fallbackType);
         }
 
         return $fallbackType;
@@ -233,7 +227,7 @@ class EntityFallbackResolver
      * @param object $object
      * @param string $objectFieldName
      * @param string|null $configName
-     * @return array
+     * @return array|string
      * @throws FallbackFieldConfigurationMissingException
      */
     public function getFallbackConfig($object, $objectFieldName, $configName = null)
@@ -294,6 +288,26 @@ class EntityFallbackResolver
         }
 
         return $this->fallbackProviders[$key];
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     * @throws InvalidFallbackTypeException
+     */
+    public function getRequiredFallbackFieldByType($type)
+    {
+        switch ($type) {
+            case EntityFallbackResolver::TYPE_BOOLEAN:
+            case EntityFallbackResolver::TYPE_INTEGER:
+            case EntityFallbackResolver::TYPE_DECIMAL:
+            case EntityFallbackResolver::TYPE_STRING:
+                return EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD;
+            case EntityFallbackResolver::TYPE_ARRAY:
+                return EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD;
+            default:
+                throw new InvalidFallbackTypeException($type);
+        }
     }
 
     /**
