@@ -86,4 +86,34 @@ class DefaultUserProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($user, $this->provider->getDefaultUser('alias', 'key'));
     }
+
+    public function testGetDefaultUserByNotExistId()
+    {
+        $user = $this->getEntity(User::class, ['id' => 2, 'first_name' => 'first name']);
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('get')
+            ->with('alias.key')
+            ->willReturn(1);
+
+        /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject $repository */
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(null);
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with([], ['id' => 'ASC'])
+            ->willReturn($user);
+
+        $this->doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->with(User::class)
+            ->willReturn($repository);
+
+        $this->assertSame($user, $this->provider->getDefaultUser('alias', 'key'));
+    }
 }

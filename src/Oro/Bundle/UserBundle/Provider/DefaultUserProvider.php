@@ -36,7 +36,14 @@ class DefaultUserProvider
         $settingsKey = TreeUtils::getConfigKey($alias, $configKey);
         $ownerId = $this->configManager->get($settingsKey);
         $repository = $this->doctrineHelper->getEntityRepositoryForClass(User::class);
+        $owner = null;
+        if ($ownerId) {
+            $owner = $repository->find($ownerId);
+        }
+        if (!$owner) {
+            $owner = $repository->findOneBy([], ['id' => 'ASC']);
+        }
 
-        return $ownerId ? $repository->find($ownerId) : $repository->findOneBy([], ['id' => 'ASC']);
+        return $owner;
     }
 }

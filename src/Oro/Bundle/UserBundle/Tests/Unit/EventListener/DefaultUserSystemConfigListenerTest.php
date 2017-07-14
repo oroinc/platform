@@ -50,6 +50,17 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$key => ['value' => $owner]], $event->getSettings());
     }
 
+    public function testOnSettingsSaveBeforeWithWrongArrayStructure()
+    {
+        $settingsKey = $this->getConfigKey();
+        $settings = ['value' => [$settingsKey => new \stdClass()]];
+        $event = $this->getEvent($settings);
+
+        $this->listener->onSettingsSaveBefore($event);
+
+        $this->assertEquals(new \stdClass(), $event->getSettings()['value'][$settingsKey]);
+    }
+
     public function testOnSettingsSaveBeforeWithWrongInstance()
     {
         $settingsKey = $this->getConfigKey();
