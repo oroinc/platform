@@ -295,7 +295,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set id
      *
      * @param int $id
-     * @return AbstractAddress
+     * @return $this
      * @deprecated since 1.10, to be removed in 2.0
      */
     public function setId($id)
@@ -309,7 +309,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set label
      *
      * @param string $label
-     * @return AbstractAddress
+     * @return $this
      */
     public function setLabel($label)
     {
@@ -332,7 +332,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set street
      *
      * @param string $street
-     * @return AbstractAddress
+     * @return $this
      */
     public function setStreet($street)
     {
@@ -355,7 +355,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set street2
      *
      * @param string $street2
-     * @return AbstractAddress
+     * @return $this
      */
     public function setStreet2($street2)
     {
@@ -378,7 +378,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set city
      *
      * @param string $city
-     * @return AbstractAddress
+     * @return $this
      */
     public function setCity($city)
     {
@@ -401,7 +401,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set region
      *
      * @param Region $region
-     * @return AbstractAddress
+     * @return $this
      */
     public function setRegion($region)
     {
@@ -424,7 +424,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set region text
      *
      * @param string $regionText
-     * @return AbstractAddress
+     * @return $this
      */
     public function setRegionText($regionText)
     {
@@ -481,7 +481,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set postal_code
      *
      * @param string $postalCode
-     * @return AbstractAddress
+     * @return $this
      */
     public function setPostalCode($postalCode)
     {
@@ -504,7 +504,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set country
      *
      * @param Country $country
-     * @return AbstractAddress
+     * @return $this
      */
     public function setCountry($country)
     {
@@ -557,7 +557,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Sets organization
      *
      * @param string $organization
-     * @return AbstractAddress
+     * @return $this
      */
     public function setOrganization($organization)
     {
@@ -581,7 +581,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set name prefix
      *
      * @param string $namePrefix
-     * @return AbstractAddress
+     * @return $this
      */
     public function setNamePrefix($namePrefix)
     {
@@ -605,7 +605,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set first name
      *
      * @param string $firstName
-     * @return AbstractAddress
+     * @return $this
      */
     public function setFirstName($firstName)
     {
@@ -629,7 +629,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set middle name
      *
      * @param string $middleName
-     * @return AbstractAddress
+     * @return $this
      */
     public function setMiddleName($middleName)
     {
@@ -652,7 +652,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set last name
      *
      * @param string $lastName
-     * @return AbstractAddress
+     * @return $this
      */
     public function setLastName($lastName)
     {
@@ -675,7 +675,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set name suffix
      *
      * @param string $nameSuffix
-     * @return AbstractAddress
+     * @return $this
      */
     public function setNameSuffix($nameSuffix)
     {
@@ -708,7 +708,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set address created date/time
      *
      * @param \DateTime $created
-     * @return AbstractAddress
+     * @return $this
      */
     public function setCreated($created)
     {
@@ -731,7 +731,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set address updated date/time
      *
      * @param \DateTime $updated
-     * @return AbstractAddress
+     * @return $this
      */
     public function setUpdated($updated)
     {

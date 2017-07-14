@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Behat\Testwork\Suite\Suite;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureFinder;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader;
@@ -65,6 +63,8 @@ class DoctrineIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
+        $event->writeln('<info>Load fixtures</info>');
+
         $this->aliceLoader->setDoctrine($this->kernel->getContainer()->get('doctrine'));
         $this->referenceRepositoryInitializer->init();
 
@@ -122,13 +122,18 @@ class DoctrineIsolator implements IsolatorInterface
             return [];
         }
 
-        $fixturesFileNames = array_filter(array_map(function ($tag) {
-            if (strpos($tag, 'fixture-') === 0) {
-                return substr($tag, 8);
-            }
+        $fixturesFileNames = array_filter(
+            array_map(
+                function ($tag) {
+                    if (strpos($tag, 'fixture-') === 0) {
+                        return substr($tag, 8);
+                    }
 
-            return null;
-        }, $tags));
+                    return null;
+                },
+                $tags
+            )
+        );
 
         return $fixturesFileNames;
     }

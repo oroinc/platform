@@ -42,6 +42,11 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_address_valid_region }
 
+    oro_address.validator.name_or_organization:
+        class: 'Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_address.validator.name_or_organization }
+
     oro_address.extension.action.type.map:
         class: '%oro_address.extension.action.type.map.class%'
         scope: prototype
