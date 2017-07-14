@@ -461,10 +461,31 @@ define(function(require) {
             }
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
+
+            var initialDialogPosition = dialog.css('position');
+            var initialScrollTop = $(window).scrollTop();
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                $('html, body').scrollTop(0);
+                dialog.css({
+                    position: 'absolute'
+                });
+            }
+
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
             this.widget.trigger('dialogreposition');
+
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                dialog.css({
+                    position: initialDialogPosition
+                });
+                $('html, body').scrollTop(initialScrollTop);
+            }
         },
 
         leftAndWidthAdjustments: function(dialog, containerEl) {
@@ -499,7 +520,9 @@ define(function(require) {
             // containerEl.offsetTop will only work if offsetParent is document.body
 
             // Set auto height for dialog before calc
-            dialog.css('height', 'auto');
+            if (!this.widgetIsResizable()) {
+                dialog.css('height', 'auto');
+            }
 
             var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
             var height = parseFloat(dialog.css('height'));
