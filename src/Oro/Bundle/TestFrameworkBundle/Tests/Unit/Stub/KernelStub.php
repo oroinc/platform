@@ -191,6 +191,7 @@ class KernelStub extends OroKernel implements KernelInterface
      */
     public function getLogDir()
     {
+        return sys_get_temp_dir();
     }
 
     /**
