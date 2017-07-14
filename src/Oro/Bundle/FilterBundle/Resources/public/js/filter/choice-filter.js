@@ -1,13 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    './text-filter'
-], function($, _, __, tools, TextFilter) {
+define(function(require) {
     'use strict';
 
     var ChoiceFilter;
+    var template = require('tpl!orofilter/templates/filter/choice-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var TextFilter = require('./text-filter');
 
     /**
      * Choice filter: filter type as option + filter value as string
@@ -22,6 +21,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#choice-filter-template',
 
         /**

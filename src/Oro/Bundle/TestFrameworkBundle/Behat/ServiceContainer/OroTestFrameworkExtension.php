@@ -13,8 +13,8 @@ use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
+use WebDriver\ServiceFactory;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
@@ -61,6 +62,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     public function process(ContainerBuilder $container)
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
+        $this->transferApplicationParameters($container);
         $this->processBundleBehatConfigurations($container);
         $this->processBundleAutoload($container);
         $this->injectMessageQueueIsolator($container);
@@ -69,6 +71,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processClassResolvers($container);
         $this->processArtifactHandlers($container);
         $this->replaceSessionListener($container);
+        $this->setWebDriverCurl($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -88,6 +91,17 @@ class OroTestFrameworkExtension implements TestworkExtension
         /** @var MinkExtension $minkExtension */
         $minkExtension = $extensionManager->getExtension('mink');
         $minkExtension->registerDriverFactory(new OroSelenium2Factory());
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    public function setWebDriverCurl(ContainerBuilder $container)
+    {
+        $curl = new OroWebDriverCurlService();
+        $curl->setLogDir($container->getParameter('kernel.log_dir'));
+
+        ServiceFactory::getInstance()->setService('service.curl', $curl);
     }
 
     /**
@@ -141,6 +155,13 @@ class OroTestFrameworkExtension implements TestworkExtension
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
             ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
+    }
+
+    private function transferApplicationParameters(ContainerBuilder $container)
+    {
+        /** @var KernelInterface $kernel */
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $container->setParameter('kernel.log_dir', $kernel->getLogDir());
     }
 
     /**

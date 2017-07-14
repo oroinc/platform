@@ -21,8 +21,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
@@ -862,8 +860,8 @@ class OroMainContext extends MinkContext implements
      */
     public function iRestartMessageConsumer()
     {
-        $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
+        $this->messageQueueIsolator->stopMessageQueue();
+        $this->messageQueueIsolator->startMessageQueue();
     }
 
     /**
@@ -1062,10 +1060,17 @@ class OroMainContext extends MinkContext implements
      */
     public function iConfirmSchemaUpdate()
     {
-        $this->pressButton('Update schema');
-        $this->assertPageContainsText('Schema update confirmation');
-        $this->pressButton('Yes, Proceed');
-        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+        try {
+            $this->pressButton('Update schema');
+            $this->assertPageContainsText('Schema update confirmation');
+            $this->pressButton('Yes, Proceed');
+            $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            $this->messageQueueIsolator->stopMessageQueue();
+            $this->messageQueueIsolator->startMessageQueue();
+        }
     }
 
     /**

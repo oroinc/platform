@@ -1,0 +1,7 @@
+api:
+    entities:
+        Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
+            actions:
+                create: false
+                delete: false
+                delete_list: false
