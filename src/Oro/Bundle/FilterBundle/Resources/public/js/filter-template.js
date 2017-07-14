@@ -36,14 +36,15 @@ define([
          * @private
          */
         _defineTemplate: function() {
-            this.template = this._getTemplate(this.templateSelector);
+            this.template = this._getTemplate('template');
         },
 
-        _getTemplate: function(selector) {
+        _getTemplate: function(property) {
+            var selector = this[property + 'Selector'] || '';
             var theme = this.templateTheme;
             var src = theme && $(selector + '-' + theme).text() || $(selector).text();
 
-            return _.template(src);
+            return !_.isEmpty(src) ? _.template(src) : this[property];
         }
     };
 

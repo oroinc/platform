@@ -1,3 +1,10 @@
 "One of the items must be set as primary.": "One of the items must be set as primary."
 "Several addresses have the same type {{ types }}.": "Several addresses have the same type {{ types }}."
 "State is required for country {{ country }}": "State is required for country {{ country }}"
+
+oro:
+    address:
+        validation:
+            invalid_first_name_field: 'First Name and Last Name or Organization should not be blank.'
+            invalid_last_name_field: 'Last Name and First Name or Organization should not be blank.'
+            invalid_organization_field: 'Organization or First Name and Last Name should not be blank.'

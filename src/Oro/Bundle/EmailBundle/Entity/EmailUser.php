@@ -434,17 +434,23 @@ class EmailUser
     public function isOutgoing()
     {
         $directions = $this->getFolderDirections();
-        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions)) {
+        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions, true)) {
             return true;
         }
 
-        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions)) {
+        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions, true)) {
             return false;
         }
 
-        return $this->getEmail() &&
-            $this->getEmail()->getFromEmailAddress() &&
-            $this->getEmail()->getFromEmailAddress()->getOwner() === $this->getOwner();
+        $owner = $this->getOwner();
+        if ($owner instanceof User) {
+            $fromEmailAddressOwner = $this->getFromEmailAddressOwner();
+            if ($fromEmailAddressOwner instanceof User && $fromEmailAddressOwner->getId() === $owner->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -453,17 +459,23 @@ class EmailUser
     public function isIncoming()
     {
         $directions = $this->getFolderDirections();
-        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions)) {
+        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions, true)) {
             return true;
         }
 
-        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions)) {
+        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions, true)) {
             return false;
         }
 
-        return $this->getEmail() &&
-            $this->getEmail()->getFromEmailAddress() &&
-            $this->getEmail()->getFromEmailAddress()->getOwner() !== $this->getOwner();
+        $owner = $this->getOwner();
+        if ($owner instanceof User) {
+            $fromEmailAddressOwner = $this->getFromEmailAddressOwner();
+            if ($fromEmailAddressOwner instanceof User && $fromEmailAddressOwner->getId() !== $owner->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -484,5 +496,22 @@ class EmailUser
                 return $folder->getDirection();
             })->toArray()
         );
+    }
+
+    /**
+     * @return object|null
+     */
+    protected function getFromEmailAddressOwner()
+    {
+        $email = $this->getEmail();
+        if (null === $email) {
+            return null;
+        }
+        $fromEmailAddress = $email->getFromEmailAddress();
+        if (null === $fromEmailAddress) {
+            return null;
+        }
+
+        return $fromEmailAddress->getOwner();
     }
 }

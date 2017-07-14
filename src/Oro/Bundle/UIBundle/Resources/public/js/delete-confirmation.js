@@ -4,6 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Modal = require('oroui/js/modal');
+    var template = require('tpl!oroui/templates/delete-confirmation.html');
 
     /**
      * Delete confirmation dialog
@@ -15,7 +16,7 @@ define(function(require) {
     return Modal.extend({
 
         /** @property {String} */
-        template: require('text!oroui/templates/delete-confirmation.html'),
+        template: template,
 
         /** @property {String} */
         className: 'modal oro-modal-danger',
@@ -33,17 +34,10 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            //Set custom template settings
-            var interpolate = {
-                interpolate: /\{\{(.+?)\}\}/g,
-                evaluate: /<%([\s\S]+?)%>/g
-            };
-
             options = _.extend({
                 title: this.title,
                 okText: this.okText,
-                cancelText: this.cancelText,
-                template: _.template(this.template, interpolate)
+                cancelText: this.cancelText
             }, options);
 
             arguments[0] = options;

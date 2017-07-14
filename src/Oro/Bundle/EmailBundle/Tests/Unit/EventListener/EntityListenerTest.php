@@ -133,24 +133,22 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($updatedEmailAddresses));
 
         $postFlushEventArgs = $this->createPostFlushEventArgsMock();
-        $postFlushEventArgs
-            ->expects($this->any())
+        $postFlushEventArgs->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
 
-        $this->emailActivityUpdates
-            ->expects($this->once())
+        $this->emailActivityUpdates->expects($this->once())
             ->method('getFilteredOwnerEntitiesToUpdate')
             ->will($this->returnValue([$emailOwner]));
+        $this->emailActivityUpdates->expects($this->once())
+            ->method('clearPendingEntities');
 
-        $this->producer
-            ->expects($this->once())
+        $this->producer->expects($this->once())
             ->method('send')
             ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
                 'ownerClass' => TestEmailOwner::class,
                 'ownerIds' => [123],
-            ])
-        ;
+            ]);
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
@@ -184,8 +182,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
         $onFlushEventArgs = $this->createOnFlushEventArgsMock();
-        $onFlushEventArgs
-            ->expects($this->any())
+        $onFlushEventArgs->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
 
@@ -209,43 +206,97 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->with($createdEmails);
 
         $postFlushEventArgs = $this->createPostFlushEventArgsMock();
-        $postFlushEventArgs
-            ->expects($this->any())
+        $postFlushEventArgs->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
 
-        $this->registry
-            ->expects($this->never())
+        $this->registry->expects($this->never())
             ->method('getRepository')
             ->will($this->returnValue($this->registry));
-        $this->registry
-            ->expects($this->never())
+        $this->registry->expects($this->never())
             ->method('getEmailsByOwnerEntity')
             ->will($this->returnValue($createdEmailsArray));
-        $this->emailActivityUpdates
-                ->expects($this->once())
-                ->method('processUpdatedEmailAddresses')
-                ->with([]);
+        $this->emailActivityUpdates->expects($this->once())
+            ->method('processUpdatedEmailAddresses')
+            ->with([]);
         $this->emailActivityUpdates->expects($this->once())
             ->method('getFilteredOwnerEntitiesToUpdate')
             ->will($this->returnValue([$emailOwner]));
-        $this->userEmailOwnerProvider
-            ->expects($this->never())
+        $this->emailActivityUpdates->expects($this->once())
+            ->method('clearPendingEntities');
+        $this->userEmailOwnerProvider->expects($this->never())
             ->method('getEmailOwnerClass')
             ->will($this->returnValue(ClassUtils::getClass(new User)));
 
-        $this->emailActivityManager
-            ->expects($this->never())
+        $this->emailActivityManager->expects($this->never())
             ->method('addAssociation');
 
-        $this->producer
-            ->expects($this->once())
+        $this->producer->expects($this->once())
             ->method('send')
             ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
                 'ownerClass' => TestEmailOwner::class,
                 'ownerIds' => [123],
-            ])
-        ;
+            ]);
+
+        $this->listener->onFlush($onFlushEventArgs);
+        $this->listener->postFlush($postFlushEventArgs);
+    }
+
+    public function testOnFlushWhenEmailAddressDoesNotHaveOwner()
+    {
+        $emailOwner = new TestEmailOwner(123);
+        $contactsArray = [new User(), new User(), new User()];
+        $updatedEmailAddresses = [new EmailAddress(1), new EmailAddress(2)];
+
+        $uow = $this->getMockBuilder('Oro\Component\TestUtils\ORM\Mocks\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->setMethods(['computeChangeSet'])
+            ->getMock();
+
+        array_map([$uow, 'addInsertion'], $contactsArray);
+
+        $metadata = $this->createClassMetadataMock();
+        $em = $this->createEntityManagerMock();
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($metadata));
+        $em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+        $uow->expects($this->exactly(2))
+            ->method('computeChangeSet')
+            ->withConsecutive(
+                [$metadata, $updatedEmailAddresses[0]],
+                [$metadata, $updatedEmailAddresses[1]]
+            );
+        $onFlushEventArgs = $this->createOnFlushEventArgsMock();
+        $onFlushEventArgs
+            ->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($em));
+
+        $this->emailOwnerManager->expects($this->once())
+            ->method('createEmailAddressData')
+            ->with($this->identicalTo($uow))
+            ->will($this->returnValue([]));
+        $this->emailOwnerManager->expects($this->once())
+            ->method('handleChangedAddresses')
+            ->with([])
+            ->will($this->returnValue($updatedEmailAddresses));
+
+        $postFlushEventArgs = $this->createPostFlushEventArgsMock();
+        $postFlushEventArgs->expects($this->any())
+            ->method('getEntityManager')
+            ->will($this->returnValue($em));
+
+        $this->emailActivityUpdates->expects($this->once())
+            ->method('getFilteredOwnerEntitiesToUpdate')
+            ->will($this->returnValue([]));
+        $this->emailActivityUpdates->expects($this->once())
+            ->method('clearPendingEntities');
+
+        $this->producer->expects($this->never())
+            ->method('send');
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);

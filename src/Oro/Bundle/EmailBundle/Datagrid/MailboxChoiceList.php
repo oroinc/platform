@@ -15,14 +15,22 @@ class MailboxChoiceList
     /** @var MailboxManager */
     private $mailboxManager;
 
+    /** @var MailboxNameHelper */
+    private $mailboxNameHelper;
+
     /**
      * @param TokenAccessorInterface $tokenAccessor
      * @param MailboxManager         $mailboxManager
+     * @param MailboxNameHelper      $mailboxNameHelper
      */
-    public function __construct(TokenAccessorInterface $tokenAccessor, MailboxManager $mailboxManager)
-    {
+    public function __construct(
+        TokenAccessorInterface $tokenAccessor,
+        MailboxManager $mailboxManager,
+        MailboxNameHelper $mailboxNameHelper
+    ) {
         $this->tokenAccessor = $tokenAccessor;
         $this->mailboxManager = $mailboxManager;
+        $this->mailboxNameHelper = $mailboxNameHelper;
     }
 
     /**
@@ -43,15 +51,20 @@ class MailboxChoiceList
         );
 
         $choiceList = [];
-        foreach ($origins as $origin) {
-            $mailbox = $origin->getMailboxName();
-            if (count($origin->getFolders()) > 0) {
-                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailbox);
+        foreach ($systemMailboxes as $mailbox) {
+            $origin = $mailbox->getOrigin();
+            if (null !== $origin) {
+                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailbox->getLabel());
             }
         }
-        foreach ($systemMailboxes as $mailbox) {
-            if ($mailbox->getOrigin() !== null) {
-                $choiceList[$mailbox->getOrigin()->getId()] = str_replace('@', '\@', $mailbox->getLabel());
+        foreach ($origins as $origin) {
+            if (!isset($choiceList[$origin->getId()]) && count($origin->getFolders()) > 0) {
+                $mailboxName = $this->mailboxNameHelper->getMailboxName(
+                    get_class($origin),
+                    $origin->getMailboxName(),
+                    null
+                );
+                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailboxName);
             }
         }
 

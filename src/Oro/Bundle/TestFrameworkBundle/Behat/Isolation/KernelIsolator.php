@@ -49,6 +49,7 @@ class KernelIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
     {
+        $this->kernel->shutdown();
     }
 
     /** {@inheritdoc} */

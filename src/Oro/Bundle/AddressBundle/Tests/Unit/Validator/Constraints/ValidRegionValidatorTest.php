@@ -42,7 +42,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testConfiguration()
     {
-        $this->assertEquals('oro_address_valid_region', $this->constraint->validatedBy());
+        $this->assertEquals(ValidRegionValidator::class, $this->constraint->validatedBy());
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
     }
 
