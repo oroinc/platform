@@ -3,18 +3,32 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
-use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    protected static $path1;
+    protected static $path2;
+
+    /**
+     * @beforeClass
+     */
+    public static function createPaths()
+    {
+        self::$path1 = sys_get_temp_dir().'/bundle1';
+        self::$path2 = sys_get_temp_dir().'/bundle2';
+        mkdir(self::$path1.'/Tests/Behat', 0777, true);
+        mkdir(self::$path2.'/Tests/Behat', 0777, true);
+    }
+
     /**
      * @var array
      */
@@ -52,11 +66,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
-        $applicableSuites = ['OroUserBundle'];
 
         $config = ['oro_test' => [
             'shared_contexts' => $sharedContexts,
-            'application_suites' => $applicableSuites,
         ]];
 
         $config = $this->processConfig($config);
@@ -65,7 +77,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->load($containerBuilder, $config);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
-        $this->assertEquals($applicableSuites, $containerBuilder->getParameter('oro_test.application_suites'));
     }
 
     public function testGetConfigKey()
@@ -173,6 +184,84 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Configuration with "MyElement" key is already defined
+     */
+    public function testExceptionForElementsWithSameName()
+    {
+        $config = [
+            'oro_behat_extension' => [
+                'elements' => [
+                    'MyElement' => [
+                        'class' => '\My\Element\MyElement'
+                    ],
+                ],
+            ],
+        ];
+        $configExtension = ['oro_test' => [
+            'shared_contexts' => $this->sharedContexts,
+        ]];
+        file_put_contents(self::$path1.'/Tests/Behat/behat.yml', Yaml::dump($config));
+        file_put_contents(self::$path2.'/Tests/Behat/behat.yml', Yaml::dump($config));
+
+        $bundlesConfig = [
+            ['name' => 'OroBundle1', 'path' => self::$path1],
+            ['name' => 'OroBundle2', 'path' => self::$path2],
+        ];
+
+        $containerBuilder = $this->getContainerBuilder($bundlesConfig);
+        $containerBuilder->setParameter('suite.configurations', []);
+        $extension = new OroTestFrameworkExtension();
+        $extension->load($containerBuilder, $this->processConfig($configExtension));
+        $extension->process($containerBuilder);
+    }
+
+    public function testMergeElements()
+    {
+        $config1 = [
+            'oro_behat_extension' => [
+                'elements' => [
+                    'MyElement1' => [
+                        'class' => '\My\Element\MyElement'
+                    ],
+                ],
+            ],
+        ];
+        $config2 = [
+            'oro_behat_extension' => [
+                'elements' => [
+                    'MyElement2' => [
+                        'class' => '\My\Element\MyElement'
+                    ],
+                ],
+            ],
+        ];
+        $configExtension = ['oro_test' => [
+            'shared_contexts' => $this->sharedContexts,
+        ]];
+        file_put_contents(self::$path1.'/Tests/Behat/behat.yml', Yaml::dump($config1));
+        file_put_contents(self::$path2.'/Tests/Behat/behat.yml', Yaml::dump($config2));
+
+        $bundlesConfig = [
+            ['name' => 'OroBundle1', 'path' => self::$path1],
+            ['name' => 'OroBundle2', 'path' => self::$path2],
+        ];
+
+        $containerBuilder = $this->getContainerBuilder($bundlesConfig);
+        $containerBuilder->setParameter('suite.configurations', []);
+        $extension = new OroTestFrameworkExtension();
+        $extension->load($containerBuilder, $this->processConfig($configExtension));
+        $extension->process($containerBuilder);
+
+        $elementFactoryDefinition = $containerBuilder->getDefinition('oro_element_factory');
+        $elements = $elementFactoryDefinition->getArgument(2);
+
+        self::assertCount(2, $elements);
+        self::assertArrayHasKey('MyElement1', $elements);
+        self::assertArrayHasKey('MyElement2', $elements);
+    }
+
+    /**
      * @param array $bundlesConfig
      * @return ContainerBuilder
      */
@@ -216,5 +305,28 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
 
         return $processor->process($tree->buildTree(), $config);
+    }
+
+    public function __destruct()
+    {
+        self::delTree(self::$path1);
+        self::delTree(self::$path2);
+        $log = sys_get_temp_dir().DIRECTORY_SEPARATOR.OroWebDriverCurlService::LOG_FILE;
+        if (is_file($log)) {
+            unlink($log);
+        }
+    }
+
+    public static function delTree($dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = array_diff(scandir($dir), array('.','..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
+        }
+        return rmdir($dir);
     }
 }

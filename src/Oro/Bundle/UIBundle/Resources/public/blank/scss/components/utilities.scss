@@ -15,3 +15,8 @@
 .no-scroll {
     overflow: hidden;
 }
+
+.disable-touch-scrolling {
+    overflow: hidden;
+    visibility: hidden;
+}

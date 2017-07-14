@@ -1,14 +1,13 @@
 define([
     'underscore',
-    'backbone',
     'backgrid',
     '../actions-panel',
-    'oroui/js/app/views/base/view'
-], function(_, Backbone, Backgrid, ActionsPanel, BaseView) {
+    'oroui/js/app/views/base/view',
+    'tpl!orodatagrid/templates/datagrid/action-header-cell.html'
+], function(_, Backgrid, ActionsPanel, BaseView, template) {
     'use strict';
 
     var ActionHeaderCell;
-    var $ = Backbone.$;
 
     /**
      *
@@ -25,8 +24,7 @@ define([
         /** @property */
         tagName: 'th',
 
-        /** @property */
-        template: '#template-datagrid-action-header-cell',
+        template: template,
 
         options: {
             controls: '[data-toggle=dropdown]'
@@ -80,7 +78,7 @@ define([
             var panel = this.subview('actionsPanel');
             this.$el.empty();
             if (panel.haveActions()) {
-                this.$el.append($(this.template).text());
+                this.$el.append(this.getTemplateFunction()(this.getTemplateData()));
                 panel.setElement(this.$('[data-action-panel]'));
                 panel.render();
                 panel.$el.children().wrap('<li/>');

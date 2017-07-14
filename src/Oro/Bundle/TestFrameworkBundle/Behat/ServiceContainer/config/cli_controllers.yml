@@ -1,0 +1,50 @@
+services:
+    cli.controller.suite:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
+        arguments:
+            - '@suite.registry'
+            - '%suite.configurations%'
+            - '@oro_behat_extension.specification.specification_divider'
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: cli.controller, priority: 1100 }
+
+    cli.controller.available_suites:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
+        arguments:
+            - '@suite.registry'
+            - '@specifications.finder'
+        tags:
+            - { name: cli.controller, priority: 700 }
+
+    cli.controller.available_suites_group:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController
+        arguments:
+            - '@suite.registry'
+            - '@specifications.finder'
+            - '%oro_test.suite_groups%'
+        tags:
+            - { name: cli.controller, priority: 710 }
+
+    cli.controller.mesure_execution_time:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
+        arguments:
+            - '@oro_test.listener.step_duration_measure_subscriber'
+            - '@event_dispatcher'
+        tags:
+            - { name: 'cli.controller' }
+
+    cli.controller.interactive_execution:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InteractiveExecutionController
+        arguments:
+            - '@oro_test.listener.interactive_execution_subscriber'
+            - '@event_dispatcher'
+        tags:
+            - { name: 'cli.controller', priority: 500 }
+
+    cli.controller.input_output_controller:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
+        arguments:
+            - '@oro_behat_extension.isolation.test_isolation_subscriber'
+        tags:
+            - { name: 'cli.controller', priority: 100 }

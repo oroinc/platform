@@ -109,12 +109,6 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->generator->generate($data, $includeCollectionTag);
         $this->assertCount($expectedCount, $result);
-
-        $this->assertCount(
-            $expectedCount,
-            $this->generator->generate($data, $includeCollectionTag),
-            'Should not provoke expectation error, cause tags info should be cached'
-        );
     }
 
     /**

@@ -3,15 +3,12 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 
-class LoadSegmentData extends AbstractFixture
+class LoadSegmentData extends AbstractLoadSegmentData
 {
     const SEGMENT_DYNAMIC = 'segment_dynamic';
     const SEGMENT_DYNAMIC_WITH_FILTER = 'segment_dynamic_with_filter';
@@ -20,7 +17,7 @@ class LoadSegmentData extends AbstractFixture
     const SEGMENT_STATIC_WITH_SEGMENT_FILTER = 'segment_static_with_segment_filter';
 
     /** @var array */
-    private static $segments = [
+    protected static $segments = [
         self::SEGMENT_DYNAMIC => [
             'name' => 'Dynamic Segment',
             'description' => 'Dynamic Segment Description',
@@ -147,28 +144,17 @@ class LoadSegmentData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-        $owner = $organization->getBusinessUnits()->first();
+        parent::load($manager);
 
-        foreach (self::$segments as $segmentReference => $data) {
-            $segmentType = $manager->getRepository(SegmentType::class)->find($data['type']);
-
-            $entity = new Segment();
-            $entity->setName($data['name']);
-            $entity->setDescription($data['description']);
-            $entity->setEntity($data['entity']);
-            $entity->setOwner($owner);
-            $entity->setType($segmentType);
-            $entity->setOrganization($organization);
-            $entity->setDefinition(json_encode($data['definition']));
-
-            $this->setReference($segmentReference, $entity);
-
-            $manager->persist($entity);
-        }
-
-        $manager->flush();
         $this->applySegmentFilterToDefinition($manager);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getSegmentsData(): array
+    {
+        return self::$segments;
     }
 
     /**

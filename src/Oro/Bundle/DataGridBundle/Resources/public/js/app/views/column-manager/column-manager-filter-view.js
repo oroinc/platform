@@ -2,18 +2,12 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerFilterView;
+    var template = require('tpl!orodatagrid/templates/column-manager/column-manager-filter.html');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var module = require('module');
-    var config = module.config();
-
-    config = _.extend({
-        templateSelector: null
-    }, config);
 
     ColumnManagerFilterView = BaseView.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager-filter.html'),
-        templateSelector: config.templateSelector,
+        template: template,
         autoRender: true,
         events: {
             'keyup [data-role="column-manager-search"]': 'onSearch',

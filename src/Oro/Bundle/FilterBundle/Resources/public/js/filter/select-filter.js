@@ -1,14 +1,13 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './abstract-filter',
-    'orofilter/js/multiselect-decorator',
-    'oroui/js/app/views/loading-mask-view'
-], function($, _, __, AbstractFilter, MultiselectDecorator, LoadingMaskView) {
+define(function(require) {
     'use strict';
 
     var SelectFilter;
+    var template = require('tpl!orofilter/templates/filter/select-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var AbstractFilter = require('./abstract-filter');
+    var MultiselectDecorator = require('orofilter/js/multiselect-decorator');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
     /**
      * Select filter: filter value as select option
@@ -23,6 +22,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#select-filter-template',
 
         /**

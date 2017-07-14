@@ -2,12 +2,11 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\Action\Action\CreateDateTime;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +66,8 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "timezone" must be a string or instance of DateTimeZone, boolean given.
+     * @expectedExceptionMessage
+     * Option "timezone" must be a PropertyPath or string or instance of DateTimeZone, boolean given.
      */
     public function testInitializeExceptionInvalidTimezone()
     {
@@ -76,10 +76,14 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider executeDataProvider
+     *
+     * @param array      $options
+     * @param mixed|null $expectedResult
+     * @param array      $context
      */
-    public function testExecute(array $options, $expectedResult = null)
+    public function testExecute(array $options, $expectedResult = null, array $context = [])
     {
-        $context = new ItemStub(array());
+        $context = new ItemStub($context);
         $attributeName = (string)$options['attribute'];
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -107,7 +111,8 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
                     'attribute' => new PropertyPath('test_attribute'),
                     'time'      => '2014-01-01 00:00:00',
                 ),
-                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('UTC'))
+                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('UTC')),
+                'context' => [],
             ),
             'with_time_and_timezone_string' => array(
                 'options' => array(
@@ -115,7 +120,8 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
                     'time'      => '2014-01-01 00:00:00',
                     'timezone'  => 'Europe/London',
                 ),
-                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('Europe/London'))
+                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('Europe/London')),
+                'context' => [],
             ),
             'with_time_and_timezone_object' => array(
                 'options' => array(
@@ -123,7 +129,17 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
                     'time'      => '2014-01-01 00:00:00',
                     'timezone'  => new \DateTimeZone('Europe/London'),
                 ),
-                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('Europe/London'))
+                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('Europe/London')),
+                'context' => [],
+            ),
+            'with_time_and_timezone_path' => array(
+                'options' => array(
+                    'attribute' => new PropertyPath('test_attribute'),
+                    'time'      => '2014-01-01 00:00:00',
+                    'timezone'  => new PropertyPath('timeZoneNY'),
+                ),
+                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('America/New_York')),
+                'context' => ['timeZoneNY' => 'America/New_York'],
             )
         );
     }

@@ -1,4 +1,4 @@
-@fixture-user.yml
+@fixture-OroUserBundle:user.yml
 Feature: Change user username to another user username
 
   Scenario: Customer user email change
