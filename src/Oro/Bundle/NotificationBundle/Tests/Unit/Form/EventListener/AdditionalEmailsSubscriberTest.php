@@ -94,6 +94,9 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
         $notification->expects($this->any())
             ->method('getEntityName')
             ->willReturn($recipientListClass);
+        $notification->expects($this->any())
+            ->method('hasEntityName')
+            ->willReturn(true);
 
         $recipientListForm = $this->createMock(FormInterface::class);
         $recipientListForm->expects($this->once())
@@ -178,6 +181,9 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
         $notification->expects($this->any())
             ->method('getEntityName')
             ->willReturn($recipientListClass);
+        $notification->expects($this->any())
+            ->method('hasEntityName')
+            ->willReturn(true);
 
         $recipientListForm = $this->createMock(FormInterface::class);
         $recipientListForm->expects($this->once())
