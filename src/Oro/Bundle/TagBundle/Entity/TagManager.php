@@ -293,14 +293,7 @@ class TagManager
                 );
             }
 
-            $taggingCollection = $tag->getTagging()->filter(
-                function (Tagging $tagging) use ($entity) {
-                    // only use tagging entities that related to current entity
-                    return
-                        $tagging->getEntityName() === ClassUtils::getClass($entity) &&
-                        $tagging->getRecordId() === TaggableHelper::getEntityId($entity);
-                }
-            );
+            $taggingCollection = $this->getTagsRepository()->getTaggingByEntityAndTag($entity, $tag);
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
@@ -311,7 +304,7 @@ class TagManager
                 }
             }
 
-            $entry['moreOwners'] = $taggingCollection->count() > 1;
+            $entry['moreOwners'] = count($taggingCollection) > 1;
             $entry['backgroundColor'] = $tag->getBackgroundColor();
 
             $result[] = $entry;
