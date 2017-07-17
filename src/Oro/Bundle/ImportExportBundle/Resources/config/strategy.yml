@@ -34,6 +34,8 @@ services:
             - '@translator'
             - '@oro_importexport.strategy.new_entities_helper'
             - '@oro_entity.doctrine_helper'
+        calls:
+            - [setValidationHelper, ['@oro_api.validation_helper']]
 
     oro_importexport.strategy.new_entities_helper:
         class: Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper
