@@ -44,6 +44,10 @@ class AvailableSuiteSetsController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!$input->getOption('available-suite-sets')) {
+            return;
+        }
+
         foreach (array_keys($this->suiteConfigRegistry->getSets()) as $set) {
             $output->writeln($set);
         }
