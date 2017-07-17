@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\ApiBundle\Util\ValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
@@ -49,6 +50,11 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
     protected $context;
 
     /**
+     * @var ValidationHelper
+     */
+    protected $validationHelper;
+
+    /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param ImportStrategyHelper $strategyHelper
      * @param FieldHelper $fieldHelper
@@ -64,6 +70,14 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
         $this->strategyHelper = $strategyHelper;
         $this->fieldHelper = $fieldHelper;
         $this->databaseHelper = $databaseHelper;
+    }
+
+    /**
+     * @param ValidationHelper $validationHelper
+     */
+    public function setValidationHelper(ValidationHelper $validationHelper)
+    {
+        $this->validationHelper = $validationHelper;
     }
 
     /**

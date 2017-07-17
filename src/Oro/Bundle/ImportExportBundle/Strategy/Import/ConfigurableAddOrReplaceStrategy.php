@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -60,7 +61,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->doctrineHelper               = $doctrineHelper;
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -91,7 +91,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param bool             $isPersistNew
      * @param mixed|array|null $itemData
      * @param array            $searchContext
-     * @param bool             $entityIsRelation
+     * @param bool             $entityIsRequiredRelation
      *
      * @return null|object
      */
@@ -101,7 +101,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $isPersistNew = false,
         $itemData = null,
         array $searchContext = [],
-        $entityIsRelation = false
+        $entityIsRequiredRelation = false
     ) {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {
@@ -119,7 +119,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         } else {
             // if can't find entity and new entity can't be persisted
             if (!$isPersistNew) {
-                if ($entityIsRelation) {
+                if ($entityIsRequiredRelation) {
                     $class         = $this->chainEntityClassNameProvider->getEntityClassName($entityClass);
                     $errorMessages = [$this->translator->trans(
                         'oro.importexport.import.errors.not_found_entity',
@@ -243,6 +243,12 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                     // single relation
                     $relationEntity = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationEntity) {
+                        $hasValidationConstraint = $this->validationHelper->hasValidationConstraintForProperty(
+                            $entity,
+                            $fieldName,
+                            NotBlank::class
+                        );
+                        $entityIsRequiredRelation = $hasValidationConstraint ? true : false;
                         $relationItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
                         $relationEntity   = $this->processEntity(
                             $relationEntity,
@@ -250,7 +256,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                             $isPersistRelation,
                             $relationItemData,
                             $searchContext,
-                            true
+                            $entityIsRequiredRelation
                         );
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
@@ -370,8 +376,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             }
         }
 
-        return !empty($notEmptyValues)
-            ? array_merge($notEmptyValues, $nullRequiredValues)
-            : null;
+        return array_merge($notEmptyValues, $nullRequiredValues);
     }
 }
