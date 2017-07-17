@@ -291,13 +291,13 @@ class EntityFallbackResolver
     }
 
     /**
-     * @param string $type
+     * @param string $fieldType
      * @return string
      * @throws InvalidFallbackTypeException
      */
-    public function getRequiredFallbackFieldByType($type)
+    public function getRequiredFallbackFieldByType($fieldType)
     {
-        switch ($type) {
+        switch ($fieldType) {
             case EntityFallbackResolver::TYPE_BOOLEAN:
             case EntityFallbackResolver::TYPE_INTEGER:
             case EntityFallbackResolver::TYPE_DECIMAL:
@@ -306,7 +306,7 @@ class EntityFallbackResolver
             case EntityFallbackResolver::TYPE_ARRAY:
                 return EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD;
             default:
-                throw new InvalidFallbackTypeException($type);
+                throw new InvalidFallbackTypeException($fieldType);
         }
     }
 

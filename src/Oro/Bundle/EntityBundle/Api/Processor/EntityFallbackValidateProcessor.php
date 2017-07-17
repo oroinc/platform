@@ -166,7 +166,7 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
      * @return array
      * @throws InvalidIncludedFallbackItemException
      */
-    protected function getCompatibleIncludedRelations(array $requestData, $entityIncludedType)
+    protected function getCompatibleIn2cludedRelations(array $requestData, $entityIncludedType)
     {
         $result = [];
 
