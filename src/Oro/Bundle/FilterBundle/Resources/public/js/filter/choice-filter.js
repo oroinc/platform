@@ -129,10 +129,12 @@ define(function(require) {
             this._appendFilter($filter);
             this._updateDOMValue();
             this._criteriaRenderd = true;
+            this._isRenderingInProgress = false;
         },
 
         _showCriteria: function() {
-            if (!this._criteriaRenderd) {
+            if (!this._criteriaRenderd && !this._isRenderingInProgress) {
+                this._isRenderingInProgress = true;
                 this._renderCriteria();
             }
             this._updateValueField();
