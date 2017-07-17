@@ -1,12 +1,15 @@
 (function(req) {
     'use strict';
     var excludeList;
+    var console = window.console;
 
     var original = req.load;
     req.load = function(context, moduleName, url) {
         if (excludeList !== undefined && excludeList.indexOf(moduleName) === -1) {
             //excludeList already loaded and moduleName not found
-            console.error(moduleName + ' not configured');
+            var message = '"' + moduleName + '" not found in minified JS file. ' +
+                'Add this file into requirejs "paths" config';
+            console.error(message);
         }
         return original.call(this, context, moduleName, url);
     };

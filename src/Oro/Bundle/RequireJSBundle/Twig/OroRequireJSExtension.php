@@ -25,7 +25,7 @@ class OroRequireJSExtension extends \Twig_Extension
     protected $buildLogger;
 
     /**
-     * @param EngineInterface $templateEngine
+     * @param EngineInterface    $templateEngine
      * @param ContainerInterface $container
      * @param string             $webRoot
      * @param boolean            $buildLogger
