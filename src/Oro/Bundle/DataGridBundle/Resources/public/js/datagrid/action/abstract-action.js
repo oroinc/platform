@@ -1,17 +1,17 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'routing',
-    'orotranslation/js/translator',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    'oroui/js/modal',
-    'orodatagrid/js/datagrid/action-launcher'
-], function($, _, Backbone, routing, __, mediator, tools, Modal, ActionLauncher) {
+define(function(require) {
     'use strict';
 
     var AbstractAction;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var routing = require('routing');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var Modal = require('oroui/js/modal');
+    var ActionLauncher = require('orodatagrid/js/datagrid/action-launcher');
+    var Chaplin = require('chaplin');
 
     /**
      * Abstract action class. Subclasses should override execute method which is invoked when action is running.
@@ -196,7 +196,7 @@ define([
          * @protected
          */
         _getDefaultMessages: function() {
-            var defaultMessages = tools.getAllPropertyVersions(this, 'defaultMessages');
+            var defaultMessages = Chaplin.utils.getAllPropertyVersions(this, 'defaultMessages');
             defaultMessages.unshift({});
             defaultMessages = _.extend.apply(_, defaultMessages);
             return defaultMessages;
