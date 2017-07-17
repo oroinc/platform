@@ -281,7 +281,6 @@ config:
         'oroui/js/app/views/jstree/subtree-action-view': 'bundles/oroui/js/app/views/jstree/subtree-action-view.js'
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
 
-        'requirejs-logger': 'bundles/oroui/js/requirejs-logger.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module

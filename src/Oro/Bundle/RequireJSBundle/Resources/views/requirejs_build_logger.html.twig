@@ -1,0 +1,10 @@
+<script type="text/javascript">
+    require({
+        config: {
+            'requirejs-build-logger-exclude-list': {
+                excludeList: {{ excludeList|json_encode|raw }}
+            }
+        }
+    });
+    require(['ororequirejs/js/requirejs-build-logger']);
+</script>
