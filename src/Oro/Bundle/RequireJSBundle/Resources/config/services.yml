@@ -7,7 +7,6 @@ services:
         class: Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension
         public: false
         arguments:
-            - '@templating'
             - '@service_container'
             - '%oro_require_js.web_root%'
             - '%oro_require_js.build_logger%'

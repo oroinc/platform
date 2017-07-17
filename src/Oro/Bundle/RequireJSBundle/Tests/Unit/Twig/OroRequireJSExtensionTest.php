@@ -36,7 +36,7 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->add('oro_requirejs.config_provider.manager', $manager)
             ->getContainer($this);
 
-        $this->extension = new OroRequireJSExtension($container, './web/root');
+        $this->extension = new OroRequireJSExtension($container, './web/root', false);
     }
 
     public function testGetRequireJSConfig()

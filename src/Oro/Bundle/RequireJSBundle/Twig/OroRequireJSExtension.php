@@ -4,16 +4,12 @@ namespace Oro\Bundle\RequireJSBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 
 class OroRequireJSExtension extends \Twig_Extension
 {
     const DEFAULT_PROVIDER_ALIAS = 'oro_requirejs_config_provider';
-
-    /** @var EngineInterface */
-    protected $templateEngine;
+    const BUILD_LOGGER_TEMPLATE = 'OroRequireJSBundle::requirejs_build_logger.html.twig';
 
     /** @var ContainerInterface */
     protected $container;
@@ -25,14 +21,12 @@ class OroRequireJSExtension extends \Twig_Extension
     protected $buildLogger;
 
     /**
-     * @param EngineInterface    $templateEngine
      * @param ContainerInterface $container
      * @param string             $webRoot
      * @param boolean            $buildLogger
      */
-    public function __construct(EngineInterface $templateEngine, ContainerInterface $container, $webRoot, $buildLogger)
+    public function __construct(ContainerInterface $container, $webRoot, $buildLogger)
     {
-        $this->templateEngine = $templateEngine;
         $this->container = $container;
         $this->webRoot = $webRoot;
         $this->buildLogger = $buildLogger;
@@ -123,7 +117,7 @@ class OroRequireJSExtension extends \Twig_Extension
     }
 
     /**
-     * Get require.js output file path
+     * Get require.js build logger script
      *
      * @param string $alias
      *
@@ -145,7 +139,8 @@ class OroRequireJSExtension extends \Twig_Extension
         $parameters = [];
         $parameters['excludeList'] = array_keys($excludeList);
 
-        return $this->templateEngine->render('OroRequireJSBundle::requirejs_build_logger.html.twig', $parameters);
+        return $this->container->get('twig')
+            ->render(static::BUILD_LOGGER_TEMPLATE, $parameters);
     }
 
     /**
