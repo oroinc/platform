@@ -337,6 +337,10 @@ define(function(require) {
             return this;
         },
 
+        getTemplateData: function() {
+            return {filters: this.filters};
+        },
+
         /**
          * Render filter list
          *
@@ -344,7 +348,7 @@ define(function(require) {
          */
         render: function() {
             this.setElement(
-                $(this.template({filters: this.filters}))
+                $(this.template(this.getTemplateData()))
             );
 
             this.dropdownContainer = this.$el.find('.filter-container');

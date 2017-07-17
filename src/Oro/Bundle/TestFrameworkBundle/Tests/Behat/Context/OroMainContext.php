@@ -874,6 +874,51 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Given /^I should see "(?P<string>[^"]*)" in "(?P<elementName>[^"]*)" under "(?P<parentElementName>[^"]*)"$/
+     */
+    public function iShouldSeeStringInElementUnderElements($string, $elementName, $parentElementName)
+    {
+        static::assertTrue($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
+            '`%s` has not been found in any of `%s` elements',
+            $string,
+            $elementName
+        ));
+    }
+
+    /**
+     * @Given /^I should not see "(?P<string>[^"]*)" in "(?P<elementName>[^"]*)" under "(?P<parentElementName>[^"]*)"$/
+     */
+    public function iShouldNotSeeStringInElementUnderElements($string, $elementName, $parentElementName)
+    {
+        static::assertFalse($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
+            '`%s` has been found in one of `%s` elements',
+            $string,
+            $elementName
+        ));
+    }
+
+    /**
+     * @param string $string
+     * @param string $elementName
+     * @param string $parentElementName
+     * @return bool
+     */
+    private function stringFoundInElements($string, $elementName, $parentElementName)
+    {
+        $allElements = $this->findAllElements($parentElementName);
+
+        $found = false;
+        foreach ($allElements as $elementRow) {
+            $element = $elementRow->findElementContains($elementName, $string);
+            if ($element->isIsset() && strpos(trim($element->getText()), trim($string)) !== false) {
+                $found = true;
+            }
+        }
+
+        return $found;
+    }
+
+    /**
      * @param int|string $count
      * @return int
      */
