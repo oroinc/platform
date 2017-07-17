@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli;
 use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
 use Behat\Testwork\Suite\SuiteRegistry;
-use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController;
+use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteGroupsController;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli\Stub\SpecificationLocatorStub;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
@@ -30,7 +30,7 @@ class AvailableSuitesGroupControllerTest extends \PHPUnit_Framework_TestCase
     {
         $suiteRegistry = new SuiteRegistry();
         $specificationFinder = new SpecificationFinder();
-        $controller = new AvailableSuitesGroupController($suiteRegistry, $specificationFinder, []);
+        $controller = new AvailableSuiteGroupsController($suiteRegistry, $specificationFinder, []);
         $returnCode = $controller->execute(new InputStub(), new OutputStub());
 
         self::assertNull($returnCode);
@@ -50,7 +50,7 @@ class AvailableSuitesGroupControllerTest extends \PHPUnit_Framework_TestCase
         $specificationFinder = new SpecificationFinder();
         $specificationLocator = new SpecificationLocatorStub($this->suites);
         $specificationFinder->registerSpecificationLocator($specificationLocator);
-        $controller = new AvailableSuitesGroupController($suiteRegistry, $specificationFinder, $this->suiteGroups);
+        $controller = new AvailableSuiteGroupsController($suiteRegistry, $specificationFinder, $this->suiteGroups);
 
         $output = new OutputStub();
 

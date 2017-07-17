@@ -48,7 +48,7 @@ class SpecificationDividerTest extends \PHPUnit_Framework_TestCase
         $specFinder->registerSpecificationLocator(new SpecificationLocatorStub($featureCount));
 
         $suiteDivider = new SpecificationDivider($specFinder);
-        $generatedSuites = $suiteDivider->divideSuite(self::SUITE_STUB_NAME, [$this->featureDir], $divider);
+        $generatedSuites = $suiteDivider->divide(self::SUITE_STUB_NAME, [$this->featureDir], $divider);
 
         $this->assertTrue(is_array($generatedSuites));
         $this->assertCount(count($expectedSuites), $generatedSuites);

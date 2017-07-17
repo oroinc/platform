@@ -113,8 +113,20 @@ services:
 
     oro_behat_extension.specification.specification_divider:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider
+
+    oro_behat_extension.specification.specification_filter:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationFilter
         arguments:
-          - '@specifications.finder'
+            - '@specifications.finder'
+
+    oro_behat_extension.suite.suite_configuration_registry:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry
+        arguments:
+            - '@symfony2_extension.kernel'
+            - '@specifications.finder'
+            - '@oro_behat_extension.specification.specification_divider'
+        calls:
+            - [setSuiteConfigurations, ['%suite.configurations%']]
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader

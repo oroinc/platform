@@ -16,18 +16,10 @@ use Symfony\Component\Finder\SplFileInfo;
 class SpecificationDivider
 {
     /**
-     * @var SpecificationFinder
-     */
-    private $specificationFinder;
-
-    public function __construct(SpecificationFinder $specificationFinder)
-    {
-        $this->specificationFinder = $specificationFinder;
-    }
-
-    /**
      * Divide suite by features count
-     * Each generated suite will has number of features
+     * Divide suites by sets
+     *
+     * Each generated chunk will has number of elements provided by divider
      * E.g. if 'AcmeSuite' suite has 14 features and divider is 5,
      *      3 suites will be generated
      *      'AcmeSuite#0' and 'AcmeSuite#1' with 5 features each
@@ -41,12 +33,11 @@ class SpecificationDivider
      *                 'AcmeSuite#1' => ['/path/to/third.feature'],
      *               ]
      */
-    public function divideSuite($suiteName, array $paths, $divider)
+    public function divide($suiteName, array $paths, $divider)
     {
         $generatedSuites = [];
 
-        $featureFiles = $this->getFeaturesList($paths);
-        $chunks = $this->getChunks($featureFiles, $divider);
+        $chunks = $this->getChunks($paths, $divider);
         foreach ($chunks as $index => $chunk) {
             $generatedSuiteName = $suiteName.'#'.$index;
             $generatedSuites[$generatedSuiteName] = $chunk;
@@ -74,25 +65,5 @@ class SpecificationDivider
         array_push($chunks, $tailChunks[0], $tailChunks[1]);
 
         return $chunks;
-    }
-
-    /**
-     * @param array $paths
-     * @return array of features absolute paths
-     */
-    private function getFeaturesList(array $paths)
-    {
-        $suite = new GenericSuite('GenericSuite', ['paths' => $paths]);
-        $iterators = $this->specificationFinder->findSuitesSpecifications([$suite]);
-        $features = [];
-
-        foreach ($iterators as $iterator) {
-            /** @var FeatureNode $featureNode */
-            foreach ($iterator as $featureNode) {
-                $features[$featureNode->getFile()] = null;
-            }
-        }
-
-        return array_keys($features);
     }
 }

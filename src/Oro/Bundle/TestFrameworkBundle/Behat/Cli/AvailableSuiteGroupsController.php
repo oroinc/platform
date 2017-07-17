@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Also special Ungrouped group contains all suites that not included in any group
  * It return only suites that have at list one executable (not skipped or incomplete) feature
  */
-class AvailableSuitesGroupController implements Controller
+class AvailableSuiteGroupsController implements Controller
 {
     const UNGROUPED_GROUP = 'Ungrouped';
 
@@ -58,7 +58,7 @@ class AvailableSuitesGroupController implements Controller
     {
         $command
             ->addOption(
-                '--available-suites-group',
+                '--available-suite-groups',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Show all available test suites in group.'.PHP_EOL.
@@ -71,7 +71,7 @@ class AvailableSuitesGroupController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $suiteGroup = $input->getOption('available-suites-group');
+        $suiteGroup = $input->getOption('available-suite-groups');
 
         if (!$suiteGroup) {
             return;
