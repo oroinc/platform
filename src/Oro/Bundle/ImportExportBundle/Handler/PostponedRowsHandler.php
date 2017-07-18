@@ -16,9 +16,9 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 
 class PostponedRowsHandler
 {
-    const MAX_ATTEMPTS = 5;
+    const MAX_ATTEMPTS = 30;
 
-    const DELAY_SECONDS = 30;
+    const DELAY_SECONDS = 5;
 
     /**
      * @var FileManager

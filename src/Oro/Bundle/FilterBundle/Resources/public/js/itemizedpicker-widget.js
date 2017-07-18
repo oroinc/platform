@@ -1,16 +1,16 @@
-define([
-    'jquery',
-    'underscore',
-    'jquery-ui'
-], function($, _) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var template = require('tpl!orofilter/templates/filter/date-picker.html');
+    require('jquery-ui');
 
     $.widget('orofilter.itemizedPicker', {
         options: {
             title: 'Title',
             items: [],
             onSelect: $.noop,
-            template: '#date-picker-itemized-content'
+            template: template
         },
 
         _create: function() {
@@ -25,8 +25,7 @@ define([
         },
 
         render: function() {
-            var template = _.template($(this.options.template).html());
-            this.element.html(template({
+            this.element.html(this.options.template({
                     title: this.options.title,
                     items: this.options.items
                 }));

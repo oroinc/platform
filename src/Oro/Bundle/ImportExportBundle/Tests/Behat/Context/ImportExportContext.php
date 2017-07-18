@@ -18,10 +18,15 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
-class ImportExportContext extends OroFeatureContext implements KernelAwareContext, OroPageObjectAware
+class ImportExportContext extends OroFeatureContext implements
+    KernelAwareContext,
+    OroPageObjectAware,
+    MessageQueueIsolatorAwareInterface
 {
     use KernelDictionary, PageObjectDictionary;
 
@@ -39,6 +44,11 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      * @var OroMainContext
      */
     private $oroMainContext;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    private $messageQueueIsolator;
 
     /**
      * @param EntityAliasResolver $aliasResolver
@@ -293,8 +303,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
 
         $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
-        // todo: CRM-7599 Replace sleep to appropriate logic
-        sleep(2);
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -409,5 +418,13 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
         static::assertTrue($jobResult->isSuccessful());
 
         return $filePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 }

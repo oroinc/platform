@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var tools = require('oroui/js/tools');
+    var Chaplin = require('chaplin');
 
     require('jquery.jstree');
 
@@ -111,7 +112,7 @@ define(function(require) {
             this.$tree.jstree(this.jsTreeConfig);
             this.jsTreeInstance = $.jstree.reference(this.$tree);
 
-            var treeEvents = tools.getAllPropertyVersions(this, 'treeEvents');
+            var treeEvents = Chaplin.utils.getAllPropertyVersions(this, 'treeEvents');
             treeEvents = _.extend.apply({}, treeEvents);
             _.each(treeEvents, function(callback, event) {
                 if (this[callback]) {

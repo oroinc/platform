@@ -2,20 +2,17 @@
 
 namespace Oro\Bundle\SyncBundle\Content;
 
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\UnitOfWork;
 
 use Symfony\Component\Form\FormInterface;
 
 class DoctrineTagGenerator implements TagGeneratorInterface
 {
-    /** @var array */
-    protected $generatedTags = [];
-
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -56,20 +53,11 @@ class DoctrineTagGenerator implements TagGeneratorInterface
      */
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
-        $cacheKey = $this->getCacheIdentifier($data);
-        if (isset($this->generatedTags[$cacheKey])) {
-            return $this->generatedTags[$cacheKey];
-        }
-
         if ($data instanceof FormInterface) {
             return $this->generate($data->getData(), $includeCollectionTag, $processNestedData);
         }
 
-        $tags = $this->getTags($data, $includeCollectionTag, $processNestedData);
-
-        $this->generatedTags[$cacheKey] = $tags;
-
-        return $tags;
+        return $this->getTags($data, $includeCollectionTag, $processNestedData);
     }
 
     /**
@@ -153,20 +141,6 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     protected function convertToTag($data)
     {
         return preg_replace('#[^a-z]+#i', '_', $data);
-    }
-
-    /**
-     * Generates cache identifier
-     *
-     * @param mixed $data
-     *
-     * @return string
-     */
-    protected function getCacheIdentifier($data)
-    {
-        return is_string($data)
-            ? $this->convertToTag($data)
-            : spl_object_hash($data);
     }
 
     /**

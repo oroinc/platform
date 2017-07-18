@@ -15,10 +15,21 @@ class TableRow extends Element
     public function getCellByNumber($number)
     {
         $number = (int) $number;
-        $columns = $this->findAll('css', 'td');
+        $columns = $this->findAll('xpath', 'child::td');
         self::assertArrayHasKey($number, $columns);
 
         return $columns[$number];
+    }
+
+    /**
+     * @param string $header
+     * @return NodeElement
+     */
+    public function getCellByHeader($header)
+    {
+        $columnNumber = $this->getColumnNumberByHeader($header);
+
+        return $this->getCellByNumber($columnNumber);
     }
 
     /**
@@ -27,9 +38,7 @@ class TableRow extends Element
      */
     public function getCellValue($header)
     {
-        /** @var TableHeader $tableHeader */
-        $tableHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
-        $columnNumber = $tableHeader->getColumnNumber($header);
+        $columnNumber = $this->getColumnNumberByHeader($header);
 
         return $this->normalizeValueByGuessingType(
             $this->getCellElementValue($columnNumber)
@@ -81,5 +90,17 @@ class TableRow extends Element
         }
 
         return $cellElementValue;
+    }
+
+    /**
+     * @param string $header
+     * @return int
+     */
+    private function getColumnNumberByHeader($header)
+    {
+        /** @var TableHeader $tableHeader */
+        $tableHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
+
+        return $tableHeader->getColumnNumber($header);
     }
 }

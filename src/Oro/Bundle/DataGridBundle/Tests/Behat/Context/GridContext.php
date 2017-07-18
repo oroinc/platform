@@ -8,7 +8,6 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -988,7 +987,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $actions = array_map(
             function (Element $action) {
-                return $action->getText();
+                return $action->getText() ?: $action->getAttribute('title');
             },
             $row->getActionLinks()
         );
@@ -1030,6 +1029,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
         $this->waitForAjax();
+    }
+
+    /**
+     * Click on first row action.
+     * Example: And click view on first row in grid
+     *
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)" grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $action
+     * @param string $gridName
+     */
+    public function clickActionOnFirstRow($action, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        if (!empty($grid->getRows()[0])) {
+            $row = $grid->getRows()[0];
+            $link = $row->getActionLink($action);
+            $link->click();
+        }
     }
 
     /**
@@ -1377,7 +1397,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1399,7 +1419,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1436,6 +1456,76 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $grid->isIsset(),
             sprintf('Grid "%s" was found on page, but it should not.', $gridName)
         );
+    }
+
+    /**
+     * Example: I should see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should see following elements in grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertTrue(
+                    $element->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertTrue(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        }
+    }
+
+    /**
+     * Example: I should not see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should not see following elements in grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldNotSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertFalse(
+                    $element->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertFalse(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        }
     }
 
     /**
