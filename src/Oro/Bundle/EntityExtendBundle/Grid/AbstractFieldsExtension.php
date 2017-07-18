@@ -115,7 +115,8 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $joinAlias = $query->getJoinAlias($join);
                     $query->addLeftJoin($join, $joinAlias);
                     $columnDataName = $fieldName;
-                    $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
+                    $targetFieldName = $extendFieldConfig->get('target_field');
+                    $sorterDataName = sprintf('%s.%s as %s_%s', $joinAlias, $targetFieldName, $joinAlias , $targetFieldName);
                     $selectExpr = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
                     $filterDataName = sprintf('%s.%s', $alias, $fieldName);
                     // adding $filterDataName to select list to allow sorting by this column and avoid GROUP BY error
