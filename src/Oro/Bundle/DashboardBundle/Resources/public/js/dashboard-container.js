@@ -234,7 +234,7 @@ define(function(require) {
             var configurationWidget = new ConfigurationWidget({
                 widget: widget
             });
-            mediator.on('widget_success:' + configurationWidget.getWid(), widget.render);
+            mediator.on('widget_success:' + configurationWidget.getWid(), widget.render, widget);
             configurationWidget.render();
         },
 
