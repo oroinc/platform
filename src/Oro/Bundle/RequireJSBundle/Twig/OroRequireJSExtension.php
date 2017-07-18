@@ -131,10 +131,12 @@ class OroRequireJSExtension extends \Twig_Extension
         }
 
         $configs = $provider->getConfig()->getBuildConfig();
-        $excludeList = array_filter($configs['paths'], function($config) {
-            return $config === 'empty:';
-        });
-
+        $excludeList = array_filter(
+            $configs['paths'],
+            function ($config) {
+                return $config === 'empty:';
+            }
+        );
 
         $parameters = [];
         $parameters['excludeList'] = array_keys($excludeList);

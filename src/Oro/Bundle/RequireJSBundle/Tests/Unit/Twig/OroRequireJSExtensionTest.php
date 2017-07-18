@@ -7,6 +7,7 @@ use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
 use Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +18,9 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $config;
+
+    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $container;
 
     protected function setUp()
     {
@@ -32,11 +36,14 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('oro_requirejs_config_provider')
             ->will($this->returnValue($provider));
 
-        $container = self::getContainerBuilder()
+        $twig = $this->createMock(\Twig_Environment::class);
+
+        $this->container = self::getContainerBuilder()
             ->add('oro_requirejs.config_provider.manager', $manager)
+            ->add('twig', $twig)
             ->getContainer($this);
 
-        $this->extension = new OroRequireJSExtension($container, './web/root', false);
+        $this->extension = new OroRequireJSExtension($this->container, './web/root', false);
     }
 
     public function testGetRequireJSConfig()
@@ -124,5 +131,44 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $this->assertEquals('requirejs_extension', $this->extension->getName());
+    }
+
+    public function testGetRequireJSBuildLoggerReturnEmptyString()
+    {
+        $extension = new OroRequireJSExtension($this->container, './web/root', false);
+        $result = $extension->getRequireJSBuildLogger();
+
+        $this->assertEquals('', $result);
+    }
+
+    public function testGetRequireJSBuildLogger()
+    {
+        $extension = new OroRequireJSExtension($this->container, './web/root', true);
+
+        $this->config->expects($this->once())
+            ->method('getBuildConfig')
+            ->willReturn(
+                [
+                    'paths' => [
+                        'orosidebar/js/widget-container/templates/icon-template.html' => 'empty:',
+                        'orocomment/templates/comment/comment-list-view.html' => 'empty:'
+                    ]
+                ]
+            );
+
+        $twig = $this->container->get('twig');
+        $twig->expects($this->once())
+            ->method('render')
+            ->with(
+                OroRequireJSExtension::BUILD_LOGGER_TEMPLATE,
+                [
+                    'excludeList' => [
+                        'orosidebar/js/widget-container/templates/icon-template.html',
+                        'orocomment/templates/comment/comment-list-view.html'
+                    ]
+                ]
+            );
+
+        $extension->getRequireJSBuildLogger();
     }
 }
