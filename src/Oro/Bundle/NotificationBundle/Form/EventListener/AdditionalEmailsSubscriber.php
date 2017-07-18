@@ -78,7 +78,7 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         $eventObject = $event->getData();
 
         $entityName = null;
-        if (null !== $eventObject && null !== $eventObject->getEntityName()) {
+        if (null !== $eventObject && $eventObject->hasEntityName()) {
             $entityName = $eventObject->getEntityName();
         }
 

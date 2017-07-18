@@ -156,10 +156,8 @@ services:
 
     oro_navigation.item.pinbar.post_persist_listener:
         class: %oro_navigation.item.pinbar.post_persist_listener.class%
-        calls:
-            - [ setClassName, [ %oro_navigation.entity.pinbar_tab.class% ]]
         tags:
-            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\NavigationBundle\Entity\AbstractPinbarTab', event: postPersist }
 
     oro_navigation.pinbar_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%

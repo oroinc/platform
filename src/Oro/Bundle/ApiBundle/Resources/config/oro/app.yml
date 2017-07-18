@@ -104,6 +104,8 @@ oro_api:
         date:
             form_type: date
             options:
+                model_timezone: UTC
+                view_timezone: UTC
                 widget: single_text
                 format: "yyyy-MM-dd" # HTML5
         time:

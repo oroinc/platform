@@ -45,6 +45,14 @@ search:
                 target_type:            datetime
                 target_fields:          [birthday]
             -
+                name: organizations
+                relation_type: many-to-many
+                relation_fields:
+                    -
+                        name: id
+                        target_type: integer
+                        target_fields: [assigned_organization_id]
+            -
                 name: emails
                 relation_type: one-to-many
                 relation_fields:

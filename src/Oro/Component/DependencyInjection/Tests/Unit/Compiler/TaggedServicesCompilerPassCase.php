@@ -33,14 +33,8 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
     private function assetProcessSkipWithoutServiceDefinition(CompilerPassInterface $compilerPass, $serviceId)
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with($serviceId)
-            ->willReturn(false);
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $this->assertHasDefinitionCall($containerBuilder, $serviceId, false);
 
         $compilerPass->process($containerBuilder);
     }
@@ -53,23 +47,13 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
     private function assertProcessSkipWithoutTaggedServices(CompilerPassInterface $compilerPass, $serviceId, $tagName)
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with($serviceId)
-            ->willReturn(true);
-
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with($tagName)
-            ->willReturn(null);
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $this->assertHasDefinitionCall($containerBuilder, $serviceId, true);
+        $this->assertFindTaggedServiceIds($containerBuilder, $tagName, null);
 
         $containerBuilder->expects($this->never())
             ->method('getDefinition')
-            ->with($serviceId);
+            ->with(call_user_func_array([$this, 'logicalOr'], (array)$serviceId));
 
         $compilerPass->process($containerBuilder);
     }
@@ -82,38 +66,15 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
      */
     private function assertProcess(CompilerPassInterface $compilerPass, $serviceId, $tagName, $addMethodName)
     {
-        $service = $this->getMockBuilder(Definition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $service->expects($this->exactly(3))->method('addMethodCall');
-
-        $service->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with($addMethodName, [new Reference('taggedService2'), 'taggedService2']);
-
-        $service->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with($addMethodName, [new Reference('taggedService3'), 'taggedService3Alias']);
-
-        $service->expects($this->at(2))
-            ->method('addMethodCall')
-            ->with($addMethodName, [new Reference('taggedService1'), 'taggedService1Alias']);
-
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
 
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with($serviceId)
-            ->willReturn(true);
+        $this->assertHasDefinitionCall($containerBuilder, $serviceId, true);
 
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with($tagName)
-            ->willReturn([
+        $this->assertFindTaggedServiceIds(
+            $containerBuilder,
+            $tagName,
+            [
                 'taggedService1' => [
                     ['priority' => 20, 'alias' => 'taggedService1Alias'],
                 ],
@@ -121,14 +82,110 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
                 ],
                 'taggedService3' => [
                     ['priority' => 10, 'alias' => 'taggedService3Alias'],
-                ],
-            ]);
-
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with($serviceId)
-            ->willReturn($service);
+                ]
+            ]
+        );
+        $this->assertServicesRegistrationByTag(
+            $containerBuilder,
+            $serviceId,
+            [
+                ['taggedService2', 'taggedService2'],
+                ['taggedService3', 'taggedService3Alias'],
+                ['taggedService1', 'taggedService1Alias']
+            ],
+            $addMethodName
+        );
 
         $compilerPass->process($containerBuilder);
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $containerBuilder
+     * @param string|array $serviceId
+     * @param bool $result
+     */
+    private function assertHasDefinitionCall(
+        \PHPUnit_Framework_MockObject_MockObject $containerBuilder,
+        $serviceId,
+        $result
+    ) {
+        $serviceId = $this->paramToConsecutive($serviceId);
+
+        $containerBuilder->expects($this->exactly(count($serviceId)))
+            ->method('hasDefinition')
+            ->withConsecutive(...$serviceId)
+            ->willReturn($result);
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $containerBuilder
+     * @param string|array $tagName
+     * @param mixed $result
+     */
+    private function assertFindTaggedServiceIds(
+        \PHPUnit_Framework_MockObject_MockObject $containerBuilder,
+        $tagName,
+        $result
+    ) {
+        $tagName = $this->paramToConsecutive($tagName);
+
+        $containerBuilder->expects($this->exactly(count($tagName)))
+            ->method('findTaggedServiceIds')
+            ->withConsecutive(...$tagName)
+            ->willReturn($result);
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $containerBuilder
+     * @param string|array $serviceId
+     * @param array $taggedServices
+     * @param $addMethodName
+     */
+    private function assertServicesRegistrationByTag(
+        \PHPUnit_Framework_MockObject_MockObject $containerBuilder,
+        $serviceId,
+        array $taggedServices,
+        $addMethodName
+    ) {
+        $serviceId = $this->paramToConsecutive($serviceId);
+        $addMethodName = (array)$addMethodName;
+
+        $returnedResult = [];
+        $itemsCount = count($serviceId);
+        for ($i = 0; $i < $itemsCount; $i++) {
+            $service = $this->getMockBuilder(Definition::class)
+                ->disableOriginalConstructor()
+                ->getMock();
+
+            $methodParameters = [];
+            foreach ($taggedServices as $taggedService) {
+                $methodParameters[] = [$addMethodName[$i], [new Reference($taggedService[0]), $taggedService[1]]];
+            }
+            $service->expects($this->exactly(count($taggedServices)))
+                ->method('addMethodCall')
+                ->withConsecutive(...$methodParameters);
+            $returnedResult[] = $service;
+        }
+
+        $containerBuilder->expects($this->exactly(count($serviceId)))
+            ->method('getDefinition')
+            ->withConsecutive(...$serviceId)
+            ->willReturnOnConsecutiveCalls(...$returnedResult);
+    }
+
+
+    /**
+     * @param string|array $param
+     * @return array
+     */
+    private function paramToConsecutive($param): array
+    {
+        $param = (array)$param;
+        foreach ($param as &$paramVal) {
+            $paramVal = [$paramVal];
+        }
+        unset($paramVal);
+
+        return $param;
     }
 }

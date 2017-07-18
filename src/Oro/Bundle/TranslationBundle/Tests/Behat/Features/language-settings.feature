@@ -1,7 +1,7 @@
 @ticket-BAP-13139
 @automatically-ticket-tagged
 @fixture-OroUserBundle:user.yml
-@fixture-LanguageFixture.yml
+@fixture-OroTranslationBundle:LanguageFixture.yml
 Feature: Applying language settings in system configuration
   Scenario: Reset user language settings when language no more allowed
     Given I login as "admin" user

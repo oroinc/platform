@@ -15,10 +15,21 @@ class TableRow extends Element
     public function getCellByNumber($number)
     {
         $number = (int) $number;
-        $columns = $this->findAll('css', 'td');
+        $columns = $this->findAll('xpath', 'child::td');
         self::assertArrayHasKey($number, $columns);
 
         return $columns[$number];
+    }
+
+    /**
+     * @param string $header
+     * @return NodeElement
+     */
+    public function getCellByHeader($header)
+    {
+        $columnNumber = $this->getColumnNumberByHeader($header);
+
+        return $this->getCellByNumber($columnNumber);
     }
 
     /**
@@ -27,12 +38,10 @@ class TableRow extends Element
      */
     public function getCellValue($header)
     {
-        /** @var TableHeader $tableHeader */
-        $tableHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
-        $columnNumber = $tableHeader->getColumnNumber($header);
+        $columnNumber = $this->getColumnNumberByHeader($header);
 
         return $this->normalizeValueByGuessingType(
-            $this->getCellByNumber($columnNumber)->getText()
+            $this->getCellElementValue($columnNumber)
         );
     }
 
@@ -58,5 +67,40 @@ class TableRow extends Element
         }
 
         return $value;
+    }
+
+    /**
+     * @param int $columnNumber
+     * @return string
+     */
+    protected function getCellElementValue($columnNumber)
+    {
+        $cellElement = $this->getCellByNumber($columnNumber);
+        $input = $cellElement->find('css', 'input');
+        $cellElementValue = $cellElement->getText();
+
+        // if it's simple element, just return text
+        if (!$input) {
+            return $cellElementValue;
+        }
+
+        // if it's a checkbox, use 'checked' attribute rather than text value
+        if ($input->hasAttribute('type') && 'checkbox' === $input->getAttribute('type')) {
+            $cellElementValue = (int) $input->isChecked();
+        }
+
+        return $cellElementValue;
+    }
+
+    /**
+     * @param string $header
+     * @return int
+     */
+    private function getColumnNumberByHeader($header)
+    {
+        /** @var TableHeader $tableHeader */
+        $tableHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
+
+        return $tableHeader->getColumnNumber($header);
     }
 }

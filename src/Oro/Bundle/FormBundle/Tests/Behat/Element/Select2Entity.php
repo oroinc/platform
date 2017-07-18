@@ -31,6 +31,7 @@ class Select2Entity extends Element
             foreach ($results as $result) {
                 if (trim($result->getText()) == $value) {
                     $result->click();
+                    $this->getDriver()->waitForAjax();
 
                     return;
                 }

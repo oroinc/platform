@@ -61,6 +61,7 @@ class ControllersTest extends WebTestCase
             [
                 'email-notification-grid[_pager][_page]' => 1,
                 'email-notification-grid[_pager][_per_page]' => 1,
+                'email-notification-grid[_filter][entityName][value][]' => self::ENTITY_NAME
             ]
         );
 
@@ -89,6 +90,7 @@ class ControllersTest extends WebTestCase
             [
                 'email-notification-grid[_pager][_page]' => 1,
                 'email-notification-grid[_pager][_per_page]' => 1,
+                'email-notification-grid[_filter][entityName][value][]' => self::ENTITY_NAME
             ]
         );
 

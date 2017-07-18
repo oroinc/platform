@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerCollectionView;
+    var template = require('tpl!orodatagrid/templates/column-manager/column-manager-collection.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
@@ -12,14 +13,12 @@ define(function(require) {
     require('jquery-ui');
 
     config = _.extend({
-        templateSelector: null,
         fallbackSelector: '.column-manager-no-columns'
     }, config);
 
     ColumnManagerCollectionView = BaseCollectionView.extend({
         animationDuration: 0,
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager-collection.html'),
-        templateSelector: config.templateSelector,
+        template: template,
         itemView: ColumnManagerItemView,
 
         className: 'dropdown-menu',
@@ -103,8 +102,7 @@ define(function(require) {
             var placeholder;
             this.$('tbody').sortable({
                 cursor: 'move',
-                delay: 25,
-                opacity: 0.7,
+                delay: 50,
                 revert: 10,
                 axis: 'y',
                 containment: this.$('tbody'),

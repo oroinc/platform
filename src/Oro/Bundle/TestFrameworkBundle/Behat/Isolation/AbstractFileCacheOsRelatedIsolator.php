@@ -57,7 +57,12 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
+        if (!$this->copyDumpToTempDirProcess) {
+            return;
+        }
+
         $this->waitForProcess();
+        $event->writeln('<info>Restore cache dirs</info>');
         $this->removeCacheDirs();
         $this->replaceCache();
         $this->startCopyDumpToTempDir();
@@ -66,6 +71,10 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
     {
+        if (!$this->copyDumpToTempDirProcess) {
+            return;
+        }
+
         $event->writeln('<info>Stop copying cache</info>');
         $this->copyDumpToTempDirProcess->stop();
         $event->writeln('<info>Remove Temp cache dir</info>');

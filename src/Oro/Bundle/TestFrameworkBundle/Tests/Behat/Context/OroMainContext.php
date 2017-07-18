@@ -21,12 +21,11 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
+use WebDriver\Exception\NoSuchElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -45,6 +44,12 @@ class OroMainContext extends MinkContext implements
     SessionAliasProviderAwareInterface,
     MessageQueueIsolatorAwareInterface
 {
+    const SKIP_WAIT_PATTERN = '/'.
+        '^(?:|I )should see ".+" flash message$|'.
+        '^(?:|I )should see ".+" error message$|'.
+        '^(?:|I )should see Schema updated flash message$'.
+    '/';
+
     use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait;
 
     /**
@@ -93,7 +98,7 @@ class OroMainContext extends MinkContext implements
         }
 
         // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see .+(flash message|error message)$/', $scope->getStep()->getText())) {
+        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
             return;
         }
 
@@ -131,6 +136,7 @@ class OroMainContext extends MinkContext implements
      * Example: Then I should see "The email was sent" flash message
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message$/
      */
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
@@ -172,6 +178,14 @@ class OroMainContext extends MinkContext implements
         } catch (\Exception $e) {
             //No worries, flash message can disappeared till time next call
         }
+    }
+
+    /**
+     * @Then /^(?:|I )should see (Schema updated) flash message$/
+     */
+    public function iShouldSeeUpdateSchema()
+    {
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
     }
 
     /**
@@ -727,10 +741,16 @@ class OroMainContext extends MinkContext implements
 
             /** @var NodeElement $labelElement */
             foreach ($labels as $labelElement) {
+                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
+
+                if ($controlLabel === null) {
+                    continue;
+                }
+
                 /** @var ControlGroup $controlLabel */
                 $controlLabel = $this->elementFactory->wrapElement(
                     'ControlGroup',
-                    $labelElement->getParent()->find('css', 'div.controls div.control-label')
+                    $controlLabel
                 );
 
                 if (true === $controlLabel->compareValues(Form::normalizeValue($value, $label))) {
@@ -764,6 +784,7 @@ class OroMainContext extends MinkContext implements
 
         if ($this->elementFactory->hasElement($field)) {
             $this->elementFactory->createElement($field)->setValue($value);
+
             return;
         }
 
@@ -786,6 +807,23 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotOnPage($element)
+    {
+        $elementOnPage = $this->createElement($element);
+
+        try {
+            self::assertFalse(
+                $elementOnPage->isVisible(),
+                sprintf('Element "%s" is present when it should not', $element)
+            );
+        } catch (NoSuchElement $e) {
+            return;
+        }
+    }
+
+    /**
      * Presses button with specified id|name|title|alt|value in some named section
      * Example: When I press "Add" in "General Information" section
      * Example: And I press "Add" in "General Information" section
@@ -798,7 +836,7 @@ class OroMainContext extends MinkContext implements
         $section = $this->fixStepArgument($section);
         $page = $this->getSession()->getPage();
 
-        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]/..')->getParent();
 
         if ($sectionContainer->hasButton($button)) {
             $sectionContainer->pressButton($button);
@@ -822,8 +860,62 @@ class OroMainContext extends MinkContext implements
      */
     public function iRestartMessageConsumer()
     {
-        $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
+        $this->messageQueueIsolator->stopMessageQueue();
+        $this->messageQueueIsolator->startMessageQueue();
+    }
+
+    /**
+     * @Then /^"([^"]*)" button is disabled$/
+     */
+    public function buttonIsDisabled($button)
+    {
+        $button = $this->getSession()->getPage()->findButton($button);
+        self::assertTrue($button->hasClass('disabled'));
+    }
+
+    /**
+     * @Given /^I should see "(?P<string>[^"]*)" in "(?P<elementName>[^"]*)" under "(?P<parentElementName>[^"]*)"$/
+     */
+    public function iShouldSeeStringInElementUnderElements($string, $elementName, $parentElementName)
+    {
+        static::assertTrue($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
+            '`%s` has not been found in any of `%s` elements',
+            $string,
+            $elementName
+        ));
+    }
+
+    /**
+     * @Given /^I should not see "(?P<string>[^"]*)" in "(?P<elementName>[^"]*)" under "(?P<parentElementName>[^"]*)"$/
+     */
+    public function iShouldNotSeeStringInElementUnderElements($string, $elementName, $parentElementName)
+    {
+        static::assertFalse($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
+            '`%s` has been found in one of `%s` elements',
+            $string,
+            $elementName
+        ));
+    }
+
+    /**
+     * @param string $string
+     * @param string $elementName
+     * @param string $parentElementName
+     * @return bool
+     */
+    private function stringFoundInElements($string, $elementName, $parentElementName)
+    {
+        $allElements = $this->findAllElements($parentElementName);
+
+        $found = false;
+        foreach ($allElements as $elementRow) {
+            $element = $elementRow->findElementContains($elementName, $string);
+            if ($element->isIsset() && strpos(trim($element->getText()), trim($string)) !== false) {
+                $found = true;
+            }
+        }
+
+        return $found;
     }
 
     /**
@@ -968,10 +1060,17 @@ class OroMainContext extends MinkContext implements
      */
     public function iConfirmSchemaUpdate()
     {
-        $this->pressButton('Update schema');
-        $this->assertPageContainsText('Schema update confirmation');
-        $this->pressButton('Yes, Proceed');
-        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+        try {
+            $this->pressButton('Update schema');
+            $this->assertPageContainsText('Schema update confirmation');
+            $this->pressButton('Yes, Proceed');
+            $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            $this->messageQueueIsolator->stopMessageQueue();
+            $this->messageQueueIsolator->startMessageQueue();
+        }
     }
 
     /**
@@ -1028,9 +1127,9 @@ class OroMainContext extends MinkContext implements
         $element = $this->createElement($elementName);
         $source = $webDriverSession->element('xpath', $element->getXpath());
 
-        $webDriverSession->moveto(array(
+        $webDriverSession->moveto([
             'element' => $source->getID()
-        ));
+        ]);
         $webDriverSession->buttondown();
 
         $dropZone = $this->createElement($dropZoneName);
@@ -1043,6 +1142,7 @@ class OroMainContext extends MinkContext implements
         if (!is_null($yOffset)) {
             $moveToOptions['yoffset'] = $xOffset;
         }
+        $this->waitForAjax();
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
     }
@@ -1078,7 +1178,7 @@ class OroMainContext extends MinkContext implements
     public function iSeeNodeAfterAnotherOneInTree($nodeTitle, $anotherNodeTitle)
     {
         $page = $this->getSession()->getPage();
-        $resultElement =  $page->find(
+        $resultElement = $page->find(
             'xpath',
             '//a[contains(., "' . $anotherNodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
             . '/following-sibling::li[contains(@class, "jstree-node")]/a[contains(., "' . $nodeTitle . '")]'
@@ -1092,7 +1192,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^Page title equals to "(?P<pageTitle>[\w\s]+)"$/
+     * @Then /^Page title equals to "(?P<pageTitle>[\w\s-]+)"$/
      *
      * @param string $pageTitle
      */
@@ -1118,6 +1218,7 @@ class OroMainContext extends MinkContext implements
         $field = $this->createOroForm()->findField($fieldName);
         $field->focus();
         $field->keyDown(13);
+        $field->keyUp(13);
         $this->waitForAjax();
     }
 

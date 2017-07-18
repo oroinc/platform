@@ -123,7 +123,7 @@ class AclExtensionSelector
     /**
      * @param object $object
      *
-     * @return array
+     * @return array [id, type, field name]
      */
     protected function parseObject($object)
     {
@@ -136,17 +136,22 @@ class AclExtensionSelector
             $object = $object->getObjectIdentity();
         }
         if ($object instanceof ObjectIdentityInterface) {
-            $type = $object->getType();
             $id = $object->getIdentifier();
+            $type = $object->getType();
         } elseif ($object instanceof AclAnnotation) {
+            $id = $object->getType();
             $type = $object->getClass();
             if (empty($type)) {
                 $type = $object->getId();
             }
-            $id = $object->getType();
         } else {
-            $type = ClassUtils::getRealClass($object);
-            $id = $this->objectIdAccessor->getId($object);
+            try {
+                $id = $this->objectIdAccessor->getId($object);
+                $type = ClassUtils::getRealClass($object);
+            } catch (InvalidDomainObjectException $e) {
+                $id = null;
+                $type = null;
+            }
         }
 
         return [$id, $type, $fieldName];

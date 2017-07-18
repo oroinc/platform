@@ -14,8 +14,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 /**
  * Class EntityFieldManager
@@ -39,7 +39,7 @@ class EntityFieldManager
     /** @var  EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
     /** @var EntityFieldValidator */
@@ -50,7 +50,7 @@ class EntityFieldManager
      * @param FormBuilder $formBuilder
      * @param EntityApiBaseHandler $handler
      * @param EntityRoutingHelper $entityRoutingHelper
-     * @param OwnershipMetadataProvider $ownershipMetadataProvider
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
      * @param EntityFieldValidator $entityFieldValidator
      */
     public function __construct(
@@ -58,7 +58,7 @@ class EntityFieldManager
         FormBuilder $formBuilder,
         EntityApiBaseHandler $handler,
         EntityRoutingHelper $entityRoutingHelper,
-        OwnershipMetadataProvider $ownershipMetadataProvider,
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         EntityFieldValidator $entityFieldValidator
     ) {
         $this->registry = $registry;
@@ -115,7 +115,7 @@ class EntityFieldManager
         $accessor = PropertyAccess::createPropertyAccessor();
         $data = [];
         $metadata = $this->getMetadataConfig($entity);
-        if (!$metadata || $metadata->isGlobalLevelOwned() || !$form->offsetExists($metadata->getOwnerFieldName())) {
+        if (!$metadata || $metadata->isOrganizationOwned() || !$form->offsetExists($metadata->getOwnerFieldName())) {
             return $data;
         }
 

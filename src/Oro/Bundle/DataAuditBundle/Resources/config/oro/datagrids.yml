@@ -1,6 +1,6 @@
 datagrids:
     audit-grid:
-        acl_resource: oro_dataaudit_history
+        acl_resource: oro_dataaudit_view
         options:
             entityHint: audits
         source:
@@ -38,9 +38,6 @@ datagrids:
                         impersonation:
                             join: ua.impersonation
                             alias: i
-                where:
-                    and:
-                        - o.id = @oro_security.token_accessor->getOrganizationId
                 groupBy: a.id, o.name, author
         columns:
             action:
@@ -128,7 +125,7 @@ datagrids:
                     enabled: false
 
     audit-history-grid:
-        acl_resource: oro_dataaudit_history
+        acl_resource: oro_dataaudit_view
         source:
             type: orm
             query:

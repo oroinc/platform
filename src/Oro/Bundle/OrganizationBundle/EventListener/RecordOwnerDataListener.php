@@ -4,30 +4,32 @@ namespace Oro\Bundle\OrganizationBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class RecordOwnerDataListener
 {
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    /** @var TokenAccessor*/
+    protected $tokenAccessor;
 
     /** @var ConfigProvider */
     protected $configProvider;
 
     /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param ConfigProvider        $configProvider
+     * @param TokenAccessor $tokenAccessor
+     * @param ConfigProvider $configProvider
      */
-    public function __construct(TokenStorageInterface $tokenStorage, ConfigProvider $configProvider)
+    public function __construct(TokenAccessor $tokenAccessor, ConfigProvider $configProvider)
     {
-        $this->tokenStorage = $tokenStorage;
+        $this->tokenAccessor = $tokenAccessor;
         $this->configProvider = $configProvider;
     }
 
@@ -39,14 +41,11 @@ class RecordOwnerDataListener
      */
     public function prePersist(LifecycleEventArgs $args)
     {
-        $token = $this->tokenStorage->getToken();
-        if (!$token) {
+        if (!$this->tokenAccessor->hasUser()) {
             return;
         }
-        $user = $token->getUser();
-        if (!$user) {
-            return;
-        }
+
+        $token = $this->tokenAccessor->getToken();
         $entity    = $args->getEntity();
         $className = ClassUtils::getClass($entity);
         if ($this->configProvider->hasConfig($className)) {

@@ -15,7 +15,9 @@
     @include clearfix();
   
     .toolbar-sticky-container & {
-        margin: 0;
+        margin: auto;
+
+        max-width: $site-width;
     }
 
     &__dropdown {

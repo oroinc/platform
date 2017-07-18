@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use WebDriver\Exception\ElementNotVisible;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 
 /**
  * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
- * @method GridRow getRowByContent($content) @see Table::getRowByContent($content)
- * @method GridRow[] getRows() @see Table::getRows()
  */
 class Grid extends Table implements GridInterface
 {
@@ -17,6 +16,39 @@ class Grid extends Table implements GridInterface
     const TABLE_ROW_ELEMENT = 'GridRow';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
     const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRows()
+    {
+        /** @var Table $table */
+        $table = $this->getElement('GridTable');
+
+        return $table->getRowElements(static::TABLE_ROW_ELEMENT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRowByContent($content)
+    {
+        /** @var Table $table */
+        $table = $this->getElement('GridTable');
+
+        return $table->getRowByContentElement($content, static::TABLE_ROW_ELEMENT);
+    }
+
+    /**
+     * @return TableHeader
+     */
+    public function getHeader()
+    {
+        /** @var Table $table */
+        $table = $this->getElement('GridTable');
+
+        return $table->getHeaderElement(static::TABLE_HEADER_ELEMENT);
+    }
 
     /**
      * {@inheritdoc}
@@ -36,14 +68,6 @@ class Grid extends Table implements GridInterface
     public function getMassActionLink($title)
     {
         return $this->elementFactory->createElement('GridFloatingMenu')->findLink($title);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSelectAllMassActionLink($title)
-    {
-        return $this->getElement('GridActionsMassActionMenu')->findLink($title);
     }
 
     /**
@@ -69,7 +93,7 @@ class Grid extends Table implements GridInterface
         $massActionsButton = $this->getMassActionButton();
         $massActionsButton->press();
 
-        $massActionLink = $this->getSelectAllMassActionLink($title);
+        $massActionLink = $this->getMassActionLink($title);
         self::assertNotNull($massActionLink, 'Mass action link not found on the page');
         self::assertTrue($massActionLink->isVisible(), 'Mass action link is not visible');
 

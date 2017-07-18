@@ -2,6 +2,8 @@ define(function(require) {
     'use strict';
 
     var DictionaryFilter;
+    var template = require('tpl!orofilter/templates/filter/dictionary-filter.html');
+    var fieldTemplate = require('tpl!orofilter/templates/filter/select-field.html');
     var $ = require('jquery');
     var routing = require('routing');
     var _ = require('underscore');
@@ -28,6 +30,7 @@ define(function(require) {
          *
          * @property
          */
+        template: template,
         templateSelector: '#dictionary-filter-template',
 
         /**
@@ -35,6 +38,7 @@ define(function(require) {
          *
          * @property
          */
+        fieldTemplate: fieldTemplate,
         fieldTemplateSelector: '#select-field-template',
 
         /**
@@ -242,9 +246,6 @@ define(function(require) {
             var select2element = this.$el.find(this.elementSelector);
             var values = this.getDataForSelect2();
 
-            if (select2Config.data.results.length > 100) {
-                select2Config.minimumInputLength = 2;
-            }
             select2element.removeClass('hide');
             select2element.attr('multiple', 'multiple');
             select2element.inputWidget('create', 'select2', {initializeOptions: select2Config});
@@ -298,6 +299,10 @@ define(function(require) {
                 config.data = {
                     results: this.select2ConfigData
                 };
+
+                if (config.data.results.length > 100) {
+                    config.minimumInputLength = 2;
+                }
             }
 
             if (this.templateTheme === '') {
@@ -342,7 +347,7 @@ define(function(require) {
          */
         _getParts: function() {
             var value = _.extend({}, this.emptyValue, this.getValue());
-            var dictionaryPartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var dictionaryPartTemplate = this._getTemplate('fieldTemplate');
             var parts = [];
             var selectedPartLabel = this._getSelectedChoiceLabel('choices', this.value);
             // add date parts only if embed template used

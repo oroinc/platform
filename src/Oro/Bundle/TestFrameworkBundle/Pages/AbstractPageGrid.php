@@ -13,7 +13,6 @@ use PHPUnit_Framework_Assert;
  */
 abstract class AbstractPageGrid extends AbstractPage
 {
-
     const NEW_ENTITY_BUTTON = '';
 
     protected $gridPath = '';

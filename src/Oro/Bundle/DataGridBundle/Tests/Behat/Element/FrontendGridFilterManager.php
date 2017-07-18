@@ -20,12 +20,26 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $filterItem->click();
+        $filterItem->getParent()->click();
 
         self::assertTrue(
             $filterItem->isChecked(),
             'Can not check filter item ' . $title
         );
+    }
+
+    /**
+     * @param string $title
+     *
+     * @return bool
+     */
+    public function isCheckColumnFilter($title)
+    {
+        $this->ensureManagerVisible();
+
+        $filterItem = $this->getFilterCheckbox($title);
+
+        return $filterItem->isChecked();
     }
 
     /**
@@ -41,7 +55,7 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $visibilityCheckbox->click();
+        $visibilityCheckbox->getParent()->click();
 
         self::assertFalse(
             $visibilityCheckbox->isChecked(),
@@ -69,7 +83,7 @@ class FrontendGridFilterManager extends Element
         if ($this->isVisible()) {
             return;
         }
-        $button = $this->elementFactory->createElement('FrontendGridFilterManagerButton');
+        $button = $this->elementFactory->createElement('GridFilterManagerButton');
         $button->click();
 
         self::assertTrue($this->isVisible(), 'Can not open grid filter manager dropdown');

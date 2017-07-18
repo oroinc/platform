@@ -4,11 +4,7 @@
 {% set isNew = record.getValue('is_new') %}
 
 <span class="nowrap">
-    {% if isNew == 1 %}
-        <strong>
-    {% endif %}
-        {{ EA.date_smart_format(date) }}
-    {% if isNew == 1 %}
-        </strong>
-    {% endif %}
+    {%- if isNew %}<strong>{% endif -%}
+    {{ EA.date_smart_format(date) }}
+    {%- if isNew %}</strong>{% endif -%}
 </span>

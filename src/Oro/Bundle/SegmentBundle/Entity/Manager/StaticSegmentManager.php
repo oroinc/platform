@@ -11,7 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Parameter;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 
@@ -24,22 +24,22 @@ class StaticSegmentManager
     protected $dynamicSegmentQB;
 
     /**
-     * @var OwnershipMetadataProvider
+     * @var OwnershipMetadataProviderInterface
      */
     protected $ownershipMetadataProvider;
 
     /**
-     * @param EntityManager              $em
-     * @param DynamicSegmentQueryBuilder $dynamicSegmentQB
-     * @param OwnershipMetadataProvider  $ownershipMetadataProvider
+     * @param EntityManager                       $em
+     * @param DynamicSegmentQueryBuilder          $dynamicSegmentQB
+     * @param OwnershipMetadataProviderInterface  $ownershipMetadataProvider
      */
     public function __construct(
         EntityManager $em,
         DynamicSegmentQueryBuilder $dynamicSegmentQB,
-        OwnershipMetadataProvider $ownershipMetadataProvider
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider
     ) {
-        $this->em                        = $em;
-        $this->dynamicSegmentQB          = $dynamicSegmentQB;
+        $this->em = $em;
+        $this->dynamicSegmentQB = $dynamicSegmentQB;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
@@ -197,7 +197,7 @@ class StaticSegmentManager
     {
         $organizationField = $this->ownershipMetadataProvider
             ->getMetadata($segment->getEntity())
-            ->getGlobalOwnerFieldName();
+            ->getOrganizationFieldName();
         if ($organizationField) {
             $qb->andWhere(
                 sprintf(

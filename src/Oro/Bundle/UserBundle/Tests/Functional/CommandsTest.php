@@ -86,7 +86,7 @@ class CommandsTest extends WebTestCase
     protected function prepareData()
     {
         return array(
-            "user" => array (
+            "user" => array(
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => '1',

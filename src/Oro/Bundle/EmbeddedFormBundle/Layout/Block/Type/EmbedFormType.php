@@ -44,7 +44,6 @@ class EmbedFormType extends AbstractType
      */
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
-
         $this->addBlockType(
             $builder,
             EmbedFormStartType::NAME,

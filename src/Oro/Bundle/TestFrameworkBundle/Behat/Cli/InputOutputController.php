@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\TestIsolationSubscriber;
-use Oro\Bundle\TestFrameworkBundle\Behat\Listener\FixturesSubscriber;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InputOutputController implements Controller
 {
-    /** @var  TestIsolationSubscriber*/
+    /** @var  TestIsolationSubscriber */
     protected $testIsolationSubscriber;
 
     public function __construct(TestIsolationSubscriber $testIsolationSubscriber)

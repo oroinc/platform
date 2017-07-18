@@ -24,6 +24,10 @@ oro_behat_extension:
       selector: 'tbody tr'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
+    GridTable:
+      selector: 'table.grid'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
+
     GridRowAction:
         selector: '.launchers-list a.action'
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -40,7 +44,7 @@ oro_behat_extension:
         selector: 'div.filters-state'
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    GridFilersButton:
+    GridFiltersButton:
       selector: 'div.toolbar div.actions-panel .action[title=Filters]'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
 
@@ -64,12 +68,12 @@ oro_behat_extension:
       selector: 'div.column-manager div.dropdown-menu'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager
 
-    FrontendGridFilterManagerButton:
+    GridFilterManagerButton:
       selector: 'button.select-filter-widget'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    FrontendGridFilterManager:
-      selector: 'div.filter-container div.datagrid-manager div.dropdown-menu'
+    GridFilterManager:
+      selector: 'div.filter-container>div.dropdown-menu'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager
 
     GridColumnManagerTable:
@@ -115,10 +119,6 @@ oro_behat_extension:
       selector: '.dropdown-menu__floating'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    GridActionsMassActionMenu:
-      selector: 'th.action-column .datagrid-massaction__dropdown-menu'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-
     MassActionHeadCheckbox:
       selector: 'th.grid-header-cell-massAction div.btn-group .btn i'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -147,11 +147,46 @@ oro_behat_extension:
       selector: '.grid-views .btn:contains("Options")'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Account Mobile Button:
+      selector:
+        type: xpath
+        locator: '//*[contains(@data-sticky-target,"top-sticky-panel")]/descendant::button[contains(@class,"hidden-on-desktop")]/descendant::span[contains(@class,"fa-user")]/ancestor::button'
+
+    Manage Grid Fullscreen Popup:
+      selector:
+        type: xpath
+        locator: '//*[contains(@class, "fullscreen-popup")]/span[contains(.,"Manage grid")]'
+
+    Select All Button:
+      selector: 'a[data-role="column-manager-select-all"]'
+
+    Deselect All Button:
+      selector: 'a[data-role="column-manager-unselect-all"]'
+
+    Email Address Handle:
+      selector:
+        type: xpath
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "Email Address")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
+
+    First Name Handle:
+      selector:
+        type: xpath
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "First Name")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
+
+    Last Name In Grid Management:
+      selector:
+        type: xpath
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "Last Name")]'
+
+    Close Fullscreen Popup:
+      selector: '.fullscreen-popup__close'
+
   suites:
     OroDataGridBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - OroFormBundle::FormContext
         - OroDataGridBundle::GridContext
+        - OroApplicationBundle::CommerceMainContext
       paths:
         - '@OroDataGridBundle/Tests/Behat/Features'

@@ -8,5 +8,4 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
  */
 class DeletionQueryResultIterator extends BufferedIdentityQueryResultIterator
 {
-
 }

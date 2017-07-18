@@ -1,13 +1,13 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    'oro/filter/number-filter'
-], function($, _, __, tools, NumberFilter) {
+define(function(require) {
     'use strict';
 
     var NumberRangeFilter;
+    var template = require('tpl!orofilter/templates/filter/number-range-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var NumberFilter = require('oro/filter/number-filter');
 
     NumberRangeFilter = NumberFilter.extend({
 
@@ -16,6 +16,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#number-range-filter-template',
 
         /**

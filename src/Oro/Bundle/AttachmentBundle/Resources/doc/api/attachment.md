@@ -227,11 +227,11 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who is the owner of a specific attachment record
+Retrieve the record of the user who is the owner of a specific attachment record.
 
 #### get_relationship
 
-Retrieve the ID of a user who is the owner of a specific attachment record
+Retrieve the ID of a user who is the owner of a specific attachment record.
 
 #### update_relationship
 
@@ -256,11 +256,11 @@ Example:
 
 #### get_subresource
 
-Get full information about a record to which the attachment belongs to.
+Retrieve a record to which the attachment belongs to.
 
 #### get_relationship
 
-Get a record to which the attachment belongs to.
+Retrieve the ID of a record to which the attachment belongs to.
 
 #### update_relationship
 

@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var FiltersManager;
+    var template = require('tpl!orofilter/templates/filters-container.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -34,14 +35,9 @@ define(function(require) {
         filters: null,
 
         /**
-         * Template selector
-         */
-        templateSelector: '#filter-container',
-
-        /**
          * Template
          */
-        template: null,
+        template: template,
 
         /**
          * Mode of filters displaying
@@ -124,7 +120,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
-            this.template = _.template($(this.templateSelector).html());
+            this.template = this.getTemplateFunction();
             this.filters = {};
 
             _.extend(this, _.pick(options, prop));
@@ -341,6 +337,10 @@ define(function(require) {
             return this;
         },
 
+        getTemplateData: function() {
+            return {filters: this.filters};
+        },
+
         /**
          * Render filter list
          *
@@ -348,7 +348,7 @@ define(function(require) {
          */
         render: function() {
             this.setElement(
-                $(this.template({filters: this.filters}))
+                $(this.template(this.getTemplateData()))
             );
 
             this.dropdownContainer = this.$el.find('.filter-container');
@@ -426,11 +426,17 @@ define(function(require) {
                 multiselectDefaults,
                 {
                     selectedText: this.addButtonHint,
-                    open: $.proxy(function() {
+                    beforeopen: _.bind(function() {
+                        _.each(this.filters, function(filter) {
+                            filter.close();
+                        });
+                        this.selectWidget.onBeforeOpenDropdown();
+                    }, this),
+                    open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                     }, this),
-                    refresh: $.proxy(function() {
+                    refresh: _.bind(function() {
                         this.selectWidget.onRefresh();
                     }, this),
                     appendTo: this.dropdownContainer
@@ -483,9 +489,8 @@ define(function(require) {
          */
         _setButtonReset: function() {
             var $footerContainer = this._createButtonReset();
-            var $checkboxContainer = this.selectWidget.multiselect('instance').checkboxContainer;
-
-            $footerContainer.insertAfter($checkboxContainer);
+            var instance = this.selectWidget.multiselect('instance');
+            instance.menu.append($footerContainer);
         },
 
         /**

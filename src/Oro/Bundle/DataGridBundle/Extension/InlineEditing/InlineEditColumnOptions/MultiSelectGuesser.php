@@ -40,8 +40,10 @@ class MultiSelectGuesser extends ChoicesGuesser
                 $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
                 $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
+
+                $translatable = isset($column['translatable']) && $column['translatable'] === true;
                 $result[Configuration::CHOICES_KEY] = $this->choiceHelper
-                    ->getChoices($targetEntity, $keyField, $labelField);
+                    ->getChoices($targetEntity, $keyField, $labelField, null, $translatable);
 
                 $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
                 $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);

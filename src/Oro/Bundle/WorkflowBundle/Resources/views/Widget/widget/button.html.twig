@@ -3,8 +3,25 @@
     <div class="btn-group" id="{{ blockId }}">
         {% for data in workflow.transitionsData %}
             {# Show button for start or transit workflow #}
+            {% set transitionLabel = data.transition.label|trans({},'workflows') %}
+
+            {% if data.transition.frontendOptions.message is defined and data.transition.frontendOptions.message.content is defined %}
+                {% set frontendMessage = data.transition.frontendOptions.message %}
+
+                {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters|default({}), 'workflows') %}
+                {% if transitionMessage and transitionMessage != frontendMessage.content %}
+                    {# if no translation for message then do not show message #}
+                    {% set message = {
+                        content: transitionMessage|nl2br,
+                        title: frontendMessage.title|default(transitionLabel),
+                    } %}
+                {% endif %}
+            {% endif %}
+
             {% set transitionData = {
                 'enabled': data.isAllowed,
+                'transition-label': transitionLabel,
+                'message': (message|default({}))|json_encode,
                 'confirmation': data.transition.frontendOptions.confirmation|default({})|json_encode,
                 'transition-condition-messages': data.errors
             } %}

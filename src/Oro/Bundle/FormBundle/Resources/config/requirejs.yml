@@ -6,35 +6,10 @@ config:
         'jquery.validate-additional-methods':
             deps:
                 - 'jquery.validate'
-        'tinymce/plugins/textcolor/plugin.min':
-            deps:
-                - 'tinymce/tinymce.min'
-        'tinymce/plugins/bdesk_photo/plugin.min.js':
-            deps:
-                - 'tinymce/tinymce.min'
-        'tinymce/plugins/fullpage/plugin.min.js':
-            deps:
-                - 'tinymce/tinymce.min'
-        'tinymce/plugins/paste/plugin.min.js':
-            deps:
-                - 'tinymce/tinymce.min'
-        'tinymce/plugins/code/plugin.min':
-            deps:
-                - 'tinymce/tinymce.min'
-        'tinymce/plugins/link/plugin.min':
-            deps:
-                - 'tinymce/tinymce.min'
-        'tinymce/themes/modern/theme.min':
-            deps:
-                - 'tinymce/tinymce.min'
-        'tinymce/jquery.tinymce.min':
+        'tinymce/jquery.tinymce':
             deps:
                 - 'jquery'
-                - 'tinymce/tinymce.min'
-                - 'tinymce/plugins/textcolor/plugin.min'
-                - 'tinymce/plugins/code/plugin.min'
-                - 'tinymce/plugins/link/plugin.min'
-                - 'tinymce/themes/modern/theme.min'
+                - 'tinymce/tinymce'
             exports: 'jQuery'
     map:
         '*':
@@ -42,8 +17,10 @@ config:
         'oroform/js/extend/validate':
             'jquery.validate': 'jquery.validate'
     paths:
-        'jquery.validate': 'bundles/bowerassets/jquery-validate/jquery.validate.js'
-        'jquery.validate-additional-methods': 'bundles/bowerassets/jquery-validate/additional-methods.js'
+        'tinymce/tinymce': 'bundles/tinymce/tinymce.min.js'
+        'tinymce/jquery.tinymce': 'bundles/tinymce/jquery.tinymce.min.js'
+        'jquery.validate': 'bundles/bowerassets/jquery-validate/dist/jquery.validate.js'
+        'jquery.validate-additional-methods': 'bundles/bowerassets/jquery-validate/dist/additional-methods.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
         'oroform/js/validator/date': 'bundles/oroform/js/validator/date.js'
         'oroform/js/validator/datetime': 'bundles/oroform/js/validator/datetime.js'
@@ -107,11 +84,10 @@ config:
         'oroform/js/app/components/select-create-inline-type-async-component': 'bundles/oroform/js/app/components/select-create-inline-type-async-component.js'
         'oroform/js/app/components/entity-tree-select-form-type-component': 'bundles/oroform/js/app/components/entity-tree-select-form-type-component.js'
         'oroform/js/app/views/week-day-picker-view': 'bundles/oroform/js/app/views/week-day-picker-view.js'
+
+        'oroform/js/expression-editor-util': 'bundles/oroform/js/expression-editor-util.js'
+        'oroform/js/app/views/expression-editor-view': 'bundles/oroform/js/app/views/expression-editor-view.js'
 build:
     paths:
-        'tinymce/tinymce.min': 'empty:'
-        'tinymce/tinymce.jquery.min': 'empty:'
-        'tinymce/plugins/textcolor/plugin.min': 'empty:'
-        'tinymce/plugins/code/plugin.min': 'empty:'
-        'tinymce/plugins/link/plugin.min': 'empty:'
-        'tinymce/themes/modern/theme.min': 'empty:'
+        'tinymce/tinymce': 'empty:'
+        'tinymce/tinymce.jquery': 'empty:'

@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -17,15 +19,14 @@ use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadata;
 
     /** @var EventDispatcherInterface */
@@ -35,14 +36,14 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     protected $aclHelper;
 
     /**
-     * @param ContextRegistry           $contextRegistry
-     * @param ManagerRegistry           $registry
-     * @param OwnershipMetadataProvider $ownershipMetadata
+     * @param ContextRegistry                    $contextRegistry
+     * @param ManagerRegistry                    $registry
+     * @param OwnershipMetadataProviderInterface $ownershipMetadata
      */
     public function __construct(
         ContextRegistry $contextRegistry,
         ManagerRegistry $registry,
-        OwnershipMetadataProvider $ownershipMetadata
+        OwnershipMetadataProviderInterface $ownershipMetadata
     ) {
         parent::__construct($contextRegistry);
 
@@ -208,7 +209,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, Organization $organization = null)
     {
         if ($organization) {
-            $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getGlobalOwnerFieldName();
+            $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getOrganizationFieldName();
             if ($organizationField) {
                 $queryBuilder->andWhere('o.' . $organizationField . ' = :organization')
                     ->setParameter('organization', $organization);

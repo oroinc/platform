@@ -43,6 +43,10 @@
         }
     }
 
+    &[type="date"] {
+        min-height: $input-date-height;
+    }
+
     &--short {
         width: $input-width-short;
     }

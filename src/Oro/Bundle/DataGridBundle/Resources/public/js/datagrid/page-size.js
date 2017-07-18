@@ -1,8 +1,9 @@
 define([
+    'tpl!orodatagrid/templates/datagrid/page-size.html',
     'jquery',
     'underscore',
     'backbone'
-], function($, _, Backbone) {
+], function(template, $, _, Backbone) {
     'use strict';
 
     var PageSize;
@@ -16,7 +17,7 @@ define([
      */
     PageSize = Backbone.View.extend({
         /** @property */
-        template: '#template-datagrid-toolbar-page-size',
+        template: template,
 
         /** @property */
         events: {
@@ -51,7 +52,10 @@ define([
                 this.items = options.items;
             }
 
-            this.template = _.template($(options.template || this.template).html());
+            if (typeof this.template !== 'function' || options.template) {
+                this.template = _.template($(options.template || this.template).html());
+            }
+
             this.collection = options.collection;
             this.listenTo(this.collection, 'add', this.render);
             this.listenTo(this.collection, 'remove', this.render);

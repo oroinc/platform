@@ -125,7 +125,7 @@ define(function(require) {
             var parts = [];
             var value = _.extend({}, this.emptyValue, this.getValue());
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var datePartTemplate = this._getTemplate('fieldTemplate');
 
             var typeDefinedValues = _.values(this.typeDefinedValues);
             var typeDefinedValueChoices = _.filter(this.choices, function(choice) {

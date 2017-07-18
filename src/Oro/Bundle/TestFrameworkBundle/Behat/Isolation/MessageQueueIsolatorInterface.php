@@ -2,17 +2,23 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Symfony\Component\Process\Process;
-
 interface MessageQueueIsolatorInterface extends IsolatorInterface
 {
-    /**
-     * @param int $timeLimit Limit queue processing, seconds
-     */
-    public function waitWhileProcessingMessages($timeLimit = 60);
+    const TIMEOUT = 600;
 
     /**
-     * @return Process|null
+     * @param int $timeLimit Limit queue processing, seconds
+     * @return void
      */
-    public function getProcess();
+    public function waitWhileProcessingMessages($timeLimit = self::TIMEOUT);
+
+    /**
+     * @return void
+     */
+    public function stopMessageQueue();
+
+    /**
+     * @return void
+     */
+    public function startMessageQueue();
 }

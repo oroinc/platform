@@ -34,4 +34,12 @@ class BlockView extends FormView
     {
         return array_key_exists('id', $this->vars) ? $this->vars['id'] : null;
     }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return array_key_exists('visible', $this->vars) ? (bool) $this->vars['visible'] : true;
+    }
 }

@@ -8,7 +8,6 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -232,6 +231,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 );
             }
         }
+    }
+
+    /**
+     * Example: And I should see following grid with exact columns order:
+     *            | First name | Last name | Primary Email     | Enabled | Status |
+     *            | John       | Doe       | admin@example.com | Enabled | Active |
+     *
+     * @Then /^(?:|I )should see following grid with exact columns order:$/
+     * @Then /^(?:|I )should see following "(?P<gridName>[\w\s]+)" grid with exact columns order:$/
+     */
+    public function iShouldSeeFollowingGridWithOrder(TableNode $table, $gridName = null)
+    {
+        $this->waitForAjax();
+        $grid = $this->getGrid($gridName);
+        $tableHeaders = $table->getRow(0);
+        $gridHeader = $grid->getHeader();
+
+        foreach ($tableHeaders as $tableHeaderIndex => $tableHeaderValue) {
+            self::assertEquals(
+                $tableHeaderIndex + 1,
+                $gridHeader->getColumnNumber($tableHeaderValue),
+                'Wrong order of columns in grid'
+            );
+        }
+
+        $this->iShouldSeeFollowingGrid($table, $gridName);
     }
 
     /**
@@ -625,9 +650,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Email   | charlie@gmail.com   |
      *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\@]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\@\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\@\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
+     * @Then /^(?:|I )should see (?P<content>[\w\s\.\_\-\@]+) in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
      */
     //@codingStandardsIgnoreEnd
     public function assertRowValues($content, TableNode $table, $gridName = null)
@@ -962,7 +987,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $actions = array_map(
             function (Element $action) {
-                return $action->getText();
+                return $action->getText() ?: $action->getAttribute('title');
             },
             $row->getActionLinks()
         );
@@ -1004,6 +1029,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
         $this->waitForAjax();
+    }
+
+    /**
+     * Click on first row action.
+     * Example: And click view on first row in grid
+     *
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)" grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $action
+     * @param string $gridName
+     */
+    public function clickActionOnFirstRow($action, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        if (!empty($grid->getRows()[0])) {
+            $row = $grid->getRows()[0];
+            $link = $row->getActionLink($action);
+            $link->click();
+        }
     }
 
     /**
@@ -1191,12 +1237,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I shouldn't see Example column in grid
      *
      * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
-     * @param $columnName
+     * @Then /^(?:|I )shouldn't see "(?P<columnName>(?:[^"]|\\")*)" column in "(?P<gridName>[\w\s]+)"$/
+     * @param string $columnName
+     * @param null|string $gridName
      */
-    public function iShouldNotSeeColumnInGrid($columnName)
+    public function iShouldNotSeeColumnInGrid($columnName, $gridName = null)
     {
         self::assertFalse(
-            $this->getGrid()->getHeader()->hasColumn($columnName),
+            $this->getGrid($gridName)->getHeader()->hasColumn($columnName),
             sprintf('"%s" column is in grid', $columnName)
         );
     }
@@ -1206,12 +1254,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then I should see Example column in grid
      *
      * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in grid$/
-     * @param $columnName
+     * @Then /^(?:|I )should see "(?P<columnName>(?:[^"]|\\")*)" column in "(?P<gridName>[\w\s]+)"$/
+     * @param string $columnName
+     * @param null|string $gridName
      */
-    public function iShouldSeeColumnInGrid($columnName)
+    public function iShouldSeeColumnInGrid($columnName, $gridName = null)
     {
         self::assertTrue(
-            $this->getGrid()->getHeader()->hasColumn($columnName),
+            $this->getGrid($gridName)->getHeader()->hasColumn($columnName),
             sprintf('"%s" column is not in grid', $columnName)
         );
     }
@@ -1258,7 +1308,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I) hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
      * @When /^(?:|I) hide all columns in grid$/
-     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"/
+     * @When /^(?:|I) hide all columns in "(?P<gridName>[\w\s]+)"$/
      *
      * @param string $exceptions
      * @param string|null $gridName
@@ -1347,12 +1397,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
         $filterManager->close();
     }
@@ -1369,14 +1419,113 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement('GridFilersButton')->open();
-        $filterButton = $grid->getElement('FrontendGridFilterManagerButton');
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
-        /** @var FrontendGridFilterManager $filterManager */
-        $filterManager = $grid->getElement('FrontendGridFilterManager');
+        /** @var GridFilterManager $filterManager */
+        $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
         $filterManager->close();
+    }
+
+    /**
+     * @When /^I select following records in "(?P<name>[\s\w]+)" grid:$/
+     * @When /^I select following records in grid:$/
+     * @param TableNode $table
+     * @param string $name
+     */
+    public function iSelectFollowingRecordsInGrid(TableNode $table, $name = 'Grid')
+    {
+        $grid = $this->getGrid($name);
+
+        foreach ($table->getRows() as $index => $record) {
+            $grid->getRowByContent(reset($record))
+                ->checkMassActionCheckbox();
+        }
+    }
+
+    /**
+     * @Given /^I should not see "(?P<gridName>[\s\w]+)" grid$/
+     */
+    public function iShouldNotSeeGrid($gridName = 'Grid')
+    {
+        $grid = $this->elementFactory->createElement($gridName);
+
+        self::assertFalse(
+            $grid->isIsset(),
+            sprintf('Grid "%s" was found on page, but it should not.', $gridName)
+        );
+    }
+
+    /**
+     * Example: I should see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should see following elements in grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertTrue(
+                    $element->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertTrue(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        }
+    }
+
+    /**
+     * Example: I should not see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should not see following elements in grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldNotSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertFalse(
+                    $element->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertFalse(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        }
     }
 
     /**
