@@ -11,8 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SuiteSetDividerController implements Controller
 {
-    const GENERATED_SUITE_SET_PREFIX = 'AutoSuiteSet#';
-
     /**
      * @var SuiteConfigurationRegistry
      */

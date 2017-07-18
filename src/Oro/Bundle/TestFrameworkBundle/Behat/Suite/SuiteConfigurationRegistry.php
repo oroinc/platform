@@ -23,7 +23,7 @@ class SuiteConfigurationRegistry
     /**
      * @var SuiteConfiguration[]
      */
-    private $suiteConfigurations;
+    private $suiteConfigurations = [];
 
     /**
      * @var KernelInterface
