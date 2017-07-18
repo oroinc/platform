@@ -107,8 +107,7 @@ class OroMainContext extends MinkContext implements
         $timeElapsedSecs = microtime(true) - $start;
 
         if (!$result) {
-            fwrite(
-                STDOUT,
+            self::fail(
                 sprintf(
                     'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
                     $timeElapsedSecs
