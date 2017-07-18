@@ -8,6 +8,9 @@
 
 namespace Oro\Component\PropertyAccess;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\PersistentCollection;
+use Oro\Bundle\ProductBundle\Entity\Product;
 use Symfony\Component\PropertyAccess\Exception;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -546,13 +549,26 @@ class PropertyAccessor implements PropertyAccessorInterface
             $reflClass = new \ReflectionClass($object);
             $camelized = $this->camelize($property);
             $singulars = (array)StringUtil::singularify($camelized);
+            $shouldRemoveItems = true;
+
+            $objectValue = $this->getValue($object, $property);
+            //if the value we want to add is not an array and we try to add it to a collection,
+            // then we don't want to overwrite the old values, instead add the new value to the collection
+            if (!is_array($value)
+                && ($objectValue instanceof \ArrayAccess || is_array($object))
+            ) {
+                //we try to add a value to a collection and we don't want to remove old items
+                $value = [$value];
+                $shouldRemoveItems = false;
+            }
+
 
             if (is_array($value) || $value instanceof \Traversable) {
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);
 
                 // Use addXxx() and removeXxx() to write the collection
                 if (null !== $methods) {
-                    $this->writeCollection($object, $property, $value, $methods[0], $methods[1]);
+                    $this->writeCollection($object, $property, $value, $methods[0], $methods[1], $shouldRemoveItems);
 
                     return;
                 }
@@ -620,8 +636,14 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
      */
-    protected function writeCollection($object, $property, $collection, $addMethod, $removeMethod)
-    {
+    protected function writeCollection(
+        $object,
+        $property,
+        $collection,
+        $addMethod,
+        $removeMethod,
+        $shouldRemoveItems = true
+    ) {
         // At this point the add and remove methods have been found
         // Use iterator_to_array() instead of clone in order to prevent side effects
         // see https://github.com/symfony/symfony/issues/4670
@@ -630,7 +652,8 @@ class PropertyAccessor implements PropertyAccessorInterface
         $propertyValue = $this->readValue($object, $property, false);
         $previousValue = $propertyValue[self::VALUE];
 
-        if (is_array($previousValue) || $previousValue instanceof \Traversable) {
+        if (is_array($previousValue)
+            || $previousValue instanceof \Traversable) {
             foreach ($previousValue as $previousItem) {
                 foreach ($collection as $key => $item) {
                     if ($item === $previousItem) {
@@ -642,8 +665,10 @@ class PropertyAccessor implements PropertyAccessorInterface
                     }
                 }
 
-                // Item not found, add to remove list
-                $itemToRemove[] = $previousItem;
+                if (true === $shouldRemoveItems) {
+                    // Item not found, add to remove list
+                    $itemToRemove[] = $previousItem;
+                }
             }
         }
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Processor;
 
 use Symfony\Component\PropertyAccess\StringUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Doctrine\ORM\EntityManager;
 
@@ -18,6 +17,7 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class ProcessLocalizedFields implements ProcessorInterface
 {
@@ -27,7 +27,7 @@ class ProcessLocalizedFields implements ProcessorInterface
     /** @var  DoctrineHelper */
     protected $doctrinHelper;
 
-    /** @var  PropertyAccess */
+    /** @var  PropertyAccessor */
     protected $propertyAccessor;
 
     /**
@@ -38,7 +38,7 @@ class ProcessLocalizedFields implements ProcessorInterface
     {
         $this->localizationHelper = $localizationHelper;
         $this->doctrinHelper = $doctrineHelper;
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -139,8 +139,7 @@ class ProcessLocalizedFields implements ProcessorInterface
                 $parent !== null ? FallbackType::PARENT_LOCALIZATION : FallbackType::SYSTEM
             );
         }
-        $addMethod = $this->getEntityAdderMethod($entity, $relationName);
-        $entity->{$addMethod}($localizedFallbackValue);
+        $this->propertyAccessor->setValue($entity, $relationName, $localizedFallbackValue);
 
         $em->persist($localizedFallbackValue);
     }
