@@ -43,8 +43,7 @@ class AvailableFeaturesController implements Controller
                 '--available-features',
                 null,
                 InputOption::VALUE_NONE,
-                'Show all available test suites.'.PHP_EOL.
-                'Suites can be configured automatically by extensions, and manually by configuration'
+                'Output available registered features'
             );
     }
 
@@ -56,8 +55,6 @@ class AvailableFeaturesController implements Controller
         if (!$input->getOption('available-features')) {
             return;
         }
-
-        $features = [];
 
         foreach ($this->suiteRepository->getSuites() as $suite) {
             $iterators = $this->specificationFinder->findSuitesSpecifications([$suite]);

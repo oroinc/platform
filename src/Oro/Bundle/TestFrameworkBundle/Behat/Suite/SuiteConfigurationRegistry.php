@@ -66,6 +66,7 @@ class SuiteConfigurationRegistry
     /**
      * @param $name
      * @return SuiteConfiguration[]
+     * @throws \InvalidArgumentException in case if given suite set is not defined
      */
     public function getSet($name)
     {
@@ -78,6 +79,7 @@ class SuiteConfigurationRegistry
 
     /**
      * @param int $divider
+     * @return void
      */
     public function divideSuites($divider)
     {
@@ -97,6 +99,10 @@ class SuiteConfigurationRegistry
         }
     }
 
+    /**
+     * @param int $divider
+     * @return void
+     */
     public function genererateSets($divider)
     {
         $this->suiteSets = $this->specificationDivider->divide(
@@ -116,6 +122,7 @@ class SuiteConfigurationRegistry
 
     /**
      * @param string $name Suite name
+     * @return SuiteConfiguration
      * @throws \InvalidArgumentException if suite name is not configured
      */
     public function getSuiteConfig($name)
@@ -134,6 +141,7 @@ class SuiteConfigurationRegistry
 
     /**
      * @param array $suiteConfigurations
+     * @return void
      */
     public function setSuiteConfigurations(array $suiteConfigurations)
     {

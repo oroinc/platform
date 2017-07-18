@@ -27,16 +27,7 @@ services:
             - '@suite.registry'
             - '@specifications.finder'
         tags:
-            - { name: cli.controller, priority: 900 }
-
-    cli.controller.available_suite_groups:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteGroupsController
-        arguments:
-            - '@suite.registry'
-            - '@specifications.finder'
-            - '%oro_test.suite_groups%'
-        tags:
-            - { name: cli.controller, priority: 800 }
+            - { name: cli.controller, priority: 1000 }
 
     cli.controller.available_suites:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
@@ -44,14 +35,14 @@ services:
             - '@suite.registry'
             - '@specifications.finder'
         tags:
-            - { name: cli.controller, priority: 700 }
+            - { name: cli.controller, priority: 900 }
 
     cli.controller.available_suite_sets:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteSetsController
         arguments:
             - '@oro_behat_extension.suite.suite_configuration_registry'
         tags:
-            - { name: cli.controller, priority: 600 }
+            - { name: cli.controller, priority: 800 }
 
     cli.controller.mesure_execution_time:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController

@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
-use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteSetRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,11 +17,6 @@ class SuiteSetDividerController implements Controller
      * @var SuiteConfigurationRegistry
      */
     protected $suiteConfigRegistry;
-
-    /**
-     * @var SuiteSetRegistry
-     */
-    protected $suiteSetRegistry;
 
     /**
      * @param SuiteConfigurationRegistry $suiteConfigRegistry

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
-use Behat\Testwork\Suite\SuiteRepository;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,7 +33,8 @@ class AvailableSuiteSetsController implements Controller
             ->addOption(
                 '--available-suite-sets',
                 null,
-                InputOption::VALUE_NONE
+                InputOption::VALUE_NONE,
+                'Output all available suite sets'
             )
         ;
     }

@@ -25,31 +25,31 @@ class SpecificationDivider
      *      'AcmeSuite#0' and 'AcmeSuite#1' with 5 features each
      *      and 'AcmeSuite#2' with 4 features
      *
-     * @param string $suiteName e.g. AcmeSuite
-     * @param array $paths Paths to feature files or directories with feature files
+     * @param string $baseName e.g. AcmeSuite
+     * @param array $array Paths to feature files or directories with feature files
      * @param int $divider
      * @return array [
      *                 'AcmeSuite#0' => ['/path/to/first.feature', '/path/to/second.feature],
      *                 'AcmeSuite#1' => ['/path/to/third.feature'],
      *               ]
      */
-    public function divide($suiteName, array $paths, $divider)
+    public function divide($baseName, array $array, $divider)
     {
         $generatedSuites = [];
 
-        $chunks = $this->getChunks($paths, $divider);
+        $chunks = $this->getChunks($array, $divider);
         foreach ($chunks as $index => $chunk) {
-            $generatedSuiteName = $suiteName.'#'.$index;
+            $generatedSuiteName = $baseName.'#'.$index;
             $generatedSuites[$generatedSuiteName] = $chunk;
         }
 
         return $generatedSuites;
     }
 
-    private function getChunks(array $paths, $divider)
+    private function getChunks(array $array, $divider)
     {
-        $count = count($paths);
-        $chunks = array_chunk($paths, $divider);
+        $count = count($array);
+        $chunks = array_chunk($array, $divider);
 
         if (0 === $count%$divider) {
             return $chunks;

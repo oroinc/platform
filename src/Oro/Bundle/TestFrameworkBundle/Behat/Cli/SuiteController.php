@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
 use Behat\Testwork\Suite\SuiteRegistry;
-use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry as OroSuiteRegistry;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SuiteController implements Controller
 {
     /**
-     * @var OroSuiteRegistry
+     * @var SuiteConfigurationRegistry
      */
     protected $suiteConfigRegistry;
 
@@ -23,9 +23,10 @@ class SuiteController implements Controller
     protected $behatSuiteRegistry;
 
     /**
-     * @param OroSuiteRegistry $suiteConfigRegistry
+     * @param SuiteConfigurationRegistry $suiteConfigRegistry
+     * @param SuiteRegistry $behatSuiteRegistry
      */
-    public function __construct(OroSuiteRegistry $suiteConfigRegistry, SuiteRegistry $behatSuiteRegistry)
+    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry, SuiteRegistry $behatSuiteRegistry)
     {
         $this->suiteConfigRegistry = $suiteConfigRegistry;
         $this->behatSuiteRegistry = $behatSuiteRegistry;

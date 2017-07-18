@@ -6,17 +6,33 @@ use Behat\Testwork\Suite\Suite;
 
 class SuiteConfiguration implements Suite
 {
+    /**
+     * @var string
+     */
     protected $name;
 
-    protected $settings;
+    /**
+     * @var array
+     */
+    protected $settings = [];
 
-    protected $type;
+    /**
+     * @var string|null
+     */
+    protected $type = null;
 
+    /**
+     * @param string $name
+     */
     public function __construct($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @param string $name
+     * @return $this
+     */
     public function setName($name)
     {
         $this->name = $name;
@@ -24,6 +40,10 @@ class SuiteConfiguration implements Suite
         return $this;
     }
 
+    /**
+     * @param string $type
+     * @return $this
+     */
     public function setType($type)
     {
         $this->type = $type;
@@ -31,20 +51,27 @@ class SuiteConfiguration implements Suite
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getType()
     {
         return $this->type;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getName()
     {
         return $this->name;
     }
 
-    public function setSettings($settings)
+    /**
+     * @param array $settings
+     * @return $this
+     */
+    public function setSettings(array $settings)
     {
         $this->settings = $settings;
 
@@ -52,13 +79,18 @@ class SuiteConfiguration implements Suite
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function getSettings()
     {
         return $this->settings;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
     public function setSetting($key, $value)
     {
         $this->settings[$key] = $value;
@@ -67,7 +99,7 @@ class SuiteConfiguration implements Suite
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function hasSetting($key)
     {
@@ -75,7 +107,8 @@ class SuiteConfiguration implements Suite
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed
+     * @throws \InvalidArgumentException in case when setting is not exist
      */
     public function getSetting($key)
     {
@@ -86,6 +119,9 @@ class SuiteConfiguration implements Suite
         return $this->settings[$key];
     }
 
+    /**
+     * @return array
+     */
     public function getPaths()
     {
         return $this->getSetting('paths');

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
-use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry as OroSuiteRegistry;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,16 +12,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SuiteDividerController implements Controller
 {
     /**
-     * @var OroSuiteRegistry
+     * @var SuiteConfigurationRegistry
      */
-    protected $oroSuiteRegistry;
+    protected $suiteConfigRegistry;
 
     /**
-     * @param OroSuiteRegistry $oroSuiteRegistry
+     * @param SuiteConfigurationRegistry $suiteConfigRegistry
      */
-    public function __construct(OroSuiteRegistry $oroSuiteRegistry)
+    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry)
     {
-        $this->oroSuiteRegistry = $oroSuiteRegistry;
+        $this->suiteConfigRegistry = $suiteConfigRegistry;
     }
 
     /**
@@ -36,7 +36,7 @@ class SuiteDividerController implements Controller
                 InputOption::VALUE_REQUIRED,
                 'Divide suite to several.'.PHP_EOL.
                 'e.g. if AcmeDemo suite has 13 features, and suites-divider is 5, so 3 suites will be created'.PHP_EOL.
-                'AcmeDemo#1 and AcmeDemo#2 suites with 5 features, and AcmeDemo#3 with 3 features'.PHP_EOL.
+                'AcmeDemo#1 with 5 features, and AcmeDemo#2 and AcmeDemo#3 suites with 4 features'.PHP_EOL.
                 'Original AcmeDemo suite will be excluded from list.'
             )
         ;
@@ -47,10 +47,10 @@ class SuiteDividerController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$divider = $input->getOption('suite-divider')) {
+        if (!$divider = (int) $input->getOption('suite-divider')) {
             return;
         }
 
-        $this->oroSuiteRegistry->divideSuites($divider);
+        $this->suiteConfigRegistry->divideSuites($divider);
     }
 }
