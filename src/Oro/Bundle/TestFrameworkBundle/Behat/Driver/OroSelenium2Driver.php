@@ -232,46 +232,44 @@ JS;
     /**
      * Wait AJAX request
      * @param int $time Time should be in milliseconds
-     * @param int $attempts
      * @return bool
      */
-    public function waitForAjax($time = 120000, $attempts = 5)
+    public function waitForAjax($time = 60000)
     {
-        $this->waitPageToLoad($time);
-        $attemptsNumber = $attempts;
-        $start = microtime(true);
-        $end = $start + $time / 1000.0;
-
         $jsAppActiveCheck = <<<JS
         (function () {
             if (typeof(jQuery) == "undefined" || jQuery == null) {
                 return false;
             }
+            
+            if (jQuery.active) {
+                return false;
+            }
+            
+            if (jQuery(document.body).hasClass('loading')) {
+                return false;
+            }
 
-            var isAppActive = 0 !== jQuery("div.loader-mask.shown").length;
+            if (0 !== jQuery("div.loader-mask.shown").length) {
+                return false;
+            }
+            
             try {
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');
                 }
-                isAppActive = isAppActive || window.mediatorCachedForSelenium.execute('isInAction');
+                if (window.mediatorCachedForSelenium.execute('isInAction')) {
+                    return false;
+                }
             } catch (e) {
                 return false;
             }
 
-            return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
+            return true;
         })();
 JS;
 
-        $result = false;
-        while (microtime(true) < $end && $attemptsNumber > 0) {
-            if ($result = $this->wait($time, $jsAppActiveCheck)) {
-                $attemptsNumber--;
-            } else {
-                $attemptsNumber = $attempts;
-            }
-        }
-
-        return $result;
+        return $this->wait($time, $jsAppActiveCheck);
     }
 
     /**
