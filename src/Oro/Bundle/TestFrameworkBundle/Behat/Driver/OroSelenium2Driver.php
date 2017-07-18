@@ -234,7 +234,7 @@ JS;
      * @param int $time Time should be in milliseconds
      * @return bool
      */
-    public function waitForAjax($time = 60000)
+    public function waitForAjax($time = 120000)
     {
         $jsAppActiveCheck = <<<JS
         (function () {
