@@ -62,6 +62,11 @@ oro:
             choose_country: "Choose a country..."
             choose_region:  "Choose a state..."
 
+        validation:
+            invalid_first_name_field: 'First Name and Last Name or Organization should not be blank.'
+            invalid_last_name_field: 'Last Name and First Name or Organization should not be blank.'
+            invalid_organization_field: 'Organization or First Name and Last Name should not be blank.'
+
         region:
             entity_label:        State
             entity_plural_label: States

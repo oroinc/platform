@@ -1,13 +1,13 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oro/filter/datetime-filter',
-    'oro/filter/choice-filter',
-    'oroentity/js/field-choice',
-    'oroquerydesigner/js/field-condition'
-], function($, _, __, DateTimeFilter, ChoiceFilter) {
+define(function(require) {
     'use strict';
+
+    var choiceTemplate = require('tpl!orofilter/templates/filter/embedded/simple-choice-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var DateTimeFilter = require('oro/filter/datetime-filter');
+    var ChoiceFilter = require('oro/filter/choice-filter');
+    require('oroquerydesigner/js/field-condition');
 
     $.widget('oroauditquerydesigner.dataAuditCondition', $.oroquerydesigner.fieldCondition, {
         options: {
@@ -52,7 +52,7 @@ define([
 
             this.auditTypeFilter = new ChoiceFilter({
                 caret: '',
-                templateSelector: '#simple-choice-filter-template-embedded',
+                template: choiceTemplate,
                 choices: {
                     changed: __('oro.dataaudit.data_audit_condition.changed'),
                     changed_to_value: __('oro.dataaudit.data_audit_condition.changed_to_value')

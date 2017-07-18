@@ -1,9 +1,10 @@
 define([
+    'tpl!orodatagrid/templates/datagrid/pagination-input.html',
     'jquery',
     'underscore',
     './pagination',
     'jquery.numeric'
-], function($, _, Pagination) {
+], function(template, $, _, Pagination) {
     'use strict';
 
     var PaginationInput;
@@ -17,7 +18,7 @@ define([
      */
     PaginationInput = Pagination.extend({
         /** @property */
-        template: '#template-datagrid-toolbar-pagination-input',
+        template: template,
 
         /** @property */
         events: {

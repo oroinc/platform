@@ -1,14 +1,20 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './empty-filter',
-    'oroui/js/tools',
-    'oroui/js/mediator'
-], function($, _, __, EmptyFilter, tools, mediator) {
+define(function(require) {
     'use strict';
 
     var TextFilter;
+    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
+    var template = require('tpl!orofilter/templates/filter/text-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var EmptyFilter = require('./empty-filter');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+
+    var config = require('module').config();
+    config = _.extend({
+        notAlignCriteria: tools.isMobile()
+    }, config);
 
     /**
      * Text grid filter.
@@ -25,8 +31,9 @@ define([
     TextFilter = EmptyFilter.extend({
         wrappable: true,
 
-        wrapperTemplate: '',
+        notAlignCriteria: config.notAlignCriteria,
 
+        wrapperTemplate: wrapperTemplate,
         wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
@@ -34,6 +41,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#text-filter-template',
 
         /**
@@ -274,7 +282,7 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            if (tools.isMobile()) {
+            if (this.notAlignCriteria) {
                 // no need to align criteria on mobile version, it is aligned over CSS
                 return;
             }
