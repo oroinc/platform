@@ -222,11 +222,44 @@ JS;
      */
     public function waitPageToLoad($time = 60000)
     {
-        $this->wait(
-            $time,
-            '"complete" == document["readyState"] '.
-            '&& document.title !=="Loading..." '
-        );
+        $jsCheck = <<<JS
+        (function () {
+            if (document["readyState"] !== "complete") {
+                return false;
+            }
+            
+            if (document.title === "Loading...") {
+                return false;
+            }
+        
+            if (typeof(jQuery) == "undefined" || jQuery == null) {
+                return false;
+            }
+            
+            if (jQuery(document.body).hasClass('loading')) {
+                return false;
+            }
+
+            if (0 !== jQuery("div.loader-mask.shown").length) {
+                return false;
+            }
+            
+            return true;
+        })();
+JS;
+
+        $result = $this->wait($time, $jsCheck);
+
+        if (!$result) {
+            self::fail(
+                sprintf(
+                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                    $time / 1000
+                )
+            );
+        }
+
+        return $result;
     }
 
     /**
