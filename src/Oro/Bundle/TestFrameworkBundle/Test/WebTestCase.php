@@ -275,6 +275,14 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function simulateAuthentication($email, $credentials, $firewallContext, $userClass = User::class)
     {
         $user = $this->getUser($email, $userClass);
+        if ($user === null) {
+            $this->client->setServerParameters([]);
+            $this->client->getCookieJar()->clear();
+            $this->client->getContainer()->get('session')->remove('_security_'.$firewallContext);
+            $this->getContainer()->get('security.token_storage')->setToken(null);
+
+            return;
+        }
         $session = $this->client->getContainer()->get('session');
 
         /** @var Organization $organization */
@@ -289,6 +297,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
         $session->set('_security_'.$firewallContext, serialize($token));
         $session->save();
+        $this->getContainer()->get('security.token_storage')->setToken($token);
 
         $cookie = new Cookie($session->getName(), $session->getId());
         $this->client->getCookieJar()->set($cookie);
