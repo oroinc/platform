@@ -133,7 +133,10 @@ class OroMainContext extends MinkContext implements
         $driver = $this->getSession()->getDriver();
 
         $url = $session->getCurrentUrl();
-        if (0 === preg_match('/^https?:\/\//', $url)) {
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            return;
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
         }
 
@@ -151,8 +154,22 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
+        $session = $this->getMink()->getSession();
+        if (false === $session->isStarted()) {
+            return;
+        }
+
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
+
+        $url = $session->getCurrentUrl();
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            return;
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        }
+
         $driver->waitForAjax();
 
         // Check for unforeseen 500 errors
