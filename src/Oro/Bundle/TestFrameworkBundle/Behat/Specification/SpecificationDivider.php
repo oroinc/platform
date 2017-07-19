@@ -39,7 +39,7 @@ class SpecificationDivider
 
         $chunks = $this->getChunks($array, $divider);
         foreach ($chunks as $index => $chunk) {
-            $generatedSuiteName = $baseName.'#'.$index;
+            $generatedSuiteName = $baseName.'_'.$index;
             $generatedSuites[$generatedSuiteName] = $chunk;
         }
 
