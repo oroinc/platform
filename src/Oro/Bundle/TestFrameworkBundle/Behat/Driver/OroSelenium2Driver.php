@@ -238,6 +238,14 @@ JS;
     {
         $jsAppActiveCheck = <<<JS
         (function () {
+            if (document["readyState"] !== "complete") {
+                return false;
+            }
+            
+            if (document.title === "Loading...") {
+                return false;
+            }
+        
             if (typeof(jQuery) == "undefined" || jQuery == null) {
                 return false;
             }
@@ -258,7 +266,13 @@ JS;
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');
                 }
-                if (window.mediatorCachedForSelenium.execute('isInAction')) {
+                
+                var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
+                if (typeof(isInAction) !== "boolean") {
+                    return false;
+                }
+                
+                if (isInAction) {
                     return false;
                 }
             } catch (e) {
@@ -269,7 +283,18 @@ JS;
         })();
 JS;
 
-        return $this->wait($time, $jsAppActiveCheck);
+        $result = $this->wait($time, $jsAppActiveCheck);
+
+        if (!$result) {
+            self::fail(
+                sprintf(
+                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                    $time / 1000
+                )
+            );
+        }
+
+        return $result;
     }
 
     /**
