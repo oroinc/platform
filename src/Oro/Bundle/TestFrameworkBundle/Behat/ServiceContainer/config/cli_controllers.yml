@@ -1,13 +1,33 @@
 services:
+    cli.controller.suite_divider:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteDividerController
+        arguments:
+            - '@oro_behat_extension.suite.suite_configuration_registry'
+        tags:
+            - { name: cli.controller, priority: 1300 }
+
+    cli.controller.suite_set_divider:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteSetDividerController
+        arguments:
+            - '@oro_behat_extension.suite.suite_configuration_registry'
+        tags:
+            - { name: cli.controller, priority: 1200 }
+
     cli.controller.suite:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
         arguments:
+            - '@oro_behat_extension.suite.suite_configuration_registry'
             - '@suite.registry'
-            - '%suite.configurations%'
-            - '@oro_behat_extension.specification.specification_divider'
-            - '@symfony2_extension.kernel'
         tags:
             - { name: cli.controller, priority: 1100 }
+
+    cli.controller.available_features:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableFeaturesController
+        arguments:
+            - '@suite.registry'
+            - '@specifications.finder'
+        tags:
+            - { name: cli.controller, priority: 1000 }
 
     cli.controller.available_suites:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
@@ -15,16 +35,14 @@ services:
             - '@suite.registry'
             - '@specifications.finder'
         tags:
-            - { name: cli.controller, priority: 700 }
+            - { name: cli.controller, priority: 900 }
 
-    cli.controller.available_suites_group:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController
+    cli.controller.available_suite_sets:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteSetsController
         arguments:
-            - '@suite.registry'
-            - '@specifications.finder'
-            - '%oro_test.suite_groups%'
+            - '@oro_behat_extension.suite.suite_configuration_registry'
         tags:
-            - { name: cli.controller, priority: 710 }
+            - { name: cli.controller, priority: 800 }
 
     cli.controller.mesure_execution_time:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
