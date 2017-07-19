@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -287,14 +287,12 @@ class TagManager
                 );
             }
 
-            $taggingCollection = $tag->getTagging()->filter(
-                function (Tagging $tagging) use ($entity) {
-                    // only use tagging entities that related to current entity
-                    return
-                        $tagging->getEntityName() === ClassUtils::getClass($entity) &&
-                        $tagging->getRecordId() === TaggableHelper::getEntityId($entity);
-                }
-            );
+            $criteria = Criteria::create()->where(Criteria::expr()->andX(
+                Criteria::expr()->eq('entityName', ClassUtils::getClass($entity)),
+                Criteria::expr()->eq('recordId', TaggableHelper::getEntityId($entity))
+            ));
+
+            $taggingCollection = $tag->getTagging()->matching($criteria);
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
