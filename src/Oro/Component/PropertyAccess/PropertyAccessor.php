@@ -554,8 +554,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             $objectValue = $this->getValue($object, $property);
             //if the value we want to add is not an array and we try to add it to a collection,
             // then we don't want to overwrite the old values, instead add the new value to the collection
-            if (!is_array($value)
-                && ($objectValue instanceof \ArrayAccess || is_array($object))
+            if ((!is_array($value) && !$value instanceof \Traversable)
+                && ($objectValue instanceof \ArrayAccess || is_array($objectValue))
             ) {
                 //we try to add a value to a collection and we don't want to remove old items
                 $value = [$value];
