@@ -219,6 +219,7 @@ JS;
     /**
      * Wait PAGE load
      * @param int $time Time should be in milliseconds
+     * @return bool
      */
     public function waitPageToLoad($time = 60000)
     {
@@ -251,12 +252,7 @@ JS;
         $result = $this->wait($time, $jsCheck);
 
         if (!$result) {
-            self::fail(
-                sprintf(
-                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
-                    $time / 1000
-                )
-            );
+            self::fail(sprintf('Wait for page init more than %d seconds', $time / 1000));
         }
 
         return $result;
@@ -319,12 +315,7 @@ JS;
         $result = $this->wait($time, $jsAppActiveCheck);
 
         if (!$result) {
-            self::fail(
-                sprintf(
-                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
-                    $time / 1000
-                )
-            );
+            self::fail(sprintf('Wait for ajax more than %d seconds', $time / 1000));
         }
 
         return $result;
