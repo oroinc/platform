@@ -131,6 +131,17 @@ class OroMainContext extends MinkContext implements
 
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
+
+        $url = $session->getCurrentUrl();
+        if (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        }
+
+        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
+        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+            return;
+        }
+
         $driver->waitPageToLoad();
     }
 
