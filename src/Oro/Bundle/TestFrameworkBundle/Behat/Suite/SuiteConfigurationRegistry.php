@@ -146,14 +146,22 @@ class SuiteConfigurationRegistry
     public function setSuiteConfigurations(array $suiteConfigurations)
     {
         foreach ($suiteConfigurations as $name => $config) {
-            if (!$paths = $this->filterPaths($config['settings']['paths'])) {
-                continue;
-            }
-
             $suiteConfig = $this->createSuiteConfig($name, $config['settings']);
-            $suiteConfig->setSetting('paths', $paths);
+            $suiteConfig->setSetting('paths', $config['settings']['paths']);
 
             $this->suiteConfigurations[$name] = $suiteConfig;
+        }
+    }
+
+    public function filterConfiguration()
+    {
+        foreach ($this->suiteConfigurations as $name => $config) {
+            $paths = $this->filterPaths($config->getPaths());
+            $config->setSetting('paths', $paths);
+
+            if (!$paths) {
+                unset($this->suiteConfigurations[$name]);
+            }
         }
     }
 
