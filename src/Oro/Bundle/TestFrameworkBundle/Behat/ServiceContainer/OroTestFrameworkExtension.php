@@ -111,12 +111,6 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $builder
             ->children()
-                ->arrayNode('suite_groups')
-                    ->useAttributeAsKey('name')
-                    ->prototype('array')
-                        ->prototype('scalar')->end()
-                    ->end()
-                ->end()
                 ->variableNode('shared_contexts')
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
@@ -149,7 +143,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $container->setParameter('oro_test.suite_groups', $config['suite_groups']);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
