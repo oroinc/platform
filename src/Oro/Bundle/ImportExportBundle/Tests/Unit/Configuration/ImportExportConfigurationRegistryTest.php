@@ -14,29 +14,39 @@ class ImportExportConfigurationRegistryTest extends TestCase
         $configurations = [
             $this->createMock(ImportExportConfigurationInterface::class),
             $this->createMock(ImportExportConfigurationInterface::class),
+            $this->createMock(ImportExportConfigurationInterface::class),
         ];
 
         $providers = [
             $this->createProvider($configurations[0]),
             $this->createProvider($configurations[1]),
+            $this->createProvider($configurations[2]),
         ];
 
-        $aliases = ['1', '2'];
+        $aliases = ['01', '2'];
 
         $registry = new ImportExportConfigurationRegistry();
 
         $registry->addConfiguration($providers[0], $aliases[0]);
-        $registry->addConfiguration($providers[1], $aliases[1]);
+        $registry->addConfiguration($providers[1], $aliases[0]);
+        $registry->addConfiguration($providers[2], $aliases[1]);
 
-        static::assertSame([$configurations[0]], $registry->getConfiguration($aliases[0]));
-        static::assertSame([$configurations[1]], $registry->getConfiguration($aliases[1]));
+        static::assertSame(
+            [
+                $configurations[0],
+                $configurations[1],
+            ],
+            $registry->getConfigurations($aliases[0])
+        );
+
+        static::assertSame([$configurations[2]], $registry->getConfigurations($aliases[1]));
     }
 
     public function testGetConfigurationForUndefinedAlias()
     {
         $registry = new ImportExportConfigurationRegistry();
 
-        static::assertEmpty($registry->getConfiguration('1'));
+        static::assertCount(0, $registry->getConfigurations('1'));
     }
 
     /**

@@ -40,7 +40,7 @@ class GetImportExportConfigurationExtensionTest extends TestCase
 
         $this->configurationRegistry
             ->expects(static::once())
-            ->method('getConfiguration')
+            ->method('getConfigurations')
             ->with($alias);
 
         $this->extension->getConfiguration($alias);
