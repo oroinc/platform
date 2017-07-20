@@ -12,19 +12,6 @@ use Symfony\Component\Finder\Finder;
 class SpecificationLocatorFilesystemStub implements SpecificationLocator
 {
     /**
-     * @var array
-     */
-    protected $paths;
-
-    /**
-     * @param array $paths
-     */
-    public function __construct(array $paths)
-    {
-        $this->paths = $paths;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getLocatorExamples()
@@ -37,17 +24,10 @@ class SpecificationLocatorFilesystemStub implements SpecificationLocator
      */
     public function locateSpecifications(Suite $suite, $locator = null)
     {
-        $finder = new Finder();
-        $finder->name('*.feature');
-
-        foreach ($this->paths as $path) {
-            $finder->in($path);
-        }
-
         $features = [];
 
-        foreach ($finder as $item) {
-            $features[] = new FeatureNode(null, null, [], null, [], '', '', $item->getRealPath(), 0);
+        foreach ($suite->getSetting('paths') as $path) {
+            $features[] = new FeatureNode(null, null, [], null, [], '', '', $path, 0);
         }
 
         return new SpecificationArrayIterator($suite, $features);

@@ -74,7 +74,7 @@ class FeatureEnvironmentHandler implements EnvironmentHandler
             $this->kernel->shutdown();
         } catch (\Exception $e) {
             throw new \RuntimeException(
-                sprintf('Error whil build "%s" suite envirorment', $suite->getName()),
+                sprintf('Error while build "%s" suite envirorment', $suite->getName()),
                 0,
                 $e
             );
