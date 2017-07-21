@@ -5,9 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -39,11 +37,6 @@ class FixtureLoader
      * @var EntitySupplement
      */
     protected $entitySupplement;
-
-    /**
-     * @var FileLocator[]
-     */
-    protected $fileLocators;
 
     /**
      * @param KernelInterface $kernel
@@ -262,5 +255,14 @@ class FixtureLoader
                 $entityReference => $values
             ]
         ];
+    }
+
+    /**
+     * @param $name
+     * @param $instance
+     */
+    public function addReference($name, $instance)
+    {
+        $this->aliceLoader->getReferenceRepository()->set($name, $instance);
     }
 }

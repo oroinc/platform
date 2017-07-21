@@ -367,7 +367,7 @@ class ACLContext extends OroFeatureContext implements
         $mainMenu->openAndClick('System/ User Management/ Roles');
         $this->waitForAjax();
 
-        $this->createElement('GridFilersButton')->open();
+        $this->createElement('GridFiltersButton')->open();
 
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->createElement('GridFilters')->getFilterItem('GridFilterStringItem', 'Label');

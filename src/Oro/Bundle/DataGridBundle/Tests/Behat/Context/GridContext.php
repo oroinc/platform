@@ -913,8 +913,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: there is no records in Frontend Grid
      *
      * @Then /^there is no records in grid$/
+     * @Then /^there are no records in grid$/
      * @Then all records should be deleted
      * @Then /^there is no records in "(?P<gridName>[\w\s]+)"$/
+     * @Then /^there are no records in "(?P<gridName>[\w\s]+)"$/
      */
     public function thereIsNoRecordsInGrid($gridName = null)
     {
@@ -1210,6 +1212,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid$/
      * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid "(?P<gridName>[\w\s]+)$"/
+     * @Then /^(?:|I )should see "(?P<recordName>(?:[^"]|\\")*)" in grid$/
+     * @Then /^(?:|I )should see "(?P<recordName>(?:[^"]|\\")*)" in grid "(?P<gridName>[\w\s]+)$"/
      */
     public function iShouldSeeRecordInGrid($recordName, $gridName = null)
     {
@@ -1397,7 +1401,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1419,7 +1423,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
