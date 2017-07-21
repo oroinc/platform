@@ -10,3 +10,6 @@ layout:
             id: requirejs_scripts_after
             blockType: container
             parentId: require_js
+#        - '@removeOption':
+#            id: requirejs_scripts
+#            optionName: provider_alias
