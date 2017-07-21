@@ -137,9 +137,19 @@ class Datagrid implements DatagridInterface
      */
     public function getAcceptedDatasource()
     {
-        $this->acceptor->acceptDatasource($this->getDatasource());
+        $this->acceptDatasource();
 
         return $this->getDatasource();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function acceptDatasource()
+    {
+        $this->acceptor->acceptDatasource($this->getDatasource());
+
+        return $this;
     }
 
     /**

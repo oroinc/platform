@@ -4,16 +4,23 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Doctrine\ORM\EntityManager;
 
+use Knp\Menu\ItemInterface as KnpItemInterface;
+
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
+use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationItemRepository;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class NavigationItemBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    const ITEM_TYPE = 'favorite';
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
@@ -32,6 +39,9 @@ class NavigationItemBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var NavigationItemBuilder */
     protected $builder;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|KnpItemInterface */
+    protected $menu;
+
     protected function setUp()
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -48,6 +58,7 @@ class NavigationItemBuilderTest extends \PHPUnit_Framework_TestCase
         );
         $this->builder->setFeatureChecker($this->featureChecker);
         $this->builder->addFeature('email');
+        $this->menu = $this->createMock(KnpItemInterface::class);
     }
 
     public function testBuildAnonUser()
@@ -58,74 +69,147 @@ class NavigationItemBuilderTest extends \PHPUnit_Framework_TestCase
         $this->tokenAccessor->expects($this->never())
             ->method('getOrganization');
 
-        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
-        $menu->expects($this->never())
+        $this->menu->expects($this->never())
             ->method('addChild');
-        $menu->expects($this->once())
+        $this->menu->expects($this->once())
             ->method('setExtra')
             ->with('type', 'pinbar');
 
-        $this->builder->build($menu, array(), 'pinbar');
+        $this->builder->build($this->menu, [], 'pinbar');
     }
 
-    public function testBuild()
+    /**
+     * @param array $item
+     * @param $expected
+     *
+     * @dataProvider itemsDataProvider
+     */
+    public function testBuild(array $item, $expected)
     {
-        $organization   = new Organization();
-        $type           = 'favorite';
-        $userId         = 1;
-        $user = $this->getMockBuilder('stdClass')
-            ->setMethods(array('getId'))
-            ->getMock();
-        $user->expects($this->once($userId))
-            ->method('getId')
-            ->will($this->returnValue(1));
+        $this->configure([$item]);
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($user));
-        $this->tokenAccessor->expects($this->once())
-            ->method('getOrganization')
-            ->will($this->returnValue($organization));
-
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface');
-        $this->factory->expects($this->once())
-            ->method('createItem')
-            ->with($type, array())
-            ->will($this->returnValue($item));
-
-        $repository = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Entity\Repository\NavigationItemRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $items = array(
-            array('id' => 1, 'title' => 'test1', 'url' => '/', 'type' => $type),
-            array('id' => 2, 'title' => 'test2', 'url' => '/home', 'type' => $type)
-        );
-        $repository->expects($this->once())
-            ->method('getNavigationItems')
-            ->with($userId, $organization, $type)
-            ->will($this->returnValue($items));
-        $this->router->expects($this->exactly(2))
+        $this->router->expects($this->once())
             ->method('match')
-            ->with($this->isType('string'))
+            ->with($expected)
             ->willReturn(['_route' => 'route']);
-        $this->featureChecker->expects($this->exactly(2))
+
+        $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
             ->with($this->anything())
             ->willReturn(true);
+
+        $this->menu->expects($this->once())->method('addChild');
+        $this->menu->expects($this->once())->method('setExtra')->with('type', self::ITEM_TYPE);
+
+        $this->builder->build($this->menu, array(), self::ITEM_TYPE);
+    }
+
+    /**
+     * @param array $item
+     * @param $expected
+     *
+     * @dataProvider itemsDataProvider
+     */
+    public function testBuildDisabledFeature(array $item, $expected)
+    {
+        $this->configure([$item]);
+
+        $this->router->expects($this->once())
+            ->method('match')
+            ->with($expected)
+            ->willReturn(['_route' => 'route']);
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($this->anything())
+            ->willReturn(false);
+
+        $this->menu->expects($this->never())->method('addChild');
+        $this->menu->expects($this->once())->method('setExtra')->with('type', self::ITEM_TYPE);
+
+        $this->builder->build($this->menu, array(), self::ITEM_TYPE);
+    }
+
+    /**
+     * @param array $item
+     * @param $expected
+     *
+     * @dataProvider itemsDataProvider
+     */
+    public function testBuildWithMissedRoute(array $item, $expected)
+    {
+        $this->configure([$item]);
+
+        $this->router->expects($this->exactly(1))
+            ->method('match')
+            ->with($expected)
+            ->willReturn(null);
+
+        $this->featureChecker->expects($this->never())
+            ->method('isResourceEnabled');
+
+        $this->menu->expects($this->never())->method('addChild');
+        $this->menu->expects($this->once())->method('setExtra')->with('type', self::ITEM_TYPE);
+
+        $this->builder->build($this->menu, array(), self::ITEM_TYPE);
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function itemsDataProvider()
+    {
+        yield [
+            'item' => ['id' => 1, 'title' => 'test1', 'url' => null, 'type' => self::ITEM_TYPE],
+            'expected' => '',
+        ];
+        yield [
+            'item' => ['id' => 1, 'title' => 'test1', 'url' => '/', 'type' => self::ITEM_TYPE],
+            'expected' => '/',
+        ];
+        yield [
+            'item' => ['id' => 2, 'title' => 'test2', 'url' => '/home', 'type' => self::ITEM_TYPE],
+            'expected' => '/home',
+        ];
+        yield [
+            'item' => ['id' => 3, 'title' => 'test2', 'url' => '/test?s=123', 'type' => self::ITEM_TYPE],
+            'expected' => '/test',
+        ];
+        yield [
+            'item' => ['id' => 3, 'title' => 'test2', 'url' => '/test#s=123', 'type' => self::ITEM_TYPE],
+            'expected' => '/test',
+        ];
+        yield [
+            'item' => ['id' => 3, 'title' => 'test2', 'url' => '/test?d=123#s=123', 'type' => self::ITEM_TYPE],
+            'expected' => '/test',
+        ];
+    }
+
+    /**
+     * @param array $items
+     */
+    protected function configure(array $items)
+    {
+        $organization = new Organization();
+        $userId = 1;
+        $user = $this->createMock(User::class);
+        $user->expects($this->once())->method('getId')->willReturn($userId);
+
+        $this->tokenAccessor->expects($this->once())->method('getUser')->willReturn($user);
+        $this->tokenAccessor->expects($this->once())->method('getOrganization')->willReturn($organization);
+
+        $item = $this->createMock(NavigationItemInterface::class);
+        $this->factory->expects($this->once())->method('createItem')->with(self::ITEM_TYPE, [])->willReturn($item);
+
+        $repository = $this->createMock(NavigationItemRepository::class);
+        $repository->expects($this->once())
+            ->method('getNavigationItems')
+            ->with($userId, $organization, self::ITEM_TYPE)
+            ->willReturn($items);
+
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with(get_class($item))
-            ->will($this->returnValue($repository));
-
-        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->getMock();
-        $menu->expects($this->exactly(2))
-            ->method('addChild');
-        $menu->expects($this->once())
-            ->method('setExtra')
-            ->with('type', $type);
-
-        $this->builder->build($menu, array(), $type);
+            ->willReturn($repository);
     }
 }

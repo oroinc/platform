@@ -25,5 +25,5 @@ Oro\Bundle\UserBundle\Entity\User:
     username: alice<current()>
     email: 'fake_<current()>@example.com'
     firstName: Alice<current()>
-    lastName: <lastName()>
+    lastName: Williams<current()>
     password: <password()>
