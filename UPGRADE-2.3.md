@@ -344,6 +344,66 @@ OrganizationBundle
 - Class `Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator`
     - changed the constructor signature: parameter `OwnershipMetadataProvider $ownershipMetadataProvider` was replaced with `OwnershipMetadataProviderInterface $ownershipMetadataProvider`
 
+ReportBundle
+------------
+
+- Class Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider was modified to use doctrine cache instead of caching the DatagridConfiguration value in property $configuration
+    - public method `setPrefixCacheKey($prefixCacheKey)` was removed
+    - public method `setReportCacheManager(Cache $reportCacheManager)` was removed
+    - changed the constructor signature:
+        - parameter `Doctrine\Common\Cache\Cache $reportCacheManager` was added
+        - parameter `$prefixCacheKey $prefixCacheKey` was added
+
+     Before
+     ```PHP
+        class ReportDatagridConfigurationProvider
+        {
+            /**
+             * @var DatagridConfiguration
+             */
+            protected $configuration;
+
+            public function getConfiguration($gridName)
+            {
+                if ($this->configuration === null) {
+                    ...
+                    $this->configuration = $this->builder->getConfiguration();
+                }
+
+                return $this->configuration;
+            }
+        }
+     ```
+
+     After
+     ```PHP
+        class ReportDatagridConfigurationProvider
+        {
+            /**
+             * Doctrine\Common\Cache\Cache
+             */
+            protected $reportCacheManager;
+
+            public function getConfiguration($gridName)
+            {
+                $cacheKey = $this->getCacheKey($gridName);
+
+                if ($this->reportCacheManager->contains($cacheKey)) {
+                    $config = $this->reportCacheManager->fetch($cacheKey);
+                    $config = unserialize($config);
+                } else {
+                    $config = $this->prepareConfiguration($gridName);
+                    $this->reportCacheManager->save($cacheKey, serialize($config));
+                }
+
+                return $config;
+            }
+        }
+     ```
+
+- Class Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener was added. It cleans cache of report grid on postUpdate event of Report entity.
+
+
 SecurityBundle
 --------------
 - Class `Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference`
