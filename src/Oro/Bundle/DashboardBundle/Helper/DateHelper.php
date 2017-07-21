@@ -173,7 +173,7 @@ class DateHelper
      * @param \DateTime    $end
      * @param QueryBuilder $qb
      * @param string       $entityField
-     * @param bool         $useCurrentTimeZone
+     * @param bool         $useCurrentTimeZone @deprecated since 1.12, will be removed in 2.4
      */
     public function addDatePartsSelect(
         \DateTime $start,
@@ -433,7 +433,7 @@ class DateHelper
      *
      * @param string $functionName
      * @param string $fieldName
-     * @param bool   $useCurrentTimeZone
+     * @param bool   $useCurrentTimeZone @deprecated since 1.12, will be removed in 2.4
      *
      * @return string
      */
