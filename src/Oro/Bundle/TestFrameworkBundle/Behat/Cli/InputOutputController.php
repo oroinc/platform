@@ -14,6 +14,9 @@ class InputOutputController implements Controller
     /** @var  TestIsolationSubscriber */
     protected $testIsolationSubscriber;
 
+    /**
+     * @param TestIsolationSubscriber $testIsolationSubscriber
+     */
     public function __construct(TestIsolationSubscriber $testIsolationSubscriber)
     {
         $this->testIsolationSubscriber = $testIsolationSubscriber;

@@ -110,6 +110,9 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         }
     }
 
+    /**
+     * @param Process $process
+     */
     private function startProcess(Process $process)
     {
         $process
