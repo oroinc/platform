@@ -8,7 +8,6 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\FrontendGridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -1030,6 +1029,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
         $this->waitForAjax();
+    }
+
+    /**
+     * Click on first row action.
+     * Example: And click view on first row in grid
+     *
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)" grid$/
+     * @Given /^(?:|I )click "(?P<action>[^"]*)" on first row in "(?P<gridName>[\w\s]+)"$/
+     *
+     * @param string $action
+     * @param string $gridName
+     */
+    public function clickActionOnFirstRow($action, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        if (!empty($grid->getRows()[0])) {
+            $row = $grid->getRows()[0];
+            $link = $row->getActionLink($action);
+            $link->click();
+        }
     }
 
     /**
