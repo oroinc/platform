@@ -19,6 +19,11 @@ Feature: Display settings manage
     Then I should not see an "Recent Emails" element
 
   Scenario: Disable WYSIWYG editor
+    Given I go to System/Configuration
+    And click "Display settings"
+    And I fill "System Config Form" with:
+      | Enable WYSIWYG editor | true |
+    And save form
     When I go to Activities/Calendar Events
     And press "Create Calendar event"
     Then I should see an "WYSIWYG editor" element
