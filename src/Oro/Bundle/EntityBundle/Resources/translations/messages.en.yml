@@ -63,7 +63,13 @@ oro:
         entityfieldfallbackvalue:
             entity_label: Entity fallback value
             entity_plural_label: Entity fallback values
-            array_value.label: Array value
-            fallback.label: Fallback
+            array_value:
+                label: Array value
+                description: The array value for the field
+            fallback:
+                label: Fallback
+                description: The value for the fallback
             id.label: Id
-            scalar_value.label: Scalar value
+            scalar_value:
+                label: Scalar value
+                description: The scalar value for the field
