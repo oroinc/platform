@@ -34,6 +34,13 @@ services:
         tags:
             - { name: oro.workflow.configuration.handler, priority: 0 }
 
+    oro_workflow.configuration.handler.clean:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Handler\CleanConfigurationHandler
+        arguments:
+            - '@request_stack'
+        tags:
+            - { name: oro.workflow.configuration.handler, priority: 299 }
+
     oro_workflow.configuration.handler.filter:
         class: Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler
         tags:
@@ -128,3 +135,7 @@ services:
         tags:
             - { name: oro_feature.config_extension }
 
+    oro_workflow.configuration.checker:
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker'
+        arguments:
+            - '@oro_action.expression.context_accessor'

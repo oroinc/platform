@@ -289,7 +289,14 @@ define(function(require) {
                     });
                     mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }, this),
-                'errorHandlerMessage': __('Could not save workflow.'),
+                'errorHandlerMessage': function(event, response) {
+                    var message = __('Could not save workflow.');
+                    if (response.responseJSON && response.responseJSON.error) {
+                        message = response.responseJSON.error;
+                    }
+
+                    return message;
+                },
                 'error': function(model, response) {
                     mediator.execute('hideLoading');
                 }
