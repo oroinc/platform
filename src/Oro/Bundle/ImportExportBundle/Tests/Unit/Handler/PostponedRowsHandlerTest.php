@@ -99,7 +99,7 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->currentJob);
 
         $result = [];
-        $body = ['attempts' => 5];
+        $body = ['attempts' => PostponedRowsHandler::MAX_ATTEMPTS];
         $this->messageProducer->expects($this->never())->method('send');
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
@@ -110,7 +110,7 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('findOrCreateChildJob')
             ->willReturn($this->currentJob);
 
-        $body = ['attempts' => 5];
+        $body = ['attempts' => PostponedRowsHandler::MAX_ATTEMPTS];
         $result = [];
         $result['postponedRows'] = ['elem1', 'elem2'];
 

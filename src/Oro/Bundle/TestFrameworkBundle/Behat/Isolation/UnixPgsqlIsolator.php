@@ -29,9 +29,6 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     protected $dbName;
 
     /** @var string */
-    protected $dbTempName;
-
-    /** @var string */
     protected $dbPass;
 
     /** @var string */
@@ -53,7 +50,6 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
         $this->dbName = $container->getParameter('database_name');
         $this->dbUser = $container->getParameter('database_user');
         $this->dbPass = $container->getParameter('database_password');
-        $this->dbTemp = $this->dbName.TokenGenerator::generateToken('db');
     }
 
     /** {@inheritdoc} */
@@ -85,6 +81,11 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
+        if (!$this->dbTemp) {
+            return;
+        }
+
+        $event->writeln('<info>Restore database from dump</info>');
         $this->dropDb();
         $this->restoreDbFromDump();
     }
@@ -92,6 +93,10 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
     {
+        if (!$this->dbTemp) {
+            return;
+        }
+
         $event->writeln('<info>Remove Db dump</info>');
         $this->dropTempDb();
     }
@@ -99,6 +104,10 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     public function restoreState(RestoreStateEvent $event)
     {
+        if (!$this->dbTemp) {
+            return;
+        }
+
         $event->writeln('<info>Begin to restore the state of Db...</info>');
 
         $event->writeln('<info>Drop Db</info>');
@@ -116,6 +125,10 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     public function isOutdatedState()
     {
+        if (!$this->dbTemp) {
+            return false;
+        }
+
         try {
             $this->makeDump();
             $this->dropTempDb();
@@ -209,6 +222,8 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     protected function makeDump()
     {
+        $this->dbTemp = $this->dbName.TokenGenerator::generateToken('db');
+
         $this->killConnections();
 
         $process = sprintf(
@@ -228,12 +243,13 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     {
         $process = sprintf(
             'PGPASSWORD="%s" psql -h %s --port=%s -U %s template1 -t -c "'.
-            'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = \'%s\'"',
+            'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname in (\'%s\', \'%s\')"',
             $this->dbPass,
             $this->dbHost,
             $this->dbPort,
             $this->dbUser,
-            $this->dbName
+            $this->dbName,
+            $this->dbTemp
         );
         $this->runProcess($process);
     }
