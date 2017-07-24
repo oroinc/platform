@@ -44,7 +44,7 @@ oro_behat_extension:
         selector: 'div.filters-state'
         class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    GridFilersButton:
+    GridFiltersButton:
       selector: 'div.toolbar div.actions-panel .action[title=Filters]'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
 
