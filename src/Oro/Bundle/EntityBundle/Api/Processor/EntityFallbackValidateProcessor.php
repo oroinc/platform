@@ -24,9 +24,9 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
     protected $fallbackResolver;
 
     /**
-     * @var ValueNormalizer
+     * @var null|string
      */
-    protected $valueNormalizer;
+    protected $entityIncludedType;
 
     /**
      * @param EntityFallbackResolver $fallbackResolver
@@ -35,7 +35,12 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
     public function __construct(EntityFallbackResolver $fallbackResolver, ValueNormalizer $valueNormalizer)
     {
         $this->fallbackResolver = $fallbackResolver;
-        $this->valueNormalizer = $valueNormalizer;
+        $this->entityIncludedType = ValueNormalizerUtil::convertToEntityType(
+            $valueNormalizer,
+            EntityFieldFallbackValue::class,
+            new RequestType([RequestType::JSON_API]),
+            false
+        );
     }
 
     /**
@@ -45,43 +50,32 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
     {
         $mainClass = $context->get(Context::CLASS_NAME);
         $requestData = $context->getRequestData();
-        if (!array_key_exists(JsonApiDoc::INCLUDED, $requestData)
-            || !is_array($requestData[JsonApiDoc::INCLUDED])
-            || !isset($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS])
-            || !is_array($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS])
-            || !isset($mainClass)
-            || !class_exists($mainClass)
-        ) {
+        if (!array_key_exists(JsonApiDoc::INCLUDED, $requestData)) {
             return;
         }
-        $relations = $requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS];
-        $entityIncludedType = ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            EntityFieldFallbackValue::class,
-            new RequestType([RequestType::JSON_API]),
-            false
-        );
 
         try {
-            $includedData = $this->getCompatibleIncludedRelations($requestData, $entityIncludedType);
+            $includedData = $this->getCompatibleIncludedRelations($requestData, $this->entityIncludedType);
         } catch (InvalidIncludedFallbackItemException $e) {
             // convert validation exceptions into a context type error
-            $this->addError($this->buildPointer([JsonApiDoc::INCLUDED, $entityIncludedType]), $e->getMessage(), $context);
+            $this->addError(
+                $this->buildPointer([JsonApiDoc::INCLUDED, $this->entityIncludedType]),
+                $e->getMessage(),
+                $context
+            );
 
             return;
         }
+        $relations = $this->getCompatibleRelations($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS]);
 
         // match included data with relationships section, and validate entity fallback values provided
         foreach ($includedData as $includedItem) {
             // parse relationships section to get the included item's (fallback compatible) entity field name
             foreach ($relations as $relationName => $relationItem) {
-                if (isset($relationItem[JsonApiDoc::DATA])
-                    && isset($relationItem[JsonApiDoc::DATA][JsonApiDoc::ID])
-                    && $includedItem[JsonApiDoc::ID] === $relationItem[JsonApiDoc::DATA][JsonApiDoc::ID]
-                ) {
+                if ($includedItem[JsonApiDoc::ID] === $relationItem[JsonApiDoc::DATA][JsonApiDoc::ID]) {
                     if (false === $this->isFallbackRequestItemValid($relationName, $includedItem, $mainClass)) {
                         $this->addError(
-                            $this->buildPointer([JsonApiDoc::INCLUDED, $entityIncludedType]),
+                            $this->buildPointer([JsonApiDoc::INCLUDED, $this->entityIncludedType]),
                             (new InvalidIncludedFallbackItemException($includedItem[JsonApiDoc::ID]))->getMessage(),
                             $context
                         );
@@ -93,6 +87,21 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
     }
 
     /**
+     * @param array $relations
+     * @return array
+     */
+    protected function getCompatibleRelations(array $relations)
+    {
+        return array_filter(
+            $relations,
+            function ($relation) {
+                return (isset($relation[JsonApiDoc::DATA][JsonApiDoc::TYPE])
+                    && $relation[JsonApiDoc::DATA][JsonApiDoc::TYPE] === $this->entityIncludedType);
+            }
+        );
+    }
+
+    /**
      * @param string $relationName
      * @param array $fallbackRequestData
      * @param string $mainEntityClass
@@ -100,9 +109,12 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
      */
     protected function isFallbackRequestItemValid($relationName, $fallbackRequestData, $mainEntityClass)
     {
-        $fallbackFiltered = array_filter($fallbackRequestData[JsonApiDoc::ATTRIBUTES], function($value) {
-            return !is_null($value);
-        });
+        $fallbackFiltered = array_filter(
+            $fallbackRequestData[JsonApiDoc::ATTRIBUTES],
+            function ($value) {
+                return !is_null($value);
+            }
+        );
 
         // only one supplied value is valid
         if (1 !== count($fallbackFiltered)) {
@@ -165,7 +177,7 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
                 continue;
             }
 
-            if (!$this->isIncludedItemValid($includedItem)) {
+            if (!isset($includedItem[JsonApiDoc::ATTRIBUTES])) {
                 throw new InvalidIncludedFallbackItemException($includedItemIndex);
             }
 
@@ -173,17 +185,5 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param array $includedItem
-     * @return bool
-     */
-    protected function isIncludedItemValid(array $includedItem)
-    {
-        return (isset($includedItem[JsonApiDoc::ID])
-            && isset($includedItem[JsonApiDoc::ATTRIBUTES])
-            && is_array($includedItem[JsonApiDoc::ATTRIBUTES])
-        );
     }
 }
