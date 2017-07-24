@@ -5,10 +5,22 @@ namespace Oro\Bundle\EntityBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+use Oro\Component\Layout\Extension\Theme\Manager\PageTemplatesManager;
+
 class EntityFieldFallbackValuesValidator extends ConstraintValidator
 {
     const ALIAS = 'oro_entity_field_fallback_values_validator';
-    const SELECTED_VALUE = 'scalarValue';
+
+    /** @var PageTemplatesManager */
+    private $pageTemplatesManager;
+
+    /**
+     * @param PageTemplatesManager $pageTemplatesManager
+     */
+    public function __construct(PageTemplatesManager $pageTemplatesManager)
+    {
+        $this->pageTemplatesManager = $pageTemplatesManager;
+    }
 
     /**
      * @param $value
@@ -18,12 +30,9 @@ class EntityFieldFallbackValuesValidator extends ConstraintValidator
      */
     public function validate($entityFieldFallbackValue, Constraint $constraint)
     {
-        $fieldName = 'pageTemplate'; // TODO - get this
+        $selectedValue = $this->getSelectedValue($entityFieldFallbackValue, $constraint->route);
 
-        $selectedValues = $entityFieldFallbackValue->getOwnValue();
-        $choices = $this->getFieldChoices($fieldName);
-
-        if (!$this->selectedValuesAreValid($selectedValues, $choices)) {
+        if (!$this->selectedValuesAreValid($selectedValue, $this->getValidValues($constraint->route))) {
             $this->context->buildViolation($constraint->message)
                 ->addViolation();
         }
@@ -44,13 +53,7 @@ class EntityFieldFallbackValuesValidator extends ConstraintValidator
 
         foreach ($selectedValues as $selectedValue) {
 
-            /* values are saved as keys in the form. ex:
-             choices = [
-              "short" => 1,
-              "two-columns" => 2
-            ]
-            */
-            if (!array_key_exists($selectedValue, $choices)) {
+            if (!in_array($selectedValue, $choices)) {
                 return false;
             }
         }
@@ -59,20 +62,40 @@ class EntityFieldFallbackValuesValidator extends ConstraintValidator
     }
 
     /**
-     * Based on the give fieldName retrieve the initial choices array
-     * that is set in the built form
+     * Retrieve the valid values for this field and route
      *
-     * @param $fieldName
+     * @param $route
      * @return array|void
      */
-    private function getFieldChoices($fieldName)
+    private function getValidValues($route)
     {
-        $fieldFormType = $this->context->getRoot()->get($fieldName);
+        $pageTemplates = $this->pageTemplatesManager->getRoutePageTemplates();
 
-        if (empty($fieldFormType) || !$fieldFormType->has(self::SELECTED_VALUE)) {
-            return;
+        $validValues = $pageTemplates[$route] ?? [];
+
+        /* values are saved in "choices" array as keys in the form. ex:
+         choices = [
+          "short" => 1,
+          "two-columns" => 2,
+          "list" => 3
+        ]
+        */
+        $validValues = array_keys($validValues["choices"]);
+
+        return array_merge($validValues, ["systemConfig", null]);
+    }
+
+    /**
+     * @param $entityFieldFallbackValue
+     * @param $route
+     * @return string|null
+     */
+    private function getSelectedValue($entityFieldFallbackValue, $route)
+    {
+        if (!empty($entityFieldFallbackValue->getFallback())) {
+            return $entityFieldFallbackValue->getFallback();
         }
 
-        return $fieldFormType->get(self::SELECTED_VALUE)->getConfig()->getOption('choices');
+        return $entityFieldFallbackValue->getArrayValue()[$route] ?? null;
     }
 }
