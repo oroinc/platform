@@ -121,7 +121,7 @@ define(function(require) {
         },
 
         _getInputs: function() {
-            return this.$el.find('input:text, textarea, select').filter('[name!=""]');
+            return this.$el.find('input, textarea, select').filter('[name!=""]');
         }
     });
 
