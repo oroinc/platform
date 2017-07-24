@@ -40,6 +40,9 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
         $this->valueNormalizer = $this->getMockBuilder(ValueNormalizer::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->willReturn('entityfieldfallbackvalues');
         $this->entityFallbackValidateProcessor = new EntityFallbackValidateProcessor(
             $this->fallbackResolver,
             $this->valueNormalizer
@@ -70,8 +73,6 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [null, []],
-            ['nonExistentClass', [JsonApiDoc::INCLUDED => null]],
-            ['nonExistentClass', [JsonApiDoc::INCLUDED => []]],
             [
                 'nonExistentClass',
                 [
@@ -101,9 +102,7 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
             JsonApiDoc::DATA => [JsonApiDoc::RELATIONSHIPS => []],
             JsonApiDoc::INCLUDED => [array_merge($initialIncluded, $includedData)],
         ];
-        $this->valueNormalizer->expects($this->once())
-            ->method('normalizeValue')
-            ->willReturn('entityfieldfallbackvalues');
+
         $this->context->expects($this->once())
             ->method('get')
             ->willReturn(\stdClass::class);
@@ -126,11 +125,6 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
     public function getErrorOnInvalidIncludedItemProvider()
     {
         return [
-            [
-                [
-                    JsonApiDoc::ID => '1',
-                ],
-            ],
             [
                 [
                     JsonApiDoc::ID => '1',
@@ -177,9 +171,6 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
         $this->fallbackResolver->expects($this->any())
             ->method('getRequiredFallbackFieldByType')
             ->willReturn($requiredValueField);
-        $this->valueNormalizer->expects($this->once())
-            ->method('normalizeValue')
-            ->willReturn('entityfieldfallbackvalues');
         $this->context->expects($this->once())
             ->method('get')
             ->willReturn(\stdClass::class);

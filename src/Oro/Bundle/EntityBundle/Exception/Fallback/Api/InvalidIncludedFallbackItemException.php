@@ -12,7 +12,8 @@ class InvalidIncludedFallbackItemException extends \Exception
     public function __construct($itemId)
     {
         $message = sprintf(
-            "Invalid entity fallback value provided for the included value with id '%s'. Please provide a correct id, and an attribute section with either a '%s' identifier, an '%s' or '%s'",
+            "Invalid entity fallback value provided for the included value with id '%s'." .
+            " Please provide a correct id, and an attribute section with either a '%s' identifier, an '%s' or '%s'",
             $itemId,
             EntityFieldFallbackValue::FALLBACK_PARENT_FIELD,
             EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD,
