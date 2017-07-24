@@ -9,6 +9,12 @@ Some inline underscore templates from next bundles, were moved to separate .html
  - FilterBundle
  - UIBundle
 
+DashboardBundle
+--------
+- Class `Oro\Bundle\DashboardBundle\Helper\DateHelper`
+    - In method `addDatePartsSelect` removed the last one argument `$useCurrentTimeZone`
+    - In method `getEnforcedTimezoneFunction` removed the last one argument `$useCurrentTimeZone`
+
 UIBundle
 --------
 - `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
