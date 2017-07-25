@@ -380,6 +380,23 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: When I click on "Help Icon" with title "Help"
+     *
+     * @When /^(?:|I )click on "(?P<selector>[^"]+)" with title "(?P<title>[^"]+)"$/
+     *
+     * @param string $selector
+     * @param string $title
+     */
+    public function iClickOnElementWithTitle($selector, $title)
+    {
+        $element = $this->findElementContains($selector, $title);
+
+        self::assertTrue($element->isValid(), sprintf('Element "%s" with title "%s" not found on page', $selector, $title));
+
+        $element->click();
+    }
+
+    /**
      * Hover on element on page
      * Example: When I hover on "Help Icon"
      *
