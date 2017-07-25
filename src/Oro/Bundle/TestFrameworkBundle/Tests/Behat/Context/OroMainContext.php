@@ -392,7 +392,8 @@ class OroMainContext extends MinkContext implements
         $element = $this->findElementContains($selector, $title);
 
         self::assertTrue(
-            $element->isValid(), sprintf('Element "%s" with title "%s" not found on page', $selector, $title)
+            $element->isValid(),
+            sprintf('Element "%s" with title "%s" not found on page', $selector, $title)
         );
 
         $element->click();
