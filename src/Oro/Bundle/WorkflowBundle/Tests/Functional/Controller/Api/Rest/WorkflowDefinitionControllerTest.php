@@ -20,6 +20,35 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
     }
 
+    public function testWorkflowDefinitionPostNotValid()
+    {
+        $this->assertEmpty($this->getDefinition(self::TEST_DEFINITION_NAME));
+
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_workflow_api_rest_workflowdefinition_post'),
+            array_merge_recursive(
+                $this->getTestConfiguration(),
+                [
+                    'transitions' => [
+                        0 => [
+                            'form_options' => [
+                                'form_init' => [
+                                    ['@assign_value' => ['$.result.test', true]]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 400);
+        $this->assertEquals(['error' => 'Workflow could not be saved'], $result);
+
+        $this->assertEmpty($this->getDefinition(self::TEST_DEFINITION_NAME));
+    }
+
     public function testWorkflowDefinitionPost()
     {
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
@@ -92,6 +121,47 @@ class WorkflowDefinitionControllerTest extends WebTestCase
             $workflow->getLabel()
         );
         $this->assertEquals(self::TEST_DEFINITION_NAME, $workflow->getName());
+    }
+
+    /**
+     * @depends testWorkflowDefinitionPost
+     */
+    public function testWorkflowDefinitionPutNotValid()
+    {
+        $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
+        $this->assertInstanceOf(Workflow::class, $workflow);
+
+        $config = $workflow->getDefinition()->getConfiguration();
+        $this->assertCount(1, $config['transition_definitions']);
+
+        $this->client->request(
+            'PUT',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflowdefinition_put',
+                ['workflowDefinition' => self::TEST_DEFINITION_NAME]
+            ),
+            array_merge_recursive(
+                $config,
+                [
+                    'transition_definitions' => [
+                        'test_definition' => [
+                            'actions' => [
+                                ['@assign_value' => ['$.result.test', true]]
+                            ]
+                        ]
+                    ]
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 400);
+        $this->assertEquals(['error' => 'Workflow could not be saved'], $result);
+
+        $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
+        $this->assertInstanceOf(Workflow::class, $workflow);
+
+        $config = $workflow->getDefinition()->getConfiguration();
+        $this->assertCount(1, $config['transition_definitions']);
     }
 
     /**
