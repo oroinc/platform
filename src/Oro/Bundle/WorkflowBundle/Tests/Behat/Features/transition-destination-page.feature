@@ -1,4 +1,5 @@
 @ticket-BAP-13968
+@selenium-incompatible
 @automatically-ticket-tagged
 @fixture-OroWorkflowBundle:Workflow.yml
 Feature: Transition Destination Page for Workflow

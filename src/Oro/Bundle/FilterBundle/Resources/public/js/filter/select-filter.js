@@ -8,6 +8,11 @@ define(function(require) {
     var AbstractFilter = require('./abstract-filter');
     var MultiselectDecorator = require('orofilter/js/multiselect-decorator');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var module = require('module');
+
+    var config = _.extend({
+        populateDefault: true
+    },  module.config());
 
     /**
      * Select filter: filter value as select option
@@ -30,7 +35,7 @@ define(function(require) {
          *
          * @property
          */
-        populateDefault: true,
+        populateDefault: config.populateDefault,
 
         /**
          * Selector for filter area
@@ -177,7 +182,7 @@ define(function(require) {
         render: function() {
             var options = this.choices.slice(0);
             if (this.populateDefault) {
-                options.unshift({value: '', label: this.placeholder});
+                options.unshift({value: '', label: this.placeholder || this.populateDefault});
             }
 
             var html = this.template({
