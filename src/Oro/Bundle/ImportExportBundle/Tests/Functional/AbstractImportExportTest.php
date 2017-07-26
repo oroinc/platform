@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -28,11 +28,13 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param ImportExportConfiguration $configuration
-     * @param string                    $expectedCsvFilePath
+     * @param ImportExportConfigurationInterface $configuration
+     * @param string                             $expectedCsvFilePath
      */
-    protected function assertExportTemplateWorks(ImportExportConfiguration $configuration, string $expectedCsvFilePath)
-    {
+    protected function assertExportTemplateWorks(
+        ImportExportConfigurationInterface $configuration,
+        string $expectedCsvFilePath
+    ) {
         $this->client->request(
             'GET',
             $this->getUrl('oro_importexport_export_template', [
@@ -52,11 +54,13 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param ImportExportConfiguration $configuration
-     * @param string                    $expectedCsvFilePath
+     * @param ImportExportConfigurationInterface $configuration
+     * @param string                             $expectedCsvFilePath
      */
-    protected function assertExportWorks(ImportExportConfiguration $configuration, string $expectedCsvFilePath)
-    {
+    protected function assertExportWorks(
+        ImportExportConfigurationInterface $configuration,
+        string $expectedCsvFilePath
+    ) {
         $this->assertPreExportActionExecuted($configuration);
 
         $preExportMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_EXPORT);
@@ -90,11 +94,13 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param ImportExportConfiguration $configuration
-     * @param string                    $importFilePath
+     * @param ImportExportConfigurationInterface $configuration
+     * @param string                             $importFilePath
      */
-    protected function assertImportWorks(ImportExportConfiguration $configuration, string $importFilePath)
-    {
+    protected function assertImportWorks(
+        ImportExportConfigurationInterface $configuration,
+        string $importFilePath
+    ) {
         $this->assertPreImportActionExecuted($configuration, $importFilePath);
 
         $preImportMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
@@ -120,12 +126,12 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param ImportExportConfiguration $configuration
-     * @param string                    $importCsvFilePath
-     * @param string                    $errorsFilePath
+     * @param ImportExportConfigurationInterface $configuration
+     * @param string                             $importCsvFilePath
+     * @param string                             $errorsFilePath
      */
     public function assertImportValidateWorks(
-        ImportExportConfiguration $configuration,
+        ImportExportConfigurationInterface $configuration,
         string $importCsvFilePath,
         string $errorsFilePath = ''
     ) {
@@ -195,6 +201,7 @@ abstract class AbstractImportExportTest extends WebTestCase
     protected function createNullMessage(array $messageData): NullMessage
     {
         $message = new NullMessage();
+
         $message->setMessageId('abc');
         $message->setBody(json_encode($messageData));
 
@@ -220,9 +227,9 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param ImportExportConfiguration $configuration
+     * @param ImportExportConfigurationInterface $configuration
      */
-    protected function assertPreExportActionExecuted(ImportExportConfiguration $configuration)
+    protected function assertPreExportActionExecuted(ImportExportConfigurationInterface $configuration)
     {
         $this->client->request(
             'GET',
@@ -249,11 +256,11 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param ImportExportConfiguration $configuration
-     * @param string                    $importCsvFilePath
+     * @param ImportExportConfigurationInterface $configuration
+     * @param string                             $importCsvFilePath
      */
     protected function assertPreImportActionExecuted(
-        ImportExportConfiguration $configuration,
+        ImportExportConfigurationInterface $configuration,
         string $importCsvFilePath
     ) {
         $file = new UploadedFile($importCsvFilePath, basename($importCsvFilePath));
@@ -288,11 +295,11 @@ abstract class AbstractImportExportTest extends WebTestCase
     }
 
     /**
-     * @param ImportExportConfiguration $configuration
-     * @param string                    $importCsvFilePath
+     * @param ImportExportConfigurationInterface $configuration
+     * @param string                             $importCsvFilePath
      */
     protected function assertPreImportValidationActionExecuted(
-        ImportExportConfiguration $configuration,
+        ImportExportConfigurationInterface $configuration,
         string $importCsvFilePath
     ) {
         $file = new UploadedFile($importCsvFilePath, basename($importCsvFilePath));
