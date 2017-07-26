@@ -13,8 +13,8 @@ use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesGroupController;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
+use WebDriver\ServiceFactory;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
@@ -70,6 +71,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processClassResolvers($container);
         $this->processArtifactHandlers($container);
         $this->replaceSessionListener($container);
+        $this->setWebDriverCurl($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -92,18 +94,23 @@ class OroTestFrameworkExtension implements TestworkExtension
     }
 
     /**
+     * @param ContainerBuilder $container
+     */
+    public function setWebDriverCurl(ContainerBuilder $container)
+    {
+        $curl = new OroWebDriverCurlService();
+        $curl->setLogDir($container->getParameter('kernel.log_dir'));
+
+        ServiceFactory::getInstance()->setService('service.curl', $curl);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function configure(ArrayNodeDefinition $builder)
     {
         $builder
             ->children()
-                ->arrayNode('suite_groups')
-                    ->useAttributeAsKey('name')
-                    ->prototype('array')
-                        ->prototype('scalar')->end()
-                    ->end()
-                ->end()
                 ->variableNode('shared_contexts')
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
@@ -136,7 +143,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $container->setParameter('oro_test.suite_groups', $config['suite_groups']);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario

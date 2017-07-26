@@ -2,19 +2,13 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerItemView;
+    var template = require('tpl!orodatagrid/templates/column-manager/column-manager-item.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var module = require('module');
-    var config = module.config();
-
-    config = _.extend({
-        templateSelector: null
-    }, config);
 
     ColumnManagerItemView = BaseView.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html'),
-        templateSelector: config.templateSelector,
+        template: template,
         tagName: 'tr',
 
         events: {

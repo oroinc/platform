@@ -118,7 +118,7 @@ define([
          */
         initialize: function(options) {
             var opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
-                'templateSelector', 'templateTheme');
+                'templateSelector', 'templateTheme', 'template');
             _.extend(this, opts);
 
             this._defineTemplate();

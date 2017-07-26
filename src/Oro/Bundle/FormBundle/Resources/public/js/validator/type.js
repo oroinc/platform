@@ -20,6 +20,7 @@ define(function(require) {
                     var valueNumber = Number(value).toFixed();
                     result = String(valueNumber) === value;
                     break;
+                case 'float':
                 case 'numeric':
                     result = !isNaN(numberFormatter.unformatStrict(value));
                     break;

@@ -1,7 +1,7 @@
 "Item deleted": "Item deleted"
 oro_datagrid:
     no_data_hint %entityHint%: "No %entityHint% exists."
-    not_found_hint %entityHint%:  "No %entityHint% was found to match your search. Try modifying your search criteria..."
+    not_found_hint %entityHint%:  "No %entityHint% were found to match your search. Try modifying your search criteria ..."
     label_add_filter: Manage filters
     label_loading_mask: "Loading . . ."
     label_reset_button: "Reset Filter"

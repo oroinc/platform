@@ -15,7 +15,16 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      routeName="oro_test_item_index",
  *      routeView="oro_test_item_view",
  *      routeCreate="oro_test_item_create",
- *      routeUpdate="oro_test_item_update"
+ *      routeUpdate="oro_test_item_update",
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
+ *          }
+ *      }
  * )
  */
 class Item implements TestFrameworkEntityInterface

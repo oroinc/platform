@@ -913,8 +913,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: there is no records in Frontend Grid
      *
      * @Then /^there is no records in grid$/
+     * @Then /^there are no records in grid$/
      * @Then all records should be deleted
      * @Then /^there is no records in "(?P<gridName>[\w\s]+)"$/
+     * @Then /^there are no records in "(?P<gridName>[\w\s]+)"$/
      */
     public function thereIsNoRecordsInGrid($gridName = null)
     {
@@ -1210,6 +1212,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid$/
      * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid "(?P<gridName>[\w\s]+)$"/
+     * @Then /^(?:|I )should see "(?P<recordName>(?:[^"]|\\")*)" in grid$/
+     * @Then /^(?:|I )should see "(?P<recordName>(?:[^"]|\\")*)" in grid "(?P<gridName>[\w\s]+)$"/
      */
     public function iShouldSeeRecordInGrid($recordName, $gridName = null)
     {
@@ -1397,7 +1401,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1419,7 +1423,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFilersButton'))->open();
+        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1456,6 +1460,76 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $grid->isIsset(),
             sprintf('Grid "%s" was found on page, but it should not.', $gridName)
         );
+    }
+
+    /**
+     * Example: I should see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should see following elements in grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertTrue(
+                    $element->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertTrue(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" not found on the page', reset($item))
+                );
+            }
+        }
+    }
+
+    /**
+     * Example: I should not see following elements in "Grid" grid:
+     *            | Action System Button  |
+     *            | Action Default Button |
+     *            | Filter Button         |
+     * @When /^(?:|I )should not see following elements in grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for grid:$/
+     * @When /^(?:|I )should not see following elements in "(?P<toolbar>[\w\s]+)" for "(?P<gridName>[\w\s]+)":$/
+     */
+    public function iShouldNotSeeElementsInGrid(TableNode $table, $toolbar = null, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $rows = $table->getRows();
+
+        if (!is_null($toolbar)) {
+            $toolbar = $grid->getElement($toolbar);
+
+            foreach ($rows as $item) {
+                $element = $this->createElement(reset($item), $toolbar);
+                self::assertFalse(
+                    $element->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        } else {
+            foreach ($rows as $item) {
+                self::assertFalse(
+                    $grid->getElement(reset($item))->isIsset(),
+                    sprintf('Element "%s" is exist on the page', reset($item))
+                );
+            }
+        }
     }
 
     /**

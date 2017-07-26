@@ -21,8 +21,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
@@ -838,7 +836,7 @@ class OroMainContext extends MinkContext implements
         $section = $this->fixStepArgument($section);
         $page = $this->getSession()->getPage();
 
-        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]/..')->getParent();
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
 
         if ($sectionContainer->hasButton($button)) {
             $sectionContainer->pressButton($button);
@@ -862,8 +860,8 @@ class OroMainContext extends MinkContext implements
      */
     public function iRestartMessageConsumer()
     {
-        $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent());
+        $this->messageQueueIsolator->stopMessageQueue();
+        $this->messageQueueIsolator->startMessageQueue();
     }
 
     /**
@@ -873,6 +871,51 @@ class OroMainContext extends MinkContext implements
     {
         $button = $this->getSession()->getPage()->findButton($button);
         self::assertTrue($button->hasClass('disabled'));
+    }
+
+    /**
+     * @Given /^I should see "(?P<string>[^"]*)" in "(?P<elementName>[^"]*)" under "(?P<parentElementName>[^"]*)"$/
+     */
+    public function iShouldSeeStringInElementUnderElements($string, $elementName, $parentElementName)
+    {
+        static::assertTrue($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
+            '`%s` has not been found in any of `%s` elements',
+            $string,
+            $elementName
+        ));
+    }
+
+    /**
+     * @Given /^I should not see "(?P<string>[^"]*)" in "(?P<elementName>[^"]*)" under "(?P<parentElementName>[^"]*)"$/
+     */
+    public function iShouldNotSeeStringInElementUnderElements($string, $elementName, $parentElementName)
+    {
+        static::assertFalse($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
+            '`%s` has been found in one of `%s` elements',
+            $string,
+            $elementName
+        ));
+    }
+
+    /**
+     * @param string $string
+     * @param string $elementName
+     * @param string $parentElementName
+     * @return bool
+     */
+    private function stringFoundInElements($string, $elementName, $parentElementName)
+    {
+        $allElements = $this->findAllElements($parentElementName);
+
+        $found = false;
+        foreach ($allElements as $elementRow) {
+            $element = $elementRow->findElementContains($elementName, $string);
+            if ($element->isIsset() && strpos(trim($element->getText()), trim($string)) !== false) {
+                $found = true;
+            }
+        }
+
+        return $found;
     }
 
     /**
@@ -1017,10 +1060,17 @@ class OroMainContext extends MinkContext implements
      */
     public function iConfirmSchemaUpdate()
     {
-        $this->pressButton('Update schema');
-        $this->assertPageContainsText('Schema update confirmation');
-        $this->pressButton('Yes, Proceed');
-        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+        try {
+            $this->pressButton('Update schema');
+            $this->assertPageContainsText('Schema update confirmation');
+            $this->pressButton('Yes, Proceed');
+            $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            $this->messageQueueIsolator->stopMessageQueue();
+            $this->messageQueueIsolator->startMessageQueue();
+        }
     }
 
     /**

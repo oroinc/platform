@@ -569,6 +569,12 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->extension->getMaskPattern($resultMask)
             )
         );
+
+        $this->assertSame(
+            $this->extension->getServiceBits($aceMask),
+            $this->extension->getServiceBits($resultMask),
+            'Service bits should not be changed.'
+        );
     }
 
     /**
@@ -1154,7 +1160,6 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
             ->disableOriginalConstructor()
             ->getMock();
-
 
         $extension = new EntityAclExtension(
             new ObjectIdAccessor($this->doctrineHelper),

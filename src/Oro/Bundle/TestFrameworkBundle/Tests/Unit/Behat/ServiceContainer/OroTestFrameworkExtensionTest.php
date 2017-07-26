@@ -3,15 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
-use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
@@ -312,6 +311,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         self::delTree(self::$path1);
         self::delTree(self::$path2);
+        $log = sys_get_temp_dir().DIRECTORY_SEPARATOR.OroWebDriverCurlService::LOG_FILE;
+        if (is_file($log)) {
+            unlink($log);
+        }
     }
 
     public static function delTree($dir)
