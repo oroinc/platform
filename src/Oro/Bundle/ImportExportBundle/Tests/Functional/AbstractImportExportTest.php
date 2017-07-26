@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -47,7 +48,7 @@ abstract class AbstractImportExportTest extends WebTestCase
             $this->client->getResponse()->getContent()
         );
 
-        $this->deleteFile($this->client->getRequest()->attributes->get('fileName'));
+        $this->deleteImportExportFile($this->client->getRequest()->attributes->get('fileName'));
     }
 
     /**
@@ -85,7 +86,7 @@ abstract class AbstractImportExportTest extends WebTestCase
             $this->getImportExportFileContent($exportedFilename)
         );
 
-        $this->deleteFile($exportedFilename);
+        $this->deleteImportExportFile($exportedFilename);
     }
 
     /**
@@ -113,6 +114,9 @@ abstract class AbstractImportExportTest extends WebTestCase
             'oro_importexport.async.http_import',
             $importMessageData
         );
+
+        $this->deleteTmpFile($preImportMessageData['fileName']);
+        $this->deleteTmpFile($importMessageData['fileName']);
     }
 
     /**
@@ -127,12 +131,12 @@ abstract class AbstractImportExportTest extends WebTestCase
     ) {
         $this->assertPreImportValidationActionExecuted($configuration, $importCsvFilePath);
 
-        $preImportMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
+        $preImportValidateMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
         $this->clearMessageCollector();
 
         $this->assertMessageProcessorExecuted(
             'oro_importexport.async.pre_http_import',
-            $preImportMessageData
+            $preImportValidateMessageData
         );
 
         $importValidateMessageData = $this->getOneSentMessageWithTopic(Topics::HTTP_IMPORT);
@@ -159,6 +163,10 @@ abstract class AbstractImportExportTest extends WebTestCase
             json_decode($this->getFileContent($errorsFilePath)),
             json_decode($this->getImportExportFileContent($jobData['errorLogFile']))
         );
+
+        $this->deleteTmpFile($preImportValidateMessageData['fileName']);
+        $this->deleteTmpFile($importValidateMessageData['fileName']);
+        $this->deleteImportExportFile($jobData['errorLogFile']);
     }
 
     /**
@@ -392,8 +400,16 @@ abstract class AbstractImportExportTest extends WebTestCase
     /**
      * @param string $filename
      */
-    protected function deleteFile(string $filename)
+    protected function deleteImportExportFile(string $filename)
     {
         static::getContainer()->get('oro_importexport.file.file_manager')->deleteFile($filename);
+    }
+
+    /**
+     * @param string $filename
+     */
+    protected function deleteTmpFile(string $filename)
+    {
+        unlink(FileManager::generateTmpFilePath($filename));
     }
 }
