@@ -836,7 +836,7 @@ class OroMainContext extends MinkContext implements
         $section = $this->fixStepArgument($section);
         $page = $this->getSession()->getPage();
 
-        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]/..')->getParent();
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
 
         if ($sectionContainer->hasButton($button)) {
             $sectionContainer->pressButton($button);

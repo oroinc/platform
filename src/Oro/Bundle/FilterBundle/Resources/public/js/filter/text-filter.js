@@ -124,8 +124,7 @@ define(function(require) {
                 return;
             }
 
-            if (!this._hasMinimumLength()) {
-                this._showMinLengthWarning();
+            if (!this._isValid()) {
                 return;
             }
 
@@ -140,8 +139,7 @@ define(function(require) {
          */
         _onClickUpdateCriteria: function(e) {
 
-            if (!this._hasMinimumLength()) {
-                this._showMinLengthWarning();
+            if (!this._isValid()) {
                 e.stopImmediatePropagation();
                 return;
             }
@@ -151,21 +149,23 @@ define(function(require) {
         },
 
         /**
-         * Handles min_length text filter option.
-         * 0 is default value which means any length is fine.
+         * Handles min_length and max_length text filter option.
          *
          * @returns {boolean}
          * @private
          */
-        _hasMinimumLength: function() {
-            if (typeof this.min_length === 'undefined') {
-                return true;
+        _isValid: function() {
+            if (typeof this.min_length !== 'undefined' && this._readDOMValue().value.length < this.min_length) {
+                this._showMinLengthWarning();
+                return false;
             }
 
-            var enoughCharacters =  this._readDOMValue().value.length >= this.min_length;
-            var noCharacters = this._readDOMValue().value.length === 0;
+            if (typeof this.max_length !== 'undefined' && this._readDOMValue().value.length > this.max_length) {
+                this._showMaxLengthWarning();
+                return false;
+            }
 
-            return this.min_length === 0 || enoughCharacters || noCharacters;
+            return true;
         },
 
         /**
@@ -176,6 +176,17 @@ define(function(require) {
                 'showFlashMessage',
                 'warning',
                 __('oro.filter.warning.min_length', {min_length: this.min_length})
+            );
+        },
+
+        /**
+         * @private
+         */
+        _showMaxLengthWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('oro.filter.warning.max_length', {max_length: this.max_length})
             );
         },
 
@@ -224,7 +235,7 @@ define(function(require) {
          */
         _applyValueAndHideCriteria: function() {
             this._hideCriteria();
-            if (this._hasMinimumLength()) {
+            if (this._isValid()) {
                 this.applyValue();
             }
         },
