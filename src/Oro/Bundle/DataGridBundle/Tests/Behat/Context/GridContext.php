@@ -224,11 +224,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table as $index => $row) {
             $rowNumber = $index + 1;
             foreach ($row as $columnTitle => $value) {
-                self::assertEquals(
-                    $value,
-                    $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle),
-                    sprintf('Unexpected value at %d row in grid', $rowNumber)
-                );
+                $cellValue = $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle);
+                if ($cellValue instanceof \DateTime) {
+                    $value = new \DateTime($value);
+                }
+                self::assertEquals($value, $cellValue, sprintf('Unexpected value at %d row in grid', $rowNumber));
             }
         }
     }
@@ -567,8 +567,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: But when I sort grid by First Name again
      * Example: When I sort "Quotes Grid" by Updated At
      *
-     * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*[^again]))(?:| again)$/
-     * @When /^(?:|when )(?:|I )sort "(?P<gridName>[\w\s]+)" by (?P<field>(?:|[\w\s]*[^again]))(?:| again)$/
+     * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
+     * @When /^(?:|when )(?:|I )sort "(?P<gridName>[\w\s]+)" by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
      */
     public function sortGridBy($field, $gridName = null)
     {
@@ -743,9 +743,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I filter First Name as contains "Aadi"
      * Example: And filter Name as is equal to "User"
      *
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s]+) "(?P<value>[\w\s\.\_\%]+)"$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s]+) "(?P<value>[\w\s\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s]+) "(?P<value>[\w\s\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|is empty|is not empty))$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\.\_\%]+)"$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
      *
      * @param string $filterName
      * @param string $type
@@ -753,7 +754,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      */
     //@codingStandardsIgnoreEnd
-    public function applyStringFilter($filterName, $type, $value, $filterGridName = 'Grid')
+    public function applyStringFilter($filterName, $type, $value = null, $filterGridName = 'Grid')
     {
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterStringItem', $filterName);
