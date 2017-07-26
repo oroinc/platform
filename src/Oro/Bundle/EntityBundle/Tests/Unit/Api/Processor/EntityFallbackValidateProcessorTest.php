@@ -51,8 +51,8 @@ class EntityFallbackValidateProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $mainClass
-     * @param $requestData
+     * @param string $mainClass
+     * @param array $requestData
      * @dataProvider getIgnoreTestProvider
      */
     public function testProcessShouldBeIgnored($mainClass, $requestData)

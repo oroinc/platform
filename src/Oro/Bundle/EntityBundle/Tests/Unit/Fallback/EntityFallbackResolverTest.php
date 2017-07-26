@@ -412,8 +412,8 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $type
-     * @param $expectedFieldName
+     * @param string $type
+     * @param string $expectedFieldName
      * @param bool $throwException
      * @dataProvider getRequiredFallbackFieldByTypeProvider
      */
