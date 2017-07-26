@@ -493,11 +493,3 @@ services:
         arguments:
             - '@doctrine'
             - '@property_accessor'
-
-    oro_entity.validator.entity_field_fallback_values:
-        class: 'Oro\Bundle\EntityBundle\Validator\Constraints\EntityFieldFallbackValuesValidator'
-        arguments:
-            - '@oro_layout.page_templates_manager'
-        public: true
-        tags:
-            - { name: validator.constraint_validator, alias: oro_entity_field_fallback_values_validator }
