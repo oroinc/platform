@@ -37,6 +37,6 @@ class GetImportExportConfigurationExtension extends \Twig_Extension
      */
     public function getConfiguration(string $alias): array
     {
-        return $this->configurationRegistry->getConfiguration($alias);
+        return $this->configurationRegistry->getConfigurations($alias);
     }
 }

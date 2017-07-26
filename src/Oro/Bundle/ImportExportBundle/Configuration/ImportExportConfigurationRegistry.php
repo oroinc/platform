@@ -20,7 +20,7 @@ class ImportExportConfigurationRegistry implements ImportExportConfigurationRegi
     /**
      * {@inheritDoc}
      */
-    public function getConfiguration(string $alias): array
+    public function getConfigurations(string $alias): array
     {
         if (!array_key_exists($alias, $this->configurations)) {
             return [];
