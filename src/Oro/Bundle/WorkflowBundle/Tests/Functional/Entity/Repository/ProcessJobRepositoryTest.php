@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 /**
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class ProcessJobRepositoryTest extends WebTestCase
 {

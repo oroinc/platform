@@ -73,7 +73,8 @@ class CleanupCommandTest extends WebTestCase
     protected function getEntityFieldAsArray($repositoryName, $field)
     {
         /** @var QueryBuilder $qb */
-        $qb = $this->getContainer()->get('doctrine')
+        $qb = $this->getContainer()->get('akeneo_batch.job_repository')
+            ->getJobManager()
             ->getRepository($repositoryName)
             ->createQueryBuilder('i');
 
