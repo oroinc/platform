@@ -291,11 +291,14 @@ define(function(require) {
                 'error': function(model, response) {
                     mediator.execute('hideLoading');
                     var jsonResponse = response.responseJSON || {};
+                    var message = __('Could not save workflow.');
 
                     if (tools.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
                         console.error(jsonResponse.error);
+                        message = jsonResponse.error;
                     }
-                    messenger.notificationFlashMessage('error', __('Could not save workflow.'));
+
+                    messenger.notificationFlashMessage('error', message);
                 }
             });
         },

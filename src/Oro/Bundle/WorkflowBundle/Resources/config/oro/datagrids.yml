@@ -116,6 +116,7 @@ datagrids:
                     - w.priority
                     - w.groups
                     - w.createdAt
+                    - w.configuration
                 from:
                     - { table: %oro_workflow.entity.workflow_definition.class%, alias: w }
         columns:
