@@ -15,6 +15,19 @@ DashboardBundle
     - In method `addDatePartsSelect` removed the last one argument `$useCurrentTimeZone`
     - In method `getEnforcedTimezoneFunction` removed the last one argument `$useCurrentTimeZone`
 
+ImportExportBundle
+--------
+- Functionality for showing import/export buttons for multiple entities were added:
+    - Class `Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration` was added for storing import/export parameters
+    - Interface `Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface` was added for specifying import/export parameters
+    - Interface `Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface` was added with responsibility to provide import/export configuration
+    - Class `Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry` was added to store and provide all configurations provided by configuration providers
+    - Interface `Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface` was added with responsibility to provide import/export configurations
+    - Class `Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ImportExportConfigurationRegistryCompilerPass` was added to fill the registry with configuration providers
+    - View `buttons_from_configuration.html.twig` was added for showing import/export buttons for multiple entities on a page
+    - Class `Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension` was added to provide access to configurations from view
+- Class `Oro\Bundle\ImportExportBundle\Tests\Functional\AbstractImportExportTest` was added as a base class for creating functional tests for import/export features
+
 UIBundle
 --------
 - `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
