@@ -138,6 +138,13 @@ oro:
             process:
                 activated:   Process has been activated successfully
                 deactivated: Process has been deactivated successfully
+            workflow:
+                could_not_be_cloned: 'Workflow could not be cloned'
+                could_not_be_saved: 'Workflow could not be saved'
+
+        status:
+            system.label: 'System'
+            readonly.label: 'Read-only'
 
         processdefinition:
             entity_label:                 Process

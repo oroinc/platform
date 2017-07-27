@@ -12,3 +12,10 @@ services:
             - '@oro_security.security_facade'
         tags:
             - { name: oro_action.condition, alias: 'is_granted_workflow_transition' }
+
+    oro_workflow.condition.is_workflow_configuration_clean:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Condition\IsWorkflowConfigurationClean'
+        arguments:
+            - '@oro_workflow.configuration.checker'
+        tags:
+            - { name: oro_action.condition, alias: 'is_workflow_configuration_clean' }
