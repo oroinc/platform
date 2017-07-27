@@ -36,6 +36,15 @@ trait PageObjectDictionary
 
     /**
      * @param string $name
+     * @return bool
+     */
+    public function hasElement($name)
+    {
+        return $this->elementFactory->hasElement($name);
+    }
+
+    /**
+     * @param string $name
      * @param NodeElement $context
      * @return Element
      */

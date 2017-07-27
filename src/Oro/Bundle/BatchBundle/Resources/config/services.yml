@@ -13,7 +13,7 @@ services:
     oro_batch.job.repository:
         class: %oro_batch.job.repository.class%
         arguments:
-            - '@doctrine.orm.batch_entity_manager'
+            - '@doctrine'
             - '%akeneo_batch.entity.job_execution.class%'
         decorates: akeneo_batch.job_repository
 

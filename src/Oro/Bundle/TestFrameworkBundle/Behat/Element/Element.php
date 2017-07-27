@@ -182,6 +182,18 @@ class Element extends NodeElement
     }
 
     /**
+     * Executes JS code that force click on element
+     */
+    public function clickForce()
+    {
+        $jsCode = sprintf(
+            '$(document.evaluate("%s",document,null,XPathResult.FIRST_ORDERED_NODE_TYPE).singleNodeValue).click();',
+            $this->getXpath()
+        );
+        $this->getDriver()->executeScript($jsCode);
+    }
+
+    /**
      * @return self
      */
     protected function getPage()

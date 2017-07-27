@@ -35,12 +35,10 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         /** @var Connection $connection */
         $connection = $doctrine->getManager()->getConnection();
-        /** @var Connection $connectionMQ */
-        $connectionMQ = $doctrine->getManager('message_queue_job')->getConnection();
 
         $connection->executeQuery('DELETE FROM oro_message_queue');
-        $connectionMQ->executeQuery('DELETE FROM oro_message_queue_job');
-        $connectionMQ->executeQuery('DELETE FROM oro_message_queue_job_unique');
+        $connection->executeQuery('DELETE FROM oro_message_queue_job');
+        $connection->executeQuery('DELETE FROM oro_message_queue_job_unique');
 
         $this->getFilesystem()
             ->remove(rtrim($this->kernel->getContainer()->getParameter('oro_message_queue.dbal.pid_file_dir')));
@@ -79,20 +77,29 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         /** @var Connection $connection */
         $connection = $doctrine->getManager()->getConnection();
-        /** @var Connection $connectionMQ */
-        $connectionMQ = $doctrine->getManager('message_queue_job')->getConnection();
 
-        $messages = $connection->executeQuery('SELECT * FROM oro_message_queue')->rowCount() +
-            $connectionMQ->executeQuery(
+        return
+            !$this->hasRows($connection, 'SELECT * FROM oro_message_queue')
+            && !$this->hasRows(
+                $connection,
                 sprintf(
                     "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s')",
                     Job::STATUS_SUCCESS,
                     Job::STATUS_FAILED
                 )
-            )->rowCount() +
-            $connectionMQ->executeQuery('SELECT * FROM oro_message_queue_job_unique')->rowCount();
+            )
+            && !$this->hasRows($connection, 'SELECT * FROM oro_message_queue_job_unique');
+    }
 
-        return false == $messages;
+    /**
+     * @param Connection $connection
+     * @param string     $sqlQuery
+     *
+     * @return bool
+     */
+    private function hasRows(Connection $connection, $sqlQuery)
+    {
+        return 0 !== $connection->executeQuery($sqlQuery)->rowCount();
     }
 
     /**

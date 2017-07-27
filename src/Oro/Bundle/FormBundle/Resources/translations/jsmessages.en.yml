@@ -12,7 +12,7 @@ oro:
         add_new: Add new
         inlineEditing:
             inline_edits: "Inline edits"
-            successMessage: "Record has been succesfully updated"
+            successMessage: "Record has been successfully updated"
             helpMessage: "Double click on cell to edit"
             loadingError: "Cannot load component or view for inline grid editor"
             saving_progress: "Inline edits are being saved"
