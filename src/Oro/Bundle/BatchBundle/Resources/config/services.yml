@@ -15,6 +15,8 @@ services:
         arguments:
             - '@doctrine.orm.batch_entity_manager'
             - '%akeneo_batch.entity.job_execution.class%'
+        calls:
+            - [ setDoctrine, [ '@doctrine' ] ]
         decorates: akeneo_batch.job_repository
 
     oro_batch.cache.doctrine_metadata:

@@ -112,7 +112,7 @@ class JobExecutor
     public function executeJob($jobType, $jobName, array $configuration = [])
     {
         $this->initialize();
-        $jobInstance  = $this->createJobInstance($jobType, $jobName, $configuration);
+        $jobInstance = $this->createJobInstance($jobType, $jobName, $configuration);
         $jobExecution = $this->createJobExecution($configuration, $jobInstance);
 
         $jobResult = $this->doJob($jobInstance, $jobExecution);
@@ -132,9 +132,10 @@ class JobExecutor
         $jobResult = new JobResult();
         $jobResult->setSuccessful(false);
 
-        $isTransactionRunning = $this->isTransactionRunning();
-        if (!$isTransactionRunning) {
+        $isTransactionStarted = false;
+        if ($this->validationMode || !$this->isTransactionRunning()) {
             $this->entityManager->beginTransaction();
+            $isTransactionStarted = true;
         }
 
         try {
@@ -146,17 +147,20 @@ class JobExecutor
             $job->execute($jobExecution);
             $isSuccessful = $this->handleJobResult($jobExecution, $jobResult);
 
-            if (!$isTransactionRunning && $isSuccessful && !$this->validationMode) {
-                $this->entityManager->commit();
-            } elseif (!$isTransactionRunning) {
-                $this->entityManager->rollback();
+            if ($isTransactionStarted) {
+                $isTransactionStarted = false;
+                if ($isSuccessful && !$this->validationMode) {
+                    $this->entityManager->commit();
+                } else {
+                    $this->entityManager->rollback();
+                }
             }
 
             // trigger save of JobExecution and JobInstance
             $this->batchJobRepository->getJobManager()->flush();
             $this->batchJobRepository->getJobManager()->clear();
         } catch (\Exception $exception) {
-            if (!$isTransactionRunning) {
+            if ($isTransactionStarted) {
                 $this->entityManager->rollback();
             }
             $jobExecution->addFailureException($exception);
@@ -207,14 +211,7 @@ class JobExecutor
      */
     protected function saveFailedJobExecution(JobExecution $jobExecution)
     {
-        $batchManager = $this->batchJobRepository->getJobManager();
-        $batchUow     = $batchManager->getUnitOfWork();
-        $couldBeSaved = $batchManager->isOpen()
-                        && $batchUow->getEntityState($jobExecution) === UnitOfWork::STATE_MANAGED;
-
-        if ($couldBeSaved) {
-            $batchManager->flush();
-        }
+        $this->batchJobRepository->updateJobExecution($jobExecution);
     }
 
     /**
