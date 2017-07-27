@@ -2,26 +2,25 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Sorter;
 
+use Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Sorter\PreciseOrderByExtension;
 
-class PreciseOrderByExtensionTest extends \PHPUnit_Framework_TestCase
+class HintExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var PreciseOrderByExtension */
+    /** @var HintExtension */
     protected $extension;
 
     public function setUp()
     {
-        $queryHintResolver = $this->getMockBuilder(QueryHintResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var QueryHintResolver|\PHPUnit_Framework_MockObject_MockObject $queryHintResolver */
+        $queryHintResolver = $this->createMock(QueryHintResolver::class);
         $queryHintResolver->expects(self::any())
             ->method('resolveHintName')
-            ->with(PreciseOrderByExtension::HINT_PRECISE_ORDER_BY)
+            ->with('HINT_PRECISE_ORDER_BY')
             ->willReturn('oro_entity.precise_order_by');
 
-        $this->extension = new PreciseOrderByExtension($queryHintResolver);
+        $this->extension = new HintExtension($queryHintResolver, 'HINT_PRECISE_ORDER_BY', -261);
     }
 
     public function testGetPriority()

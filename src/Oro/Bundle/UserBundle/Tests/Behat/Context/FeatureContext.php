@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -27,6 +26,8 @@ class FeatureContext extends OroFeatureContext implements
 
     /**
      * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {

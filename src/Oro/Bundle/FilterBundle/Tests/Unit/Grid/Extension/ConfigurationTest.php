@@ -90,6 +90,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'translatable' => true,
                             'force_like' => false,
                             'min_length' => 0,
+                            'max_length' => PHP_INT_MAX,
                         ],
                     ],
                     'default' => [],
@@ -104,6 +105,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'data_name' => 'test',
                                 'force_like' => true,
                                 'min_length' => 3,
+                                'max_length' => 99,
                             ],
                         ],
                     ],
@@ -118,6 +120,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'translatable' => true,
                             'force_like' => true,
                             'min_length' => 3,
+                            'max_length' => 99,
                         ],
                     ],
                     'default' => [],
@@ -189,6 +192,28 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'type' => 'string',
                             'data_name' => 'test',
                             'min_length' => -1,
+                        ],
+                    ],
+                ],
+            ]],
+            'invalid max_length option' => [[
+                'filters' => [
+                    'columns' => [
+                        'sku' => [
+                            'type' => 'string',
+                            'data_name' => 'test',
+                            'max_length' => 'string'
+                        ],
+                    ],
+                ],
+            ]],
+            'invalid max_length value' => [[
+                'filters' => [
+                    'columns' => [
+                        'sku' => [
+                            'type' => 'string',
+                            'data_name' => 'test',
+                            'max_length' => 0,
                         ],
                     ],
                 ],
