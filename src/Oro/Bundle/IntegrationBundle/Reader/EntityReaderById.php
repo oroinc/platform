@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Reader;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
@@ -30,7 +29,15 @@ class EntityReaderById extends BaseReader
      */
     protected function initializeFromContext(ContextInterface $context)
     {
-        parent::initializeFromContext($context);
+        if ($context->hasOption('entityName')) {
+            $this->setSourceEntityName(
+                $context->getOption('entityName'),
+                $context->getOption('organization'),
+                $this->getIdsFromContext($context)
+            );
+        } else {
+            parent::initializeFromContext($context);
+        }
 
         $this->ensureInitialized($context);
     }
@@ -66,5 +73,28 @@ class EntityReaderById extends BaseReader
 
             $this->setSourceIterator(new BufferedIdentityQueryResultIterator($this->qb));
         }
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return int[]
+     */
+    protected function getIdsFromContext(ContextInterface $context)
+    {
+        $ids = $context->getOption('ids', []);
+
+        if ($context->hasOption('id')) {
+            $id = $context->getOption('id');
+
+            if (is_array($id)) {
+                $ids = array_unique(array_merge($ids, $id));
+            } else {
+                if (!in_array($id, $ids)) {
+                    array_push($ids, $context->getOption('id'));
+                }
+            }
+        }
+
+        return $ids;
     }
 }
