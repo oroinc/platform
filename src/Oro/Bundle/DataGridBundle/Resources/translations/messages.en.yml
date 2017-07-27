@@ -53,6 +53,8 @@ oro:
                 confirm_title: Mass Delete Confirmation
                 confirm_content: Are you sure you want to delete these items?
                 success_message: "{0} No entities were deleted|{1} One entity was deleted|]1,Inf[ %count% entities were deleted"
+            edit:
+                success_message: "{0} No entities were edited|{1} One entity was edited|]1,Inf[ %count% entities were edited"
         datagrid.page_size.all: All
         export.csv: CSV
         export.xlsx: XLSX
