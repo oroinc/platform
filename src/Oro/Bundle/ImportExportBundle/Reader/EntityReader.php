@@ -132,7 +132,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         foreach ($identifierNames = $metadata->getIdentifierFieldNames() as $fieldName) {
             $qb->orderBy('o.' . $fieldName, 'ASC');
         }
-        if (! empty($ids)) {
+        if (!empty($ids)) {
             if (count($identifierNames) > 1) {
                 throw new \LogicException(sprintf(
                     'not supported entity (%s) with composite primary key.',
@@ -140,9 +140,16 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
                 ));
             }
             $identifierName = 'o.' . current($identifierNames);
-            $qb
-                ->andWhere($identifierName . ' IN (:ids)')
-                ->setParameter('ids', $ids);
+
+            if (count($ids) === 1) {
+                $qb
+                    ->andWhere($identifierName . ' = :id')
+                    ->setParameter('id', reset($ids));
+            } else {
+                $qb
+                    ->andWhere($identifierName . ' IN (:ids)')
+                    ->setParameter('ids', $ids);
+            }
         }
 
         $this->addOrganizationLimits($qb, $entityName, $organization);
