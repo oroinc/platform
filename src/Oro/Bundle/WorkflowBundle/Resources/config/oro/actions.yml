@@ -9,6 +9,16 @@ operations:
         datagrids:
             - workflow-definitions-grid
         acl_resource: [CREATE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
+        replace: [preconditions]
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@is_workflow_configuration_clean':
+                    parameters: $.data
+                    message: 'oro.workflow.notification.workflow.could_not_be_cloned'
+                - '@or':
+                    - '@not_blank': $.routes[name]
+                    - '@not_blank': $.gridName
         preactions:
             - '@tree':
                 conditions:

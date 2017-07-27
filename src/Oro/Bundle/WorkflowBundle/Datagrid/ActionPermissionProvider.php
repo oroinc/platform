@@ -4,20 +4,24 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 
 class ActionPermissionProvider
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $configProvider;
+
+    /** @var ConfigurationChecker */
+    protected $configurationChecker;
 
     /**
      * @param ConfigProvider $configProvider
+     * @param ConfigurationChecker $configurationChecker
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(ConfigProvider $configProvider, ConfigurationChecker $configurationChecker)
     {
         $this->configProvider = $configProvider;
+        $this->configurationChecker = $configurationChecker;
     }
 
     /**
@@ -32,15 +36,15 @@ class ActionPermissionProvider
             $config = $this->configProvider->getConfig($relatedEntity);
             $isActiveWorkflow = $record->getValue('name') == $config->get('active_workflow');
         }
-
+        $isConfigurationValid = $this->configurationChecker->isClean($record->getValue('configuration'));
         $isSystem = $record->getValue('system');
 
         return array(
             'activate'   => !$isActiveWorkflow,
-            'clone'      => true,
+            'clone'      => $isConfigurationValid,
             'deactivate' => $isActiveWorkflow,
             'delete'     => !$isSystem,
-            'update'     => !$isSystem,
+            'update'     => !$isSystem && $isConfigurationValid,
             'view'       => true,
 
         );

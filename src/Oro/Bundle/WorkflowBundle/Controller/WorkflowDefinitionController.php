@@ -76,7 +76,7 @@ class WorkflowDefinitionController extends Controller
      */
     public function updateAction(WorkflowDefinition $workflowDefinition)
     {
-        if ($workflowDefinition->isSystem()) {
+        if ($workflowDefinition->isSystem() || !$this->isEditable($workflowDefinition)) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
 
@@ -128,8 +128,20 @@ class WorkflowDefinitionController extends Controller
         return array(
             'entity' => $workflowDefinition,
             'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
+            'edit_allowed' => $this->isEditable($workflowDefinition)
         );
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return bool
+     */
+    protected function isEditable(WorkflowDefinition $workflowDefinition)
+    {
+        $checker = $this->get('oro_workflow.configuration.checker');
+
+        return $checker->isClean($workflowDefinition->getConfiguration());
     }
 
     /**

@@ -2,94 +2,146 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
 
 class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
-    /**
-     * @var ActionPermissionProvider
-     */
+    /** @var ConfigurationChecker|\PHPUnit_Framework_MockObject_MockObject */
+    protected $configurationChecker;
+
+    /** @var ActionPermissionProvider */
     protected $provider;
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
+        $this->configurationChecker = $this->getMockBuilder(ConfigurationChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->provider = new ActionPermissionProvider($this->configProvider);
+
+        $this->provider = new ActionPermissionProvider($this->configProvider, $this->configurationChecker);
     }
 
     /**
-     * @param array $expected
-     * @param object $input
      * @dataProvider getWorkflowDefinitionPermissionsDataProvider
+     *
+     * @param array $expected
+     * @param ResultRecordInterface $input
+     * @param bool $configurationClean
      */
-    public function testGetWorkflowDefinitionPermissionsSystemRelated(array $expected, $input)
+    public function testGetWorkflowDefinitionPermissionsSystemRelated(array $expected, $input, $configurationClean)
     {
+        $this->configurationChecker->expects($this->any())->method('isClean')->willReturn($configurationClean);
+
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
+    /**
+     * @return array
+     */
     public function getWorkflowDefinitionPermissionsDataProvider()
     {
         $systemDefinition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
         $systemDefinition->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValueMap(array(array('system', true))));
+            ->willReturnMap(
+                [
+                    ['system', true],
+                    ['configuration', []],
+                ]
+            );
 
         $regularDefinition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
         $regularDefinition->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValueMap(array(array('system', false))));
+            ->willReturnMap(
+                [
+                    ['system', false],
+                    ['configuration', []],
+                ]
+            );
 
-        return array(
-            'system definition' => array(
-                'expected' => array(
+        return [
+            'system definition' => [
+                'expected' => [
                     'view' => true,
                     'update' => false,
                     'clone'  => true,
                     'delete' => false,
                     'activate' => true,
                     'deactivate' => false
-                ),
-                'input' => $systemDefinition
-            ),
-            'regular definition' => array(
-                'expected' => array(
+                ],
+                'input' => $systemDefinition,
+                'configurationClean' => true
+            ],
+            'system definition not clean' => [
+                'expected' => [
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => false,
+                    'delete' => false,
+                    'activate' => true,
+                    'deactivate' => false
+                ],
+                'input' => $systemDefinition,
+                'configurationClean' => false
+            ],
+            'regular definition' => [
+                'expected' => [
                     'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,
                     'activate' => true,
                     'deactivate' => false
-                ),
-                'input' => $regularDefinition
-            )
-        );
+                ],
+                'input' => $regularDefinition,
+                'configurationClean' => true
+            ],
+            'regular definition not clean' => [
+                'expected' => [
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => false,
+                    'delete' => true,
+                    'activate' => true,
+                    'deactivate' => false
+                ],
+                'input' => $regularDefinition,
+                'configurationClean' => false
+            ]
+        ];
     }
 
     /**
      * @param array $expected
-     * @param object $input
+     * @param ResultRecordInterface $input
      * @param bool $hasConfig
      * @param string $activeWorkflowName
+     * @param bool $configurationClean
      * @dataProvider getWorkflowDefinitionActivationDataProvider
      */
     public function testGetWorkflowDefinitionPermissionsActivationRelated(
         array $expected,
         $input,
         $hasConfig,
-        $activeWorkflowName
+        $activeWorkflowName,
+        $configurationClean
     ) {
         $relatedEntity = $input->getValue('entityClass');
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($relatedEntity)
             ->will($this->returnValue($hasConfig));
+
+        $this->configurationChecker->expects($this->any())->method('isClean')->willReturn($configurationClean);
+
         if ($hasConfig) {
             $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
                 ->getMock();
@@ -110,50 +162,97 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
+    /**
+     * @return array
+     */
     public function getWorkflowDefinitionActivationDataProvider()
     {
-
-        return array(
-            'no config' => array(
-                'expected' => array(
+        return [
+            'no config' => [
+                'expected' => [
                     'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,
                     'activate' => true,
                     'deactivate' => false
-                ),
+                ],
                 'input' => $this->getDefinitionMock(),
-                false,
-                null
-            ),
-            'active definition' => array(
-                'expected' => array(
+                'hasConfig' => false,
+                'activeWorkflowName' => null,
+                'configurationClean' => true
+            ],
+            'no config not clean' => [
+                'expected' => [
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => false,
+                    'delete' => true,
+                    'activate' => true,
+                    'deactivate' => false
+                ],
+                'input' => $this->getDefinitionMock(),
+                'hasConfig' => false,
+                'activeWorkflowName' => null,
+                'configurationClean' => false
+            ],
+            'active definition' => [
+                'expected' => [
                     'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,
                     'activate' => false,
                     'deactivate' => true
-                ),
+                ],
                 'input' => $this->getDefinitionMock(),
-                true,
-                'workflow_name'
-            ),
-            'inactive definition' => array(
-                'expected' => array(
+                'hasConfig' => true,
+                'activeWorkflowName' => 'workflow_name',
+                'configurationClean' => true
+            ],
+            'active definition not clean' => [
+                'expected' => [
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => false,
+                    'delete' => true,
+                    'activate' => false,
+                    'deactivate' => true
+                ],
+                'input' => $this->getDefinitionMock(),
+                'hasConfig' => true,
+                'activeWorkflowName' => 'workflow_name',
+                'configurationClean' => false
+            ],
+            'inactive definition' => [
+                'expected' => [
                     'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,
                     'activate' => true,
                     'deactivate' => false
-                ),
+                ],
                 'input' => $this->getDefinitionMock(),
-                true,
-                'other_workflow_name'
-            )
-        );
+                'hasConfig' => true,
+                'activeWorkflowName' => 'other_workflow_name',
+                'configurationClean' => true
+            ],
+            'inactive definition not clean' => [
+                'expected' => [
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => false,
+                    'delete' => true,
+                    'activate' => true,
+                    'deactivate' => false
+                ],
+                'input' => $this->getDefinitionMock(),
+                'hasConfig' => true,
+                'activeWorkflowName' => 'other_workflow_name',
+                'configurationClean' => false
+            ]
+        ];
     }
 
     /**
@@ -167,10 +266,11 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getValue')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('name', 'workflow_name'),
-                        array('entityClass', '\stdClass')
-                    )
+                    [
+                        ['name', 'workflow_name'],
+                        ['entityClass', '\stdClass'],
+                        ['configuration', []],
+                    ]
                 )
             );
 

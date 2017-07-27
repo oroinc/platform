@@ -114,6 +114,7 @@ datagrid:
                     - w.label
                     - w.system
                     - w.createdAt
+                    - w.configuration
                 from:
                     - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
         columns:
