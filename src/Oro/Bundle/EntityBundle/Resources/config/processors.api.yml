@@ -5,4 +5,5 @@ services:
             - '@oro_entity.fallback.resolver.entity_fallback_resolver'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_input, priority: -32, class: '%oro_product.entity.product.class%'}
+            - { name: oro.api.processor, action: create, group: normalize_input, priority: -32 }
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: -32 }
