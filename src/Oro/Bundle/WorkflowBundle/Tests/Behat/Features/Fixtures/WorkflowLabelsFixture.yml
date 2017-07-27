@@ -1,0 +1,392 @@
+Oro\Bundle\TranslationBundle\Entity\TranslationKey:
+    workflow_custom_workflow_editable_label_key:
+        key: oro.workflow.workflow_custom_workflow_editable.label
+        domain: workflows
+    workflow_custom_workflow_readonly_label_key:
+        key: oro.workflow.workflow_custom_workflow_readonly.label
+        domain: workflows
+    workflow_system_workflow_editable_label_key:
+        key: oro.workflow.workflow_system_workflow_editable.label
+        domain: workflows
+    workflow_system_workflow_readonly_label_key:
+        key: oro.workflow.workflow_system_workflow_readonly.label
+        domain: workflows
+
+Oro\Bundle\TranslationBundle\Entity\Translation:
+    workflow_custom_workflow_editable_label:
+        translationKey: '@workflow_custom_workflow_editable_label_key'
+        value: 'Custom editable workflow'
+        language: '@en_language'
+        scope: 1
+    workflow_custom_workflow_readonly_label:
+        translationKey: '@workflow_custom_workflow_readonly_label_key'
+        value: 'Custom readonly workflow'
+        language: '@en_language'
+        scope: 1
+    workflow_system_workflow_editable_label:
+        translationKey: '@workflow_system_workflow_editable_label_key'
+        value: 'System editable workflow'
+        language: '@en_language'
+        scope: 1
+    workflow_system_workflow_readonly_label:
+        translationKey: '@workflow_system_workflow_readonly_label_key'
+        value: 'System readonly workflow'
+        language: '@en_language'
+        scope: 1
+
+Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
+    workflow_custom_workflow_editable:
+        name: workflow_custom_workflow_editable
+        label: 'oro.workflow.workflow_custom_workflow_editable.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        entityAttributeName: 'entity'
+        stepsDisplayOrdered: false
+        system: false
+        active: false
+        priority: 0
+        applications:
+            - default
+        configuration:
+            force_autostart: false
+            scopes: {  }
+            datagrids: {  }
+            disable_operations: {  }
+            entity_restrictions: {  }
+            steps:
+                'step:starting_point':
+                    order: -1
+                    _is_start: true
+                    is_final: false
+                    allowed_transitions:
+                        - transition
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_custom_workflow_editable.step.step:starting_point.label'
+                step:
+                    is_final: true
+                    order: 0
+                    allowed_transitions: {  }
+                    _is_start: false
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_custom_workflow_editable.step.step.label'
+            variable_definitions:
+                variables: {  }
+            attributes: {  }
+            transitions:
+                transition:
+                    display_type: dialog
+                    destination_page: ''
+                    step_to: step
+                    is_start: true
+                    form_options:
+                        attribute_fields: {  }
+                    is_unavailable_hidden: true
+                    transition_definition: transition_definition
+                    frontend_options:
+                        icon: ''
+                        class: ''
+                    is_hidden: false
+                    acl_message: null
+                    form_type: oro_workflow_transition
+                    page_template: null
+                    dialog_template: null
+                    init_entities: {  }
+                    init_routes: {  }
+                    init_datagrids: {  }
+                    init_context_attribute: init_context
+                    message_parameters: {  }
+                    triggers: {  }
+                    label: 'oro.workflow.workflow_custom_workflow_editable.transition.transition.label'
+                    button_label: 'oro.workflow.workflow_custom_workflow_editable.transition.transition.button_label'
+                    button_title: 'oro.workflow.workflow_custom_workflow_editable.transition.transition.button_title'
+                    message: 'oro.workflow.workflow_custom_workflow_editable.transition.transition.warning_message'
+            transition_definitions:
+                transition_definition:
+                    preactions: {  }
+                    preconditions: {  }
+                    conditions: {  }
+                    actions: {  }
+    workflow_custom_workflow_readonly:
+        name: workflow_custom_workflow_readonly
+        label: 'oro.workflow.workflow_custom_workflow_readonly.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        entityAttributeName: 'entity'
+        stepsDisplayOrdered: false
+        system: false
+        active: false
+        priority: 0
+        applications:
+            - default
+        configuration:
+            force_autostart: false
+            scopes: {  }
+            datagrids: {  }
+            disable_operations: {  }
+            entity_restrictions: {  }
+            steps:
+                'step:starting_point':
+                    order: -1
+                    _is_start: true
+                    is_final: false
+                    allowed_transitions:
+                        - transition
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_custom_workflow_readonly.step.step:starting_point.label'
+                step:
+                    is_final: true
+                    order: 0
+                    allowed_transitions: {  }
+                    _is_start: false
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_custom_workflow_readonly.step.step.label'
+            variable_definitions:
+                variables: {  }
+            attributes: {  }
+            transitions:
+                transition:
+                    display_type: dialog
+                    destination_page: ''
+                    step_to: step
+                    is_start: true
+                    form_options:
+                        attribute_fields: {  }
+                    is_unavailable_hidden: true
+                    transition_definition: transition_definition
+                    frontend_options:
+                        icon: ''
+                        class: ''
+                    is_hidden: false
+                    acl_message: null
+                    form_type: oro_workflow_transition
+                    page_template: null
+                    dialog_template: null
+                    init_entities: {  }
+                    init_routes: {  }
+                    init_datagrids: {  }
+                    init_context_attribute: init_context
+                    message_parameters: {  }
+                    triggers: {  }
+                    label: 'oro.workflow.workflow_custom_workflow_readonly.transition.transition.label'
+                    button_label: 'oro.workflow.workflow_custom_workflow_readonly.transition.transition.button_label'
+                    button_title: 'oro.workflow.workflow_custom_workflow_readonly.transition.transition.button_title'
+                    message: 'oro.workflow.workflow_custom_workflow_readonly.transition.transition.warning_message'
+            transition_definitions:
+                transition_definition:
+                    preactions: {  }
+                    preconditions: {  }
+                    conditions: {  }
+                    actions:
+                        -
+                            '@assign_value':
+                                - $.result.test
+                                - null
+
+
+
+
+
+
+    workflow_system_workflow_editable:
+        name: workflow_system_workflow_editable
+        label: 'oro.workflow.workflow_system_workflow_editable.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        entityAttributeName: 'entity'
+        stepsDisplayOrdered: false
+        system: true
+        active: false
+        priority: 0
+        applications:
+            - default
+        configuration:
+            force_autostart: false
+            scopes: {  }
+            datagrids: {  }
+            disable_operations: {  }
+            entity_restrictions: {  }
+            steps:
+                'step:starting_point':
+                    order: -1
+                    _is_start: true
+                    is_final: false
+                    allowed_transitions:
+                        - transition
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_system_workflow_editable.step.step:starting_point.label'
+                step:
+                    is_final: true
+                    order: 0
+                    allowed_transitions: {  }
+                    _is_start: false
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_system_workflow_editable.step.step.label'
+            variable_definitions:
+                variables: {  }
+            attributes: {  }
+            transitions:
+                transition:
+                    display_type: dialog
+                    destination_page: ''
+                    step_to: step
+                    is_start: true
+                    form_options:
+                        attribute_fields: {  }
+                    is_unavailable_hidden: true
+                    transition_definition: transition_definition
+                    frontend_options:
+                        icon: ''
+                        class: ''
+                    is_hidden: false
+                    acl_message: null
+                    form_type: oro_workflow_transition
+                    page_template: null
+                    dialog_template: null
+                    init_entities: {  }
+                    init_routes: {  }
+                    init_datagrids: {  }
+                    init_context_attribute: init_context
+                    message_parameters: {  }
+                    triggers: {  }
+                    label: 'oro.workflow.workflow_system_workflow_editable.transition.transition.label'
+                    button_label: 'oro.workflow.workflow_system_workflow_editable.transition.transition.button_label'
+                    button_title: 'oro.workflow.workflow_system_workflow_editable.transition.transition.button_title'
+                    message: 'oro.workflow.workflow_system_workflow_editable.transition.transition.warning_message'
+            transition_definitions:
+                transition_definition:
+                    preactions: {  }
+                    preconditions: {  }
+                    conditions: {  }
+                    actions: {  }
+    workflow_system_workflow_readonly:
+        name: workflow_system_workflow_readonly
+        label: 'oro.workflow.workflow_system_workflow_readonly.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        entityAttributeName: 'entity'
+        stepsDisplayOrdered: false
+        system: true
+        active: false
+        priority: 0
+        applications:
+            - default
+        configuration:
+            force_autostart: false
+            scopes: {  }
+            datagrids: {  }
+            disable_operations: {  }
+            entity_restrictions: {  }
+            steps:
+                'step:starting_point':
+                    order: -1
+                    _is_start: true
+                    is_final: false
+                    allowed_transitions:
+                        - transition
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_system_workflow_readonly.step.step:starting_point.label'
+                step:
+                    is_final: true
+                    order: 0
+                    allowed_transitions: {  }
+                    _is_start: false
+                    position: {  }
+                    entity_acl: {  }
+                    label: 'oro.workflow.workflow_system_workflow_readonly.step.step.label'
+            variable_definitions:
+                variables: {  }
+            attributes: {  }
+            transitions:
+                transition:
+                    display_type: dialog
+                    destination_page: ''
+                    step_to: step
+                    is_start: true
+                    form_options:
+                        attribute_fields: {  }
+                    is_unavailable_hidden: true
+                    transition_definition: transition_definition
+                    frontend_options:
+                        icon: ''
+                        class: ''
+                    is_hidden: false
+                    acl_message: null
+                    form_type: oro_workflow_transition
+                    page_template: null
+                    dialog_template: null
+                    init_entities: {  }
+                    init_routes: {  }
+                    init_datagrids: {  }
+                    init_context_attribute: init_context
+                    message_parameters: {  }
+                    triggers: {  }
+                    label: 'oro.workflow.workflow_system_workflow_readonly.transition.transition.label'
+                    button_label: 'oro.workflow.workflow_system_workflow_readonly.transition.transition.button_label'
+                    button_title: 'oro.workflow.workflow_system_workflow_readonly.transition.transition.button_title'
+                    message: 'oro.workflow.workflow_system_workflow_readonly.transition.transition.warning_message'
+            transition_definitions:
+                transition_definition:
+                    preactions: {  }
+                    preconditions: {  }
+                    conditions: {  }
+                    actions:
+                        -
+                            '@assign_value':
+                                - $.result.test
+                                - null
+
+Oro\Bundle\WorkflowBundle\Entity\WorkflowStep:
+    workflow_custom_workflow_editable_step1:
+        name: step:starting_point
+        label: '(Start)'
+        stepOrder: -1
+        final: false
+        definition: '@workflow_custom_workflow_editable'
+    workflow_custom_workflow_editable_step2:
+        name: step
+        label: 'step'
+        stepOrder: 0
+        final: true
+        definition: '@workflow_custom_workflow_editable'
+
+    workflow_custom_workflow_readonly_step1:
+        name: step:starting_point
+        label: '(Start)'
+        stepOrder: -1
+        final: false
+        definition: '@workflow_custom_workflow_readonly'
+    workflow_custom_workflow_readonly_step2:
+        name: step
+        label: 'step'
+        stepOrder: 0
+        final: true
+        definition: '@workflow_custom_workflow_readonly'
+
+    workflow_system_workflow_editable_step1:
+        name: step:starting_point
+        label: '(Start)'
+        stepOrder: -1
+        final: false
+        definition: '@workflow_system_workflow_editable'
+    workflow_system_workflow_editable_step2:
+        name: step
+        label: 'step'
+        stepOrder: 0
+        final: true
+        definition: '@workflow_system_workflow_editable'
+
+    workflow_system_workflow_readonly_step1:
+        name: step:starting_point
+        label: '(Start)'
+        stepOrder: -1
+        final: false
+        definition: '@workflow_system_workflow_readonly'
+    workflow_system_workflow_readonly_step2:
+        name: step
+        label: 'step'
+        stepOrder: 0
+        final: true
+        definition: '@workflow_system_workflow_readonly'
