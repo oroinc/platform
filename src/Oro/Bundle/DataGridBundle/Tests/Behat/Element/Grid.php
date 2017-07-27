@@ -24,8 +24,9 @@ class Grid extends Table implements GridInterface
     {
         /** @var Table $table */
         $table = $this->getElement('GridTable');
+        $elementName = $this->getMappedChildElementName(static::TABLE_ROW_ELEMENT);
 
-        return $table->getRowElements(static::TABLE_ROW_ELEMENT);
+        return $table->getRowElements($elementName);
     }
 
     /**

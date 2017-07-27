@@ -1,4 +1,5 @@
 @ticket-BAP-11224
+@selenium-incompatible
 @automatically-ticket-tagged
 Feature: User user comment
   In order to have ability comment user

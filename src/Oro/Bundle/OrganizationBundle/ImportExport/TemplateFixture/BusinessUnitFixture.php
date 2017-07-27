@@ -7,12 +7,14 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class BusinessUnitFixture extends AbstractTemplateRepository
 {
+    const MAIN_BUSINESS_UNIT = 'Main';
+
     /**
      * {@inheritdoc}
      */
     public function getEntityClass()
     {
-        return 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
+        return BusinessUnit::class;
     }
 
     /**
@@ -30,7 +32,7 @@ class BusinessUnitFixture extends AbstractTemplateRepository
     public function fillEntityData($key, $entity)
     {
         switch ($key) {
-            case 'Main':
+            case self::MAIN_BUSINESS_UNIT:
                 $entity->setName($key);
                 return;
         }

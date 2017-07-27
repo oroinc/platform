@@ -9,6 +9,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\EventListener\SearchListener;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class AclHelper
 {
@@ -21,19 +22,25 @@ class AclHelper
     /** @var OwnershipConditionDataBuilder */
     protected $ownershipDataBuilder;
 
+    /** @var OwnershipMetadataProviderInterface */
+    protected $metadataProvider;
+
     /**
      * @param SearchMappingProvider         $mappingProvider
      * @param TokenAccessorInterface        $tokenAccessor
      * @param OwnershipConditionDataBuilder $ownershipDataBuilder
+     * @param OwnershipMetadataProviderInterface $metadataProvider
      */
     public function __construct(
         SearchMappingProvider $mappingProvider,
         TokenAccessorInterface $tokenAccessor,
-        OwnershipConditionDataBuilder $ownershipDataBuilder
+        OwnershipConditionDataBuilder $ownershipDataBuilder,
+        OwnershipMetadataProviderInterface $metadataProvider
     ) {
         $this->tokenAccessor = $tokenAccessor;
         $this->mappingProvider = $mappingProvider;
         $this->ownershipDataBuilder = $ownershipDataBuilder;
+        $this->metadataProvider = $metadataProvider;
     }
 
     /**
@@ -55,7 +62,9 @@ class AclHelper
             foreach ($querySearchAliases as $entityAlias) {
                 $className = $this->mappingProvider->getEntityClass($entityAlias);
                 if ($className) {
-                    $ownerField = sprintf('%s_owner', $entityAlias);
+                    $metadata = $this->metadataProvider->getMetadata($className);
+                    $ownerField = sprintf('%s_%s', $entityAlias, $metadata->getOwnerFieldName());
+
                     $condition  = $this->ownershipDataBuilder->getAclConditionData($className, $permission);
                     if (count($condition) === 0 || !($condition[0] === null && $condition[3] === null)) {
                         $allowedAliases[] = $entityAlias;
