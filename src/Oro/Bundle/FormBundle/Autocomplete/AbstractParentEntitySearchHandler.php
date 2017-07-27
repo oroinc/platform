@@ -9,6 +9,18 @@ abstract class AbstractParentEntitySearchHandler extends SearchHandler
     /**
      * {@inheritdoc}
      */
+    public function search($query, $page, $perPage, $searchById = false)
+    {
+        if ($searchById && strpos($query, self::DELIMITER) !== false) {
+            list($query) = $this->explodeSearchTerm($query);
+        }
+
+        return parent::search($query, $page, $perPage, $searchById);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function searchEntities($search, $firstResult, $maxResults)
     {
         if (strpos($search, self::DELIMITER) === false) {

@@ -5,11 +5,13 @@
 "No": "No"
 "OK, got it.": "OK, got it."
 "Cancel": "Cancel"
+"Back": "Back"
 "Delete Confirmation": "Delete Confirmation"
 "Edit": "Edit"
 "Loading...": "Loading..."
 "Saving...": "Saving..."
 "Deleting...": "Deleting..."
+"View more...": "View more..."
 "An unexpected error has occurred. Please contact the system administrator.": "An unexpected error has occurred. Please contact the system administrator."
 Now: Now
 Prev: Prev
@@ -62,6 +64,11 @@ oro:
         leave_page_save_data_or_discard_title: "Navigation confirmation"
         leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
         error: "There was an error performing the requested operation. Please try again or contact us for assistance."
+        request_too_large_error: >
+            The information you are submitting does not fit the doorway on the server side.
+            This may happen due to the extremely high-resolution images in your data.
+            Please replace the attached information to reduce the total data size,
+            or talk to your admin to extend the doorway by updating HTTP server configuration.
         page_header:
             button:
                 more: "More"
@@ -87,17 +94,32 @@ oro:
             other: Other
         jstree:
             move_node_error: "You can not move node {{ nodeText }} here."
+            no_node_selected_error: "You didn't select any node"
+            move_success: '{{ nodes }} was successfully moved'
             actions:
                 expand: 'Expand all'
                 collapse: 'Collapse all'
-                subcategories:
-                    select: 'Select Sub Categories'
-                    do_not_select: 'Do Not Select Sub Categories'
+                move: 'Move To'
+                subitems:
+                    itemsLabel: 'Items'
+                    select: 'Select Sub {{ itemsLabel }}'
+                    do_not_select: 'Do Not Select Sub {{ itemsLabel }}'
+            search:
+                search_no_found: 'No result was found'
         select2:
             input_too_short: "{1}Please enter {{ number }} more character|[2,Inf[Please enter {{ number }} more characters"
             input_too_long: "{1}Please delete {{ number }} character|[2,Inf[Please delete {{ number }} characters"
             selection_too_big: "{1}You can only select {{ limit }} item|[2,Inf[You can only select {{ limit }} items"
             load_more: "Loading more results..."
+        widget_form_component:
+            save_flash_success: Saved successfully
+
+        element_value:
+            messages:
+                copied: Copied to clipboard
+                copy_not_successful: Copy command was not successful
+                copy_not_supported: Your browser does not support copy command. Please press Ctrl/Cmd+C to copy
+
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

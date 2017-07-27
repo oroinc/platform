@@ -33,6 +33,13 @@ services:
             - '@request_stack'
             - '@oro_action.provider.route'
 
+    oro_action.helper.destination_page:
+        class: 'Oro\Bundle\ActionBundle\Helper\DestinationPageHelper'
+        arguments:
+            - '@request_stack'
+            - '@oro_entity_config.helper.entity_config'
+            - '@router'
+
     oro_action.provider.current_application:
         class: 'Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider'
         arguments:
@@ -61,6 +68,19 @@ services:
             - '@oro_action.provider.route'
             - '@router'
 
+    oro_action.resolver.destination_page_resolver:
+        class: 'Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver'
+        arguments:
+            - '@request_stack'
+            - '@oro_entity_config.helper.entity_config'
+            - '@router'
+
+    oro_action.resolver.options_resolver:
+        class: 'Oro\Bundle\ActionBundle\Resolver\OptionsResolver'
+        arguments:
+            - '@oro_action.options_assembler'
+            - '@oro_action.expression.context_accessor'
+
     oro_action.operation_registry:
         class: %oro_action.operation_registry.class%
         arguments:
@@ -75,8 +95,8 @@ services:
             - '@oro_action.configuration.provider.action_groups'
             - '@oro_action.assembler.action_group'
 
-    oro_action.attribute_guesser:
-        class: %oro_action.attribute_guesser.class%
+    oro_action.abstract_guesser:
+        abstract: true
         arguments:
             - '@form.registry'
             - '@doctrine'
@@ -103,6 +123,13 @@ services:
             # custom types
             - [addDoctrineTypeMapping, ["percent", "float"]]
             - [addDoctrineTypeMapping, ["money", "float"]]
+            # set doctine typr mapping provider
+            - [setDoctrineTypeMappingProvider, ['@oro_action.provider.doctrine_type_mapping']]
+
+    oro_action.attribute_guesser:
+        class: %oro_action.attribute_guesser.class%
+        parent: oro_action.abstract_guesser
+        calls:
             # mapping from attribute type to form parameters
             - [addFormTypeMapping, ["string", "text"]]
             - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]
@@ -115,6 +142,10 @@ services:
         class: %oro_action.options_assembler.class%
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
+
+
+    oro_action.provider.doctrine_type_mapping:
+        class: 'Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider'
 
     oro_action.form.handler.operation_button:
         class: Oro\Bundle\ActionBundle\Handler\OperationFormHandler
@@ -131,8 +162,8 @@ services:
             - ''
             - '@doctrine.orm.entity_manager'
 
-    oro_action.datagrid.event_listener.button:
-        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener'
+    oro_action.datagrid.action.button_provider:
+        class: 'Oro\Bundle\ActionBundle\Datagrid\Provider\DatagridActionButtonProvider'
         arguments:
             - '@oro_action.provider.button'
             - '@oro_action.helper.context'
@@ -143,7 +174,7 @@ services:
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.extension.action.configure-actions.before, method: onConfigureActions }
+            - { name: oro_datagrid.extension.action.provider, priority: 250 }
 
     oro_action.datagrid.extension.delete_mass_action:
         class: Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension
@@ -177,20 +208,6 @@ services:
         tags:
             - { name: layout.data_provider, alias: buttons }
 
-    oro_action.condition.route_exists:
-        class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
-        arguments:
-            - '@router'
-        tags:
-            - { name: oro_action.condition, alias: 'route_exists' }
-
-    oro_action.condition.service_exists:
-        class: 'Oro\Bundle\ActionBundle\Condition\ServiceExists'
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: oro_action.condition, alias: 'service_exists' }
-
     oro_action.provider.button_search_context:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider'
         arguments:
@@ -198,6 +215,12 @@ services:
 
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
+        lazy: true
+        calls:
+            - [setLogger, ['@logger']]
+            - [setEventDispatcher, ['@event_dispatcher']]
+        tags:
+            - { name: monolog.logger, channel: oro_action }
 
     oro_action.provider.button.extension.operation:
         class: 'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension'
@@ -205,7 +228,14 @@ services:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
             - '@oro_action.provider.route'
-            - '@oro_action.options_assembler'
-            - '@oro_action.expression.context_accessor'
+            - '@oro_action.resolver.options_resolver'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }
+
+    oro_action.twig.extension.operation:
+        class: 'Oro\Bundle\ActionBundle\Twig\OperationExtension'
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }

@@ -73,6 +73,8 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     public function setFirstResult($firstResult)
     {
         $this->query->getCriteria()->setFirstResult($firstResult);
+
+        return $this;
     }
 
     /**
@@ -89,6 +91,8 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     public function setMaxResults($maxResults)
     {
         $this->query->getCriteria()->setMaxResults($maxResults);
+
+        return $this;
     }
 
     /**
@@ -145,11 +149,17 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
     {
-        $field = $type . '.' . $fieldName;
+        if (strpos($fieldName, '.') === false) {
+            $field = $type . '.' . $fieldName;
+        } else {
+            $field = $fieldName;
+        }
 
         $this->query
             ->getCriteria()
             ->orderBy([$field => $direction]);
+
+        return $this;
     }
 
     /**
@@ -157,7 +167,9 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function addSelect($fieldName, $enforcedFieldType = null)
     {
-        return $this->query->addSelect($fieldName, $enforcedFieldType);
+        $this->query->addSelect($fieldName, $enforcedFieldType);
+
+        return $this;
     }
 
     /**
@@ -165,7 +177,9 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setFrom($entities)
     {
-        return $this->query->from($entities);
+        $this->query->from($entities);
+
+        return $this;
     }
 
     /**

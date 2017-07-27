@@ -27,53 +27,9 @@
 {% endblock breadcrumbs %}
 
 {% block navButtons %}
-    {% set enableDelete = oro_integration_is_delete_enabled(entity.getEditMode) %}
-    {% if entity.id and resource_granted('DELETE', entity) and enableDelete %}
-        {{ UI.deleteButton({
-            'dataUrl': path('oro_api_delete_integration', {'id': entity.id}),
-            'dataRedirect': path('oro_integration_index'),
-            'aCss': 'no-hash remove-button',
-            'id': 'btn-remove-channel',
-            'dataId': entity.id,
-            'entity_label':   'oro.integration.integration.entity_label'|trans,
-            'dataMessage':    'oro.integration.delete_sync_integration.content'|trans,
-            'successMessage': 'oro.integration.delete_sync_integration.success'|trans
-        }) }}
-        {{ UI.buttonSeparator() }}
-    {% endif %}
-
     {{ UI.cancelButton(path('oro_integration_index')) }}
 
     {% if entity.id %}
-        {% set switchEnabled = oro_integration_is_switch_enabled(entity.getEditMode) %}
-        {% if switchEnabled %}
-            {% import 'OroUIBundle::macros.html.twig' as UI %}
-            {% if entity.enabled %}
-                {{ UI.ajaxButton({
-                'aCss':  'btn-danger',
-                'iCss':  'fa-close',
-                'label': 'oro.integration.deactivate'|trans,
-                'title': 'oro.integration.deactivate'|trans,
-                'dataId': entity.id,
-                'dataUrl': path('oro_api_deactivate_integration', {'id': entity.id}),
-                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'}),
-                'errorMessage': 'oro.integration.deactivate.fail.message'
-                }) }}
-            {% else %}
-                {{ UI.ajaxButton({
-                'aCss':  'btn-success',
-                'iCss':  'fa-check',
-                'label': 'oro.integration.activate'|trans,
-                'title': 'oro.integration.activate'|trans,
-                'dataId': entity.id,
-                'dataUrl': path('oro_api_activate_integration', {'id': entity.id}),
-                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'}),
-                'errorMessage': 'oro.integration.activate.fail.message'
-                }) }}
-            {% endif %}
-            {{ UI.buttonSeparator() }}
-        {% endif %}
-
         {% if entity.enabled %}
         <div class="btn-group">
             {% set buttonsHtml %}
@@ -90,12 +46,12 @@
             'route': 'oro_integration_index',
             'params': {'_enableContentProviders': 'mainMenu'}
         }) %}
-        {% if resource_granted('oro_integration_create') %}
+        {% if is_granted('oro_integration_create') %}
             {% set html = html ~ UI.saveAndNewButton({
                 'route': 'oro_integration_create'
             }) %}
         {% endif %}
-        {% if form.vars.value.id or resource_granted('oro_integration_update') %}
+        {% if form.vars.value.id or is_granted('oro_integration_update') %}
             {% set html = html ~ UI.saveAndStayButton({
                 'route': 'oro_integration_update',
                 'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
@@ -184,13 +140,21 @@
                     mediator.execute('showLoading');
 
                     $.ajax(url, {
-                        success: function (res) {
-                            messenger.notificationMessage('success', res.message);
+                        success: function (response) {
+                            messenger.notificationMessage(
+                                response.successful ? 'success' : 'warning',
+                                response.message
+                            );
                         },
-                        error: function () {
-                            messenger.notificationMessage('error', __('oro.integration.error'));
+                        error: function(response) {
+                            messenger.notificationMessage(
+                                'error',
+                                response.responseJSON && response.responseJSON.message
+                                    ? response.responseJSON.message
+                                    : __('oro.integration.error')
+                            );
                         },
-                        dataType: 'json'
+                        errorHandlerMessage: false
                     }).always(function () {
                         mediator.execute('hideLoading');
                     });
@@ -207,7 +171,6 @@
                             cancelText: __("oro.integration.force_sync.cancel"),
                             content: __('oro.integration.force_sync.message', {'integration_name': {{ entity.name|json_encode|raw }} }),
                             className: 'modal oro-modal-danger',
-                            okButtonClass: 'btn-danger',
                             handleClose: true
                         });
 

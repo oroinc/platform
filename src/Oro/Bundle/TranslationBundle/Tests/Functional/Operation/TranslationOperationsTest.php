@@ -7,9 +7,6 @@ use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-/**
- * @dbIsolation
- */
 class TranslationOperationsTest extends ActionTestCase
 {
     /**
@@ -50,7 +47,7 @@ class TranslationOperationsTest extends ActionTestCase
         $translationClass = $this->getContainer()->getParameter('oro_translation.entity.translation.class');
 
         $this->assertExecuteOperation(
-            'oro_translation_translation_remove',
+            'oro_translation_translation_reset',
             $translation->getId(),
             $translationClass,
             ['datagrid' => 'oro-translation-translations-grid', 'group' => ['datagridRowAction']]

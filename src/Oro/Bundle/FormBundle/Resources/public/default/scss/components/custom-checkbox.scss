@@ -1,3 +1,5 @@
+// @theme: default;
+
 .custom-checkbox {
     &__input {
         &:focus {
@@ -12,6 +14,23 @@
                 color: get-color('ui', 'focus');
 
                 @include fa-icon($checkbox-icon-checked);
+            }
+        }
+
+        &:indeterminate {
+            ~ .custom-checkbox__icon {
+                color: get-color('ui', 'focus');
+
+                @include fa-icon($checkbox-icon-indeterminate);
+            }
+        }
+
+        @include element-state('disabled') {
+            & ~ .custom-checkbox__icon {
+                @include base-disabled-style(.55);
+            }
+            & ~ .custom-checkbox__text {
+                @include base-disabled-style(.35);
             }
         }
     }
@@ -33,5 +52,19 @@
 
     &__text {
         margin-left: $offset-x-s / 2;
+    }
+
+    &.absolute {
+        position: relative;
+
+        .custom-checkbox__text {
+            display: inline-block;
+            margin-left: $checkbox-icon-absolute-offset;
+        }
+
+       .custom-checkbox__icon {
+           position: absolute;
+           left: 0;
+       }
     }
 }

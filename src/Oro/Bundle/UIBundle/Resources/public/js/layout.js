@@ -129,6 +129,10 @@ define(function(require) {
             });
 
             $items.popover(options).on('click.popover', function(e) {
+                if ($(this).is('.disabled, :disabled')) {
+                    return;
+                }
+
                 $(this).popover('toggle');
                 e.preventDefault();
             });
@@ -240,7 +244,9 @@ define(function(require) {
             $parents.each(function() {
                 heightDiff += this.scrollTop;
             });
-            return heightDiff - this.getDevToolbarHeight() - this.PAGE_BOTTOM_PADDING;
+            heightDiff -= documentHeight - $('#container')[0].getBoundingClientRect().bottom;
+            heightDiff -= this.PAGE_BOTTOM_PADDING;
+            return heightDiff;
         },
 
         /**

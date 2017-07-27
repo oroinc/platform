@@ -2,20 +2,66 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub;
 
+use Oro\Bundle\DistributionBundle\OroKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class KernelStub implements KernelInterface
+class KernelStub extends OroKernel implements KernelInterface
 {
     protected $bundleMap;
 
     protected $container;
 
-    public function __construct()
+    /**
+     * @var array
+     */
+    protected $registeredBundles = [];
+
+    protected $parameters = [
+        'database_driver' => 'pdo_mysql',
+        'database_host' => '127.0.0.1',
+        'database_port' => null,
+        'database_name' => 'oro_crm',
+        'database_user' => 'root',
+        'database_password' => null,
+        'session_handler' => 'session.handler.native_file',
+        'message_queue_transport' => 'dbal',
+        'message_queue_transport_config' => null,
+    ];
+
+    /**
+     * KernelStub constructor.
+     * @param array $bundleConfig In format
+     * [
+     *   [name => Bundle1, path => /var/www/app],
+     *   [name => Bundle2, parent => Bundle1]
+     * ]
+     */
+    public function __construct(array $bundleConfig = [])
     {
         $this->container = new Container();
+
+        foreach ($this->parameters as $key => $value) {
+            $this->container->setParameter($key, $value);
+        }
+
+        foreach ($bundleConfig as $config) {
+            $bundle = new TestBundle($config['name']);
+
+            if (array_key_exists('parent', $config)) {
+                $bundle->setParent($config['parent']);
+            }
+
+            if (array_key_exists('path', $config)) {
+                $bundle->setPath($config['path']);
+            }
+
+            $this->registeredBundles[] = $bundle;
+        }
+
+        $this->initializeBundles();
     }
 
     /**
@@ -29,24 +75,9 @@ class KernelStub implements KernelInterface
     /**
      * {@inheritdoc}
      */
-    public function getBundle($name, $first = true)
-    {
-        return $this->bundleMap[$name];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBundles()
-    {
-        return $this->bundleMap;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles()
     {
+        return $this->registeredBundles;
     }
 
     /**
@@ -160,6 +191,7 @@ class KernelStub implements KernelInterface
      */
     public function getLogDir()
     {
+        return sys_get_temp_dir();
     }
 
     /**

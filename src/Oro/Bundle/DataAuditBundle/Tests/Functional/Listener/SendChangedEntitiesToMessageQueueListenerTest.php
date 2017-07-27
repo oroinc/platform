@@ -18,6 +18,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @dbIsolationPerTest
+ */
 class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 {
     use MessageQueueExtension;
@@ -26,15 +29,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->initClient([], [], true);
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
+        $this->initClient();
     }
 
     public function testCouldBeGetAsServiceFromContainer()
@@ -344,6 +339,35 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $this->assertArrayHasKey('user_class', $message->getBody());
         $this->assertSame(User::class, $message->getBody()['user_class']);
+    }
+
+    public function testShouldSendOwnerDescriptionIfPresent()
+    {
+        $organization = new Organization();
+        $token = new OrganizationToken($organization);
+        $token->setAttribute('owner_description', 'Test Description');
+
+        /** @var TokenStorageInterface $tokenStorage */
+        $tokenStorage = $this->getContainer()->get('security.token_storage');
+        $tokenStorage->setToken($token);
+
+        $em = $this->getEntityManager();
+
+        $entity = new TestAuditDataOwner();
+        $entity->setStringProperty('aString');
+        $em->persist($entity);
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
+
+        //guard
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
+
+        $message = $sentMessages[0]['message'];
+
+        $this->assertArrayHasKey('owner_description', $message->getBody());
+        $this->assertSame('Test Description', $message->getBody()['owner_description']);
     }
 
     public function testShouldSendOrganizationInfoIfPresent()

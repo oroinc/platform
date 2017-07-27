@@ -1,0 +1,14 @@
+oro_configurable_permissions:
+    commerce:
+        default: true
+        entities:
+            TestEntity:
+                update: false
+                delete: true
+        workflows:
+            TestWorkflow:
+                VIEW: false
+                delete: true
+        capabilities:
+            action1: false
+            action2: true

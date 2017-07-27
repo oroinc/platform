@@ -3,14 +3,25 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
 use Doctrine\ORM\Query;
-
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
 class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
 {
     const TEST_GRID_NAME = 'test';
+
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
+
+    public function setUp()
+    {
+        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
 
     public function testConfiguration()
     {
@@ -35,7 +46,8 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
             $doctrine,
-            new DatagridGuesserMock()
+            new DatagridGuesserMock(),
+            $this->entityNameResolver
         );
 
         $builder->setGridName(self::TEST_GRID_NAME);
@@ -66,7 +78,8 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
             $doctrine,
-            new DatagridGuesserMock()
+            new DatagridGuesserMock(),
+            $this->entityNameResolver
         );
 
         $builder->setConfigManager($configManager);
@@ -79,6 +92,11 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @param null $route
+     *
+     * @return array
+     */
     public function getExpectedDefinition($route = null)
     {
         $definition = [
@@ -106,7 +124,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
+                        'value' => SqlWalker::class,
                     ]
                 ],
                 'acl_resource' => 'oro_segment_view',

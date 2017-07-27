@@ -5,9 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class RestUsersACLTest extends WebTestCase
 {
     const DEFAULT_USER_ID = '1';
@@ -21,7 +18,7 @@ class RestUsersACLTest extends WebTestCase
     public function testCreateUser()
     {
         $request = array(
-            "user" => array (
+            "user" => array(
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => '1',
@@ -74,7 +71,7 @@ class RestUsersACLTest extends WebTestCase
     public function testUpdateUser()
     {
         $request = array(
-            "user" => array (
+            "user" => array(
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => '1',

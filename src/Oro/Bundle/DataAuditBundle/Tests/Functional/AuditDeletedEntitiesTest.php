@@ -10,24 +10,16 @@ use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
+/**
+ * @dbIsolationPerTest
+ */
 class AuditDeletedEntitiesTest extends WebTestCase
 {
     use AuditChangedEntitiesExtensionTrait;
     
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->initClient([], [], true);
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
-        self::$loadedFixtures = [];
+        $this->initClient();
     }
 
     public function testShouldCreateAuditForDeletedEntity()
@@ -37,6 +29,7 @@ class AuditDeletedEntitiesTest extends WebTestCase
         $message = $this->createDummyMessage([
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'theTransactionId',
+            'owner_description' => 'Some Owner Description',
             'entities_deleted' => [
                 [
                     'entity_class' => TestAuditDataOwner::class,
@@ -61,6 +54,7 @@ class AuditDeletedEntitiesTest extends WebTestCase
         $this->assertEquals(1, $audit->getVersion());
         $this->assertEquals('theTransactionId', $audit->getTransactionId());
         $this->assertEquals($expectedLoggedAt, $audit->getLoggedAt());
+        $this->assertEquals('Some Owner Description', $audit->getOwnerDescription());
         $this->assertNull($audit->getUser());
         $this->assertNull($audit->getOrganization());
     }

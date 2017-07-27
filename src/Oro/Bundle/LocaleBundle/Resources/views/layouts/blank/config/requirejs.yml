@@ -6,8 +6,21 @@ config:
         'numeral':
             exports:
                 - 'numeral'
+    map:
+        '*':
+            'moment': 'orolocale/js/moment-l10n'
+            'moment-timezone': 'orolocale/js/extend/moment-timezone'
+        'orolocale/js/moment-l10n':
+            'moment': 'moment'
+        'moment-timezone':
+            'moment': 'moment'
+        'orolocale/js/extend/moment-timezone':
+            'moment-timezone': 'moment-timezone'
 
     paths:
-        'moment': 'bundles/orolocale/lib/moment/moment.js'
+        'moment': 'bundles/bowerassets/moment/min/moment-with-locales.js'
+        'moment-timezone': 'bundles/bowerassets/moment-timezone/builds/moment-timezone-with-data.js'
         'numeral': 'bundles/bowerassets/numeral/numeral.js'
         'orolocale/js/locale-settings/data': '../js/oro.locale_data.js'
+        'orolocale/js/moment-l10n': 'bundles/orolocale/js/moment-l10n.js'
+

@@ -2,22 +2,30 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 
 class AddressExtension extends \Twig_Extension
 {
-    /**
-     * @var AddressFormatter
-     */
-    protected $formatter;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param AddressFormatter $formatter
+     * @param ContainerInterface $container
      */
-    public function __construct(AddressFormatter $formatter)
+    public function __construct(ContainerInterface $container)
     {
-        $this->formatter = $formatter;
+        $this->container = $container;
+    }
+
+    /**
+     * @return AddressFormatter
+     */
+    protected function getAddressFormatter()
+    {
+        return $this->container->get('oro_locale.formatter.address');
     }
 
     /**
@@ -25,26 +33,27 @@ class AddressExtension extends \Twig_Extension
      */
     public function getFilters()
     {
-        return array(
+        return [
             new \Twig_SimpleFilter(
                 'oro_format_address',
-                array($this, 'format'),
-                array('is_safe' => array('html'))
+                [$this, 'formatAddress'],
+                ['is_safe' => ['html']]
             )
-        );
+        ];
     }
 
     /**
      * Formats address according to locale settings.
      *
      * @param AddressInterface $address
-     * @param string|null $country
-     * @param string $newLineSeparator
+     * @param string|null      $country
+     * @param string           $newLineSeparator
+     *
      * @return string
      */
-    public function format(AddressInterface $address, $country = null, $newLineSeparator = "\n")
+    public function formatAddress(AddressInterface $address, $country = null, $newLineSeparator = "\n")
     {
-        return $this->formatter->format($address, $country, $newLineSeparator);
+        return $this->getAddressFormatter()->format($address, $country, $newLineSeparator);
     }
 
     /**

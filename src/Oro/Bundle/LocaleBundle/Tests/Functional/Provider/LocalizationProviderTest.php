@@ -9,9 +9,6 @@ use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LocalizationProviderTest extends WebTestCase
 {
     /**
@@ -32,31 +29,29 @@ class LocalizationProviderTest extends WebTestCase
         $this->repository = $this->em->getRepository('OroLocaleBundle:Localization');
     }
 
-    public function tearDown()
-    {
-        unset($this->em, $this->repository);
-    }
-
     public function testCache()
     {
-        $this->markTestSkipped('Memory cache has been disabled due to BAP-12888. @todo BB-6952');
+        $this->markTestSkipped('Skipped because should be fixed at BAP-14732');
+
         $manager = $this->getContainer()->get('oro_locale.manager.localization');
 
         $queryAnalyzer = new QueryAnalyzer($this->em->getConnection()->getDatabasePlatform());
         $prevLogger = $this->em->getConnection()->getConfiguration()->getSQLLogger();
 
-        $this->em->getConnection()->getConfiguration()->setSQLLogger($queryAnalyzer);
-
+        //warm up cache
         $manager->getLocalizations();
+
+        $this->em->getConnection()->getConfiguration()->setSQLLogger($queryAnalyzer);
+        //data should be restored from cache
         $data = $manager->getLocalizations();
 
         foreach ($data as $key => $localization) {
-            $this->assertSame($key, $localization->getId());
-            $this->assertSame($localization, $manager->getLocalization($localization->getId()));
+            $this->assertEquals($key, $localization->getId());
+            $this->assertEquals($localization, $manager->getLocalization($localization->getId()));
         }
 
         $queries = $queryAnalyzer->getExecutedQueries();
-        $this->assertCount(1, $queries);
+        $this->assertCount(0, $queries);
 
         $this->assertNotEmpty($data);
 

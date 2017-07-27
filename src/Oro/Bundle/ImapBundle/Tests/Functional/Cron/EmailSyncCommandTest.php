@@ -4,8 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Functional\Cron;
 
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration;
-use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Tests\Functional\EmailFeatureTrait;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
@@ -17,11 +16,12 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 
 /**
- * @outputBuffering enabled
  * @dbIsolationPerTest
  */
 class EmailSyncCommandTest extends WebTestCase
 {
+    use EmailFeatureTrait;
+
     /** @var ImapConnectorFactory|\PHPUnit_Framework_MockObject_MockObject */
     protected $imapConnectorFactory;
 
@@ -81,6 +81,8 @@ class EmailSyncCommandTest extends WebTestCase
             ->will($this->returnValue($imapConnector));
 
         $this->getContainer()->set('oro_imap.connector.factory', $this->imapConnectorFactory);
+
+        $this->enableEmailFeature();
     }
 
     public function testImapSyncNoOrigins()
@@ -135,27 +137,10 @@ class EmailSyncCommandTest extends WebTestCase
 
     public function testCommandOutputWithEmailFeatureDisabled()
     {
-        $this->toggleEmailFeatureValue(false);
+        $this->disableEmailFeature();
         $result = $this->runCommand('oro:cron:imap-sync', []);
 
         $this->assertContains('The email feature is disabled. The command will not run.', $result);
-    }
-
-    /**
-     * Disable email feature toggle
-     *
-     * @param bool $value
-     */
-    protected function toggleEmailFeatureValue($value)
-    {
-        $key = Configuration::getConfigKeyByName('feature_enabled');
-
-        $configManager = $this->getContainer()->get('oro_config.manager');
-        $configManager->set($key, (bool) $value);
-        $configManager->flush();
-
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
-        $featureChecker->resetCache();
     }
 
     /**

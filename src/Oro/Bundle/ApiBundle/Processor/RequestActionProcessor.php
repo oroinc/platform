@@ -62,7 +62,6 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
 
         $processors = $this->processorBag->getProcessors($context);
         $processorId = null;
-
         try {
             /** @var ProcessorInterface $processor */
             foreach ($processors as $processor) {

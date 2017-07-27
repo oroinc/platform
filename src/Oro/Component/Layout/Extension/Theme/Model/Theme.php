@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class Theme
 {
     /** @var string */
@@ -34,6 +36,12 @@ class Theme
     /** @var array */
     protected $config = [];
 
+    /** @var ArrayCollection|PageTemplate[] */
+    protected $pageTemplates;
+
+    /** @var array */
+    protected $pageTemplateTitles = [];
+
     /**
      * @param string $name
      * @param        $parentTheme
@@ -42,6 +50,7 @@ class Theme
     {
         $this->name        = $name;
         $this->parentTheme = $parentTheme;
+        $this->pageTemplates = new ArrayCollection();
     }
 
     /**
@@ -218,5 +227,75 @@ class Theme
             return $this->config[$key];
         }
         return $default;
+    }
+
+    /**
+     * @param PageTemplate $pageTemplate
+     * @param bool         $force
+     * @return $this
+     */
+    public function addPageTemplate(PageTemplate $pageTemplate, $force = false)
+    {
+        $key = $pageTemplate->getKey() . '_' . $pageTemplate->getRouteName();
+        if ($force === true || !$this->pageTemplates->containsKey($key)) {
+            $this->pageTemplates->set($key, $pageTemplate);
+        } else {
+            /** @var PageTemplate $existing */
+            $existing = $this->pageTemplates->get($key);
+            $existing->mergeParent($pageTemplate);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection|PageTemplate[]
+     */
+    public function getPageTemplates()
+    {
+        return $this->pageTemplates;
+    }
+
+    /**
+     * @param string $key
+     * @param string $routeName
+     * @return PageTemplate
+     */
+    public function getPageTemplate($key, $routeName)
+    {
+        return $this->getPageTemplates()->filter(function (PageTemplate $pageTemplate) use ($key, $routeName) {
+            return $pageTemplate->getKey() === $key
+                && $pageTemplate->getRouteName() === $routeName
+                && $pageTemplate->isEnabled() !== false;
+        })->first();
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return $this
+     */
+    public function addPageTemplateTitle($key, $value)
+    {
+        $this->pageTemplateTitles[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @return string|null
+     */
+    public function getPageTemplateTitle($key)
+    {
+        return array_key_exists($key, $this->pageTemplateTitles) ? $this->pageTemplateTitles[$key] : null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPageTemplateTitles()
+    {
+        return $this->pageTemplateTitles;
     }
 }

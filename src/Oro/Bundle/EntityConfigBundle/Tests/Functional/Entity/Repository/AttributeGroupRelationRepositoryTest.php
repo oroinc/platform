@@ -10,9 +10,6 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class AttributeGroupRelationRepositoryTest extends WebTestCase
 {
     /**
@@ -95,5 +92,62 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
         $this->assertCount(1, $this->repository->findBy(['entityConfigFieldId' => $regularAttributeId]));
         $this->assertEquals(1, $this->repository->removeByFieldId($regularAttributeId));
         $this->assertEmpty($this->repository->findBy(['entityConfigFieldId' => $regularAttributeId]));
+    }
+
+    public function testGetAttributeGroupRelationsByFamily()
+    {
+        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+
+        $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2);
+
+        $attributeGroupRelations = $this->repository->getAttributeGroupRelationsByFamily($family);
+
+        $this->assertEquals(3, count($attributeGroupRelations));
+
+        usort($attributeGroupRelations, function (AttributeGroupRelation $a, AttributeGroupRelation $b) {
+            return $a->getEntityConfigFieldId() - $b->getEntityConfigFieldId();
+        });
+
+        $systemAttribute1 = $configManager->getConfigFieldModel(
+            LoadAttributeData::ENTITY_CONFIG_MODEL,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_1
+        );
+        $systemAttribute2 = $configManager->getConfigFieldModel(
+            LoadAttributeData::ENTITY_CONFIG_MODEL,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_2
+        );
+        $regularAttribute1 = $configManager->getConfigFieldModel(
+            LoadAttributeData::ENTITY_CONFIG_MODEL,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2
+        );
+
+        /** @var AttributeGroupRelation[] $expectedAttributes */
+        $expectedAttributes = [];
+        $expectedAttributes[$systemAttribute1->getId()] = $systemAttribute1;
+        $expectedAttributes[$systemAttribute2->getId()] = $systemAttribute2;
+        $expectedAttributes[$regularAttribute1->getId()] = $regularAttribute1;
+
+        // Need to sort expected and returned values by entity config field id in the same way
+        // to be able to assert them in order
+        ksort($expectedAttributes);
+        $expectedAttributes = array_values($expectedAttributes);
+
+        $this->assertEquals($expectedAttributes[0]->getId(), $attributeGroupRelations[0]->getEntityConfigFieldId());
+        $this->assertSame(
+            $this->getReference(LoadAttributeGroupData::DEFAULT_ATTRIBUTE_GROUP_2),
+            $attributeGroupRelations[0]->getAttributeGroup()
+        );
+
+        $this->assertEquals($expectedAttributes[1]->getId(), $attributeGroupRelations[1]->getEntityConfigFieldId());
+        $this->assertSame(
+            $this->getReference(LoadAttributeGroupData::DEFAULT_ATTRIBUTE_GROUP_2),
+            $attributeGroupRelations[1]->getAttributeGroup()
+        );
+
+        $this->assertEquals($expectedAttributes[2]->getId(), $attributeGroupRelations[2]->getEntityConfigFieldId());
+        $this->assertSame(
+            $this->getReference(LoadAttributeGroupData::REGULAR_ATTRIBUTE_GROUP_2),
+            $attributeGroupRelations[2]->getAttributeGroup()
+        );
     }
 }

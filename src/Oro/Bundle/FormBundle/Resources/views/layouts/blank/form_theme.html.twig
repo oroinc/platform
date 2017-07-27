@@ -16,6 +16,38 @@
     </div>
 {%- endblock form_row -%}
 
+{%- block form_label -%}
+    {% spaceless %}
+        {% if label is not sameas(false) %}
+            {% if not compound %}
+                {% set label_attr = label_attr|merge({'for': id}) %}
+            {% endif %}
+            {% if required %}
+                {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+            {% endif %}
+            {% if label is empty %}
+                {% if label_format is not empty -%}
+                    {% set label = label_format|replace({'%name%': name, '%id%': id}) %}
+                {% else %}
+                    {% set label = name|humanize %}
+                {% endif %}
+            {% endif %}
+            {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
+
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if translatable_label is defined and not translatable_label -%}
+                {{ label }}
+            {%- elseif raw_label is defined and raw_label -%}
+                {{ label|raw }}
+            {%- else -%}
+                {{ label|trans({}, translation_domain) }}
+            {%- endif -%}
+            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
+            </label>
+        {%- endif -%}
+    {% endspaceless %}
+{%- endblock form_label -%}
+
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
         <ul class="notifications notifications--error">
@@ -25,3 +57,31 @@
         </ul>
     {%- endif -%}
 {%- endblock form_errors -%}
+
+{% block attributes -%}
+    {% set attributesThatContainsUri = ['src', 'href', 'action', 'cite', 'data', 'poster'] %}
+    {% for attrname, attrvalue in attr %}
+        {%- if (attrvalue is iterable) -%}
+            {% set attrvalue = attrvalue|json_encode() %}
+        {% elseif attrname in attributesThatContainsUri %}
+            {{- ' ' ~ attrname }}="{{ attrvalue|e('html')|replace({'&amp;': '&'})|raw }}"
+        {% else %}
+            {% set attrvalue = attrvalue|trim %}
+        {%- endif -%}
+        {{- ' ' ~ attrname }}="{{ attrvalue }}"
+    {% endfor %}
+{%- endblock attributes -%}
+
+{%- block choice_widget_collapsed %}
+    {% set attr = layout_attr_defaults({
+        'class': 'select select--full'
+    }, attr) %}
+
+    {{ parent() }}
+{% endblock %}
+
+{%- block number_widget -%}
+    {%- set attr = attr|merge({'step': 'any', 'min': '0'}) -%}
+    {%- set type = type|default('number') -%}
+    {{ block('form_widget_simple') }}
+{%- endblock number_widget -%}

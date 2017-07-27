@@ -3,7 +3,7 @@
 {% oro_title_set({ params : {"%form.title%": entity.title} }) %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_embedded_form_delete') %}
+    {% if is_granted('oro_embedded_form_delete') %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
             'dataRedirect': path('oro_embedded_form_list'),
@@ -14,7 +14,7 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
 
-    {% if resource_granted('oro_embedded_form_delete') %}
+    {% if is_granted('oro_embedded_form_delete') %}
         {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Edit'|trans, 'label' : 'Edit'|trans}) }}
     {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
@@ -61,6 +61,7 @@
     {% set formPreview %}
     <div class="widget-content">
         <iframe
+            id="embedded-form"
             src="{{ url('oro_embedded_form_submit', {'id': entity.id}) }}"
             width="640"
             height="800"
@@ -126,8 +127,7 @@
     {% set informationWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_embedded_form_info', {id: entity.id}),
-            'title': ''
+            'url': path('oro_embedded_form_info', {id: entity.id})
         }) }}
     {% endset %}
 

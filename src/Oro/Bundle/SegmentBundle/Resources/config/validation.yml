@@ -4,6 +4,7 @@ Oro\Bundle\SegmentBundle\Entity\Segment:
             fields: [ name ]
             message: "Segment name already in use"
         - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint: ~
+        - Oro\Bundle\SegmentBundle\Validator\Constraints\Sorting: ~
     properties:
         name:
             - NotBlank:     ~
@@ -11,6 +12,11 @@ Oro\Bundle\SegmentBundle\Entity\Segment:
                 max: 255
         type:
             - NotBlank:     ~
+        recordsLimit:
+            - Type:
+                type: integer
+            - GreaterThan:
+                value: 0
         entity:
             - NotBlank:     ~
             - Length:

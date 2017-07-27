@@ -3,9 +3,11 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 
@@ -56,18 +58,21 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
-            ->with($this->equalTo(Translation::class))
             ->will($this->returnValue($this->em));
+
+        $language = new Language();
+
+        $connection = $this->createMock(Connection::class);
+        $this->em->expects($this->any())->method('getConnection')->willReturn($connection);
+
+        $entityRepository = $this->createMock(EntityRepository::class);
+        $entityRepository->expects($this->any())->method('findOneBy')->willReturn($language);
+        $this->em->expects($this->any())->method('getRepository')->willReturn($entityRepository);
 
         $this->persister = new DatabasePersister(
             $this->registry,
             $this->translationManager
         );
-
-        // set batch size to 2
-        $reflection = new \ReflectionProperty(get_class($this->persister), 'batchSize');
-        $reflection->setAccessible(true);
-        $reflection->setValue($this->persister, 2);
     }
 
     protected function tearDown()
@@ -86,11 +91,8 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit');
         $this->em->expects($this->never())->method('rollback');
 
-        $this->translationManager->expects($this->exactly(5))->method('saveTranslation')->willReturn(new Translation());
-        $this->translationManager->expects($this->exactly(3))->method('flush');
-        $this->translationManager->expects($this->exactly(3))->method('clear');
-
         $this->translationManager->expects($this->once())->method('invalidateCache')->with($this->testLocale);
+        $this->translationManager->expects($this->once())->method('clear');
 
         $this->persister->persist($this->testLocale, $this->testData);
     }
@@ -105,11 +107,8 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
         $this->em->expects($this->once())->method('rollback');
 
-        $this->translationManager->expects($this->exactly(5))->method('saveTranslation')->willReturn(new Translation());
-        $this->translationManager->expects($this->exactly(3))->method('flush');
-        $this->translationManager->expects($this->exactly(3))->method('clear');
-
         $this->translationManager->expects($this->never())->method('invalidateCache');
+        $this->translationManager->expects($this->never())->method('clear');
 
         $this->persister->persist($this->testLocale, $this->testData);
     }

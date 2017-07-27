@@ -18,8 +18,14 @@ abstract class AbstractOsRelatedIsolator
      */
     public function isApplicableOS()
     {
-        $os = explode(' ', strtoupper(php_uname()))[0];
+        return in_array($this->getOs(), $this->getApplicableOs());
+    }
 
-        return in_array($os, $this->getApplicableOs());
+    /**
+     * @return string
+     */
+    public function getOs()
+    {
+        return explode(' ', strtoupper(php_uname()))[0];
     }
 }

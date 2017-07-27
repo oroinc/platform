@@ -136,9 +136,8 @@ class RolePrivilegeCategoryProvider
             }
         }
         ksort($orderedCategoryList);
-        $categoryList = call_user_func_array('array_merge', $orderedCategoryList);
-        
-        return $categoryList;
+
+        return $orderedCategoryList ? call_user_func_array('array_merge', $orderedCategoryList) : [];
     }
 
     /**

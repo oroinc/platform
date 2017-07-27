@@ -6,15 +6,42 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var template = require('tpl!orodatagrid/templates/inline-editing/error-holder.html');
+
+    /* The same like `getBoundingClientRect` but takes in account all child nodes, i.e. calculates real occupied rect
+     *  for case when a child goes beyond its parent
+     */
+    function getTreeRect(el) {
+        if (!el || !_.isFunction(el.getBoundingClientRect)) {
+            return null;
+        }
+        var rect = _.pick(el.getBoundingClientRect(), ['top', 'right', 'bottom',  'left', 'width', 'height']);
+        _.forEach(el.childNodes, function(child) {
+            var childRect = getTreeRect(child);
+            if (childRect) {
+                rect.top = Math.min(rect.top, childRect.top);
+                rect.left = Math.min(rect.left, childRect.left);
+                rect.right = Math.max(rect.right, childRect.right);
+                rect.bottom = Math.max(rect.bottom, childRect.bottom);
+            }
+        });
+        rect.width = rect.right - rect.left;
+        rect.height = rect.bottom - rect.top;
+        return rect;
+    }
+
     require('jquery-ui');
 
     InlineEditorErrorHolderView = BaseView.extend({
         keepElement: true,
 
-        POSITION_TOP: '',
-        POSITION_RIGHT: 'error-message-right',
-        POSITION_BOTTOM: 'error-message-below',
-        POSITION_LEFT: 'error-message-left',
+        DEFAULT_POSITION: 'top',
+
+        POSITION_CLASSES: {
+            bottom: 'error-message-below',
+            right: 'error-message-right',
+            left: 'error-message-left',
+        },
+
         DROPDOWNS: [
             '.select2-container.select2-drop-below',
             '.timepicker-dialog-is-below',
@@ -34,9 +61,9 @@ define(function(require) {
         },
 
         events: {
-            click: 'updatePosition',
-            mouseenter: 'updatePosition',
-            updatePosition: 'updatePosition',
+            'click': 'updatePosition',
+            'mouseenter': 'updatePosition',
+            'updatePosition': 'updatePosition',
             'datepicker:dialogShow': 'updatePosition',
             'datepicker:dialogReposition': 'updatePosition',
             'datepicker:dialogHide': 'updatePosition',
@@ -109,82 +136,67 @@ define(function(require) {
         },
 
         updatePosition: function() {
-            if (!this.getErrorMessageElements().length) {
+            var errorMessageElements = this.getErrorMessageElements();
+            if (errorMessageElements.length === 0) {
                 return;
             }
-
             var withinRect = this.getWithinRect();
-            var classes = [this.POSITION_TOP, this.POSITION_RIGHT, this.POSITION_BOTTOM, this.POSITION_LEFT].join(' ');
-            this.$el.removeClass(classes);
-            $.Deferred().resolve(false).promise()
-                .then(_.bind(this.tryTop, this, withinRect))
-                .then(_.bind(this.tryBottom, this, withinRect))
-                .then(_.bind(this.tryRight, this, withinRect))
-                .then(_.bind(this.tryLeft, this, withinRect));
+            var positionSequence = _.keys(this.POSITION_CLASSES);
+            var initialPosition = this.getPositionByClass();
+            // check if current position is default and correct
+            if (initialPosition === this.DEFAULT_POSITION) {
+                if (this.checkPosition(initialPosition, withinRect, errorMessageElements[0])) {
+                    return;
+                }
+            } else {
+                // if initial position is'n default it needs to try default position as well
+                positionSequence.unshift(this.DEFAULT_POSITION);
+            }
+            var initialOpacity = errorMessageElements.css('opacity');
+            errorMessageElements.css('opacity', 0);
+            for (var i = 0; i < positionSequence.length; i++) {
+                var position = positionSequence[i];
+                this.setPositionClass(position);
+                if (this.checkPosition(position, withinRect, errorMessageElements[0])) {
+                    break;
+                }
+            }
+            errorMessageElements.css('opacity', initialOpacity);
         },
 
-        tryTop: function(withinRect, done) {
-            if (done || this.$(this.DROPUPS.join(', ')).length) {
-                return done;
-            }
-
-            this.$el.addClass(this.POSITION_TOP);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.top >= withinRect.top) {
-                done = true;
+        checkPosition: function(position, withinRect, errorMessageElement) {
+            var methodName = 'check' + _.capitalize(position);
+            if (_.isFunction(this[methodName])) {
+                return this[methodName](withinRect, errorMessageElement);
             } else {
-                this.$el.removeClass(this.POSITION_TOP);
+                return false;
             }
-
-            return done;
         },
 
-        tryBottom: function(withinRect, done) {
-            if (done || this.$(this.DROPDOWNS.join(', ')).length) {
-                return done;
+        checkTop: function(withinRect, errorMessageElement) {
+            if (this.$(this.DROPUPS.join(', ')).length > 0) { // don't show error above if dropup is present
+                return false;
             }
-
-            this.$el.addClass(this.POSITION_BOTTOM);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.bottom <= withinRect.bottom) {
-                done = true;
-            } else {
-                this.$el.removeClass(this.POSITION_BOTTOM);
-            }
-
-            return done;
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.top >= withinRect.top && messageRect.right <= withinRect.right;
         },
 
-        tryRight: function(withinRect, done) {
-            if (done) {
-                return done;
+        checkBottom: function(withinRect, errorMessageElement) {
+            if (this.$(this.DROPDOWNS.join(', ')).length > 0) { // don't show error below if dropdown is present
+                return false;
             }
-
-            this.$el.addClass(this.POSITION_RIGHT);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.right <= withinRect.right) {
-                done = true;
-            } else {
-                this.$el.removeClass(this.POSITION_RIGHT);
-            }
-
-            return done;
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.bottom <= withinRect.bottom && messageRect.right <= withinRect.right;
         },
 
-        tryLeft: function(withinRect, done) {
-            if (done) {
-                return done;
-            }
+        checkRight: function(withinRect, errorMessageElement) {
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.right <= withinRect.right;
+        },
 
-            this.$el.addClass(this.POSITION_LEFT);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.left >= withinRect.left) {
-                done = true;
-            } else {
-                this.$el.removeClass(this.POSITION_LEFT);
-            }
-
-            return done;
+        checkLeft: function(withinRect, errorMessageElement) {
+            var messageRect = getTreeRect(errorMessageElement);
+            return messageRect && messageRect.left >= withinRect.left;
         },
 
         getErrorMessageElements: function() {
@@ -196,18 +208,27 @@ define(function(require) {
             this.render();
         },
 
-        adoptErrorMessage: function() {
+        parseValidatorErrors: function(errorList) {
             var errors = {};
-            _.each(this.getErrorMessageElements(), function(label) {
-                var name = label.getAttribute('for');
-                var $input = this.$('#' + name);
-                // if 'for' attribute reference to an input's ID, map it into its name
-                if ($input.length) {
-                    name = $input[0].getAttribute('name');
-                }
-                errors[name] = $(label).text();
+            _.each(errorList, function(errorItem) {
+                errors[errorItem.element.getAttribute('name')] = errorItem.message;
             }, this);
             this._errors = errors;
+        },
+
+        setPositionClass: function(position) {
+            var classesToRemove = _.values(_.omit(this.POSITION_CLASSES, position));
+            this.$el.removeClass(classesToRemove.join(' '));
+            if (position !== this.DEFAULT_POSITION) {
+                this.$el.addClass(_.result(this.POSITION_CLASSES, position));
+            }
+        },
+
+        getPositionByClass: function() {
+            var position = _.findKey(this.POSITION_CLASSES, function(value) {
+                return this.$el.hasClass(value);
+            }, this);
+            return position || this.DEFAULT_POSITION;
         }
     });
 

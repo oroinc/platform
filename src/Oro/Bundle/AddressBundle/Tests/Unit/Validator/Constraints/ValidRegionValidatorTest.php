@@ -42,7 +42,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testConfiguration()
     {
-        $this->assertEquals('oro_address_valid_region', $this->constraint->validatedBy());
+        $this->assertEquals(ValidRegionValidator::class, $this->constraint->validatedBy());
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
     }
 
@@ -92,12 +92,9 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('Country'));
 
         $this->context->expects($this->once())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('test'));
-        $this->context->expects($this->once())
             ->method('addViolationAt')
             ->with(
-                'test.region',
+                'region',
                 $this->constraint->message,
                 ['{{ country }}' => 'Country']
             );

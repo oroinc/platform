@@ -2,11 +2,12 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerFilterView;
+    var template = require('tpl!orodatagrid/templates/column-manager/column-manager-filter.html');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerFilterView = BaseView.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager-filter.html'),
+        template: template,
         autoRender: true,
         events: {
             'keyup [data-role="column-manager-search"]': 'onSearch',
@@ -33,7 +34,7 @@ define(function(require) {
             var search = this.model.get('search');
             var renderable = Boolean(this.model.get('renderable'));
             this.$('[data-role="column-manager-search"]').val(search);
-            this.$('.column-manager-search').toggleClass('empty', search.length === 0);
+            this.$('[datagrid-manager-search]').toggleClass('empty', search.length === 0);
             this.$('[data-role="column-manager-show-all"]').toggleClass('active', !renderable);
             this.$('[data-role="column-manager-show-selected"]').toggleClass('active', renderable);
         },

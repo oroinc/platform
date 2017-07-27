@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
+use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 
 /**
  * A base class for configuration scope managers
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractScopeManager
 {
@@ -18,17 +22,25 @@ abstract class AbstractScopeManager
     /** @var CacheProvider */
     protected $cache;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var array */
     protected $changedSettings = [];
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param CacheProvider   $cache
+     * @param ManagerRegistry          $doctrine
+     * @param CacheProvider            $cache
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ManagerRegistry $doctrine, CacheProvider $cache)
-    {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        CacheProvider $cache,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->doctrine = $doctrine;
         $this->cache    = $cache;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -46,12 +58,18 @@ abstract class AbstractScopeManager
         $setting = $this->getCachedSetting($entityId, $name);
 
         $result = null;
-        if (null !== $setting && isset($setting['value'])) {
+
+        if ($setting === null) {
+            return $result;
+        }
+
+        if ($setting[ConfigManager::VALUE_KEY] !== null
+            || $setting[ConfigManager::USE_PARENT_SCOPE_VALUE_KEY] === false
+        ) {
+            $result = $setting[ConfigManager::VALUE_KEY];
             if ($full) {
-                $result          = $setting;
-                $result['scope'] = $this->getScopedEntityName();
-            } else {
-                $result = $setting['value'];
+                $result = $setting;
+                $result[ConfigManager::SCOPE_KEY] = $this->getScopedEntityName();
             }
         }
 
@@ -101,16 +119,17 @@ abstract class AbstractScopeManager
         if (!$this->cache->contains($cacheKey)) {
             $settings = $this->loadStoredSettings($entityId);
             $this->cache->save($cacheKey, $settings);
+        } else {
+            $settings = $this->cache->fetch($cacheKey);
         }
 
-        $settings = $this->cache->fetch($cacheKey);
         $keySetting = null;
 
         if (!empty($settings[$section][$key])) {
             $keySetting = $settings[$section][$key];
         }
 
-        if (isset($this->changedSettings[$entityId][$name]['value'])) {
+        if (isset($this->changedSettings[$entityId][$name][ConfigManager::VALUE_KEY])) {
             if (null === $keySetting) {
                 $keySetting = [];
             }
@@ -132,8 +151,8 @@ abstract class AbstractScopeManager
         $entityId = $this->resolveIdentifier($scopeIdentifier);
 
         $this->changedSettings[$entityId][$name] = [
-            'value'                  => $value,
-            'use_parent_scope_value' => false
+            ConfigManager::VALUE_KEY                  => $value,
+            ConfigManager::USE_PARENT_SCOPE_VALUE_KEY => false
         ];
     }
 
@@ -150,7 +169,7 @@ abstract class AbstractScopeManager
         $this->cache->delete($this->getCacheKey($this->getScopedEntityName(), $entityId));
 
         $this->changedSettings[$entityId][$name] = [
-            'use_parent_scope_value' => true
+            ConfigManager::USE_PARENT_SCOPE_VALUE_KEY => true
         ];
     }
 
@@ -175,8 +194,8 @@ abstract class AbstractScopeManager
     public function flush($scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        if (count($this->changedSettings[$entityId]) > 0) {
-            $this->save($this->changedSettings[$entityId]);
+        if (!empty($this->changedSettings[$entityId])) {
+            $this->save($this->changedSettings[$entityId], $scopeIdentifier);
             $this->changedSettings[$entityId] = [];
         }
     }
@@ -205,7 +224,7 @@ abstract class AbstractScopeManager
             $config->setScopedEntity($entity)->setRecordId($entityId);
         }
 
-        list ($updated, $removed) = $this->calculateChangeSet($settings, $entityId);
+        list($updated, $removed) = $this->calculateChangeSet($settings, $entityId);
         foreach ($removed as $name) {
             list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
             $config->removeValue($section, $key);
@@ -253,14 +272,14 @@ abstract class AbstractScopeManager
         foreach ($settings as $name => $value) {
             $entityId = $this->resolveIdentifier($scopeIdentifier);
             $currentValue = $this->getSettingValue($name, true, $entityId);
-            $useCurrentScope = empty($value['use_parent_scope_value']);
+            $useCurrentScope = empty($value[ConfigManager::USE_PARENT_SCOPE_VALUE_KEY]);
 
             // save only if there's no default checkbox checked
             if ($useCurrentScope) {
-                $updated[$name] = $value['value'];
+                $updated[$name] = $value[ConfigManager::VALUE_KEY];
             }
 
-            $valueDefined = empty($currentValue['use_parent_scope_value']);
+            $valueDefined = empty($currentValue[ConfigManager::USE_PARENT_SCOPE_VALUE_KEY]);
             if ($valueDefined && !$useCurrentScope) {
                 $removed[] = $name;
             }
@@ -297,6 +316,12 @@ abstract class AbstractScopeManager
      */
     public function setScopeId($scopeId)
     {
+    }
+
+    protected function dispatchScopeIdChangeEvent()
+    {
+        $event = new ConfigManagerScopeIdUpdateEvent();
+        $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
     }
 
     /**

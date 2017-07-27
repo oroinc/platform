@@ -87,6 +87,10 @@ define([
             return;
         }
 
+        if (this.deferredRender) {
+            this.deferredRender.reject(this);
+            delete this.deferredRender;
+        }
         this.disposePageComponents();
         this.trigger('dispose', this);
 
@@ -131,7 +135,12 @@ define([
         // initializes layout
         Backbone.mediator.execute('layout:init', this.getLayoutElement());
         // initializes page components
-        return this.initPageComponents(options);
+        var initPromise = this.initPageComponents(options);
+        if (!this.deferredRender) {
+            this._deferredRender();
+            initPromise.always(_.bind(this._resolveDeferredRender, this));
+        }
+        return initPromise;
     };
     /**
      * Create flag of deferred render
@@ -152,9 +161,12 @@ define([
      * @protected
      */
     Backbone.View.prototype._resolveDeferredRender = function() {
-        var self = this;
         if (this.deferredRender) {
             var promises = [];
+            var resolve = _.bind(function() {
+                this.deferredRender.resolve(this);
+                delete this.deferredRender;
+            }, this);
 
             if (this.subviews.length) {
                 _.each(this.subviews, function(subview) {
@@ -163,10 +175,13 @@ define([
                     }
                 });
             }
-            $.when.apply($, promises).done(function() {
-                self.deferredRender.resolve(self);
-                delete self.deferredRender;
-            });
+
+            if (promises.length) {
+                // even with empty list of promises $.when takes about 1.4ms
+                $.when.apply($, promises).done(resolve);
+            } else {
+                resolve();
+            }
         }
     };
 

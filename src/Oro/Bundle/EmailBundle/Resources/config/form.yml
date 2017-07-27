@@ -2,7 +2,6 @@ parameters:
     oro_email.form.subscriber.emailtemplate.class:        Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber
     oro_email.form.subscriber.autoresponserule.class:     Oro\Bundle\EmailBundle\Form\EventListener\AutoResponseRuleSubscriber
     oro_email.form.type.autoresponserule.class:           Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType
-    oro_email.form.type.autoresponserule_condition.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleConditionType
     oro_email.form.type.autoresponse_template.class:      Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType
     oro_email.form.type.autoresponse_template_choice.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType
     oro_email.form.extension.mailbox_unbound_rules.class: Oro\Bundle\EmailBundle\Form\Extension\MailboxUnboudRulesExtension
@@ -35,12 +34,12 @@ services:
     oro_email.form.subscriber.emailtemplate:
         class: %oro_email.form.subscriber.emailtemplate.class%
         arguments:
-            - '@security.context'
+            - '@security.token_storage'
 
     oro_email.form.subscriber.autoresponserule:
         class: %oro_email.form.subscriber.autoresponserule.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
 
     oro_email.form.type.autoresponserule:
         class: %oro_email.form.type.autoresponserule.class%
@@ -48,11 +47,6 @@ services:
             - '@oro_email.form.subscriber.autoresponserule'
         tags:
             - { name: form.type, alias: oro_email_autoresponserule }
-
-    oro_email.form.type.autoresponserule_condition:
-        class: %oro_email.form.type.autoresponserule_condition.class%
-        tags:
-            - { name: form.type, alias: oro_email_autoresponserule_condition }
 
     oro_email.form.type.autoresponse_template:
         class: %oro_email.form.type.autoresponse_template.class%
@@ -67,7 +61,7 @@ services:
     oro_email.form.type.autoresponse_template_choice:
         class: %oro_email.form.type.autoresponse_template_choice.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@translator'
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
@@ -146,7 +140,8 @@ services:
     oro_email.form.type.email:
         class: %oro_email.form.type.email.class%
         arguments:
-            - '@security.context'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@oro_email.email_renderer'
             - '@oro_email.email.model.builder.helper'
             - '@oro_config.user'
@@ -161,7 +156,7 @@ services:
             - '@request'
             - '@doctrine.orm.entity_manager'
             - "@oro_email.email.entity.builder="
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@event_dispatcher'
             - '@oro_email.email_importance_transformer'
             - '@oro_email.email_body_type_transformer'
@@ -263,11 +258,23 @@ services:
     oro_email.form.type.email_address_from:
         class: %oro_email.form.type.email_address_from.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_email.related_emails.provider'
             - '@oro_email.mailbox.manager'
         tags:
             - { name: form.type, alias: oro_email_email_address_from }
+
+    oro_email.form.type.email_origin_from:
+        class: 'Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType'
+        arguments:
+            - '@oro_security.token_accessor'
+            - '@oro_email.related_emails.provider'
+            - '@oro_email.email.model.builder.helper'
+            - '@oro_email.mailbox.manager'
+            - '@doctrine'
+            - '@oro_email.tools.email_origin_helper'
+        tags:
+            - { name: form.type, alias: oro_email_email_origin_from }
 
     oro_email.form.type.email_address_recipients:
         class: %oro_email.form.type.email_address_recipients.class%

@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 class FilterHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider handleData
+     * @dataProvider handleProvider
      * @param array $config
      * @param array $expected
      */
@@ -25,7 +25,7 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    public function handleData()
+    public function handleProvider()
     {
         return [
             [
@@ -54,6 +54,8 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'label' => 'Test Transition',
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
+                            'display_type' => 'type',
+                            'destination_page' => 'dest',
                             'form_options' => [
                                 'attribute_fields' => [
                                     'test_attribute' => [
@@ -62,7 +64,10 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                                         ],
                                     ]
                                 ]
-                            ]
+                            ],
+                            'init_entities' => ['entity1'],
+                            'init_routes' => ['route1'],
+                            'init_datagrids' => ['datagrid1'],
                         ]
                     ],
                     WorkflowConfiguration::NODE_STEPS => [
@@ -91,6 +96,27 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'unknown' => 'fv',
                             'actions' => []
                         ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_var' => [
+                                'name' => 'var_name',
+                                'type' => 'string',
+                                'value' => 'test',
+                                'options' => []
+                            ],
+                            'test_entity_var' => [
+                                'name' => 'entity_var_name',
+                                'type' => 'entity',
+                                'value' => 1,
+                                'property_path' => 'entity.test_variable',
+                                'entity_acl' => [
+                                    'delete' => false,
+                                ],
+                                'options' => [],
+                                'unknownKey' => 'unkownValue',
+                            ]
+                        ]
                     ]
                 ],
                 'expected' => [
@@ -113,6 +139,8 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'name' => 'test_transition',
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
+                            'display_type' => 'type',
+                            'destination_page' => 'dest',
                             'form_options' => [
                                 'attribute_fields' => [
                                     'test_attribute' => [
@@ -121,7 +149,10 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                                         ],
                                     ]
                                 ]
-                            ]
+                            ],
+                            'init_entities' => ['entity1'],
+                            'init_routes' => ['route1'],
+                            'init_datagrids' => ['datagrid1'],
                         ]
                     ],
                     WorkflowConfiguration::NODE_STEPS => [
@@ -145,6 +176,26 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'preactions' => [],
                             'preconditions' => [],
                             'actions' => []
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_var' => [
+                                'name' => 'var_name',
+                                'type' => 'string',
+                                'value' => 'test',
+                                'options' => []
+                            ],
+                            'test_entity_var' => [
+                                'name' => 'entity_var_name',
+                                'type' => 'entity',
+                                'value' => 1,
+                                'property_path' => 'entity.test_variable',
+                                'entity_acl' => [
+                                    'delete' => false,
+                                ],
+                                'options' => []
+                            ]
                         ]
                     ]
                 ]

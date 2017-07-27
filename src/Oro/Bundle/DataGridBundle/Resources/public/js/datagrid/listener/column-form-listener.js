@@ -16,7 +16,6 @@ define([
      * @extends orodatagrid.datagrid.listener.AbstractGridChangeListener
      */
     ColumnFormListener = AbstractGridChangeListener.extend({
-
         /** @param {Object} */
         selectors: {
             included: null,
@@ -31,13 +30,19 @@ define([
                 throw new Error('Field selectors is not specified');
             }
             this.selectors = options.selectors;
+
             this.grid = options.grid;
             this.confirmModal = {};
 
             ColumnFormListener.__super__.initialize.apply(this, arguments);
 
             this.selectRows();
-            this.listenTo(options.grid.collection, 'sync', this.selectRows);
+            this.listenTo(options.grid.collection, {
+                'sync': this.selectRows,
+                'excludeRow': this._excludeRow,
+                'includeRow': this._includeRow,
+                'setState': this.setState
+            });
         },
 
         /**
@@ -68,41 +73,57 @@ define([
          * @inheritDoc
          */
         _processValue: function(id, model) {
-            var original = this.get('original');
-            var included = this.get('included');
-            var excluded = this.get('excluded');
+            id = String(id);
 
             var isActive = model.get(this.columnName);
-            var originallyActive;
-            if (_.has(original, id)) {
-                originallyActive = original[id];
-            } else {
-                originallyActive = !isActive;
-                original[id] = originallyActive;
-            }
 
             if (isActive) {
-                if (originallyActive) {
-                    included = _.without(included, [id]);
-                } else {
-                    included = _.union(included, [id]);
-                }
-                excluded = _.without(excluded, id);
+                this._includeRow(id);
             } else {
-                included = _.without(included, id);
-                if (!originallyActive) {
-                    excluded = _.without(excluded, [id]);
-                } else {
-                    excluded = _.union(excluded, [id]);
-                }
+                this._excludeRow(id);
             }
 
             model.trigger('backgrid:selected', model, isActive);
+        },
+
+        _excludeRow: function(id) {
+            var included = this.get('included');
+            var excluded = this.get('excluded');
+
+            if (_.contains(included, id)) {
+                included = _.without(included, id);
+            } else {
+                excluded = _.union(excluded, [id]);
+            }
 
             this.set('included', included);
             this.set('excluded', excluded);
-            this.set('original', original);
 
+            this._synchronizeState();
+        },
+
+        _includeRow: function(id) {
+            var included = this.get('included');
+            var excluded = this.get('excluded');
+
+            if (_.contains(excluded, id)) {
+                excluded = _.without(excluded, id);
+            } else {
+                included = _.union(included, [id]);
+            }
+
+            this.set('included', included);
+            this.set('excluded', excluded);
+
+            this._synchronizeState();
+        },
+
+        /**
+         * Sets included and excluded elements ids using provided arrays
+         */
+        setState: function(included, excluded) {
+            this.set('included', included);
+            this.set('excluded', excluded);
             this._synchronizeState();
         },
 
@@ -112,7 +133,6 @@ define([
         _clearState: function() {
             this.set('included', []);
             this.set('excluded', []);
-            this.set('original', {});
         },
 
         /**
@@ -142,7 +162,7 @@ define([
             if (!string) {
                 return [];
             }
-            return _.map(string.split(','), function(val) { return val ? parseInt(val, 10) : null; });
+            return _.map(string.split(','), function(val) { return val ? String(val) : null; });
         },
 
         /**
@@ -151,8 +171,8 @@ define([
           * @private
           */
         _restoreState: function() {
-            var included = '';
-            var excluded = '';
+            var included = [];
+            var excluded = [];
             var columnName = this.columnName;
             if (this.selectors.included && $(this.selectors.included).length) {
                 included = this._explode($(this.selectors.included).val());
@@ -162,9 +182,10 @@ define([
                 excluded = this._explode($(this.selectors.excluded).val());
                 this.set('excluded', excluded);
             }
+
             _.each(this.grid.collection.models, function(model) {
                 var isActive = model.get(columnName);
-                var modelId = model.id;
+                var modelId = String(model.id);
                 if (!isActive && _.contains(included, modelId)) {
                     model.set(columnName, true);
                 }
@@ -172,6 +193,7 @@ define([
                     model.set(columnName, false);
                 }
             });
+
             if (included || excluded) {
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_in', included);
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_not_in', excluded);

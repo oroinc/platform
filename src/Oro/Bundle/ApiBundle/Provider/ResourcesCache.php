@@ -13,6 +13,7 @@ class ResourcesCache
     const RESOURCES_KEY_PREFIX            = 'resources_';
     const SUBRESOURCE_KEY_PREFIX          = 'subresource_';
     const ACCESSIBLE_RESOURCES_KEY_PREFIX = 'accessible_';
+    const EXCLUDED_ACTIONS_KEY_PREFIX     = 'excluded_actions_';
 
     /** @var CacheProvider */
     protected $cache;
@@ -41,6 +42,25 @@ class ResourcesCache
 
         return false !== $resources
             ? $resources
+            : null;
+    }
+
+    /**
+     * Fetches an information about excluded actions from the cache.
+     *
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return array|null [entity class => [action, ...]] or NULL if the list is not cached yet
+     */
+    public function getExcludedActions($version, RequestType $requestType)
+    {
+        $excludedActions = $this->cache->fetch(
+            self::EXCLUDED_ACTIONS_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType)
+        );
+
+        return false !== $excludedActions
+            ? $excludedActions
             : null;
     }
 
@@ -76,7 +96,7 @@ class ResourcesCache
      * @param string      $version     The Data API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
-     * @return ApiResourceSubresources[]|null The list of sub-resources or NULL if it is not cached yet
+     * @return ApiResourceSubresources|null The list of sub-resources or NULL if it is not cached yet
      */
     public function getSubresources($entityClass, $version, RequestType $requestType)
     {
@@ -101,6 +121,7 @@ class ResourcesCache
     public function saveResources($version, RequestType $requestType, array $resources, array $accessibleResources)
     {
         $allResources = [];
+        $excludedActionsData = [];
         $accessibleResourcesData = array_fill_keys($accessibleResources, true);
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
@@ -108,11 +129,16 @@ class ResourcesCache
             if (!isset($accessibleResourcesData[$entityClass])) {
                 $accessibleResourcesData[$entityClass] = false;
             }
+            $excludedActions = $resource->getExcludedActions();
+            if (!empty($excludedActions)) {
+                $excludedActionsData[$entityClass] = $excludedActions;
+            }
         }
 
         $keyIndex = $this->getCacheKeyIndex($version, $requestType);
         $this->cache->save(self::RESOURCES_KEY_PREFIX . $keyIndex, $allResources);
         $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResourcesData);
+        $this->cache->save(self::EXCLUDED_ACTIONS_KEY_PREFIX . $keyIndex, $excludedActionsData);
     }
 
     /**

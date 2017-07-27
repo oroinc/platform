@@ -15,19 +15,22 @@ define(function(require) {
     var dialogManager = new DialogManager();
     require('jquery.dialog.extended');
 
+    var config = _.extend({
+        type: 'dialog',
+        dialogOptions: null,
+        stateEnabled: true,
+        incrementalPosition: true,
+        preventModelRemoval: false,
+        messengerContainerClass: ''
+    }, require('module').config());
+
     /**
      * @export  oro/dialog-widget
      * @class   oro.DialogWidget
      * @extends oroui.widget.AbstractWidget
      */
     DialogWidget = AbstractWidget.extend({
-        options: _.extend({}, AbstractWidget.prototype.options, {
-            type: 'dialog',
-            dialogOptions: null,
-            stateEnabled: true,
-            incrementalPosition: true,
-            preventModelRemoval: false
-        }),
+        options: _.extend({}, AbstractWidget.prototype.options, config),
 
         // Windows manager global variables
         windowsPerRow: 10,
@@ -54,8 +57,11 @@ define(function(require) {
         listen: {
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
-            'page:request mediator': 'onPageChange'
+            'page:request mediator': 'onPageChange',
+            'layout:reposition mediator': 'resetDialogPosition'
         },
+
+        $messengerContainer: null,
 
         /**
          * Initialize dialog
@@ -69,7 +75,7 @@ define(function(require) {
             _.defaults(dialogOptions, {
                 title: options.title,
                 limitTo: '#container',
-                minWidth: 375,
+                minWidth: 320,
                 minHeight: 150
             });
             if (tools.isMobile()) {
@@ -94,6 +100,22 @@ define(function(require) {
         onWidgetRender: function(content) {
             this._initAdjustHeight(content);
             this._setMaxSize();
+            this._addMessengerContainer();
+        },
+
+        /**
+         * Add temporary container for messages into dialog window
+         * @private
+         */
+        _addMessengerContainer: function() {
+            var containerClass = this.options.messengerContainerClass;
+            var $title = this.widget.dialog('instance').uiDialogTitlebar;
+
+            if (containerClass && !$title.find('.' + containerClass).length) {
+                this.$messengerContainer = $('<div/>').appendTo($title)
+                    .addClass(containerClass)
+                    .attr('data-role', 'messenger-temporary-container');
+            }
         },
 
         setTitle: function(title) {
@@ -141,12 +163,18 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+
+            if (this.$messengerContainer) {
+                this.$messengerContainer.trigger('remove').remove();
+            }
+
+            $(window).off(this.eventNamespace());
             dialogManager.remove(this);
             if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({
-                    errorOutput: function(event, xhr) {
-                        // Suppress error if it's 404 response and not debug mode
-                        return xhr.status !== 404 || tools.debug;
+                    errorHandlerMessage: function(event, xhr) {
+                        // Suppress error if it's 404 response
+                        return xhr.status !== 404;
                     }
                 });
             }
@@ -433,10 +461,31 @@ define(function(require) {
             }
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
+
+            var initialDialogPosition = dialog.css('position');
+            var initialScrollTop = $(window).scrollTop();
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                $('html, body').scrollTop(0);
+                dialog.css({
+                    position: 'absolute'
+                });
+            }
+
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
             this.widget.trigger('dialogreposition');
+
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                dialog.css({
+                    position: initialDialogPosition
+                });
+                $('html, body').scrollTop(initialScrollTop);
+            }
         },
 
         leftAndWidthAdjustments: function(dialog, containerEl) {
@@ -460,11 +509,21 @@ define(function(require) {
                 if (minWidth > containerEl.clientWidth - left) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
+            } else {
+                if (!this.widgetIsResizable() && !this.options.dialogOptions.autoResize) {
+                    dialog.css('width', this.options.dialogOptions.width);
+                }
             }
         },
 
         topAndHeightAdjustments: function(dialog, containerEl) {
             // containerEl.offsetTop will only work if offsetParent is document.body
+
+            // Set auto height for dialog before calc
+            if (!this.widgetIsResizable()) {
+                dialog.css('height', 'auto');
+            }
+
             var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
             var height = parseFloat(dialog.css('height'));
             var minHeight = parseFloat(dialog.css('min-height'));
@@ -558,6 +617,9 @@ define(function(require) {
             this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
             });
+        },
+        widgetIsResizable: function() {
+            return this.options.dialogOptions.resizable;
         }
     });
 

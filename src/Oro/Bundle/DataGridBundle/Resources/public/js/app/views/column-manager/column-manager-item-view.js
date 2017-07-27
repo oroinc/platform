@@ -2,12 +2,13 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerItemView;
+    var template = require('tpl!orodatagrid/templates/column-manager/column-manager-item.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerItemView = BaseView.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html'),
+        template: template,
         tagName: 'tr',
 
         events: {
@@ -22,6 +23,9 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
+        /**
+         * @inheritDoc
+         */
         render: function() {
             ColumnManagerItemView.__super__.render.apply(this, arguments);
             this.$el.toggleClass('renderable', this.model.get('renderable'));

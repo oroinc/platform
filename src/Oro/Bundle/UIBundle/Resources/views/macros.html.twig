@@ -98,7 +98,7 @@
         data - row data
 #}
 {% macro renderAttribute(title, data) %}
-    <div class="control-group">
+    <div class="control-group attribute-row">
         <label class="control-label">{{ title }}</label>
         <div class="controls">
             {{ data|raw }}
@@ -127,9 +127,42 @@
         fieldName - the name of field on wich Field ACL should be checked
 #}
 {% macro renderHtmlProperty(title, data, entity = null, fieldName = null) %}
-    {% if entity is defined and fieldName is defined and not resource_granted('VIEW', entity, fieldName) %}
+    {% if entity is defined and fieldName is defined and not is_granted('VIEW', entity, fieldName) %}
     {% else %}
         {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {% endif %}
+{% endmacro %}
+
+{#
+    Render collapsible html property block
+    Parameters:
+        title - property title
+        data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+#}
+{% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName) %}
+    {% if is_granted('VIEW', entity, fieldName) %}
+        {% set collapseView = {
+                widgetModule: 'oroui/js/widget/collapse-widget',
+                storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
+                uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
+                animationSpeed: 0,
+                closeClass: 'overflows',
+                checkOverflow: true,
+                open: false
+            } %}
+        <div class="collapse-block"
+             data-page-component-module="oroui/js/app/components/jquery-widget-component"
+             data-page-component-options="{{ collapseView|json_encode }}">
+            {{ _self.renderAttribute(title,
+                '<div class="control-label" data-collapse-container>' ~
+                    data|default('oro.ui.empty'|trans) ~
+                '</div>' ~
+                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ 'Show more'|trans ~ '</a>' ~
+                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ 'Show less'|trans ~ '</a>'
+            ) }}
+        </div>
     {% endif %}
 {% endmacro %}
 
@@ -895,10 +928,10 @@
         contentAttributes - additional attributes for block content
         useSubBlockDivider - indicates if 'row-fluid-divider' css class should be added to a row when there are more than one subblocks
 #}
-{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider) %}
+{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider, headerLinkContent = '') %}
     {% set cols = subblocks|length %}
     <div class="responsive-section">
-        <h4 class="scrollspy-title">{{ title }}</h4>
+        <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
             {% if isForm is defined and isForm == true %}
@@ -942,8 +975,8 @@
             'hiddenData' - additional data (hidden fields from the form)
         ]
 #}
-{% macro scrollData(dataTarget, data, form = null) %}
-    {% set data = oro_ui_scroll_data_before(dataTarget, data, form) %}
+{% macro scrollData(dataTarget, data, entity, form = null) %}
+    {% set data = oro_ui_scroll_data_before(dataTarget, data, entity, form) %}
 
     {% if form is defined and form %}
         {% set isForm = true %}
@@ -975,10 +1008,10 @@
         {% endif %}
         <div data-spy="scroll" data-target="#{{ dataTarget }}" data-offset="1" class="scrollspy container-fluid scrollable-container{% if isForm %} form-container{% endif %}">
             {% for scrollBlock in dataBlocks %}
-                {{ _self.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true) }}
+                {{ _self.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true, scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null) }}
             {% endfor %}
             {% if data.hiddenData is defined or isForm %}
-                <div class="hide">
+                <div class="hide" data-skip-input-widgets>
                     {% if data.hiddenData is defined %}
                         {{ data.hiddenData|raw }}
                     {% endif %}
@@ -997,10 +1030,16 @@
         field - form collection field
         label - label of block
         buttonCaption - Caption of add entity button
+        tooltipText (optional) - text to render a tooltip for the collection field
 #}
-{% macro collectionField(field, label, buttonCaption) %}
+{% macro collectionField(field, label, buttonCaption, tooltipText = null) %}
     <div class="control-group">
-        <label class="control-label">{{ label }}</label>
+        <div class="control-label wrap">
+            {% if tooltipText is not null %}
+                {{ _self.tooltip(tooltipText) }}
+            {% endif %}
+            <label>{{ label }}</label>
+        </div>
         <div class="controls">
             <div class="row-oro">
                 <div class="oro-item-collection collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
@@ -1023,7 +1062,7 @@
 {% macro attributes(attr, excludes) %}
     {% spaceless %}
         {% set attr = attr|default({}) %}
-        {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue }}" {% endif %}{% endif %}{% endfor %}
+        {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue is iterable ? attrvalue|json_encode : attrvalue }}" {% endif %}{% endif %}{% endfor %}
     {% endspaceless %}
 {% endmacro %}
 
@@ -1038,7 +1077,7 @@
         {%- if entity %}
             {% set ownerType = oro_get_owner_type(entity) %}
             {%- if ownerType %}
-                {% if  resource_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
+                {% if  is_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
                     {% set owner = oro_get_entity_owner(entity) %}
                     {% if owner %}
                         {% if (ownerType == 'USER') %}
@@ -1058,7 +1097,7 @@
                                     )|trans
                                 }}:
                             {% endif %}
-                            {% if ownerPath is defined and resource_granted('VIEW', owner) %}
+                            {% if ownerPath is defined and is_granted('VIEW', owner) %}
                                 {{ _self.renderUrl(ownerPath, ownerName) }}
                             {% else %}
                                 {{ ownerName }}
@@ -1154,7 +1193,7 @@
 
 {%- macro entityViewLink(entity, label, route, permission) -%}
     {% if entity %}
-        {% if route and resource_granted(permission|default('VIEW'), entity) %}
+        {% if route and is_granted(permission|default('VIEW'), entity) %}
             {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
         {% else %}
             {{ label|escape }}
@@ -1188,7 +1227,7 @@
         entityLabelIfNotGranted - Entity label that should be rendered in case if user have no access to see field value
 #}
 {%- macro renderEntityViewLabel(entity, fieldName, entityLabelIfNotGranted = null) -%}
-    {% if entity is not null and resource_granted('VIEW', entity, fieldName) %}
+    {% if entity is not null and is_granted('VIEW', entity, fieldName) %}
         {{ attribute(entity, fieldName) }}
     {% else %}
         {% if entityLabelIfNotGranted is not null %}
@@ -1198,83 +1237,59 @@
 {%- endmacro -%}
 
 {%- macro renderJsTree(data, actions) -%}
-    {% set defaultActions = {
-        'expand': {
-            'view': 'oroui/js/app/views/jstree/expand-action-view'
-        },
-        'collapse': {
-            'view': 'oroui/js/app/views/jstree/collapse-action-view'
-        },
-        'subcategories': {
-            'view': 'oroui/js/app/views/jstree/subcategories-action-view'
+    {% set defaultTreeData = {
+        treeOptions: {
+            view: 'oroui/js/app/views/jstree/base-tree-view'
         }
     } %}
-
-    {% set enabledActions = [] %}
-
-    {% for key, action in actions %}
-        {% if action is iterable %}
-            {% set enabledActions = enabledActions|merge({
-                (key): action
-            }) %}
-        {% else %}
-            {% set enabledActions = enabledActions|merge({
-                (action): defaultActions[action]
-            }) %}
-        {% endif %}
-    {% endfor %}
-
     <div class="jstree-wrapper collapse-view expanded"
         data-page-component-module="oroui/js/app/components/jquery-widget-component"
         data-page-component-options="{{ {
             widgetModule: 'oroui/js/widget/collapse-widget'
         }|json_encode() }}"
         data-role="jstree-wrapper">
-
-        {% if data.label|default('') %}
-        <div class="jstree-wrapper__title">
-            <span class="jstree-wrapper__label">
-                <label class="custom-checkbox jstree-wrapper__checkbox"
-                       data-role="jstree-checkall">
-                    <input class="custom-checkbox__input"
-                           type="checkbox"
-                           name="categories"
-                           data-action-type="checkAll"/>
-                    <span class="custom-checkbox__text"></span>
-                </label>
-                <span class="jstree-wrapper__text"
-                    data-collapse-trigger>
-                    {{ data.label }}
-                </span>
-            </span>
-            {% if enabledActions|length %}
-            <div class="jstree-actions dropdown btn-group"
-                 data-page-component-module="oroui/js/app/components/view-component"
-                 data-page-component-options="{{ {
-                     'view': 'oroui/js/app/views/jstree/action-manager-view',
-                    'actions': enabledActions
-                 }|json_encode}}">
-                <button type="button" class="jstree-actions__handle btn btn-default btn-small dropdown-toggle"
-                        data-toggle="dropdown" title="Mass Actions">
-                    <i class="fa-ellipsis-h"></i>
-                    <i class="caret"></i>
-                </button>
-                <ul class="jstree-actions__menu dropdown-menu dropdown-menu__action-column" data-role="jstree-actions">
-                </ul>
-            </div>
+        <div data-page-component-module="oroui/js/app/components/view-component"
+             data-page-component-options="{{ defaultTreeData.treeOptions|merge(data.treeOptions)|json_encode }}">
+            {% if data.label|default('') %}
+                <div class="jstree-wrapper__title">
+                    <span class="jstree-wrapper__label">
+                        <label class="custom-checkbox jstree-wrapper__checkbox"
+                               data-role="jstree-checkall">
+                            <input class="custom-checkbox__input"
+                                   type="checkbox"
+                                   name="jstree-items"
+                                   data-action-type="checkAll"/>
+                            <span class="custom-checkbox__text"></span>
+                        </label>
+                        <span class="jstree-wrapper__text"
+                            data-collapse-trigger>
+                            {{ data.label }}
+                        </span>
+                    </span>
+                    <div class="jstree-actions dropdown btn-group"
+                        data-page-component-module="oroui/js/app/components/view-component"
+                        data-page-component-options="{{ {
+                            'view': 'oroui/js/app/views/jstree/action-manager-view',
+                            'actions': actions|default({})
+                        }|json_encode}}">
+                        <button type="button" class="jstree-actions__handle btn btn-default btn-small dropdown-toggle"
+                                data-toggle="dropdown" title="Mass Actions">
+                            <i class="fa-ellipsis-h"></i>
+                            <i class="caret"></i>
+                        </button>
+                        <ul class="jstree-actions__menu dropdown-menu dropdown-menu__action-column" data-role="jstree-actions">
+                        </ul>
+                    </div>
+                </div>
             {% endif %}
-        </div>
-        {% endif %}
-
-        <div data-page-component-module="{{ data.module }}"
-             data-page-component-options="{{ data.treeOptions|json_encode }}"
-             data-collapse-container>
-            {% if not data.disableSearch|default(false) and data.treeOptions.data|default([]) %}
-            <div class="jstree-search-component">
-                <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
+            <div data-collapse-container>
+                {% if not data.disableSearch|default(false) and data.treeOptions.data|default([]) %}
+                <div class="jstree-search-component">
+                    <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
+                </div>
+                {% endif %}
+                <div data-role="jstree-container"></div>
             </div>
-            {% endif %}
-            <div data-role="jstree-container"></div>
         </div>
-     </div>
+    </div>
 {%- endmacro -%}

@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\EntityBundle;
 
-use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Component\PhpUtils\ClassLoader;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFallbackCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DatabaseCheckerCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
@@ -34,8 +35,7 @@ class OroEntityBundle extends Bundle
     public function __construct(KernelInterface $kernel)
     {
         // register logging hydrators class loader
-        $loader = new ClassLoader();
-        $loader->addPrefix(
+        $loader = new ClassLoader(
             'OroLoggingHydrator\\',
             $kernel->getCacheDir() . DIRECTORY_SEPARATOR . 'oro_entities'
         );
@@ -48,6 +48,7 @@ class OroEntityBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
+        $container->addCompilerPass(new DatabaseCheckerCompilerPass());
         $container->addCompilerPass(new EntityAliasProviderPass());
         $container->addCompilerPass(new EntityNameProviderPass());
         $container->addCompilerPass(new EntityClassNameProviderPass());

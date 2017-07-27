@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\ContextItemInterface;
+use Oro\Component\Layout\Tests\Unit\Stubs\ContextItemStub;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
@@ -50,10 +50,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $contextItemInterface = $this->createMock(ContextItemInterface::class);
-        $contextItemInterface->expects($this->once())
-            ->method('toString')
-            ->will($this->returnValue('ContextItemInterface'));
+        $contextItemInterface =  new ContextItemStub();
         $contextItems = [
             'string' => 'string',
             'array' => ['array'],
@@ -63,24 +60,23 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             $context->set($name, $item);
         }
         $contextItems['array'] = json_encode($contextItems['array']);
-        $contextItems['ContextItemInterface'] = 'ContextItemInterface';
+        $contextItems['ContextItemInterface'] = '(object) ContextItemStub::id:1';
 
         $contextData = [
             'string' => 'string',
-            'array' => ['array'],
-            'object' => new \stdClass()
+            'array' => [],
+            'object' => \stdClass::class
         ];
         foreach ($contextData as $name => $item) {
             $context->data()->set($name, $item);
         }
-        $contextData['array'] = json_encode($contextData['array']);
-        $contextData['object'] = get_class($contextData['object']);
 
         $this->contextHolder
             ->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
 
+        $this->dataCollector->setNotAppliedActions(['action1', 'action2']);
         $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
 
         $result = [
@@ -89,7 +85,9 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
                 'data' => $contextData
             ],
             'views' => [],
-            'count' => 0
+            'count' => 0,
+            'not_applied_actions_count' => 2,
+            'not_applied_actions' => ['action1', 'action2']
         ];
 
         $this->assertEquals($result, $this->dataCollector->getData());

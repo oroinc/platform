@@ -215,15 +215,15 @@ class OroJquerySelect2HiddenType extends AbstractType
         ];
 
         if ($form->getData()) {
-            $result = [];
             /** @var ConverterInterface $converter */
             $converter = $options['converter'];
             if (isset($options['configs']['multiple']) && $options['configs']['multiple']) {
+                $result = [];
                 foreach ($form->getData() as $item) {
                     $result[] = $converter->convertItem($item);
                 }
             } else {
-                $result[] = $converter->convertItem($form->getData());
+                $result = $converter->convertItem($form->getData());
             }
 
             $vars['attr'] = [

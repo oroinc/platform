@@ -2,12 +2,19 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Provider\Event\OnButtonsMatched;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 
@@ -19,18 +26,29 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ButtonProviderExtensionInterface[]|\PHPUnit_Framework_MockObject_MockObject[] */
     private $extensions = [];
 
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $logger;
+
+    /** @var ButtonSearchContext|\PHPUnit_Framework_MockObject_MockObject */
+    private $searchContext;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
+        $this->searchContext = $this->createMock(ButtonSearchContext::class);
+
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $this->buttonProvider = new ButtonProvider();
+        $this->buttonProvider->setLogger($this->logger);
+        $this->buttonProvider->setEventDispatcher($this->eventDispatcher);
     }
 
     public function testMatch()
     {
-        $searchContext = $this->createMock(ButtonSearchContext::class);
-
         $button1 = $this->getButton();
         $button2 = $this->getButton();
         $button3 = $this->getButton();
@@ -40,7 +58,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         $extension2 = $this->extension('two');
         $extension2->expects($this->once())->method('find')->willReturn([$button2, $button3]);
 
-        $collection = $this->buttonProvider->match($searchContext);
+        $collection = $this->buttonProvider->match($this->searchContext);
         $this->assertInstanceOf(ButtonsCollection::class, $collection);
 
         //checking correct mapping button => extension at collection
@@ -69,6 +87,20 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         $collection->map($callable);
     }
 
+    public function testMatchEvent()
+    {
+        $extension1 = $this->extension('one');
+        $extension1->expects($this->once())->method('find')->willReturn([]);
+        $extension2 = $this->extension('two');
+        $extension2->expects($this->once())->method('find')->willReturn([]);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(OnButtonsMatched::NAME, new OnButtonsMatched(new ButtonsCollection()));
+
+        $this->buttonProvider->match($this->searchContext);
+    }
+
     /**
      * @param string $identifier
      * @return ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -86,6 +118,22 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         return $this->extensions[$identifier];
     }
 
+    public function testFindAvailableWithErrors()
+    {
+        $this->extension('one')->expects($this->once())->method('find')->willReturn([$this->getButton()]);
+        $this->extension('one')->expects($this->once())
+            ->method('isAvailable')
+            ->willReturnCallback(
+                function ($button, $searchContext, ArrayCollection $errors) {
+                    $errors->add(['message' => 'error message', 'parameters' => ['param1']]);
+                }
+            );
+
+        $this->logger->expects($this->once())->method('error')->with('error message', ['param1']);
+
+        $this->buttonProvider->findAvailable($this->searchContext);
+    }
+
     /**
      * @dataProvider findAllDataProvider
      *
@@ -94,15 +142,12 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFindAll(array $input, array $output)
     {
-        /** @var ButtonSearchContext $searchContext */
-        $searchContext = $this->createMock(ButtonSearchContext::class);
-
         $this->extension('one')->expects($this->once())
             ->method('find')
-            ->with($searchContext)
+            ->with($this->searchContext)
             ->willReturn($input);
 
-        $this->assertEquals($output, $this->buttonProvider->findAll($searchContext));
+        $this->assertEquals($output, $this->buttonProvider->findAll($this->searchContext));
     }
 
     /**
@@ -132,6 +177,42 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
                 'output' => [$button2, $button3]
             ]
         ];
+    }
+
+    public function testFindAllWithErrors()
+    {
+        $this->extension('one')->expects($this->once())->method('find')->willReturn([$this->getButton()]);
+        $this->extension('one')->expects($this->once())
+            ->method('isAvailable')
+            ->willReturnCallback(
+                function ($button, $searchContext, ArrayCollection $errors) {
+                    $errors->add(['message' => 'error message', 'parameters' => ['param1']]);
+                }
+            );
+
+        $this->logger->expects($this->once())->method('error')->with('error message', ['param1']);
+
+        $this->buttonProvider->findAll($this->searchContext);
+    }
+
+    public function testHasButtons()
+    {
+        $this->extension('one')->expects($this->once())
+            ->method('find')
+            ->with($this->searchContext)
+            ->willReturn([$this->getButton()]);
+
+        $this->assertTrue($this->buttonProvider->hasButtons($this->searchContext));
+    }
+
+    public function testHasButtonsWithoutButtons()
+    {
+        $this->extension('one')->expects($this->once())
+            ->method('find')
+            ->with($this->searchContext)
+            ->willReturn([]);
+
+        $this->assertFalse($this->buttonProvider->hasButtons($this->searchContext));
     }
 
     /**

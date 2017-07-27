@@ -4,8 +4,10 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -22,8 +24,14 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     /** @var ConfigProvider */
     protected $dictionaryConfigProvider;
 
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
+
     /** @var ManagerRegistry */
     protected $doctrine;
+
+    /** @var TranslatorInterface */
+    protected $translator;
 
     /** @var array */
     protected $virtualFields = [];
@@ -40,18 +48,24 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     /**
      * Constructor
      *
-     * @param ConfigProvider  $groupingConfigProvider
-     * @param ConfigProvider  $dictionaryConfigProvider
+     * @param ConfigProvider $groupingConfigProvider
+     * @param ConfigProvider $dictionaryConfigProvider
+     * @param ConfigProvider $entityConfigProvider
      * @param ManagerRegistry $doctrine
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ConfigProvider $groupingConfigProvider,
         ConfigProvider $dictionaryConfigProvider,
-        ManagerRegistry $doctrine
+        ConfigProvider $entityConfigProvider,
+        ManagerRegistry $doctrine,
+        TranslatorInterface $translator
     ) {
         $this->groupingConfigProvider   = $groupingConfigProvider;
         $this->dictionaryConfigProvider = $dictionaryConfigProvider;
+        $this->entityConfigProvider     = $entityConfigProvider;
         $this->doctrine                 = $doctrine;
+        $this->translator               = $translator;
     }
 
     /**
@@ -116,6 +130,22 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                             ? $virtualFieldName
                             : Inflector::tableize($associationName);
                         $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $label);
+
+                        if ($this->translator->trans($label) === $label) {
+                            $multiple = false;
+                            $associationMapping = $metadata->getAssociationMapping($associationName);
+
+                            if (($associationMapping['type'] & ClassMetadataInfo::TO_MANY)) {
+                                $multiple = true;
+                            }
+
+                            $entityConfig = $this->entityConfigProvider->getConfig($targetClassName);
+                            $labelOption  = $multiple ? 'plural_label' : 'label';
+                            if ($entityConfig->has($labelOption)) {
+                                $label = $entityConfig->get($labelOption);
+                            }
+                        }
+
                         $this->virtualFields[$className][$virtualFieldName] = [
                             'query' => [
                                 'select' => [

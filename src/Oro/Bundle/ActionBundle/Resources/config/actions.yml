@@ -28,6 +28,24 @@ services:
         tags:
             - { name: oro_action.action, alias: configurable }
 
+    oro_action.action.duplicate_entity:
+        class: 'Oro\Bundle\ActionBundle\Action\DuplicateEntity'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        calls:
+          - [setDuplicatorFactory, ['@oro_action.factory.duplicator_factory']]
+        tags:
+            - { name: oro_action.action, alias: duplicate|duplicate_entity }
+
+    oro_action.action.resolve_destination_page:
+        class: 'Oro\Bundle\ActionBundle\Action\ResolveDestinationPage'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_action.resolver.destination_page_resolver'
+            - '@request_stack'
+        tags:
+            - { name: oro_action.action, alias: resolve_destination_page }
+
     oro_action.action.create_datetime:
         class: 'Oro\Component\Action\Action\CreateDateTime'
         arguments:
@@ -129,7 +147,7 @@ services:
         class: 'Oro\Component\Action\Action\AssignActiveUser'
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@security.context'
+            - '@security.token_storage'
         tags:
             - { name: oro_action.action, alias: assign_active_user|get_active_user }
 
@@ -245,3 +263,28 @@ services:
             - '@logger'
         tags:
             - { name: oro_action.action, alias: clone_entity }
+
+    oro_action.action.extendable:
+        class: 'Oro\Component\Action\Action\ExtendableAction'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        calls:
+            - [setDispatcher, ['@event_dispatcher']]
+        tags:
+            - { name: oro_action.action, alias: extendable }
+
+    oro_action.action.increase_value:
+        class: 'Oro\Component\Action\Action\IncreaseValue'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        calls:
+            - [setDispatcher, ['@event_dispatcher']]
+        tags:
+            - { name: oro_action.action, alias: increase_value }
+
+    oro_action.action.substring:
+        class: 'Oro\Component\Action\Action\Substring'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: substring }

@@ -14,10 +14,8 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-
-use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 
 class OperationButtonProviderExtension implements ButtonProviderExtensionInterface
 {
@@ -30,11 +28,8 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     /** @var RouteProviderInterface */
     protected $routeProvider;
 
-    /** @var OptionsAssembler */
-    protected $optionsAssembler;
-
-    /** @var ContextAccessor */
-    protected $contextAccessor;
+    /** @var OptionsResolver */
+    protected $optionsResolver;
 
     /** @var ButtonContext */
     private $baseButtonContext;
@@ -43,21 +38,18 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
      * @param OperationRegistry $operationRegistry
      * @param ContextHelper $contextHelper
      * @param RouteProviderInterface $routeProvider
-     * @param OptionsAssembler $optionsAssembler
-     * @param ContextAccessor $contextAccessor
+     * @param OptionsResolver $optionsResolver
      */
     public function __construct(
         OperationRegistry $operationRegistry,
         ContextHelper $contextHelper,
         RouteProviderInterface $routeProvider,
-        OptionsAssembler $optionsAssembler,
-        ContextAccessor $contextAccessor
+        OptionsResolver $optionsResolver
     ) {
         $this->operationRegistry = $operationRegistry;
         $this->contextHelper = $contextHelper;
         $this->routeProvider = $routeProvider;
-        $this->optionsAssembler = $optionsAssembler;
-        $this->contextAccessor = $contextAccessor;
+        $this->optionsResolver = $optionsResolver;
     }
 
     /**
@@ -103,11 +95,28 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         }
 
         $actionData = $this->getActionData($buttonSearchContext);
-        $result = $button->getOperation()->isAvailable($actionData);
+        try {
+            $result = $button->getOperation()->isAvailable($actionData);
+        } catch (\Exception $e) {
+            if (null !== $errors) {
+                $errors->add([
+                    'message' => sprintf(
+                        'Checking conditions of operation "%s" failed.',
+                        $button->getOperation()->getName()
+                    ),
+                    'parameters' => ['exception' => $e]
+                ]);
+            }
+
+            $result = false;
+        }
 
         $definition = $button->getOperation()->getDefinition();
-        $definition->setFrontendOptions($this->resolveOptions($actionData, $definition->getFrontendOptions()))
-            ->setButtonOptions($this->resolveOptions($actionData, $definition->getButtonOptions()));
+        $definition->setFrontendOptions(
+            $this->optionsResolver->resolveOptions($actionData, $definition->getFrontendOptions())
+        )->setButtonOptions(
+            $this->optionsResolver->resolveOptions($actionData, $definition->getButtonOptions())
+        );
 
         $button->setData($actionData);
 
@@ -177,33 +186,5 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             ContextHelper::FROM_URL_PARAM => $searchContext->getReferrer(),
             ContextHelper::ROUTE_PARAM => $searchContext->getRouteName(),
         ]);
-    }
-
-    /**
-     * @param ActionData $data
-     * @param array $options
-     * @return array
-     */
-    protected function resolveOptions(ActionData $data, array $options)
-    {
-        return $this->resolveValues($data, $this->optionsAssembler->assemble($options));
-    }
-
-    /**
-     * @param ActionData $data
-     * @param array $options
-     * @return array
-     */
-    protected function resolveValues(ActionData $data, array $options)
-    {
-        foreach ($options as &$value) {
-            if (is_array($value)) {
-                $value = $this->resolveValues($data, $value);
-            } else {
-                $value = $this->contextAccessor->getValue($data, $value);
-            }
-        }
-
-        return $options;
     }
 }

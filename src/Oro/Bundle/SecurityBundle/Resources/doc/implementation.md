@@ -77,10 +77,10 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor; #required for AclAncestor 
 public function viewAction()
 ```
 
-or check in code directly with [securityFacade service](#securityFacade)
+or check in code directly with [Authorization Checker service](#checkAccess)
 
 ``` php
-$this->securityFacade->isGranted('myentity_view')
+$this->authorizationChecker->isGranted('myentity_view')
 ```
 
  **Capabilities**:
@@ -128,10 +128,10 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor; #required for AclAncestor 
 public function somethingAction()
 ```
 
-or check in code directly with [securityFacade service](#securityFacade)
+or check in code directly with [Authorization Checker service](#checkAccess)
 
 ``` php
-$this->securityFacade->isGranted('can_do_something')
+$this->authorizationChecker->isGranted('can_do_something')
 ```
 
 If you'd like to bind acl resource to specific controller action, you can use bindings:
@@ -148,51 +148,43 @@ can_do_something_specific:
 
 In this case, when someMethod of someClass is called, can_do_something_specific premission will be checked.
 
-#### Security Facade
+#### Check Access
 
-oro_security.security_facade is a public service that covers most of ACL check cases and it should be injected in case some custom ACL checks are required.
+The `security.authorization_checker` is a public service that is used to check whether an access to a resounce is granted or denied. This service represents the [Authorization Checker](https://symfony.com/doc/current/components/security/authorization.html#authorization-checker). The implementation of the Platform specific attributes and objects is in [AuthorizationChecker](../../Authorization/AuthorizationChecker.php) class.
 
-There are 2 public methods:
-
-``` php
-isClassMethodGranted($class, $method)
-```
-Checks if an access to the given method of the given class is granted
-
-and
+The main entry point is `isGranted` method:
 
 ``` php
 isGranted($attributes[, $object])
 ```
-Checks if an access to the resource defined by `$attributes` and `$object(optional)` is granted
 
-**$attributes** can be a role name(s), permission name(s), an ACL annotation id or some other identifiers depending on registered security voters.
+**$attributes** can be a role name(s), permission name(s), an ACL annotation id, a string in format "permission;descriptor" (e.g. "VIEW;entity:AcmeDemoBundle:AcmeEntity" or "EDIT;action:acme_action") or some other identifiers depending on registered security voters.
 
-**$object** can be a descriptor('Entity:MyBundle:MyEntity'), entity object or instance of ObjectIdentity
+**$object** can be an entity type descriptor (e.g. "entity:Acme/DemoBundle/Entity/AcmeEntity" or  "action:some_action"), an entity object, instance of `ObjectIdentity`, `DomainObjectReference` or `DomainObjectWrapper`
 
 **Examples**
 
 Checking access to some ACL annotation resource
 
 ``` php
-$this->securityFacade->isGranted('some_resource_id')
+$this->authorizationChecker->isGranted('some_resource_id')
 ```
 Checking VIEW access to the entity by class name
 
 ``` php
-$this->securityFacade->isGranted('VIEW', 'Entity:MyBundle:MyEntity' );
+$this->authorizationChecker->isGranted('VIEW', 'Entity:MyBundle:MyEntity' );
 ```
 
 Checking VIEW access to the entity's field
 
 ``` php
-$this->securityFacade->isGranted('VIEW', new FieldVote($entity, $fieldName) );
+$this->authorizationChecker->isGranted('VIEW', new FieldVote($entity, $fieldName) );
 ```
 
 Checking ASSIGN access to the entity object
 
 ``` php
-$this->securityFacade->isGranted('ASSIGN', $myEntity);
+$this->authorizationChecker->isGranted('ASSIGN', $myEntity);
 ```
 
 Checking access is performed in the following way: **Object-Scope**->**Class-Scope**->**Default Permissions**.
@@ -200,6 +192,11 @@ Checking access is performed in the following way: **Object-Scope**->**Class-Sco
 For example, we are checking View permission to $myEntity object of MyEntity class. When we call
 
 ``` php
-$this->securityFacade->isGranted('VIEW', $myEntity);
+$this->authorizationChecker->isGranted('VIEW', $myEntity);
 ```
 first ACL for `$myEntity` object is checked, if nothing is found, then it checks ACL for `MyEntity` class and if no records are found, finally checks the Default(root) permissions.
+
+Also there are two additional authorization checkers that may be helpful is some cases:
+
+- [ClassAuthorizationChecker](../../Authorization/ClassAuthorizationChecker.php)
+- [RequestAuthorizationChecker](../../Authorization/RequestAuthorizationChecker.php)

@@ -3,24 +3,21 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class EntityTypeFeatureCheckTest extends \PHPUnit_Framework_TestCase
+class EntityTypeFeatureCheckTest extends GetListProcessorTestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
     protected $featureChecker;
 
-    /**
-     * @var EntityTypeFeatureCheck
-     */
+    /** @var EntityTypeFeatureCheck */
     protected $processor;
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -28,40 +25,32 @@ class EntityTypeFeatureCheckTest extends \PHPUnit_Framework_TestCase
         $this->processor = new EntityTypeFeatureCheck($this->featureChecker);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
     public function testProcessDisabled()
     {
-        $className = 'TestClass';
+        $className = 'Test\Class';
 
-        $context = $this->getMockBuilder(Context::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $context->expects($this->once())
-            ->method('getClassName')
-            ->willReturn($className);
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
             ->with($className, 'api_resources')
             ->willReturn(false);
-        $this->expectException(AccessDeniedException::class);
 
-        $this->processor->process($context);
+        $this->context->setClassName($className);
+        $this->processor->process($this->context);
     }
 
     public function testProcessEnabled()
     {
-        $className = 'TestClass';
+        $className = 'Test\Class';
 
-        $context = $this->getMockBuilder(Context::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $context->expects($this->once())
-            ->method('getClassName')
-            ->willReturn($className);
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
             ->with($className, 'api_resources')
             ->willReturn(true);
 
-        $this->processor->process($context);
+        $this->context->setClassName($className);
+        $this->processor->process($this->context);
     }
 }

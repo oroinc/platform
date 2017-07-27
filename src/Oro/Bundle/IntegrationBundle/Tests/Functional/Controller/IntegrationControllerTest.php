@@ -7,13 +7,11 @@ use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestIntegrationTransport;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Form;
 
-/**
- * @dbIsolation
- */
 class IntegrationControllerTest extends WebTestCase
 {
     use MessageQueueExtension;
@@ -57,7 +55,6 @@ class IntegrationControllerTest extends WebTestCase
         $channel = $this->createChannel();
         $this->entityManager->persist($channel);
         $this->entityManager->flush();
-
         $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -77,7 +74,7 @@ class IntegrationControllerTest extends WebTestCase
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         /** @var User $user */
-        $user    = $this->getContainer()->get('security.context')->getToken()->getUser();
+        $user    = $this->getContainer()->get('security.token_storage')->getToken()->getUser();
         $newUser = clone $user;
         $newUser->setUsername('new username');
         $newUser->setEmail(mt_rand() . $user->getEmail());
@@ -180,8 +177,7 @@ class IntegrationControllerTest extends WebTestCase
 
         $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 400);
-
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertNotEmpty($result['message']);
@@ -223,6 +219,7 @@ class IntegrationControllerTest extends WebTestCase
         $channel->setName('aName');
         $channel->setType('aType');
         $channel->setEnabled(true);
+        $channel->setTransport(new TestIntegrationTransport());
 
         return $channel;
     }

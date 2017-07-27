@@ -92,4 +92,25 @@ class ConfigExtensionRegistry
 
         return $settings;
     }
+
+    /**
+     * Returns names of all registered configuration sections.
+     *
+     * @return string[]
+     */
+    public function getConfigSectionNames()
+    {
+        $sectionNameMap = [];
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
+            $sections = $extension->getEntityConfigurationSections();
+            foreach ($sections as $name => $configuration) {
+                if (!isset($sectionNameMap[$name])) {
+                    $sectionNameMap[$name] = true;
+                }
+            }
+        }
+
+        return array_keys($sectionNameMap);
+    }
 }

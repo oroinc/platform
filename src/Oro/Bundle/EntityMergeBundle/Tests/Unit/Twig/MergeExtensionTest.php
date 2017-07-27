@@ -2,56 +2,44 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeExtension;
+use Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class MergeExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var MergeExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var MergeExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $accessor;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
     protected function setUp()
     {
-        $this->accessor = $this->createMock('Oro\\Bundle\\EntityMergeBundle\\Model\\Accessor\\AccessorInterface');
-        $this->renderer = $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Twig\\MergeRenderer')
+        $this->accessor = $this->createMock(AccessorInterface::class);
+        $this->renderer = $this->getMockBuilder(MergeRenderer::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->createMock('Symfony\\Component\\Translation\\TranslatorInterface');
-        $this->extension = new MergeExtension($this->accessor, $this->renderer, $this->translator);
-    }
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-    public function testGetFunctions()
-    {
-        $functions = $this->extension->getFunctions();
-        $this->assertCount(2, $functions);
-        $this->assertInstanceOf('Twig_SimpleFunction', $functions[0]);
-        $this->assertEquals('oro_entity_merge_render_field_value', $functions[0]->getName());
-        $this->assertInstanceOf('Twig_SimpleFunction', $functions[1]);
-        $this->assertEquals('oro_entity_merge_render_entity_label', $functions[1]->getName());
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_entity_merge.accessor', $this->accessor)
+            ->add('oro_entity_merge.twig.renderer', $this->renderer)
+            ->add('translator', $this->translator)
+            ->getContainer($this);
 
-    public function testGetFilters()
-    {
-        $filters = $this->extension->getFilters();
-        $this->assertCount(1, $filters);
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $this->assertEquals('oro_entity_merge_sort_fields', $filters[0]->getName());
+        $this->extension = new MergeExtension($container);
     }
 
     public function testSortMergeFields()
@@ -66,7 +54,10 @@ class MergeExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
-        $this->assertEquals($expectedFields, $this->extension->sortMergeFields($actualFields));
+        $this->assertEquals(
+            $expectedFields,
+            self::callTwigFilter($this->extension, 'oro_entity_merge_sort_fields', [$actualFields])
+        );
     }
 
     protected function createFormView(array $vars)

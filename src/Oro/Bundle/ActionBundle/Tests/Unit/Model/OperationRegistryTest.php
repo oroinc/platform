@@ -161,7 +161,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['operation6', 'operation10', 'operation12', 'operation13', 'operation15']
+                'expected' => ['operation6', 'operation10', 'operation12', 'operation13', 'operation15', 'operation20']
             ],
             'route1' => [
                 'entityClass' => null,
@@ -175,7 +175,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => 'datagrid1',
                 'group' => null,
-                'expected' => ['operation8']
+                'expected' => ['operation8', 'operation21']
             ],
             'entity1 group1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
@@ -203,21 +203,29 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => 'datagrid2',
                 'group' => null,
-                'expected' => ['operation9_0']
+                'expected' => ['operation9_0', 'operation20']
             ],
             'route1 & entity1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                 'route' => 'route1',
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['operation4', 'operation6', 'operation10', 'operation12', 'operation13', 'operation15']
+                'expected' => [
+                    'operation4',
+                    'operation6',
+                    'operation10',
+                    'operation12',
+                    'operation13',
+                    'operation15',
+                    'operation20'
+                ]
             ],
             'route1 & datagrid1' => [
                 'entityClass' => null,
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => null,
-                'expected' => ['operation4', 'operation8', 'operation10']
+                'expected' => ['operation4', 'operation8', 'operation10', 'operation21']
             ],
             'route1 & entity1 & datagrid1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
@@ -231,7 +239,8 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                     'operation10',
                     'operation12',
                     'operation13',
-                    'operation15'
+                    'operation15',
+                    'operation21'
                 ]
             ],
             'route1 group1 & entity1 group1 & datagrid1 group1' => [
@@ -246,14 +255,14 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['operation10', 'operation13', 'operation14']
+                'expected' => ['operation10', 'operation13', 'operation14', 'operation20']
             ],
             'entity3 substitution of operation15 by operation16' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['operation13', 'operation14']
+                'expected' => ['operation13', 'operation14', 'operation20']
             ],
             'operation17 matched by group but no substitution and no appearance' => [
                 'entityClass' => null,
@@ -277,20 +286,32 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $operationName
      * @param string|null $expected
+     * @param OperationFindCriteria $criteria
+     * @param array $filterResult
      */
-    public function testFindByName($operationName, $expected)
-    {
+    public function testFindByName(
+        $operationName,
+        $expected,
+        OperationFindCriteria $criteria = null,
+        array $filterResult = []
+    ) {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn(
                 [
-                    'operation1' => [
-                        'label' => 'Label1'
-                    ]
+                    'operation1' => $this->createOperationConfig(['label' => 'Label1', 'entities' => ['stdClass']])
                 ]
             );
 
-        $operation = $this->registry->findByName($operationName);
+        $filter = $this->createMock(OperationRegistryFilterInterface::class);
+        $filter->expects($this->any())
+            ->method('filter')
+            ->with($this->isType('array'), $criteria)
+            ->willReturn($filterResult);
+
+        $this->registry->addFilter($filter);
+
+        $operation = $this->registry->findByName($operationName, $criteria);
 
         $this->assertEquals($expected, $operation ? $operation->getName() : $operation);
     }
@@ -308,6 +329,23 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             'valid operation name' => [
                 'operationName' => 'operation1',
                 'expected' => 'operation1'
+            ],
+            'with filter criteria and operation not found' => [
+                'operationName' => 'operation1',
+                'expected' => null,
+                'criteria' => new OperationFindCriteria(null, null, null)
+            ],
+            'with filter criteria and operation found' => [
+                'operationName' => 'operation1',
+                'expected' => 'operation1',
+                'criteria' => new OperationFindCriteria('stdClass', null, null),
+                'filterResult' => ['operation1']
+            ],
+            'with filter criteria and operation found but not applicable' => [
+                'operationName' => 'operation1',
+                'expected' => null,
+                'criteria' => new OperationFindCriteria('DateTime', null, null),
+                'filterResult' => ['operation1']
             ],
         ];
     }
@@ -433,6 +471,17 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'substitute_operation' => 'operation18',
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
                 'groups' => ['limited']
+            ],
+            'operation20' => [
+                'label' => 'Label20',
+                'for_all_entities' => true,
+                'for_all_datagrids' => true,
+                'exclude_datagrids' => ['datagrid1']
+            ],
+            'operation21' => [
+                'label' => 'Datagrid and exclude_entities matches',
+                'datagrids' => ['datagrid1'],
+                'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
             ],
         ];
 

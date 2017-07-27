@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
@@ -26,8 +26,8 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
 {
     const TOKEN_PARAMETER = '_impersonation_token';
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var UsernamePasswordOrganizationTokenFactoryInterface */
     protected $tokenFactory;
@@ -39,18 +39,18 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     protected $router;
 
     /**
-     * @param EntityManager $em
+     * @param ManagerRegistry $doctrine
      * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
      * @param EventDispatcherInterface $eventDispatcher
      * @param UrlGeneratorInterface $router
      */
     public function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,
         EventDispatcherInterface $eventDispatcher,
         UrlGeneratorInterface $router
     ) {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->tokenFactory = $tokenFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->router = $router;
@@ -97,7 +97,7 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
 
         $impersonation->setLoginAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $impersonation->setIpAddress($request->getClientIp());
-        $this->em->flush();
+        $this->doctrine->getManager()->flush();
     }
 
     /**
@@ -154,7 +154,7 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     protected function getImpersonation($token)
     {
-        return $this->em
+        return $this->doctrine
             ->getRepository('OroUserBundle:Impersonation')
             ->findOneBy(['token' => $token]);
     }

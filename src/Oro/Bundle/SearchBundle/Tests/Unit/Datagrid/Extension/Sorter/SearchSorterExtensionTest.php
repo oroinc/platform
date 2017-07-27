@@ -131,8 +131,8 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
                             'addSorting' => false,
                         ],
                     ],
-                    'initialState'             => [Configuration::SORTERS_KEY => ['name' => 'ASC',]],
-                    'state'                    => [Configuration::SORTERS_KEY => ['name' => 'ASC',]],
+                    'initialState'             => [Configuration::SORTERS_KEY => []],
+                    'state'                    => [Configuration::SORTERS_KEY => []],
                 ]
             ],
             'multiple' => [
@@ -160,8 +160,8 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
                             'addSorting' => false,
                         ],
                     ],
-                    'initialState'             => [Configuration::SORTERS_KEY => ['name' => 'ASC',]],
-                    'state'                    => [Configuration::SORTERS_KEY => ['name' => 'ASC',]],
+                    'initialState'             => [Configuration::SORTERS_KEY => []],
+                    'state'                    => [Configuration::SORTERS_KEY => []],
                 ]
             ],
             'toolbar'  => [
@@ -196,8 +196,8 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
                             'addSorting' => true,
                         ],
                     ],
-                    'initialState'             => [Configuration::SORTERS_KEY => ['name' => 'ASC',]],
-                    'state'                    => [Configuration::SORTERS_KEY => ['name' => 'ASC',]],
+                    'initialState'             => [Configuration::SORTERS_KEY => []],
+                    'state'                    => [Configuration::SORTERS_KEY => []],
                 ]
             ]
         ];
@@ -263,6 +263,9 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
+                Configuration::DEFAULT_SORTERS_KEY => [
+                    'testColumn' => 'ASC'
+                ],
                 Configuration::COLUMNS_KEY => [
                     'testColumn' => [
                         'data_name' => 'testColumn',
@@ -314,6 +317,9 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
+                Configuration::DEFAULT_SORTERS_KEY => [
+                    'testColumn' => 'ASC'
+                ],
                 Configuration::COLUMNS_KEY => [
                     'testColumn' => [
                         'data_name' => 'testColumn',
@@ -335,7 +341,43 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
         $this->sorter->visitDatasource($config, $mockDatasource);
     }
 
-    public function testVisitDatasourceWithDisableDefaultSorting()
+    public function testVisitDatasourceWithDefaultSorterAndDefaultSortingIsNotDisabled()
+    {
+        $config = DatagridConfiguration::create([
+            Configuration::SORTERS_KEY => [
+                Configuration::COLUMNS_KEY                 => [
+                    'testColumn' => [
+                        'data_name' => 'testColumn',
+                        'type'      => 'string',
+                    ]
+                ],
+                Configuration::DEFAULT_SORTERS_KEY         => [
+                    'testColumn' => 'ASC',
+                ]
+            ],
+        ]);
+
+        $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
+            ->getMock();
+
+        $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockDatasource
+            ->expects($this->once())
+            ->method('getSearchQuery')
+            ->willReturn($mockQuery);
+
+        $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->sorter->setParameters($mockParameterBag);
+
+        $this->sorter->visitDatasource($config, $mockDatasource);
+    }
+
+    public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting()
     {
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [

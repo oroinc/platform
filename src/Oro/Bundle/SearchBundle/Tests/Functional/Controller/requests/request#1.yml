@@ -1,22 +1,22 @@
 # common test case
 request:
     supported_engines: [orm]
-    search: \"item9@mail.com\"
+    search: \"item9@mail.net\"
     offset: ~
     max_results: ~
 response:
-    records_count: 1
-    count: 1
+    records_count: 9
+    count: 9
     rest:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item9@mail.com 123-456-900
+                record_string: "item9@mail.com 0123-456900"
                 record_url: http://localhost%oro_default_prefix%search/
     soap:
         item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item9@mail.com 123-456-900
+                recordTitle: "item9@mail.com 0123-456900"
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []

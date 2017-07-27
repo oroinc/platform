@@ -2,43 +2,34 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
 use Oro\Bundle\LocaleBundle\Twig\DateFormatExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     const TEST_TYPE = 'test_format_type';
     const TEST_FORMAT = 'MMM, d y t';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $converterRegistry;
 
-    /**
-     * @var DateFormatExtension
-     */
+    /** @var DateFormatExtension */
     protected $extension;
-
-    /**
-     * @var array
-     */
-    protected $expectedFunctions = array(
-        'oro_datetime_formatter_list' => 'getDateTimeFormatterList',
-        'oro_day_format' => 'getDayFormat',
-        'oro_date_format' => 'getDateFormat',
-        'oro_time_format' => 'getTimeFormat',
-        'oro_datetime_format' => 'getDateTimeFormat',
-    );
 
     protected function setUp()
     {
-        $this->converterRegistry =
-            $this->getMockBuilder('Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry')
-                ->disableOriginalConstructor()
-                ->setMethods(array('getFormatConverter', 'getFormatConverters'))
-                ->getMock();
+        $this->converterRegistry =$this->getMockBuilder(DateTimeFormatConverterRegistry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->extension = new DateFormatExtension($this->converterRegistry);
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.format_converter.date_time.registry', $this->converterRegistry)
+            ->getContainer($this);
+
+        $this->extension = new DateFormatExtension($container);
     }
 
     protected function tearDown()
@@ -50,21 +41,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $this->assertEquals('oro_locale_dateformat', $this->extension->getName());
-    }
-
-    public function testGetFunctions()
-    {
-        $actualFunctions = $this->extension->getFunctions();
-        $this->assertSameSize($this->expectedFunctions, $actualFunctions);
-
-        /** @var $actualFunction \Twig_SimpleFunction */
-        foreach ($actualFunctions as $actualFunction) {
-            $this->assertInstanceOf('\Twig_SimpleFunction', $actualFunction);
-            $actualFunctionName = $actualFunction->getName();
-            $this->assertArrayHasKey($actualFunctionName, $this->expectedFunctions);
-            $expectedCallback = array($this->extension, $this->expectedFunctions[$actualFunctionName]);
-            $this->assertEquals($expectedCallback, $actualFunction->getCallable());
-        }
     }
 
     public function testGetDateFormat()
@@ -83,7 +59,10 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_TYPE)
             ->will($this->returnValue($formatConverter));
 
-        $this->assertEquals(self::TEST_FORMAT, $this->extension->getDateFormat(self::TEST_TYPE, $dateType, $locale));
+        $this->assertEquals(
+            self::TEST_FORMAT,
+            self::callTwigFunction($this->extension, 'oro_date_format', [self::TEST_TYPE, $dateType, $locale])
+        );
     }
 
     public function testGetTimeFormat()
@@ -102,7 +81,10 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_TYPE)
             ->will($this->returnValue($formatConverter));
 
-        $this->assertEquals(self::TEST_FORMAT, $this->extension->getTimeFormat(self::TEST_TYPE, $timeType, $locale));
+        $this->assertEquals(
+            self::TEST_FORMAT,
+            self::callTwigFunction($this->extension, 'oro_time_format', [self::TEST_TYPE, $timeType, $locale])
+        );
     }
 
     public function testGetDateTimeFormat()
@@ -124,7 +106,11 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             self::TEST_FORMAT,
-            $this->extension->getDateTimeFormat(self::TEST_TYPE, $dateType, $timeType, $locale)
+            self::callTwigFunction(
+                $this->extension,
+                'oro_datetime_format',
+                [self::TEST_TYPE, $dateType, $timeType, $locale]
+            )
         );
     }
 
@@ -138,7 +124,10 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFormatConverters')
             ->will($this->returnValue($formatConverters));
 
-        $this->assertEquals(array_keys($formatConverters), $this->extension->getDateTimeFormatterList());
+        $this->assertEquals(
+            array_keys($formatConverters),
+            self::callTwigFunction($this->extension, 'oro_datetime_formatter_list', [])
+        );
     }
 
     /**

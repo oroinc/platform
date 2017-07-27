@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
@@ -29,6 +30,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var ConfigProviderBagMock */
+    protected $configProviderBag;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
@@ -79,7 +83,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             $this->configCache
         );
 
-        $this->configManager->addProvider($this->configProvider);
+        $this->configProviderBag = new ConfigProviderBagMock();
+        $this->configProviderBag->addProvider($this->configProvider);
+        $this->configManager->setProviderBag($this->configProviderBag);
     }
 
     public function testGetProviders()
@@ -1430,7 +1436,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $extendConfigProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('extend');
-        $this->configManager->addProvider($extendConfigProvider);
+        $this->configProviderBag->addProvider($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS)
@@ -1651,7 +1657,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $extendConfigProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('extend');
-        $this->configManager->addProvider($extendConfigProvider);
+        $this->configProviderBag->addProvider($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS, 'id')

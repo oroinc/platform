@@ -6,7 +6,7 @@ use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Intl\Intl;
 
@@ -21,6 +21,17 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|CurrencyProviderInterface
      */
     protected $currencyProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\LocaleBundle\Model\LocaleSettings
+     */
+    protected $localeSettings;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
+     */
+    protected $currencyNameHelper;
+
 
     /**
      * {@inheritDoc}
@@ -38,19 +49,22 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $localeSettings = $this
+        $this->localeSettings = $this
             ->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->setMethods(['getCurrency', 'getLocale'])
             ->disableOriginalConstructor()
             ->getMock();
-        $localeSettings->expects($this->any())
+        $this->localeSettings->expects($this->any())
             ->method('getLocale')
             ->willReturn(\Locale::getDefault());
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
+        $this->currencyNameHelper = new CurrencyNameHelperStub();
+
         $this->formType = new CurrencySelectionType(
             $this->currencyProvider,
-            $localeSettings,
-            new CurrencyNameHelperStub()
+            $this->localeSettings,
+            $this->currencyNameHelper
         );
     }
 
@@ -73,21 +87,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
             ->method('getCurrencyList')
             ->willReturn($allowedCurrencies);
 
-
-        $form = $this->factory->create($this->formType, null, $inputOptions);
-        $formConfig = $form->getConfig();
-
-        foreach ($expectedOptions as $key => $value) {
-            $this->assertTrue($formConfig->hasOption($key));
-        }
-
-        if (!isset($inputOptions['full_currency_list']) || !$inputOptions['full_currency_list']) {
-            $this->assertEquals($expectedOptions['choices'], $form->createView()->vars['choices']);
-        }
-
-        $form->submit($submittedData);
-        $this->assertTrue($form->isValid());
-        $this->assertEquals($submittedData, $form->getData());
+        $this->doTestForm($inputOptions, $expectedOptions, $submittedData);
     }
 
     /**
@@ -252,5 +252,31 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     public function testGetParent()
     {
         $this->assertEquals('choice', $this->formType->getParent());
+    }
+
+    /**
+     * @param array $inputOptions
+     * @param array $expectedOptions
+     * @param $submittedData
+     * @return FormInterface
+     */
+    protected function doTestForm(array $inputOptions, array $expectedOptions, $submittedData)
+    {
+        $form = $this->factory->create($this->formType, null, $inputOptions);
+        $formConfig = $form->getConfig();
+
+        foreach ($expectedOptions as $key => $value) {
+            $this->assertTrue($formConfig->hasOption($key));
+        }
+
+        if (!isset($inputOptions['full_currency_list']) || !$inputOptions['full_currency_list']) {
+            $this->assertEquals($expectedOptions['choices'], $form->createView()->vars['choices']);
+        }
+
+        $form->submit($submittedData);
+        $this->assertTrue($form->isValid());
+        $this->assertEquals($submittedData, $form->getData());
+
+        return $form;
     }
 }

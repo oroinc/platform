@@ -34,6 +34,11 @@ final class Events
     const RENAME_FIELD = 'oro.entity_config.field.rename';
 
     /**
+     * This event occurs after the field is deleted.
+     */
+    const AFTER_REMOVE_FIELD = 'oro.entity_config.field.after_remove';
+
+    /**
      * This event occurs before changes of configuration data is flushed into a database.
      */
     const PRE_FLUSH = 'oro.entity_config.pre_flush';

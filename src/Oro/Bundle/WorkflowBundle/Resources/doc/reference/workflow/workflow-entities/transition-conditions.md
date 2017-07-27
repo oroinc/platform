@@ -10,7 +10,7 @@ Add Custom Condition
 -------------------------
 The conditions are based on the [ConfigExpression](../../../../../../../Component/ConfigExpression/README.md) component.
 
-To add custom condition simply add a service to DIC with the tag "oro_workflow.condition", for example:
+To add custom condition simply add a service to DIC with the tag "oro_action.condition", for example:
 
 ```
 parameters:
@@ -19,7 +19,7 @@ services:
     oro_workflow.condition.blank:
         class: %oro_workflow.condition.blank.class%
         tags:
-            - { name: oro_workflow.condition, alias: blank|empty }
+            - { name: oro_action.condition, alias: blank|empty }
 ```
 
 Symbol "|" in alias can be used to have several aliases. Note that service class must implement

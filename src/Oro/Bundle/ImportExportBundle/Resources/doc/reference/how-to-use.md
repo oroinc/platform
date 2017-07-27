@@ -10,6 +10,7 @@ Table of Contents
  - [Import Processor](#import-processor)
  - [Fixture Services](#fixture-services)
  - [Import and export UI setup](#import-and-export-ui-setup)
+ - [Storage configuration](#storage-configuration)
 
 Adding Normalizers
 ------------------
@@ -170,7 +171,7 @@ of result exported file and some additional information:
 Import Strategy
 ---------------
 
-Strategy is class a that responsible for processing import logic. For example import could add new records or
+Strategy is a class that responsible for processing import logic. For example import could add new records or
 it can update only existed ones.
 
 
@@ -202,6 +203,8 @@ class ContactAddOrReplaceStrategy extends ConfigurableAddOrReplaceStrategy
 
     // other methods
 ```
+
+Also in strategy you may use [rows postponing](rows-postponing.md).
 
 **Service**
 
@@ -441,7 +444,7 @@ processors which will be displayed as options in a pop-up when user wants to dow
    oro.importexport.export.oro_another_type: Some other export type
 ```
 In this case, you have to specify the processors that can be used as select options in the pop-up. On the configuration
-of the import/export buttons you have to specify the processors as array, like in the example bellow(**exportProcessors**
+of the import/export buttons you have to specify the processors as array, like in the example bellow (**exportProcessors**
 and/or **exportTemplateProcessors**):
 
 ```twig
@@ -458,8 +461,8 @@ and/or **exportTemplateProcessors**):
 
 *Import pop-up customization:*
 
-If the user wants to have a different behaviour of the import pop-up he can extend the default **ImportType** from the
-OroImportExportBundle and provide a different appearence for the form.
+To implement custom behaviour of the import pop-up you can extend the default **ImportType** from the
+OroImportExportBundle and implement custom form appearence.
 
 ```php
 <?php
@@ -491,9 +494,9 @@ class CustomImportTypeExtension extends AbstractTypeExtension
 
 *Export pop-up customization:*
 
-In case you want to display the export/export template options in a different way (other than the default select with
-options) you have the possibility of extending the base types (**ExportType** and **ExportTemplateType**) from this
-bundle which are used in displaying the form with options in the pop-up.
+To display the export/export template options in a different way (other than the default select with
+options) you can extend the base types (**ExportType** and **ExportTemplateType**) from the ImportExport
+bundle. These types are used when displaying the form with options in the pop-up.
 
 Example of displaying with choice(radio buttons):
 ```php
@@ -523,3 +526,10 @@ class CustomExportTypeExtension extends AbstractTypeExtension
     }
 }
 ```
+
+Storage configuration
+---------------------
+
+OroImportExportBundle uses [KnpGaufretteBundle](https://github.com/KnpLabs/KnpGaufretteBundle) to provide a filesystem abstraction layer.
+
+By default, it is configured to store files in the `app/import_export` directory of your project. You can change this in the `Resources/config/oro/app.yml` file. User can reconfigure these settings. More info about KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).

@@ -8,9 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
-/**
- * @dbIsolation
- */
 class ProcessDefinitionControllerTest extends WebTestCase
 {
     protected function setUp()

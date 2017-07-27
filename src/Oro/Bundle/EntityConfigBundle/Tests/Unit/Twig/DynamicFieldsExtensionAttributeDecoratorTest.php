@@ -8,55 +8,46 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
     use EntityTrait;
 
     const ENTITY_CLASS_NAME = 'entity_class';
 
-    /**
-     * @var AbstractDynamicFieldsExtension|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $extension;
+    /** @var AbstractDynamicFieldsExtension|\PHPUnit_Framework_MockObject_MockObject */
+    private $baseExtension;
 
-    /**
-     * @var AttributeConfigHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var AttributeConfigHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $attributeConfigHelper;
 
-    /**
-     * @var DynamicFieldsExtensionAttributeDecorator
-     */
-    private $decorator;
+    /** @var DynamicFieldsExtensionAttributeDecorator */
+    private $extension;
 
     protected function setUp()
     {
-        $this->extension = $this->getMockBuilder(AbstractDynamicFieldsExtension::class)
+        $this->baseExtension = $this->getMockBuilder(AbstractDynamicFieldsExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->attributeConfigHelper = $this->getMockBuilder(AttributeConfigHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->decorator = new DynamicFieldsExtensionAttributeDecorator(
-            $this->extension,
-            $this->attributeConfigHelper
+        $container = self::getContainerBuilder()
+            ->add('oro_entity_config.config.attributes_config_helper', $this->attributeConfigHelper)
+            ->getContainer($this);
+
+        $this->extension = new DynamicFieldsExtensionAttributeDecorator(
+            $this->baseExtension,
+            $container
         );
     }
 
     public function testGetName()
     {
-        $this->assertEquals(AbstractDynamicFieldsExtension::NAME, $this->decorator->getName());
-    }
-
-    public function testGetFunctions()
-    {
-        $functions = $this->decorator->getFunctions();
-        $this->assertCount(2, $functions);
-        $this->assertInstanceOf(\Twig_SimpleFunction::class, $functions[0]);
-        $this->assertInstanceOf(\Twig_SimpleFunction::class, $functions[1]);
+        $this->assertEquals(AbstractDynamicFieldsExtension::NAME, $this->extension->getName());
     }
 
     public function testGetField()
@@ -66,15 +57,17 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_Te
             'label' => 'SomeLabel',
             'value' => 777
         ];
-        $this->extension
-            ->expects($this->once())
+        $this->baseExtension->expects($this->once())
             ->method('getField')
             ->willReturn($expectedData);
 
         $entity = $this->getEntity(TestActivityTarget::class);
         /** @var FieldConfigModel $field */
         $field = $this->getEntity(FieldConfigModel::class);
-        $this->assertEquals($expectedData, $this->decorator->getField($entity, $field));
+        $this->assertEquals(
+            $expectedData,
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_field', [$entity, $field])
+        );
     }
 
     /**
@@ -164,8 +157,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_Te
     ) {
         $entity = $this->getEntity(TestActivityTarget::class);
 
-        $this->extension
-            ->expects($this->once())
+        $this->baseExtension->expects($this->once())
             ->method('getFields')
             ->with($entity, $entityClass)
             ->willReturn($fields);
@@ -176,6 +168,9 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_Te
             ->withConsecutive(...$attributeHelperWiths)
             ->willReturnOnConsecutiveCalls(...$attributeHelperReturns);
 
-        $this->assertEquals($expectedFields, $this->decorator->getFields($entity, $entityClass));
+        $this->assertEquals(
+            $expectedFields,
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity, $entityClass])
+        );
     }
 }

@@ -4,18 +4,18 @@ namespace Oro\Bundle\EmailBundle\Async;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 
 class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -92,9 +92,9 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
     }
 
     /**
-     * @param int $size
+     * @param int[] $ids
      *
-     * @return BufferedQueryResultIterator
+     * @return BufferedIdentityQueryResultIterator
      */
     private function getEmailAttachments($ids)
     {
@@ -107,7 +107,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
 
         $em = $this->getEntityManager();
 
-        $emailAttachments = (new BufferedQueryResultIterator($qb))
+        $emailAttachments = (new BufferedIdentityQueryResultIterator($qb))
             ->setBufferSize(static::LIMIT)
             ->setPageCallback(
                 function () use ($em) {

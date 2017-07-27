@@ -1,0 +1,27 @@
+request:
+    search: "+- item1 &^& item2"
+    offset: ~
+    max_results: ~
+response:
+    records_count: 2
+    count: 2
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: "item1@mail.com 0123-456100"
+                record_url: http://localhost%oro_default_prefix%search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: "item2@mail.com 200987654"
+                record_url: http://localhost%oro_default_prefix%search/
+    soap:
+        item:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: "item1@mail.com 0123-456100"
+                record_url: http://localhost%oro_default_prefix%search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: "item2@mail.com 200987654"
+                record_url: http://localhost%oro_default_prefix%search/

@@ -7,7 +7,6 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -298,13 +297,6 @@ class OrmTotalsExtension extends AbstractExtension
         $queryBuilder
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
-
-        $parameters = $queryBuilder->getParameters();
-        if ($parameters->count()) {
-            $queryBuilder->resetDQLPart('where')
-                ->resetDQLPart('having');
-            QueryUtils::removeUnusedParameters($queryBuilder);
-        }
 
         $this->addPageLimits($queryBuilder, $pageData, $perPage);
 

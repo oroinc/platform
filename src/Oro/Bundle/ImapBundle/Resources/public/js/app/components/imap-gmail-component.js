@@ -126,6 +126,7 @@ define(function(require) {
                 method: 'POST',
                 data: {code: code},
                 success: _.bind(this.prepareAuthorization, this),
+                errorHandlerMessage: false,
                 error:  _.bind(this.requestError, this)
             });
         },
@@ -211,6 +212,7 @@ define(function(require) {
                 method: 'POST',
                 data: data,
                 success: _.bind(this.renderFormGetFolder, this),
+                errorHandlerMessage: false,
                 error:  _.bind(this.requestError, this)
             });
         },
@@ -249,6 +251,7 @@ define(function(require) {
                 method: 'POST',
                 data: data,
                 success: _.bind(this.handlerGetFolders, this),
+                errorHandlerMessage: false,
                 error: _.bind(this.requestError, this)
             });
         },

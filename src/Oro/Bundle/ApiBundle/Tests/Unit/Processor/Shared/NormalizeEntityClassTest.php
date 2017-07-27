@@ -78,6 +78,9 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         $this->assertSame('Test\Class', $this->context->getClassName());
     }
 
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException
+     */
     public function testProcessForNotAccessibleEntityType()
     {
         $this->context->setClassName('test');
@@ -92,14 +95,6 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
             ->willReturn(false);
 
         $this->processor->process($this->context);
-
-        $this->assertNull($this->context->getClassName());
-        $this->assertEquals(
-            [
-                Error::createValidationError('entity type constraint', 'Unknown entity type: test.')
-            ],
-            $this->context->getErrors()
-        );
     }
 
     public function testProcessForInvalidEntityType()

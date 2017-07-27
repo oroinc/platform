@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
@@ -17,20 +19,35 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionOptionsResolver */
+    protected $optionsResolver;
+
+    /** @var Transition */
+    protected $transition;
+
+    protected function setUp()
+    {
+        $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+        $this->transition = new Transition($this->optionsResolver);
+    }
+
     public function testAccessors()
     {
         $this->assertPropertyAccessors(
-            new Transition(),
+            $this->transition,
             [
                 ['name', 'test'],
-                ['hidden', true],
-                ['start', true],
+                ['buttonLabel', 'test_button_label'],
+                ['buttonTitle', 'test_button_title'],
+                ['hidden', true, false],
+                ['start', true, false],
                 ['unavailableHidden', true],
                 ['stepTo', $this->getStepMock('testStep')],
-                ['frontendOptions', ['key' => 'value']],
+                ['frontendOptions', ['key' => 'value'], []],
                 ['formType', 'custom_workflow_transition'],
                 ['displayType', 'page'],
-                ['formOptions', ['one', 'two']],
+                ['destinationPage', 'destination'],
+                ['formOptions', ['one', 'two'], []],
                 ['pageTemplate', 'Workflow:Test:page_template.html.twig'],
                 ['dialogTemplate', 'Workflow:Test:dialog_template.html.twig'],
                 ['scheduleCron', '1 * * * *'],
@@ -43,36 +60,21 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ['initEntities', ['TEST_ENTITY_1', 'TEST_ENTITY_2', 'TEST_ENTITY_3']],
                 ['initRoutes', ['TEST_ROUTE_1', 'TEST_ROUTE_2', 'TEST_ROUTE_3']],
                 ['initContextAttribute', 'testInitContextAttribute'],
+                ['message', 'test message'],
             ]
         );
     }
 
-    public function testHidden()
-    {
-        $transition = new Transition();
-        $this->assertFalse($transition->isHidden());
-        $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Transition',
-            $transition->setHidden(true)
-        );
-        $this->assertTrue($transition->isHidden());
-        $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Transition',
-            $transition->setHidden(false)
-        );
-        $this->assertFalse($transition->isHidden());
-    }
-
     public function testToString()
     {
-        $transition = new Transition();
-        $transition->setName('test_transition');
+        $this->transition->setName('test_transition');
 
-        $this->assertEquals('test_transition', (string) $transition);
+        $this->assertEquals('test_transition', (string)$this->transition);
     }
 
     /**
      * @dataProvider isAllowedDataProvider
+     *
      * @param bool $isAllowed
      * @param bool $expected
      */
@@ -82,18 +84,16 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $obj = new Transition();
-
         if (null !== $isAllowed) {
             $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
             $condition->expects($this->once())
                 ->method('evaluate')
                 ->with($workflowItem)
                 ->will($this->returnValue($isAllowed));
-            $obj->setCondition($condition);
+            $this->transition->setCondition($condition);
         }
 
-        $this->assertEquals($expected, $obj->isAllowed($workflowItem));
+        $this->assertEquals($expected, $this->transition->isAllowed($workflowItem));
     }
 
     /**
@@ -104,15 +104,15 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         return [
             'allowed' => [
                 'isAllowed' => true,
-                'expected'  => true
+                'expected' => true
             ],
             'not allowed' => [
                 'isAllowed' => false,
-                'expected'  => false,
+                'expected' => false,
             ],
             'no condition' => [
                 'isAllowed' => null,
-                'expected'  => true,
+                'expected' => true,
             ],
         ];
     }
@@ -121,32 +121,28 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
     {
         $workflowItem = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
 
-        $obj = new Transition();
-
         $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())->method('execute')->with($workflowItem);
-        $obj->setPreAction($action);
+        $this->transition->setPreAction($action);
 
         $condition = $this->createMock(ExpressionInterface::class);
         $condition->expects($this->once())->method('evaluate')->with($workflowItem)->willReturn(true);
-        $obj->setCondition($condition);
+        $this->transition->setCondition($condition);
 
-        $this->assertTrue($obj->isAllowed($workflowItem));
+        $this->assertTrue($this->transition->isAllowed($workflowItem));
     }
 
     /**
      * @dataProvider isAllowedDataProvider
+     *
      * @param bool $isAllowed
      * @param bool $expected
      */
     public function testIsAvailableWithForm($isAllowed, $expected)
     {
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
 
-        $obj = new Transition();
-        $obj->setFormOptions(['key' => 'value']);
+        $this->transition->setFormOptions(['key' => 'value']);
 
         if (null !== $isAllowed) {
             $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
@@ -154,14 +150,18 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ->method('evaluate')
                 ->with($workflowItem)
                 ->will($this->returnValue($isAllowed));
-            $obj->setPreCondition($condition);
+            $this->transition->setPreCondition($condition);
         }
+        $this->optionsResolver->expects($this->once())
+            ->method('resolveTransitionOptions')
+            ->with($this->transition, $workflowItem);
 
-        $this->assertEquals($expected, $obj->isAvailable($workflowItem));
+        $this->assertEquals($expected, $this->transition->isAvailable($workflowItem));
     }
 
     /**
      * @dataProvider isAvailableDataProvider
+     *
      * @param bool $isAllowed
      * @param bool $isAvailable
      * @param bool $expected
@@ -172,15 +172,13 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $obj = new Transition();
-
         if (null !== $isAvailable) {
             $preCondition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
             $preCondition->expects($this->any())
                 ->method('evaluate')
                 ->with($workflowItem)
                 ->will($this->returnValue($isAvailable));
-            $obj->setPreCondition($preCondition);
+            $this->transition->setPreCondition($preCondition);
         }
         if (null !== $isAllowed) {
             $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
@@ -188,10 +186,10 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ->method('evaluate')
                 ->with($workflowItem)
                 ->will($this->returnValue($isAllowed));
-            $obj->setCondition($condition);
+            $this->transition->setCondition($condition);
         }
 
-        $this->assertEquals($expected, $obj->isAvailable($workflowItem));
+        $this->assertEquals($expected, $this->transition->isAvailable($workflowItem));
     }
 
     /**
@@ -203,35 +201,37 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             'allowed' => [
                 'isAllowed' => true,
                 'isAvailable' => true,
-                'expected'  => true
+                'expected' => true
             ],
             'not allowed #1' => [
                 'isAllowed' => false,
                 'isAvailable' => true,
-                'expected'  => false,
+                'expected' => false,
             ],
             'not allowed #2' => [
                 'isAllowed' => true,
                 'isAvailable' => false,
-                'expected'  => false,
+                'expected' => false,
             ],
             'not allowed #3' => [
                 'isAllowed' => false,
                 'isAvailable' => false,
-                'expected'  => false,
+                'expected' => false,
             ],
             'no conditions' => [
                 'isAllowed' => null,
                 'isAvailable' => null,
-                'expected'  => true,
+                'expected' => true,
             ],
         ];
     }
 
     /**
      * @dataProvider transitDisallowedDataProvider
+     *
      * @param bool $preConditionAllowed
      * @param bool $conditionAllowed
+     *
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException
      * @expectedExceptionMessage Transition "test" is not allowed.
      */
@@ -259,12 +259,11 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $action->expects($this->never())
             ->method('execute');
 
-        $obj = new Transition();
-        $obj->setName('test');
-        $obj->setPreCondition($preCondition);
-        $obj->setCondition($condition);
-        $obj->setAction($action);
-        $obj->transit($workflowItem);
+        $this->transition->setName('test')
+            ->setPreCondition($preCondition)
+            ->setCondition($condition)
+            ->setAction($action)
+            ->transit($workflowItem);
     }
 
     /**
@@ -281,12 +280,13 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider transitDataProvider
+     *
      * @param boolean $isFinal
      * @param boolean $hasAllowedTransition
      */
     public function testTransit($isFinal, $hasAllowedTransition)
     {
-        $currentStepEntity =  $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+        $currentStepEntity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -327,12 +327,12 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->with($workflowItem);
 
-        $obj = new Transition();
-        $obj->setPreCondition($preCondition);
-        $obj->setCondition($condition);
-        $obj->setAction($action);
-        $obj->setStepTo($step);
-        $obj->transit($workflowItem);
+        $this->transition
+            ->setPreCondition($preCondition)
+            ->setCondition($condition)
+            ->setAction($action)
+            ->setStepTo($step)
+            ->transit($workflowItem);
     }
 
     /**
@@ -351,6 +351,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @param bool $isFinal
      * @param bool $hasAllowedTransitions
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject|Step
      */
     protected function getStepMock($name, $isFinal = false, $hasAllowedTransitions = true)
@@ -363,39 +364,40 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         return $step;
     }
 
-    public function testStart()
-    {
-        $obj = new Transition();
-        $this->assertFalse($obj->isStart());
-        $obj->setStart(true);
-        $this->assertTrue($obj->isStart());
-    }
-
-    public function testGetSetFrontendOption()
-    {
-        $obj = new Transition();
-
-        $this->assertEquals([], $obj->getFrontendOptions());
-
-        $frontendOptions = ['class' => 'foo', 'icon' => 'bar'];
-        $obj->setFrontendOptions($frontendOptions);
-        $this->assertEquals($frontendOptions, $obj->getFrontendOptions());
-    }
-
     public function testHasForm()
     {
-        $obj = new Transition();
+        $this->assertFalse($this->transition->hasForm()); // by default transition has form
 
-        $this->assertFalse($obj->hasForm()); // by default transition has form
+        $this->transition->setFormOptions(['key' => 'value']);
+        $this->assertFalse($this->transition->hasForm());
 
-        $obj->setFormOptions(['key' => 'value']);
-        $this->assertFalse($obj->hasForm());
+        $this->transition->setFormOptions(['attribute_fields' => []]);
+        $this->assertFalse($this->transition->hasForm());
 
-        $obj->setFormOptions(['attribute_fields' => []]);
-        $this->assertFalse($obj->hasForm());
+        $this->transition->setFormOptions(['attribute_fields' => ['key' => 'value']]);
+        $this->assertTrue($this->transition->hasForm());
+    }
 
-        $obj->setFormOptions(['attribute_fields' => ['key' => 'value']]);
-        $this->assertTrue($obj->hasForm());
+    public function testHasFormWithFormConfiguration()
+    {
+        $this->assertFalse($this->transition->hasForm()); // by default transition has form
+
+        $this->transition->setFormOptions(['key' => 'value']);
+        $this->assertFalse($this->transition->hasForm());
+
+        $this->transition->setFormOptions(['configuration' => []]);
+        $this->assertFalse($this->transition->hasForm());
+
+        $this->transition->setFormOptions(['configuration' => ['key' => 'value']]);
+        $this->assertTrue($this->transition->hasForm());
+    }
+
+    public function testHasFormForPage()
+    {
+        $this->assertFalse($this->transition->hasForm()); // by default transition has form
+
+        $this->transition->setDisplayType('page');
+        $this->assertTrue($this->transition->hasForm());
     }
 
     /**
@@ -408,11 +410,10 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsNotEmptyInitContext(array $entities, array $routes, array $datagrids, $result)
     {
-        $transition = new Transition();
-        $transition->setInitEntities($entities);
-        $transition->setInitRoutes($routes);
-        $transition->setInitDatagrids($datagrids);
-        $this->assertSame($result, $transition->isEmptyInitOptions());
+        $this->transition->setInitEntities($entities)
+            ->setInitRoutes($routes)
+            ->setInitDatagrids($datagrids);
+        $this->assertSame($result, $this->transition->isEmptyInitOptions());
     }
 
     /**
@@ -458,5 +459,27 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 'result' => false
             ]
         ];
+    }
+
+    public function testFormOptionsConfiguration()
+    {
+        $this->assertEquals([], $this->transition->getFormOptions());
+        $this->assertFalse($this->transition->hasFormConfiguration());
+
+        $formConfiguration = [
+            'handler' => 'handler',
+            'template' => 'template',
+            'data_provider' => 'data_provider',
+            'data_attribute' => 'data_attribute',
+        ];
+        $formOptions = [WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => $formConfiguration];
+
+        $this->transition->setFormOptions($formOptions);
+
+        $this->assertTrue($this->transition->hasFormConfiguration());
+        $this->assertEquals($formConfiguration['handler'], $this->transition->getFormHandler());
+        $this->assertEquals($formConfiguration['template'], $this->transition->getFormTemplate());
+        $this->assertEquals($formConfiguration['data_provider'], $this->transition->getFormDataProvider());
+        $this->assertEquals($formConfiguration['data_attribute'], $this->transition->getFormDataAttribute());
     }
 }

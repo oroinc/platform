@@ -42,6 +42,9 @@ class ResetType extends AbstractType
             'second_options'  => [
                 'label' => 'oro.user.password.enter_new_password_again.label',
             ],
+            'error_mapping' => [
+                '.' => 'second',
+            ],
         ]);
     }
 

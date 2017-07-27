@@ -3,19 +3,21 @@
 namespace Oro\Bundle\WorkflowBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Type;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+use Oro\Bundle\TranslationBundle\Migrations\Data\ORM\LoadLanguageData;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
-class UpdateDefinitionTranslations extends AbstractFixture implements ContainerAwareInterface
+class UpdateDefinitionTranslations extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     use ContainerAwareTrait;
 
@@ -98,5 +100,27 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
                 $workflowStep->setLabel($stepConfiguration['label']);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [
+            /**
+             * Languages should be pre loaded before this fixture will start to work,
+             * because the expected behaviour is:
+             * If some of the workflow translatable fields values was not translated,
+             * value should be saved as the translation of this field
+             *
+             * @see \Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor::handle
+             * @see \Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper::saveTranslation
+             * @see \Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper::saveValue
+             * @see \Oro\Bundle\TranslationBundle\Manager\TranslationManager::saveTranslation
+             * @see \Oro\Bundle\TranslationBundle\Manager\TranslationManager::createTranslation
+             */
+            LoadLanguageData::class
+        ];
     }
 }

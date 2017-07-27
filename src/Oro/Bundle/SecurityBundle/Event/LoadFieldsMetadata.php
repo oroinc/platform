@@ -21,8 +21,8 @@ class LoadFieldsMetadata extends Event
     protected $className;
 
     /**
-     * @param string $className
-     * @param array  $fields
+     * @param string                  $className
+     * @param FieldSecurityMetadata[] $fields
      */
     public function __construct($className, $fields)
     {

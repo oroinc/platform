@@ -14,6 +14,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
+     * Command name
+     */
+    const COMMAND_NAME = 'oro:cron:imap-sync';
+
+    /**
      * The maximum number of email origins which can be synchronized
      */
     const MAX_TASKS = -1;
@@ -39,7 +44,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     const MAX_JOBS_COUNT = 3;
 
     /**
-     * {@internaldoc}
+     * @inheritdoc
      */
     public function getDefaultDefinition()
     {
@@ -51,7 +56,9 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
      */
     public function isActive()
     {
-        return $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->isFeatureEnabled('email');
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+
+        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
     }
 
     /**
@@ -60,7 +67,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     protected function configure()
     {
         $this
-            ->setName('oro:cron:imap-sync')
+            ->setName(self::COMMAND_NAME)
             ->setDescription('Synchronization emails via IMAP')
             ->addOption(
                 'max-concurrent-tasks',

@@ -88,6 +88,7 @@ class ObjectMetadataLoader
                 $this->objectMetadataFactory->createAndAddAssociationMetadata(
                     $entityMetadata,
                     $entityClass,
+                    $config,
                     $fieldName,
                     $field,
                     $targetAction

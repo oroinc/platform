@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\NotificationBundle\Model\ExtendEmailNotification;
 
 /**
  * EmailNotification
@@ -35,7 +36,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  *      }
  * )
  */
-class EmailNotification
+class EmailNotification extends ExtendEmailNotification
 {
     /**
      * @var integer
@@ -114,12 +115,20 @@ class EmailNotification
     }
 
     /**
+     * @return bool
+     */
+    public function hasEntityName()
+    {
+        return !empty($this->entityName);
+    }
+
+    /**
      * Set event
      *
      * @param Event $event
      * @return EmailNotification
      */
-    public function setEvent(Event $event)
+    public function setEvent(Event $event = null)
     {
         $this->event = $event;
 
@@ -143,7 +152,7 @@ class EmailNotification
      *
      * @return EmailNotification
      */
-    public function setTemplate(EmailTemplate $template)
+    public function setTemplate(EmailTemplate $template = null)
     {
         $this->template = $template;
 
@@ -167,7 +176,7 @@ class EmailNotification
      *
      * @return EmailNotification
      */
-    public function setRecipientList(RecipientList $recipientList)
+    public function setRecipientList(RecipientList $recipientList = null)
     {
         $this->recipientList = $recipientList;
 

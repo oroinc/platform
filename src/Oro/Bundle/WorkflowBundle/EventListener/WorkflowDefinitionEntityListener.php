@@ -4,22 +4,28 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowDefinitionEntityListener
 {
+    /** @var ContainerInterface */
+    private $container;
+
     /** @var WorkflowRegistry */
     private $workflowRegistry;
 
     /**
-     * @param WorkflowRegistry $workflowRegistry
+     * @param ContainerInterface $container
      */
-    public function __construct(WorkflowRegistry $workflowRegistry)
+    public function __construct(ContainerInterface $container)
     {
-        $this->workflowRegistry = $workflowRegistry;
+        $this->container = $container;
     }
 
     /**
@@ -28,14 +34,18 @@ class WorkflowDefinitionEntityListener
      */
     public function prePersist(WorkflowDefinition $definition)
     {
-        if ($definition->isActive() && $definition->hasExclusiveActiveGroups()) {
-            $workflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
-                $definition->getExclusiveActiveGroups()
-            );
+        if ($definition->isActive()) {
+            if ($definition->hasExclusiveActiveGroups()) {
+                $workflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
+                    $definition->getExclusiveActiveGroups()
+                );
 
-            if (count($workflows) !== 0) {
-                throw $this->generateException($definition, $workflows->getValues());
+                if (count($workflows) !== 0) {
+                    throw $this->generateException($definition, $workflows->getValues());
+                }
             }
+
+            $this->clearEntitiesCache();
         }
     }
 
@@ -46,8 +56,9 @@ class WorkflowDefinitionEntityListener
      */
     public function preUpdate(WorkflowDefinition $definition, PreUpdateEventArgs $event)
     {
-        if ($event->hasChangedField('active') && $event->getNewValue('active') === true) {
-            $storedWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
+        $isActivated = $event->hasChangedField('active') && $event->getNewValue('active') === true;
+        if ($isActivated) {
+            $storedWorkflows = $this->getWorkflowRegistry()->getActiveWorkflowsByActiveGroups(
                 $definition->getExclusiveActiveGroups()
             );
 
@@ -59,6 +70,24 @@ class WorkflowDefinitionEntityListener
                 throw $this->generateException($definition, $conflictingWorkflows->getValues());
             }
         }
+
+        if ($isActivated || $event->hasChangedField('relatedEntity')) {
+            $this->clearEntitiesCache();
+        }
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     *
+     * @throws WorkflowRemoveException
+     */
+    public function preRemove(WorkflowDefinition $definition)
+    {
+        if ($definition->isSystem()) {
+            throw new WorkflowRemoveException($definition->getName());
+        }
+
+        $this->clearEntitiesCache();
     }
 
     /**
@@ -89,5 +118,22 @@ class WorkflowDefinitionEntityListener
             $definition->getName(),
             implode(', ', $conflicts)
         ));
+    }
+
+    /**
+     * @return WorkflowRegistry
+     */
+    private function getWorkflowRegistry()
+    {
+        if (null === $this->workflowRegistry) {
+            $this->workflowRegistry = $this->container->get('oro_workflow.registry.system');
+        }
+
+        return $this->workflowRegistry;
+    }
+
+    private function clearEntitiesCache()
+    {
+        $this->container->get('oro_workflow.cache.entities_with_workflow')->deleteAll();
     }
 }

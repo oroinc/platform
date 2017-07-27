@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -57,6 +58,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
         $loader->load('processors.customize_loaded_data.yml');
+        $loader->load('processors.shared.yml');
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
         $loader->load('processors.delete.yml');
@@ -72,6 +74,9 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');
             $this->registerDebugServices($container);
+        }
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $this->configureTestEnvironment($container);
         }
 
         /**
@@ -181,17 +186,44 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     /**
      * @param ContainerBuilder $container
      */
+    protected function configureTestEnvironment(ContainerBuilder $container)
+    {
+        // oro_api.tests.migration_listener
+        $testMigrationListenerDef = new Definition(
+            'Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesMigrationListener'
+        );
+        $testMigrationListenerDef->addTag(
+            'kernel.event_listener',
+            ['event' => 'oro_migration.post_up', 'method' => 'onPostUp']
+        );
+        $container->setDefinition('oro_api.tests.migration_listener', $testMigrationListenerDef);
+
+        // oro_api.tests.entity_alias_provider
+        $testEntityAliasProviderDef = new Definition(
+            'Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestEntitiesAliasProvider'
+        );
+        $testEntityAliasProviderDef->setPublic(false);
+        $testEntityAliasProviderDef->addTag('oro_entity.alias_provider');
+        $container->setDefinition('oro_api.tests.entity_alias_provider', $testEntityAliasProviderDef);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
     protected function loadApiConfiguration(ContainerBuilder $container)
     {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_api',
-            new YamlCumulativeFileLoader('Resources/config/oro/api.yml')
-        );
+        $configFileLoaders = [new YamlCumulativeFileLoader('Resources/config/oro/api.yml')];
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $configFileLoaders[] = new YamlCumulativeFileLoader('Tests/Functional/Environment/api.yml');
+        }
+        $configLoader = new CumulativeConfigLoader('oro_api', $configFileLoaders);
         $resources = $configLoader->load($container);
 
         $config = [];
         foreach ($resources as $resource) {
-            $config[] = $resource->data[ApiConfiguration::ROOT_NODE];
+            if (array_key_exists(ApiConfiguration::ROOT_NODE, $resource->data)) {
+                $config[] = $resource->data[ApiConfiguration::ROOT_NODE];
+            }
         }
         $config = $this->processConfiguration(
             new ApiConfiguration($container->get(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)),

@@ -69,6 +69,13 @@ class Imap extends \Zend\Mail\Storage\Imap
     private $ignoreCloseCommand = false;
 
     /**
+     * It is used to cache response from getUniqueId in getNumberByUniqueId
+     *
+     * @var array
+     */
+    private $uniqueIds = [];
+
+    /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -385,6 +392,34 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         parent::close();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNumberByUniqueId($id)
+    {
+        if (!$this->uniqueIds) {
+            $uniqueIds = $this->getUniqueId();
+            if (is_array($uniqueIds)) {
+                $this->uniqueIds = $uniqueIds;
+            }
+        }
+        foreach ($this->uniqueIds as $k => $v) {
+            if ($v == $id) {
+                return $k;
+            }
+        }
+
+        throw new BaseException\InvalidArgumentException('unique id not found');
+    }
+
+    /**
+     * Clear cache of UniqueId which was created in method getNumberByUniqueId
+     */
+    public function clearCacheUniqueId()
+    {
+        $this->uniqueIds = [];
     }
 
     /**

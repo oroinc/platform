@@ -13,7 +13,7 @@ use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class ButtonProviderTest extends WebTestCase
 {
@@ -32,7 +32,7 @@ class ButtonProviderTest extends WebTestCase
      */
     protected function setUp()
     {
-        $this->initClient([], [], true);
+        $this->initClient();
         $this->buttonProvider = $this->getContainer()->get('oro_action.provider.button');
         $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
     }

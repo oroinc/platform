@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\File;
 
+use Symfony\Component\Filesystem\Filesystem;
+
+/**
+ * @deprecated since 2.1. Please use FileManager class for working with files instead as it supports gaufrette.
+ */
 class FileSystemOperator
 {
     /**
@@ -29,23 +34,27 @@ class FileSystemOperator
         $this->temporaryDirectoryName = $temporaryDirectoryName;
     }
 
+
     /**
+     * @param bool $readOnly
      * @return string
      * @throws \LogicException
      */
-    public function getTemporaryDirectory()
+    public function getTemporaryDirectory($readOnly = false)
     {
         if (!$this->temporaryDirectory) {
             $cacheDirectory = rtrim($this->cacheDirectory, DIRECTORY_SEPARATOR);
             $temporaryDirectory = $cacheDirectory . DIRECTORY_SEPARATOR . $this->temporaryDirectoryName;
             if (!file_exists($temporaryDirectory) && !is_dir($temporaryDirectory)) {
-                mkdir($temporaryDirectory);
+                $fs = new Filesystem();
+                $fs->mkdir($temporaryDirectory, 0755);
+                $fs->chmod($temporaryDirectory, 0755);
             }
 
             if (!is_readable($temporaryDirectory)) {
                 throw new \LogicException('Import/export directory is not readable');
             }
-            if (!is_writable($temporaryDirectory)) {
+            if (!$readOnly && !is_writable($temporaryDirectory)) {
                 throw new \LogicException('Import/export directory is not writeable');
             }
 
@@ -57,12 +66,13 @@ class FileSystemOperator
 
     /**
      * @param $fileName
+     * @param bool $readOnly
      * @return \SplFileObject
      * @throws \LogicException
      */
-    public function getTemporaryFile($fileName)
+    public function getTemporaryFile($fileName, $readOnly = false)
     {
-        $temporaryDirectory = $this->getTemporaryDirectory();
+        $temporaryDirectory = $this->getTemporaryDirectory($readOnly);
         $fullFileName = $temporaryDirectory . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($fullFileName) || !is_file($fullFileName) || !is_readable($fullFileName)) {
             throw new \LogicException(sprintf('Can\'t read file %s', $fileName));

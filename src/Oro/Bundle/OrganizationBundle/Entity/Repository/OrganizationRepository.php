@@ -181,18 +181,25 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
-     * @param array $orgIds
+     * @param array|null $orgIds
      *
      * @return Organization[]
      */
-    public function getEnabledOrganizations(array $orgIds)
+    public function getEnabledOrganizations(array $orgIds = [])
     {
-        return $this->createQueryBuilder('org')
-            ->select('org')
-            ->where('org.id in (:ids)')
-            ->andWhere('org.enabled = true')
-            ->setParameter('ids', $orgIds)
-            ->getQuery()
-            ->execute();
+        $queryBuilder = $this->createQueryBuilder('org');
+
+        $queryBuilder->select('org');
+        if ($orgIds) {
+            $queryBuilder
+                ->where('org.id in (:ids)')
+                ->andWhere('org.enabled = true')
+                ->setParameter('ids', $orgIds)
+            ;
+        } else {
+            $queryBuilder->where('org.enabled = true');
+        }
+
+        return $queryBuilder->getQuery()->execute();
     }
 }

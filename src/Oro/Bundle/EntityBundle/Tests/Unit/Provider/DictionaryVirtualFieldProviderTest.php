@@ -19,6 +19,9 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
     private $dictionaryConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $entityConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $em;
 
     /** @var DictionaryVirtualFieldProvider */
@@ -32,8 +35,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->dictionaryConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -47,7 +57,9 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new DictionaryVirtualFieldProvider(
             $this->groupingConfigProvider,
             $this->dictionaryConfigProvider,
-            $doctrine
+            $this->entityConfigProvider,
+            $doctrine,
+            $translator
         );
     }
 

@@ -2,45 +2,63 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintViolation;
 
+/**
+ * Provides a set of static methods that may be helpful in Data API form processing.
+ */
 class FormUtil
 {
     /**
-     * Returns default options of a form.
+     * Checks whether the form is submitted and does not have errors.
      *
-     * @return array
+     * @param FormInterface $form
+     *
+     * @return bool
      */
-    public static function getFormDefaultOptions()
+    public static function isSubmittedAndValid(FormInterface $form)
     {
-        return [
-            'validation_groups'    => ['Default', 'api'],
-            'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
-        ];
+        return $form->isSubmitted() && $form->isValid();
     }
 
     /**
-     * Gets options of a form field.
+     * Adds an error to a form.
      *
-     * @param PropertyMetadata            $property
-     * @param EntityDefinitionFieldConfig $config
-     *
-     * @return array
+     * @param FormInterface $form
+     * @param string        $errorMessage
      */
-    public static function getFormFieldOptions(PropertyMetadata $property, EntityDefinitionFieldConfig $config)
+    public static function addFormError(FormInterface $form, $errorMessage)
     {
-        $options = $config->getFormOptions();
-        if (null === $options) {
-            $options = [];
-        }
-        $propertyPath = $property->getPropertyPath();
-        if (!$propertyPath) {
-            $options['mapped'] = false;
-        } elseif ($propertyPath !== $property->getName()) {
-            $options['property_path'] = $propertyPath;
-        }
+        $form->addError(new FormError($errorMessage));
+    }
 
-        return $options;
+    /**
+     * Adds constraint violation to a form.
+     *
+     * @param FormInterface $form
+     * @param Constraint    $constraint
+     * @param string|null   $errorMessage
+     */
+    public static function addFormConstraintViolation(
+        FormInterface $form,
+        Constraint $constraint,
+        $errorMessage = null
+    ) {
+        if (!$errorMessage && property_exists($constraint, 'message')) {
+            $errorMessage = $constraint->message;
+        }
+        $violation = new ConstraintViolation($errorMessage, null, [], '', '', '', null, null, $constraint);
+        $form->addError(
+            new FormError(
+                $violation->getMessage(),
+                $violation->getMessageTemplate(),
+                $violation->getParameters(),
+                $violation->getPlural(),
+                $violation
+            )
+        );
     }
 }

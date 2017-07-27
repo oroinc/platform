@@ -1,0 +1,6 @@
+# wrong data type
+request:
+    query: "from oro_test_item where inter id=1"
+response:
+    code: 400
+    message: "Unknown field type \"inter\" around position 36."

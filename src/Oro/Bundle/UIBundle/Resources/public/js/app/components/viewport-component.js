@@ -13,7 +13,7 @@ define(function(require) {
          * @property {Object}
          */
         options: {
-            screenType: 'any',
+            viewport: {},
             component: 'oroui/js/app/components/view-component',
             componentOptions: {}
         },
@@ -32,7 +32,7 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this.options = _.extend({}, this.options, _.pick(options, ['screenType', 'component']));
+            this.options = _.extend({}, this.options, _.pick(options, ['viewport', 'component']));
             this.options.componentOptions = _.omit(options, _.keys(this.options));
 
             tools.loadModules(this.options.component, _.bind(this.onComponentLoaded, this));
@@ -56,7 +56,7 @@ define(function(require) {
         },
 
         onViewportChange: function(viewport) {
-            if (viewport.screenTypes[this.options.screenType]) {
+            if (viewport.isApplicable(this.options.viewport)) {
                 this.initializeComponent();
             } else {
                 this.disposeComponent();

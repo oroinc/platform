@@ -1,11 +1,11 @@
-#oro/datagrid
+# oro/datagrid
 
-##Table of content
+## Table of content
 - [Events](#events)
 
-##Events
+## Events
 
-###Mediator events
+### Mediator events
 Datagrid listens on mediator for events:
 
 - `datagrid:setParam:<gridName>` - `param`, `value`
@@ -25,8 +25,11 @@ Datagrid listens on mediator for events:
 
 - `datagrid:doReset:<gridName>`
   Reset datagrid state
+  
+- `datagrid:changeColumnParam:<gridName>` - `columnName`, `option`, `value`
+  Sets column option value
 
-###DOM events
+### DOM events
 Datagrid emits DOM events on its $el element:
 
 - `datagrid:change:<gridName>` - `model`

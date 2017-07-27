@@ -4,11 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector;
 
 class ActivityContext extends OroFeatureContext implements OroPageObjectAware, SnippetAcceptingContext
 {
@@ -24,7 +24,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     {
         $this->getSession()->getDriver()->waitForAjax();
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $activityList->getActivityListItem($content);
     }
 
@@ -38,7 +38,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     {
         try {
             /** @var ActivityList $activityList */
-            $activityList = $this->createElement('ActivityList');
+            $activityList = $this->createElement('Activity List');
             $activityList->getActivityListItem($content);
         } catch (\Exception $e) {
             return;
@@ -59,7 +59,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iAddActivityCommentWith(TableNode $table)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $activityList->getCollapsedItem()->addComment($table);
     }
 
@@ -74,7 +74,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iEditActivityCommentWith($comment, TableNode $table)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $activityList->getCollapsedItem()->editComment($comment, $table);
     }
 
@@ -88,19 +88,19 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iDeleteActivityCommentWith($comment)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $activityList->getCollapsedItem()->deleteComment($comment);
     }
 
     /**
      * Assert that activity list is empty
      *
-     * @Then there is no records in activity list
+     * @Then /^(?:|I )see no records in activity list$/
      */
     public function thereIsNoRecordsInActivityList()
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $items = $activityList->getItems();
 
         self::assertCount(
@@ -118,7 +118,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function thereIsNumberRecordsInActivityList($number)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
 
         self::assertCount(
             $this->getCount($number),
@@ -136,7 +136,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      */
     public function goToNewerOrOlderActivities($linkLocator)
     {
-        $link = $this->createElement('ActivityList')->findLink(ucfirst($linkLocator));
+        $link = $this->createElement('Activity List')->findLink(ucfirst($linkLocator));
 
         if (!$link) {
             self::fail(sprintf('Can\'t find "%s" button', $linkLocator));
@@ -156,7 +156,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iCollapseActivityListItem($content)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $item = $activityList->getActivityListItem($content);
         $item->collapse();
     }
@@ -171,7 +171,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iClickActionOnContentInActivityList($action, $content)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $item = $activityList->getActivityListItem($content);
         $link = $item->getActionLink($action);
 
@@ -188,7 +188,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iShouldSeeInEmailBody($content)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
         $emailBody = $collapsedItem->find('css', 'div.email-body')->getHtml();
 
@@ -208,7 +208,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     {
         $this->getSession()->getDriver()->waitForAjax();
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $item = $activityList->getActivityListItem($content);
         $icon = $item->find('css', 'div.icon i');
 
@@ -227,7 +227,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function emailShouldHaveTwoEmails($content, $emailsCount)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $item = $activityList->getActivityListItem($content);
         $threadEmails = $item->findAll('css', 'div.thread-view div.email-info');
 
@@ -247,7 +247,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iShouldSeeNameInContexts($text)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
         $collapsedItem->hasContext($text);
     }
@@ -261,7 +261,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function iShouldSeeTextInCollapsedActivityItem($text)
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
 
         self::assertNotFalse(
@@ -278,21 +278,9 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      */
     public function selectUserInActivityContextSelector($needle)
     {
+        /** @var ContextSelector $contextSelector */
         $contextSelector = $this->createElement('ContextSelector');
-        $contextSelector->find('css', 'span.fa-caret-down')->click();
-        $contexts = $contextSelector->findAll('css', 'ul.context-items-dropdown li');
-
-        /** @var NodeElement $context */
-        foreach ($contexts as $context) {
-            if ($needle === $context->getText()) {
-                $context->click();
-                $this->getSession()->getDriver()->waitForAjax();
-
-                return;
-            }
-        }
-
-        self::fail(sprintf('Can\'t find "%s" context in context selector', $needle));
+        $contextSelector->select($needle);
     }
 
     /**
@@ -304,7 +292,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function deleteAllContextsFromActionItem()
     {
         /** @var ActivityList $activityList */
-        $activityList = $this->createElement('ActivityList');
+        $activityList = $this->createElement('Activity List');
         $collapsedItem = $activityList->getCollapsedItem();
         $collapsedItem->deleteAllContexts();
     }

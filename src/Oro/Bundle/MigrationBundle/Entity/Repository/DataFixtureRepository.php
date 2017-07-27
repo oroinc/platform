@@ -3,9 +3,20 @@
 namespace Oro\Bundle\MigrationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 
 class DataFixtureRepository extends EntityRepository
 {
+    /**
+     * @param $className
+     *
+     * @return DataFixture[]
+     */
+    public function findByClassName($className)
+    {
+        return $this->findBy(['className' => $className]);
+    }
+
     /**
      * @param string $where
      * @param array  $parameters

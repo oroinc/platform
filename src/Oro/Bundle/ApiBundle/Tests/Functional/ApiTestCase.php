@@ -6,13 +6,15 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Parser;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ApiTestCase extends WebTestCase
@@ -59,15 +61,33 @@ abstract class ApiTestCase extends WebTestCase
 
     /**
      * @param string $entityClass
+     * @param bool   $throwException
      *
      * @return string
      */
-    protected function getEntityType($entityClass)
+    protected function getEntityType($entityClass, $throwException = true)
     {
-        return $this->valueNormalizer->normalizeValue(
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
             $entityClass,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
+            $this->getRequestType(),
+            $throwException
+        );
+    }
+
+    /**
+     * @param string $entityType
+     * @param bool   $throwException
+     *
+     * @return string
+     */
+    protected function getEntityClass($entityType, $throwException = true)
+    {
+        return ValueNormalizerUtil::convertToEntityClass(
+            $this->valueNormalizer,
+            $entityType,
+            $this->getRequestType(),
+            $throwException
         );
     }
 
@@ -256,7 +276,7 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Assert response status code equals
+     * Asserts response status code equals.
      *
      * @param Response  $response
      * @param int|int[] $statusCode
@@ -281,13 +301,7 @@ abstract class ApiTestCase extends WebTestCase
                 \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            if ((is_array($statusCode) ? min($statusCode) : $statusCode) <= 400
-                && $response->getStatusCode() >= 400
-                && (
-                    $response->headers->contains('Content-Type', 'application/json')
-                    || $response->headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE)
-                )
-            ) {
+            if ($response->getStatusCode() >= 400 && static::isApplicableContentType($response->headers)) {
                 $e = new \PHPUnit_Framework_ExpectationFailedException(
                     $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()
@@ -295,5 +309,35 @@ abstract class ApiTestCase extends WebTestCase
             }
             throw $e;
         }
+    }
+
+    /**
+     * Asserts an array contains the expected array.
+     *
+     * @param array  $expected
+     * @param mixed  $actual
+     * @param string $message
+     */
+    protected static function assertArrayContains(array $expected, $actual, $message = '')
+    {
+        self::assertThat($actual, new ArrayContainsConstraint($expected, false), $message);
+    }
+
+    /**
+     * @param ResponseHeaderBag $headers
+     *
+     * @return bool
+     */
+    protected static function isApplicableContentType(ResponseHeaderBag $headers)
+    {
+        return $headers->contains('Content-Type', 'application/json');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getManager();
     }
 }

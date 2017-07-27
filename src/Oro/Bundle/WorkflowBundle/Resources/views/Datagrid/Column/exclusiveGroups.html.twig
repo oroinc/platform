@@ -1,0 +1,7 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% if value[0] is defined and value[0] is not empty %}
+    {{ UI.renderList(value) }}
+{% else %}
+    {{ 'N/A'|trans }}
+{% endif %}

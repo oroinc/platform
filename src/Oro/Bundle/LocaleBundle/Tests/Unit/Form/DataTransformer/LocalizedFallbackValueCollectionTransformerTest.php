@@ -51,6 +51,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
         $firstStringValue = $this->createLocalizedFallbackValue(2, 1, null, 'first');
         $secondStringValue = $this->createLocalizedFallbackValue(3, 2, null, 'second');
         $thirdStringValue = $this->createLocalizedFallbackValue(4, 3, FallbackType::SYSTEM);
+        $emptyIdValue = $this->createLocalizedFallbackValue(null, 4, FallbackType::SYSTEM);
 
         $emptyTextValue = $this->createLocalizedFallbackValue(5, null, null, null, 'empty');
         $firstTextValue = $this->createLocalizedFallbackValue(6, 1, null, null, 'first');
@@ -78,6 +79,19 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
                         1 => 2,
                         2 => 3,
                         3 => 4,
+                    ],
+                ],
+            ],
+            'empty id' => [
+                'field' => 'string',
+                'source' => [$emptyStringValue, $emptyIdValue],
+                'expected' => [
+                    LocalizedFallbackValueCollectionType::FIELD_VALUES => [
+                        null => 'empty',
+                        4 => new FallbackType(FallbackType::SYSTEM),
+                    ],
+                    LocalizedFallbackValueCollectionType::FIELD_IDS => [
+                        0 => 1,
                     ],
                 ],
             ],

@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -103,27 +102,28 @@ class MassActionDispatcher
         $datagrid->getParameters()->mergeKey(OrmFilterExtension::FILTER_ROOT_PARAM, $filters);
 
         // create mediator
-        $massAction     = $this->getMassActionByName($actionName, $datagrid);
-        $identifier     = $this->getIdentifierField($massAction);
-        $qb             = $this->getDatagridQuery($datagrid, $identifier, $inset, $values);
+        $massAction       = $this->getMassActionByName($actionName, $datagrid);
+        $identifier       = $this->getIdentifierField($massAction);
+        $objectIdentifier = $this->getObjectIdentifier($massAction);
+        $qb               = $this->getDatagridQuery($datagrid, $identifier, $inset, $values, $objectIdentifier);
 
         //prepare query builder
         $qb->setMaxResults(null);
+        $qb->setFirstResult(null);
 
         if ($datagrid->getDatasource() instanceof OrmDatasource
             && !$datagrid->getConfig()->isDatasourceSkipAclApply()
         ) {
             $qb = $this->aclHelper->apply($qb);
         }
-
         $resultIterator = $this->getResultIterator($qb);
+
         $handlerArgs    = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
 
         // perform mass action
         $handler = $this->getMassActionHandler($massAction);
-        $result  = $handler->handle($handlerArgs);
 
-        return $result;
+        return $handler->handle($handlerArgs);
     }
 
     /**
@@ -131,19 +131,22 @@ class MassActionDispatcher
      * @param string            $identifierField
      * @param bool              $inset
      * @param array             $values
+     * @param string            $objectIdentifier
+     *
+     * @throws LogicException
      *
      * @return QueryBuilder
-     * @throws LogicException
      */
     protected function getDatagridQuery(
         DatagridInterface $datagrid,
         $identifierField = 'id',
         $inset = true,
-        $values = []
+        $values = [],
+        $objectIdentifier = null
     ) {
         $datasource = $datagrid->getDatasource();
-        if ($datasource instanceof SearchDatasource) {
-            throw new LogicException("Mass actions applicable only for datagrids with ORM datasource.");
+        if (!$datasource instanceof OrmDatasource) {
+            throw new LogicException('Mass actions applicable only for datagrids with ORM datasource.');
         }
 
         /** @var QueryBuilder $qb */
@@ -152,9 +155,13 @@ class MassActionDispatcher
         if ($values) {
             $valueWhereCondition =
                 $inset
-                    ? $qb->expr()->in($identifierField, $values)
-                    : $qb->expr()->notIn($identifierField, $values);
+                    ? $qb->expr()->in($identifierField, ':values')
+                    : $qb->expr()->notIn($identifierField, ':values');
             $qb->andWhere($valueWhereCondition);
+            $qb->setParameter('values', $values);
+        }
+        if ($objectIdentifier) {
+            $qb->addSelect($objectIdentifier);
         }
 
         return $qb;
@@ -164,7 +171,7 @@ class MassActionDispatcher
      * @param string            $massActionName
      * @param DatagridInterface $datagrid
      *
-     * @return \Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface
+     * @return MassActionInterface
      * @throws LogicException
      */
     protected function getMassActionByName($massActionName, DatagridInterface $datagrid)
@@ -180,7 +187,7 @@ class MassActionDispatcher
         /** @var MassActionExtension|bool $extension */
         $extension = reset($extensions);
         if ($extension === false) {
-            throw new LogicException("MassAction extension is not applied to datagrid.");
+            throw new LogicException('MassAction extension is not applied to datagrid.');
         }
 
         $massAction = $extension->getMassAction($massActionName, $datagrid);
@@ -235,7 +242,7 @@ class MassActionDispatcher
     }
 
     /**
-     * @param Actions\MassActionInterface $massAction
+     * @param MassActionInterface $massAction
      *
      * @throws LogicException
      *
@@ -249,5 +256,15 @@ class MassActionDispatcher
         }
 
         return $identifier;
+    }
+
+    /**
+     * @param MassActionInterface $massAction
+     *
+     * @return string|null
+     */
+    protected function getObjectIdentifier(MassActionInterface $massAction)
+    {
+        return $massAction->getOptions()->offsetGetOr('object_identifier');
     }
 }

@@ -17,10 +17,6 @@ class EntityFieldFallbackTransformer implements DataTransformerInterface
             return $value;
         }
 
-        if (is_null($value->getFallback())) {
-            return $value->setScalarValue($value->getOwnValue());
-        }
-
         return $value;
     }
 

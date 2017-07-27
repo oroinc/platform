@@ -3,7 +3,7 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
@@ -11,17 +11,22 @@ use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
 {
+    /** @var array */
     public $columns = [];
+
+    /** @var string */
     public $needle;
+
+    /** @var string */
     public $mode;
 
     /**
      * Init additional doctrine functions
      *
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param ClassMetadata $class
      */
-    public function initRepo(EntityManager $em, ClassMetadata $class)
+    public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
         $ormConfig = $em->getConfiguration();
         $ormConfig->addCustomStringFunction(
@@ -60,9 +65,20 @@ class PdoPgsql extends BaseDriver
     {
         $useFieldName = $searchCondition['fieldName'] !== '*';
         $condition = $searchCondition['condition'];
-        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
+
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldName'], $searchCondition['fieldValue']);
 
         switch ($condition) {
+            case Query::OPERATOR_LIKE:
+                $searchString = parent::createContainsStringQuery($index, $useFieldName);
+                $setOrderBy = false;
+                break;
+
+            case Query::OPERATOR_NOT_LIKE:
+                $searchString = parent::createNotContainsStringQuery($index, $useFieldName);
+                $setOrderBy = false;
+                break;
+
             case Query::OPERATOR_CONTAINS:
                 $searchString = $this->createContainsStringQuery($index, $useFieldName);
                 break;
@@ -218,7 +234,7 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true)) {
+        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true) && $fieldValue) {
             $searchArray = explode(Query::DELIMITER, $fieldValue);
 
             foreach ($searchArray as $key => $string) {
@@ -235,6 +251,8 @@ class PdoPgsql extends BaseDriver
             }
         } elseif ($searchCondition === Query::OPERATOR_STARTS_WITH) {
             $qb->setParameter('value' . $index, $fieldValue . '%');
+        } elseif ($searchCondition === Query::OPERATOR_LIKE || $searchCondition === Query::OPERATOR_NOT_LIKE) {
+            $qb->setParameter('value' . $index, '%' . $fieldValue . '%');
         } else {
             $qb->setParameter('value' . $index, $fieldValue);
         }

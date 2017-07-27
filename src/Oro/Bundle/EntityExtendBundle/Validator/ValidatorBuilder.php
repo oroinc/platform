@@ -400,6 +400,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getValidator()
     {

@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
+
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
+/**
+ * @method OroSelenium2Driver getDriver()
+ */
 class Element extends NodeElement
 {
     use AssertTrait;
@@ -51,6 +53,15 @@ class Element extends NodeElement
             $this->selectorManipulator->getSelectorAsXpath($session->getSelectorsHandler(), $selector),
             $session
         );
+
+        $this->init();
+    }
+
+    /**
+     * Initialize element
+     */
+    protected function init()
+    {
     }
 
     /**
@@ -88,7 +99,7 @@ class Element extends NodeElement
     /**
      * Finds label with specified locator.
      *
-     * @param string $locator label text
+     * @param string $text label text
      *
      * @return Element|null
      */
@@ -137,6 +148,16 @@ class Element extends NodeElement
 
     /**
      * @param string $name
+     *
+     * @return Element[]
+     */
+    public function getElements($name)
+    {
+        return $this->elementFactory->findAllElements($name, $this);
+    }
+
+    /**
+     * @param string $name
      * @param string $text
      *
      * @return Element
@@ -147,21 +168,40 @@ class Element extends NodeElement
     }
 
     /**
-     * Returns element's driver.
+     * Click on button or link
      *
-     * @return OroSelenium2Driver
+     * @param string $button
      */
-    protected function getDriver()
+    public function clickOrPress($button)
     {
-        return parent::getDriver();
+        if ($this->hasButton($button)) {
+            $this->pressButton($button);
+        } else {
+            $this->clickLink($button);
+        }
     }
 
     /**
-     * @return DocumentElement
+     * Executes JS code that force click on element
+     */
+    public function clickForce()
+    {
+        $jsCode = sprintf(
+            '$(document.evaluate("%s",document,null,XPathResult.FIRST_ORDERED_NODE_TYPE).singleNodeValue).click();',
+            $this->getXpath()
+        );
+        $this->getDriver()->executeScript($jsCode);
+    }
+
+    /**
+     * @return self
      */
     protected function getPage()
     {
-        return $this->session->getPage();
+        return $this->elementFactory->wrapElement(
+            'Page',
+            $this->session->getPage()
+        );
     }
 
     /**
@@ -170,5 +210,32 @@ class Element extends NodeElement
     protected function getName()
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
+    }
+
+    /**
+     * @param \Closure $lambda
+     * @param int $timeLimit
+     * @return null|mixed Return null if closure throw error or return not true value.
+     *                     Return value that return closure
+     */
+    protected function spin(\Closure $lambda, $timeLimit = 60)
+    {
+        $time = $timeLimit;
+
+        while ($time > 0) {
+            $start = microtime(true);
+            try {
+                if ($result = $lambda($this)) {
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            } catch (\Throwable $e) {
+                // do nothing
+            }
+            usleep(50000);
+            $time -= microtime(true) - $start;
+        }
+        return null;
     }
 }

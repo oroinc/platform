@@ -47,6 +47,7 @@
         data: datagridData,
         enableFilters: enableFilters,
         enableToggleFilters: enableToggleFilters,
+        filterContainerSelector: renderParams.filterContainerSelector is defined ? renderParams.filterContainerSelector : null,
         filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : null,
         enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
         showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
@@ -63,17 +64,20 @@
          data-layout="separate"
             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
     >
-        <div class="oro-datagrid">
+        <div class="oro-datagrid"
+             data-skip-input-widgets
+        >
+
             {% if toolbarOptions.placement.top %}
-                <div class="toolbar" data-grid-toolbar="top">
-                    {{ block_widget(block[id ~ '_toolbar']) }}
+                <div class="toolbar">
+                    {{ block_widget(block[id ~ '_toolbar'],{attr: {'data-grid-toolbar': 'top'}}) }}
                 </div>
             {% endif %}
 
             <div class="other-scroll-container">
                 <div class="other-scroll"></div>
 
-                <div class="container-fluid grid-scrollable-container">
+                <div class="grid-scrollable-container">
                     <div class="grid-container">
                         <div class="grid table-hover table table-bordered table-condensed">
                             {% if themeOptions.headerHide is not defined or themeOptions.headerHide == false %}
@@ -108,8 +112,8 @@
             </div>
 
             {% if toolbarOptions.placement.bottom %}
-                <div class="toolbar dropup-area" data-grid-toolbar="bottom">
-                    {{ block_widget(block[id ~ '_toolbar']) }}
+                <div class="toolbar dropup-area">
+                    {{ block_widget(block[id ~ '_toolbar'], {attr: {'data-grid-toolbar':'bottom'}}) }}
                 </div>
             {% endif %}
         </div>

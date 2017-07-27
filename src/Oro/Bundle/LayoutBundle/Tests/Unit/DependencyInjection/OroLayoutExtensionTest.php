@@ -7,9 +7,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
-
+use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
+use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
+use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle\TestBundle;
-use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle2\TestBundle2;
 
 class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,8 +26,9 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         // view annotations
         $this->assertEquals(
             [
-                'Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener',
-                'Oro\\Bundle\\LayoutBundle\\EventListener\\ThemeListener'
+                LayoutListener::class,
+                ThemeListener::class,
+                LayoutHelper::class
             ],
             $extension->getClassesToCompile(),
             'Failed asserting that @Layout annotation is enabled'
@@ -192,27 +194,6 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('gold.ico', $result->getIcon());
         $this->assertSame('gold', $result->getDirectory());
         $this->assertEquals(['main', 'another'], $result->getGroups());
-    }
-
-    public function testLoadWithBundleThemesConfig()
-    {
-        $container = new ContainerBuilder();
-
-        $bundle = new TestBundle();
-        CumulativeResourceManager::getInstance()->clear()
-            ->setBundles([$bundle->getName() => get_class($bundle)]);
-
-        $extension = new OroLayoutExtension();
-        $extension->load([], $container);
-
-        $expectedThemeNames = ['base', 'oro-black'];
-
-        $themes = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getAllThemes();
-        $themeNames = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
-
-        $this->assertSame(sort($expectedThemeNames), sort($themeNames));
-        $this->assertSame('Oro Black theme', $themes['oro-black']->getLabel());
-        $this->assertSame('Oro Black theme description', $themes['oro-black']->getDescription());
     }
 
     protected function normalizeResources(array &$resources)

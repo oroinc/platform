@@ -25,8 +25,10 @@ define([
          * @return {Promise}
          */
         init: function(options) {
+            this.initOptions = options || {};
+
             var elements = this._collectElements();
-            var items = this._readElementsData(elements, options);
+            var items = this._readElementsData(elements, this.initOptions);
 
             // collect nested elements' data
             _.each(items, function(item) {
@@ -68,7 +70,9 @@ define([
                     return;
                 }
                 e.preventDefault();
-                this.init();
+                this.init(this.initOptions).done(function() {
+                    $(e.target).trigger('content:initialized');
+                });
             }, this));
 
             // if the container catches content remove event -- disposes related components

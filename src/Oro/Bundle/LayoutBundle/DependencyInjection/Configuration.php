@@ -13,6 +13,8 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
     const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
 
+    const AUTO = 'auto';
+
     /**
      * {@inheritdoc}
      */
@@ -198,7 +200,7 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->arrayNode('inputs')
                         ->info('Input assets list')
-                        ->prototype('scalar')->end()
+                        ->prototype('variable')->end()
                     ->end()
                     ->arrayNode('filters')
                         ->info('Filters to manipulate input assets')
@@ -211,7 +213,7 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         $widthHeightValidator = function ($value) {
-            return !is_null($value) && !is_int($value);
+            return !is_null($value) && !is_int($value) && self::AUTO !== $value;
         };
 
         $imagesNode
@@ -232,18 +234,27 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('dimensions')
                     ->useAttributeAsKey('name')
                     ->prototype('array')
+                        ->validate()
+                            ->ifTrue(function (array $dimension) {
+                                return self::AUTO === $dimension['width'] && self::AUTO === $dimension['height'];
+                            })
+                            ->thenInvalid('Either width or height can be set to \'auto\', not both.')
+                        ->end()
                         ->children()
                             ->scalarNode('width')
                                 ->validate()
                                     ->ifTrue($widthHeightValidator)
-                                    ->thenInvalid('Width value can be null or integer only')
+                                    ->thenInvalid('Width value can be null, \'auto\' or integer only')
                                 ->end()
                             ->end()
                             ->scalarNode('height')
                                 ->validate()
                                     ->ifTrue($widthHeightValidator)
-                                    ->thenInvalid('Height value can be null or integer only')
+                                    ->thenInvalid('Height value can be null, \'auto\' or integer only')
                                 ->end()
+                            ->end()
+                            ->arrayNode('options')
+                                ->prototype('variable')
                             ->end()
                         ->end()
                     ->end()
@@ -252,5 +263,38 @@ class Configuration implements ConfigurationInterface
 
         $configNode->append($assetsNode);
         $configNode->append($imagesNode);
+        $configNode->append($this->getPageTemplatesNode($treeBuilder));
+    }
+
+    /**
+     * @param TreeBuilder $treeBuilder
+     * @return ArrayNodeDefinition
+     */
+    protected function getPageTemplatesNode(TreeBuilder $treeBuilder)
+    {
+        $pageTemplatesNode = $treeBuilder->root('page_templates');
+        $pageTemplatesNode
+            ->children()
+                ->arrayNode('templates')
+                    ->info('List of page templates')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('route_name')->cannotBeEmpty()->end()
+                            ->scalarNode('key')->cannotBeEmpty()->end()
+                            ->scalarNode('label')->cannotBeEmpty()->end()
+                            ->scalarNode('description')->defaultNull()->end()
+                            ->scalarNode('screenshot')->defaultNull()->end()
+                            ->booleanNode('enabled')->defaultNull()->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('titles')
+                    ->useAttributeAsKey('titles')
+                        ->prototype('scalar')->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $pageTemplatesNode;
     }
 }

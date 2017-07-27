@@ -64,6 +64,19 @@ trait FormTrait
     }
 
     /**
+     * Sets a form option. If an option is already exist its value will be replaced with new value.
+     *
+     * @param string $name  The name of an option
+     * @param mixed  $value The value of an option
+     */
+    public function setFormOption($name, $value)
+    {
+        $entityOptions = $this->getFormOptions();
+        $entityOptions[$name] = $value;
+        $this->setFormOptions($entityOptions);
+    }
+
+    /**
      * Adds a validation constraint to the form options.
      *
      * @param Constraint $constraint

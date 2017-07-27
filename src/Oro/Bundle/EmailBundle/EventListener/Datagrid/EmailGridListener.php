@@ -6,35 +6,35 @@ use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EmailBundle\Datagrid\EmailGridResultHelper;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class EmailGridListener implements FeatureToggleableInterface
+class EmailGridListener
 {
-    use FeatureCheckerHolderTrait;
-
-    /**
-     * @var EmailQueryFactory
-     */
+    /** @var EmailQueryFactory */
     protected $factory;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    /**
-     * @var GridViewManager
-     */
+    /** @var GridViewManager */
     protected $gridViewManager;
+
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /** @var EmailGridResultHelper */
+    protected $resultHelper;
 
     /**
      * Stores join's root and alias if joins for filters are added - ['eu' => ['alias1']]
@@ -44,18 +44,24 @@ class EmailGridListener implements FeatureToggleableInterface
     protected $filterJoins;
 
     /**
-     * @param EmailQueryFactory $factory
-     * @param SecurityFacade $securityFacade
-     * @param GridViewManager $gridViewManager
+     * @param EmailQueryFactory      $factory
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param GridViewManager        $gridViewManager
+     * @param ConfigManager          $configManager
+     * @param EmailGridResultHelper  $resultHelper
      */
     public function __construct(
         EmailQueryFactory $factory,
-        SecurityFacade $securityFacade,
-        GridViewManager $gridViewManager
+        TokenAccessorInterface $tokenAccessor,
+        GridViewManager $gridViewManager,
+        ConfigManager $configManager,
+        EmailGridResultHelper $resultHelper
     ) {
         $this->factory = $factory;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->gridViewManager = $gridViewManager;
+        $this->configManager = $configManager;
+        $this->resultHelper = $resultHelper;
     }
 
     /**
@@ -63,10 +69,6 @@ class EmailGridListener implements FeatureToggleableInterface
      */
     public function onResultBeforeQuery(OrmResultBeforeQuery $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         $qb = $event->getQueryBuilder();
         if ($this->filterJoins) {
             $this->removeJoinByRootAndAliases($qb, $this->filterJoins);
@@ -81,19 +83,32 @@ class EmailGridListener implements FeatureToggleableInterface
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
+        $datagrid = $event->getDatagrid();
 
         /** @var OrmDatasource $ormDataSource */
-        $ormDataSource = $event->getDatagrid()->getDatasource();
+        $ormDataSource = $datagrid->getDatasource();
         $queryBuilder  = $ormDataSource->getQueryBuilder();
         $countQb       = $ormDataSource->getCountQb();
-        $parameters    = $event->getDatagrid()->getParameters();
+        $parameters    = $datagrid->getParameters();
 
-        $this->factory->applyAcl($queryBuilder);
-        if ($countQb) {
-            $this->factory->applyAcl($countQb);
+        $isThreadGroupingEnabled = $this->configManager->get('oro_email.threads_grouping');
+
+        $this->factory->addEmailsCount($queryBuilder, $isThreadGroupingEnabled);
+
+        if ($isThreadGroupingEnabled) {
+            $this->factory->applyAclThreadsGrouping(
+                $queryBuilder,
+                $datagrid,
+                $this->getFilters($parameters)
+            );
+            if ($countQb) {
+                $this->factory->applyAclThreadsGrouping($countQb);
+            }
+        } else {
+            $this->factory->applyAcl($queryBuilder);
+            if ($countQb) {
+                $this->factory->applyAcl($countQb);
+            }
         }
 
         if ($parameters->has('emailIds')) {
@@ -108,6 +123,18 @@ class EmailGridListener implements FeatureToggleableInterface
     }
 
     /**
+     * @param OrmResultAfter $event
+     */
+    public function onResultAfter(OrmResultAfter $event)
+    {
+        /** @var ResultRecord[] $records */
+        $records = $event->getRecords();
+        $this->resultHelper->addEmailDirections($records);
+        $this->resultHelper->addEmailMailboxNames($records);
+        $this->resultHelper->addEmailRecipients($records);
+    }
+
+    /**
      * Add joins and group by for query just if filter used. For performance optimization - BAP-10674
      *
      * @param ParameterBag $parameters
@@ -116,10 +143,7 @@ class EmailGridListener implements FeatureToggleableInterface
      */
     protected function prepareQueryToFilter($parameters, QueryBuilder $queryBuilder, QueryBuilder $countQb = null)
     {
-        $filters = $parameters->get('_filter');
-        if (!$filters || !is_array($filters)) {
-            $filters = $this->getGridViewFiltersData();
-        }
+        $filters = $this->getFilters($parameters);
         if (!$filters) {
             return;
         }
@@ -160,12 +184,27 @@ class EmailGridListener implements FeatureToggleableInterface
     }
 
     /**
+     * @param ParameterBag $parameters
+     *
+     * @return array
+     */
+    protected function getFilters($parameters)
+    {
+        $filters = $parameters->get('_filter');
+        if (!$filters || !is_array($filters)) {
+            $filters = $this->getGridViewFiltersData();
+        }
+
+        return $filters;
+    }
+
+    /**
      * @return array
      */
     protected function getGridViewFiltersData()
     {
         $filters = [];
-        $user = $this->securityFacade->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
         if (!$user) {
             return $filters;
         }
@@ -188,9 +227,9 @@ class EmailGridListener implements FeatureToggleableInterface
         $groupByParts = $qb->getDQLPart('groupBy');
         $qb->resetDQLPart('groupBy');
         /** @var GroupBy $groupByPart */
-        foreach ($groupByParts as $i => $groupByPart) {
+        foreach ($groupByParts as $groupByPart) {
             $newGroupByPart = [];
-            foreach ($groupByPart->getParts() as $j => $val) {
+            foreach ($groupByPart->getParts() as $val) {
                 if ($val !== $part) {
                     $newGroupByPart[] = $val;
                 }

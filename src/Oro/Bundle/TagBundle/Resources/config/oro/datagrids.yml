@@ -1,7 +1,7 @@
 datagrids:
     tag-grid:
         options:
-            entityHint: tag
+            entityHint: tags
             entity_pagination: true
         acl_resource: oro_tag_view
         source:
@@ -114,7 +114,7 @@ datagrids:
 
     tag-results-grid:
         options:
-            entityHint: result
+            entityHint: results
         acl_resource: oro_tag_view
         source:
             type: orm
@@ -136,7 +136,7 @@ datagrids:
 
     taxonomy-grid:
         options:
-            entityHint: taxonomy
+            entityHint: taxonomies
             entity_pagination: true
         acl_resource: oro_taxonomy_view
         source:
@@ -208,7 +208,7 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.view
                 link:          view_link
-                icon:          eye-open
+                icon:          eye
                 acl_resource:  oro_taxonomy_view
                 rowAction:     true
             update:

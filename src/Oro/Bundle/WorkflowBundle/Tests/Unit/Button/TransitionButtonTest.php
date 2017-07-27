@@ -72,7 +72,7 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetLabel()
     {
         $label = 'test_label';
-        $this->transition->expects($this->once())->method('getLabel')->willReturn($label);
+        $this->transition->expects($this->once())->method('getButtonLabel')->willReturn($label);
 
         $this->assertEquals($label, $this->button->getLabel());
     }
@@ -117,11 +117,13 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
                 'route' => $this->buttonContext->getRouteName(),
                 'datagrid' => $this->buttonContext->getDatagridName(),
                 'group' => $this->buttonContext->getGroup(),
+                'originalUrl' => $this->buttonContext->getOriginalUrl(),
                 'workflowItemId' => null
             ],
             'executionRoute' => $this->buttonContext->getExecutionRoute(),
             'dialogRoute' => null,
             'additionalData' => [],
+            'jsDialogWidget' => TransitionButton::TRANSITION_JS_DIALOG_WIDGET,
         ];
 
         $this->assertEquals(array_merge($defaultData, $customData), $this->button->getTemplateData($customData));
@@ -161,5 +163,15 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetTranslationDomain()
     {
         $this->assertEquals('workflows', $this->button->getTranslationDomain());
+    }
+
+    public function testClone()
+    {
+        $newButton = clone $this->button;
+        $this->assertEquals($newButton, $this->button);
+        $this->assertEquals($newButton->getTransition(), $this->button->getTransition());
+
+        $this->assertNotSame($newButton, $this->button);
+        $this->assertNotSame($newButton->getTransition(), $this->button->getTransition());
     }
 }

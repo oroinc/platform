@@ -29,19 +29,25 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     /** @var DatagridGuesser */
     protected $datagridGuesser;
 
+    /** @var FieldsHelper */
+    protected $fieldsHelper;
+
     /**
      * @param ConfigManager       $configManager
      * @param EntityClassResolver $entityClassResolver
      * @param DatagridGuesser     $datagridGuesser
+     * @param FieldsHelper        $fieldsHelper
      */
     public function __construct(
         ConfigManager $configManager,
         EntityClassResolver $entityClassResolver,
-        DatagridGuesser $datagridGuesser
+        DatagridGuesser $datagridGuesser,
+        FieldsHelper $fieldsHelper
     ) {
         $this->configManager       = $configManager;
         $this->entityClassResolver = $entityClassResolver;
         $this->datagridGuesser     = $datagridGuesser;
+        $this->fieldsHelper = $fieldsHelper;
     }
 
     /**
@@ -110,9 +116,15 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $joinAlias = $query->getJoinAlias($join);
                     $query->addLeftJoin($join, $joinAlias);
                     $columnDataName = $fieldName;
-                    $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
+
+                    $targetField = $extendFieldConfig->get('target_field');
+                    $sorterDataName = sprintf('%s_%s', $joinAlias, $targetField);
+                    $sorterSelectExpr = sprintf('%s.%s as %s', $joinAlias, $targetField, $sorterDataName);
+
                     $selectExpr = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
                     $filterDataName = sprintf('%s.%s', $alias, $fieldName);
+                    // adding $filterDataName to select list to allow sorting by this column and avoid GROUP BY error
+                    $selectExpr = [$selectExpr, $sorterSelectExpr];
                     break;
                 case 'multiEnum':
                     $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
@@ -197,7 +209,10 @@ abstract class AbstractFieldsExtension extends AbstractExtension
      *
      * @return FieldConfigId[]
      */
-    abstract protected function getFields(DatagridConfiguration $config);
+    protected function getFields(DatagridConfiguration $config)
+    {
+        return $this->fieldsHelper->getFields($this->getEntityName($config));
+    }
 
     /**
      * @param FieldConfigId $field
@@ -221,6 +236,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     'label' => $this->getFieldConfig('entity', $field)->get('label', false, $fieldName),
                     'renderable' => $isRenderable,
                     'required' => $isRequired,
+                    'order' => $this->getFieldConfig('datagrid', $field)->get('order', false, 0),
                 ],
                 DatagridGuesser::SORTER => [
                     'data_name' => $fieldName,
@@ -239,7 +255,6 @@ abstract class AbstractFieldsExtension extends AbstractExtension
             case RelationType::TO_ONE:
                 $extendFieldConfig = $this->getFieldConfig('extend', $field);
                 $columnOptions = ArrayUtil::arrayMergeRecursiveDistinct(
-                    $columnOptions,
                     [
                         DatagridGuesser::FILTER => [
                             'type' => 'entity',
@@ -253,7 +268,8 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                                 ],
                             ],
                         ],
-                    ]
+                    ],
+                    $columnOptions
                 );
                 break;
             default:

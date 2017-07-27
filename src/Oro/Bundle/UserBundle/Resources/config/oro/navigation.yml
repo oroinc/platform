@@ -6,36 +6,35 @@ navigation:
                 uri: '#'
                 attributes:
                     class: 'mobile-hide'
+                position: 100
                 extras:
-                    position: 100
                     icon: fa-gear
             users_management:
-                label: 'oro.user.menu.users_management.label'
-                uri: '#'
-                extras:
-                    position: 20
+                label:    'oro.user.menu.users_management.label'
+                uri:      '#'
+                position: 20
             user_list:
-                label: 'oro.user.entity_plural_label'
-                route: 'oro_user_index'
+                label:    'oro.user.entity_plural_label'
+                route:    'oro_user_index'
+                position: 10
                 extras:
-                    position: 10
                     routes: ['/^oro_user_(?!role\w+|group\w+|security\w+|reset\w+)\w+$/']
                     description: 'oro.user.menu.user_list.description'
             user_create:
                 label: 'oro.user.menu.user_create.label'
                 route: 'oro_user_create'
             user_roles:
-                label: 'oro.user.role.entity_plural_label'
-                route: 'oro_user_role_index'
+                label:    'oro.user.role.entity_plural_label'
+                route:    'oro_user_role_index'
+                position: 20
                 extras:
-                    position: 20
                     routes: ['oro_user_role_*']
                     description: 'oro.user.menu.user_roles.description'
             user_groups:
-                label: 'oro.user.group.entity_plural_label'
-                route: 'oro_user_group_index'
+                label:    'oro.user.group.entity_plural_label'
+                route:    'oro_user_group_index'
+                position: 30
                 extras:
-                    position: 30
                     routes: ['oro_user_group_*']
                     description: 'oro.user.menu.user_groupes.description'
             shortcut_new_user:
@@ -61,15 +60,13 @@ navigation:
                 extras:
                     description: 'oro.user.menu.shortcut_new_group.description'
             oro_user_profile_view:
-                label: 'oro.user.menu.oro_user_profile_view.label'
-                route: 'oro_user_profile_view'
-                extras:
-                    position: 10
+                label:    'oro.user.menu.oro_user_profile_view.label'
+                route:    'oro_user_profile_view'
+                position: 10
             oro_user_profile_configuration:
-                label: 'oro.user.menu.oro_user_profile_configuration.label'
-                route: 'oro_user_profile_configuration'
-                extras:
-                    position: 12
+                label:    'oro.user.menu.oro_user_profile_configuration.label'
+                route:    'oro_user_profile_configuration'
+                position: 12
                 attributes:
                     class: 'mobile-hide'
 
@@ -97,18 +94,19 @@ navigation:
 
     titles:
         oro_user_index: ~
-        oro_user_view: '%%username%%'
-        oro_user_update: '%%username%% - Edit'
-        oro_user_create: 'Create User'
-        oro_user_config: '%%username%% - Configure'
+        oro_user_view: '%username% - oro.ui.view'
+        oro_user_update: '%username% - oro.ui.edit'
+        oro_user_create: 'oro.ui.create_entity'
+        oro_user_config: '%username% - oro.user.configure.label'
 
-        oro_user_profile_view: '%%username%%'
-        oro_user_profile_update: '%%username%% - Edit'
-        oro_user_profile_configuration: '%%username%% - Configure'
+        oro_user_profile_view: '%username% - oro.ui.view'
+        oro_user_profile_update: '%username% - oro.ui.edit'
+        oro_user_profile_configuration: '%username% - oro.user.configure.label'
 
         oro_user_role_index: ~
-        oro_user_role_update: '%%role%% - Edit'
-        oro_user_role_create: 'Create Role'
+        oro_user_role_view: '%role% - oro.ui.view'
+        oro_user_role_update: '%role% - oro.ui.edit'
+        oro_user_role_create: 'oro.ui.create_entity'
 
         oro_user_security_login: 'Login'
         oro_user_status_list: "User Status"
@@ -119,5 +117,5 @@ navigation:
         oro_user_reset_check_email: 'Password Reset - Check Email'
 
         oro_user_group_index: ~
-        oro_user_group_create: 'Create Group'
-        oro_user_group_update: '%%group%% - Edit'
+        oro_user_group_create: 'oro.ui.create_entity'
+        oro_user_group_update: '%group% - oro.ui.edit'

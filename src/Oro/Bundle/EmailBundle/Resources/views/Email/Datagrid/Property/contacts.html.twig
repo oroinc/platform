@@ -1,44 +1,47 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{% set thread = record.getValue('email.thread') %}
 {% set isNew = record.getValue('is_new') %}
-{% set threadEmailCount = record.getValue('thread_email_count') %}
-
-{% if record.getValue('incoming') %}
-    {% set sender = record.getValue('email.from_name') %}
-{% elseif thread is not null %}
-    {% set recipients = oro_get_email_thread_recipients(thread) %}
-{% elseif record.getValue('outgoing') %}
-    {% set recipients = record.getValue('email.recipients') %}
-{% endif %}
 
 <span class="nowrap">
+    <span class="icon grid">
+        <i class="{{ record.getValue('incoming') ? 'fa-sign-in' : 'fa-sign-out' }}"></i>
+    </span>
     {% if record.getValue('incoming') %}
-        <span class="icon grid">
-            <i class="fa-sign-in"></i>
-        </span>
+        {{ _self.renderEmailAddressCell(record.getValue('fromName'), isNew, 22) }}
     {% else %}
-        <span class="icon grid">
-            <i class="fa-sign-out"></i>
-        </span>
-    {% endif %}
-{% if sender is defined %}
-    {{ EA.wrapTextToTag(sender|truncate(22, false, '...'), isNew) }}
-{% elseif (recipients is defined and recipients|length > 0 and recipients|length < 3) %}
-    {{ EA.wrapTextToTag(EA.email_participants_name(recipients, true, false), isNew) }}
-{% else %}
-        {% if (recipients is defined and recipients|length > 0) %}
-            {% set firstEmail = recipients|first %}
-            {% set lastEmail = recipients|last %}
-            {% set firstLastRecipients =
-                EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
-                ~ '..' ~
-                EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
-            %}
-            {{ EA.wrapTextToTag(firstLastRecipients, isNew) }}
+        {% set recipients = record.getValue('recipients') %}
+        {% if recipients|length > 0 %}
+            {% if recipients|length < 3 %}
+                {{ _self.renderEmailAddressCell(EA.email_participants_name(recipients, true, false), isNew) }}
+            {% else %}
+                {% set firstEmail = recipients|first %}
+                {% set lastEmail = recipients|last %}
+                {% set firstLastRecipients =
+                    EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
+                    ~ ' .. ' ~
+                    EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
+                    %}
+                {{ _self.renderEmailAddressCell(firstLastRecipients, isNew) }}
+            {% endif %}
         {% endif %}
-{% endif %}
-{% if threadEmailCount > 1 %}
-    {{ EA.wrapTextToTag('(' ~ threadEmailCount ~ ')', isNew) }}
-{% endif %}
+    {% endif %}
+    {% if oro_config_value('oro_email.threads_grouping') %}
+        {% set threadEmailCount = record.getValue('thread_email_count') %}
+        {% if threadEmailCount > 1 %}
+            {{ _self.renderEmailAddressCell('(' ~ threadEmailCount ~ ')', isNew) }}
+        {% endif %}
+    {% endif %}
 </span>
+
+{% macro renderEmailAddressCell(label, isNew, maxLength) %}
+    {% if maxLength and label|length > maxLength %}
+        {% set title, label = label, label|truncate(maxLength) %}
+    {% endif %}
+    {%- if isNew -%}
+        <strong{% if title is defined %} title="{{ title }}"{% endif %}>{{ label }}</strong>
+    {%- elseif title is defined -%}
+        <span title="{{ title }}">{{ label }}</span>
+    {%- else -%}
+        {{ label }}
+    {%- endif -%}
+{% endmacro %}

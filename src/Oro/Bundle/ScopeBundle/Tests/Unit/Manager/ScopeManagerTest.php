@@ -60,7 +60,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRelations')
             ->with(Scope::class)
             ->willReturn([['name' => 'relation']]);
-        $expectedCriteria = new ScopeCriteria(['relation' => null]);
+        $expectedCriteria = new ScopeCriteria(['relation' => null], [['name' => 'relation']]);
         $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();
         $scope = new Scope();
         $repository->method('findOneByCriteria')
@@ -91,7 +91,8 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $scope = new Scope();
         $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaForCurrentScope')->willReturn(['fieldName' => 1]);
-        $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]);
+        $fieldsInfo = [['name' => 'fieldName'], ['name' => 'fieldName2']];
+        $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null], $fieldsInfo);
         $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();
         $repository->method('findOneByCriteria')->with($scopeCriteria)->willReturn($scope);
 
@@ -126,7 +127,8 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
                 ['name' => 'fieldName2'],
             ]);
 
-        $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]);
+        $fieldsInfo = [['name' => 'fieldName'], ['name' => 'fieldName2']];
+        $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null], $fieldsInfo);
         $repository = $this->getMockBuilder(ScopeRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -151,7 +153,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateScopeByCriteriaWithFlush()
     {
-        $scopeCriteria = new ScopeCriteria([]);
+        $scopeCriteria = new ScopeCriteria([], []);
         $this->entityStorage->expects($this->once())
             ->method('getScheduledForInsertByCriteria')
             ->with($scopeCriteria)
@@ -167,7 +169,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateScopeByCriteriaWithoutFlush()
     {
-        $scopeCriteria = new ScopeCriteria([]);
+        $scopeCriteria = new ScopeCriteria([], []);
         $this->entityStorage->expects($this->once())
             ->method('getScheduledForInsertByCriteria')
             ->with($scopeCriteria)
@@ -184,7 +186,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
     public function testCreateScopeByCriteriaScheduled()
     {
         $scope = new Scope();
-        $scopeCriteria = new ScopeCriteria([]);
+        $scopeCriteria = new ScopeCriteria([], []);
         $this->entityStorage->expects($this->once())
             ->method('getScheduledForInsertByCriteria')
             ->with($scopeCriteria)
@@ -201,7 +203,8 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $scope = new Scope();
         $scopeCriteria = new ScopeCriteria(
-            [StubScopeCriteriaProvider::STUB_FIELD => StubScopeCriteriaProvider::STUB_VALUE]
+            [StubScopeCriteriaProvider::STUB_FIELD => StubScopeCriteriaProvider::STUB_VALUE],
+            [['name' => StubScopeCriteriaProvider::STUB_FIELD]]
         );
         $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();
         $repository->method('findByCriteria')->with($scopeCriteria)->willReturn([$scope]);
@@ -239,9 +242,10 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $scopes = [new Scope()];
+        $fieldsInfo = [['name' => 'fieldName'], ['name' => 'fieldName2']];
         $repository->expects($this->once())
             ->method('findByCriteria')
-            ->with(new ScopeCriteria(['fieldName' => ScopeCriteria::IS_NOT_NULL, 'fieldName2' => null]))
+            ->with(new ScopeCriteria(['fieldName' => ScopeCriteria::IS_NOT_NULL, 'fieldName2' => null], $fieldsInfo))
             ->willReturn($scopes);
 
         $this->entityStorage->expects($this->any())
@@ -270,9 +274,10 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $scopeIds = [1, 4];
+        $fieldsInfo = [['name' => 'fieldName'], ['name' => 'fieldName2']];
         $repository->expects($this->once())
             ->method('findIdentifiersByCriteria')
-            ->with(new ScopeCriteria(['fieldName' => ScopeCriteria::IS_NOT_NULL, 'fieldName2' => null]))
+            ->with(new ScopeCriteria(['fieldName' => ScopeCriteria::IS_NOT_NULL, 'fieldName2' => null], $fieldsInfo))
             ->willReturn($scopeIds);
 
         $this->entityStorage->expects($this->any())
@@ -300,9 +305,10 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $scopes = [new Scope()];
+        $fieldsInfo = [['name' => 'fieldName'], ['name' => 'fieldName2']];
         $repository->expects($this->once())
             ->method('findIdentifiersByCriteriaWithPriority')
-            ->with(new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]))
+            ->with(new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null], $fieldsInfo))
             ->willReturn($scopes);
 
         $this->entityStorage->expects($this->any())
@@ -419,7 +425,9 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $provider->expects($this->once())
             ->method('getCriteriaForCurrentScope')
             ->willReturn(['fieldName' => 1]);
-        $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]);
+
+        $fieldsInfo = [['name' => 'fieldName'], ['name' => 'fieldName2']];
+        $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null], $fieldsInfo);
         $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())
             ->method('findMostSuitable')
@@ -440,5 +448,46 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->addProvider('testScope', $provider);
         $actualScope = $this->manager->findMostSuitable('testScope');
         $this->assertEquals($scope, $actualScope);
+    }
+
+    /**
+     * @dataProvider isScopeMatchCriteriaDataProvider
+     *
+     * @param $expectedResult
+     * @param $criteriaContext
+     * @param $scopeFieldValue
+     */
+    public function testIsScopeMatchCriteria($expectedResult, $criteriaContext, $scopeFieldValue)
+    {
+        $criteria = new ScopeCriteria($criteriaContext, []);
+
+        $this->manager->addProvider('some_type', new StubScopeCriteriaProvider());
+        $scope = new StubScope();
+        $scope->setScopeField($scopeFieldValue);
+        $this->entityFieldProvider->method('getRelations')->willReturn([]);
+
+        $result = $this->manager->isScopeMatchCriteria($scope, $criteria, 'some_type');
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function isScopeMatchCriteriaDataProvider()
+    {
+        return [
+            'scope match criteria' => [
+                'expectedResult' => true,
+                'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => 'expected_value'],
+                'scopeFieldValue' => 'expected_value'
+            ],
+            'scope dont match criteria' => [
+                'expectedResult' => false,
+                'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => 'unexpected_value'],
+                'scopeFieldValue' => 'expected_value'
+            ],
+            'scope match criteria with null value' => [
+                'expectedResult' => true,
+                'criteriaContext' => [StubScopeCriteriaProvider::STUB_FIELD => 'unexpected_value'],
+                'scopeFieldValue' => null
+            ],
+        ];
     }
 }

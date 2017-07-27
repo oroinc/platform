@@ -3,14 +3,18 @@
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
-use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\SerializedName;
-
+use JMS\Serializer\Annotation\Type;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
  * @ORM\Entity()
+ * @Config(
+ *      defaultValues={
+ *          "security"={}
+ *     }
+ * )
  */
 class Audit extends AbstractAudit
 {
@@ -72,6 +76,13 @@ class Audit extends AbstractAudit
      * @SerializedName("username")
      */
     protected $user;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="owner_description", type="string", length=255, nullable=true)
+     */
+    protected $ownerDescription;
 
     /**
      * {@inheritdoc}

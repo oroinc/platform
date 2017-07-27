@@ -3,9 +3,9 @@
 ## Symfony Profiler
 
 In **Symfony Profiler** page you can find section **Layout** that contains:
- - **Context Items**
- - **Context Data Items**
  - **Layout Tree**
+ - **Not Applied Actions**
+ - **Context**
  
 **IMPORTANT:** [Layout data collector](../../DataCollector/LayoutDataCollector.php) collect debug information only if layout cache is fresh. 
 See [Layout cache](./layout_cache.md) section.
@@ -15,8 +15,6 @@ See [Layout cache](./layout_cache.md) section.
 In left part of **Layout Tree** section you can see tree of **block views** with **block id** and **block type**.
 In the right part of **Layout Tree** section you can find information of chosen **block view**.
 It contains such blocks:
- - **Context Items** - [LayoutContext](../../../../Component/Layout/LayoutContext.php) items for current page
- - **Context Data Items** - [ContextDataCollection](../../../../Component/Layout/ContextDataCollection.php) items for current page
  - **Build Block Options** - collected when [buildBlock](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered
  - **Build View Options** - collected when [buildView](../../../../Component/Layout/BlockTypeExtensionInterface.php) method is triggered
  - **View Variables** - [BlockView](../../../../Component/Layout/BlockView.php) vars
@@ -26,6 +24,10 @@ It contains such blocks:
 Also you can disable **Layout Tree** in developer toolbar, go to `System - Configuration - Development Settings - Generate Layout Tree Dump For The Developer Toolbar`
 
 **IMPORTANT:** This options works with debug mode enabled only
+
+### Not Applied Actions
+
+In **Not Applied Actions** you can find all actions that was not applied when generating layout tree. 
 
 ## Developer toolbar
 

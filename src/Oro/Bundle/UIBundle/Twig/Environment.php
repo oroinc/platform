@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Twig_Environment;
-
-class Environment extends Twig_Environment
+class Environment extends \Twig_Environment
 {
     /**
      * Generates a template cache file by template name.

@@ -9,6 +9,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -25,7 +26,7 @@ use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $authorizationChecker;
 
     protected function setUp()
     {
@@ -38,15 +39,13 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             )
             ->getFormFactory();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-        unset($this->securityFacade);
+        unset($this->authorizationChecker);
     }
 
     /**
@@ -204,9 +203,9 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             __DIR__ . '/../Fixtures/Provider/good_definition_with_acl_check.yml'
         );
 
-        $this->securityFacade->expects($this->at(0))->method('isGranted')->with($this->equalTo('ALLOWED'))
+        $this->authorizationChecker->expects($this->at(0))->method('isGranted')->with($this->equalTo('ALLOWED'))
             ->will($this->returnValue(true));
-        $this->securityFacade->expects($this->at(1))->method('isGranted')->with($this->equalTo('DENIED'))
+        $this->authorizationChecker->expects($this->at(1))->method('isGranted')->with($this->equalTo('DENIED'))
             ->will($this->returnValue(false));
 
         $form = $provider->getForm('third_group');
@@ -290,7 +289,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()->getMock();
         $configBag = new ConfigBag($config, $container);
-        $provider = new SystemConfigurationFormProvider($configBag, $this->factory, $this->securityFacade);
+        $provider = new SystemConfigurationFormProvider($configBag, $this->factory, $this->authorizationChecker);
 
         return $provider;
     }

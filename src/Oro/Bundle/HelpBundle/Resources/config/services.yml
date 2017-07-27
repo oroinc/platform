@@ -1,6 +1,5 @@
 parameters:
     oro_help.model.help_link_provider.class: Oro\Bundle\HelpBundle\Model\HelpLinkProvider
-    oro_help.twig.extension.class: Oro\Bundle\HelpBundle\Twig\HelpExtension
     oro_help.listener.help_link.class: Oro\Bundle\HelpBundle\EventListener\HelpLinkRequestListener
 
 services:
@@ -18,9 +17,10 @@ services:
             - '@oro_platform.composer.version_helper'
 
     oro_help.twig.extension:
-        class: %oro_help.twig.extension.class%
+        class: Oro\Bundle\HelpBundle\Twig\HelpExtension
+        public: false
         arguments:
-            - '@oro_help.model.help_link_provider'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 

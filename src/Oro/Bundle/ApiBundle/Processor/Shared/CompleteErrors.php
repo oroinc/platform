@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 
@@ -40,9 +41,28 @@ class CompleteErrors implements ProcessorInterface
         }
 
         $errors = $context->getErrors();
-        $metadata = $context->getMetadata();
+        $metadata = $this->getMetadata($context);
         foreach ($errors as $error) {
             $this->errorCompleter->complete($error, $metadata);
+        }
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return EntityMetadata|null
+     */
+    protected function getMetadata(Context $context)
+    {
+        $entityClass = $context->getClassName();
+        if (!$entityClass || false === strpos($entityClass, '\\')) {
+            return null;
+        }
+
+        try {
+            return $context->getMetadata();
+        } catch (\Exception $e) {
+            return null;
         }
     }
 }

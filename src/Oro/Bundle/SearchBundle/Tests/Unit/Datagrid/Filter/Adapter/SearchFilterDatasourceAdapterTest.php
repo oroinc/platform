@@ -105,7 +105,12 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
         $formFactory = $this->createMock(FormFactoryInterface::class);
 
         $stringFilter = new SearchStringFilter($formFactory, new FilterUtility());
-        $stringFilter->init('test', [FilterUtility::DATA_NAME_KEY => 'foo']);
+        $stringFilter->init('test', [
+            FilterUtility::DATA_NAME_KEY => 'foo',
+            FilterUtility::MIN_LENGTH_KEY => 0,
+            FilterUtility::MAX_LENGTH_KEY => 100,
+            FilterUtility::FORCE_LIKE_KEY => false,
+        ]);
 
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $stringFilter->apply($ds, ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'bar']);

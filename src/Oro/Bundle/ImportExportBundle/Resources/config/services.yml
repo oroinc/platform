@@ -2,6 +2,7 @@ parameters:
     oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
     oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
     oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
+    oro_importexport.export.size_of_batch:                    100
 
 services:
     oro_importexport.template_fixture.entity_registry:
@@ -23,7 +24,7 @@ services:
             - { name: oro_action.action, alias: execute_job }
 
     oro_importexport.formatter.formatter_provider:
-        class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
+        class: 'Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider'
         arguments:
             - '@service_container'
             - []
@@ -31,7 +32,7 @@ services:
         public: false
 
     oro_importexport.formatter.excel_datetime:
-        class: Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter
+        class: 'Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter'
         arguments:
             - '@oro_locale.settings'
             - '@translator'
@@ -41,7 +42,7 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: time, format_type: excel}
 
     oro_importexport.formatter.locale_number:
-        class: Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter
+        class: 'Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter'
         arguments:
             - '@oro_locale.formatter.number'
         tags:
@@ -50,13 +51,47 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: integer, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }
 
-    oro_importexport.async.import_export_job_summary_result_service:
-        class: Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService
+    oro_importexport.async.import_export_result_summarizer:
+        class: 'Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer'
         arguments:
             - '@router'
             - '@oro_config.global'
-            - '@oro_email.email_renderer'
-            - '@doctrine'
+            - '@oro_importexport.file.file_manager'
+        public: false
 
     oro_importexport.writer.writer_chain:
-        class: Oro\Bundle\ImportExportBundle\Writer\WriterChain
+        class: 'Oro\Bundle\ImportExportBundle\Writer\WriterChain'
+
+    oro_importexport.reader.reader_chain:
+        class: 'Oro\Bundle\ImportExportBundle\Reader\ReaderChain'
+
+    oro_importexport.file.file_manager:
+        class: 'Oro\Bundle\ImportExportBundle\File\FileManager'
+        arguments:
+          - '@knp_gaufrette.filesystem_map'
+
+    oro_importexport.file.batch_file_manager:
+        class: 'Oro\Bundle\ImportExportBundle\File\BatchFileManager'
+        arguments:
+          - '@oro_importexport.file.file_manager'
+          - '%oro_importexport.export.size_of_batch%'
+
+    oro_importexport.job.context.aggregator_registry:
+        class: 'Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry'
+        public: false
+
+    oro_importexport.job.context.aggregator.selective:
+        class: 'Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator'
+        public: false
+        arguments:
+            - '@oro_importexport.context_registry'
+        tags:
+            - { name: 'oro_importexport.job.context.aggregator' }
+
+    oro_importexport.job.context.aggregator.simple:
+        class: 'Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator'
+        public: false
+        arguments:
+            - '@oro_importexport.context_registry'
+        tags:
+            - { name: 'oro_importexport.job.context.aggregator' }

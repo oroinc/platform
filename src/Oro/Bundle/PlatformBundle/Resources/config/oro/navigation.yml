@@ -2,10 +2,9 @@ navigation:
     menu_config:
         items:
             oro_platform_system_info:
-                label: 'oro.platform.system_info'
-                extras:
-                    position: 120
-                route: 'oro_platform_system_info'
+                label:    'oro.platform.system_info'
+                position: 120
+                route:    'oro_platform_system_info'
 
         tree:
             application_menu:

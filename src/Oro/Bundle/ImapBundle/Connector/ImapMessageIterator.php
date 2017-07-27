@@ -208,6 +208,8 @@ class ImapMessageIterator implements \Iterator, \Countable
             $this->iterationMin = 0;
             $this->iterationMax = count($this->ids) - 1;
         }
+
+        $this->imap->clearCacheUniqueId();
     }
 
     /**

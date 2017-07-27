@@ -22,9 +22,6 @@ class Orm extends AbstractEngine
     /** @var ObjectMapper */
     protected $mapper;
 
-    /** @var array */
-    protected $drivers = [];
-
     /**
      * @param ManagerRegistry          $registry
      * @param ObjectMapper             $mapper
@@ -38,14 +35,6 @@ class Orm extends AbstractEngine
         parent::__construct($registry, $eventDispatcher);
 
         $this->mapper = $mapper;
-    }
-
-    /**
-     * @param array $drivers
-     */
-    public function setDrivers(array $drivers)
-    {
-        $this->drivers = $drivers;
     }
 
     /**
@@ -106,8 +95,6 @@ class Orm extends AbstractEngine
         }
 
         $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
-        $this->indexRepository->setDriversClasses($this->drivers);
-        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
     }

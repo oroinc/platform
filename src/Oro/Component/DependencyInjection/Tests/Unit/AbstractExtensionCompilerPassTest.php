@@ -46,7 +46,7 @@ abstract class AbstractExtensionCompilerPassTest extends \PHPUnit_Framework_Test
      */
     abstract protected function getTagName();
 
-    public function testProcessWithoutListenerDefinition()
+    public function testProcessWithoutDefinition()
     {
         $this->containerBuilder->expects($this->once())
             ->method('hasDefinition')
@@ -74,7 +74,7 @@ abstract class AbstractExtensionCompilerPassTest extends \PHPUnit_Framework_Test
         }
     }
 
-    protected function assertConteinerBuilderCalled()
+    protected function assertContainerBuilderCalled()
     {
         $this->containerBuilder->expects($this->once())
             ->method('hasDefinition')

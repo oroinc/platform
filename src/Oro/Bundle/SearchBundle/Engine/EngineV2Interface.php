@@ -2,18 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Result;
-
-interface EngineV2Interface
+/**
+ * @deprecated should be removed in platform 2.3 - please, use EngineInterface instead
+ */
+interface EngineV2Interface extends EngineInterface
 {
-    /**
-     * Performs search in index according to passed query
-     *
-     * @param Query $query
-     * @param array $context
-     *
-     * @return Result
-     */
-    public function search(Query $query, array $context = []);
 }

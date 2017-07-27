@@ -8,8 +8,11 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 class CountQueryBuilderOptimizerTest extends OrmTestCase
@@ -533,5 +536,133 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     public static function createQueryBuilder(EntityManager $entityManager)
     {
         return new QueryBuilder($entityManager);
+    }
+
+    /**
+     * @dataProvider getCountQueryBuilderDataProviderWithEventDispatcher
+     *
+     * @param callback $queryBuilder
+     * @param array    $joinsToDelete
+     * @param string   $expectedDql
+     */
+    public function testGetCountQueryBuilderWithEventDispatcher($queryBuilder, array $joinsToDelete, $expectedDql)
+    {
+        $optimizer = new CountQueryBuilderOptimizer();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(
+                function ($eventName, CountQueryOptimizationEvent $event) use ($joinsToDelete) {
+                    if (count($joinsToDelete)) {
+                        foreach ($joinsToDelete as $deletedJoin) {
+                            $event->removeJoinFromOptimizedQuery($deletedJoin);
+                        }
+                    }
+                }
+            );
+        $optimizer->setEventDispatcher($eventDispatcher);
+        $countQb = $optimizer->getCountQueryBuilder(call_user_func($queryBuilder, $this->em));
+
+        $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $countQb);
+        // Check for expected DQL
+        $this->assertEquals($expectedDql, $countQb->getQuery()->getDQL());
+        // Check that Optimized DQL can be converted to SQL
+        $this->assertNotEmpty($countQb->getQuery()->getSQL());
+    }
+
+    public function getCountQueryBuilderDataProviderWithEventDispatcher()
+    {
+        return [
+            'delete_one_join_table'                                     => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->leftJoin('u.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
+                        ->leftJoin('bu.users', 'o', Join::WITH, 'o.id = 123')
+                        ->select('u.id, o.username');
+                },
+                ['o'],
+                'expectedDQL'  => 'SELECT u.id FROM Test:User u '
+                    . 'LEFT JOIN u.businessUnits bu WITH bu.id = 456'
+            ],
+            'request_with_3th_join_table_without_deleting'              => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
+                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
+                        ->select('u.id, o.username');
+                },
+                [],
+                'expectedDQL'  => 'SELECT u.id FROM Test:User u '
+                    . 'LEFT JOIN u.organization o WITH o.id = 456 '
+                    . 'LEFT JOIN o.businessUnits businessUnits WITH businessUnits.id = 123'
+            ],
+            'request_with_3th_join_table_delete_main_join_table'        => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
+                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
+                        ->select('u.id, o.username');
+                },
+                ['o'],
+                'expectedDQL'  => 'SELECT u.id FROM Test:User u LEFT '
+                    . 'JOIN u.organization o WITH o.id = 456 '
+                    . 'LEFT JOIN o.businessUnits businessUnits WITH businessUnits.id = 123'
+            ],
+            'request_with_3th_join_table_delete_3th_join_table'         => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
+                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
+                        ->select('u.id, o.username');
+                },
+                ['businessUnits'],
+                'expectedDQL'  => 'SELECT u.id FROM Test:User u'
+            ],
+            'request_with_2_3th_join_tables_without_deleting'           => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
+                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
+                        ->leftJoin('o.users', 'users', Join::WITH, 'users.id = 123')
+                        ->select('u.id, o.username');
+                },
+                [],
+                'expectedDQL'  => 'SELECT u.id FROM Test:User u '
+                    . 'LEFT JOIN u.organization o WITH o.id = 456 '
+                    . 'LEFT JOIN o.businessUnits businessUnits WITH businessUnits.id = 123 '
+                    . 'LEFT JOIN o.users users WITH users.id = 123'
+            ],
+            'request_with_2_3th_join_tables_delete_3th_join_table'      => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
+                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
+                        ->leftJoin('o.users', 'users', Join::WITH, 'users.id = 123')
+                        ->select('u.id, o.username');
+                },
+                ['businessUnits'],
+                'expectedDQL'  => 'SELECT u.id FROM Test:User u '
+                    . 'LEFT JOIN u.organization o WITH o.id = 456 '
+                    . 'LEFT JOIN o.users users WITH users.id = 123'
+            ],
+            'request_with_2_3th_join_tables_delete_both_3th_join_table' => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
+                        ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
+                        ->leftJoin('o.users', 'users', Join::WITH, 'users.id = 123')
+                        ->select('u.id, o.username');
+                },
+                ['businessUnits', 'users'],
+                'expectedDQL'  => 'SELECT u.id FROM Test:User u'
+            ]
+        ];
     }
 }

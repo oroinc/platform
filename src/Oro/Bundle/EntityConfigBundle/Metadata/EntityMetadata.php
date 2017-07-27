@@ -99,6 +99,23 @@ class EntityMetadata extends MergeableClassMetadata
     }
 
     /**
+     * @return array
+     */
+    public function getRoutes()
+    {
+        return array_filter(
+            array_merge(
+                $this->routes,
+                [
+                    'name' => $this->routeName,
+                    'view' => $this->routeView,
+                    'create' => $this->routeCreate,
+                ]
+            )
+        );
+    }
+
+    /**
      * @param string $routeType Route Type
      * @param bool   $strict    Should exception be thrown if no route of given type found
      *

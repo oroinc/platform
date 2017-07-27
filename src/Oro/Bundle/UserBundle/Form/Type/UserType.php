@@ -2,28 +2,29 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Doctrine\ORM\EntityRepository;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Doctrine\ORM\EntityRepository;
-
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class UserType extends AbstractType
 {
-    /** @var SecurityContextInterface */
-    protected $security;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var bool */
     protected $isMyProfilePage;
@@ -32,19 +33,19 @@ class UserType extends AbstractType
     protected $optionsProvider;
 
     /**
-     * @param SecurityContextInterface $security Security context
-     * @param SecurityFacade $securityFacade
-     * @param Request $request                   Request
-     * @param PasswordFieldOptionsProvider $optionsProvider
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param Request                       $request
+     * @param PasswordFieldOptionsProvider  $optionsProvider
      */
     public function __construct(
-        SecurityContextInterface $security,
-        SecurityFacade           $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         Request $request,
         PasswordFieldOptionsProvider $optionsProvider
     ) {
-        $this->security          = $security;
-        $this->securityFacade    = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
         $this->optionsProvider = $optionsProvider;
@@ -64,9 +65,9 @@ class UserType extends AbstractType
     public function addEntityFields(FormBuilderInterface $builder)
     {
         // user fields
-        $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->security));
+        $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->tokenAccessor));
         $this->setDefaultUserFields($builder);
-        if ($this->securityFacade->isGranted('oro_user_role_view')) {
+        if ($this->authorizationChecker->isGranted('oro_user_role_view')) {
             $builder->add(
                 'roles',
                 'entity',
@@ -90,7 +91,7 @@ class UserType extends AbstractType
                 ]
             );
         }
-        if ($this->securityFacade->isGranted('oro_user_group_view')) {
+        if ($this->authorizationChecker->isGranted('oro_user_group_view')) {
             $builder->add(
                 'groups',
                 'entity',
@@ -169,8 +170,6 @@ class UserType extends AbstractType
                         ? ['Roles', 'Default']
                         : ['Registration', 'Roles', 'Default'];
                 },
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'   => true,
                 'ownership_disabled'   => $this->isMyProfilePage
             ]
         );
@@ -208,7 +207,7 @@ class UserType extends AbstractType
             ->add('middleName', 'text', ['label' => 'oro.user.middle_name.label', 'required' => false])
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
-            ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false]);
+            ->add('birthday', OroBirthdayType::class, ['label' => 'oro.user.birthday.label', 'required' => false]);
     }
 
     /**
@@ -236,8 +235,8 @@ class UserType extends AbstractType
      */
     protected function addOrganizationField(FormBuilderInterface $builder)
     {
-        if ($this->securityFacade->isGranted('oro_organization_view')
-            && $this->securityFacade->isGranted('oro_business_unit_view')
+        if ($this->authorizationChecker->isGranted('oro_organization_view')
+            && $this->authorizationChecker->isGranted('oro_business_unit_view')
         ) {
             $builder->add(
                 'organizations',

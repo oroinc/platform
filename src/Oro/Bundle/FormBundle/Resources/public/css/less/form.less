@@ -16,6 +16,7 @@
     border-top-color: #ccc;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
+    overflow: hidden;
   }
 }
 .mce-fullscreen-overlay {
@@ -52,6 +53,15 @@
 .controls {
   .entities.list-group {
     width: 297px;
+  }
+  .fallback-item, .float-holder {
+    td {
+      padding-top: 0;
+      padding-bottom: 0;
+      &:first-child, &.fallback-item-value {
+        padding-left: 0;
+      }
+    }
   }
 }
 

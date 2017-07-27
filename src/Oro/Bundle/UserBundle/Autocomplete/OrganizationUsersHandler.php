@@ -4,27 +4,36 @@ namespace Oro\Bundle\UserBundle\Autocomplete;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 
 /**
  * This user search handler return users that was assigned to current organization and limit by search string
  * excluding current user.
  * This handler does not use ACL helper and search engine because we does not needed any ACL checks
- *
- * Class OrganizationUsersHandler
- * @package Oro\Bundle\UserBundle\Autocomplete
  */
 class OrganizationUsersHandler extends UserSearchHandler
 {
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
+
+    /** @var SearchCriteria */
+    protected $searchUserCriteria;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
+    public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
+    }
+
+    /**
+     * @param SearchCriteria $searchCriteria
+     */
+    public function setSearchUserCriteria(SearchCriteria $searchCriteria)
+    {
+        $this->searchUserCriteria = $searchCriteria;
     }
 
     /**
@@ -47,7 +56,7 @@ class OrganizationUsersHandler extends UserSearchHandler
     {
         $queryBuilder = $this->getBasicQueryBuilder();
         if ($search) {
-            $this->addSearchCriteria($queryBuilder, $search);
+            $this->searchUserCriteria->addSearchCriteria($queryBuilder, $search);
         }
         $queryBuilder
             ->setFirstResult($firstResult)
@@ -69,47 +78,10 @@ class OrganizationUsersHandler extends UserSearchHandler
             ->andWhere('org.id = :org')
             ->andWhere('u.id != :currentUser')
             ->andWhere('u.enabled = :enabled')
-            ->setParameter('org', $this->securityFacade->getOrganizationId())
-            ->setParameter('currentUser', $this->securityFacade->getLoggedUserId())
+            ->setParameter('org', $this->tokenAccessor->getOrganizationId())
+            ->setParameter('currentUser', $this->tokenAccessor->getUserId())
             ->setParameter('enabled', true);
 
         return $queryBuilder;
-    }
-
-    /**
-     * Adds a search criteria to the given query builder based on the given query string
-     *
-     * @param QueryBuilder $queryBuilder The query builder
-     * @param string       $search       The search string
-     */
-    protected function addSearchCriteria(QueryBuilder $queryBuilder, $search)
-    {
-        $queryBuilder
-            ->andWhere(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like(
-                        $queryBuilder->expr()->concat(
-                            'u.firstName',
-                            $queryBuilder->expr()->concat(
-                                $queryBuilder->expr()->literal(' '),
-                                'u.lastName'
-                            )
-                        ),
-                        ':search'
-                    ),
-                    $queryBuilder->expr()->like(
-                        $queryBuilder->expr()->concat(
-                            'u.lastName',
-                            $queryBuilder->expr()->concat(
-                                $queryBuilder->expr()->literal(' '),
-                                'u.firstName'
-                            )
-                        ),
-                        ':search'
-                    ),
-                    $queryBuilder->expr()->like('u.username', ':search')
-                )
-            )
-            ->setParameter('search', '%' . str_replace(' ', '%', $search) . '%');
     }
 }

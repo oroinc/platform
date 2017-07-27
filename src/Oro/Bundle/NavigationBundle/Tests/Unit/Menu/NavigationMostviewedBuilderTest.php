@@ -2,61 +2,47 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface
-     */
-    protected $securityContext;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
-    /**
-     * @var NavigationMostviewedBuilder
-     */
-    protected $builder;
-
-    /**
-     * @var Router
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
-    /**
-     * @var FeatureChecker
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $featureChecker;
 
-    /**
-     * @var \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $factory;
+
+    /** @var NavigationMostviewedBuilder */
+    protected $builder;
 
     protected function setUp()
     {
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->factory = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
-        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->factory = $this->createMock(ItemFactory::class);
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->builder = new NavigationMostviewedBuilder(
-            $this->securityContext,
+            $this->tokenAccessor,
             $this->em,
             $this->factory,
             $this->router
@@ -79,22 +65,12 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue($userId));
 
-        $token = $this->getMockBuilder(
-            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-        $token->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
-
-        $token->expects($this->once())
-            ->method('getOrganizationContext')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getOrganization')
             ->will($this->returnValue($organization));
-
-        $this->securityContext->expects($this->atLeastOnce())
-            ->method('getToken')
-            ->will($this->returnValue($token));
 
         $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface');
         $this->factory->expects($this->once())
@@ -135,7 +111,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
 
         $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')->getMock();
 
-        $this->builder->setOptions($configMock);
+        $this->builder->setConfigManager($configMock);
         $this->builder->build($menu, array(), $type);
     }
 }

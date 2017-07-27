@@ -4,9 +4,9 @@ namespace Oro\Bundle\DataAuditBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 
 class SegmentWidgetOptionsListener
@@ -17,24 +17,24 @@ class SegmentWidgetOptionsListener
     /** @var HttpKernelInterface */
     protected $httpKernel;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var ContextChecker */
     protected $contextChecker;
 
     /**
-     * @param HttpKernelInterface $httpKernel
-     * @param SecurityFacade      $securityFacade
-     * @param ContextChecker      $contextChecker
+     * @param HttpKernelInterface           $httpKernel
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ContextChecker                $contextChecker
      */
     public function __construct(
         HttpKernelInterface $httpKernel,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         ContextChecker $contextChecker
     ) {
-        $this->httpKernel     = $httpKernel;
-        $this->securityFacade = $securityFacade;
+        $this->httpKernel = $httpKernel;
+        $this->authorizationChecker = $authorizationChecker;
         $this->contextChecker = $contextChecker;
     }
 
@@ -51,7 +51,7 @@ class SegmentWidgetOptionsListener
      */
     public function onLoad(WidgetOptionsLoadEvent $event)
     {
-        if (!$this->securityFacade->isGranted('oro_dataaudit_history')) {
+        if (!$this->authorizationChecker->isGranted('oro_dataaudit_view')) {
             return;
         }
         $widgetOptions = $event->getWidgetOptions();
@@ -98,7 +98,7 @@ class SegmentWidgetOptionsListener
             '_controller' => 'OroDataAuditBundle:Api/Rest/Audit:getFields'
         ];
         $subRequest = $this->request->duplicate(['_format' => 'json'], null, $path);
-        $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::MASTER_REQUEST);
+        $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
 
         return $response->getContent();
     }

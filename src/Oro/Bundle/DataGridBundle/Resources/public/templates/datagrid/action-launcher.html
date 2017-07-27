@@ -11,17 +11,23 @@
     class="action
         <%= className ? " " + className : "" %>
         <%= !enabled ? " disabled" : "" %>
+        <%= launcherMode != '' ? 'mode-' +  launcherMode : "" %>
         <% if (links) { %> dropdown-toggle<% } %>
     "
     <% attributesTemplate(attributes) %>
     title="<%= title %>"
     <% if (links) { %> data-toggle="dropdown"<% } %>>
-    <% if (icon) { %>
-        <i class="fa-<%= icon %> hide-text"><%= label %></i><% if (!iconHideText) { %><%= label %><% } %>
-    <% } else { %>
+
+    <% if (launcherMode == 'icon-text') { %>
+        <i class="fa-<%= icon %> hide-text"></i>
+        <%= label %>
+    <% } else if (launcherMode == 'icon-only') { %>
+        <i class="fa-<%= icon %> hide-text"></i>
+    <% } else if (launcherMode == 'text-only') { %>
         <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
         <%= label %>
     <% } %>
+
     <% if (links) { %><i class="caret"></i><% } %>
 </<%= tagName %>>
 
@@ -31,12 +37,15 @@
         <li><a href="<%= link %>" data-index="<%= index %>" title="<%= item.label %>"
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             data-key="<%= item.key %>">
-        <% if (item.icon) { %>
-            <i class="fa-<%= item.icon %> hide-text"><%= item.label %></i><% if (!iconHideText) { %><%= item.label %><% } %>
-        <% } else { %>
-            <% if (item.iconClassName) { %><i class="<%= item.iconClassName %>"></i><% } %>
-            <%= item.label %>
-        <% } %>
+            <% if (launcherMode == 'icon-text') { %>
+                <i class="fa-<%= icon %> hide-text"></i>
+                <%= item.label %>
+            <% } else if (launcherMode == 'icon-only') { %>
+                <i class="fa-<%= icon %> hide-text"></i>
+            <% } else if (launcherMode == 'text-only') { %>
+                <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
+                <%= item.label %>
+            <% } %>
         </a></li>
     <% }) %>
     </ul>

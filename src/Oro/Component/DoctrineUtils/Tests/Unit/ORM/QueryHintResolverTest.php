@@ -212,6 +212,40 @@ class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testResolveCustomHintName()
+    {
+        $this->queryHintResolver->addTreeWalker('test', 'Test\Walker', null, 'HINT_TEST');
+
+        $this->assertEquals(
+            'test',
+            $this->queryHintResolver->resolveHintName('HINT_TEST')
+        );
+        $this->assertEquals(
+            'test',
+            $this->queryHintResolver->resolveHintName('test')
+        );
+    }
+
+    public function testResolveDoctrineHintName()
+    {
+        $this->assertEquals(
+            Query::HINT_CUSTOM_OUTPUT_WALKER,
+            $this->queryHintResolver->resolveHintName('HINT_CUSTOM_OUTPUT_WALKER')
+        );
+        $this->assertEquals(
+            Query::HINT_CUSTOM_OUTPUT_WALKER,
+            $this->queryHintResolver->resolveHintName(Query::HINT_CUSTOM_OUTPUT_WALKER)
+        );
+    }
+
+    public function testResolveUndefinedHintName()
+    {
+        $this->assertEquals(
+            'HINT_UNDEFINED',
+            $this->queryHintResolver->resolveHintName('HINT_UNDEFINED')
+        );
+    }
+
     /**
      * @return Query
      */

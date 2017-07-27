@@ -91,7 +91,7 @@ define(function(require) {
             if (this.$variables.dateVariables('getPart') === 'value') {
                 return this.dateValueHelper.isValid(value) ?
                     this.dateValueHelper.formatRawValue(value) :
-                    dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+                    VariableDateTimePickerView.__super__.getBackendFormattedValue.call(this);
             }
 
             return this.getBackendPartFormattedValue();

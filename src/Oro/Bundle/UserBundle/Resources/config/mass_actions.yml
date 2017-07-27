@@ -10,4 +10,38 @@ services:
         arguments:
             - '@oro_user.handler.reset_password_handler'
             - '@translator'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
+
+    oro_datagrid.mass_action.disable_users:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction
+        shared: false
+        tags:
+            - { name: oro_datagrid.extension.mass_action.type, type: disableusers }
+
+    oro_datagrid.mass_action.enable_users:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction
+        shared: false
+        tags:
+            - { name: oro_datagrid.extension.mass_action.type, type: enableusers }
+
+    oro_datagrid.mass_action.users_enable_switch.handler.disable:
+        class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\UsersEnableSwitchActionHandler
+        shared: false
+        arguments:
+            - '@oro_security.acl_helper'
+            - '@security.token_storage'
+            - '@translator'
+            - false
+            - 'oro.user.mass_actions.disable_users.success_message'
+            - 'oro.user.mass_actions.disable_users.error_message'
+
+    oro_datagrid.mass_action.users_enable_switch.handler.enable:
+        class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\UsersEnableSwitchActionHandler
+        shared: false
+        arguments:
+            - '@oro_security.acl_helper'
+            - '@security.token_storage'
+            - '@translator'
+            - true
+            - 'oro.user.mass_actions.enable_users.success_message'
+            - 'oro.user.mass_actions.enable_users.error_message'

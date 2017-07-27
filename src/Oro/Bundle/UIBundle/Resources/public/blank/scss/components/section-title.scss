@@ -5,4 +5,8 @@
 
   font-size: $section-title-font-size;
   font-family: $section-title-font-family;
+
+  &--size-m {
+    font-size: $section-title-font-size-m;
+  }
 }

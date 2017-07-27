@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
@@ -26,10 +26,10 @@ class PdoMysql extends BaseDriver
     /**
      * Init additional doctrine functions
      *
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param ClassMetadata $class
      */
-    public function initRepo(EntityManager $em, ClassMetadata $class)
+    public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
         $ormConfig = $em->getConfiguration();
         $ormConfig->addCustomStringFunction(
@@ -67,9 +67,21 @@ class PdoMysql extends BaseDriver
     {
         $fieldValue = $searchCondition['fieldValue'];
         $condition = $searchCondition['condition'];
-        $words = $this->getWords($this->filterTextFieldValue($fieldValue), $condition);
+
+        $words = array_filter(
+            explode(' ', $this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue)),
+            'strlen'
+        );
 
         switch ($condition) {
+            case Query::OPERATOR_LIKE:
+                $whereExpr = $this->createLikeExpr($qb, $searchCondition['fieldValue'], $index);
+                break;
+
+            case Query::OPERATOR_NOT_LIKE:
+                $whereExpr = $this->createNotLikeExpr($qb, $searchCondition['fieldValue'], $index);
+                break;
+
             case Query::OPERATOR_CONTAINS:
                 $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
                 $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
@@ -102,6 +114,50 @@ class PdoMysql extends BaseDriver
     }
 
     /**
+     * Uses whole string for like expression. Does not operate on words.
+     *
+     * @param QueryBuilder $qb
+     * @param string $fieldValue
+     * @param $index
+     *
+     * @return string
+     */
+    protected function createLikeExpr(QueryBuilder $qb, $fieldValue, $index)
+    {
+        $this->setLikeExpParameters($qb, $fieldValue, $index);
+        return parent::createContainsStringQuery($index, false);
+    }
+
+    /**
+     * Uses whole string for not like expression. Does not operate on words.
+     *
+     * @param QueryBuilder $qb
+     * @param string $fieldValue
+     * @param $index
+     *
+     * @return string
+     */
+    protected function createNotLikeExpr(QueryBuilder $qb, $fieldValue, $index)
+    {
+        $this->setLikeExpParameters($qb, $fieldValue, $index);
+        return parent::createNotContainsStringQuery($index, false);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $fieldValue
+     * @param string $index
+     */
+    protected function setLikeExpParameters(QueryBuilder $qb, $fieldValue, $index)
+    {
+        $parameterName = 'value' . $index;
+        $parameterValue = '%' . $fieldValue . '%';
+
+        $qb->setParameter($parameterName, $parameterValue);
+    }
+
+    /**
+     * @deprecated
      * Get array of words retrieved from $value string
      *
      * @param  string $value
@@ -111,7 +167,7 @@ class PdoMysql extends BaseDriver
      */
     protected function getWords($value, $searchCondition)
     {
-        $results = array_filter(explode(' ', $value));
+        $results = array_filter(explode(' ', $value), 'strlen');
         $results = array_map(
             function ($word) use ($searchCondition) {
                 if ($searchCondition === Query::OPERATOR_CONTAINS && filter_var($word, FILTER_VALIDATE_EMAIL)) {
@@ -157,7 +213,7 @@ class PdoMysql extends BaseDriver
     protected function getFullTextMinWordLength()
     {
         if (null === $this->fullTextMinWordLength) {
-            $this->fullTextMinWordLength = (int)$this->em->getConnection()->fetchColumn(
+            $this->fullTextMinWordLength = (int)$this->entityManager->getConnection()->fetchColumn(
                 "SHOW VARIABLES LIKE 'ft_min_word_len'",
                 [],
                 1
@@ -192,7 +248,11 @@ class PdoMysql extends BaseDriver
         $valueParameter = 'value' . $index;
 
         $result = "MATCH_AGAINST($joinAlias.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
-        $qb->setParameter($valueParameter, implode('* ', $words) . '*');
+        if ($words) {
+            $qb->setParameter($valueParameter, implode('* ', $words) . '*');
+        } else {
+            $qb->setParameter($valueParameter, '');
+        }
 
         if ($this->isConcreteField($fieldName)) {
             $result = $qb->expr()->andX(
@@ -234,7 +294,7 @@ class PdoMysql extends BaseDriver
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
             $result->add("$joinAlias.value LIKE :$valueParameter");
-            $qb->setParameter($valueParameter, $value . '%');
+            $qb->setParameter($valueParameter, "%$value%");
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
             $fieldParameter = 'field' . $index;
@@ -359,5 +419,17 @@ class PdoMysql extends BaseDriver
         parent::truncateEntities($dbPlatform, $connection);
 
         $connection->query('SET FOREIGN_KEY_CHECKS=1');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
+    {
+        if ($this->em->getConnection()->isTransactionActive()) {
+            return sprintf('DELETE FROM %s', $tableName);
+        }
+
+        return parent::getTruncateQuery($dbPlatform, $tableName);
     }
 }

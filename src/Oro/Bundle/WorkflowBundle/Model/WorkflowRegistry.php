@@ -4,39 +4,36 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
-use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
+use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
+use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionProvider;
 
 class WorkflowRegistry
 {
-    /** @var ManagerRegistry */
-    protected $managerRegistry;
-
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
     /** @var Workflow[] */
     protected $workflowByName = [];
 
-    /** @var array|WorkflowDefinitionFilterInterface[] */
-    protected $definitionFilters = [];
+    /** @var WorkflowDefinitionFilters */
+    protected $definitionFilters;
 
     /**
-     * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
+     * @param WorkflowDefinitionFilters $definitionFilters
+     * @param WorkflowDefinitionProvider $definitionProvider
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        WorkflowAssembler $workflowAssembler
+        WorkflowDefinitionProvider $definitionProvider,
+        WorkflowAssembler $workflowAssembler,
+        WorkflowDefinitionFilters $definitionFilters
     ) {
-        $this->managerRegistry = $managerRegistry;
+        $this->definitionProvider = $definitionProvider;
         $this->workflowAssembler = $workflowAssembler;
+        $this->definitionFilters = $definitionFilters;
     }
 
     /**
@@ -59,20 +56,24 @@ class WorkflowRegistry
         }
 
         if (!array_key_exists($name, $this->workflowByName)) {
-            /** @var WorkflowDefinition $definition */
-            $definition = $this->getEntityRepository()->find($name);
-            if (!$definition) {
-                if ($exceptionOnNotFound) {
-                    throw new WorkflowNotFoundException($name);
-                } else {
-                    return null;
-                }
-            }
-
-            return $this->getAssembledWorkflow($definition);
+            $definition = $this->definitionProvider->find($name);
+        } else {
+            $definition = $this->workflowByName[$name]->getDefinition();
         }
 
-        return $this->refreshWorkflow($this->workflowByName[$name]);
+        if ($definition) {
+            $definition = $this->processDefinitionFilters(new ArrayCollection([$definition]))->first();
+        }
+
+        if (!$definition) {
+            if ($exceptionOnNotFound) {
+                throw new WorkflowNotFoundException($name);
+            }
+
+            return null;
+        }
+
+        return $this->getAssembledWorkflow($definition);
     }
 
     /**
@@ -98,13 +99,27 @@ class WorkflowRegistry
      */
     public function hasActiveWorkflowsByEntityClass($entityClass)
     {
-        $class = ClassUtils::getRealClass($entityClass);
-
-        $activeWorkflowDefinitions = $this->getEntityRepository()->findActiveForRelatedEntity($class);
-
-        $items = $this->processDefinitionFilters(
-            $this->getNamedDefinitionsCollection($activeWorkflowDefinitions)
+        return $this->isWorkflowsArrayEmpty(
+            $this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass)
         );
+    }
+
+    /**
+     * @param string $entityClass
+     * @return bool
+     */
+    public function hasWorkflowsByEntityClass($entityClass)
+    {
+        return $this->isWorkflowsArrayEmpty($this->definitionProvider->getDefinitionsForRelatedEntity($entityClass));
+    }
+
+    /**
+     * @param array|WorkflowDefinition[] $workflowDefinitions
+     * @return bool
+     */
+    private function isWorkflowsArrayEmpty(array $workflowDefinitions)
+    {
+        $items = $this->processDefinitionFilters($this->getNamedDefinitionsCollection($workflowDefinitions));
 
         return !$items->isEmpty();
     }
@@ -118,25 +133,36 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        $class = ClassUtils::getRealClass($entityClass);
-
         return $this->getAssembledWorkflows(
-            $this->getEntityRepository()->findActiveForRelatedEntity($class)
+            $this->definitionProvider->getActiveDefinitionsForRelatedEntity($entityClass)
         );
+    }
+
+    /**
+     * Get Workflows that applicable to entity class
+     *
+     * @param string $entityClass
+     * @return Workflow[]|Collection Named collection of Workflow instances
+     *                               with structure: ['workflowName' => Workflow $workflowInstance]
+     */
+    public function getWorkflowsByEntityClass($entityClass)
+    {
+        return $this->getAssembledWorkflows($this->definitionProvider->getDefinitionsForRelatedEntity($entityClass));
     }
 
     /**
      * Get Active Workflows by active groups
      *
      * @param array $groupNames
-     * @return Workflow[]|Collection
+     * @return Workflow[]|Collection Named collection of active Workflow instances
+     *                               with structure: ['workflowName' => Workflow $workflowInstance]
      */
     public function getActiveWorkflowsByActiveGroups(array $groupNames)
     {
         $groupNames = array_map('strtolower', $groupNames);
 
         $definitions = array_filter(
-            $this->getEntityRepository()->findActive(),
+            $this->definitionProvider->getActiveDefinitions(),
             function (WorkflowDefinition $definition) use ($groupNames) {
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
@@ -151,17 +177,17 @@ class WorkflowRegistry
      * Returns named collection of active Workflow instances with structure:
      *      ['workflowName' => Workflow $workflowInstance]
      *
-     * @return Workflow[]|ArrayCollection
+     * @return Workflow[]|Collection
      */
     public function getActiveWorkflows()
     {
-        return $this->getAssembledWorkflows($this->getEntityRepository()->findActive());
+        return $this->getAssembledWorkflows($this->definitionProvider->getActiveDefinitions());
     }
 
     /**
      * @param WorkflowDefinition[] $definitions
      *
-     * @return ArrayCollection
+     * @return Collection
      */
     private function getAssembledWorkflows(array $definitions)
     {
@@ -185,7 +211,7 @@ class WorkflowRegistry
             return $workflowDefinitions;
         }
 
-        foreach ($this->definitionFilters as $definitionFilter) {
+        foreach ($this->definitionFilters->getFilters() as $definitionFilter) {
             $workflowDefinitions = $definitionFilter->filter($workflowDefinitions);
         }
 
@@ -209,22 +235,6 @@ class WorkflowRegistry
     }
 
     /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->managerRegistry->getManagerForClass(WorkflowDefinition::class);
-    }
-
-    /**
-     * @return WorkflowDefinitionRepository
-     */
-    protected function getEntityRepository()
-    {
-        return $this->getEntityManager()->getRepository(WorkflowDefinition::class);
-    }
-
-    /**
      * Ensure that all database entities in workflow are still in Doctrine Unit of Work
      *
      * @param Workflow $workflow
@@ -233,36 +243,9 @@ class WorkflowRegistry
      */
     protected function refreshWorkflow(Workflow $workflow)
     {
-        $refreshedDefinition = $this->refreshWorkflowDefinition($workflow->getDefinition());
+        $refreshedDefinition = $this->definitionProvider->refreshWorkflowDefinition($workflow->getDefinition());
         $workflow->setDefinition($refreshedDefinition);
 
         return $workflow;
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return WorkflowDefinition
-     * @throws WorkflowNotFoundException
-     */
-    protected function refreshWorkflowDefinition(WorkflowDefinition $definition)
-    {
-        if (!$this->getEntityManager()->getUnitOfWork()->isInIdentityMap($definition)) {
-            $definitionName = $definition->getName();
-
-            $definition = $this->getEntityRepository()->find($definitionName);
-            if (!$definition) {
-                throw new WorkflowNotFoundException($definitionName);
-            }
-        }
-
-        return $definition;
-    }
-
-    /**
-     * @param WorkflowDefinitionFilterInterface $definitionFilter
-     */
-    public function addDefinitionFilter(WorkflowDefinitionFilterInterface $definitionFilter)
-    {
-        $this->definitionFilters[] = $definitionFilter;
     }
 }

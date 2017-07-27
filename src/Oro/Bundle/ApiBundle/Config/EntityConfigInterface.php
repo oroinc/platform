@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-interface EntityConfigInterface
+interface EntityConfigInterface extends ConfigBagInterface
 {
     /**
      * Checks whether the configuration of at least one field exists.
@@ -81,39 +81,6 @@ interface EntityConfigInterface
      * @param string $fieldName
      */
     public function removeField($fieldName);
-
-    /**
-     * Checks whether the configuration attribute exists.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has($key);
-
-    /**
-     * Gets the configuration value.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function get($key);
-
-    /**
-     * Sets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function set($key, $value);
-
-    /**
-     * Removes the configuration value.
-     *
-     * @param string $key
-     */
-    public function remove($key);
 
     /**
      * Indicates whether the exclusion policy is set explicitly.

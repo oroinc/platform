@@ -65,7 +65,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
 
         // Namespace of custom functions is hardcoded in \Oro\ORM\Query\AST\FunctionFactory::create
         // To load the custom function we need to manually include the file
-        require_once('Mocks/Functions.php');
+        require_once('Mocks/Cast.php');
         $config->setCustomStringFunctions(['cast' => 'Oro\ORM\Query\AST\Functions\Cast']);
 
         if ($conn === null) {
@@ -169,8 +169,8 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $conn
-     * @param string                                   $sql
-     * @param array                                    $result
+     * @param string                                   $sql SQL that run in database
+     * @param array                                    $result data that will return after SQL execute
      * @param array                                    $params
      * @param array                                    $types
      */

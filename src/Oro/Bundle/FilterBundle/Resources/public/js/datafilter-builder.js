@@ -3,7 +3,6 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var tools = require('oroui/js/tools');
@@ -12,8 +11,12 @@ define(function(require) {
     var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
     var module = require('module');
     var persistentStorage = require('oroui/js/persistent-storage');
-    var moduleConfigs = module.config();
+    var config = module.config();
     var cachedFilters = {};
+
+    config = _.extend({
+        FiltersManager: FiltersManager
+    }, config);
 
     var methods = {
         /**
@@ -38,6 +41,10 @@ define(function(require) {
                 var type = filter.type;
                 modules[type] = mapFilterModuleName(type);
             });
+
+            if (_.isString(config.FiltersManager)) {
+                modules.FiltersManager = config.FiltersManager;
+            }
             return modules;
         },
 
@@ -46,21 +53,33 @@ define(function(require) {
                 return;
             }
 
+            FiltersManager = this.modules.FiltersManager || FiltersManager;
+
             var filtersList;
+            var $filterContainer;
             var options = methods.combineOptions.call(this);
+
+            if (this.filterContainerSelector && this.$el.find(this.filterContainerSelector).length) {
+                $filterContainer = this.$el.find(this.filterContainerSelector);
+            } else {
+                $filterContainer = this.$el;
+            }
+
             options.collection = this.collection;
-            options.el = $('<div/>').prependTo(this.$el);
             if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
                 options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
             } else {
                 var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
                 options.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
                 if (this.enableToggleFilters) {
-                    options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo(this.$el);
+                    options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo($filterContainer);
                 }
             }
+
             filtersList = new FiltersManager(options);
             filtersList.render();
+            filtersList.$el.prependTo($filterContainer);
+
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
@@ -131,9 +150,6 @@ define(function(require) {
                             loader.success.call(this, data[loader.name]);
                         }
                     });
-                })
-                .fail(function() {
-                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
                 });
         },
 
@@ -173,7 +189,7 @@ define(function(require) {
                 modules: null
             };
 
-            _.extend(self, _.pick(options, 'filtersStateElement', 'enableToggleFilters'));
+            _.extend(self, _.pick(options, 'filtersStateElement', 'filterContainerSelector', 'enableToggleFilters'));
 
             methods.initBuilder.call(self);
 
@@ -190,7 +206,7 @@ define(function(require) {
             if (!_.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
-            if (_.result(moduleConfigs, 'enableToggleFilters') === false) {
+            if (_.result(config, 'enableToggleFilters') === false) {
                 options.enableToggleFilters = false;
             }
             if (options.enableToggleFilters) {

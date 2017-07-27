@@ -1,3 +1,5 @@
+@ticket-BAP-11232
+@automatically-ticket-tagged
 Feature: Quick access menu
   In order to quick access to some page in application
   As crm user
@@ -16,7 +18,7 @@ Feature: Quick access menu
       | Dashboards/ Manage Dashboards             |
       | Dashboards/ Dashboard                     |
     Then History must looks like:
-      | Manage dashboards - Dashboards             |
+      | Manage Dashboards - Dashboards             |
       | Users - User Management - System           |
       | Manage Custom Reports - Reports & Segments |
 
@@ -24,7 +26,7 @@ Feature: Quick access menu
     Given I choose Most Viewed tab
     Then Most Viewed must looks like:
       | Users - User Management - System           |
-      | Manage dashboards - Dashboards             |
+      | Manage Dashboards - Dashboards             |
       | Manage Custom Reports - Reports & Segments |
 
   Scenario: Add page to favorite

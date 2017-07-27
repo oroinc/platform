@@ -2,14 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Doctrine\DBAL\Driver\PDOConnection;
-
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as InternalRequest;
 use Symfony\Component\BrowserKit\Response as InternalResponse;
@@ -21,26 +17,6 @@ use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 class Client extends BaseClient
 {
     const LOCAL_URL = 'http://localhost';
-
-    /**
-     * @var PDOConnection
-     */
-    protected $pdoConnection;
-
-    /**
-     * @var KernelInterface
-     */
-    protected $kernel;
-
-    /**
-     * @var boolean
-     */
-    protected $hasPerformedRequest;
-
-    /**
-     * @var boolean[]
-     */
-    protected $loadedFixtures;
 
     /**
      * @var bool
@@ -158,7 +134,7 @@ class Client extends BaseClient
             $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
             $acl         = $gridConfig->getAclResource();
 
-            if ($acl && !$container->get('oro_security.security_facade')->isGranted($acl)) {
+            if ($acl && !$container->get('security.authorization_checker')->isGranted($acl)) {
                 return new Response('Access denied.', 403);
             }
 
@@ -220,36 +196,6 @@ class Client extends BaseClient
     protected function getUrl($name, $parameters = array(), $absolute = false)
     {
         return $this->getContainer()->get('router')->generate($name, $parameters, $absolute);
-    }
-
-    /**
-     * @param bool|true $hasPerformedRequest
-     */
-    public function reboot($hasPerformedRequest = true)
-    {
-        $this->kernel->shutdown();
-        $this->kernel->boot();
-
-        $this->hasPerformedRequest = $hasPerformedRequest;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function doRequest($request)
-    {
-        if ($this->hasPerformedRequest) {
-            $this->reboot();
-        } else {
-            $this->hasPerformedRequest = true;
-        }
-
-        $response = $this->kernel->handle($request);
-
-        if ($this->kernel instanceof TerminableInterface) {
-            $this->kernel->terminate($request, $response);
-        }
-        return $response;
     }
 
     /**

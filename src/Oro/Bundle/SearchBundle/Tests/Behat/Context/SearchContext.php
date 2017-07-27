@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -19,7 +18,7 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      *            | Type            | N | isSelected |
      *            | All             | 3 | yes        |
      *            | Business Units  | 1 |            |
-     *            | Calendar events | 1 |            |
+     *            | Calendar Events | 1 |            |
      *            | Organizations   | 1 |            |
      *
      * @Then /^(?:|I )should see following search entity types:$/
@@ -34,7 +33,7 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
 
         /** @var \DOMElement $link */
         foreach ($crawler->filter('ul li') as $link) {
-            preg_match('/([\w\s]+).+(\d+)/', $link->textContent, $matches);
+            preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
             $links[trim($matches[1])] = [
                 'number' => $matches[2],
                 'isSelected' => false !== stripos($link->getAttribute('class'), 'selected'),

@@ -45,6 +45,7 @@ oro:
                 manyToMany:         Many to many
                 enum:               Select
                 multiEnum:          Multi-Select
+                html_escaped:       HTML
 
                 ref-one:            System relation
                 ref-many:           System relation
@@ -129,6 +130,7 @@ oro:
                         precision: "Precision"
                         scale: "Scale"
                         is_deleted: "Deleted"
+                        bidirectional: "Bidirectional"
             search:
                 field:
                     items:

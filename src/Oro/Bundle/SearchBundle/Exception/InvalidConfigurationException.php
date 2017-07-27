@@ -7,5 +7,4 @@ namespace Oro\Bundle\SearchBundle\Exception;
  */
 class InvalidConfigurationException extends \Exception
 {
-
 }

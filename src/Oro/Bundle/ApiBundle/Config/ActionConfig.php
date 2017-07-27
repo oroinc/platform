@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ActionConfig
+class ActionConfig implements ConfigBagInterface
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
@@ -19,6 +19,7 @@ class ActionConfig
     use Traits\FieldsetTrait;
     use Traits\MetaPropertyTrait;
     use Traits\FormTrait;
+    use Traits\FormEventSubscriberTrait;
     use Traits\StatusCodesTrait;
 
     /** a flag indicates whether the action should not be available for the entity */
@@ -59,6 +60,9 @@ class ActionConfig
 
     /** the form options that should be used for the entity */
     const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
+
+    /** event subscriber that should be used for the entity form */
+    const FORM_EVENT_SUBSCRIBER = EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER;
 
     /** additional response status codes for the entity */
     const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;

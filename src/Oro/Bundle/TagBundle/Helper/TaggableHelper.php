@@ -36,6 +36,20 @@ class TaggableHelper
     }
 
     /**
+     * Checks if tags should be automatically rendered in the entity view
+     *
+     * @param $entity
+     *
+     * @return bool
+     */
+    public function shouldRenderDefault($entity)
+    {
+        return $this->isTaggable($entity) &&
+               $this->tagConfigProvider->hasConfig($entity) &&
+               $this->tagConfigProvider->getConfig($entity)->is('enableDefaultRendering');
+    }
+
+    /**
      * Checks if column with tags should appear by default on the grid for entity
      *
      * @param string|object $entity

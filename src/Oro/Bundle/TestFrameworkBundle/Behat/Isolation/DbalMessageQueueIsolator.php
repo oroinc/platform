@@ -3,69 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\RuntimeException;
-use Symfony\Component\Process\Process;
 
-class DbalMessageQueueIsolator implements IsolatorInterface
+class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
 {
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
-
-    /**
-     * @param KernelInterface $kernel
-     */
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-    }
-
-    /** {@inheritdoc} */
-    public function start(BeforeStartTestsEvent $event)
-    {
-    }
-
-    /** {@inheritdoc} */
-    public function beforeTest(BeforeIsolatedTestEvent $event)
-    {
-        $command = sprintf(
-            './console oro:message-queue:consume --env=%s %s > /dev/null 2>&1 &',
-            $this->kernel->getEnvironment(),
-            $this->kernel->isDebug() ? '' : '--no-debug'
-        );
-        $process = new Process($command, $this->kernel->getRootDir());
-        $process->run();
-    }
-
-    /** {@inheritdoc} */
-    public function afterTest(AfterIsolatedTestEvent $event)
-    {
-        /** @var EntityManager $em */
-        $em = $this->kernel->getContainer()->get('doctrine')->getManager();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
-
-        $process = new Process('pkill -f oro:message-queue:consume', $this->kernel->getRootDir());
-
-        try {
-            $process->run();
-        } catch (RuntimeException $e) {
-            //it's ok
-        }
-    }
-
-    /** {@inheritdoc} */
-    public function terminate(AfterFinishTestsEvent $event)
-    {
-    }
+    /** @var Filesystem */
+    private $fs;
 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
@@ -76,42 +23,94 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     /**
      * {@inheritdoc}
      */
-    public function isOutdatedState()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function restoreState(RestoreStateEvent $event)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'Dbal Message Queue';
     }
 
-    /**
-     * @param Connection $connection
-     */
-    public static function waitForMessageQueue(Connection $connection, $timeLimit = 60)
+    protected function cleanUp()
     {
-        $time = $timeLimit;
-        $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
+        $this->kernel->boot();
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
+        /** @var Connection $connection */
+        $connection = $doctrine->getManager()->getConnection();
 
-        while (0 !== $result) {
-            if ($time <= 0) {
-                throw new RuntimeException('Message Queue was not process messages during time limit');
+        $connection->executeQuery('DELETE FROM oro_message_queue');
+        $connection->executeQuery('DELETE FROM oro_message_queue_job');
+        $connection->executeQuery('DELETE FROM oro_message_queue_job_unique');
+
+        $this->getFilesystem()
+            ->remove(rtrim($this->kernel->getContainer()->getParameter('oro_message_queue.dbal.pid_file_dir')));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function waitWhileProcessingMessages($timeLimit = self::TIMEOUT)
+    {
+        $isRunning = $this->isOutdatedState();
+        if (!$isRunning) {
+            throw new RuntimeException('Message Queue is not running');
+        }
+
+        while ($timeLimit > 0) {
+            $isQueueEmpty = $this->isQueueEmpty();
+            if ($isQueueEmpty) {
+                return;
             }
 
-            $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
-            usleep(250000);
-            $time -= 0.25;
+            sleep(1);
+            $timeLimit -= 1;
         }
+
+        throw new RuntimeException('Message Queue was not process messages during time limit');
+    }
+
+    /**
+     * @return bool
+     */
+    private function isQueueEmpty()
+    {
+        $this->kernel->boot();
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
+        /** @var Connection $connection */
+        $connection = $doctrine->getManager()->getConnection();
+
+        return
+            !$this->hasRows($connection, 'SELECT * FROM oro_message_queue')
+            && !$this->hasRows(
+                $connection,
+                sprintf(
+                    "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s')",
+                    Job::STATUS_SUCCESS,
+                    Job::STATUS_FAILED
+                )
+            )
+            && !$this->hasRows($connection, 'SELECT * FROM oro_message_queue_job_unique');
+    }
+
+    /**
+     * @param Connection $connection
+     * @param string     $sqlQuery
+     *
+     * @return bool
+     */
+    private function hasRows(Connection $connection, $sqlQuery)
+    {
+        return 0 !== $connection->executeQuery($sqlQuery)->rowCount();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFilesystem()
+    {
+        if (!$this->fs) {
+            $this->fs = new Filesystem();
+        }
+
+        return $this->fs;
     }
 }

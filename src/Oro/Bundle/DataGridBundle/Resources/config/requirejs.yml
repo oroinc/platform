@@ -13,6 +13,7 @@ config:
         'oro/datagrid/action/ajaxdelete-action': 'bundles/orodatagrid/js/datagrid/action/ajaxdelete-action.js'
         'oro/datagrid/action/mass-action': 'bundles/orodatagrid/js/datagrid/action/mass-action.js'
         'oro/datagrid/action/delete-mass-action': 'bundles/orodatagrid/js/datagrid/action/delete-mass-action.js'
+        'oro/datagrid/action/edit-mass-action': 'bundles/orodatagrid/js/datagrid/action/edit-mass-action.js'
         'oro/datagrid/action/dialog-action': 'bundles/orodatagrid/js/datagrid/action/dialog-action.js'
         'oro/datagrid/action/model-action': 'bundles/orodatagrid/js/datagrid/action/model-action.js'
         'oro/datagrid/action/navigate-action': 'bundles/orodatagrid/js/datagrid/action/navigate-action.js'
@@ -22,6 +23,7 @@ config:
         'oro/datagrid/action/row/importexport-action': 'bundles/orodatagrid/js/datagrid/action/row/importexport-action.js'
         'oro/datagrid/action/show-component-action': 'bundles/orodatagrid/js/datagrid/action/show-component-action.js'
         'oro/datagrid/action/select-data-appearance-action': 'bundles/orodatagrid/js/datagrid/action/select-data-appearance-action.js'
+        'oro/datagrid/action/trigger-event-action': 'bundles/orodatagrid/js/datagrid/action/trigger-event-action.js'
         'orodatagrid/js/datagrid/actions-panel': 'bundles/orodatagrid/js/datagrid/actions-panel.js'
         'orodatagrid/js/datagrid/column/action-column': 'bundles/orodatagrid/js/datagrid/column/action-column.js'
         'orodatagrid/js/datagrid/body': 'bundles/orodatagrid/js/datagrid/body.js'
@@ -59,6 +61,7 @@ config:
         'orodatagrid/js/datagrid/listener/abstract-listener': 'bundles/orodatagrid/js/datagrid/listener/abstract-listener.js'
         'orodatagrid/js/datagrid/listener/abstract-grid-change-listener': 'bundles/orodatagrid/js/datagrid/listener/abstract-grid-change-listener.js'
         'orodatagrid/js/datagrid/listener/column-form-listener': 'bundles/orodatagrid/js/datagrid/listener/column-form-listener.js'
+        'orodatagrid/js/datagrid/listener/action-form-listener': 'bundles/orodatagrid/js/datagrid/listener/action-form-listener.js'
         'orodatagrid/js/datagrid/listener/callback-listener': 'bundles/orodatagrid/js/datagrid/listener/callback-listener.js'
         'orodatagrid/js/datagrid/listener/change-editable-cell-listener': 'bundles/orodatagrid/js/datagrid/listener/change-editable-cell-listener.js'
         'orodatagrid/js/datagrid/sorting/dropdown': 'bundles/orodatagrid/js/datagrid/sorting/dropdown.js'
@@ -75,7 +78,7 @@ config:
 
         'orodatagrid/js/app/components/datagrid-component': 'bundles/orodatagrid/js/app/components/datagrid-component.js'
         'orodatagrid/js/app/components/column-renderer-component': 'bundles/orodatagrid/js/app/components/column-renderer-component.js'
-
+        'orodatagrid/js/app/components/grid-sidebar-component': 'bundles/orodatagrid/js/app/components/grid-sidebar-component.js'
         'orodatagrid/js/inline-editing/builder': 'bundles/orodatagrid/js/inline-editing/builder.js'
         'orodatagrid/js/app/plugins/grid/inline-editing-plugin': 'bundles/orodatagrid/js/app/plugins/grid/inline-editing-plugin.js'
         'orodatagrid/js/inline-editing/default-editors': 'bundles/orodatagrid/js/inline-editing/default-editors.js'
@@ -88,3 +91,5 @@ config:
         'orodatagrid/js/app/transitions/update-main-property-transition': 'bundles/orodatagrid/js/app/transitions/update-main-property-transition.js'
         'orodatagrid/js/app/views/board/card-view': 'bundles/orodatagrid/js/app/views/board/card-view.js'
         'orodatagrid/js/app/transitions/abstract-transition': 'bundles/orodatagrid/js/app/transitions/abstract-transition.js'
+        'orodatagrid/js/app/components/multi-grid-component': 'bundles/orodatagrid/js/app/components/multi-grid-component.js'
+        'orodatagrid/js/app/views/multi-grid-view': 'bundles/orodatagrid/js/app/views/multi-grid-view.js'

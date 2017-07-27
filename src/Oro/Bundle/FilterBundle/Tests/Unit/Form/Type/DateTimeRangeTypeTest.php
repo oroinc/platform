@@ -33,7 +33,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
             ->method('getTimezone')
             ->will($this->returnValue($this->defaultTimezone));
 
-        $this->formExtensions[] = new CustomFormExtension([new DateRangeType()]);
+        $this->formExtensions[] = new CustomFormExtension([new DateRangeType($localeSettings)]);
 
         parent::setUp();
 
@@ -64,7 +64,8 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
                     'field_type' => 'datetime',
                     'field_options' => array(
                         'format' => 'yyyy-MM-dd HH:mm',
-                        'view_timezone' => $this->defaultTimezone
+                        'view_timezone' => $this->defaultTimezone,
+                        'model_timezone' => $this->defaultTimezone
                     )
                 )
             )

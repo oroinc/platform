@@ -44,11 +44,15 @@ define(function(require) {
         /** @property {String} */
         icon: undefined,
 
-        /** @property {Boolean} */
-        iconHideText: config.iconHideText,
-
         /** @property {String} */
         iconClassName: undefined,
+
+        /** @property {Boolean} */
+        /** @deprecated use launcherMode */
+        iconHideText: config.iconHideText,
+
+        /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
+        launcherMode: '',
 
         /** @property {String} */
         className: undefined,
@@ -84,6 +88,7 @@ define(function(require) {
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
          * @param {String} [options.icon]
+         * @param {Boolean} [options.launcherMode]
          * @param {Boolean} [options.iconHideText]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
@@ -110,6 +115,10 @@ define(function(require) {
                 this.iconHideText = opts.iconHideText;
             }
 
+            if (opts.launcherMode) {
+                this.launcherMode = opts.launcherMode;
+            }
+
             if (opts.className) {
                 this.className = opts.className;
             }
@@ -123,7 +132,23 @@ define(function(require) {
             this.items = opts.items;
 
             this.action = opts.action;
+
             SelectChoiceLauncher.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @return {String}
+         */
+        _convertToLauncherMode: function() {
+            var str = '';
+
+            if (this.icon) {
+                str = this.iconHideText ? 'icon-only'  : 'icon-text';
+            } else {
+                str = 'text-only';
+            }
+
+            return str;
         },
 
         /**
@@ -135,19 +160,21 @@ define(function(require) {
             }
             delete this.action;
             delete this.runAction;
+
             SelectChoiceLauncher.__super__.dispose.apply(this, arguments);
         },
 
         getTemplateData: function() {
             var label = this.label || this.action.label;
 
+            this.launcherMode = this.launcherMode || this._convertToLauncherMode();
             return {
                 label: label,
                 icon: this.selectedItem.icon,
-                iconHideText: this.iconHideText,
                 title: this.selectedItem.title,
                 className: this.selectedItem.className,
                 iconClassName: this.selectedItem.iconClassName,
+                launcherMode: this.launcherMode,
                 link: this.link,
                 links: this.items,
                 action: this.action,

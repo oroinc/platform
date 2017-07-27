@@ -1,0 +1,6 @@
+# unsupported operator
+request:
+    query: "frm oro_test_item where integer id =+ 1"
+response:
+    code: 400
+    message: "Unexpected character \"+\" around position 36."

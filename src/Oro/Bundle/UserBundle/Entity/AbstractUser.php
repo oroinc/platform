@@ -134,7 +134,7 @@ abstract class AbstractUser implements
     /**
      * @var RoleInterface[]|Collection
      *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role")
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role", inversedBy="users")
      * @ORM\JoinTable(name="oro_user_access_role",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
@@ -165,24 +165,6 @@ abstract class AbstractUser implements
      * )
      */
     protected $confirmationToken;
-
-    /**
-     * @var Collection|Organization[]
-     *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="users")
-     * @ORM\JoinTable(name="oro_user_organization",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $organizations;
 
     /**
      * @var Organization
@@ -564,74 +546,6 @@ abstract class AbstractUser implements
     }
 
     /**
-     * Add Organization to User
-     *
-     * @param Organization $organization
-     * @return AbstractUser
-     */
-    public function addOrganization(Organization $organization)
-    {
-        if (!$this->hasOrganization($organization)) {
-            $this->getOrganizations()->add($organization);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Whether user in specified organization
-     *
-     * @param Organization $organization
-     * @return bool
-     */
-    public function hasOrganization(Organization $organization)
-    {
-        return $this->getOrganizations()->contains($organization);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrganizations($onlyActive = false)
-    {
-        if ($onlyActive) {
-            return $this->organizations->filter(
-                function (Organization $organization) {
-                    return $organization->isEnabled() === true;
-                }
-            );
-        }
-
-        return $this->organizations;
-    }
-
-    /**
-     * @param Collection $organizations
-     * @return AbstractUser
-     */
-    public function setOrganizations(Collection $organizations)
-    {
-        $this->organizations = $organizations;
-
-        return $this;
-    }
-
-    /**
-     * Delete Organization from User
-     *
-     * @param Organization $organization
-     * @return AbstractUser
-     */
-    public function removeOrganization(Organization $organization)
-    {
-        if ($this->hasOrganization($organization)) {
-            $this->getOrganizations()->removeElement($organization);
-        }
-
-        return $this;
-    }
-
-    /**
      * Get organization
      *
      * @return OrganizationInterface
@@ -728,5 +642,20 @@ abstract class AbstractUser implements
         $this->passwordChangedAt = $time;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganizations($onlyActive = false)
+    {
+        $collection = new ArrayCollection();
+        if ($this->organization) {
+            if (!$onlyActive || ($onlyActive && $this->organization->isEnabled())) {
+                $collection->add($this->organization);
+            }
+        }
+
+        return $collection;
     }
 }

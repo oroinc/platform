@@ -1,15 +1,15 @@
-define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = {};
+    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
 
     /**
      * @export oroui/js/tools
      * @name   oroui.tools
      */
-    var tools = {};
-    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
-
-    _.extend(tools, Chaplin.utils);
-
     _.extend(tools, {
         /** @type {boolean} */
         debug: false,
@@ -32,6 +32,9 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          * @return {Object}
          */
         unpackFromQueryString: function(query) {
+            if (query.charAt(0) === '?') {
+                query = query.slice(1);
+            }
             var setValue = function(root, path, value) {
                 if (path.length > 1) {
                     var dir = path.shift();
@@ -51,6 +54,9 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
             var data = {};
             for (var i = 0 ; i < nvp.length ; i++) {
                 var pair = nvp[i].split('=');
+                if (pair.length < 2) {
+                    continue;
+                }
                 var name = this.decodeUriComponent(pair[0]);
                 var value = this.decodeUriComponent(pair[1]);
 
@@ -169,6 +175,14 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          */
         isMobile: function() {
             return _.isMobile();
+        },
+
+        /**
+         * Are we have touch screen
+         */
+        isTouchDevice: function()  {
+            return ('ontouchstart' in window) ||
+                ('DocumentTouch' in window && document instanceof window.DocumentTouch);
         },
 
         /**
@@ -307,7 +321,47 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          */
         isTargetBlankEvent: function(event) {
             var mouseMiddleButton = 2;
-            return this.modifierKeyPressed(event) || event.which === mouseMiddleButton;
+            return event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ||
+                event.which === mouseMiddleButton;
+        },
+
+        /**
+         * Gets an XPath for an element which describes its hierarchical location.
+         *
+         * @param {HTMLElement} element
+         * @returns {string|null}
+         */
+        getElementXPath: function(element) {
+            var paths = [];
+            if (element && element.id) {
+                return '//*[@id="' + element.id + '"]';
+            } else {
+                // Use nodeName (instead of localName) so namespace prefix is included (if any).
+                for (; element && element.nodeType === 1; element = element.parentNode)  {
+                    var index = 0;
+                    // EXTRA TEST FOR ELEMENT.ID
+                    if (element && element.id) {
+                        paths.splice(0, 0, '/*[@id="' + element.id + '"]');
+                        break;
+                    }
+
+                    for (var sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
+                        // Ignore document type declaration.
+                        if (sibling.nodeType === Node.DOCUMENT_TYPE_NODE) {
+                            continue;
+                        }
+                        if (sibling.nodeName === element.nodeName) {
+                            ++index;
+                        }
+                    }
+
+                    var tagName = element.nodeName.toLowerCase();
+                    var pathIndex = (index ? '[' + (index + 1) + ']' : '');
+                    paths.splice(0, 0, tagName + pathIndex);
+                }
+
+                return paths.length ? '/' + paths.join('/') : null;
+            }
         }
     });
 

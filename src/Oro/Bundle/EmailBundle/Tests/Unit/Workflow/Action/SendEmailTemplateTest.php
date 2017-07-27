@@ -460,7 +460,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->emailProcessor->expects($this->once())
             ->method('process')
             ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
-            ->willThrowException(new \Swift_SwiftException('An email was not delivered.'));
+            ->willThrowException(new \Swift_SwiftException('The email was not delivered.'));
 
         $this->logger->expects($this->once())
             ->method('error')

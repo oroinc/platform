@@ -10,7 +10,12 @@ define(function(require) {
     var ColumnFilterView = require('orodatagrid/js/app/views/column-manager/column-manager-filter-view');
     var ColumnManagerCollectionView = require('orodatagrid/js/app/views/column-manager/column-manager-collection-view');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
+    var module = require('module');
+    var config = module.config();
 
+    config = _.extend({
+        enableFilters: true
+    }, config);
     /**
      * @class ColumnManagerComponent
      * @extends BaseComponent
@@ -40,6 +45,13 @@ define(function(require) {
          */
         addSorting: true,
 
+        /**
+         * Check if filters enabled
+         * @type {boolean}
+         */
+        enableFilters: config.enableFilters,
+
+        columnManagerView: ColumnManagerView,
         /**
          * @inheritDoc
          */
@@ -78,7 +90,6 @@ define(function(require) {
             // remove properties to prevent disposing them with the columns manager
             delete this.columns;
             delete this.grid;
-
             ColumnManagerComponent.__super__.dispose.apply(this, arguments);
         },
 
@@ -104,17 +115,21 @@ define(function(require) {
         _createViews: function(options) {
             // index of first manageable column
             var orderShift = this.managedColumns[0] ? this.managedColumns[0].get('order') : 0;
-            this.columnManagerView = new ColumnManagerView({
+            this.columnManagerView = new this.columnManagerView({
                 el: options._sourceElement,
                 collection: this.managedColumns,
                 columnFilterModel: this.columnFilterModel
             });
-            this.columnFilterView = new ColumnFilterView({
-                el: this.columnManagerView.$('.column-manager-filter').get(0),
-                model: this.columnFilterModel
-            });
+
+            if (this.enableFilters) {
+                this.columnFilterView = new ColumnFilterView({
+                    el: this.columnManagerView.$('[data-role="column-manager-filter"]').get(0),
+                    model: this.columnFilterModel
+                });
+            }
+
             this.columnManagerCollectionView = new ColumnManagerCollectionView({
-                el: this.columnManagerView.$('.column-manager-table').get(0),
+                el: this.columnManagerView.$('[data-role="column-manager-table"]').get(0),
                 collection: this.managedColumns,
                 filterModel: this.columnFilterModel,
                 addSorting: this.addSorting,
@@ -127,7 +142,8 @@ define(function(require) {
             if (!this.columnManagerCollectionView) {
                 this.createViews();
             }
-            this.columnManagerCollectionView.updateView();
+            this.columnManagerCollectionView.updateHeaderWidths();
+            this.columnManagerView.updateStateView();
         },
 
         /**

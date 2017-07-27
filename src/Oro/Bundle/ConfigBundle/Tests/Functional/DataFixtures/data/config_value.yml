@@ -1,0 +1,19 @@
+general_section_scalar_value:
+    section: general
+    value: Company name
+
+general_section_array_value:
+    section: general
+    value:
+        - USD
+        - EUR
+
+additional_section_scalar_value:
+    section: additional
+    value: 1
+
+additional_section_array_value:
+    section: additional
+    value:
+        - English
+        - German

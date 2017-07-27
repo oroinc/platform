@@ -89,32 +89,39 @@ class ExpandRelatedEntities implements ProcessorInterface
         array $extras
     ) {
         $associations = $this->splitExpandedEntities($expandedEntities);
-        foreach ($associations as $fieldName => $childExpandedEntities) {
-            $propertyPath = null;
-            if ($definition->hasField($fieldName)) {
-                $propertyPath = $definition->getField($fieldName)->getPropertyPath();
-            }
-            if (!$propertyPath) {
-                $propertyPath = $fieldName;
-            }
-            if (!$metadata->hasAssociation($propertyPath)) {
-                continue;
+        foreach ($associations as $fieldName => $targetExpandedEntities) {
+            $propertyPath = $this->getPropertyPath($fieldName, $definition);
+
+            $lastDelimiter = strrpos($propertyPath, '.');
+            if (false === $lastDelimiter) {
+                $targetMetadata = $metadata;
+                $targetFieldName = $propertyPath;
+            } else {
+                $targetMetadata = $this->doctrineHelper->findEntityMetadataByPath(
+                    $metadata->name,
+                    substr($propertyPath, 0, $lastDelimiter)
+                );
+                $targetFieldName = substr($propertyPath, $lastDelimiter + 1);
             }
 
-            $this->completeAssociation(
-                $definition,
-                $fieldName,
-                $metadata->getAssociationTargetClass($propertyPath),
-                $childExpandedEntities,
-                $version,
-                $requestType,
-                $extras
-            );
-            $field = $definition->getField($fieldName);
-            if (null !== $field && $field->getTargetClass()) {
-                $field->setTargetType(
-                    $this->getAssociationTargetType($metadata->isCollectionValuedAssociation($propertyPath))
+            if (null !== $targetMetadata && $targetMetadata->hasAssociation($targetFieldName)) {
+                $this->completeAssociation(
+                    $definition,
+                    $fieldName,
+                    $targetMetadata->getAssociationTargetClass($targetFieldName),
+                    $targetExpandedEntities,
+                    $version,
+                    $requestType,
+                    $extras
                 );
+                $field = $definition->getField($fieldName);
+                if (null !== $field && $field->getTargetClass()) {
+                    $field->setTargetType(
+                        $this->getAssociationTargetType(
+                            $targetMetadata->isCollectionValuedAssociation($targetFieldName)
+                        )
+                    );
+                }
             }
         }
     }
@@ -134,25 +141,22 @@ class ExpandRelatedEntities implements ProcessorInterface
         array $extras
     ) {
         $associations = $this->splitExpandedEntities($expandedEntities);
-        foreach ($associations as $fieldName => $childExpandedEntities) {
+        foreach ($associations as $fieldName => $targetExpandedEntities) {
             $field = $definition->getField($fieldName);
-            if (!$field) {
-                continue;
+            if (null !== $field) {
+                $targetClass = $field->getTargetClass();
+                if ($targetClass) {
+                    $this->completeAssociation(
+                        $definition,
+                        $fieldName,
+                        $targetClass,
+                        $targetExpandedEntities,
+                        $version,
+                        $requestType,
+                        $extras
+                    );
+                }
             }
-            $targetClass = $field->getTargetClass();
-            if (!$targetClass) {
-                continue;
-            }
-
-            $this->completeAssociation(
-                $definition,
-                $fieldName,
-                $targetClass,
-                $childExpandedEntities,
-                $version,
-                $requestType,
-                $extras
-            );
         }
     }
 
@@ -160,7 +164,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $fieldName
      * @param string                 $targetClass
-     * @param string[]               $childExpandedEntities
+     * @param string[]               $targetExpandedEntities
      * @param string                 $version
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
@@ -169,22 +173,16 @@ class ExpandRelatedEntities implements ProcessorInterface
         EntityDefinitionConfig $definition,
         $fieldName,
         $targetClass,
-        $childExpandedEntities,
+        $targetExpandedEntities,
         $version,
         RequestType $requestType,
         array $extras
     ) {
-        $targetExtras = $extras;
-        if (!empty($childExpandedEntities)) {
-            $targetExtras[] = new ExpandRelatedEntitiesConfigExtra($childExpandedEntities);
+        if (!empty($targetExpandedEntities)) {
+            $extras[] = new ExpandRelatedEntitiesConfigExtra($targetExpandedEntities);
         }
 
-        $config = $this->configProvider->getConfig(
-            $targetClass,
-            $version,
-            $requestType,
-            $targetExtras
-        );
+        $config = $this->configProvider->getConfig($targetClass, $version, $requestType, $extras);
         if ($config->hasDefinition()) {
             $targetEntity = $config->getDefinition();
             foreach ($extras as $extra) {
@@ -230,5 +228,20 @@ class ExpandRelatedEntities implements ProcessorInterface
     protected function getAssociationTargetType($isCollection)
     {
         return $isCollection ? 'to-many' : 'to-one';
+    }
+
+    /**
+     * @param string                 $fieldName
+     * @param EntityDefinitionConfig $definition
+     *
+     * @return string
+     */
+    protected function getPropertyPath($fieldName, EntityDefinitionConfig $definition)
+    {
+        if (!$definition->hasField($fieldName)) {
+            return $fieldName;
+        }
+
+        return $definition->getField($fieldName)->getPropertyPath($fieldName);
     }
 }

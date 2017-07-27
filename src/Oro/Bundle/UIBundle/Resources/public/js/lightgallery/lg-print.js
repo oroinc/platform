@@ -63,7 +63,7 @@ define(['jquery'], function($) {
         frameDoc.document.write(printHtml);
         frameDoc.document.write('</body></html>');
         frameDoc.document.close();
-        $(window.frames['print-frame']).load(function() {
+        $(window.frames['print-frame']).on('load', function() {
             var self = $(this).get(0);
             setTimeout(function() {
                 self.focus();

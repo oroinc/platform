@@ -13,8 +13,6 @@ class CurrentUserWalker extends TreeWalkerAdapter
 {
     const HINT_SECURITY_CONTEXT = 'oro_security.current_user_walker.security_context';
 
-    const EXPECTED_TYPE = 12;
-
     /**
      * {@inheritdoc}
      */
@@ -125,7 +123,7 @@ class CurrentUserWalker extends TreeWalkerAdapter
      */
     protected function createEqualByIdComparisonExpression($alias, $field, $id)
     {
-        $pathExpr       = new AST\PathExpression(self::EXPECTED_TYPE, $alias, $field);
+        $pathExpr = new AST\PathExpression(AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION, $alias, $field);
         $pathExpr->type = AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
 
         return new AST\ComparisonExpression(

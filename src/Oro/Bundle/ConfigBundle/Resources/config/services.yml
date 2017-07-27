@@ -3,7 +3,6 @@ parameters:
     oro_config.config_definition_bag.class:                                      Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag
     oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
     oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserScopeManager
-    oro_config.twig_extension.class:                                             Oro\Bundle\ConfigBundle\Twig\ConfigExtension
     oro_config.provider.system_configuration.form_provider.class:                Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
 
     oro_config.form.config_subscriber.class:                                     Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
@@ -41,6 +40,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_config.cache'
+            - '@event_dispatcher'
 
     oro_config.scope.user:
         class: %oro_config.user.class%
@@ -68,9 +68,10 @@ services:
             - '@event_dispatcher'
 
     oro_config.twig.config_extension:
-        class: %oro_config.twig_extension.class%
+        class: Oro\Bundle\ConfigBundle\Twig\ConfigExtension
+        public: false
         arguments:
-           - '@oro_config.user'
+           - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -79,7 +80,7 @@ services:
         arguments:
             - '@oro_config.config_bag'
             - '@form.factory'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
@@ -90,6 +91,7 @@ services:
         class: %oro_config.form.config_subscriber.class%
         arguments:
           - '@oro_config.user'
+          - '@oro_entity.doctrine_helper'
 
     oro_config.type.form:
         class:                        %oro_config.type.form.class%
@@ -136,4 +138,8 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
-            - '@oro_attachment.file_manager'
+
+    oro_config.cache.doctrine_metadata:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'doctrine_metadata_config' ] ]

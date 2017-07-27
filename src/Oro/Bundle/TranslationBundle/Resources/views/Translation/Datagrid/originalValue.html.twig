@@ -1,6 +1,0 @@
-{% set originalValue = record.getValue('key')|trans({}, record.getValue('domain'), 'en') %}
-{% if originalValue is empty %}
-    <span class="empty-string-value">Empty</span>
-{% else %}
-    {{ originalValue }}
-{% endif %}

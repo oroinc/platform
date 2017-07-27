@@ -8,7 +8,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_query_designer.query_designer.manager'
+            - '@oro_query_designer.query_designer.manager.link'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: audit }
 
@@ -34,6 +34,7 @@ services:
             - '@security.token_storage'
             - '@oro_dataaudit.converter.entity_to_entity_change_array'
             - '@oro_dataaudit.audit_config_provider'
+            - '@logger'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: -255 }
             - { name: doctrine.event_listener, event: postFlush, priority: -255 }
@@ -64,7 +65,7 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener'
         arguments:
             - '@http_kernel'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_dataaudit.segment_widget.context_checker'
         calls:
             - ['setRequest', ["@?request="]]
@@ -125,7 +126,6 @@ services:
 
     oro_dataaudit.converter.entity_changes_to_audit_entry:
         class: 'Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter'
-        public: false
         arguments:
             - '@doctrine'
             - '@oro_dataaudit.loggable.audit_entity_mapper'
@@ -158,3 +158,11 @@ services:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_dataaudit.migration.demo_data_fixtures_listener:
+        class: Oro\Bundle\DataAuditBundle\EventListener\DemoDataFixturesListener
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

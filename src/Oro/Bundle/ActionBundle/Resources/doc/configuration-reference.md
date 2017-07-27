@@ -117,6 +117,9 @@ Single operation configuration has next properties:
 * **enabled**
     *boolean*
     Flag that define whether this operation is enabled. Disabled operations will not be used in application.
+* **page_reload**
+    *boolean*
+    By default *true*. Flag that define whether this operation should reload page after execution. It applies when redirect url or datagrid not specified inside *actions* block.
 * **entities**
     *array*
     Array of entity class names. Operation button will be shown on view/edit pages of this entities.

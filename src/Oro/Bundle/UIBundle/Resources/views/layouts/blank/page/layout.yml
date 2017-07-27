@@ -9,7 +9,8 @@ layout:
                 title:
                     blockType: title
                     options:
-                        value: '=data["title_provider"].getTitle(context["route_name"], params)'
+                        defaultValue: '=data["title_provider"].getTitle(context["route_name"], params)'
+                        value: '=defaultValue'
                         params: []
                 meta_charset:
                     blockType: meta
@@ -41,6 +42,10 @@ layout:
                     blockType: container
                 page_main:
                     blockType: container
+                page_main_content:
+                    blockType: container
+                page_main_header:
+                    blockType: container
                 page_sidebar:
                     blockType: container
                 page_content:
@@ -56,7 +61,7 @@ layout:
                 app_script:
                     blockType: script
                     options:
-                        content: 'require(["oroui/js/app"]);'
+                        content: 'require(["oroui/js/app"]); require(["oroui/js/init-layout"]);'
             tree:
                 root:
                     head:
@@ -73,5 +78,7 @@ layout:
                         wrapper:
                             page_container:
                                 page_main:
-                                    page_sidebar: ~
-                                    page_content: ~
+                                    page_main_content:
+                                        page_main_header: ~
+                                        page_sidebar: ~
+                                        page_content: ~

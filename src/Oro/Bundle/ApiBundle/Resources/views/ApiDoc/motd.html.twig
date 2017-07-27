@@ -9,7 +9,7 @@
     div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
 </style>
 <script type="text/javascript">
-    handleResourceLinks = function ($el) {
+    handleResourceLinks = function ($el, apiPrefix) {
         var value = $el.text(),
             arrayOfPrefix = 'array of ',
             isArrayOf = (0 === value.indexOf(arrayOfPrefix)),
@@ -18,7 +18,7 @@
             $el.text('');
             elements = (isArrayOf ? value.substr(arrayOfPrefix.length) : value).split(',');
             for (i = 0; i < elements.length; i++) {
-                resourceId = 'get--api-' + elements[i].trim();
+                resourceId = 'get-' + apiPrefix + '-api-' + elements[i].trim();
                 if ($('#' + resourceId).length) {
                     links.push('<a href="#' + resourceId
                         + '" onclick="return gotoResource(\'' + resourceId + '\');">'
@@ -55,6 +55,7 @@
             $apiDocLink = $('#header a').first(),
             apiDocHref = $apiDocLink.attr('href'),
             apiType = window.location.pathname.substr(apiDocHref.length + 1),
+            apiPrefix = '',
             escapeSelector = function (val) {
                 return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
             },
@@ -93,6 +94,11 @@
                 $('input.key', header).val(headerKey);
                 $('input.value', header).val(headerValue);
             };
+
+        var apiPrefixMatch = window.location.pathname.match(/\/(\w+)\/api\//i);
+        if (apiPrefixMatch) {
+            apiPrefix = '-' + apiPrefixMatch[1];
+        }
 
         $apiDocLink.after('<div id="api_type">type:&nbsp;&nbsp;' +
             '<a href="' + apiDocHref + '"' + (apiType === '' ? ' class="active"' : '') + '>plain</a>' +
@@ -212,16 +218,16 @@
              * Add relation links
              */
             $filters.find('td:contains(Relation)').each(function (index, el) {
-                handleResourceLinks($(el).next());
+                handleResourceLinks($(el).next(), apiPrefix);
             });
             $container.find('.pane.content table.input>tbody>tr').each(function (parentIndex, parentEl) {
                 $(parentEl).find('td:eq(1)').each(function (index, el) {
-                    handleResourceLinks($(el));
+                    handleResourceLinks($(el), apiPrefix);
                 });
             });
             $container.find('.pane.content table.output>tbody>tr').each(function (parentIndex, parentEl) {
                 $(parentEl).find('td:eq(1)').each(function (index, el) {
-                    handleResourceLinks($(el));
+                    handleResourceLinks($(el), apiPrefix);
                 });
             });
 

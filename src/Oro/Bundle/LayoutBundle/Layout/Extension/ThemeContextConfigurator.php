@@ -33,9 +33,7 @@ class ThemeContextConfigurator implements ContextConfiguratorInterface
                 [
                     'theme' => function (Options $options, $value) {
                         if (null === $value && $this->request) {
-                            if (null === $value) {
-                                $value = $this->request->attributes->get('_theme');
-                            }
+                            $value = $this->request->attributes->get('_theme', 'default');
                         }
 
                         return $value;

@@ -11,34 +11,35 @@ define(function(require) {
     }
 
     /**
-     * Filters passed fields by exclude mask
+     * Filters passed fields by rules
      *
      * @param {Array} fields
-     * @param {Object} exclude
+     * @param {Object} rules
+     * @param {Boolean} include
      * @returns {Object}
      * @static
      */
-    Util.filterFields = function(fields, exclude) {
+    Util.filterFields = function(fields, rules, include) {
         fields = _.filter(fields, function(item) {
             var result;
-            result = !_.some(exclude, function(rule) {
+            result = _.some(rules, function(rule) {
                 var result;
                 var cut;
-                // exclude can be a property name
+                // rule can be a property name
                 if (_.isString(rule)) {
                     result = _.intersection(
                         [rule],
                         _.keys(item)
                     ).length > 0;
                 } else {
-                    // or exclude can be an object with data to compare
+                    // or rule can be an object with data to compare
                     cut = _.pick(item, _.keys(rule));
                     result = _.isEqual(cut, rule);
                 }
 
                 return result;
             });
-            return result;
+            return include ? result : !result;
         });
         return fields;
     };
@@ -54,6 +55,18 @@ define(function(require) {
         init: function(entity, data) {
             this.entity = entity;
             this.data = data || {};
+        },
+
+        /**
+         *
+         * @returns {Array.<Object>}
+         */
+        getEntityRoutes: function() {
+            if (!this.data[this.entity]) {
+                return {};
+            }
+
+            return this.data[this.entity].routes || {};
         },
 
         /**

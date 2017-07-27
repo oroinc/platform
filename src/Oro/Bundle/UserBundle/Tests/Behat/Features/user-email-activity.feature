@@ -1,3 +1,5 @@
+@ticket-BAP-10957
+@automatically-ticket-tagged
 Feature: User email activity
   In order to have ability send email to user
   As OroCRM sales rep
@@ -5,10 +7,10 @@ Feature: User email activity
 
 Scenario: Send email
   Given the following users:
-    | firstName | lastName | email             | username |
-    | Charlie   | Sheen    | charlie@sheen.com | charlie  |
-    | Brad      | Pitt     | brad@pitt.com     | brad     |
-    | Bruce     | Willis   | bruce@willis.com  | bruce    |
+    | firstName | lastName | email             | username | authStatus          |
+    | Charlie   | Sheen    | charlie@sheen.com | charlie  |  @admin->authStatus |
+    | Brad      | Pitt     | brad@pitt.com     | brad     |  @admin->authStatus |
+    | Bruce     | Willis   | bruce@willis.com  | bruce    |  @admin->authStatus |
   And I login as administrator
   And I go to System/User Management/Users
   And click view Charlie in grid
@@ -57,8 +59,6 @@ Scenario: Response email
 #  When I click next attachment
 #  Then I should see view of 2 attachment
 
-# todo: unskip when BAP-12843 will resolved
-@skip
 Scenario: Forward email
   Given shouldn't see "Fwd: Re: Work for you" email in activity list
   When I click "Forward" on "Work for you" in activity list
@@ -66,8 +66,6 @@ Scenario: Forward email
   And press "Send"
   Then should see "Fwd: Re: Work for you" email in activity list
 
-# todo: unskip when BAP-12843 will resolved
-@skip
 Scenario: Delete contexts
   When I collapse "Fwd: Re: Work for you" in activity list
   And delete all contexts from collapsed email
@@ -76,8 +74,6 @@ Scenario: Delete contexts
   And click view Brad in grid
   And shouldn't see "Fwd: Re: Work for you" email in activity list
 
-# todo: unskip when BAP-12843 will resolved
-@skip
 Scenario: Add contexts
   Given I click My emails in user menu
   And I click View Work for you in grid

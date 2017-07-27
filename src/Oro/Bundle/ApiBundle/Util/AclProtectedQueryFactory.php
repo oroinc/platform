@@ -10,6 +10,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class AclProtectedQueryFactory extends QueryFactory
 {
+    const SKIP_ACL_FOR_ROOT_ENTITY = 'skip_acl_for_root_entity';
+
     /** @var AclHelper */
     protected $aclHelper;
 
@@ -26,7 +28,16 @@ class AclProtectedQueryFactory extends QueryFactory
      */
     public function getQuery(QueryBuilder $qb, EntityConfig $config)
     {
-        $query = $this->aclHelper->apply($qb);
+        if ($config->get(self::SKIP_ACL_FOR_ROOT_ENTITY)) {
+            $this->aclHelper->setCheckRootEntity(false);
+            try {
+                $query = $this->aclHelper->apply($qb);
+            } finally {
+                $this->aclHelper->setCheckRootEntity(true);
+            }
+        } else {
+            $query = $this->aclHelper->apply($qb);
+        }
         $this->queryHintResolver->resolveHints($query, $config->getHints());
 
         return $query;

@@ -21,6 +21,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         EntityDefinitionConfig::HINTS                  => 'setHints',
         EntityDefinitionConfig::POST_SERIALIZE         => 'setPostSerializeHandler',
         EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES => 'setIdentifierFieldNames',
+        EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER  => 'setFormEventSubscribers',
     ];
 
     /** @var ConfigLoaderFactory */

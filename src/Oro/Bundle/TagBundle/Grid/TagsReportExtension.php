@@ -58,7 +58,7 @@ class TagsReportExtension extends AbstractTagsExtension
         return
             parent::isApplicable($config) &&
             $this->hasTagFields($config) &&
-            $this->isReportOrSegmentGrid($config);
+            $this->isUnsupportedGridPrefix($config);
     }
 
     /**

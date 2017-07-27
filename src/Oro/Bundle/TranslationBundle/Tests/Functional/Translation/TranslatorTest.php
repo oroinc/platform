@@ -15,7 +15,7 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\Strategy\TranslationStrat
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class TranslatorTest extends WebTestCase
 {
@@ -36,7 +36,7 @@ class TranslatorTest extends WebTestCase
      */
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader(), true);
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadStrategyLanguages::class]);
 
         $this->translator = $this->getContainer()->get('translator.default');

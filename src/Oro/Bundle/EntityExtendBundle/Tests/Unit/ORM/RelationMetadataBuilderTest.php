@@ -79,6 +79,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
 
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
             $entityClass,
@@ -157,6 +166,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
 
         $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
@@ -242,6 +260,14 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetFieldName   = 'targetField';
         $targetFieldType   = RelationType::ONE_TO_MANY;
         $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
@@ -313,6 +339,9 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testBuildManyToOneWithCustomizedColumnName()
     {
         $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
@@ -325,12 +354,11 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
 
         $this->configManager
-            ->expects($this->at(0))
+            ->expects($this->at(1))
             ->method('hasConfig')
             ->with($targetEntityClass)
             ->willReturn(false);
-
-        $this->configManager->expects($this->at(1))
+        $this->configManager->expects($this->at(2))
             ->method('hasConfig')
             ->with($entityClass, $fieldName)
             ->willReturn(true);
@@ -338,6 +366,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $targetEntityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
@@ -427,6 +464,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
 
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
             $entityClass,
@@ -500,6 +546,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
@@ -578,6 +633,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
@@ -686,6 +750,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getFieldConfig');
 
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
             $entityClass,
@@ -763,6 +836,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
@@ -877,6 +959,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
 
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
             $entityClass,
@@ -990,6 +1081,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldConfig')
             ->with('extend', $entityClass, $fieldName)
             ->willReturn($fieldConfig);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
@@ -1134,6 +1234,16 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetFieldType   = RelationType::MANY_TO_MANY;
         $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
 
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+
+
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
             $entityClass,
@@ -1206,6 +1316,15 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetFieldName   = 'targetField';
         $targetFieldType   = RelationType::MANY_TO_MANY;
         $targetFieldId     = new FieldConfigId('extend', $entityClass, $targetFieldName, $targetFieldType);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => 'Active'
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')

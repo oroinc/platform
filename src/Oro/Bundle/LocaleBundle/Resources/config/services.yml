@@ -22,14 +22,6 @@ parameters:
 
     oro_locale.locale_listener.class:   Oro\Bundle\LocaleBundle\EventListener\LocaleListener
 
-    oro_locale.twig.date_format.class: Oro\Bundle\LocaleBundle\Twig\DateFormatExtension
-    oro_locale.twig.locale.class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
-    oro_locale.twig.calendar.class: Oro\Bundle\LocaleBundle\Twig\CalendarExtension
-    oro_locale.twig.date_time.class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
-    oro_locale.twig.name.class: Oro\Bundle\LocaleBundle\Twig\NameExtension
-    oro_locale.twig.address.class: Oro\Bundle\LocaleBundle\Twig\AddressExtension
-    oro_locale.twig.number.class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
-
     oro_locale.formatter.datetime.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
     oro_locale.formatter.date.class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
 
@@ -62,6 +54,7 @@ services:
         public: false
         arguments:
             - '@oro_locale.translation.strategy.localization_fallback_strategy'
+            - '@oro_locale.manager.localization'
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postUpdate }
@@ -151,6 +144,9 @@ services:
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.name'
+            - '@property_accessor'
+        calls:
+            - [setPhoneProvider, ['@oro_address.provider.phone']]
 
     oro_locale.formatter.date_time:
         class: %oro_locale.formatter.date_time.class%
@@ -187,58 +183,58 @@ services:
 
     # Twig extensions
     oro_locale.twig.date_format:
-        class: %oro_locale.twig.date_format.class%
+        class: Oro\Bundle\LocaleBundle\Twig\DateFormatExtension
+        public: false
         arguments:
-            - '@oro_locale.format_converter.date_time.registry'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.locale:
-        class: %oro_locale.twig.locale.class%
+        class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
+        public: false
         arguments:
-            - '@oro_locale.settings'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.calendar:
-        class: %oro_locale.twig.calendar.class%
+        class: Oro\Bundle\LocaleBundle\Twig\CalendarExtension
+        public: false
         arguments:
-            - '@oro_locale.settings'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.date_time:
-        class: %oro_locale.twig.date_time.class%
+        class: Oro\Bundle\LocaleBundle\Twig\DateTimeExtension
+        public: false
         arguments:
-            - '@oro_locale.formatter.date_time'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
-    oro_locale.twig.name:
-        class: %oro_locale.twig.name.class%
-        arguments:
-            - '@oro_entity.twig.extension.entity'
-
     oro_locale.twig.address:
-        class: %oro_locale.twig.address.class%
+        class: Oro\Bundle\LocaleBundle\Twig\AddressExtension
+        public: false
         arguments:
-            - '@oro_locale.formatter.address'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.number:
-        class: %oro_locale.twig.number.class%
+        class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
+        public: false
         arguments:
-            - '@oro_locale.formatter.number'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.localization:
         class: 'Oro\Bundle\LocaleBundle\Twig\LocalizationExtension'
+        public: false
         arguments:
-            - '@oro_locale.formatter.language_code'
-            - '@oro_locale.formatter.formatting_code'
-            - '@oro_locale.helper.localization'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -261,7 +257,7 @@ services:
     oro_locale.format.currency:
         class: Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter
         arguments:
-            - '@oro_locale.twig.number'
+            - '@oro_locale.formatter.number'
         tags:
             - { name: oro_formatter, formatter: currency }
 
@@ -291,6 +287,7 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter'
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_config.manager'
         calls:
             - [setClassName, ['%oro_locale.entity.localization.class%']]
         tags:
@@ -307,14 +304,22 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.formatter.language_code'
-            - '@oro_locale.formatter.formatting_code'
+            - '@oro_translation.provider.language'
             - '@oro_locale.manager.localization'
+
+    oro_locale.decorator.localization_cache:
+        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator'
+        public: false
+        arguments:
+            - '@oro_locale.cache'
+            - '@jms_serializer'
 
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_config.global'
+            - '@oro.cache.memory_cache_chain'
 
     oro_locale.provider.current_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
@@ -326,10 +331,9 @@ services:
 
     oro_locale.twig.date_time_organization:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension
+        public: false
         parent: oro_locale.twig.date_time
         deprecated: The "%service_id%" service is deprecated since 1.11, will be removed after 1.13.
-        calls:
-            - [setConfigManager, ['@oro_config.global']]
         tags:
             - { name: twig.extension }
 

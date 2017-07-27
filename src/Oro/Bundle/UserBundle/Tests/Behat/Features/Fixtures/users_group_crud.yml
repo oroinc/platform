@@ -1,0 +1,8 @@
+Oro\Bundle\UserBundle\Entity\User:
+  user{1..15}:
+    username: alice<current()>
+    email: 'fake_<current()>@example.com'
+    firstName: Alice<current()>
+    lastName: <lastName()>
+    password: <password()>
+    organization: '@organization'

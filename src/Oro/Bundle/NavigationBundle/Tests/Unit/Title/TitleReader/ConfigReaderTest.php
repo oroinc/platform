@@ -2,40 +2,46 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 
 class ConfigReaderTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_ROUTE = 'test_route';
 
-    /**
-     * @var ConfigReader
-     */
+    /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    private $configurationProvider;
+
+    /** @var ConfigReader */
     private $reader;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->reader = new ConfigReader();
-        $this->reader->setConfigData(array(self::TEST_ROUTE => 'Test title template'));
+        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configurationProvider
+            ->expects($this->once())
+            ->method('getConfiguration')
+            ->with(ConfigurationProvider::TITLES_KEY)
+            ->willReturn([self::TEST_ROUTE => 'Test title template']);
+
+        $this->reader = new ConfigReader($this->configurationProvider);
     }
 
-    public function testGetDataSuccess()
+    public function testGetTitle()
     {
-        try {
-            $data = $this->reader->getData(array(self::TEST_ROUTE => 'Test route data'));
-
-            $this->assertInternalType('array', $data);
-            $this->assertCount(1, $data);
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException', $e);
-        }
+        $title = $this->reader->getTitle(self::TEST_ROUTE);
+        $this->assertEquals('Test title template', $title);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
-    public function testGetDataFailed()
+    public function testGetTitleEmpty()
     {
-        $this->reader->getData(array());
+        $title = $this->reader->getTitle('custom_route');
+        $this->assertNull($title);
     }
 }

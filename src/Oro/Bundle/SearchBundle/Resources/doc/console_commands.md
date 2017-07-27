@@ -47,3 +47,20 @@ One entity reindexation:
 Started reindex task for "OroUserBundle:User" entity
 
 ```
+
+Normally, reindexation is performed immediately after the reindex command
+is issued. However, it can also be scheduled to be 
+performed in the background by the Message Queue consumers.
+
+Advantages of this mode:
+* asynchronous
+* can be multithreaded
+* scalable
+
+You will need a configured Message Queue and at least one running consumer worker to use this mode.
+
+Please use the following parameter to enable it:
+```
+> app/console oro:search:reindex --scheduled
+
+```

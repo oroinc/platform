@@ -10,7 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {
@@ -23,22 +23,22 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     /** @var TranslatorInterface  */
     protected $translator;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param ResetPasswordHandler $resetPasswordHandler
-     * @param TranslatorInterface $translator
-     * @param SecurityFacade $securityFacade
+     * @param ResetPasswordHandler   $resetPasswordHandler
+     * @param TranslatorInterface    $translator
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
         ResetPasswordHandler $resetPasswordHandler,
         TranslatorInterface $translator,
-        SecurityFacade $securityFacade
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->resetPasswordHandler = $resetPasswordHandler;
         $this->translator = $translator;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -48,7 +48,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     {
         // current user will be processed last
         $processCurrent = false;
-        $currentUser = $this->securityFacade->getLoggedUser();
+        $currentUser = $this->tokenAccessor->getUser();
         $currentUserId = $currentUser ? $currentUser->getId() : null;
 
         $count = 0;
@@ -99,9 +99,9 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     protected function generateResponse($count)
     {
         if ($count > 0) {
-            return new MassActionResponse(true, $this->translator->trans(self::SUCCESS_MESSAGE), ['count' => $count]);
+            return new MassActionResponse(true, $this->translator->trans(self::SUCCESS_MESSAGE, ['%count%' => $count]));
         }
 
-        return new MassActionResponse(false, $this->translator->trans(self::ERROR_MESSAGE), ['count' => $count]);
+        return new MassActionResponse(false, $this->translator->trans(self::ERROR_MESSAGE, ['%count%' => $count]));
     }
 }

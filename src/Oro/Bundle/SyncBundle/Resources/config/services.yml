@@ -7,7 +7,6 @@ parameters:
     oro_wamp.client_ping.interval: 45000 # 45 seconds
 
     oro_wamp.publisher.class:             Oro\Bundle\SyncBundle\Wamp\TopicPublisher
-    oro_wamp.twig.class:                  Oro\Bundle\SyncBundle\Twig\OroSyncExtension
     oro_wamp.listener.maintenance.class:  Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
 
 services:
@@ -36,16 +35,10 @@ services:
             - "@logger"
 
     oro_wamp.twig.sync_extension:
-        class: %oro_wamp.twig.class%
+        class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
+        public: false
         arguments:
-            - "@oro_wamp.publisher"
-        tags:
-            - { name: twig.extension }
-
-    oro_sync.twig.content.tags_extension:
-        class: Oro\Bundle\SyncBundle\Twig\ContentTagsExtension
-        arguments:
-            - '@oro_sync.content.tag_generator_chain'
+            - "@service_container"
         tags:
             - { name: twig.extension }
 
@@ -53,7 +46,7 @@ services:
         class: %oro_wamp.listener.maintenance.class%
         arguments:
             - "@oro_wamp.publisher"
-            - "@oro_security.security_facade"
+            - "@oro_security.token_accessor"
             - "@logger"
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
@@ -93,6 +86,7 @@ services:
             - { name: oro_sync.tag_generator }
 
     oro_sync.content.security.context.link:
+        deprecated: The "%service_id%" service is deprecated since 2.3.
         tags:
             - { name: oro_service_link, service: security.context }
 
@@ -105,5 +99,5 @@ services:
         arguments:
             - '@oro_wamp.publisher'
             - '@oro_sync.content.tag_generator_chain.link'
-            - '@oro_sync.content.security.context.link'
+            - '@security.token_storage'
             - '@logger'

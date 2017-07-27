@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
@@ -56,8 +57,8 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
         $this->dbName = $container->getParameter('database_name');
         $this->dbUser = $container->getParameter('database_user');
         $this->dbPass = $container->getParameter('database_password');
-        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName;
-        $this->dbTempName = $this->dbName.'_temp';
+        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName.TokenGenerator::generateToken('db');
+        $this->dbTempName = $this->dbName.'_temp'.TokenGenerator::generateToken('db');
     }
 
     /** {@inheritdoc} */
@@ -65,7 +66,7 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
     {
         return
             self::isApplicableOS()
-            && 'pdo_mysql' === $container->getParameter('database_driver');
+            && DatabaseDriverInterface::DRIVER_MYSQL === $container->getParameter('database_driver');
     }
 
     /**
@@ -133,6 +134,12 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
     public function isOutdatedState()
     {
         return is_file($this->dbDump);
+    }
+
+    /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
     }
 
     /**

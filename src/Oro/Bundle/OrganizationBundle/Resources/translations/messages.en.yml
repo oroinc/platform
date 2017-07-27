@@ -28,31 +28,62 @@ oro:
     organization:
         entity_label:         Organization
         entity_plural_label:  Organizations
-        entity_description:   Represent organization
-        id.label:          Id
-        name.label:        Name
-        description.label: Description
-        enabled.label:     Status
-        business_units.label: Business units
-        users.label:       Users
+        entity_description:   The highest level of the system permissions grouping.
+        id:
+            label:            Id
+            description:      The unique identifier of the organization record.
+        name:
+            label:            Name
+            description:      The organization name.
+        description:
+            label:            Description
+            description:      Short description of the organization record.
+        enabled:
+            label:            Status
+            description:      Defines whether the organization is active or inactive.
+        business_units:
+            label:            Business units
+            description:      The business units that belong to an organization.
+        is_global:
+            label:            Is global
+            description:      Defines whether the organization has global access level or not.
+        users:
+            label:            Users
+            description:      The users who have access to an organization.
         form:
             choose_organization: Choose an organization...
 
         businessunit:
-            email.label:         Email
-            entity_description:  Represent business unit
             entity_label:        Business Unit
             entity_plural_label: Business Units
-            fax.label:           Fax
-            id.label:            Id
-            name.label:          Name
+            entity_description:  Business units represent a group of users with similar business or administrative tasks/roles.
+            email:
+                label:           Email
+                description:     Email address specified for the business unit record.
+            fax:
+                label:           Fax
+                description:     The fax number specified for the business unit record.
+            id:
+                label:           Id
+                description:     The unique identifier of the business unit record.
+            name:
+                label:           Name
+                description:     The name given to the business unit record.
             organization.label:  Organization
             owner.label:         Owner
             parent.label:        Parent Business Unit
-            phone.label:         Phone
-            users.label:         Users
-            website.label:       Website
-            extend_description.label: Description
+            phone:
+                label:           Phone
+                description:     The phone number specified for the business unit record.
+            users:
+                label:           Users
+                description:     The users who have access to the business unit record.
+            website:
+                label:           Website
+                description:     The website specified for the business unit record.
+            extend_description:
+                label:            Description
+                description:      Short description of the business unit record
 
         controller:
             message:

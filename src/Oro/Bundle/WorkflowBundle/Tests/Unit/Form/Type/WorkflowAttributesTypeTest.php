@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -78,6 +79,139 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->propertyPathSecurityHelper,
             $this->translator
         );
+    }
+
+    /**
+     * @param array $attributeField
+     * @param array $expectedOptions
+     *
+     * @dataProvider buildFormProvider
+     */
+    public function testBuildForm(array $attributeField, array $expectedOptions)
+    {
+        $workflow = $this->createWorkflow(
+            'test_workflow_with_attributes',
+            [
+                'attr' => $this->createAttribute('attr', 'string', 'AttributeLabel'),
+            ]
+        );
+
+        $formOptions = [
+            'workflow' => $workflow,
+            'workflow_item' => $this->createWorkflowItem($workflow),
+            'disable_attribute_fields' => [],
+            'attribute_fields' => [
+                'attr'  => $attributeField,
+            ],
+        ];
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($id, $parameters, $domain) {
+                    return $domain === 'custom' ? $id : sprintf('%s-%s', $id, $domain);
+                }
+            );
+
+        /* @var $builder FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects($this->at(1))
+            ->method('add')
+            ->with('attr', 'text', $expectedOptions)
+            ->willReturnSelf();
+
+        $this->type->buildForm($builder, $formOptions);
+    }
+
+    /**
+     * @return array
+     */
+    public function buildFormProvider()
+    {
+        return [
+            'root label' => [
+                'attribute' => [
+                    'form_type' => 'text',
+                    'label' => 'RootLabel1',
+                ],
+                'expected' => [
+                    'label' => 'RootLabel1',
+                    'required' => false,
+                ],
+            ],
+            'option label' => [
+                'attribute'  => [
+                    'form_type' => 'text',
+                    'options' => [
+                        'label' => 'OptionsLabel2',
+                    ],
+                ],
+                'expected' => [
+                    'label' => 'OptionsLabel2',
+                    'required' => false,
+                ],
+            ],
+            'array option label' => [
+                'attribute'  => [
+                    'form_type' => 'text',
+                    'options' => [
+                        'label' => ['OptionsLabel3'],
+                    ],
+                ],
+                'expected' => [
+                    'label' => 'OptionsLabel3',
+                    'required' => false,
+                ],
+            ],
+            'no translation' => [
+                'attribute'  => [
+                    'form_type' => 'text',
+                    'options' => [
+                        'label' => 'OptionsLabel4',
+                        'translation_domain' => 'custom',
+                    ],
+                ],
+                'expected' => [
+                    'label' => 'AttributeLabel',
+                    'required' => false,
+                    'translation_domain' => 'custom',
+                ],
+            ],
+            'custom translation domain' => [
+                'attribute'  => [
+                    'form_type' => 'text',
+                    'options' => [
+                        'label' => 'OptionsLabel4',
+                        'translation_domain' => 'messages',
+                    ],
+                ],
+                'expected' => [
+                    'label' => 'OptionsLabel4',
+                    'required' => false,
+                    'translation_domain' => 'messages',
+                ],
+            ],
+            'no label' => [
+                'attribute'  => [
+                    'form_type' => 'text',
+                ],
+                'expected' => [
+                    'label' => 'AttributeLabel',
+                    'required' => false,
+                ],
+            ],
+            'workflow label' => [
+                'attribute'  => [
+                    'form_type' => 'text',
+                    'label' => 'oro.workflow.attribute6.label',
+                ],
+                'expected' => [
+                    'label' => 'oro.workflow.attribute6.label',
+                    'required' => false,
+                    'translation_domain' => 'workflows',
+                ],
+            ]
+        ];
     }
 
     /**
@@ -390,7 +524,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     public function testNotEditableAttributes()
     {
-        $entity = new \stdClass();
+        $entity = (object)['first' => null, 'second' => null];
         $formData = $this->createWorkflowData(array('entity' => $entity));
         $workflow = $this->createWorkflow(
             'test_workflow_with_attributes',
@@ -424,6 +558,35 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->assertFalse($form->has('second'));
     }
 
+    public function testEditableVirtualAttributes()
+    {
+        $entity = new \stdClass();
+        $formData = $this->createWorkflowData(['entity' => $entity]);
+        $workflow = $this->createWorkflow(
+            'test_workflow_with_attributes',
+            [
+                'first' => $this->createAttribute('first', 'string', 'First'),
+                'second' => $this->createAttribute('second', 'string', 'Second'),
+            ]
+        );
+        $workflow->getDefinition()->setEntityAttributeName('entity');
+        $formOptions = [
+            'workflow' => $workflow,
+            'workflow_item' => $this->createWorkflowItem($workflow),
+            'attribute_fields' => [
+                'first'  => ['form_type' => 'text'],
+                'second' => ['form_type' => 'text'],
+            ],
+        ];
+
+        $this->propertyPathSecurityHelper->expects($this->never())->method('isGrantedByPropertyPath');
+
+        $form = $this->factory->create($this->type, $formData, $formOptions);
+
+        $this->assertTrue($form->has('first'));
+        $this->assertTrue($form->has('second'));
+    }
+
     public function testNormalizers()
     {
         $expectedWorkflow = $this->createWorkflow('test_workflow');
@@ -436,9 +599,5 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->with($expectedWorkflow->getName())->will($this->returnValue($expectedWorkflow));
 
         $this->factory->create($this->type, null, $options);
-    }
-
-    protected function setFormTypeGuesser(array $guessedData)
-    {
     }
 }

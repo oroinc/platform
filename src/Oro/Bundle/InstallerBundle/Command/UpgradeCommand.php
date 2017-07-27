@@ -36,6 +36,12 @@ class UpgradeCommand extends AbstractCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Determines whether translation data need to be loaded or not'
+            )
+            ->addOption(
+                'skip-download-translations',
+                null,
+                InputOption::VALUE_NONE,
+                'Determines whether translation data need to be downloaded or not'
             );
 
         parent::configure();
@@ -59,10 +65,23 @@ class UpgradeCommand extends AbstractCommand
 
             $updateParams = ['--process-isolation' => true];
             foreach ($input->getOptions() as $key => $value) {
-                if ($value) {
+                if ($value !== '' && $value !== null) {
                     $updateParams['--' . $key] = $value;
                 }
             }
+
+            if ($input->getOption('skip-assets')) {
+                $updateParams['--skip-assets'] = true;
+            }
+
+            if ($input->getOption('skip-translations')) {
+                $updateParams['--skip-translations'] = true;
+
+                if ($input->getOption('skip-download-translations')) {
+                    $updateParams['--skip-download-translations'] = true;
+                }
+            }
+
             $commandExecutor->runCommand('oro:platform:update', $updateParams);
         } else {
             $output->writeln(

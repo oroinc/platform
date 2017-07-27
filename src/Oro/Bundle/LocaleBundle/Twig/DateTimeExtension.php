@@ -2,21 +2,42 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class DateTimeExtension extends \Twig_Extension
 {
-    /**
-     * @var DateTimeFormatter
-     */
-    protected $formatter;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param DateTimeFormatter $formatter
+     * @param ContainerInterface $container
      */
-    public function __construct(DateTimeFormatter $formatter)
+    public function __construct(ContainerInterface $container)
     {
-        $this->formatter = $formatter;
+        $this->container = $container;
+    }
+
+    /**
+     * @return DateTimeFormatter
+     */
+    protected function getDateTimeFormatter()
+    {
+        return $this->container->get('oro_locale.formatter.date_time');
+    }
+
+    /**
+     * @param \DateTime|null|string $date
+     * @return string
+     */
+    public function dateTimeMediumFormat($date)
+    {
+        if ($date instanceof \DateTime) {
+            $date = $this->formatDateTime($date, ['timeType' => \IntlDateFormatter::MEDIUM]);
+        }
+
+        return $date;
     }
 
     /**
@@ -51,6 +72,11 @@ class DateTimeExtension extends \Twig_Extension
     /**
      * Formats date time according to locale settings.
      *
+     * To format datetime given from `Date` or `Time` sql types, you can omit `timeZone` option,
+     * e.g. `formatDateTime($date)`
+     * To format the date and time of `DateTime` sql type value, you have to specify timeZone directly,
+     * e.g. `formatDateTime($date, ['timeZone' => 'UTC']`
+     *
      * Options format:
      * array(
      *     'dateType' => <dateType>,
@@ -60,7 +86,8 @@ class DateTimeExtension extends \Twig_Extension
      * )
      *
      * @param \DateTime|string|int $date
-     * @param array $options
+     * @param array                $options
+     *
      * @return string
      */
     public function formatDateTime($date, array $options = [])
@@ -70,11 +97,16 @@ class DateTimeExtension extends \Twig_Extension
         $locale = $this->getOption($options, 'locale');
         $timeZone = $this->getOption($options, 'timeZone');
 
-        return $this->formatter->format($date, $dateType, $timeType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
     }
 
     /**
      * Formats date time according to locale settings.
+     *
+     * To format date given from `Date` sql type, you can omit `timeZone` option,
+     * e.g. `formatDate($date)`
+     * To format the date part of `DateTime` sql type value, you have to specify timeZone directly,
+     * e.g. `formatDate($date, ['timeZone' => 'UTC']`
      *
      * Options format:
      * array(
@@ -84,7 +116,8 @@ class DateTimeExtension extends \Twig_Extension
      * )
      *
      * @param \DateTime|string|int $date
-     * @param array $options
+     * @param array                $options
+     *
      * @return string
      */
     public function formatDate($date, array $options = [])
@@ -93,7 +126,7 @@ class DateTimeExtension extends \Twig_Extension
         $locale = $this->getOption($options, 'locale');
         $timeZone = $this->getOption($options, 'timeZone', 'UTC');
 
-        return $this->formatter->formatDate($date, $dateType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->formatDate($date, $dateType, $locale, $timeZone);
     }
 
     /**
@@ -106,7 +139,8 @@ class DateTimeExtension extends \Twig_Extension
      * )
      *
      * @param \DateTime|string|int $date
-     * @param array $options
+     * @param array                $options
+     *
      * @return string
      */
     public function formatDay($date, array $options = [])
@@ -115,11 +149,16 @@ class DateTimeExtension extends \Twig_Extension
         $locale = $this->getOption($options, 'locale');
         $timeZone = $this->getOption($options, 'timeZone', 'UTC');
 
-        return $this->formatter->formatDay($date, $dateType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->formatDay($date, $dateType, $locale, $timeZone);
     }
 
     /**
      * Formats date time according to locale settings.
+     *
+     * To format time given from `Time` sql type, you can omit `timeZone` option,
+     * e.g. `formatTime($date)`
+     * To format the time part of `DateTime` sql type value, you have to specify timeZone directly,
+     * e.g. `formatTime($date, ['timeZone' => 'UTC']`
      *
      * Options format:
      * array(
@@ -129,7 +168,8 @@ class DateTimeExtension extends \Twig_Extension
      * )
      *
      * @param \DateTime|string|int $date
-     * @param array $options
+     * @param array                $options
+     *
      * @return string
      */
     public function formatTime($date, array $options = [])
@@ -138,15 +178,16 @@ class DateTimeExtension extends \Twig_Extension
         $locale = $this->getOption($options, 'locale');
         $timeZone = $this->getOption($options, 'timeZone', 'UTC');
 
-        return $this->formatter->formatTime($date, $timeType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->formatTime($date, $timeType, $locale, $timeZone);
     }
 
     /**
      * Gets option or default value if option not exist
      *
-     * @param array $options
+     * @param array  $options
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
+     *
      * @return mixed
      */
     protected function getOption(array $options, $name, $default = null)

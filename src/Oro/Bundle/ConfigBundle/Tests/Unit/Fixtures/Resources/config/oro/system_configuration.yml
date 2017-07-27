@@ -9,6 +9,10 @@ system_configuration:
             data_type: string
             type: choice
 
+        test_bundle.service_another_field:
+            data_type: string
+            type: choice
+
     groups:
         first_group:
             title: 'First group'
@@ -45,3 +49,4 @@ system_configuration:
                                         children:
                                             - test_bundle.some_field
                                             - test_bundle.some_another_field
+                                            - test_bundle.service_another_field

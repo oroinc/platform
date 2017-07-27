@@ -2,74 +2,90 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Twig;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
+use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\ReminderBundle\Twig\ReminderExtension;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ReminderExtension
-     */
-    protected $target;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ReminderExtension */
+    protected $extension;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityContext;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $paramsProvider;
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityManager   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->paramsProvider = $this->getMockBuilder(MessageParamsProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->paramsProvider  = $this->getMockBuilder(
-            'Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider'
-        )
+        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(Reminder::class)
+            ->willReturn($this->entityManager);
 
-        $this->target = new ReminderExtension($this->entityManager, $this->securityContext, $this->paramsProvider);
+        $container = self::getContainerBuilder()
+            ->add('security.token_storage', $this->tokenStorage)
+            ->add('oro_reminder.web_socket.message_params_provider', $this->paramsProvider)
+            ->add('doctrine', $doctrine)
+            ->getContainer($this);
+
+        $this->extension = new ReminderExtension($container);
     }
 
     public function testGetRequestedRemindersReturnAnEmptyArrayIfUserNotExist()
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->getMockForAbstractClass();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())->method('getUser')->will($this->returnValue(null));
-        $this->securityContext->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
 
-        $actual = $this->target->getRequestedRemindersData();
-        $this->assertEquals(array(), $actual);
+        $this->assertEquals(
+            [],
+            self::callTwigFunction($this->extension, 'oro_reminder_get_requested_reminders_data', [])
+        );
     }
 
     public function testGetRequestedRemindersReturnAnEmptyArrayIfUserNotEqualType()
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->getMockForAbstractClass();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())->method('getUser')->will($this->returnValue(new \stdClass()));
-        $this->securityContext->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
 
-        $actual = $this->target->getRequestedRemindersData();
-        $this->assertEquals(array(), $actual);
+        $this->assertEquals(
+            [],
+            self::callTwigFunction($this->extension, 'oro_reminder_get_requested_reminders_data', [])
+        );
     }
 
     public function testGetRequestedRemindersReturnCorrectData()
     {
-        $reminder  = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $reminder1 = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $reminder2 = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder  = $this->createMock(Reminder::class);
+        $reminder1 = $this->createMock(Reminder::class);
+        $reminder2 = $this->createMock(Reminder::class);
 
         $expectedReminder      = new \stdClass();
         $expectedReminder->id  = 42;
@@ -80,12 +96,12 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedReminders     = array($expectedReminder, $expectedReminder1, $expectedReminder2);
 
         $reminders = array($reminder, $reminder1, $reminder2);
-        $token     = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->getMockForAbstractClass();
-        $user      = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()
+        $token     = $this->createMock(TokenInterface::class);
+        $user      = $this->getMockBuilder(User::class)
+            ->disableOriginalConstructor()
             ->getMock();
         $token->expects($this->once())->method('getUser')->will($this->returnValue($user));
-        $repository = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository')
+        $repository = $this->getMockBuilder(ReminderRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $repository->expects($this->once())
@@ -94,14 +110,16 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($reminders));
         $this->entityManager->expects($this->once())
             ->method('getRepository')->will($this->returnValue($repository));
-        $this->securityContext->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
 
         $this->paramsProvider->expects($this->once())
             ->method('getMessageParamsForReminders')
             ->with($reminders)
             ->will($this->returnValue($expectedReminders));
 
-        $actual = $this->target->getRequestedRemindersData();
-        $this->assertEquals($expectedReminders, $actual);
+        $this->assertEquals(
+            $expectedReminders,
+            self::callTwigFunction($this->extension, 'oro_reminder_get_requested_reminders_data', [])
+        );
     }
 }

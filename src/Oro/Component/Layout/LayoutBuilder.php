@@ -292,8 +292,12 @@ class LayoutBuilder implements LayoutBuilderInterface
 
         $this->buildValueBags($blockView);
 
-        foreach ($blockView->children as $childView) {
+        foreach ($blockView->children as $key => $childView) {
             $this->processBlockViewData($childView, $context, $data, $deferred, $encoding);
+
+            if (!$childView->isVisible()) {
+                unset($blockView->children[$key]);
+            }
         }
     }
 
@@ -351,5 +355,13 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotAppliedActions()
+    {
+        return $this->layoutManipulator->getNotAppliedActions();
     }
 }

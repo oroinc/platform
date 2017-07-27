@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
-use Behat\Mink\Element\DocumentElement;
+use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Page;
@@ -35,11 +36,22 @@ trait PageObjectDictionary
 
     /**
      * @param string $name
-     * @return OroElement
+     * @param NodeElement $context
+     * @return Element
      */
-    public function createElement($name)
+    public function createElement($name, NodeElement $context = null)
     {
-        return $this->elementFactory->createElement($name);
+        return $this->elementFactory->createElement($name, $context);
+    }
+
+    /**
+     * @param string $name
+     * @param NodeElement|null $context
+     * @return Element[]
+     */
+    public function findAllElements($name, NodeElement $context = null)
+    {
+        return $this->elementFactory->findAllElements($name, $context);
     }
 
     /**

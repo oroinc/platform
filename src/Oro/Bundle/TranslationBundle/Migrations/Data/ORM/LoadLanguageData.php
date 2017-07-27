@@ -52,11 +52,18 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
             )
         );
 
+        $configManager->set(
+            Configuration::getConfigKeyByName('languages'),
+            array_unique(array_merge($enabledLanguages, [Translator::DEFAULT_LOCALE, $defaultLanguage]))
+        );
+        $configManager->flush();
+
         $user = $this->getUser($manager);
 
         foreach ($languages as $languageCode) {
             $this->getLanguage($manager, $languageCode)
-                ->setEnabled(in_array($languageCode, $enabledLanguages, true) || $defaultLanguage === $languageCode)
+                ->setEnabled(in_array($languageCode, $enabledLanguages, true) ||
+                    (($defaultLanguage === $languageCode) || (Translator::DEFAULT_LOCALE === $languageCode)))
                 ->setOrganization($user->getOrganization())
                 ->setOwner($user);
         }

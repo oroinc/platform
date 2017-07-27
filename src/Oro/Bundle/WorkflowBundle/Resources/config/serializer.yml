@@ -23,10 +23,16 @@ services:
           - ['@oro_workflow.serializer.data.normalizer']
           - ['@serializer.encoder.json']
         calls:
-          - [setWorkflowRegistry,  ['@oro_workflow.registry']]
+          - [setWorkflowRegistry,  ['@oro_workflow.registry.system']]
 
     oro_workflow.serializer.data.normalizer:
         class: %oro_workflow.serializer.data.normalizer.class%
+
+    oro_workflow.serializer.variable.normalizer:
+        class: 'Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer'
+        parent: oro_workflow.serializer.data.normalizer
+        arguments:
+            - '@doctrine'
 
     oro_workflow.serializer.data.attribute_normalizer.standard:
         class: %oro_workflow.serializer.data.attribute_normalizer.standard.class%

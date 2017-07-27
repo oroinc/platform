@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -11,12 +11,13 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
+use Oro\Bundle\UserBundle\Exception\OrganizationException;
 
 class UserChecker extends BaseUserChecker
 {
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var FlashBagInterface */
     protected $flashBag;
@@ -25,18 +26,35 @@ class UserChecker extends BaseUserChecker
     protected $translator;
 
     /**
-     * @param ServiceLink         $securityContextLink
-     * @param FlashBagInterface   $flashBag
-     * @param TranslatorInterface $translator
+     * @param TokenStorageInterface $tokenStorage
+     * @param FlashBagInterface     $flashBag
+     * @param TranslatorInterface   $translator
      */
     public function __construct(
-        ServiceLink $securityContextLink,
+        TokenStorageInterface $tokenStorage,
         FlashBagInterface $flashBag,
         TranslatorInterface $translator
     ) {
-        $this->securityContextLink = $securityContextLink;
-        $this->flashBag            = $flashBag;
-        $this->translator          = $translator;
+        $this->tokenStorage = $tokenStorage;
+        $this->flashBag = $flashBag;
+        $this->translator = $translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkPostAuth(UserInterface $user)
+    {
+        parent::checkPostAuth($user);
+
+        if ($user instanceof User && null !== $user->getAuthStatus()) {
+            if (!$this->hasOrganization($user)) {
+                $exception = new OrganizationException();
+                $exception->setUser($user);
+
+                throw $exception;
+            }
+        }
     }
 
     /**
@@ -50,7 +68,7 @@ class UserChecker extends BaseUserChecker
             return;
         }
 
-        if (null !== $this->securityContextLink->getService()->getToken()
+        if (null !== $this->tokenStorage->getToken()
             && null !== $user->getPasswordChangedAt()
             && null !== $user->getLastLogin()
             && $user->getPasswordChangedAt() > $user->getLastLogin()
@@ -67,10 +85,20 @@ class UserChecker extends BaseUserChecker
         }
 
         if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED) {
-            $exception = new CredentialsExpiredException('Password expired.');
+            $exception = new CredentialsResetException('Password reset.');
             $exception->setUser($user);
 
             throw $exception;
         }
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    protected function hasOrganization(User $user)
+    {
+        return $user->getOrganizations(true)->count() > 0;
     }
 }

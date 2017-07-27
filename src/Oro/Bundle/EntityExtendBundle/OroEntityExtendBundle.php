@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -77,17 +78,19 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
                 [
-                    ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir) => 'Extend\Entity'
+                    ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir) =>
+                        ExtendClassLoadingUtils::getEntityNamespace()
                 ]
             )
         );
         $container->addCompilerPass(new ExtensionPass());
-        $container->addCompilerPass(new WarmerPass());
+        $container->addCompilerPass(new WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
     private function ensureInitialized()
     {
         if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
+            && !CommandExecutor::isCurrentCommand('oro:install', true)
             && !CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)) {
             ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
             if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))) {

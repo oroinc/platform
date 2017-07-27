@@ -60,12 +60,18 @@ oro:
             entity_plural_label:            Integrations
             entity_description:             Represent integration
             id.label:                       Id
-            type.label:                     Type
+            type:
+                label:                      Type
+                description:                Integration type
             transport.label:                Transport type
-            enabled.label:                  Enabled
+            enabled:
+                label:                      Enabled
+                description:                Enable or disable integration
             mapping_settings.label:         Mapping Setting
             statuses.label:                 Statuses
-            name.label:                     Name
+            name:
+                label:                      Name
+                description:                Integration name
             connectors.label:               Connectors
             synchronization_settings.label: Synchronization Settings
             organization.label:             Organization
@@ -81,11 +87,12 @@ oro:
             connector.label: Connector
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
-        sync_error: 'Failed to add sync job to the queue. Error: %s.'
-        sync_error_integration_deactivated: 'Failed to add sync job to the queue. Integration is not active.'
-        progress: Check progress.
-        activate: Activate
-        deactivate: Deactivate
+        sync_error: 'Failed to add sync job to the queue.'
+        sync_error_integration_deactivated: 'Cannot add sync job to the queue because the integration is not active.'
+        scheduled: 'The synchronization has been scheduled. <a href="%url%">Check job progress</a>.'
+        activate: 'Activate'
+        deactivate: 'Deactivate'
+        delete: 'Delete'
         button:
             force_sync: Full Re-sync
             sync: Schedule sync
@@ -103,8 +110,14 @@ oro:
 
         notification:
             channel:
-                activated: Integration has been activated successfully
-                deactivated: Integration has been deactivated successfully
+                activated: 'Integration has been activated successfully'
+                deactivated: 'Integration has been deactivated successfully'
+                deleted: 'Integration has been deleted successfully'
 
         action:
             assign.label: Select the assignee of the integration
+
+        operation:
+            attribute:
+                actionAllowed.label: 'Action is allowed'
+                actionSuccess.label: 'Action is successful'

@@ -7,28 +7,22 @@ use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\BatchBundle\Step\StepExecutor;
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Context\Context;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 
 class ExportHandler implements StepExecutionWarningHandlerInterface
 {
     /**
-     * @var FileSystemOperator
+     * @var FileManager
      */
-    protected $fileSystemOperator;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected $fileManager;
 
     /**
      * @var LoggerInterface
@@ -36,29 +30,16 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
     protected $logger;
 
     /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
      * @var bool
      */
     protected $exportFailed = false;
 
     /**
-     * @param FileSystemOperator $fileSystemOperator
+     * @param FileManager $fileManager
      */
-    public function __construct(FileSystemOperator $fileSystemOperator)
+    public function setFileManager(FileManager $fileManager)
     {
-        $this->fileSystemOperator = $fileSystemOperator;
-    }
-
-    /**
-     * @param RouterInterface $router
-     */
-    public function setRouter(RouterInterface $router)
-    {
-        $this->router = $router;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -67,14 +48,6 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
-    }
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function setConfigManager(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
     }
 
     /**
@@ -100,13 +73,12 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
             throw new InvalidArgumentException('Parameter "gridName" must be provided.');
         }
 
-        $filePath = $this
-            ->fileSystemOperator
-            ->generateTemporaryFileName(sprintf('datagrid_%s', $contextParameters['gridName']), $format);
+        $fileName = FileManager::generateFileName(sprintf('datagrid_%s', $contextParameters['gridName']), $format);
+        $filePath = FileManager::generateTmpFilePath($fileName);
 
         $contextParameters['filePath'] = $filePath;
 
-        $context  = new Context($contextParameters);
+        $context = new Context($contextParameters);
         $executor = new StepExecutor();
         $executor->setBatchSize($batchSize);
         $executor
@@ -120,18 +92,24 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         }
 
         $executor->execute($this);
-
-        $url = null;
-        if (! $this->exportFailed) {
-            $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
-                'oro_importexport_export_download',
-                ['fileName' => basename($filePath)]
-            );
+        $this->fileManager->writeFileToStorage($filePath, $fileName);
+        @unlink($filePath);
+        $readsCount = $context->getReadCount() ?: 0;
+        $errorsCount = count($context->getFailureExceptions());
+        $errors = array_slice(array_merge($context->getErrors(), $context->getFailureExceptions()), 0, 100);
+        if ($writer instanceof ClosableInterface) {
+            $writer->close();
+        }
+        if ($reader instanceof ClosableInterface) {
+            $reader->close();
         }
 
         return [
             'success' => !$this->exportFailed,
-            'url' => $url,
+            'file' => $fileName,
+            'readsCount' => $readsCount,
+            'errorsCount' => $errorsCount,
+            'errors' => $errors
          ];
     }
 
@@ -147,5 +125,19 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         $this->exportFailed = true;
 
         $this->logger->error(sprintf('[DataGridExportHandle] Error message: %s', $reason), ['element' => $element]);
+    }
+
+    /**
+     * @param DatagridExportIdFetcher $idFetcher
+     * @param array $parameters
+     *
+     * @return array
+     */
+    public function getExportingEntityIds(DatagridExportIdFetcher $idFetcher, array $parameters)
+    {
+        $context  = new Context($parameters);
+        $idFetcher->setImportExportContext($context);
+
+        return $idFetcher->getGridDataIds();
     }
 }

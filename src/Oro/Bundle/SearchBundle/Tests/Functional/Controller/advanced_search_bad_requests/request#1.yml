@@ -1,0 +1,6 @@
+# no white spaces around operator
+request:
+    query: "from oro_test_item where integer id=1"
+response:
+    code: 400
+    message: "Not allowed operator. Unexpected token \"end of expression\" of value \"\" (\"operator\" expected with value \">, >=, <, <=, =, !=, in, !in, exists, notexists\") around position 38."

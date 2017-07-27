@@ -56,7 +56,7 @@
 {% block content %}
     {% set buttons = '' %}
     {% set html = '' %}
-    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
+    {% if form.vars.value.id and is_granted('DELETE', form.vars.value) %}
         {% set buttons = buttons ~ UI.deleteButton({
             'dataUrl': path('oro_email_mailbox_delete', {'id': form.vars.value.id}),
             'dataRedirect': path('oro_config_configuration_system', {
@@ -142,7 +142,7 @@
                                                                 'modal': true,
                                                                 'dblclick': 'maximize',
                                                                 'maximizedHeightDecreaseBy': 'minimize-bar',
-                                                                'width': 700,
+                                                                'width': 1000,
                                                             }
                                                         }
                                                     },

@@ -59,6 +59,7 @@ class DateTimeRangeType extends AbstractType
                 'field_options' => array(
                     'format' => 'yyyy-MM-dd HH:mm',
                     'view_timezone' => $this->localeSettings->getTimeZone(),
+                    'model_timezone' => $this->localeSettings->getTimeZone(),
                 ),
             )
         );

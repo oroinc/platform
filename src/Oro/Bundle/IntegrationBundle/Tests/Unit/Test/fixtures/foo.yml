@@ -1,0 +1,15 @@
+__DEFAULT__:
+    code: 302
+    headers: ~
+    body: ~
+
+"/foo":
+    code: 200
+    headers: ~
+    body: bar
+
+"/bar":
+    code: 200
+    headers: ~
+    body:
+        - baz

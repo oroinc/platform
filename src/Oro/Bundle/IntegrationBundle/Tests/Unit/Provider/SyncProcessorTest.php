@@ -38,7 +38,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('createQueryBuilder', 'getRepository'))
+            ->setMethods(['createQueryBuilder', 'getRepository'])
             ->getMock();
 
         $this->processorRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
@@ -296,7 +296,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registry = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->any())->method('getManager')
             ->will($this->returnValue($this->em));
         $registry->expects($this->any())->method('getRepository')

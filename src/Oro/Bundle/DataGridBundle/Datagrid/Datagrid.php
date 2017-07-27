@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -82,7 +83,7 @@ class Datagrid implements DatagridInterface
      */
     public function getData()
     {
-        /** @var array $rows */
+        /** @var ResultRecordInterface $rows */
         $rows = $this->getAcceptedDatasource()->getResults();
 
         $result = ResultsObject::create(['data' => $rows]);
@@ -136,9 +137,19 @@ class Datagrid implements DatagridInterface
      */
     public function getAcceptedDatasource()
     {
-        $this->acceptor->acceptDatasource($this->getDatasource());
+        $this->acceptDatasource();
 
         return $this->getDatasource();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function acceptDatasource()
+    {
+        $this->acceptor->acceptDatasource($this->getDatasource());
+
+        return $this;
     }
 
     /**

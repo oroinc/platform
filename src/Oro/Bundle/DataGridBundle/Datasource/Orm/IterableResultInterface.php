@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 interface IterableResultInterface extends \Iterator
@@ -14,7 +15,7 @@ interface IterableResultInterface extends \Iterator
     public function setBufferSize($size);
 
     /**
-     * @return QueryBuilder
+     * @return Query|QueryBuilder
      */
     public function getSource();
 }

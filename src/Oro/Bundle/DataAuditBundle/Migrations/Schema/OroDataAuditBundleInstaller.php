@@ -15,7 +15,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v2_2';
     }
 
     /**
@@ -46,6 +46,7 @@ class OroDataAuditBundleInstaller implements Installation
         $auditTable->addColumn('organization_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('type', 'string', ['length' => 255]);
         $auditTable->addColumn('transaction_id', 'string', ['length' => 255]);
+        $auditTable->addColumn('owner_description', 'string', ['notnull' => false, 'length' => 255]);
 
         $auditTable->setPrimaryKey(['id']);
 
@@ -62,6 +63,7 @@ class OroDataAuditBundleInstaller implements Installation
 
         $auditTable->addIndex(['logged_at'], 'idx_oro_audit_logged_at', []);
         $auditTable->addIndex(['object_class'], 'idx_oro_audit_object_class', []);
+        $auditTable->addIndex(['object_id', 'object_class', 'type'], 'idx_oro_audit_obj_by_type', []);
 
         $auditTable->addIndex(['organization_id'], 'idx_oro_audit_organization_id', []);
         $auditTable->addForeignKeyConstraint(
@@ -96,9 +98,15 @@ class OroDataAuditBundleInstaller implements Installation
         $auditFieldTable->addColumn('new_date', 'date', ['notnull' => false]);
         $auditFieldTable->addColumn('new_time', 'time', ['notnull' => false]);
         $auditFieldTable->addColumn('new_datetime', 'datetime', ['notnull' => false]);
-        $auditFieldTable->addColumn('old_datetimetz', 'datetimetz', ['notnull' => false]);
+        $auditFieldTable->addColumn('old_datetimetz', 'datetimetz', [
+            'notnull' => false,
+            'comment' => '(DC2Type:datetimetz)'
+        ]);
         $auditFieldTable->addColumn('old_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
-        $auditFieldTable->addColumn('new_datetimetz', 'datetimetz', ['notnull' => false]);
+        $auditFieldTable->addColumn('new_datetimetz', 'datetimetz', [
+            'notnull' => false,
+            'comment' => '(DC2Type:datetimetz)'
+        ]);
         $auditFieldTable->addColumn('new_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $auditFieldTable->addColumn('visible', 'boolean', ['default' => '1']);
         $auditFieldTable->addColumn('old_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);

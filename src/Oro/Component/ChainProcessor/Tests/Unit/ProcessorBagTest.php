@@ -188,22 +188,22 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->processorBag->addProcessor('processor1_no_group', [], 'action1');
         $this->processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
         $this->processorBag->addProcessor('processor3_no_group', [], 'action1', null, 1);
-        $this->processorBag->addProcessor('processor4_no_group', [], 'action1', null, -65535);
-        $this->processorBag->addProcessor('processor5_no_group', [], 'action1', null, -65280);
+        $this->processorBag->addProcessor('processor4_no_group', [], 'action1', null, -1000);
+        $this->processorBag->addProcessor('processor5_no_group', [], 'action1', null, 1000);
 
         $context->setAction('action1');
         $this->assertProcessors(
             [
+                'processor5_no_group',
                 'processor3_no_group',
                 'processor1_no_group',
-                'processor2_no_group',
                 'processor1_6',
                 'processor1_4',
                 'processor1_5',
                 'processor1_3',
                 'processor1_1',
                 'processor1_2',
-                'processor5_no_group',
+                'processor2_no_group',
                 'processor4_no_group',
             ],
             $this->processorBag->getProcessors($context)
@@ -229,14 +229,14 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->processorBag->addProcessor('processor1_no_action', []);
         $this->processorBag->addProcessor('processor2_no_action', [], null, null, -1);
         $this->processorBag->addProcessor('processor3_no_action', [], null, null, 1);
-        $this->processorBag->addProcessor('processor4_no_action', [], null, null, -66000);
-        $this->processorBag->addProcessor('processor5_no_action', [], null, null, -65536);
+        $this->processorBag->addProcessor('processor4_no_action', [], null, null, -1000);
+        $this->processorBag->addProcessor('processor5_no_action', [], null, null, 1000);
 
         $this->processorBag->addProcessor('processor1_1_no_group', [], 'action1');
         $this->processorBag->addProcessor('processor1_2_no_group', [], 'action1', null, -1);
         $this->processorBag->addProcessor('processor1_3_no_group', [], 'action1', null, 1);
-        $this->processorBag->addProcessor('processor1_4_no_group', [], 'action1', null, -65535);
-        $this->processorBag->addProcessor('processor1_5_no_group', [], 'action1', null, -65280);
+        $this->processorBag->addProcessor('processor1_4_no_group', [], 'action1', null, -1000);
+        $this->processorBag->addProcessor('processor1_5_no_group', [], 'action1', null, 1000);
 
         $this->processorBag->addProcessor('processor2_1', [], 'action2', 'group1');
         $this->processorBag->addProcessor('processor2_1_no_group', [], 'action2');
@@ -244,21 +244,21 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $context->setAction('action1');
         $this->assertProcessors(
             [
+                'processor5_no_action',
                 'processor3_no_action',
                 'processor1_no_action',
-                'processor2_no_action',
+                'processor1_5_no_group',
                 'processor1_3_no_group',
                 'processor1_1_no_group',
-                'processor1_2_no_group',
                 'processor1_6',
                 'processor1_4',
                 'processor1_5',
                 'processor1_3',
                 'processor1_1',
                 'processor1_2',
-                'processor1_5_no_group',
+                'processor1_2_no_group',
                 'processor1_4_no_group',
-                'processor5_no_action',
+                'processor2_no_action',
                 'processor4_no_action',
             ],
             $this->processorBag->getProcessors($context)
@@ -267,12 +267,12 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $context->setAction('action2');
         $this->assertProcessors(
             [
+                'processor5_no_action',
                 'processor3_no_action',
                 'processor1_no_action',
-                'processor2_no_action',
                 'processor2_1_no_group',
                 'processor2_1',
-                'processor5_no_action',
+                'processor2_no_action',
                 'processor4_no_action',
             ],
             $this->processorBag->getProcessors($context)
@@ -313,7 +313,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
         $this->processorBag->addProcessor('processor1_1', [], 'action1', 'group1');
 
-        $this->processorBag->addProcessor('processor1_no_action', [], null, null, -65536);
+        $this->processorBag->addProcessor('processor1_no_action', [], null, null, -1);
 
         $context->setAction('action1');
         $this->assertProcessors(
@@ -398,11 +398,11 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RangeException
-     * @expectedExceptionMessage The value 253 is not valid priority of a group. It must be between -254 and 252.
+     * @expectedExceptionMessage The value 256 is not valid priority of a group. It must be between -255 and 255.
      */
     public function testMaxGroupPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1', 253);
+        $this->processorBag->addGroup('group1', 'action1', 256);
         $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
 
         $context = new Context();
@@ -412,11 +412,11 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RangeException
-     * @expectedExceptionMessage The value -255 is not valid priority of a group. It must be between -254 and 252.
+     * @expectedExceptionMessage The value -256 is not valid priority of a group. It must be between -255 and 255.
      */
     public function testMinGroupPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1', -255);
+        $this->processorBag->addGroup('group1', 'action1', -256);
         $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
 
         $context = new Context();
@@ -424,15 +424,13 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @expectedException \RangeException
-     * @expectedExceptionMessage The value 256 is not valid priority of a processor. It must be between -255 and 255. Also it can be between -65535 and -65280 if you need to execute ungrouped processor after grouped processors and less than -65535 if you need to execute common processor after other processors.
+     * @expectedExceptionMessage The value 256 is not valid priority of a processor. It must be between -255 and 255.
      */
-    // @codingStandardsIgnoreEnd
     public function testMaxProcessorPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1', 252);
+        $this->processorBag->addGroup('group1', 'action1');
         $this->processorBag->addProcessor('processor1', [], 'action1', 'group1', 256);
 
         $context = new Context();
@@ -440,15 +438,13 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @expectedException \RangeException
-     * @expectedExceptionMessage The value -256 is not valid priority of a processor. It must be between -255 and 255. Also it can be between -65535 and -65280 if you need to execute ungrouped processor after grouped processors and less than -65535 if you need to execute common processor after other processors.
+     * @expectedExceptionMessage The value -256 is not valid priority of a processor. It must be between -255 and 255.
      */
-    // @codingStandardsIgnoreEnd
     public function testMinProcessorPriority()
     {
-        $this->processorBag->addGroup('group1', 'action1', -254);
+        $this->processorBag->addGroup('group1', 'action1');
         $this->processorBag->addProcessor('processor1', [], 'action1', 'group1', -256);
 
         $context = new Context();
@@ -456,58 +452,115 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RangeException
-     * @expectedExceptionMessage The value -256 is not valid priority of a common processor. It must be between -255 and 255 for common processors are executed before other processors and less than -65535 for common processors are executed after other processors.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testMinEndingCommonProcessorPriority()
+    public function testInternalPriorityForLastGroupedProcessor()
     {
-        $this->processorBag->addGroup('group1', 'action1');
-        $this->processorBag->addProcessor('processor1', [], 'action1', 'group1');
-        $this->processorBag->addProcessor('processor2', [], null, null, -256);
-
-        $context = new Context();
-        $context->setAction('action1');
-        $this->processorBag->getProcessors($context);
+        $this->assertEquals(
+            -130561,
+            $this->callCalculatePriority(-255, -255)
+        );
     }
 
-    public function testInternalProcessorPriorityCalculation()
+    public function testInternalPriorityForFirstUngroupedProcessorExecutedAtEnd()
+    {
+        $this->assertEquals(
+            -130562,
+            $this->callCalculatePriority(-1)
+        );
+    }
+
+    public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtEnd()
+    {
+        $this->assertEquals(
+            -130561 - 1000,
+            $this->callCalculatePriority(-1000)
+        );
+    }
+
+    public function testInternalPriorityForFirstGroupedProcessor()
+    {
+        $this->assertEquals(
+            130559,
+            $this->callCalculatePriority(255, 255)
+        );
+    }
+
+    public function testInternalPriorityForLastUngroupedProcessorExecutedAtBegin()
+    {
+        $this->assertEquals(
+            130560,
+            $this->callCalculatePriority(0)
+        );
+    }
+
+    public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtBegin()
+    {
+        $this->assertEquals(
+            130560 + 1000,
+            $this->callCalculatePriority(1000)
+        );
+    }
+
+    public function testInternalPriorityForZeroProcessor()
+    {
+        $this->assertEquals(
+            -1,
+            $this->callCalculatePriority(0, 0)
+        );
+    }
+
+    public function testInternalPriorityForLastProcessorInZeroGroup()
+    {
+        $this->assertEquals(
+            -256,
+            $this->callCalculatePriority(-255, 0)
+        );
+    }
+
+    public function testInternalPriorityForFirstProcessorInZeroGroup()
+    {
+        $this->assertEquals(
+            254,
+            $this->callCalculatePriority(255, 0)
+        );
+    }
+
+    public function testProcessorPrioritiesShouldNotBeIntersected()
+    {
+        $prevMaxPriority = $this->callCalculatePriority(255, -255);
+        $groupPriority = -254;
+        while ($groupPriority <= 255) {
+            $minPriority = $this->callCalculatePriority(-255, $groupPriority);
+            self::assertSame(
+                $prevMaxPriority,
+                $minPriority - 1,
+                sprintf(
+                    'Failed expectation of the priority calculation.' . "\n"
+                    . 'The calculated priority of the last processor from previous group is %s.' . "\n"
+                    . 'The calculated priority of the first processor from current group is %s.' . "\n"
+                    . 'The current group priority is %s.',
+                    $prevMaxPriority,
+                    $minPriority,
+                    $groupPriority
+                )
+            );
+            $prevMaxPriority = $this->callCalculatePriority(255, $groupPriority);
+            $groupPriority++;
+        }
+    }
+
+    /**
+     * @param int      $processorPriority
+     * @param int|null $groupPriority
+     *
+     * @return int
+     */
+    protected function callCalculatePriority($processorPriority, $groupPriority = null)
     {
         $class  = new \ReflectionClass($this->processorBag);
         $method = $class->getMethod('calculatePriority');
         $method->setAccessible(true);
 
-        $minGroupedPriority = $method->invokeArgs($this->processorBag, [-255, -254]);
-        $this->assertEquals(-65279, $minGroupedPriority, 'minGroupedPriority');
-
-        $maxGroupedPriority = $method->invokeArgs($this->processorBag, [255, 252]);
-        $this->assertEquals(65023, $maxGroupedPriority, 'maxGroupedPriority');
-
-        $zeroPriority = $method->invokeArgs($this->processorBag, [0, 0]);
-        $this->assertEquals(256, $zeroPriority, 'zeroPriority');
-
-        $minZeroGroupPriority = $method->invokeArgs($this->processorBag, [-255, 0]);
-        $this->assertEquals(1, $minZeroGroupPriority, 'minZeroGroupPriority');
-
-        $maxZeroGroupPriority = $method->invokeArgs($this->processorBag, [255, 0]);
-        $this->assertEquals(511, $maxZeroGroupPriority, 'maxZeroGroupPriority');
-
-        $minUngroupedPriority = $method->invokeArgs($this->processorBag, [-255]);
-        $this->assertEquals(65025, $minUngroupedPriority, 'minUngroupedPriority');
-
-        $zeroUngroupedPriority = $method->invokeArgs($this->processorBag, [0]);
-        $this->assertEquals(65280, $zeroUngroupedPriority, 'zeroUngroupedPriority');
-
-        $maxUngroupedPriority = $method->invokeArgs($this->processorBag, [255]);
-        $this->assertEquals(65535, $maxUngroupedPriority, 'maxUngroupedPriority');
-
-        $minUngroupedTailedPriority = $method->invokeArgs($this->processorBag, [-65535]);
-        $this->assertEquals(-65535, $minUngroupedTailedPriority, 'minUngroupedTailedPriority');
-
-        $maxUngroupedTailedPriority = $method->invokeArgs($this->processorBag, [-65280]);
-        $this->assertEquals(-65280, $maxUngroupedTailedPriority, 'maxUngroupedTailedPriority');
+        return $method->invokeArgs($this->processorBag, [$processorPriority, $groupPriority]);
     }
 
     /**

@@ -50,6 +50,35 @@ class ResourcesCacheTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetExcludedActionsNoCache()
+    {
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with('excluded_actions_1.2rest')
+            ->willReturn(false);
+
+        $this->assertNull(
+            $this->resourcesCache->getExcludedActions('1.2', new RequestType(['rest']))
+        );
+    }
+
+    public function testGetExcludedActions()
+    {
+        $cachedData = [
+            'Test\Entity1' => ['delete']
+        ];
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with('excluded_actions_1.2rest')
+            ->willReturn($cachedData);
+
+        $this->assertEquals(
+            $cachedData,
+            $this->resourcesCache->getExcludedActions('1.2', new RequestType(['rest']))
+        );
+    }
+
     public function testGetResourcesNoCache()
     {
         $this->cache->expects($this->once())
@@ -109,6 +138,15 @@ class ResourcesCacheTest extends \PHPUnit_Framework_TestCase
                     'Test\Entity1' => true,
                     'Test\Entity2' => false,
                     'Test\Entity3' => true
+                ]
+            );
+        $this->cache->expects($this->at(2))
+            ->method('save')
+            ->with(
+                'excluded_actions_1.2rest',
+                [
+                    'Test\Entity2' => ['get', 'get_list'],
+                    'Test\Entity3' => ['create']
                 ]
             );
 

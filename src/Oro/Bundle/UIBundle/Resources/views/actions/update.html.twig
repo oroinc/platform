@@ -12,30 +12,37 @@
 
 {% block content %}
     {% if isWidgetContext and savedId is defined and savedId %}
-        <script type="text/javascript">
-            require(['oroui/js/widget-manager'],
-            function(widgetManager) {
-                widgetManager.getWidgetInstance(
-                    {{ app.request.get('_wid')|json_encode|raw }},
-                    function (widget) {
-                        widget.trigger('formSave', {{ savedId|json_encode|raw }});
-                    }
-                );
-            });
-        </script>
+        {% block widget_context %}
+            <div {{ UI.renderPageComponentAttributes({
+                module: 'oroui/js/app/components/widget-form-component',
+                options: {
+                    _wid: app.request.get('_wid'),
+                    data: savedId|default(null)
+                }
+            }) }}></div>
+        {% endblock widget_context %}
     {% else %}
     {% set formAction = formAction|default() %}
     {% if addQueryParameters is not defined or addQueryParameters == true %}
         {% set formAction = oro_url_add_query(formAction) %}
     {% endif %}
-    <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
-          method="{{ form.vars.method }}" data-collect="true"
+    {% set formAttr = formAttr|default({})|merge({
+        'id': form.vars.id,
+        'name': form.vars.name,
+        'action': formAction,
+        'method': form.vars.method,
+        'data-collect': 'true'
+    }) %}
+    <form {{ UI.attributes(formAttr) }}
+          {{ form_enctype(form) }}
           {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         {% if isWidgetContext %}
+            {% block page_widget_actions %}
             <div class="widget-actions">
                 <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
                 <button type="submit" class="btn btn-success">{{ 'Save'|trans }}</button>
             </div>
+            {% endblock page_widget_actions %}
         {% else %}
         <div class="container-fluid page-title">
             <div class="navigation clearfix navbar-extra navbar-extra-right">
@@ -53,12 +60,24 @@
                                         {% block breadcrumbs %}
                                             {% if breadcrumbs is defined %}
                                                 <div class="pull-left">
-                                                    <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a></div>
+                                                    <div class="sub-title">
+                                                        {%- if breadcrumbs.indexPath is defined -%}
+                                                            <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
+                                                        {%- else -%}
+                                                            {{ breadcrumbs.indexLabel }}
+                                                        {%- endif -%}
+                                                    </div>
                                                     <span class="separator">/</span>
                                                     {% if breadcrumbs.additional is defined %}
                                                         {% for breadcrumb in breadcrumbs.additional %}
-                                                        <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumb.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
-                                                        <span class="separator">/</span>
+                                                            <div class="sub-title">
+                                                                {%- if breadcrumb.indexPath is defined -%}
+                                                                    <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
+                                                                {%- else -%}
+                                                                    {{ breadcrumb.indexLabel }}
+                                                                {%- endif -%}
+                                                            </div>
+                                                            <span class="separator">/</span>
                                                         {% endfor %}
                                                     {% endif %}
                                                     {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
@@ -75,10 +94,10 @@
                                         <ul class="inline">
                                             {% block stats %}
                                                 {% if breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.updatedAt is defined %}
-                                                    {% if  resource_granted('VIEW', breadcrumbs.entity, 'createdAt') %}
+                                                    {% if is_granted('VIEW', breadcrumbs.entity, 'createdAt') %}
                                                         <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
                                                     {% endif %}
-                                                    {% if  resource_granted('VIEW', breadcrumbs.entity, 'updatedAt') %}
+                                                    {% if is_granted('VIEW', breadcrumbs.entity, 'updatedAt') %}
                                                         <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime :  'oro.ui.empty'|trans }}</li>
                                                     {% endif %}
                                                 {% endif %}
@@ -96,10 +115,14 @@
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
                             {% if form.vars.method != 'GET' %}
+                                {% set inputAction  = form.vars.default_input_action is defined
+                                    ? form.vars.default_input_action
+                                    : constant('Oro\\Bundle\\UIBundle\\Route\\Router::ACTION_SAVE_CLOSE')
+                                %}
                                 <input
                                         type="hidden"
                                         name="input_action"
-                                        value="{{ constant('Oro\\Bundle\\UIBundle\\Route\\Router::ACTION_SAVE_CLOSE') }}"
+                                        value="{{ inputAction }}"
                                         data-form-id="{{ form.vars.id }}"
                                 />
                             {% endif %}
@@ -116,7 +139,7 @@
                                                 'entity': entity|default(form.vars.value),
                                                 'entity_class': audit_entity_class|default(null),
                                                 'id': audit_entity_id,
-                                                'title': audit_title|default(form.vars.value.__toString is defined ? form.vars.value : null),
+                                                'title': audit_title|default(form.vars.value.__toString is defined ? form.vars.value.__toString : null),
                                                 'audit_path': audit_path|default('oro_dataaudit_history'),
                                                 'audit_show_change_history': audit_show_change_history|default(false)
                                             } %}
@@ -205,7 +228,7 @@
 
                     {% set data = data|merge({'dataBlocks': dataBlocks}) %}
                 {% endif  %}
-                {{ UI.scrollData(id, data, form) }}
+                {{ UI.scrollData(id, data, entity, form) }}
             {% endblock content_data %}
         </div>
         {% block sync_content_tags %}

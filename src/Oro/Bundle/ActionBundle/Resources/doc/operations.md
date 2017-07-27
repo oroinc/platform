@@ -93,7 +93,7 @@ operations:
             demo_attr:                                              # attribute name
                 label: Demo Field                                   # attribute label
                 type: string                                        # attribute type
-                property_path: data.demo                            # (optional if label and type are set) path to entity property, which helps to automatically defined attribute metadata
+                property_path: data.demo                            # (optional if label and type are set) path to entity property, which helps to automatically defined attribute metadata, and will be mapped for that property
                 options:                                            # attribute options
                     class: \Acme\Bundle\DemoBundle\Model\MyModel    # (optional) entity class name, set if type is entity
 
@@ -177,7 +177,7 @@ from `routeCommerceUpdate` and `routeCommerceDelete` options.
 
 ### Questions and Answers
 
-####How I can disable CRUD default operation for my Bundle?
+#### How I can disable CRUD default operation for my Bundle?
 
   Suppose you need to disable default `DELETE` operation for your new entity `MyEntity`.
 Here the case which describe the way. You can do this in `actions.yml` under your bundle config resources directory:
@@ -190,7 +190,7 @@ operations:
   This will merge addition special condition to default operation during config compilation. 
 So that default operation `DELETE` will not be matched for your entity and will not be displayed as well.
 
-####Can I disable default operation for my datagrid?
+#### Can I disable default operation for my datagrid?
 
   Yes. There are two ways to do that. **The first**: you can disable operation by updating datagrid configuration in its
 section `action_configuration` you should define a key that corresponds to operation name with value `false`.
@@ -226,7 +226,7 @@ This is it.
 You can always use more different ways to define, reuse or customize operation definition. With basic merge there also
 `replace`, `extend` and `substitute_operation` options to help with different cases.
 
-####How I can modify CRUD default operation for my Bundle?
+#### How I can modify CRUD default operation for my Bundle?
   If you need to customize somehow a default (or any other) operation. Suppose to change basically its `label`, you can
 do thing like that:
  

@@ -13,9 +13,6 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * @dbIsolation
- */
 class UserCreateUpdateTest extends WebTestCase
 {
     /**

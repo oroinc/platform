@@ -9,6 +9,7 @@ use Behat\Testwork\Environment\Environment;
 use Behat\Testwork\Environment\Handler\EnvironmentHandler;
 use Behat\Testwork\Suite\Exception\SuiteConfigurationException;
 use Behat\Testwork\Suite\Suite;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class FeatureEnvironmentHandler implements EnvironmentHandler
 {
@@ -16,6 +17,11 @@ class FeatureEnvironmentHandler implements EnvironmentHandler
      * @var ContextFactory
      */
     private $factory;
+
+    /**
+     * @var KernelInterface
+     */
+    private $kernel;
 
     /**
      * @var ClassResolver[]
@@ -27,9 +33,10 @@ class FeatureEnvironmentHandler implements EnvironmentHandler
      *
      * @param ContextFactory $factory
      */
-    public function __construct(ContextFactory $factory)
+    public function __construct(ContextFactory $factory, KernelInterface $kernel)
     {
         $this->factory = $factory;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -55,11 +62,22 @@ class FeatureEnvironmentHandler implements EnvironmentHandler
      */
     public function buildEnvironment(Suite $suite)
     {
-        $environment = new InitializedContextEnvironment($suite);
+        try {
+            $this->kernel->boot();
+            $environment = new InitializedContextEnvironment($suite);
 
-        foreach ($this->getNormalizedContextSettings($suite) as $context) {
-            $context = $this->factory->createContext($this->resolveClass($context[0]), $context[1]);
-            $environment->registerContext($context);
+            foreach ($this->getNormalizedContextSettings($suite) as $context) {
+                $context = $this->factory->createContext($this->resolveClass($context[0]), $context[1]);
+                $environment->registerContext($context);
+            }
+
+            $this->kernel->shutdown();
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                sprintf('Error while build "%s" suite envirorment', $suite->getName()),
+                0,
+                $e
+            );
         }
 
         return $environment;

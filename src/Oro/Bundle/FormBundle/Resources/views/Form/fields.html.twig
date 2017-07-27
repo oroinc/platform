@@ -184,7 +184,7 @@
             {%- else -%}
                 {{ label|trans({}, translation_domain) }}
             {%- endif -%}
-            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
+             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {%- endif -%}
     {% endspaceless %}
@@ -238,6 +238,8 @@
             changeMonth: true,
             changeYear: true,
             yearRange: years|default('-80:+1'),
+            minDate: minDate,
+            maxDate: maxDate,
             showButtonPanel: true
         }
     } %}
@@ -574,7 +576,7 @@
                     module: 'oroform/js/app/components/select-create-inline-type-' ~ asyncNameSegment|default('') ~ 'component',
                     options: {
                         inputSelector: '#'~id,
-                        entityLabel: label|trans,
+                        entityLabel: label|trans({}, translation_domain),
                         urlParts: urlParts,
                         existingEntityGridId: form.vars.existing_entity_grid_id|default('id'),
                         createEnabled: form.vars.create_enabled|default(false)
@@ -603,7 +605,7 @@
 {% endblock %}
 
 {% block oro_link_type_widget %}
-    {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
+    {% if isPath or is_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
         <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
             {{ title|trans }}
         </a>
@@ -698,10 +700,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {{ UI.renderJsTree(
         {
-            'module': form.vars.pageComponentModule,
             'treeOptions': form.vars.treeOptions
-        },
-        ['expand', 'collapse']
+        }
     ) }}
 
     {{ form_widget(form) }}

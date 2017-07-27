@@ -5,10 +5,11 @@ namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 interface ReaderInterface
 {
     /**
-     * Returns data from source
+     * Returns title for current route name from source if exist
      *
-     * @param  array $routes
-     * @return array
+     * @param string $route
+     *
+     * @return string|null
      */
-    public function getData(array $routes);
+    public function getTitle($route);
 }

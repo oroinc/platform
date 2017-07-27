@@ -19,6 +19,13 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
     const FIELD_NAME = 'someExtendFieldName';
     const ENTITY_CLASS_NAME = 'Oro\Bundle\SomeBundle\Entity\SomeEntity';
 
+    const DEFAULT_EXTEND_OPTIONS = [
+        'is_extend' => true,
+        'origin' => ExtendScope::ORIGIN_CUSTOM,
+        'owner' => ExtendScope::OWNER_CUSTOM,
+        'state' => ExtendScope::STATE_NEW
+    ];
+
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     private $configManager;
 
@@ -223,12 +230,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fieldType, $resultFieldType);
         $this->assertEquals(
             [
-                'extend' => [
-                    'is_extend' => true,
-                    'origin'    => ExtendScope::ORIGIN_CUSTOM,
-                    'owner'     => ExtendScope::OWNER_CUSTOM,
-                    'state'     => ExtendScope::STATE_NEW
-                ]
+                'extend' => static::DEFAULT_EXTEND_OPTIONS
             ],
             $resultFieldOptions
         );
@@ -252,12 +254,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fieldType, $resultFieldType);
         $this->assertEquals(
             [
-                'extend'       => [
-                    'is_extend' => true,
-                    'origin' => ExtendScope::ORIGIN_CUSTOM,
-                    'owner'  => ExtendScope::OWNER_CUSTOM,
-                    'state'  => ExtendScope::STATE_NEW
-                ],
+                'extend'       => static::DEFAULT_EXTEND_OPTIONS,
                 'anotherScope' => [
                     'option1' => 'value1'
                 ]
@@ -280,12 +277,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('enum', $resultFieldType);
         $this->assertEquals(
             [
-                'extend' => [
-                    'is_extend' => true,
-                    'origin'    => ExtendScope::ORIGIN_CUSTOM,
-                    'owner'     => ExtendScope::OWNER_CUSTOM,
-                    'state'     => ExtendScope::STATE_NEW
-                ],
+                'extend' => static::DEFAULT_EXTEND_OPTIONS,
                 'enum' => [
                     'enum_code' => 'some_enum_code'
                 ]
@@ -308,12 +300,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('multiEnum', $resultFieldType);
         $this->assertEquals(
             [
-                'extend' => [
-                    'is_extend' => true,
-                    'origin'    => ExtendScope::ORIGIN_CUSTOM,
-                    'owner'     => ExtendScope::OWNER_CUSTOM,
-                    'state'     => ExtendScope::STATE_NEW
-                ],
+                'extend' => static::DEFAULT_EXTEND_OPTIONS,
                 'enum' => [
                     'enum_code' => 'some_enum_code'
                 ]
@@ -351,7 +338,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'owner'         => ExtendScope::OWNER_CUSTOM,
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'oneToMany|Test\Entity|Test\TargetEntity|owningSideField',
-                    'target_entity' => 'Test\TargetEntity'
+                    'target_entity' => 'Test\TargetEntity',
                 ]
             ],
             $resultFieldOptions
@@ -387,7 +374,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'owner'         => ExtendScope::OWNER_CUSTOM,
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'manyToOne|Test\Entity|Test\TargetEntity|owningSideField',
-                    'target_entity' => 'Test\TargetEntity'
+                    'target_entity' => 'Test\TargetEntity',
                 ]
             ],
             $resultFieldOptions
@@ -437,6 +424,23 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($configProvider);
 
         $this->assertEquals($entityConfig, $this->configHelper->getEntityConfig($entityConfigModel, $scope));
+    }
+
+    public function testGetNonExtendedEntitiesClasses()
+    {
+        $entitiesConfig = [
+            $this->getEntityConfig('extended_1', ['is_extend' => true]),
+            $this->getEntityConfig('extended_2', ['is_extend' => true]),
+            $this->getEntityConfig('not_extended_1', ['is_extend' => false]),
+            $this->getEntityConfig('not_extended_2', ['is_extend' => false]),
+        ];
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('getConfigs')
+            ->willReturn($entitiesConfig);
+
+        $this->assertEquals(['not_extended_1', 'not_extended_2'], $this->configHelper->getNonExtendedEntitiesClasses());
     }
 
     private function expectsGetClassNameAndFieldName()

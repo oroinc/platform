@@ -1,51 +1,48 @@
 <?php
+
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Twig;
 
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldBeConstructed()
+    use TwigExtensionTestCaseTrait;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $router;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
+
+    /** @var BackLinkExtension */
+    protected $extension;
+
+    protected function setUp()
     {
-        $this->createBackLinkExtension();
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+
+        $container = self::getContainerBuilder()
+            ->add('router', $this->router)
+            ->add('translator', $this->translator)
+            ->getContainer($this);
+
+        $this->extension = new BackLinkExtension($container);
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnName()
+    public function testShouldReturnName()
     {
         $this->assertEquals(
             'oro_embedded_form_back_link_extension',
-            $this->createBackLinkExtension()->getName()
+            $this->extension->getName()
         );
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnTwigFilter()
-    {
-        $extension = $this->createBackLinkExtension();
-        $filters = $extension->getFilters();
-
-        $this->assertCount(1, $filters);
-
-        $backLinkFilter = $filters[0];
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $backLinkFilter);
-
-        $this->assertEquals('back_link', $backLinkFilter->getName());
-        $this->assertSame([$extension, 'backLinkFilter'], $backLinkFilter->getCallable());
-    }
-
-    /**
-     * @test
-     */
-    public function shouldReplacePlaceholderWithProvidedUrlAndLinkText()
+    public function testShouldReplacePlaceholderWithProvidedUrlAndLinkText()
     {
         $id = uniqid('id');
         $url = uniqid('url');
@@ -54,26 +51,22 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
         $originalString = 'Before link {back_link|' . $text . '} After link';
         $expectedString = 'Before link <a href="' . $url . '">' . $translatedText . '</a> After link';
 
-        $router = $this->createMock('Symfony\Component\Routing\Router');
-        $router->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
             ->will($this->returnValue($url));
-
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with($text)
             ->will($this->returnValue($translatedText));
 
-        $extension = $this->createBackLinkExtension($router, $translator);
         $this->assertEquals(
             $expectedString,
-            $extension->backLinkFilter($originalString, $id)
+            self::callTwigFilter($this->extension, 'back_link', [$originalString, $id])
         );
     }
 
-    public function shouldReplacePlaceholderWithReloadLinkAndLinkText()
+    public function testShouldReplacePlaceholderWithReloadLinkAndLinkText()
     {
         $text = uniqid('text');
         $translatedText = uniqid('translatedText');
@@ -83,78 +76,46 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
                         . '</a>';
         $expectedString = 'Before link ' . $expectedLink . ' After link';
 
-        $router = $this->createMock('Symfony\Component\Routing\Router');
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with($text)
+            ->will($this->returnValue($translatedText));
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->once())
-                   ->method('trans')
-                   ->with($text)
-                   ->will($this->returnValue($translatedText));
-
-        $extension = $this->createBackLinkExtension($router, $translator);
         $this->assertEquals(
             $expectedString,
-            $extension->backLinkFilter($originalString, null)
+            self::callTwigFilter($this->extension, 'back_link', [$originalString, null])
         );
     }
 
-    /**
-     * @test
-     */
-    public function shouldReplacePlaceholderWithProvidedUrlAndDefaultLinkText()
+    public function testShouldReplacePlaceholderWithProvidedUrlAndDefaultLinkText()
     {
         $id = uniqid('id');
         $url = uniqid('url');
         $originalString = 'Before link {back_link} After link';
         $expectedString = 'Before link <a href="' . $url . '">Back</a> After link';
 
-        $router = $this->createMock('Symfony\Component\Routing\Router');
-        $router->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
             ->will($this->returnValue($url));
-
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('oro.embeddedform.back_link_default_text')
             ->will($this->returnValue('Back'));
 
-        $extension = $this->createBackLinkExtension($router, $translator);
         $this->assertEquals(
             $expectedString,
-            $extension->backLinkFilter($originalString, $id)
+            self::callTwigFilter($this->extension, 'back_link', [$originalString, $id])
         );
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnOriginalStringWhenNoPlaceholderProvided()
+    public function testShouldReturnOriginalStringWhenNoPlaceholderProvided()
     {
         $originalString = uniqid('any string');
 
-        $extension = $this->createBackLinkExtension();
         $this->assertEquals(
             $originalString,
-            $extension->backLinkFilter($originalString, uniqid('id'))
+            self::callTwigFilter($this->extension, 'back_link', [$originalString, uniqid('id')])
         );
-    }
-
-    /**
-     * @param $router
-     * @param $translator
-     * @return BackLinkExtension
-     */
-    protected function createBackLinkExtension($router = null, $translator = null)
-    {
-        if (!$router) {
-            $router = $this->createMock('Symfony\Component\Routing\Router');
-        }
-        if (!$translator) {
-            $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        }
-
-        return new BackLinkExtension($router, $translator);
     }
 }

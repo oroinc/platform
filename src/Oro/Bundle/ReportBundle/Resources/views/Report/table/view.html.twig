@@ -5,13 +5,13 @@
 {% set pageTitle = entity.name %}
 
 {% block navButtons %}
-    {% if isDesktopVersion() and resource_granted('EDIT', entity) %}
+    {% if isDesktopVersion() and is_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path': path('oro_report_update', {'id': entity.id}),
             'entity_label': 'oro.report.entity_label'|trans
         }) }}
     {% endif %}
-    {% if isDesktopVersion() and resource_granted('DELETE', entity) %}
+    {% if isDesktopVersion() and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_report', {'id': entity.id}),
             'dataRedirect': path('oro_report_index'),
@@ -33,6 +33,12 @@
     {{ parent() }}
 {% endblock pageHeader %}
 
+{% block after_breadcrumbs %}
+    <div class="pull-left">
+        <div class="grid-views-holder"></div>
+    </div>
+{% endblock %}
+
 {% block content_data %}
     {% if gridName is defined %}
         {% if chartView is defined %}
@@ -42,11 +48,12 @@
         {% endif %}
         {% set renderParams = renderParams|default({})|merge({
             enableFullScreenLayout: true,
-            enableViews: false
+            enableViews: true,
+            showViewsInCustomElement: '.page-title > .navbar-extra .pull-left-extra .grid-views-holder'
         }) %}
         {% set gridParams =  {
-            '_grid_view': {'_disabled': true},
-            '_tags'     : {'_disabled': true}
+            '_grid_view': {},
+            '_tags'     : {'_disabled': true},
         } %}
         {% if oro_config_value('oro_report.display_sql_query') %}
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}

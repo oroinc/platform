@@ -41,6 +41,14 @@ class FormAccessor extends AbstractFormAccessor
      */
     public function toString()
     {
+        return 'name:' . $this->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
         return $this->hash;
     }
 }

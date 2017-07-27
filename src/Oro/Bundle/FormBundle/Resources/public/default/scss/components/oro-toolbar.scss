@@ -1,3 +1,5 @@
+// @theme: default;
+
 .oro-toolbar {
     position: relative;
 
@@ -8,17 +10,17 @@
         display: inline-block;
         vertical-align: top;
 
-        margin-left: 3px;
+        margin-left: $oro-toolbar-icon-offset;
     }
 
     &__content {
         min-width: $oro-toolbar-content-min-width;
 
-        padding: 0 $offset-y-m;
+        padding: $oro-toolbar-content-inner-offset;
 
-        line-height: ($base-font-size - 0.1) * 2;
-        font-family: $bae-font-minor;
-        text-align: center;
+        line-height: $oro-toolbar-content-line-height;
+        font-family: $oro-toolbar-content-font-family;
+        text-align: $oro-toolbar-content-text-align;
 
         cursor: pointer;
     }
@@ -29,12 +31,10 @@
         right: 0;
         left: auto;
         margin: 0;
-        padding: 10px 15px;
-
-        z-index: 80;
+        padding: $oro-toolbar-dropdown-inner-offset;
+        z-index: $oro-toolbar-dropdown-z-index;
 
         display: none;
-
         min-width: $oro-toolbar-toolbar-min-width;
 
         font-size: $base-font-size;
@@ -53,7 +53,7 @@
 
 
         &-item {
-            margin-top: 2px;
+            margin-top: $oro-toolbar-list-item-offset;
 
             &:first-child {
                 margin-top: 0;
@@ -96,6 +96,23 @@
 
         .oro-toolbar__dropdown {
             display: block;
+        }
+    }
+
+    // toolbar in fullscreen popup
+    &.fullscreen-mode {
+        display: block;
+
+        .oro-toolbar__list-item {
+            margin-top: 0
+        }
+
+        .oro-toolbar__link {
+            padding: 8px 16px;
+
+            text-transform: uppercase;
+
+            border-bottom: 1px solid get-color('additional', 'light');
         }
     }
 }

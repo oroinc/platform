@@ -1,14 +1,18 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './abstract-filter',
-    'orofilter/js/multiselect-decorator',
-    'oroui/js/app/views/loading-mask-view'
-], function($, _, __, AbstractFilter, MultiselectDecorator, LoadingMaskView) {
+define(function(require) {
     'use strict';
 
     var SelectFilter;
+    var template = require('tpl!orofilter/templates/filter/select-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var AbstractFilter = require('./abstract-filter');
+    var MultiselectDecorator = require('orofilter/js/multiselect-decorator');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var module = require('module');
+
+    var config = _.extend({
+        populateDefault: true
+    },  module.config());
 
     /**
      * Select filter: filter value as select option
@@ -23,6 +27,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#select-filter-template',
 
         /**
@@ -30,7 +35,7 @@ define([
          *
          * @property
          */
-        populateDefault: true,
+        populateDefault: config.populateDefault,
 
         /**
          * Selector for filter area
@@ -177,7 +182,7 @@ define([
         render: function() {
             var options = this.choices.slice(0);
             if (this.populateDefault) {
-                options.unshift({value: '', label: this.placeholder});
+                options.unshift({value: '', label: this.placeholder || this.populateDefault});
             }
 
             var html = this.template({
@@ -239,6 +244,9 @@ define([
                         collision: 'fit none',
                         within: $dropdownContainer
                     },
+                    beforeopen: _.bind(function() {
+                        this.selectWidget.onBeforeOpenDropdown();
+                    }, this),
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this.trigger('showCriteria', this);
@@ -256,7 +264,8 @@ define([
                             }
                         }, this), 100);
                     }, this),
-                    appendTo: this.dropdownContainer
+                    appendTo: this.dropdownContainer,
+                    refreshNotOpened: this.templateTheme !== ''
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });

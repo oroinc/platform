@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -14,23 +13,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroSearchExtension extends Extension
 {
-    /**
-     * Merge strategy.
-     */
-    const STRATEGY_APPEND = 'append';
-    const STRATEGY_REPLACE = 'replace';
-
     const SEARCH_FILE_ROOT_NODE = 'search';
-
-    /**
-     * Default merge strategy params
-     *
-     * @var array $optionsToMerge
-     */
-    protected $mergeOptions = [
-        'title_fields' => self::STRATEGY_REPLACE,
-        'fields' => self::STRATEGY_APPEND
-    ];
 
     /**
      * @param  array $configs
@@ -40,33 +23,19 @@ class OroSearchExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         // load entity search configuration from search.yml files
-        $configPart = [];
         $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search.yml');
         $configurationLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
         $engineResources = $configurationLoader->load($container);
 
+        $entitiesConfigPart = [];
         foreach ($engineResources as $resource) {
-            if (!isset($resource->data[self::SEARCH_FILE_ROOT_NODE])
-                || !is_array($resource->data[self::SEARCH_FILE_ROOT_NODE])
-            ) {
-                continue;
-            }
-            foreach ($resource->data[self::SEARCH_FILE_ROOT_NODE] as $key => $value) {
-                if (isset($configPart[$key])) {
-                    $firstConfig = $configPart[$key];
-                    $configPart[$key] = $this->mergeConfig($firstConfig, $value);
-                } else {
-                    $configPart[$key] = $value;
-                }
-            }
+            $entitiesConfigPart[] = $resource->data[self::SEARCH_FILE_ROOT_NODE];
         }
 
-        // merge entity configuration with main configuration
-        if (isset($configs[0]['entities_config'])) {
-            $configs[0]['entities_config'] = array_merge($configPart, $configs[0]['entities_config']);
-        } else {
-            $configs[0]['entities_config'] = $configPart;
-        }
+        // Process and merge configuration for entities_config section
+        $processedEntitiesConfig = $this->processConfiguration(new EntitiesConfigConfiguration(), $entitiesConfigPart);
+
+        $configs = $this->mergeConfigs($configs, $processedEntitiesConfig);
 
         // parse and validate configuration
         $config = $this->processConfiguration(new Configuration(), $configs);
@@ -75,7 +44,7 @@ class OroSearchExtension extends Extension
         $container->setParameter('oro_search.engine', $config['engine']);
         $container->setParameter('oro_search.engine_parameters', $config['engine_parameters']);
         $container->setParameter('oro_search.log_queries', $config['log_queries']);
-        $this->setEntitiesConfigParameter($container, $config['entities_config']);
+        $this->setEntitiesConfigParameter($container, $config[EntitiesConfigConfiguration::ROOT_NODE]);
         $container->setParameter('oro_search.twig.item_container_template', $config['item_container_template']);
 
         // load engine specific and general search services
@@ -93,65 +62,23 @@ class OroSearchExtension extends Extension
     }
 
     /**
-     * Merge configs data
-     * By default used replace strategy:
-     * - fields data from first config will replaced with data from second config
-     * - new fields will be added
-     * Complex config fields provided as array will be merged using replace or append strategy
-     * according to merge options
-     *
-     * @param array $firstConfig
-     * @param array $secondConfig
+     * @param array $configs
+     * @param array $processedEntitiesConfig
      * @return array
-     * @deprecated Since 1.9, will be removed after 1.11.
-     *
-     * @todo: it is a temporary workaround to add ability to merge configs until improvement BAP-10010 is implemented
      */
-    public function mergeConfig(array $firstConfig, array $secondConfig)
+    protected function mergeConfigs(array $configs, array $processedEntitiesConfig)
     {
-        foreach ($secondConfig as $nodeName => $value) {
-            if (!array_key_exists($nodeName, $firstConfig)) {
-                $firstConfig[$nodeName] = $value;
-            } else {
-                if (is_array($value)) {
-                    if ($this->getStrategy($nodeName) === self::STRATEGY_APPEND) {
-                        $mergedArray = ArrayUtil::arrayMergeRecursiveDistinct($firstConfig[$nodeName], $value);
-                        $firstConfig[$nodeName] = array_unique($mergedArray, SORT_REGULAR);
-                    } else {
-                        $firstConfig[$nodeName] = $value;
-                    }
-                } else {
-                    $firstConfig[$nodeName] = $value;
-                }
-            }
+        // replace configuration from bundles by configuration from mail config file
+        if (isset($configs[Configuration::ROOT_NODE][EntitiesConfigConfiguration::ROOT_NODE])) {
+            $configs[Configuration::ROOT_NODE][EntitiesConfigConfiguration::ROOT_NODE] = array_merge(
+                $processedEntitiesConfig,
+                $configs[Configuration::ROOT_NODE][EntitiesConfigConfiguration::ROOT_NODE]
+            );
+        } else {
+            $configs[Configuration::ROOT_NODE][EntitiesConfigConfiguration::ROOT_NODE] = $processedEntitiesConfig;
         }
 
-        return $firstConfig;
-    }
-
-    /**
-     * Merge strategy getter.
-     *
-     * @param string $fieldName
-     * @return string
-     */
-    public function getStrategy($fieldName)
-    {
-        if (array_key_exists($fieldName, $this->mergeOptions)) {
-            return $this->mergeOptions[$fieldName];
-        }
-
-        return $this->getDefaultStrategy();
-    }
-
-    /**
-     * Default merge Strategy getter.
-     *
-     * @return string
-     */
-    public function getDefaultStrategy()
-    {
-        return self::STRATEGY_REPLACE;
+        return $configs;
     }
 
     /**

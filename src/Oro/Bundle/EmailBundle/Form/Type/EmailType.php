@@ -7,7 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
@@ -16,18 +17,17 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailType extends AbstractType
 {
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /**
-     * @var EmailRenderer
-     */
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
+
+    /** @var EmailRenderer */
     protected $emailRenderer;
 
     /** @var EmailModelBuilderHelper */
@@ -37,18 +37,21 @@ class EmailType extends AbstractType
     protected $configManager;
 
     /**
-     * @param SecurityContextInterface $securityContext
-     * @param EmailRenderer $emailRenderer
-     * @param EmailModelBuilderHelper $emailModelBuilderHelper
-     * @param ConfigManager $configManager
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param EmailRenderer                 $emailRenderer
+     * @param EmailModelBuilderHelper       $emailModelBuilderHelper
+     * @param ConfigManager                 $configManager
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         EmailRenderer $emailRenderer,
         EmailModelBuilderHelper $emailModelBuilderHelper,
         ConfigManager $configManager
     ) {
-        $this->securityContext = $securityContext;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
         $this->emailRenderer = $emailRenderer;
         $this->emailModelBuilderHelper = $emailModelBuilderHelper;
         $this->configManager = $configManager;
@@ -67,7 +70,11 @@ class EmailType extends AbstractType
             ->add('entityId', 'hidden', ['required' => false])
             ->add(
                 'from',
-                'oro_email_email_address_from',
+                'hidden'
+            )
+            ->add(
+                'origin',
+                'oro_email_email_origin_from',
                 [
                     'required' => true,
                     'label' => 'oro.email.from_email_address.label',
@@ -133,6 +140,9 @@ class EmailType extends AbstractType
                 'required' => false,
                 'allow_add' => true,
                 'prototype' => false,
+                'constraints' => [
+                    new Valid()
+                ],
                 'options' => [
                     'required' => false,
                 ],
@@ -147,7 +157,7 @@ class EmailType extends AbstractType
                     'collectionModel' => true,
                     'error_bubbling'  => false,
                     'tooltip'   => 'oro.email.contexts.tooltip',
-                    'read_only' => !$this->securityContext->isGranted(
+                    'read_only' => !$this->authorizationChecker->isGranted(
                         'EDIT',
                         'entity:Oro\Bundle\EmailBundle\Entity\EmailUser'
                     ),
@@ -180,12 +190,15 @@ class EmailType extends AbstractType
             return;
         }
 
+        if (is_array($data) && isset($data['origin'])) {
+            $value = $data['origin'];
+            $values =  explode('|', $value);
+            $data['from'] = $values[1];
+            $event->setData($data);
+        }
+
         $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $form = $event->getForm();
-
-        /** @var UsernamePasswordOrganizationToken $token */
-        $token        = $this->securityContext->getToken();
-        $organization = $token->getOrganizationContext();
 
         FormUtils::replaceField(
             $form,
@@ -193,11 +206,12 @@ class EmailType extends AbstractType
             [
                 'selectedEntity' => $entityClass,
                 'query_builder'  =>
-                    function (EmailTemplateRepository $templateRepository) use (
-                        $entityClass,
-                        $organization
-                    ) {
-                        return $templateRepository->getEntityTemplatesQueryBuilder($entityClass, $organization, true);
+                    function (EmailTemplateRepository $templateRepository) use ($entityClass) {
+                        return $templateRepository->getEntityTemplatesQueryBuilder(
+                            $entityClass,
+                            $this->tokenAccessor->getOrganization(),
+                            true
+                        );
                     },
             ],
             ['choice_list', 'choices']
@@ -244,7 +258,6 @@ class EmailType extends AbstractType
                 'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
                 'intention'          => 'email',
                 'csrf_protection'    => true,
-                'cascade_validation' => true,
             ]
         );
     }

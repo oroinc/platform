@@ -40,6 +40,8 @@ class Query
     const OPERATOR_STARTS_WITH         = 'starts_with';
     const OPERATOR_EXISTS              = 'exists';
     const OPERATOR_NOT_EXISTS          = 'notexists';
+    const OPERATOR_LIKE                = 'like';
+    const OPERATOR_NOT_LIKE            = 'notlike';
 
     const TYPE_TEXT     = 'text';
     const TYPE_INTEGER  = 'integer';
@@ -232,6 +234,7 @@ class Query
      * Add "WHERE" parameter
      *
      * @deprecated Since 1.8 use criteria to add conditions
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * @param string $keyWord
      * @param string $fieldName
@@ -247,6 +250,12 @@ class Query
         $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldName);
 
         switch ($condition) {
+            case self::OPERATOR_LIKE:
+                $expr = $expr->like($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_NOT_LIKE:
+                $expr = $expr->notLike($fieldName, $fieldValue);
+                break;
             case self::OPERATOR_CONTAINS:
                 $expr = $expr->contains($fieldName, $fieldValue);
                 break;
@@ -474,11 +483,21 @@ class Query
      */
     public static function clearString($inputString)
     {
+        /**
+         * Replace all not not supported characters with whitespaces to support both MyISAM and InnoDB
+         *
+         * /[^\p{L}\d\s]/u <- returns all characters that are not:
+         * p{L} <- letter in any unicode language
+         * \d <- digit
+         * \s <- whitespace
+         *
+         * /[\s]{2,}/ <-- returns all multi-spaces
+         */
         $string = trim(
             preg_replace(
-                '/ +/',
+                '/[\s]{2,}/',
                 self::DELIMITER,
-                preg_replace('/[^\w:*@.]/u', self::DELIMITER, $inputString)
+                preg_replace('/[^\p{L}\d\s]/u', self::DELIMITER, $inputString)
             )
         );
 
@@ -566,7 +585,7 @@ class Query
         $result  = [];
 
         foreach ($this->select as $select) {
-            list ($fieldType, $fieldName) = Criteria::explodeFieldTypeName($select);
+            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($select);
             if (isset($aliases[$fieldName])) {
                 $resultName = $aliases[$fieldName];
             } elseif (isset($aliases[$select])) {

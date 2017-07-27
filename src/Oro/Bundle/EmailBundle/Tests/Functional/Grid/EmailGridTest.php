@@ -5,9 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Functional\AbstractDatagridTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class EmailGridTest extends AbstractDatagridTestCase
 {
     const AUTH_USER = 'simple_user';
@@ -63,7 +60,7 @@ class EmailGridTest extends AbstractDatagridTestCase
                         'gridName' => 'user-email-grid'
                     ],
                     'gridFilters' => [
-                        'user-email-grid[_filter][to][value]' => 'admin',
+                        'user-email-grid[_filter][from][value]' => 'admin',
                     ],
                     'assert' => [],
                     'expectedResultCount' => 0,

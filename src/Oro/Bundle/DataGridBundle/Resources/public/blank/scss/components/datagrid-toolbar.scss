@@ -1,0 +1,157 @@
+// @theme: blank;
+
+.datagrid-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+    justify-content: center;
+
+    margin: 10px 0;
+    padding: 0;
+
+    &__side,
+    &__rightside {
+        display: flex;
+        flex: 1 0 200px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    &__rightside {
+        justify-content: flex-end;
+    }
+
+    &__base {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+    }
+
+    &__panel {
+        width: 100%;
+    }
+
+    &.extended {
+        .datagrid-tool {
+            flex-grow: 0;
+
+            &:first-child {
+                position: relative;
+
+                flex-grow: 1;
+            }
+        }
+    }
+
+    &--offset {
+        &-s {
+            margin: $offset-y-s 0;
+        }
+    }
+
+    &.simplistic {
+        .datagrid-tool {
+            flex-grow: 1;
+
+            &:first-child {
+                flex-grow: 3;
+            }
+        }
+    }
+
+    .page-size {
+        flex-grow: 0;
+
+        .select2-container {
+            min-width: 64px;
+        }
+
+        .select {
+            min-width: 64px;
+        }
+    }
+
+}
+
+.datagrid-tool {
+    margin: 3px 5px 3px 0;
+
+    &:not(:first-child) {
+        margin-left: $offset-x-s;
+    }
+
+    &:first-child {
+        position: relative;
+    }
+
+    &:last-child {
+        flex-grow: 0;
+    }
+}
+
+@include breakpoint('desktop') {
+    .datagrid-toolbar {
+        &.simplistic {
+            .datagrid-tool {
+                &:first-child {
+                    flex-basis: 100%;
+                    margin: 0 0 10px;
+                }
+            }
+        }
+    }
+}
+
+@include breakpoint('tablet') {
+    .datagrid-toolbar {
+        &.extended {
+            .datagrid-tool {
+                &:last-child {
+                    flex-basis: auto;
+                }
+            }
+        }
+
+        .grid-toolbar-mass-actions {
+            order: 3;
+            flex-basis: calc(100% - 138px);
+            margin: 0 0 10px;
+
+            text-align: right;
+        }
+    }
+}
+
+@include breakpoint('mobile-landscape') {
+    .form-horizontal { //Platform override
+        .oro-items-counter {
+            display: none;
+        }
+    }
+}
+
+@include breakpoint('mobile') {
+    .datagrid-toolbar {
+        justify-content: space-between;
+
+        &__side,
+        &__rightside {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+
+            min-width: 0;
+        }
+
+        &__rightside {
+            margin-left: auto;
+        }
+    }
+
+    .grid-toolbar {
+        justify-content: space-between;
+
+        .action-selectbox_custom_in-pager {
+            margin-right: $offset-x-s;
+        }
+    }
+}

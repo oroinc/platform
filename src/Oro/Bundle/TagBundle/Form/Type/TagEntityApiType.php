@@ -33,8 +33,6 @@ class TagEntityApiType extends AbstractType
         $resolver->setDefaults(
             [
                 'error_bubbling'       => false,
-                'cascade_validation'   => true,
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
             ]
         );
     }

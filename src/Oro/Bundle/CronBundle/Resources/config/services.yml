@@ -7,6 +7,7 @@ services:
         class: '%oro_cron.schedule_manager.class%'
         arguments:
             - '@doctrine'
+            - '@oro_cron.filter.schedules_by_arguments'
             - '%oro_cron.entity.schedule.class%'
 
     oro_cron.deferred_scheduler:
@@ -14,6 +15,7 @@ services:
         arguments:
             - '@oro_cron.schedule_manager'
             - '@doctrine'
+            - '@oro_cron.filter.schedules_by_arguments'
             - '%oro_cron.entity.schedule.class%'
 
     oro_cron.command_args_tokenizer:
@@ -52,6 +54,15 @@ services:
     oro_cron.async.command_runner_message_processor:
         class: Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor
         arguments:
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_cron.async.command_runner_processor:
+        class: Oro\Bundle\CronBundle\Async\CommandRunnerProcessor
+        arguments:
             - '@oro_cron.engine.command_runner'
             - '@oro_message_queue.job.runner'
             - '@logger'
@@ -67,3 +78,37 @@ services:
         class: Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener
         tags:
             - {name: doctrine.event_listener, event: onSchemaColumnDefinition, method: onSchemaColumnDefinition}
+
+    oro_cron.repository.schedule:
+        class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
+        factory: ['@doctrine', getRepository]
+        arguments:
+            - 'Oro\Bundle\CronBundle\Entity\Schedule'
+        calls:
+            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
+
+    oro_cron.configuration.feature_configuration_extension:
+        class: Oro\Bundle\CronBundle\Configuration\FeatureConfigurationExtension
+        tags:
+            - { name: oro_feature.config_extension }
+
+    oro_cron.filter.schedules_by_arguments:
+        class: 'Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilter'
+
+    oro_cron.validator.schedule_intervals_intersection:
+        class: 'Oro\Bundle\CronBundle\Validator\Constraints\ScheduleIntervalsIntersectionValidator'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_cron_schedule_intervals_intersection_validator }
+
+    oro_cron.form.type.schedule_interval:
+        class: 'Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType'
+        tags:
+            - { name: form.type, alias: oro_cron_schedule_interval }
+
+    oro_cron.form.type.schedule_intervals_collection:
+        class: 'Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalsCollectionType'
+        tags:
+            - { name: form.type, alias: oro_cron_schedule_intervals_collection }
+
+    oro_cron.checker.schedule_interval_checker:
+        class: Oro\Bundle\CronBundle\Checker\ScheduleIntervalChecker

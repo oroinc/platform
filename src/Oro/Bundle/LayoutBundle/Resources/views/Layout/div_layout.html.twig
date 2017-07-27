@@ -125,6 +125,15 @@
     {% endspaceless %}
 {%- endblock %}
 
+{% block page_title_widget -%}
+    {% spaceless %}
+        {% set value = value|block_text(translation_domain) %}
+        {% if value|length %}
+            {{ value }}
+        {% endif %}
+    {% endspaceless %}
+{%- endblock %}
+
 {% block meta_widget %}
     {% if charset is defined %}
         {% set attr = attr|merge({
@@ -350,6 +359,12 @@
     {% if type is defined %}
         {% set attr = attr|merge({
             type: type
+        }) %}
+    {% endif %}
+
+    {% if hreflang is defined %}
+        {% set attr = attr|merge({
+        hreflang: hreflang
         }) %}
     {% endif %}
 

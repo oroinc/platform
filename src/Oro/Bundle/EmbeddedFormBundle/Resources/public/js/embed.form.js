@@ -59,12 +59,7 @@ var ORO = (function(ORO) {
         show: function() {
             this.ajax(this.options.url, {
                 method: 'GET',
-                success: this.renderForm,
-                error: function(xhr, statusText) {
-                    if (console) {
-                        console.error(statusText);
-                    }
-                }
+                success: this.renderForm
             });
         },
 
@@ -87,12 +82,7 @@ var ORO = (function(ORO) {
             this.ajax(this.options.url, {
                 method: 'POST',
                 data: new FormData(e.target),
-                success: this.renderForm,
-                error: function(xhr, statusText) {
-                    if (console) {
-                        console.error(statusText);
-                    }
-                }
+                success: this.renderForm
             });
         }
     };

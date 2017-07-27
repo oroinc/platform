@@ -1,3 +1,7 @@
+@ticket-BAP-10956
+@automatically-ticket-tagged
+@skip
+# unskip after OPI-86 will resolved
 Feature: User Notes
   In order to have ability to manage notes
   As OroCRM sales rep
@@ -11,7 +15,7 @@ Scenario: Add note to user entity
   And I check "Notes"
   When I save and close form
   And click update schema
-  Then I should see "Schema updated" flash message
+  Then I should see Schema updated flash message
 
 Scenario: Add note
   Given the following user:
@@ -48,4 +52,4 @@ Scenario: Edit note in view page
 Scenario: Delete note
   When I click "Delete note" on "Very good actor" in activity list
   And press "Yes, Delete"
-  Then there is no records in activity list
+  Then I see no records in activity list

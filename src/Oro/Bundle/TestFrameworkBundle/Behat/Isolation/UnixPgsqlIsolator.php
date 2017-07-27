@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
     const TIMEOUT = 120;
+    const DROPDB = 'PGPASSWORD="%s" dropdb --host=%s --port=%s --username=%s %s';
+    const CREATEDB = 'PGPASSWORD="%s" createdb --host=%s --port=%s --username=%s --owner=%s --template=%s %s';
 
     /** @var string */
     protected $dbHost;
@@ -28,18 +29,13 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     protected $dbName;
 
     /** @var string */
-    protected $dbTempName;
-
-    /** @var string */
     protected $dbPass;
 
     /** @var string */
     protected $dbUser;
 
-    /**
-     * @var string full path to DB dump file
-     */
-    protected $dbDump;
+    /** @var string */
+    protected $dbTemp;
 
     /**
      * @param KernelInterface $kernel
@@ -54,7 +50,6 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
         $this->dbName = $container->getParameter('database_name');
         $this->dbUser = $container->getParameter('database_user');
         $this->dbPass = $container->getParameter('database_password');
-        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName;
     }
 
     /** {@inheritdoc} */
@@ -62,7 +57,7 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     {
         return
             self::isApplicableOS()
-            && 'pdo_pgsql' === $container->getParameter('database_driver');
+            && DatabaseDriverInterface::DRIVER_POSTGRESQL === $container->getParameter('database_driver');
     }
 
     /** {@inheritdoc} */
@@ -86,6 +81,11 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
+        if (!$this->dbTemp) {
+            return;
+        }
+
+        $event->writeln('<info>Restore database from dump</info>');
         $this->dropDb();
         $this->restoreDbFromDump();
     }
@@ -93,33 +93,56 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
     {
+        if (!$this->dbTemp) {
+            return;
+        }
+
         $event->writeln('<info>Remove Db dump</info>');
-        unlink($this->dbDump);
+        $this->dropTempDb();
     }
 
     /** {@inheritdoc} */
     public function restoreState(RestoreStateEvent $event)
     {
-        if (false === is_file($this->dbDump)) {
-            throw new RuntimeException('Can\'t restore Db without sql dump');
+        if (!$this->dbTemp) {
+            return;
         }
 
         $event->writeln('<info>Begin to restore the state of Db...</info>');
 
         $event->writeln('<info>Drop Db</info>');
         $this->dropDb();
+
         $event->writeln('<info>Restore Db from dump</info>');
         $this->restoreDbFromDump();
-        $event->writeln('<info>Remove Db dump</info>');
 
-        unlink($this->dbDump);
+        $event->writeln('<info>Remove Db dump</info>');
+        $this->dropTempDb();
+
         $event->writeln('<info>Db was restored from dump</info>');
     }
 
     /** {@inheritdoc} */
     public function isOutdatedState()
     {
-        return is_file($this->dbDump);
+        if (!$this->dbTemp) {
+            return false;
+        }
+
+        try {
+            $this->makeDump();
+            $this->dropTempDb();
+
+            return false;
+        } catch (ProcessFailedException $e) {
+            return true;
+        }
+    }
+
+    /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
     }
 
     /** {@inheritdoc} */
@@ -152,17 +175,28 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
 
     protected function dropDb()
     {
+        $this->killConnections();
+
         $process = sprintf(
-            'PGPASSWORD="%s" psql -h %s -U %s %s -t -c "'.
-            'select \'drop table \"\' || tablename || \'\" cascade;\' from pg_tables where schemaname=\'public\'"'.
-            '| psql -h %s -U %s %s',
+            self::DROPDB,
             $this->dbPass,
             $this->dbHost,
-            $this->dbUser,
-            $this->dbName,
-            $this->dbHost,
+            $this->dbPort,
             $this->dbUser,
             $this->dbName
+        );
+        $this->runProcess($process);
+    }
+
+    protected function dropTempDb()
+    {
+        $process = sprintf(
+            self::DROPDB,
+            $this->dbPass,
+            $this->dbHost,
+            $this->dbPort,
+            $this->dbUser,
+            $this->dbTemp
         );
         $this->runProcess($process);
     }
@@ -170,13 +204,17 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     protected function restoreDbFromDump()
     {
+        $this->killConnections();
+
         $process = sprintf(
-            'PGPASSWORD="%s" psql -h %s -U %s %s < %s',
+            self::CREATEDB,
             $this->dbPass,
             $this->dbHost,
+            $this->dbPort,
             $this->dbUser,
-            $this->dbName,
-            $this->dbDump
+            $this->dbUser,
+            $this->dbTemp,
+            $this->dbName
         );
         $this->runProcess($process);
     }
@@ -184,13 +222,35 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     protected function makeDump()
     {
-        $this->runProcess(sprintf(
-            'PGPASSWORD="%s" pg_dump -h %s -U %s %s > %s',
+        $this->dbTemp = $this->dbName.TokenGenerator::generateToken('db');
+
+        $this->killConnections();
+
+        $process = sprintf(
+            self::CREATEDB,
             $this->dbPass,
             $this->dbHost,
+            $this->dbPort,
+            $this->dbUser,
             $this->dbUser,
             $this->dbName,
-            $this->dbDump
-        ));
+            $this->dbTemp
+        );
+        $this->runProcess($process);
+    }
+
+    private function killConnections()
+    {
+        $process = sprintf(
+            'PGPASSWORD="%s" psql -h %s --port=%s -U %s template1 -t -c "'.
+            'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname in (\'%s\', \'%s\')"',
+            $this->dbPass,
+            $this->dbHost,
+            $this->dbPort,
+            $this->dbUser,
+            $this->dbName,
+            $this->dbTemp
+        );
+        $this->runProcess($process);
     }
 }

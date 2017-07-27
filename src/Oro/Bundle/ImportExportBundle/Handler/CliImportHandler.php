@@ -7,7 +7,6 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class CliImportHandler extends AbstractImportHandler
 {
-
     /**
      * {@inheritdoc}
      */
@@ -53,7 +52,7 @@ class CliImportHandler extends AbstractImportHandler
         array $options = []
     ) {
         $jobResult = $this->executeJob($jobName, $processorAlias, $options);
-
+        $entityName = '';
         $counts = $this->getValidationCounts($jobResult);
 
         $errors = [];
@@ -63,6 +62,12 @@ class CliImportHandler extends AbstractImportHandler
 
         $isSuccessful = $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0;
 
+        if ($isSuccessful) {
+            $entityName = $this->processorRegistry->getProcessorEntityName(
+                ProcessorRegistry::TYPE_IMPORT,
+                $processorAlias
+            );
+        }
         $message = $isSuccessful
             ? $this->translator->trans('oro.importexport.import.success')
             : $this->translator->trans('oro.importexport.import.error');
@@ -72,6 +77,8 @@ class CliImportHandler extends AbstractImportHandler
             'counts'  => $counts,
             'errors'  => $errors,
             'message' => $message,
+            'importInfo' => $this->getImportInfo($counts, $entityName),
+            'postponedRows' => $jobResult->getContext()->getPostponedRows(),
         ];
     }
 

@@ -53,8 +53,8 @@ abstract class AbstractDbOsRelatedIsolator extends AbstractOsRelatedIsolator imp
         $this->dbName = $container->getParameter('database_name');
         $this->dbUser = $container->getParameter('database_user');
         $this->dbPass = $container->getParameter('database_password');
-        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName;
-        $this->dbTempName = $this->dbName.'_temp';
+        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName.TokenGenerator::generateToken('db');
+        $this->dbTempName = $this->dbName.'_temp'.TokenGenerator::generateToken('db');
     }
 
     /** {@inheritdoc} */
@@ -119,6 +119,12 @@ abstract class AbstractDbOsRelatedIsolator extends AbstractOsRelatedIsolator imp
     public function isOutdatedState()
     {
         return is_file($this->dbDump);
+    }
+
+    /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
     }
 
     /**

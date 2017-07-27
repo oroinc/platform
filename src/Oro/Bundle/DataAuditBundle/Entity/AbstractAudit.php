@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
@@ -16,7 +16,8 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
  *     indexes={
  *         @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
  *         @ORM\Index(name="idx_oro_audit_type", columns={"type"}),
- *         @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"})
+ *         @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"}),
+ *         @ORM\Index(name="idx_oro_audit_obj_by_type", columns={"object_id", "object_class", "type"})
  *     },
  *     uniqueConstraints={
  *         @ORM\UniqueConstraint(name="idx_oro_audit_version", columns={"object_id", "object_class", "version"})
@@ -25,6 +26,22 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({"audit" = "Oro\Bundle\DataAuditBundle\Entity\Audit"})
+ *
+ * @Config(
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"="",
+ *              "category"="account_management",
+ *              "permissions"="VIEW"
+ *          }
+ *     }
+ * )
  */
 abstract class AbstractAudit
 {
@@ -116,6 +133,13 @@ abstract class AbstractAudit
      * @ORM\Column(name="transaction_id", type="string", length=255)
      */
     protected $transactionId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="owner_description", type="string", length=255, nullable=true)
+     */
+    protected $ownerDescription;
 
     /**
      * Set user
@@ -406,5 +430,21 @@ abstract class AbstractAudit
             ];
         }
         return $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwnerDescription()
+    {
+        return $this->ownerDescription;
+    }
+
+    /**
+     * @param string $ownerDescription
+     */
+    public function setOwnerDescription($ownerDescription)
+    {
+        $this->ownerDescription = $ownerDescription;
     }
 }

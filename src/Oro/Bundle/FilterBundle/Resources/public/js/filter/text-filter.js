@@ -1,12 +1,20 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './empty-filter'
-], function($, _, __, EmptyFilter) {
+define(function(require) {
     'use strict';
 
     var TextFilter;
+    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
+    var template = require('tpl!orofilter/templates/filter/text-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var EmptyFilter = require('./empty-filter');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+
+    var config = require('module').config();
+    config = _.extend({
+        notAlignCriteria: tools.isMobile()
+    }, config);
 
     /**
      * Text grid filter.
@@ -23,8 +31,9 @@ define([
     TextFilter = EmptyFilter.extend({
         wrappable: true,
 
-        wrapperTemplate: '',
+        notAlignCriteria: config.notAlignCriteria,
 
+        wrapperTemplate: wrapperTemplate,
         wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
@@ -32,6 +41,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#text-filter-template',
 
         /**
@@ -74,6 +84,10 @@ define([
             'click .disable-filter': '_onClickDisableFilter'
         },
 
+        listen: {
+            'layout:reposition mediator': '_onLayoutReposition'
+        },
+
         /**
          * Initialize.
          *
@@ -106,9 +120,15 @@ define([
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
-            if (e.which === 13) {
-                this._applyValueAndHideCriteria();
+            if (e.which !== 13) {
+                return;
             }
+
+            if (!this._isValid()) {
+                return;
+            }
+
+            this._applyValueAndHideCriteria();
         },
 
         /**
@@ -118,8 +138,56 @@ define([
          * @private
          */
         _onClickUpdateCriteria: function(e) {
+
+            if (!this._isValid()) {
+                e.stopImmediatePropagation();
+                return;
+            }
+
             this.trigger('updateCriteriaClick', this);
             this._applyValueAndHideCriteria();
+        },
+
+        /**
+         * Handles min_length and max_length text filter option.
+         *
+         * @returns {boolean}
+         * @private
+         */
+        _isValid: function() {
+            if (typeof this.min_length !== 'undefined' && this._readDOMValue().value.length < this.min_length) {
+                this._showMinLengthWarning();
+                return false;
+            }
+
+            if (typeof this.max_length !== 'undefined' && this._readDOMValue().value.length > this.max_length) {
+                this._showMaxLengthWarning();
+                return false;
+            }
+
+            return true;
+        },
+
+        /**
+         * @private
+         */
+        _showMinLengthWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('oro.filter.warning.min_length', {min_length: this.min_length})
+            );
+        },
+
+        /**
+         * @private
+         */
+        _showMaxLengthWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('oro.filter.warning.max_length', {max_length: this.max_length})
+            );
         },
 
         /**
@@ -156,12 +224,20 @@ define([
             }
         },
 
+        _onLayoutReposition: function() {
+            if (this.popupCriteriaShowed) {
+                this._alignCriteria();
+            }
+        },
+
         /**
          * @protected
          */
         _applyValueAndHideCriteria: function() {
             this._hideCriteria();
-            this.applyValue();
+            if (this._isValid()) {
+                this.applyValue();
+            }
         },
 
         /**
@@ -217,14 +293,19 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            var $container = this._findDropdownFitContainer();
-            if ($container === null) {
+            if (this.notAlignCriteria) {
+                // no need to align criteria on mobile version, it is aligned over CSS
+                return;
+            }
+            var $container = this.$el.closest('.filter-box');
+            if (!$container.length) {
                 return;
             }
             var $dropdown = this.$(this.criteriaSelector);
+            $dropdown.css('margin-left', 'auto');
             var rect = $dropdown.get(0).getBoundingClientRect();
             var containerRect = $container.get(0).getBoundingClientRect();
-            var shift = rect.right - (containerRect.left + $container.prop('clientWidth'));
+            var shift = rect.right - containerRect.right;
             if (shift > 0) {
                 /**
                  * reduce shift to avoid overlaping left edge of container

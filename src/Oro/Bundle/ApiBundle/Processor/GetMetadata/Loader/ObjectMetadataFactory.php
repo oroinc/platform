@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -107,6 +108,7 @@ class ObjectMetadataFactory
     /**
      * @param EntityMetadata              $entityMetadata
      * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $config
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
      * @param string                      $targetAction
@@ -117,6 +119,7 @@ class ObjectMetadataFactory
     public function createAndAddAssociationMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
+        EntityDefinitionConfig $config,
         $fieldName,
         EntityDefinitionFieldConfig $field,
         $targetAction,
@@ -131,25 +134,86 @@ class ObjectMetadataFactory
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setCollapsed($field->isCollapsed());
 
+        $completed = false;
+
         $dataType = $field->getDataType();
         if (!$dataType) {
-            $this->setAssociationDataType($associationMetadata, $field);
-            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
-            $associationMetadata->addAcceptableTargetClassName($targetClass);
+            $dataType = $this->getAssociationDataType($field);
         } elseif (DataType::isExtendedAssociation($dataType)) {
-            list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
-            $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
-            $this->setAssociationDataType($associationMetadata, $field);
-            $associationMetadata->setAssociationType($associationType);
-            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
-            $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
-        } else {
+            $this->completeExtendedAssociationMetadata($associationMetadata, $entityClass, $config, $field);
+            $completed = true;
+        }
+
+        if (!$completed) {
             $associationMetadata->setDataType($dataType);
             $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
             $associationMetadata->addAcceptableTargetClassName($targetClass);
         }
 
         return $associationMetadata;
+    }
+
+    /**
+     * @param AssociationMetadata         $associationMetadata
+     * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $config
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function completeExtendedAssociationMetadata(
+        AssociationMetadata $associationMetadata,
+        $entityClass,
+        EntityDefinitionConfig $config,
+        EntityDefinitionFieldConfig $field
+    ) {
+        list($associationType, $associationKind) = DataType::parseExtendedAssociation($field->getDataType());
+        $this->setAssociationDataType($associationMetadata, $field);
+        $associationMetadata->setAssociationType($associationType);
+        $targets = $this->getExtendedAssociationTargets(
+            $this->getAssociationOwnerClass($entityClass, $config, $field),
+            $associationType,
+            $associationKind
+        );
+        if (empty($targets)) {
+            $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
+        } else {
+            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
+        }
+        $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
+    }
+
+    /**
+     * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $config
+     * @param EntityDefinitionFieldConfig $field
+     *
+     * @return null|string
+     */
+    protected function getAssociationOwnerClass(
+        $entityClass,
+        EntityDefinitionConfig $config,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $propertyPath = $field->getPropertyPath();
+        if (!$propertyPath) {
+            return $entityClass;
+        }
+
+        $lastDelimiter = strrpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+        if (false === $lastDelimiter) {
+            return $entityClass;
+        }
+
+        $ownerField = $config->findFieldByPath(substr($propertyPath, 0, $lastDelimiter), true);
+        if (null === $ownerField) {
+            return $entityClass;
+        }
+
+        $associationOwnerClass = $ownerField->getTargetClass();
+        if (!$associationOwnerClass) {
+            return $entityClass;
+        }
+
+        return $associationOwnerClass;
     }
 
     /**
@@ -172,13 +236,13 @@ class ObjectMetadataFactory
     }
 
     /**
-     * @param AssociationMetadata         $associationMetadata
      * @param EntityDefinitionFieldConfig $field
+     *
+     * @return string|null
      */
-    protected function setAssociationDataType(
-        AssociationMetadata $associationMetadata,
-        EntityDefinitionFieldConfig $field
-    ) {
+    protected function getAssociationDataType(EntityDefinitionFieldConfig $field)
+    {
+        $associationDataType = null;
         $targetEntity = $field->getTargetEntity();
         if ($targetEntity) {
             $associationDataType = DataType::STRING;
@@ -189,6 +253,21 @@ class ObjectMetadataFactory
                     $associationDataType = $targetIdField->getDataType();
                 }
             }
+        }
+
+        return $associationDataType;
+    }
+
+    /**
+     * @param AssociationMetadata         $associationMetadata
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function setAssociationDataType(
+        AssociationMetadata $associationMetadata,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $associationDataType = $this->getAssociationDataType($field);
+        if ($associationDataType) {
             $associationMetadata->setDataType($associationDataType);
         }
     }

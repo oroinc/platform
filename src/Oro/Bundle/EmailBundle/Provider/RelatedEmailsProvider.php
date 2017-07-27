@@ -8,15 +8,18 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class RelatedEmailsProvider
 {
@@ -26,8 +29,11 @@ class RelatedEmailsProvider
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var NameFormatter */
     protected $nameFormatter;
@@ -41,28 +47,37 @@ class RelatedEmailsProvider
     /** @var EmailRecipientsHelper */
     protected $emailRecipientsHelper;
 
+    /** @var EntityFieldProvider  */
+    protected $entityFieldProvider;
+
     /**
-     * @param Registry $registry
-     * @param ConfigManager $configManager
-     * @param SecurityFacade $securityFacade
-     * @param NameFormatter $nameFormatter
-     * @param EmailAddressHelper $emailAddressHelper
-     * @param EmailRecipientsHelper $emailRecipientsHelper
+     * @param Registry                      $registry
+     * @param ConfigManager                 $configManager
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param NameFormatter                 $nameFormatter
+     * @param EmailAddressHelper            $emailAddressHelper
+     * @param EmailRecipientsHelper         $emailRecipientsHelper
+     * @param EntityFieldProvider           $entityFieldProvider
      */
     public function __construct(
         Registry $registry,
         ConfigManager $configManager,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         NameFormatter $nameFormatter,
         EmailAddressHelper $emailAddressHelper,
-        EmailRecipientsHelper $emailRecipientsHelper
+        EmailRecipientsHelper $emailRecipientsHelper,
+        EntityFieldProvider $entityFieldProvider
     ) {
         $this->registry = $registry;
         $this->configManager = $configManager;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
         $this->nameFormatter = $nameFormatter;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->emailRecipientsHelper = $emailRecipientsHelper;
+        $this->entityFieldProvider = $entityFieldProvider;
     }
 
     /**
@@ -81,8 +96,8 @@ class RelatedEmailsProvider
             return $recipients;
         }
 
-        if (!$depth || ($ignoreAcl || !$this->securityFacade->isGranted('VIEW', $object))) {
-            if (!$depth || $this->securityFacade->getLoggedUser() !== $object) {
+        if (!$depth || ($ignoreAcl || !$this->authorizationChecker->isGranted('VIEW', $object))) {
+            if (!$depth || $this->tokenAccessor->getUser() !== $object) {
                 return $recipients;
             }
         }
@@ -91,16 +106,14 @@ class RelatedEmailsProvider
         $metadata = $this->getMetadata($className);
         $attributes = $this->initAttributes($className, $metadata);
 
-        foreach ($metadata->associationMappings as $name => $assoc) {
-            if (in_array(
-                'Oro\Bundle\EmailBundle\Entity\EmailInterface',
-                class_implements($assoc['targetEntity']),
-                true
-            )) {
-                $attributes[] = new EmailAttribute($name, true);
+        $relations = $this->entityFieldProvider->getRelations($className);
+
+        foreach ($relations as $relation) {
+            if (is_a($relation['related_entity_name'], EmailInterface::class, true)) {
+                $attributes[] = new EmailAttribute($relation['name'], true);
             } else {
                 if ($depth > 1) {
-                    $assocObject = $this->getPropertyAccessor()->getValue($object, $name);
+                    $assocObject = $this->getPropertyAccessor()->getValue($object, $relation['name']);
                     if (!$assocObject instanceof \Traversable && !is_array($assocObject)) {
                         if ($assocObject) {
                             $assocObject = [$assocObject];
@@ -140,6 +153,7 @@ class RelatedEmailsProvider
         $recipients = $this->getRecipients($object, $depth, $ignoreAcl);
 
         $emails = [];
+        /** @var Recipient $recipient */
         foreach ($recipients as $recipient) {
             $emails[$recipient->getEmail()] = $recipient->getId();
         }
@@ -278,7 +292,7 @@ class RelatedEmailsProvider
     protected function initAttributes($className, $metadata)
     {
         $attributes = [];
-        if (in_array('Oro\Bundle\EmailBundle\Model\EmailHolderInterface', class_implements($className), true)) {
+        if (is_a($className, EmailHolderInterface::class, true)) {
             $attributes[] = new EmailAttribute('email');
         }
         $attributes = array_merge($attributes, $this->getFieldAttributes($metadata));

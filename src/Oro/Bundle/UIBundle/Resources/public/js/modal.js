@@ -1,15 +1,31 @@
-define([
-    'underscore',
-    'backbone',
-    'orotranslation/js/translator',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    'backbone-bootstrap-modal'
-], function(_, Backbone, __, mediator, tools) {
+define(function(require) {
     'use strict';
 
     var Modal;
+    var module = require('module');
+    var template = require('tpl!oroui/templates/modal-dialog.html');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var Backbone = require('backbone');
     var $ = Backbone.$;
+    require('backbone-bootstrap-modal');
+
+    var config = module.config();
+
+    config = $.extend(true, {
+        defaults: {
+            templateSelector: '',
+            okText: __('OK'),
+            cancelText: __('Cancel'),
+            okButtonClass: 'btn ok btn-primary',
+            cancelButtonClass: 'btn cancel',
+            handleClose: false,
+            allowCancel: true,
+            allowOk: true
+        }
+    }, config);
 
     /**
      * Implementation of Bootstrap Modal
@@ -20,15 +36,13 @@ define([
      * @extends Backbone.BootstrapModal
      */
     Modal = Backbone.BootstrapModal.extend({
+        template: template,
+
         events: _.extend(Backbone.BootstrapModal.prototype.events, {
             'click [data-button-id]': 'onButtonClick'
         }),
 
-        defaults: {
-            okText: __('OK'),
-            cancelText: __('Cancel'),
-            handleClose: false
-        },
+        defaults: config.defaults,
 
         /** @property {String} */
         className: 'modal oro-modal-normal',
@@ -36,6 +50,14 @@ define([
         initialize: function(options) {
             options = options || {};
             _.defaults(options, this.defaults);
+
+            if (options.templateSelector) {
+                options.template = _.template($(options.templateSelector).html());
+            } else if (typeof options.template === 'string') {
+                options.template = _.template(options.template);
+            } else if (!options.template) {
+                options.template = this.template;
+            }
 
             if (options.handleClose) {
                 this.events = _.extend({}, this.events, {'click .close': _.bind(this.onClose, this)});

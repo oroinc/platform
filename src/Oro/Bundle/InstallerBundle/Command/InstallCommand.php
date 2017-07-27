@@ -3,6 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
 
 use Symfony\Component\Console\Helper\Table as TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +15,9 @@ use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
@@ -46,7 +49,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 InputOption::VALUE_NONE,
                 'Skip UI related commands during installation'
             )
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption(
                 'sample-data',
@@ -65,6 +67,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 null,
                 InputOption::VALUE_NONE,
                 'Determines whether translation data need to be loaded or not'
+            )
+            ->addOption(
+                'skip-download-translations',
+                null,
+                InputOption::VALUE_NONE,
+                'Determines whether translation data need to be downloaded or not'
             );
 
         parent::configure();
@@ -82,24 +90,21 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $this->validate($input);
         }
 
-        $forceInstall = $input->getOption('force');
         $skipAssets = $input->getOption('skip-assets');
         $commandExecutor = $this->getCommandExecutor($input, $output);
 
-        // if there is application is not installed or no --force option
-        $isInstalled = $this->getContainer()->hasParameter('installed')
-            && $this->getContainer()->getParameter('installed');
-
-        if ($isInstalled && !$forceInstall) {
+        if ($this->isInstalled()) {
             $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
             $output->writeln(
-                'To proceed with install - run command with <info>--force</info> option:'
+                'To proceed with install: '
             );
-            $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+            $output->writeln(' - set parameter <info>installed: false</info> in app/config/parameters.yml.');
+            $output->writeln(' - remove caches in app/cache folder manually');
+            $output->writeln(' - drop database manually or reinstall over existing database.');
             $output->writeln(
-                'To reinstall over existing database - run command with <info>--force --drop-database</info> options:'
+                'To reinstall over existing database - run command with <info>--drop-database</info> option:'
             );
-            $output->writeln(sprintf('    <info>%s --force --drop-database</info>', $this->getName()));
+            $output->writeln(sprintf('    <info>%s --drop-database</info>', $this->getName()));
             $output->writeln(
                 '<comment>ATTENTION</comment>: All data will be lost. ' .
                 'Database backup is highly recommended before executing this command.'
@@ -109,33 +114,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             return;
         }
 
-        if ($forceInstall) {
-            // if --force option we have to clear cache and set installed to false
-            $this->updateInstalledFlag(false);
-            $commandExecutor->runCommand(
-                'cache:clear',
-                [
-                    '--no-optional-warmers' => true,
-                    '--process-isolation'   => true
-                ]
-            );
-        }
-
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
-        $dropDatabase = 'none';
-        if ($forceInstall) {
-            if ($input->getOption('drop-database')) {
-                $dropDatabase = 'full';
-            } elseif ($isInstalled) {
-                $dropDatabase = 'app';
-            }
-        }
-
         $this
-            ->checkStep($output)
-            ->prepareStep($commandExecutor, $dropDatabase)
+            ->checkStep($input, $output)
+            ->prepareStep($input, $output)
             ->loadDataStep($commandExecutor, $output)
             ->finalStep($commandExecutor, $output, $input, $skipAssets);
 
@@ -158,6 +142,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'API documentation cache</info>'
             );
         }
+        $output->writeln(
+            '<info>Make sure that consumer command was running <comment>oro:message-queue:consume</comment>. ' .
+            'More info you can find here: <comment>'.
+            'https://www.orocrm.com/documentation/current/book/installation#activating-background-tasks' .
+            '</comment></info>.'
+        );
     }
 
     /**
@@ -187,12 +177,11 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
-     *
      * @return InstallCommand
-     * @throws \RuntimeException
      */
-    protected function checkStep(OutputInterface $output)
+    protected function checkStep(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Oro requirements check:</info>');
 
@@ -202,7 +191,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 . 'OroRequirements.php';
         }
 
-        $collection = new \OroRequirements();
+        $collection = new \OroRequirements($input->getOption('env'));
 
         $this->renderTable($collection->getMandatoryRequirements(), 'Mandatory requirements', $output);
         $this->renderTable($collection->getPhpIniRequirements(), 'PHP settings', $output);
@@ -223,33 +212,21 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     /**
      * Drop schema, clear entity config and extend caches
      *
-     * @param CommandExecutor $commandExecutor
-     * @param string          $dropDatabase Can be 'none', 'app' or 'full'
-     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
      * @return InstallCommand
      */
-    protected function prepareStep(CommandExecutor $commandExecutor, $dropDatabase = 'none')
+    protected function prepareStep(InputInterface $input, OutputInterface $output)
     {
-        if ($dropDatabase !== 'none') {
-            $schemaDropOptions = [
-                '--force'             => true,
-                '--process-isolation' => true
-            ];
-            if ($dropDatabase === 'full') {
-                $schemaDropOptions['--full-database'] = true;
-                $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
-            } else {
-                $managers = $this->getContainer()->get('doctrine')->getManagers();
-                foreach ($managers as $name => $manager) {
-                    if ($manager instanceof EntityManager) {
-                        $schemaDropOptions['--em'] = $name;
-                        $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
-                    }
+        if ($input->getOption('drop-database')) {
+            $output->writeln('<info>Drop schema.</info>');
+            $managers = $this->getContainer()->get('doctrine')->getManagers();
+            foreach ($managers as $name => $manager) {
+                if ($manager instanceof EntityManager) {
+                    $tool = new SchemaTool($manager);
+                    $tool->dropDatabase();
                 }
             }
-            $commandExecutor
-                ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
-                ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
         }
 
         return $this;
@@ -461,13 +438,19 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 ]
             )
             ->runCommand(
-                'oro:workflow:definitions:load',
+                LoadConfigurablePermissionCommand::NAME,
                 [
                     '--process-isolation' => true
                 ]
             )
             ->runCommand(
                 'oro:cron:definitions:load',
+                [
+                    '--process-isolation' => true
+                ]
+            )
+            ->runCommand(
+                'oro:workflow:definitions:load',
                 [
                     '--process-isolation' => true
                 ]
@@ -538,17 +521,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $assetsOptions['--symlink'] = true;
         }
 
-        if (!$input->getOption('skip-translations')) {
-            $commandExecutor
-                ->runCommand('oro:translation:load', ['--process-isolation' => true]);
-        }
-
-        $commandExecutor->runCommand(
-            'oro:navigation:init',
-            [
-                '--process-isolation' => true,
-            ]
-        );
+        $this->processTranslations($input, $commandExecutor);
 
         if (!$skipAssets) {
             $commandExecutor->runCommand(
@@ -592,6 +565,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         if ($commandExecutor->getDefaultOption('no-debug')) {
             $cacheClearOptions['--no-debug'] = true;
         }
+        if ($input->getOption('env')) {
+            $cacheClearOptions['--env'] = $input->getOption('env');
+        }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 
         $output->writeln('');
@@ -610,6 +586,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $params                        = $dumper->parse();
         $params['system']['installed'] = $installed;
         $dumper->dump($params);
+    }
+
+    /**
+     * Clears the state of all database checkers to make sure they will recheck the database state
+     */
+    protected function clearCheckDatabaseState()
+    {
+        $this->getContainer()->get('oro_entity.database_checker.state_manager')->clearState();
     }
 
     /**
@@ -662,5 +646,32 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
 
         $table->render($output);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isInstalled()
+    {
+        $isInstalled = $this->getContainer()->hasParameter('installed')
+            && $this->getContainer()->getParameter('installed');
+
+        return $isInstalled;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param CommandExecutor $commandExecutor
+     */
+    protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor)
+    {
+        if (!$input->getOption('skip-translations')) {
+            if (!$input->getOption('skip-download-translations')) {
+                $commandExecutor
+                    ->runCommand(OroLanguageUpdateCommand::NAME, ['--process-isolation' => true, '--all' => true]);
+            }
+            $commandExecutor
+                ->runCommand('oro:translation:load', ['--process-isolation' => true, '--rebuild-cache' => true]);
+        }
     }
 }

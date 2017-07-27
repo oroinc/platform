@@ -101,7 +101,7 @@ services:
         class: %oro_imap.form.type.configuration.class%
         arguments:
             - '@oro_security.encoder.mcrypt'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@translator'
         tags:
              - { name: form.type, alias: oro_imap_configuration }
@@ -123,7 +123,7 @@ services:
         arguments:
              - '@translator'
              - '@oro_config.user'
-             - '@oro_security.security_facade'
+             - '@oro_security.token_accessor'
         tags:
              - { name: form.type, alias: oro_imap_configuration_gmail }
 
@@ -213,3 +213,15 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_imap.command.email_sync:
+        class: 'Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand'
+        tags:
+            - { name: console.command }
+
+    oro_imap.validator.email_folders:
+        class: 'Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator'
+        arguments:
+            - @translator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_imap.validator.email_folders }

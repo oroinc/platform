@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 
+use Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper;
 use Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailFolder;
@@ -12,15 +13,18 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUserEmailOrigin;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    protected $tokenAccessor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MailboxNameHelper */
+    protected $mailboxNameHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|MailboxRepository */
     protected $mailboxRepository;
@@ -72,17 +76,14 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
             ->method('createQueryBuilder')
             ->will($this->returnValue($originQb));
 
-        $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->mailboxNameHelper = $this->createMock(MailboxNameHelper::class);
 
         $this->originFolderFilterProvider = new OriginFolderFilterProvider(
             $this->doctrine,
-            $this->securityFacade
+            $this->tokenAccessor,
+            $this->mailboxNameHelper
         );
     }
 
@@ -129,6 +130,9 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
         $folder3->setFullName('Folder3');
         $origin2->addFolder($folder3);
 
+        $origin1MailboxName = 'Origin 1 Mailbox';
+        $origin2MailboxName = 'Origin 2 Mailbox';
+
         $this->doctrine->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($this->originRepository));
@@ -141,15 +145,22 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
             ->method('findAvailableMailboxes')
             ->willReturn([]);
 
+        $this->mailboxNameHelper->expects(self::any())
+            ->method('getMailboxName')
+            ->willReturnMap([
+                [get_class($origin1), $origin1->getMailboxName(), null, $origin1MailboxName],
+                [get_class($origin2), $origin2->getMailboxName(), null, $origin2MailboxName],
+            ]);
+
         $result = $this->originFolderFilterProvider->getListTypeChoices();
 
         $this->assertNotEmpty($result);
         $this->assertCount(2, $result);
-        $this->assertEquals($origin1->isActive(), $result[$origin1->getMailboxName()]['active']);
-        $this->assertEquals($origin2->isActive(), $result[$origin2->getMailboxName()]['active']);
-        $this->assertCount(2, $result[$origin1->getMailboxName()]['folder']);
-        $this->assertCount(1, $result[$origin2->getMailboxName()]['folder']);
-        $this->assertEquals($folder2->getFullName(), $result[$origin1->getMailboxName()]['folder'][$folder2->getId()]);
+        $this->assertEquals($origin1->isActive(), $result[$origin1MailboxName]['active']);
+        $this->assertEquals($origin2->isActive(), $result[$origin2MailboxName]['active']);
+        $this->assertCount(2, $result[$origin1MailboxName]['folder']);
+        $this->assertCount(1, $result[$origin2MailboxName]['folder']);
+        $this->assertEquals($folder2->getFullName(), $result[$origin1MailboxName]['folder'][$folder2->getId()]);
     }
 
     public function testMailboxOrigins()

@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Entity\ReportType;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -30,6 +31,7 @@ class ReportController extends Controller
      */
     public function viewAction(Report $entity)
     {
+        $this->checkReport($entity);
         $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
 
         $reportGroup = $this->get('oro_entity_config.provider.entity')
@@ -75,6 +77,31 @@ class ReportController extends Controller
     }
 
     /**
+     * @Route("/view/{gridName}", name="oro_report_view_grid", requirements={"gridName"="[-\w]+"})
+     *
+     * @Template
+     * @Acl(
+     *      id="oro_report_view",
+     *      type="entity",
+     *      permission="VIEW",
+     *      class="OroReportBundle:Report"
+     * )
+     *
+     * @param string $gridName
+     * @return array
+     */
+    public function viewFromGridAction($gridName)
+    {
+        $configuration = $this->get('oro_datagrid.datagrid.manager')->getConfigurationForGrid($gridName);
+        $pageTitle = isset($configuration['pageTitle']) ? $configuration['pageTitle'] : $gridName;
+
+        return [
+            'pageTitle' => $this->get('translator')->trans($pageTitle),
+            'gridName'  => $gridName,
+        ];
+    }
+
+    /**
      * @Route("/create", name="oro_report_create")
      * @Template("OroReportBundle:Report:update.html.twig")
      * @Acl(
@@ -102,6 +129,8 @@ class ReportController extends Controller
      */
     public function updateAction(Report $entity)
     {
+        $this->checkReport($entity);
+
         return $this->update($entity);
     }
 
@@ -189,5 +218,23 @@ class ReportController extends Controller
         }
 
         return $chartOptions;
+    }
+
+    /**
+     * @param Report $report
+     */
+    protected function checkReport(Report $report)
+    {
+        if ($report->getEntity() && !$this->getFeatureChecker()->isResourceEnabled($report->getEntity(), 'entities')) {
+            throw $this->createNotFoundException();
+        }
+    }
+
+    /**
+     * @return FeatureChecker
+     */
+    protected function getFeatureChecker()
+    {
+        return $this->get('oro_featuretoggle.checker.feature_checker');
     }
 }

@@ -9,9 +9,6 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
-/**
- * @dbIsolation
- */
 class TranslationKeyRepositoryTest extends WebTestCase
 {
     /** @var EntityManager */
@@ -44,5 +41,20 @@ class TranslationKeyRepositoryTest extends WebTestCase
 
         $this->assertContains('test_domain', $domains);
         $this->assertGreaterThanOrEqual(1, count($domains));
+    }
+
+    public function testGetTranslationKeysData()
+    {
+        $data = $this->repository->getTranslationKeysData();
+        $this->assertArrayHasKey(LoadTranslations::TRANSLATION_KEY_DOMAIN, $data);
+        $expectedTranslationKeys = [
+            LoadTranslations::TRANSLATION_KEY_1,
+            LoadTranslations::TRANSLATION_KEY_2,
+            LoadTranslations::TRANSLATION_KEY_3,
+            LoadTranslations::TRANSLATION_KEY_4,
+            LoadTranslations::TRANSLATION_KEY_5,
+        ];
+
+        $this->assertEquals($expectedTranslationKeys, array_keys($data[LoadTranslations::TRANSLATION_KEY_DOMAIN]));
     }
 }

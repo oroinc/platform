@@ -11,9 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class RefreshContextListenerTest extends WebTestCase
 {
     protected function setUp()
@@ -27,7 +24,7 @@ class RefreshContextListenerTest extends WebTestCase
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));
 
-        $token = $this->getContainer()->get('security.context')->getToken();
+        $token = $this->getContainer()->get('security.token_storage')->getToken();
         $this->assertNotEmpty($token);
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\TokenInterface', $token);
 
@@ -70,14 +67,14 @@ class RefreshContextListenerTest extends WebTestCase
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));
 
-        $this->getContainer()->get('security.context')->getToken()->setUser(new User());
+        $this->getContainer()->get('security.token_storage')->getToken()->setUser(new User());
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine')->getManager();
         $this->assertInstanceOf('Doctrine\ORM\EntityManager', $entityManager);
 
         $entityManager->clear();
-        $this->assertNull($this->getContainer()->get('security.context')->getToken());
+        $this->assertNull($this->getContainer()->get('security.token_storage')->getToken());
     }
 
     public function testRefreshNotExistingUser()
@@ -89,13 +86,13 @@ class RefreshContextListenerTest extends WebTestCase
         $reflection->setAccessible(true);
         $reflection->setValue($user, 999);
 
-        $this->getContainer()->get('security.context')->getToken()->setUser($user);
+        $this->getContainer()->get('security.token_storage')->getToken()->setUser($user);
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine')->getManager();
         $this->assertInstanceOf('Doctrine\ORM\EntityManager', $entityManager);
 
         $entityManager->clear();
-        $this->assertNull($this->getContainer()->get('security.context')->getToken());
+        $this->assertNull($this->getContainer()->get('security.token_storage')->getToken());
     }
 }

@@ -5,3 +5,11 @@
 "Download finished.": "Download finished."
 "Update finished.": "Update finished."
 "Up to date": "Up to date"
+
+oro.translation:
+    action:
+        reset:
+            message: 'Reset translated value?'
+            confirm_title: 'Reset Confirmation'
+            confirm_content: 'Are you sure you want to reset selected translations to their original values?'
+            confirm_ok: 'Reset'

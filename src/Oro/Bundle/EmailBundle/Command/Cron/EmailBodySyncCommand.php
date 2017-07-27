@@ -2,18 +2,23 @@
 
 namespace Oro\Bundle\EmailBundle\Command\Cron;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
-use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\LockHandler;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
+use Oro\Component\Log\OutputLogger;
+
 class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
+    /**
+     * Command name
+     */
+    const COMMAND_NAME = 'oro:cron:email-body-sync';
+
     /**
      * Number of emails in batch
      */
@@ -32,11 +37,14 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
         return '*/30 * * * *';
     }
 
+    /**
+     * @return bool
+     */
     public function isActive()
     {
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
-        return $featureChecker->isFeatureEnabled('email');
+        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
     }
 
     /**
@@ -45,7 +53,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     protected function configure()
     {
         $this
-            ->setName('oro:cron:email-body-sync')
+            ->setName(self::COMMAND_NAME)
             ->setDescription('Synchronize email body')
             ->addOption(
                 'max-exec-time',

@@ -9,7 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Table(name="test_workflow_aware_entity")
  * @ORM\Entity
- * @Config
+ * @Config(
+ *      routeName="oro_test_wfa_index",
+ *      routeView="oro_test_wfa_view",
+ *      routeCreate="oro_test_wfa_create",
+ *      routeUpdate="oro_test_wfa_update",
+ *      routeDelete="oro_test_wfa_delete"
+ * )
  */
 class WorkflowAwareEntity implements TestFrameworkEntityInterface
 {
@@ -39,7 +45,8 @@ class WorkflowAwareEntity implements TestFrameworkEntityInterface
 
     /**
      * @param string $name
-     * @return WorkflowAwareEntity
+     *
+     * @return $this
      */
     public function setName($name)
     {

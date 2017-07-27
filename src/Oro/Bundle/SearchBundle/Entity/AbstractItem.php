@@ -362,7 +362,7 @@ abstract class AbstractItem
      */
     public function setTitle($title)
     {
-        $this->title = substr($title, 0, 255);
+        $this->title = mb_substr($title, 0, 255, mb_detect_encoding($title));
 
         return $this;
     }

@@ -12,6 +12,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -100,7 +101,7 @@ class OperationFormHandler
             if ($form->isValid()) {
                 $operation->execute($actionData, $data['errors']);
 
-                $data['response'] = $this->getResponseData($actionData, $flashBag);
+                $data['response'] = $this->getResponseData($actionData, $flashBag, $operation);
 
                 if ($this->hasRedirect($data)) {
                     return new RedirectResponse($data['response']['redirectUrl'], 302);
@@ -152,13 +153,17 @@ class OperationFormHandler
      * @param string $name
      * @param ActionData $data
      * @return Operation
+     * @throws ForbiddenOperationException
      * @throws OperationNotFoundException
      */
     private function getOperation($name, ActionData $data)
     {
         $operation = $this->operationRegistry->findByName($name);
-        if (!$operation instanceof Operation || !$operation->isAvailable($data)) {
+        if (!$operation instanceof Operation) {
             throw new OperationNotFoundException($name);
+        }
+        if (!$operation->isAvailable($data)) {
+            throw new ForbiddenOperationException();
         }
 
         return $operation;
@@ -213,18 +218,22 @@ class OperationFormHandler
 
     /**
      * @param ActionData $context
-     *
      * @param FlashBagInterface $flashBag
+     * @param Operation $operation
+     *
      * @return array
      */
-    private function getResponseData(ActionData $context, FlashBagInterface $flashBag)
+    private function getResponseData(ActionData $context, FlashBagInterface $flashBag, Operation $operation)
     {
-        $response = ['success' => true];
+        $response = ['success' => true, 'pageReload' => $operation->getDefinition()->isPageReload()];
 
         if ($context->getRedirectUrl()) {
             $response['redirectUrl'] = $context->getRedirectUrl();
         } elseif ($context->getRefreshGrid()) {
             $response['refreshGrid'] = $context->getRefreshGrid();
+        }
+
+        if ($context->getRefreshGrid() || !$response['pageReload']) {
             $response['flashMessages'] = $flashBag->all();
         }
 

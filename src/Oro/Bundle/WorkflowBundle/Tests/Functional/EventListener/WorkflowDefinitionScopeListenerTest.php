@@ -12,9 +12,6 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
-/**
- * @dbIsolation
- */
 class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
 {
     const WITH_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopes';

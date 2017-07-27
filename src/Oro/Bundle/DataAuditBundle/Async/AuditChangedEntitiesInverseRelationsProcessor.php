@@ -60,6 +60,8 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
         }
 
+        $ownerDecription = isset($body['owner_description']) ? $body['owner_description'] : null;
+
         $map = [];
 
         // one to one, one to many, many to many inverse side
@@ -79,7 +81,8 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $loggedAt,
             $user,
             $organization,
-            $impersonation
+            $impersonation,
+            $ownerDecription
         );
 
         return self::ACK;
@@ -99,7 +102,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
 
             foreach ($sourceEntityData['change_set'] as $sourceFieldName => $sourceChange) {
-                if (false == isset($sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'])) {
+                if (!isset($sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'])) {
                     continue;
                 }
 
@@ -231,7 +234,9 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             }
         }
 
+
         if (is_array($new) && array_key_exists('deleted', $new) && is_array($new['deleted'])) {
+
             foreach ($new['deleted'] as $deletedEntityData) {
                 $entityId = $deletedEntityData['entity_id'];
 
@@ -242,7 +247,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                     'entity_id'    => $sourceEntityId,
                     'change_set'   => [],
                 ];
-
+                
                 $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
             }
         }

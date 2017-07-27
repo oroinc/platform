@@ -178,8 +178,17 @@
 
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes li {
     padding: 0;
+    &:after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+    &.hidden-item {
+      height: 0;
+    }
 }
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label {
+    white-space: nowrap;
     margin: 0;
     float: left;
 }
@@ -230,18 +239,12 @@
     display: none;
 }
 
-.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes input[type="checkbox"] {
-    margin: 0 6px 5px 5px;
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-footer {
+    display: none;
 }
 
-.ui-multiselect.filter-list, .ui-multiselect.select-filter-widget {
-
-    background: none;
-    border: none;
-    font-size: 13px;
-    font-weight: bold;
-    padding: 9px 0 7px 6px;
-    line-height: 1em;
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes input[type="checkbox"] {
+    margin: 0 6px 5px 5px;
 }
 
 .ui-multiselect.select-filter-widget:hover .add-filter-button span.caret {
@@ -359,6 +362,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       }
       .select2-container {
         border: 0 none;
+        background: transparent;
         .select2-choices {
           border-left: 0;
           border-right: 0;

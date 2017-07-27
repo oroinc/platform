@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ */
 class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -165,11 +168,12 @@ class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Job Title'  => '',
                     'Email'      => '',
                 ),
-                'result' => array(
+                'result' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                    'jobTitle'  => ''
-                ),
+                    'jobTitle'  => null,
+                    'emails'    => [],
+                ],
                 'skipNull' => false
             ),
             'complex data' => array(
@@ -192,6 +196,51 @@ class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     ),
                 )
             ),
+            'multi-level array data'           => [
+                'exportedRecord' => [
+                    'First Name'                    => 'John',
+                    'Last Name'                     => 'Doe',
+                    'Job Title'                     => 'Engineer',
+                    'address:0:name'                => 'John',
+                    'address:0:last'                => 'Doe',
+                    'address:0:city'                => 'City',
+                    'address:0:organization:0:name' => 'Main',
+                    'address:0:organization:1:name' => 'Default',
+                    'address:0:organization:2:name' => '',
+                    'address:1'                     => '',
+                ],
+                'result'         => [
+                    'firstName' => 'John',
+                    'lastName'  => 'Doe',
+                    'jobTitle'  => 'Engineer',
+                    'address'   => [
+                        [
+                            'name'         => 'John',
+                            'last'         => 'Doe',
+                            'city'         => 'City',
+                            'organization' => [
+                                ['name' => 'Main'],
+                                ['name' => 'Default'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'multi-level data with empty data' => [
+                'exportedRecord' => [
+                    'First Name' => 'John',
+                    'Last Name'  => 'Doe',
+                    'Job Title'  => 'Engineer',
+                    'address:0'  => [],
+                    'address:1'  => [],
+                ],
+                'result'         => [
+                    'firstName' => 'John',
+                    'lastName'  => 'Doe',
+                    'jobTitle'  => 'Engineer',
+                    'address'   => [],
+                ],
+            ],
             'no conversion rules' => array(
                 'exportedRecord' => array(
                     'First Name' => 'John',

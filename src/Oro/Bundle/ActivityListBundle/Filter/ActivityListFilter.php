@@ -6,14 +6,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
-use LogicException;
-
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -21,6 +20,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 
@@ -50,8 +50,11 @@ class ActivityListFilter extends EntityFilter
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /** @var DatagridHelper */
-    protected $datagridHelper;
+    /** @var ServiceLink */
+    protected $queryDesignerManagerLink;
+
+    /** @var ServiceLink */
+    protected $datagridHelperLink;
 
     /**
      * @param FormFactoryInterface      $factory
@@ -60,8 +63,8 @@ class ActivityListFilter extends EntityFilter
      * @param ActivityListChainProvider $activityListChainProvider
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param EntityRoutingHelper       $entityRoutingHelper
-     * @param Manager                   $queryDesignerManager
-     * @param DatagridHelper            $datagridHelper
+     * @param ServiceLink               $queryDesignerManagerLink
+     * @param ServiceLink               $datagridHelperLink
      */
     public function __construct(
         FormFactoryInterface $factory,
@@ -70,16 +73,16 @@ class ActivityListFilter extends EntityFilter
         ActivityListChainProvider $activityListChainProvider,
         ActivityListFilterHelper $activityListFilterHelper,
         EntityRoutingHelper $entityRoutingHelper,
-        Manager $queryDesignerManager,
-        DatagridHelper $datagridHelper
+        ServiceLink $queryDesignerManagerLink,
+        ServiceLink $datagridHelperLink
     ) {
         parent::__construct($factory, $util);
         $this->activityAssociationHelper = $activityAssociationHelper;
         $this->activityListChainProvider = $activityListChainProvider;
         $this->activityListFilterHelper  = $activityListFilterHelper;
         $this->entityRoutingHelper       = $entityRoutingHelper;
-        $this->queryDesignerManager      = $queryDesignerManager;
-        $this->datagridHelper            = $datagridHelper;
+        $this->queryDesignerManagerLink  = $queryDesignerManagerLink;
+        $this->datagridHelperLink        = $datagridHelperLink;
     }
 
     /**
@@ -111,7 +114,7 @@ class ActivityListFilter extends EntityFilter
         $this->activityListAlias = $ds->generateParameterName('a');
 
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new LogicException(sprintf(
+            throw new \LogicException(sprintf(
                 '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
                 get_class($ds)
             ));
@@ -206,10 +209,12 @@ class ActivityListFilter extends EntityFilter
     protected function createRelatedActivityDql(OrmFilterDatasourceAdapter $activityDs, array $data)
     {
         $grid = $this->createRelatedActivityGrid($data);
+        /** @var QueryBuilder $qb */
         $qb = $grid->getDatasource()->getQueryBuilder();
 
         $alias = $qb->getRootAliases()[0];
-        if ($joinPart = $qb->getDQLPart('join')) {
+        $joinPart = $qb->getDQLPart('join');
+        if ($joinPart) {
             $lastGroup = end($joinPart);
             $alias = end($lastGroup)->getAlias();
         }
@@ -245,7 +250,7 @@ class ActivityListFilter extends EntityFilter
      * @param ClassMetadata $metadata
      *
      * @return string
-     * @throws LogicException
+     * @throws \LogicException
      */
     protected function getIdentifier(ClassMetadata $metadata)
     {
@@ -280,7 +285,7 @@ class ActivityListFilter extends EntityFilter
     {
         $source = $this->createRelatedActivitySource($data);
 
-        return $this->datagridHelper->createGrid($source);
+        return $this->datagridHelperLink->getService()->createGrid($source);
     }
 
     /**
@@ -331,7 +336,8 @@ class ActivityListFilter extends EntityFilter
      */
     protected function applyFilter(FilterDatasourceAdapterInterface $ds, $name, $field, $data)
     {
-        $filter = $this->queryDesignerManager->createFilter($name, [
+        /** @var FilterInterface $filter */
+        $filter = $this->queryDesignerManagerLink->getService()->createFilter($name, [
             FilterUtility::DATA_NAME_KEY => $field,
         ]);
 
@@ -366,8 +372,6 @@ class ActivityListFilter extends EntityFilter
     }
 
     /**
-     * @param string $columnName
-     *
      * @return string
      */
     protected function getField()

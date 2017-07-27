@@ -7,21 +7,12 @@ Create the layout theme
 -----------------------
 
 The theme definition should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
-Deprecated method: placed  `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`:
 
 ```yaml
 #DemoBundle/Resources/views/layouts/first_theme/theme.yml
 label:  Test Theme
 icon:   bundles/demo/images/favicon.ico
 groups: [ main ]
-
-#DemoBundle/Resources/config/oro/layout.yml
-oro_layout:
-    themes:
-        first_theme:
-            label:  Test Theme
-            icon:   bundles/demo/images/favicon.ico
-            groups: [ main ]
 ```
 See [theme definition](./theme_definition.md) topic for more details.
 

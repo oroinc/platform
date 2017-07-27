@@ -2,50 +2,62 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 use Knp\Menu\MenuItem;
 
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TabExtension extends \Twig_Extension
 {
     const TEMPLATE = 'OroUIBundle::tab_panel.html.twig';
     const DEFAULT_WIDGET_TYPE = 'block';
 
-    /**
-     * @var MenuExtension
-     */
-    protected $menuExtension;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var RouterInterface
+     * @param ContainerInterface $container
      */
-    protected $router;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @var SecurityFacade
+     * @return MenuExtension
      */
-    protected $securityFacade;
+    protected function getMenuExtension()
+    {
+        return $this->container->get('oro_menu.twig.extension');
+    }
 
     /**
-     * @var TranslatorInterface
+     * @return RouterInterface
      */
-    protected $translator;
+    protected function getRouter()
+    {
+        return $this->container->get('router');
+    }
 
-    public function __construct(
-        MenuExtension $menuExtension,
-        RouterInterface $router,
-        SecurityFacade $securityFacade,
-        TranslatorInterface $translator
-    ) {
-        $this->menuExtension  = $menuExtension;
-        $this->router         = $router;
-        $this->securityFacade = $securityFacade;
-        $this->translator     = $translator;
+    /**
+     * @return AuthorizationCheckerInterface
+     */
+    protected function getAuthorizationChecker()
+    {
+        return $this->container->get('security.authorization_checker');
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    protected function getTranslator()
+    {
+        return $this->container->get('translator');
     }
 
     /**
@@ -54,21 +66,15 @@ class TabExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'menuTabPanel' => new \Twig_Function_Method(
-                $this,
+            new \Twig_SimpleFunction(
                 'menuTabPanel',
-                [
-                    'is_safe' => ['html'],
-                    'needs_environment' => true
-                ]
+                [$this, 'menuTabPanel'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            'tabPanel' => new \Twig_Function_Method(
-                $this,
+            new \Twig_SimpleFunction(
                 'tabPanel',
-                [
-                    'is_safe' => ['html'],
-                    'needs_environment' => true
-                ]
+                [$this, 'tabPanel'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
             )
         ];
     }
@@ -101,7 +107,7 @@ class TabExtension extends \Twig_Extension
     public function getTabs($menuName, $options = [])
     {
         /* @var MenuItem $menu */
-        $menu = $this->menuExtension->getMenu($menuName, [], $options);
+        $menu = $this->getMenuExtension()->getMenu($menuName, [], $options);
 
         $tabs = [];
         foreach ($menu->getChildren() as $child) {
@@ -125,7 +131,7 @@ class TabExtension extends \Twig_Extension
                         }
                     }
 
-                    $url = $this->router->generate($route, $routeParameters);
+                    $url = $this->getRouter()->generate($route, $routeParameters);
                 } else {
                     throw new InvalidArgumentException(
                         sprintf('Extra parameter "widgetRoute" should be defined for %s', $child->getName())
@@ -133,10 +139,10 @@ class TabExtension extends \Twig_Extension
                 }
             }
 
-            if ($this->securityFacade->isGranted($child->getExtra('widgetAcl'))) {
+            if ($this->getAuthorizationChecker()->isGranted($child->getExtra('widgetAcl'))) {
                 $label = $child->getLabel();
                 if (!empty($label)) {
-                    $label = $this->translator->trans($label);
+                    $label = $this->getTranslator()->trans($label);
                 }
                 $tabs[] = [
                     'alias'      => $child->getName(),

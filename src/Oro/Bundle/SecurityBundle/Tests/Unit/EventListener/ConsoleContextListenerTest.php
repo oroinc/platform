@@ -3,122 +3,84 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $userRepository;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $organizationRepository;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityContextInterface
-     */
-    protected $securityContext;
+    /** @var TokenStorage */
+    protected $tokenStorage;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|UserManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $userManager;
 
-    /**
-     * @var ConsoleContextListener
-     */
+    /** @var ConsoleContextListener */
     protected $listener;
 
     protected function setUp()
     {
-        $this->securityContext = new SecurityContext(
-            new TokenStorage(),
-            $this->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')
-        );
-
-        $this->userRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
-        $this->organizationRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
-
-        $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
+        $this->tokenStorage = new TokenStorage();
+        $this->userManager = $this->getMockBuilder(UserManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $registry->expects($this->any())
+        $this->userRepository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->organizationRepository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getRepository')
-            ->with($this->isType('string'))
-            ->will(
-                $this->returnCallback(
-                    function ($entity) {
-                        switch ($entity) {
-                            case 'OroUserBundle:User':
-                                return $this->userRepository;
-                            case 'OroOrganizationBundle:Organization':
-                                return $this->organizationRepository;
-                        }
-                        return null;
-                    }
-                )
-            );
+            ->willReturnMap([
+                ['OroUserBundle:User', null, $this->userRepository],
+                ['OroOrganizationBundle:Organization', null, $this->organizationRepository],
+            ]);
 
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['doctrine', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $registry],
-                        [
-                            'security.context',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->securityContext,
-                        ],
-                        ['oro_user.manager', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->userManager],
-                    ]
-                )
-            );
+        $container = TestContainerBuilder::create()
+            ->add('doctrine', $doctrine)
+            ->add('security.token_storage', $this->tokenStorage)
+            ->add('oro_user.manager', $this->userManager)
+            ->getContainer($this);
 
-        $this->listener = new ConsoleContextListener($registry, $this->securityContext, $this->userManager);
-        $this->listener->setContainer($this->container);
+        $this->listener = new ConsoleContextListener($container);
     }
 
     public function testNoOptions()
     {
-        $this->assertEmpty($this->securityContext->getToken());
+        $this->assertEmpty($this->tokenStorage->getToken());
 
         $event = $this->getEvent();
         $this->listener->onConsoleCommand($event);
 
-        $this->assertEmpty($this->securityContext->getToken());
+        $this->assertEmpty($this->tokenStorage->getToken());
     }
 
     public function testSetUserIdAndOrganizationIds()
     {
-        $this->assertEmpty($this->securityContext->getToken());
+        $this->assertEmpty($this->tokenStorage->getToken());
 
         $userId = 1;
         $user = new User();
@@ -131,7 +93,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $user->addOrganization($organization);
 
         $event = $this->getEvent();
-        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
         $input->expects($this->at(0))
             ->method('getParameterOption')
@@ -153,17 +115,17 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener->onConsoleCommand($event);
         /** @var ConsoleToken $token */
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
 
         $this->assertNotEmpty($token);
-        $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken', $token);
+        $this->assertInstanceOf(ConsoleToken::class, $token);
         $this->assertEquals($user, $token->getUser());
         $this->assertEquals($organization, $token->getOrganizationContext());
     }
 
     public function testSetUsernameAndOrganizationName()
     {
-        $this->assertEmpty($this->securityContext->getToken());
+        $this->assertEmpty($this->tokenStorage->getToken());
 
         $username = 'test_user';
         $user = new User();
@@ -176,7 +138,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $user->addOrganization($organization);
 
         $event = $this->getEvent();
-        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
         $input->expects($this->at(0))
             ->method('getParameterOption')
@@ -198,10 +160,10 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener->onConsoleCommand($event);
         /** @var ConsoleToken $token */
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
 
         $this->assertNotEmpty($token);
-        $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken', $token);
+        $this->assertInstanceOf(ConsoleToken::class, $token);
         $this->assertEquals($user, $token->getUser());
         $this->assertEquals($organization, $token->getOrganizationContext());
     }
@@ -215,7 +177,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $username = 'test_user';
 
         $event = $this->getEvent();
-        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
         $input->expects($this->at(0))
             ->method('getParameterOption')
@@ -239,7 +201,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $organizationName = 'test_organization';
 
         $event = $this->getEvent();
-        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
         $input->expects($this->at(1))
             ->method('getParameterOption')
@@ -265,7 +227,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $organization->setName($organizationName);
 
         $event = $this->getEvent();
-        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
         $input->expects($this->at(1))
             ->method('getParameterOption')
@@ -296,7 +258,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $organization->setEnabled(true);
 
         $event = $this->getEvent();
-        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
         $input->expects($this->at(0))
             ->method('getParameterOption')
@@ -325,13 +287,13 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
     protected function getEvent()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|InputDefinition $definition */
-        $definition = $this->getMockBuilder('Symfony\Component\Console\Input\InputDefinition')
+        $definition = $this->getMockBuilder(InputDefinition::class)
             ->disableOriginalConstructor()
             ->setMethods(['addOption', 'getParameterOption'])
             ->getMock();
         $definition->expects($this->at(0))
             ->method('addOption')
-            ->with($this->isInstanceOf('Symfony\Component\Console\Input\InputOption'))
+            ->with($this->isInstanceOf(InputOption::class))
             ->will(
                 $this->returnCallback(
                     function (InputOption $option) {
@@ -351,7 +313,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
             );
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|Application $application */
-        $application = $this->getMockBuilder('Symfony\Component\Console\Application')
+        $application = $this->getMockBuilder(Application::class)
             ->disableOriginalConstructor()
             ->setMethods(['getHelperSet'])
             ->getMock();
@@ -361,14 +323,15 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new HelperSet()));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|Command $command */
-        $command = $this->getMockBuilder('Symfony\Component\Console\Command\Command')
+        $command = $this->getMockBuilder(Command::class)
             ->disableOriginalConstructor()
             ->setMethods(null)
             ->getMock();
         $command->setApplication($application);
+        $command->setDefinition($definition);
 
-        $input = $this->createMock('Symfony\Component\Console\Input\InputInterface');
-        $output = $this->createMock('Symfony\Component\Console\Output\OutputInterface');
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
 
         return new ConsoleCommandEvent($command, $input, $output);
     }

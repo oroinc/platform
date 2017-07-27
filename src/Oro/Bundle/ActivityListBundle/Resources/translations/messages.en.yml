@@ -38,7 +38,7 @@ oro:
                 per_page.label: Items Per Page By Default
             email_threads:
                 use_threads_in_activities:
-                    label: Display Emails in Activities as
+                    label: Display email conversations in activity lists as
                     choices:
                         non_threaded.label: Non-Threaded
                         threaded.label: Threaded

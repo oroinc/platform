@@ -50,6 +50,8 @@ class Parser
         Query::OPERATOR_CONTAINS,
         Query::OPERATOR_NOT_CONTAINS,
         Query::OPERATOR_STARTS_WITH,
+        Query::OPERATOR_LIKE,
+        QUERY::OPERATOR_NOT_LIKE,
     ];
 
     /** @var array */
@@ -72,6 +74,8 @@ class Parser
             Query::OPERATOR_STARTS_WITH,
             Query::OPERATOR_EXISTS,
             Query::OPERATOR_NOT_EXISTS,
+            Query::OPERATOR_LIKE,
+            QUERY::OPERATOR_NOT_LIKE,
         ],
         Query::TYPE_INTEGER  => [
             Query::OPERATOR_GREATER_THAN,
@@ -545,11 +549,11 @@ class Parser
                 }
                 break;
             case Token::STRING_TYPE:
-                list ($type, $expr) = $this->parseSimpleCondition();
+                list($type, $expr) = $this->parseSimpleCondition();
                 $this->query->getCriteria()->{$type}($expr);
                 break;
             case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
-                list ($type, $expr) = $this->parseSimpleCondition($token->value);
+                list($type, $expr) = $this->parseSimpleCondition($token->value);
                 $this->query->getCriteria()->{$type}($expr);
                 break;
             case Token::KEYWORD_TYPE:
@@ -573,13 +577,20 @@ class Parser
      */
     private function getComparisonForOtherOperators(Token $operatorToken, ExpressionBuilder $expr, $fieldName)
     {
-
         switch ($operatorToken->value) {
             case Query::OPERATOR_CONTAINS:
                 $expr = $expr->contains($fieldName, $this->stream->current->value);
                 break;
             case Query::OPERATOR_NOT_CONTAINS:
                 $expr = $expr->notContains($fieldName, $this->stream->current->value);
+                break;
+
+            case Query::OPERATOR_LIKE:
+                $expr = $expr->like($fieldName, $this->stream->current->value);
+                break;
+
+            case Query::OPERATOR_NOT_LIKE:
+                $expr = $expr->notLike($fieldName, $this->stream->current->value);
                 break;
 
             case Query::OPERATOR_EQUALS:

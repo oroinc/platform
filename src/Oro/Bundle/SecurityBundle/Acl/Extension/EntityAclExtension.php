@@ -17,7 +17,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -54,7 +54,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
      * @param ObjectIdAccessor                           $objectIdAccessor
      * @param EntityClassResolver                        $entityClassResolver
      * @param EntitySecurityMetadataProvider             $entityMetadataProvider
-     * @param MetadataProviderInterface                  $metadataProvider
+     * @param OwnershipMetadataProviderInterface         $metadataProvider
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @param PermissionManager                          $permissionManager
@@ -65,7 +65,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
-        MetadataProviderInterface $metadataProvider,
+        OwnershipMetadataProviderInterface $metadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         PermissionManager $permissionManager,
@@ -238,12 +238,12 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $maskBuilder->getMask('MASK_' . $permission . '_SYSTEM');
                     }
-                } elseif ($metadata->isGlobalLevelOwned()) {
+                } elseif ($metadata->isOrganizationOwned()) {
                     if ($this->getAccessLevel($mask) < AccessLevel::GLOBAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $maskBuilder->getMask('MASK_' . $permission . '_GLOBAL');
                     }
-                } elseif ($metadata->isLocalLevelOwned()) {
+                } elseif ($metadata->isBusinessUnitOwned()) {
                     if ($this->getAccessLevel($mask) < AccessLevel::LOCAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $maskBuilder->getMask('MASK_' . $permission . '_LOCAL');
@@ -343,7 +343,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             $result = array_keys($this->getPermissionsToIdentityMap());
@@ -360,7 +360,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
             }
         }
 
-        $allowed = $this->getPermissionsForType($oid->getType());
+        $allowed = $this->getPermissionsForType($oid->getType(), $aclGroup);
 
         return array_values(array_intersect($result, $allowed));
     }
@@ -377,11 +377,12 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
 
     /**
      * @param string $type
+     * @param string|null $aclGroup
      * @return array
      */
-    protected function getPermissionsForType($type)
+    protected function getPermissionsForType($type, $aclGroup = null)
     {
-        $group = $this->groupProvider->getGroup();
+        $group = $aclGroup ?: $this->groupProvider->getGroup();
 
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             $permissions = $this->permissionManager->getPermissionsForGroup($group);
@@ -512,13 +513,13 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
             return $maskBuilder->get();
         }
 
-        if ($metadata->isGlobalLevelOwned()) {
+        if ($metadata->isOrganizationOwned()) {
             $maskBuilder = $this->getEntityMaskBuilder($identity);
 
             return
                 $maskBuilder->getMask('GROUP_SYSTEM')
                 | $maskBuilder->getMask('GROUP_GLOBAL');
-        } elseif ($metadata->isLocalLevelOwned()) {
+        } elseif ($metadata->isBusinessUnitOwned()) {
             $maskBuilder = $this->getEntityMaskBuilder($identity);
 
             return
@@ -526,7 +527,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
                 | $maskBuilder->getMask('GROUP_GLOBAL')
                 | $maskBuilder->getMask('GROUP_DEEP')
                 | $maskBuilder->getMask('GROUP_LOCAL');
-        } elseif ($metadata->isBasicLevelOwned()) {
+        } elseif ($metadata->isUserOwned()) {
             $maskBuilder = $this->getEntityMaskBuilder($identity);
 
             return

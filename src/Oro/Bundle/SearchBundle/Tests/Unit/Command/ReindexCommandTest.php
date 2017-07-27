@@ -23,7 +23,7 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container = new Container();
-        $container->set('oro_search.async.indexer', $indexer);
+        $container->set('oro_search.search.engine.indexer', $indexer);
 
         $command = new ReindexCommand();
         $command->setContainer($container);
@@ -32,6 +32,7 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
         $tester->execute([]);
 
         $this->assertContains('Started reindex task for all mapped entities', $tester->getDisplay());
+        $this->assertContains('Reindex finished successfully', $tester->getDisplay());
     }
 
     public function testShouldReindexOnlySingleClassIfClassArgumentExists()
@@ -44,7 +45,7 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container = new Container();
-        $container->set('oro_search.async.indexer', $indexer);
+        $container->set('oro_search.search.engine.indexer', $indexer);
 
         $command = new ReindexCommand();
         $command->setContainer($container);
@@ -55,6 +56,27 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertContains('Started reindex task for "class-name" entity', $tester->getDisplay());
+    }
+
+    public function testShouldReindexAsynchronouslyIfParameterSpecified()
+    {
+        $indexer = $this->createSearchIndexerMock();
+        $indexer
+            ->expects($this->once())
+            ->method('reindex')
+            ->with($this->isNull())
+        ;
+
+        $container = new Container();
+        $container->set('oro_search.async.indexer', $indexer);
+
+        $command = new ReindexCommand();
+        $command->setContainer($container);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--scheduled' => true]);
+
+        $this->assertContains('Started reindex task for all mapped entities', $tester->getDisplay());
     }
 
     /**

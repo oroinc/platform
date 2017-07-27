@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
@@ -11,17 +12,15 @@ use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
  */
 class ImagineFilterConfigListener
 {
-    /**
-     * @var ImageFilterLoader
-     */
-    protected $imageFilterLoader;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param ImageFilterLoader $imageFilterLoader
+     * @param ContainerInterface $container
      */
-    public function __construct(ImageFilterLoader $imageFilterLoader)
+    public function __construct(ContainerInterface $container)
     {
-        $this->imageFilterLoader = $imageFilterLoader;
+        $this->container = $container;
     }
 
     /**
@@ -30,7 +29,9 @@ class ImagineFilterConfigListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         if ($event->isMasterRequest()) {
-            $this->imageFilterLoader->load();
+            /** @var ImageFilterLoader $loader */
+            $loader = $this->container->get('oro_layout.loader.image_filter');
+            $loader->load();
         }
     }
 }

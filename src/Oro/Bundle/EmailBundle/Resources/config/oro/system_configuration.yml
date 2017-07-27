@@ -213,6 +213,15 @@ system_configuration:
                 tooltip: oro.email.system_configuration.sanitize_html.tooltip
                 required: false
 
+        oro_email.threads_grouping:
+            data_type: boolean
+            type: choice
+            options:
+                label: oro.email.system_configuration.email_threads.use_threads.label
+                choices:
+                    - oro.email.system_configuration.email_threads.use_threads.choices.non_threaded.label
+                    - oro.email.system_configuration.email_threads.use_threads.choices.threaded.label
+
     tree:
         system_configuration:
             platform:
@@ -257,6 +266,9 @@ system_configuration:
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid
+                                    email_threads:
+                                        children:
+                                            - oro_email.threads_grouping
 
         user_configuration:
             platform:
@@ -280,7 +292,9 @@ system_configuration:
                                     user_mailbox:
                                         children:
                                             - oro_email.user_mailbox
-
+                                    email_threads:
+                                        children:
+                                            - oro_email.threads_grouping
     api_tree:
         signature_configuration:
             oro_email.signature: ~

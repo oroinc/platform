@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Filter;
 
+use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Value;
+use Doctrine\Common\Collections\Expr\Comparison as BaseComparison;
+use Doctrine\Common\Collections\Expr\Comparison as CommonComparision;
+
+use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberRangeFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
-use Doctrine\Common\Collections\Expr\Comparison as BaseComparison;
-use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchNumberRangeFilterTest extends \PHPUnit_Framework_TestCase
 {
@@ -84,11 +89,24 @@ class SearchNumberRangeFilterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $ds->expects($this->exactly(2))
+        $ds->expects($this->exactly(1))
             ->method('addRestriction')
-            ->withConsecutive(
-                [new BaseComparison("decimal.".$fieldName, Comparison::LTE, 123), FilterUtility::CONDITION_AND, false],
-                [new BaseComparison("decimal.".$fieldName, Comparison::GTE, 155), FilterUtility::CONDITION_AND, false]
+            ->with(
+                new CompositeExpression(
+                    FilterUtility::CONDITION_OR,
+                    [
+                        new CommonComparision(
+                            'decimal.field',
+                            Comparison::LTE,
+                            new Value(123)
+                        ),
+                        new CommonComparision(
+                            'decimal.field',
+                            Comparison::GTE,
+                            new Value(155)
+                        ),
+                    ]
+                )
             );
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);

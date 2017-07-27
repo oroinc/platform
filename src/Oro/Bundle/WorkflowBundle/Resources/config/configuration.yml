@@ -1,50 +1,45 @@
 parameters:
-    oro_workflow.configuration.config.workflow_sole.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration
-    oro_workflow.configuration.config.workflow_list.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration
-
-    oro_workflow.configuration.handler.step.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\StepHandler
-    oro_workflow.configuration.handler.attribute.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\AttributeHandler
-    oro_workflow.configuration.handler.transition.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler
-    oro_workflow.configuration.handler.workflow.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler
-
-    oro_workflow.configuration.config.process_definition_sole.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration
-    oro_workflow.configuration.config.process_definition_list.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionListConfiguration
-    oro_workflow.configuration.config.process_trigger_sole.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration
-    oro_workflow.configuration.config.process_trigger_list.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration
-
-    oro_workflow.configuration.provider.workflow_config.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider
-    oro_workflow.configuration.provider.process_config.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider
-
-    oro_workflow.configuration.builder.workflow_definition.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder
-    oro_workflow.configuration.builder.workflow_definition.handle.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder
-    oro_workflow.configuration.builder.process_configuration.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder
+    oro_workflow.configuration.default_subdirectory: '/Resources/config/oro/'
+    oro_workflow.configuration.default_filename: 'workflows.yml'
 
 services:
     oro_workflow.configuration.config.workflow_sole:
-        class: %oro_workflow.configuration.config.workflow_sole.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration
 
     oro_workflow.configuration.config.workflow_list:
-        class: %oro_workflow.configuration.config.workflow_list.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration
         arguments:
             - '@oro_workflow.configuration.config.workflow_sole'
 
     oro_workflow.configuration.handler.step:
-        class: %oro_workflow.configuration.handler.step.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\Handler\StepHandler
 
     oro_workflow.configuration.handler.attribute:
-        class: %oro_workflow.configuration.handler.attribute.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\Handler\AttributeHandler
+
+    oro_workflow.configuration.handler.variable:
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\Handler\VariableHandler'
+        public: false
 
     oro_workflow.configuration.handler.transition:
-        class: %oro_workflow.configuration.handler.transition.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler
 
     oro_workflow.configuration.handler.workflow:
-        class: %oro_workflow.configuration.handler.workflow.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler
         calls:
             - [addHandler, ['@oro_workflow.configuration.handler.step']]
             - [addHandler, ['@oro_workflow.configuration.handler.attribute']]
+            - [addHandler, ['@oro_workflow.configuration.handler.variable']]
             - [addHandler, ['@oro_workflow.configuration.handler.transition']]
         tags:
             - { name: oro.workflow.configuration.handler, priority: 0 }
+
+    oro_workflow.configuration.handler.clean:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Handler\CleanConfigurationHandler
+        arguments:
+            - '@request_stack'
+        tags:
+            - { name: oro.workflow.configuration.handler, priority: 299 }
 
     oro_workflow.configuration.handler.filter:
         class: Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler
@@ -52,50 +47,95 @@ services:
             - { name: oro.workflow.configuration.handler, priority: 300 }
 
     oro_workflow.configuration.config.process_definition_sole:
-        class: %oro_workflow.configuration.config.process_definition_sole.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration
 
     oro_workflow.configuration.config.process_definition_list:
-        class: %oro_workflow.configuration.config.process_definition_list.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionListConfiguration
         arguments:
             - '@oro_workflow.configuration.config.process_definition_sole'
 
     oro_workflow.configuration.config.process_trigger_sole:
-        class: %oro_workflow.configuration.config.process_trigger_sole.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration
 
     oro_workflow.configuration.config.process_trigger_list:
-        class: %oro_workflow.configuration.config.process_trigger_list.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration
         arguments:
             - '@oro_workflow.configuration.config.process_trigger_sole'
 
-    oro_workflow.configuration.provider.workflow_config:
-        class: %oro_workflow.configuration.provider.workflow_config.class%
+    oro_workflow.configuration.config_finder.factory:
+        class: Oro\Bundle\WorkflowBundle\Configuration\ConfigFinderFactory
         arguments:
-            - %kernel.bundles%
+            - '%kernel.bundles%'
+
+    oro_workflow.configuration.workflow_config_finder.builder:
+        class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder
+        arguments:
+            - '@oro_workflow.configuration.config_finder.factory'
+        calls:
+            - ['setSubDirectory', ['%oro_workflow.configuration.default_subdirectory%']]
+            - ['setFileName', ['%oro_workflow.configuration.default_filename%']]
+
+    oro_workflow.configuration.reader.yaml:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Reader\YamlFileCachedReader
+
+    oro_workflow.configuration.import_processor_factory.file_resource:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory
+        arguments:
+            - '@oro_workflow.configuration.reader.yaml'
+
+    oro_workflow.configuration.import_processor_factory.workflow_file:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessorFactory
+        arguments:
+            - '@oro_workflow.configuration.reader.yaml'
+
+    oro_workflow.configuration.import_processor_factory.workflow_import_supervisor:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisorFactory
+        arguments:
+            - '@oro_workflow.configuration.reader.yaml'
+            - '@oro_workflow.configuration.workflow_config_finder.builder'
+
+    oro_workflow.configuration.imports.processor:
+        class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationImportsProcessor
+        calls:
+            - ['addImportProcessorFactory', ['@oro_workflow.configuration.import_processor_factory.file_resource']]
+            - ['addImportProcessorFactory', ['@oro_workflow.configuration.import_processor_factory.workflow_file']]
+            - ['addImportProcessorFactory', ['@oro_workflow.configuration.import_processor_factory.workflow_import_supervisor']]
+
+    oro_workflow.configuration.provider.workflow_config:
+        class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider
+        arguments:
             - '@oro_workflow.configuration.config.workflow_list'
+            - '@oro_workflow.configuration.workflow_config_finder.builder'
+            - '@oro_workflow.configuration.reader.yaml'
+            - '@oro_workflow.configuration.imports.processor'
 
     oro_workflow.configuration.provider.process_config:
-        class: %oro_workflow.configuration.provider.process_config.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider
         arguments:
-            - %kernel.bundles%
+            - '%kernel.bundles%'
             - '@oro_workflow.configuration.config.process_definition_list'
             - '@oro_workflow.configuration.config.process_trigger_list'
 
     oro_workflow.configuration.builder.workflow_definition:
-        class: %oro_workflow.configuration.builder.workflow_definition.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder
         arguments:
             - '@oro_workflow.workflow_assembler'
 
     oro_workflow.configuration.builder.workflow_definition.handle:
-        class: %oro_workflow.configuration.builder.workflow_definition.handle.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder
         arguments:
             - '@oro_workflow.configuration.config.workflow_sole'
             - '@oro_workflow.configuration.builder.workflow_definition'
 
     oro_workflow.configuration.builder.process_configuration:
-        class: %oro_workflow.configuration.builder.process_configuration.class%
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder
 
     oro_workflow.config_extension.feature:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension'
         tags:
             - { name: oro_feature.config_extension }
 
+    oro_workflow.configuration.checker:
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker'
+        arguments:
+            - '@oro_action.expression.context_accessor'

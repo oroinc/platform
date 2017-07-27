@@ -7,11 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -20,6 +23,8 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 {
     const SAMPLE_ERROR_MESSAGE = 'Restore error message';
     const SAMPLE_SUCCESS_MESSAGE = 'Entity config was successfully saved';
+    const SAMPLE_VALIDATION_ERROR_MESSAGE1 = 'Validation error 1';
+    const SAMPLE_VALIDATION_ERROR_MESSAGE2 = 'Validation error 2';
 
     /**
      * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
@@ -51,6 +56,11 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $handler;
 
+    /**
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $eventDispatcher;
+
     protected function setUp()
     {
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
@@ -71,11 +81,14 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->fieldConfigModel = $this->getMockBuilder(FieldConfigModel::class)->getMock();
 
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $this->handler = new RemoveRestoreConfigFieldHandler(
             $this->configManager,
             $this->validationHelper,
             $this->configHelper,
-            $this->session
+            $this->session,
+            $this->eventDispatcher
         );
     }
 
@@ -106,44 +119,18 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
     }
 
-    /**
-     * @return array
-     */
-    public function removeDataProvider()
+    public function testHandleRemove()
     {
-        return [
-            'fieldIsNotUpgradeable' => [
-                'fields' => [],
-                'isUpgradeable' => false
-            ],
-            'fieldIsUpgradeable' => [
-                'fields' => [
-                    'some' => 'field'
-                ],
-                'isUpgradeable' => true
-            ]
-        ];
-    }
-
-    /**
-     * @dataProvider removeDataProvider
-     *
-     * @param $fields
-     * @param bool $isUpgradeable
-     */
-    public function testHandleRemove($fields, $isUpgradeable)
-    {
-        $this->configHelper
-            ->expects($this->once())
-            ->method('filterEntityConfigByField')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($fields);
+        $this->validationHelper->expects($this->once())
+            ->method('getRemoveFieldValidationErrors')
+            ->with($this->fieldConfigModel)
+            ->willReturn([]);
 
         $entityConfig = $this->createMock(ConfigInterface::class);
         $entityConfig
             ->expects($this->once())
             ->method('set')
-            ->with('upgradeable', $isUpgradeable);
+            ->with('upgradeable', true);
 
         $this->configHelper
             ->expects($this->once())
@@ -184,9 +171,62 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::AFTER_REMOVE_FIELD, new AfterRemoveFieldEvent($this->fieldConfigModel));
+
         $expectedContent = [
             'message' => self::SAMPLE_SUCCESS_MESSAGE,
             'successful' => true
+        ];
+
+        $response = $this->handler->handleRemove($this->fieldConfigModel, self::SAMPLE_SUCCESS_MESSAGE);
+
+        $this->expectsJsonResponseWithContent($response, $expectedContent);
+    }
+
+    public function testHandleRemoveValidationError()
+    {
+        $this->validationHelper->expects($this->once())
+            ->method('getRemoveFieldValidationErrors')
+            ->with($this->fieldConfigModel)
+            ->willReturn([
+                self::SAMPLE_VALIDATION_ERROR_MESSAGE1,
+                self::SAMPLE_VALIDATION_ERROR_MESSAGE2
+            ]);
+
+        $fieldConfig = $this->createMock(ConfigInterface::class);
+
+        $fieldConfig
+            ->expects($this->never())
+            ->method('set')
+            ->with('state', ExtendScope::STATE_DELETE);
+
+        $this->configManager
+            ->expects($this->never())
+            ->method('flush');
+
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        $flashBag
+            ->expects($this->exactly(2))
+            ->method('add')
+            ->withConsecutive(
+                ['error', self::SAMPLE_VALIDATION_ERROR_MESSAGE1],
+                ['error', self::SAMPLE_VALIDATION_ERROR_MESSAGE2]
+            );
+
+        $this->session
+            ->expects($this->exactly(2))
+            ->method('getFlashBag')
+            ->willReturn($flashBag);
+
+        $expectedContent = [
+            'message' => sprintf(
+                '%s. %s',
+                self::SAMPLE_VALIDATION_ERROR_MESSAGE1,
+                self::SAMPLE_VALIDATION_ERROR_MESSAGE2
+            ),
+            'successful' => false
         ];
 
         $response = $this->handler->handleRemove($this->fieldConfigModel, self::SAMPLE_SUCCESS_MESSAGE);
@@ -201,6 +241,17 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('canFieldBeRestored')
             ->with($this->fieldConfigModel)
             ->willReturn(false);
+
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        $flashBag
+            ->expects($this->once())
+            ->method('add')
+            ->with('error', self::SAMPLE_ERROR_MESSAGE);
+
+        $this->session
+            ->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($flashBag);
 
         $this->configManager
             ->expects($this->never())

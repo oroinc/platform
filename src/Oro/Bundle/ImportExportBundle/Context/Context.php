@@ -3,7 +3,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
-class Context implements ContextInterface
+class Context implements ContextInterface, BatchContextInterface
 {
     /**
      * @var array
@@ -24,6 +24,11 @@ class Context implements ContextInterface
      * @var array
      */
     private $errors = array();
+
+    /**
+     * @var array
+     */
+    private $postponedRows = array();
 
     /**
      * Constructor
@@ -59,6 +64,36 @@ class Context implements ContextInterface
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRow(array $row)
+    {
+        $this->postponedRows[] = $row;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRows(array $rows)
+    {
+        foreach ($rows as $row) {
+            $this->addPostponedRow($row);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPostponedRows()
+    {
+        return $this->postponedRows;
     }
 
     /**
@@ -256,5 +291,21 @@ class Context implements ContextInterface
         if ($this->hasOption($name)) {
             unset($this->configuration[$name]);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchSize()
+    {
+        return $this->getValue('batch_size');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchNumber()
+    {
+        return $this->getValue('batch_number');
     }
 }

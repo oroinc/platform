@@ -1,0 +1,106 @@
+operations:
+    oro_cache_invalidate:
+        label: oro.cache.invalidate.label
+        page_reload: false
+        button_options:
+            icon: fa-clock-o
+        frontend_options:
+            template: OroCacheBundle:Action:invalidate.html.twig
+            title: oro.cache.invalidate.label
+            options:
+                width: 505
+                modal: false
+                stateEnabled: false
+                incrementalPosition: false
+                allowMaximize: false
+                allowMinimize: false
+                maximizedHeightDecreaseBy: minimize-bar
+        attributes:
+            invalidateService:
+                label: oro.cache.invalidate_service.label
+                type: string
+            invalidateType:
+                label: oro.cache.invalidate.label
+                type: string
+            invalidateCacheAt:
+                label: oro.cache.invalidate.invalidate_cache_at.label
+                type: object
+                options:
+                    class: DateTime
+            invalidateNow:
+                label: oro.cache.invalidate.invalidate_now.label
+                type: string
+        form_options:
+            attribute_fields:
+                invalidateType:
+                    form_type: choice
+                    options:
+                        placeholder: false
+                        choices:
+                            scheduled: oro.cache.invalidate.type.scheduled
+                            immediate: oro.cache.invalidate.type.immediate
+                invalidateCacheAt:
+                    form_type: Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
+                invalidateNow:
+                    form_type: hidden
+            attribute_default_values:
+                invalidateCacheAt: $.invalidateCacheAt
+        form_init:
+            - '@call_method':
+                object: $.dataStorage
+                method: set
+                method_parameters:
+                    - $.paramHandlerServiceName
+                    - $.invalidateService
+            - '@call_service_method':
+                service: oro_cache.action.provider.invalidate_cache_time
+                method: getByDataStorage
+                method_parameters: [$.dataStorage]
+                attribute: $.invalidateCacheAt
+        preactions:
+            - '@create_object':
+                class: 'Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage'
+                attribute: $.dataStorage
+            - '@assign_constant_value':
+                attribute: $.paramInvalidateTime
+                value: Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler::PARAM_INVALIDATE_TIME
+            - '@assign_constant_value':
+                attribute: $.paramHandlerServiceName
+                value: Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler::PARAM_HANDLER_SERVICE_NAME
+        actions:
+            - '@call_method':
+                object: $.dataStorage
+                method: set
+                method_parameters:
+                    - $.paramInvalidateTime
+                    - $.invalidateCacheAt
+            - '@call_method':
+                object: $.dataStorage
+                method: set
+                method_parameters:
+                    - $.paramHandlerServiceName
+                    - $.invalidateService
+            - '@call_service_method':
+                conditions:
+                    '@equal': [$.invalidateNow, true]
+                parameters:
+                    service: $.invalidateService
+                    method: handle
+                    method_parameters: [$.dataStorage]
+            - '@call_service_method':
+                conditions:
+                    '@equal': [$.invalidateNow, false]
+                parameters:
+                    service: oro_cache.action.handler.invalidate_scheduled
+                    method: handle
+                    method_parameters: [$.dataStorage]
+            - '@flash_message':
+                conditions:
+                    '@not_empty': $.invalidateNow
+                message: oro.cache.invalidate.flash.invalidate_success
+                type: 'success'
+            - '@flash_message':
+                conditions:
+                    '@empty': $.invalidateNow
+                message: oro.cache.invalidate.flash.save_success
+                type: 'success'

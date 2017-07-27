@@ -22,20 +22,14 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
-
     protected function setUp()
     {
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcher');
-        $this->securityFacade  = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
     }
 
     protected function tearDown()
     {
         unset($this->eventDispatcher);
-        unset($this->securityFacade);
     }
 
     public function testRegisterExtensions()
@@ -73,6 +67,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
      * @param int                   $extensionsCount
      * @param array                 $extensionsMocks
      * @param array                 $minifiedParams
+     * @param array                 $additionalParams
      */
     public function testBuild(
         $config,
@@ -80,7 +75,8 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $raisedEvents,
         $extensionsCount,
         $extensionsMocks = [],
-        $minifiedParams = []
+        $minifiedParams = [],
+        $additionalParams = []
     ) {
         $builder = $this->getBuilderMock(['buildDataSource']);
         $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
@@ -92,7 +88,8 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
         if (is_array($minifiedParams) && array_key_exists('g', $minifiedParams) && is_array($minifiedParams['g'])) {
             $parameters->expects($this->once())
-                ->method('add');
+                ->method('add')
+                ->with(array_merge($minifiedParams['g'], $additionalParams));
         } else {
             $parameters->expects($this->never())
                 ->method('add');
@@ -120,7 +117,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
 
         /** @var DatagridInterface $result */
-        $result = $builder->build($config, $parameters);
+        $result = $builder->build($config, $parameters, $additionalParams);
         $this->assertInstanceOf($resultFQCN, $result);
 
         $this->assertInstanceOf(self::DEFAULT_ACCEPTOR_CLASS, $result->getAcceptor());
@@ -191,7 +188,8 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 $baseEventList,
                 0,
                 [],
-                ['g' => ['class_name' => 'Extended_Entity_Test']]
+                ['g' => ['class_name' => 'Extended_Entity_Test']],
+                ['additional' => 'param']
             ]
         ];
     }
@@ -221,7 +219,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($expectedException !== null) {
-            list ($name, $message) = $expectedException;
+            list($name, $message) = $expectedException;
 
             $this->expectException($name);
             $this->expectExceptionMessage($message);
@@ -270,8 +268,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $args = [
             self::DEFAULT_DATAGRID_CLASS,
             self::DEFAULT_ACCEPTOR_CLASS,
-            $this->eventDispatcher,
-            $this->securityFacade
+            $this->eventDispatcher
         ];
         return $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Builder')
             ->setConstructorArgs($args)

@@ -14,6 +14,8 @@ oro:
 
         form:
             choose_event: Choose an event...
+            recipient_list:
+                empty: At least one Recipient must be specified.
 
         datagrid:
             action:
@@ -26,18 +28,19 @@ oro:
                 owner: Recipient entity owner
 
         emailnotification:
-            entity_label:         Notification Rule
-            entity_plural_label:  Notification Rules
-            entity_description:   Represent email notification
-            edit_entity:          Edit notification rule %name%
-            id.label:             Id
-            entity_name.label:    Entity name
-            entity_name.tooltip:  Only entities that have templates available are listed. If you don't see an entity you want in this list, please create <a href="url" target="_blank">a notification template</a> for it first.
-            event.label:          Event name
-            template.label:       Template
-            recipient_list.label: Recipient list
-            email.label:          Email
-            owner.label:          Owner
+            entity_label:                        Notification Rule
+            entity_plural_label:                 Notification Rules
+            entity_description:                  Represent email notification
+            edit_entity:                         Edit notification rule %name%
+            id.label:                            Id
+            entity_name.label:                   Entity name
+            entity_name.tooltip:                 Only entities that have templates available are listed. If you don't see an entity you want in this list, please create <a href="url" target="_blank">a notification template</a> for it first.
+            event.label:                         Event name
+            template.label:                      Template
+            recipient_list.label:                Recipient list
+            email.label:                         Email
+            owner.label:                         Owner
+            additional_email_associations.label: Additional associations
 
         massnotification:
             entity_label:         Maintenance Notification

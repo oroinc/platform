@@ -30,7 +30,6 @@ define(function(require) {
          */
         initialize: function(options) {
             this.target = $(options.target);
-            this.targetLabel = $('label[for="' + this.target.attr('id') + '"]');
             this.$simpleEl = $(options.simpleEl);
 
             this.target.closest('.controls').append(this.$simpleEl);
@@ -72,7 +71,7 @@ define(function(require) {
         },
 
         addRequiredFlag: function(el) {
-            var label = this.getInputLabel(el);
+            var label = this.getInputLabel(this.target);
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
@@ -81,7 +80,7 @@ define(function(require) {
         },
 
         removeRequiredFlag: function(el) {
-            var label = this.getInputLabel(el);
+            var label = this.getInputLabel(this.target);
             if (label.hasClass('required')) {
                 label
                     .removeClass('required')
@@ -140,7 +139,7 @@ define(function(require) {
         switchInputWidget: function(display) {
             switch (this.switchState) {
                 case 'disable':
-                    this.target.inputWidget('disable', display);
+                    this.target.inputWidget('disable', !display);
                     break;
                 default: {
                     this.target.inputWidget(display ? 'show' : 'hide');

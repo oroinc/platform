@@ -8,7 +8,7 @@ parameters:
     oro_distribution.composer.installer.class:                Composer\Installer
     oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
     oro_distribution.composer.json_file.class:                Composer\Json\JsonFile
-    oro_distribution.composer_json:                           %kernel.root_dir%/../composer.json
+    oro_distribution.composer_json:                           '%kernel.root_dir%/../composer.json'
 
     #
     # BAP-10865: Hide "Package Manager" from menu
@@ -89,6 +89,7 @@ services:
     oro_distribution.composer.io:
         class: %oro_distribution.composer.io.class%
         public: false
+        lazy: true
 
     oro_distribution.composer.installer:
         class: %oro_distribution.composer.installer.class%
@@ -96,18 +97,21 @@ services:
         factory_class: Composer\Installer
         factory_method: create
         arguments: ['@oro_distribution.composer.io', '@oro_distribution.composer']
+        lazy: true
 
     oro_distribution.composer:
         class: %oro_distribution.composer.class%
         factory_class: Composer\Factory
         factory_method: create
         arguments: ['@oro_distribution.composer.io', %oro_distribution.composer_json%]
+        lazy: true
 
     oro_distribution.composer.installation_manager:
         class: %oro_distribution.composer.installation_manager.class%
         public: false
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
+        lazy: true
 
     oro_distribution.composer.json_file:
         class: %oro_distribution.composer.json_file.class%
@@ -120,7 +124,8 @@ services:
     #oro_distribution.listener.navigation_listener:
     #    class: %oro_distribution.listener.navigation_listener.class%
     #    arguments:
-    #        - '@security.context'
+    #        - '@security.authorization_checker'
+    #        - '@security.token_storage'
     #        - %oro_distribution.entry_point%
     #    tags:
     #        - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
@@ -137,3 +142,20 @@ services:
         class: %oro_distribution.form.type.composer_repository.class%
         tags:
             - { name: form.type, alias: oro_composer_repository }
+
+    # Translations
+    # event listeners
+    oro_distribution.locale_listener:
+        class: 'Oro\Bundle\DistributionBundle\EventListener\LocaleListener'
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    # DBAL Loader
+    oro_distribution.database_translation.loader:
+        class: 'Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: translation.loader, alias: oro_dbal_translation }

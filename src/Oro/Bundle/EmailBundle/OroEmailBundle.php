@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
-use Symfony\Component\ClassLoader\UniversalClassLoader;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
+use Oro\Component\PhpUtils\ClassLoader;
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
@@ -19,13 +19,15 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPa
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFolderLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\OverrideServiceSwiftMailer;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 
 class OroEmailBundle extends Bundle
 {
     const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
     const CACHED_ENTITIES_DIR_NAME = 'oro_entities';
+    const VARIABLE_PROCESSOR_TAG = 'oro_email.emailtemplate.variable_processor';
 
     /**
      * Constructor
@@ -35,12 +37,9 @@ class OroEmailBundle extends Bundle
     public function __construct(KernelInterface $kernel)
     {
         // register email address proxy class loader
-        $loader = new UniversalClassLoader();
-        $loader->registerNamespaces(
-            [
-                self::ENTITY_PROXY_NAMESPACE =>
-                    $kernel->getCacheDir() . DIRECTORY_SEPARATOR . self::CACHED_ENTITIES_DIR_NAME
-            ]
+        $loader = new ClassLoader(
+            self::ENTITY_PROXY_NAMESPACE . '\\',
+            $kernel->getCacheDir() . DIRECTORY_SEPARATOR . self::CACHED_ENTITIES_DIR_NAME
         );
         $loader->register();
     }
@@ -61,6 +60,14 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
         $container->addCompilerPass(new EmailRecipientsProviderPass());
         $container->addCompilerPass(new MailboxProcessPass());
+        $container->addCompilerPass(new OverrideServiceSwiftMailer());
+
+        $container->addCompilerPass(
+            new TaggedServiceLinkRegistryCompilerPass(
+                self::VARIABLE_PROCESSOR_TAG,
+                'oro_email.emailtemplate.variable_processor'
+            )
+        );
 
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
@@ -72,8 +79,7 @@ class OroEmailBundle extends Bundle
             ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates multiple emails for email owner')
             ->add(Topics::SYNC_EMAIL_SEEN_FLAG, 'Synchronization email flags')
             ->add(Topics::PURGE_EMAIL_ATTACHMENTS, 'Purge email attachments')
-            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids')
-        ;
+            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids');
 
         $container->addCompilerPass($addTopicPass);
     }

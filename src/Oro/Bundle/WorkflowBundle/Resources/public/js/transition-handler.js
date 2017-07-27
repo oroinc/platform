@@ -1,10 +1,12 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
     'oroui/js/modal',
-    'oroworkflow/js/transition-executor',
-    'oroworkflow/js/transition-event-handlers',
-], function($, _, Modal, performTransition, TransitionEventHandlers) {
+    'oroui/js/tools',
+    'backbone',
+    'oroworkflow/js/transition-executor'
+], function($, _, __, Modal, tools, Backbone, performTransition) {
     'use strict';
 
     /**
@@ -46,43 +48,58 @@ define([
                 dialogOptions = _.extend(dialogOptions, additionalOptions);
             }
 
-            require(['oro/dialog-widget'],
-                function(DialogWidget) {
-                    var transitionFormWidget = new DialogWidget(dialogOptions);
-                    transitionFormWidget.on('widgetRemove', function() {
-                        resetInProgress();
-                    });
+            tools.loadModules('oroworkflow/transition-dialog-widget', function(Widget) {
+                var _widget = new Widget(dialogOptions);
+                Backbone.listenTo(_widget, 'widgetRemove', _.bind(function() {
+                    resetInProgress();
+                }, this));
 
-                    transitionFormWidget.on('formSave', function(data) {
-                        transitionFormWidget.remove();
-                        performTransition(element, data, pageRefresh);
-                    });
-
-                    transitionFormWidget.on('transitionSuccess', function(response) {
-                        transitionFormWidget.remove();
-                        TransitionEventHandlers.getOnSuccess(element, pageRefresh)(response);
-                    });
-
-                    transitionFormWidget.on('transitionFailure', function(jqxhr) {
-                        transitionFormWidget.remove();
-                        TransitionEventHandlers.getOnFailure(element, pageRefresh)(jqxhr);
-                    });
-
-                    transitionFormWidget.render();
-                }
-            );
+                _widget.render();
+            });
         };
 
-        var showConfirmationModal = function() {
+        /**
+         * @param {function} callback
+         */
+        var showConfirmationModal = function(callback) {
             var message = element.data('message');
-            var confirm = new Modal({
-                title: element.data('transition-label'),
-                content: message
-            });
+            var modalOptions = {};
+            if (typeof message === 'string') {
+                modalOptions = {
+                    content: message,
+                    title: element.data('transition-label')
+                };
+            } else {
+                modalOptions = message;
+            }
 
-            confirm.on('ok', function() {
-                performTransition(element, null, pageRefresh);
-            });
+            var confirmation = element.data('confirmation') || {};
+            var placeholders = {};
+            if (confirmation.message_parameters !== undefined) {
+                placeholders = confirmation.message_parameters;
+            }
+            if (confirmation.title || '') {
+                modalOptions.title = __(confirmation.title, $.extend({}, placeholders));
+            }
+            if (confirmation.message || '') {
+                modalOptions.content = __(confirmation.message, $.extend({}, placeholders));
+            }
+            if (confirmation.okText || '') {
+                modalOptions.okText = __(confirmation.okText, $.extend({}, placeholders));
+            }
+            if (confirmation.cancelText || '') {
+                modalOptions.cancelText = __(confirmation.cancelText, $.extend({}, placeholders));
+            }
+
+            var confirm = new Modal(modalOptions);
+
+            if (callback) {
+                confirm.on('ok', callback);
+            } else {
+                confirm.on('ok', function() {
+                    performTransition(element, null, pageRefresh);
+                });
+            }
             confirm.on('cancel', function() {
                 resetInProgress();
             });
@@ -97,17 +114,13 @@ define([
         element.one('transitions_success', resetInProgress);
         element.one('transitions_failure', resetInProgress);
 
-        if (element.data('dialog-url')) {
+        var dialogUrl = element.data('dialogUrl');
+        if (!_.isEmpty(element.data('confirmation')) || !dialogUrl && !_.isEmpty(element.data('message'))) {
+            showConfirmationModal(dialogUrl ? showDialog : null);
+        } else if (dialogUrl) {
             showDialog();
-            return;
+        } else {
+            performTransition(element, null, pageRefresh);
         }
-
-        if (element.data('message')) {
-            showConfirmationModal();
-            return;
-        }
-
-        performTransition(element, null, pageRefresh);
     };
-
 });

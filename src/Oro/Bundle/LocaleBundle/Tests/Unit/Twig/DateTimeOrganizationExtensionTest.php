@@ -2,47 +2,39 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var DateTimeOrganizationExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var DateTimeOrganizationExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formatter;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     protected function setUp()
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+        $this->formatter = $this->getMockBuilder(DateTimeFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
-        
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new DateTimeOrganizationExtension($this->formatter);
-        $this->extension->setConfigManager($this->configManager);
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.formatter.date_time', $this->formatter)
+            ->add('oro_config.global', $this->configManager)
+            ->getContainer($this);
 
-    public function testGetFilters()
-    {
-        $filters = $this->extension->getFilters();
-
-        $this->assertCount(5, $filters);
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[4]);
-        $this->assertEquals('oro_format_datetime_organization', $filters[4]->getName());
+        $this->extension = new DateTimeOrganizationExtension($container);
     }
 
     public function testFormatDateTimeOrganizationShouldUseTimezoneFromConfigurationIfOrganizationProvided()
@@ -72,9 +64,10 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
             'timeZone'     => 'Europe/Athens',
             'organization' => $organization
         ];
-        $actual = $this->extension->formatDateTimeOrganization($date, $options);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_format_datetime_organization', [$date, $options])
+        );
     }
 
     public function testFormatDateTimeOrganizationShouldUseTimezonePassedInOptionsIfOrganizationNotProvided()
@@ -96,9 +89,10 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
             'locale'   => $locale,
             'timeZone' => $timezone
         ];
-        $actual = $this->extension->formatDateTimeOrganization($date, $options);
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_format_datetime_organization', [$date, $options])
+        );
     }
 
     public function testGetName()

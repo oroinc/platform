@@ -55,6 +55,11 @@ class Context
     private $executionInterrupted;
 
     /**
+     * @var boolean
+     */
+    private $interruptedReason;
+
+    /**
      * @param SessionInterface $session
      */
     public function __construct(SessionInterface $session)
@@ -174,6 +179,22 @@ class Context
     public function isExecutionInterrupted()
     {
         return $this->executionInterrupted;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInterruptedReason()
+    {
+        return $this->interruptedReason;
+    }
+
+    /**
+     * @param string $reason
+     */
+    public function setInterruptedReason($reason)
+    {
+        $this->interruptedReason = $reason;
     }
 
     /**

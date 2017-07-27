@@ -1,24 +1,29 @@
-#sub-widget-with-separator {
+#sub-widget-with-separator(@width: 100%) {
   &:after {
-    content: '';
     position: absolute;
-    height: 15px;
-    border-bottom: 1px solid #eaeaea;
-    left: 15px;
     right: 15px;
+    bottom: -15px;
+
+    width: calc(@width ~' - 30px');
+    height: 15px;
+
+    content: '';
+
+    border-bottom: 1px solid #eaeaea;
   }
 }
 #sub-widget-with-no-separator {
   &:after {
-    content: normal;
+    content: normal !important;
   }
 }
 
 .quick-launchpad-toolbar {
   &.with-subwidgets{
+    display: flex;
+    flex-wrap: wrap;
+
     overflow: hidden;
-    position: relative;
-    display: block;
   }
   & > li.sub-widget {
     padding: 0 15px;
@@ -26,9 +31,8 @@
     background: none;
     float: left;
     display: block;
-    position: static;
     &:nth-child(3n) {
-      #sub-widget-with-separator();
+      #sub-widget-with-separator(300%);
     }
     &:last-child {
       #sub-widget-with-no-separator();
@@ -59,6 +63,11 @@
       }
       & > .date-range {
         float: right;
+
+        max-width: ~'calc(100% - 70px)';
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
@@ -72,7 +81,7 @@
           #sub-widget-with-no-separator();
         }
         &:nth-child(2n) {
-          #sub-widget-with-separator();
+          #sub-widget-with-separator(200%);
         }
       }
     }

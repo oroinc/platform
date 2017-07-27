@@ -4,6 +4,7 @@ define(function(require) {
     var EmailNotificationCollection;
     var EmailNotificationModel = require('./email-notification-model');
     var RoutingCollection = require('oroui/js/app/models/base/routing-collection');
+    var error = require('oroui/js/error');
 
     /**
      * @export oroemail/js/app/models/email-notification-collection
@@ -58,7 +59,7 @@ define(function(require) {
             } else {
                 response.emails.forEach(function(element, index) {
                     if (element.seen && index < count || !element.seen && index >= count) {
-                        window.console.error('Wrong server response', response);
+                        error.showErrorInConsole(response);
                     }
                 });
             }

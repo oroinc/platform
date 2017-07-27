@@ -3,9 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
@@ -28,14 +28,31 @@ class AddressFormatter
     protected $propertyAccessor;
 
     /**
+     * @var PhoneProvider
+     */
+    protected $phoneProvider;
+
+    /**
      * @param LocaleSettings $localeSettings
      * @param NameFormatter $nameFormatter
+     * @param PropertyAccessor $propertyAccessor
      */
-    public function __construct(LocaleSettings $localeSettings, NameFormatter $nameFormatter)
-    {
+    public function __construct(
+        LocaleSettings $localeSettings,
+        NameFormatter $nameFormatter,
+        PropertyAccessor $propertyAccessor
+    ) {
         $this->localeSettings = $localeSettings;
         $this->nameFormatter = $nameFormatter;
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor;
+    }
+
+    /**
+     * @param PhoneProvider $phoneProvider
+     */
+    public function setPhoneProvider(PhoneProvider $phoneProvider)
+    {
+        $this->phoneProvider = $phoneProvider;
     }
 
     /**
@@ -45,19 +62,13 @@ class AddressFormatter
      * @param null|string $country
      * @param string $newLineSeparator
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function format(AddressInterface $address, $country = null, $newLineSeparator = "\n")
     {
         if (!$country) {
-            $country = null;
-            if ($this->localeSettings->isFormatAddressByAddressCountry()) {
-                $country = $address->getCountryIso2();
-            } else {
-                $country = $this->localeSettings->getCountry();
-            }
-            if (!$country) {
-                $country = LocaleConfiguration::DEFAULT_COUNTRY;
-            }
+            $country = $this->getCountry($address);
         }
 
         $format = $this->getAddressFormat($country);
@@ -77,6 +88,8 @@ class AddressFormatter
                     $value = $this->getValue($address, 'countryName');
                 } elseif ('region' === $lowerCaseKey) {
                     $value = $this->getValue($address, 'regionName');
+                } elseif ('phone' === $lowerCaseKey && $this->phoneProvider) {
+                    $value = $this->phoneProvider->getPhoneNumber($address);
                 } elseif ('region_code' === $lowerCaseKey) {
                     $value = $this->getValue($address, 'regionCode');
                     if (!$value) {
@@ -104,6 +117,7 @@ class AddressFormatter
         $formatted = trim($formatted, $newLineSeparator);
         $formatted = preg_replace('/ +/', ' ', $formatted);
         $formatted = preg_replace('/ +\n/', "\n", $formatted);
+
         return trim($formatted);
     }
 
@@ -164,5 +178,25 @@ class AddressFormatter
             $value = null;
         }
         return $value;
+    }
+
+    /**
+     * @param AddressInterface $address
+     *
+     * @return string
+     */
+    protected function getCountry(AddressInterface $address)
+    {
+        $country = null;
+        if ($this->localeSettings->isFormatAddressByAddressCountry()) {
+            $country = $address->getCountryIso2();
+        } else {
+            $country = $this->localeSettings->getCountry();
+        }
+        if (!$country) {
+            $country = LocaleConfiguration::DEFAULT_COUNTRY;
+        }
+
+        return $country;
     }
 }

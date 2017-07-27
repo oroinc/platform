@@ -28,10 +28,25 @@ define(function(require) {
             for (var i = 0; i < data.length; i++) {
                 var field = data[i];
                 var name = field.name;
+
                 var fieldNameParts = name.match(/\[(\w+)\]$/);
                 if (fieldNameParts) {
                     name = fieldNameParts[1];
+                    result[name] = field.value;
+                    continue;
                 }
+
+                fieldNameParts = name.match(/\[(\w+)\]\[\]$/);
+                if (fieldNameParts) {
+                    name = fieldNameParts[1];
+                    if (typeof result[name] === 'undefined') {
+                        result[name] = [];
+                    }
+
+                    result[name].push(field.value);
+                    continue;
+                }
+
                 result[name] = field.value;
             }
             return result;

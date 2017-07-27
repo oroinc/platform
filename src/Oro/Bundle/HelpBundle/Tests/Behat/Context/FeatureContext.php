@@ -14,7 +14,7 @@ class FeatureContext extends OroFeatureContext
         $windowNames = $this->getSession()->getWindowNames();
         $this->getSession()->switchToWindow($windowNames[1]);
         self::assertContains(
-            'www.orocrm.com/documentation/index',
+            'www.orocrm.com/documentation/current',
             $this->getSession()->getCurrentUrl()
         );
     }

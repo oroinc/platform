@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
@@ -17,6 +18,9 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
@@ -26,6 +30,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class WorkflowTest extends \PHPUnit_Framework_TestCase
 {
@@ -542,6 +547,60 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetVariables()
+    {
+        $variables = new ArrayCollection([$this->createMock(Variable::class)]);
+
+        /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $variableAssembler */
+        $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
+            ->setMethods(['assemble'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $variableAssembler->expects($this->any())
+            ->method('assemble')
+            ->willReturn($variables);
+
+        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $variableManager */
+        $variableManager = $this->getMockBuilder(VariableManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $variableManager->expects($this->any())
+            ->method('getVariableAssembler')
+            ->willReturn($variableAssembler);
+
+        $workflow = $this->createWorkflow(null, null, null, null, $variableManager);
+
+        $this->assertEquals($variables, $workflow->getVariables());
+    }
+
+    public function testGetCachedVariables()
+    {
+        $variables = new ArrayCollection([$this->createMock(Variable::class)]);
+
+        /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $variableAssembler */
+        $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
+            ->setMethods(['assemble'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $variableAssembler->expects($this->once())
+            ->method('assemble')
+            ->willReturn($variables);
+
+        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $variableManager */
+        $variableManager = $this->getMockBuilder(VariableManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $variableManager->expects($this->any())
+            ->method('getVariableAssembler')
+            ->willReturn($variableAssembler);
+
+        $workflow = $this->createWorkflow(null, null, null, null, $variableManager);
+
+        //assemble method was called once, method twice, validates cache
+        $workflow->getVariables();
+        $this->assertEquals($variables, $workflow->getVariables());
+    }
+
     /**
      * @param WorkflowStep $step
      * @param string $expectedTransitionName
@@ -608,11 +667,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllowedTransitions()
     {
-        $firstTransition = new Transition();
-        $firstTransition->setName('first_transition');
-
-        $secondTransition = new Transition();
-        $secondTransition->setName('second_transition');
+        $firstTransition = $this->getTransitionMock('first_transition');
+        $secondTransition = $this->getTransitionMock('second_transition');
 
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('test_step');
@@ -855,13 +911,15 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      * @param AclManager|\PHPUnit_Framework_MockObject_MockObject $aclManager
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
+     * @param $variableManager $variableManager
      * @return Workflow
      */
     protected function createWorkflow(
         $workflowName = null,
         $aclManager = null,
         $attributeManager = null,
-        $transitionManager = null
+        $transitionManager = null,
+        $variableManager = null
     ) {
         if (!$aclManager) {
             $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
@@ -874,13 +932,33 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        if (!$variableManager) {
+            /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $variableAssembler */
+            $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
+                ->setMethods(['assemble'])
+                ->disableOriginalConstructor()
+                ->getMock();
+            $variableAssembler->expects($this->any())
+                ->method('assemble')
+                ->willReturn(new ArrayCollection());
+
+            /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $variableManager */
+            $variableManager = $this->getMockBuilder(VariableManager::class)
+                ->disableOriginalConstructor()
+                ->getMock();
+            $variableManager->expects($this->any())
+                ->method('getVariableAssembler')
+                ->willReturn($variableAssembler);
+        }
+
         $workflow = new Workflow(
             $this->doctrineHelper,
             $aclManager,
             $restrictionManager,
             null,
             $attributeManager,
-            $transitionManager
+            $transitionManager,
+            $variableManager
         );
 
         $definition = new WorkflowDefinition();

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Oro\Bundle\SearchBundle\Engine\EngineV2Interface;
+use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -21,7 +21,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     /** @var ObjectMapper|\PHPUnit_Framework_MockObject_MockObject */
     protected $mapper;
 
-    /** @var EngineV2Interface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EngineInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $engine;
 
     /** @var SecurityProvider|\PHPUnit_Framework_MockObject_MockObject */
@@ -33,7 +33,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
-        $this->engine        = $this->createMock(EngineV2Interface::class);
+        $this->engine        = $this->createMock(EngineInterface::class);
         $this->mapper        = new ObjectMapper(
             $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
             $this->config

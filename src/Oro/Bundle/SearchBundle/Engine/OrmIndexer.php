@@ -13,17 +13,11 @@ use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 
 class OrmIndexer extends AbstractIndexer
 {
-    /** @var array */
-    protected $drivers = [];
-
     /** @var SearchIndexRepository */
     private $indexRepository;
 
     /** @var OroEntityManager */
     private $indexManager;
-
-    /** @var DbalStorer */
-    protected $dbalStorer;
 
     /**
      * @param ManagerRegistry $registry
@@ -40,16 +34,6 @@ class OrmIndexer extends AbstractIndexer
         DbalStorer $dbalStorer
     ) {
         parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
-
-        $this->dbalStorer = $dbalStorer;
-    }
-
-    /**
-     * @param array $drivers
-     */
-    public function setDrivers(array $drivers)
-    {
-        $this->drivers = $drivers;
     }
 
     /**
@@ -66,7 +50,7 @@ class OrmIndexer extends AbstractIndexer
 
         if ($hasSavedEntities) {
             $this->getIndexManager()->getConnection()->transactional(function () {
-                $this->dbalStorer->store();
+                $this->getIndexRepository()->flushWrites();
                 $this->getIndexManager()->clear();
             });
         }
@@ -83,13 +67,21 @@ class OrmIndexer extends AbstractIndexer
         if (!$entities) {
             return false;
         }
+        $sortedEntitiesData = [];
+        foreach ($entities as $entity) {
+            if (!$this->doctrineHelper->isManageableEntity($entity)) {
+                continue;
+            }
+            $entityClass = $this->doctrineHelper->getEntityClass($entity);
+            $sortedEntitiesData[$entityClass][] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        }
 
         $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
-
         $hasDeletedEntities = !empty($existingItems);
-        foreach ($existingItems as $items) {
-            foreach ($items as $item) {
-                $this->getIndexManager()->remove($item);
+        foreach ($sortedEntitiesData as $entityClass => $entityIds) {
+            $batches = array_chunk($entityIds, $this->getBatchSize());
+            foreach ($batches as $batch) {
+                $this->getIndexRepository()->removeEntities($batch, $entityClass);
             }
         }
 
@@ -149,7 +141,7 @@ class OrmIndexer extends AbstractIndexer
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $this->dbalStorer->addItem($item);
+            $this->getIndexRepository()->writeItem($item);
 
             $hasSavedEntities = true;
         }
@@ -208,8 +200,6 @@ EOF;
         }
 
         $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
-        $this->indexRepository->setDriversClasses($this->drivers);
-        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
     }

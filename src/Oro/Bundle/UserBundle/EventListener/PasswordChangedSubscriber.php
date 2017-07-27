@@ -5,6 +5,9 @@ namespace Oro\Bundle\UserBundle\EventListener;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Events;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -12,26 +15,25 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class PasswordChangedSubscriber implements EventSubscriber
 {
-
-    /** @var EnumValueProvider */
-    protected $enumValueProvider;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param EnumValueProvider $enumValueProvider
+     * @param ContainerInterface $container
      */
-    public function __construct(EnumValueProvider $enumValueProvider)
+    public function __construct(ContainerInterface $container)
     {
-        $this->enumValueProvider = $enumValueProvider;
+        $this->container = $container;
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSubscribedEvents()
     {
         return [
-            'prePersist',
-            'preUpdate',
+            Events::prePersist,
+            Events::preUpdate,
         ];
     }
 
@@ -58,7 +60,7 @@ class PasswordChangedSubscriber implements EventSubscriber
      *
      * @param  LifecycleEventArgs $args
      */
-    protected function updateAuthStatus(LifecycleEventArgs $args)
+    private function updateAuthStatus(LifecycleEventArgs $args)
     {
         $user = $args->getEntity();
         if (!$user instanceof User) {
@@ -67,8 +69,16 @@ class PasswordChangedSubscriber implements EventSubscriber
 
         if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED) {
             $user->setAuthStatus(
-                $this->enumValueProvider->getEnumValueByCode('auth_status', UserManager::STATUS_ACTIVE)
+                $this->getEnumValueProvider()->getEnumValueByCode('auth_status', UserManager::STATUS_ACTIVE)
             );
         }
+    }
+
+    /**
+     * @return EnumValueProvider
+     */
+    private function getEnumValueProvider()
+    {
+        return $this->container->get('oro_entity_extend.enum_value_provider');
     }
 }

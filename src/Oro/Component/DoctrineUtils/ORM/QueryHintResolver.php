@@ -101,24 +101,15 @@ class QueryHintResolver implements QueryHintResolverInterface
      */
     public function addHint(Query $query, $name, $value)
     {
+        if (Query::HINT_CUSTOM_TREE_WALKERS === $name) {
+            return QueryUtil::addTreeWalker($query, $value);
+        }
+
         $result = false;
-        if ($name === Query::HINT_CUSTOM_TREE_WALKERS) {
-            $walkers = $query->getHint(Query::HINT_CUSTOM_TREE_WALKERS);
-            if (false === $walkers) {
-                $walkers = [$value];
-                $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
-                $result = true;
-            } elseif (!in_array($value, $walkers, true)) {
-                $walkers[] = $value;
-                $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
-                $result = true;
-            }
-        } elseif ($name === Query::HINT_CUSTOM_OUTPUT_WALKER) {
-            if ($query->getHint($name) !== $value) {
-                $query->setHint($name, $value);
-                $result = true;
-            }
-        } else {
+        if (Query::HINT_CUSTOM_OUTPUT_WALKER !== $name) {
+            $query->setHint($name, $value);
+            $result = true;
+        } elseif ($query->getHint($name) !== $value) {
             $query->setHint($name, $value);
             $result = true;
         }
@@ -152,7 +143,7 @@ class QueryHintResolver implements QueryHintResolverInterface
      *
      * @return string
      */
-    protected function resolveHintName($name)
+    public function resolveHintName($name)
     {
         if (isset($this->aliases[$name])) {
             return $this->aliases[$name];

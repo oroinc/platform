@@ -2,14 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
 
 class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
@@ -19,15 +12,16 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
         'doctrine',
         'oro_data',
         'oro_entities',
-        'oro'
     ];
 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        return
-            $this->isApplicableOS()
-            && 'session.handler.native_file' == $container->getParameter('session_handler');
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $this->cacheDirectories['oro'] = 'oro';
+        }
+
+        return $this->isApplicableOS();
     }
 
     /** {@inheritdoc} */
@@ -46,8 +40,8 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
         foreach ($this->cacheDirectories as $directory) {
             $commands[] = sprintf(
                 "mv %s %s",
-                $this->cacheTempDir.'/'.$directory,
-                $this->cacheDir.'/'.$directory
+                $this->cacheTempDir.DIRECTORY_SEPARATOR.$directory,
+                $this->cacheDir.DIRECTORY_SEPARATOR.$directory
             );
         }
 
@@ -57,9 +51,9 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     protected function startCopyDumpToTempDir()
     {
         $this->copyDumpToTempDirProcess = new Process(sprintf(
-            "exec cp -r %s %s",
+            "exec cp -rp %s %s",
             $this->cacheDumpDir.'/*',
-            $this->cacheTempDir.'/'
+            $this->cacheTempDir.DIRECTORY_SEPARATOR
         ));
 
         $this->copyDumpToTempDirProcess
@@ -73,9 +67,9 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
 
         foreach ($this->cacheDirectories as $directory) {
             $commands[] = sprintf(
-                'cp -r %s %s',
-                $this->cacheDir.'/'.$directory,
-                $this->cacheDumpDir.'/'.$directory
+                'cp -rp %s %s',
+                $this->cacheDir.DIRECTORY_SEPARATOR.$directory,
+                $this->cacheDumpDir.DIRECTORY_SEPARATOR.$directory
             );
         }
 
@@ -102,7 +96,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
-            $commands[] = sprintf('rm -rf %s', $this->cacheDir.'/'.$directory);
+            $commands[] = sprintf('rm -rf %s', $this->cacheDir.DIRECTORY_SEPARATOR.$directory);
         }
 
         $this->runProcess(implode(' && ', $commands));

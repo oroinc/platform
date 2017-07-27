@@ -4,6 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Modal = require('oroui/js/modal');
+    var template = require('tpl!oroui/templates/standart-confirmation.html');
 
     /**
      * Standart confirmation dialog
@@ -15,33 +16,19 @@ define(function(require) {
     return Modal.extend({
 
         /** @property {String} */
-        template: require('text!oroui/templates/standart-confirmation.html'),
+        template: template,
 
         /** @property {String} */
         className: 'modal oro-modal-normal',
-
-        /** @property {String} */
-        okButtonClass: 'btn-danger',
-
-        /** @property {Boolean} */
-        allowOk: true,
 
         /**
          * @param {Object} options
          */
         initialize: function(options) {
-            //Set custom template settings
-            var interpolate = {
-                interpolate: /\{\{(.+?)\}\}/g,
-                evaluate: /<%([\s\S]+?)%>/g
-            };
-
             options = _.extend({
                 title: __('Confirmation'),
                 okText: __('Yes'),
-                cancelText: __('Cancel'),
-                template: _.template(this.template, interpolate),
-                allowOk: this.allowOk
+                cancelText: __('Cancel')
             }, options);
 
             arguments[0] = options;

@@ -10,8 +10,8 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
-* @SuppressWarnings(PHPMD.TooManyMethods)
-*/
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterface
 {
     use AttachmentExtensionAwareTrait;

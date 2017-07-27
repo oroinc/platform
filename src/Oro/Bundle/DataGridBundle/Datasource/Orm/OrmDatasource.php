@@ -82,6 +82,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     }
 
     /**
+     * You must avoid to make changes of QueryBuilder here
+     * because query was already used as is in datagrid extensions for example "PaginatorExtension"
+     *
      * @return ResultRecordInterface[]
      */
     public function getResults()

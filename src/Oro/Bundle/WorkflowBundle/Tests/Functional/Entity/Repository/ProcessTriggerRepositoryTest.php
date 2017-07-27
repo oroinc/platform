@@ -10,9 +10,6 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
-/**
- * @dbIsolation
- */
 class ProcessTriggerRepositoryTest extends WebTestCase
 {
     /**

@@ -2,6 +2,7 @@ operations:
     DELETE:
         exclude_entities:
             - Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+
     clone_workflow:
         extends: CLONE
         entities:
@@ -9,7 +10,16 @@ operations:
         datagrids:
             - workflow-definitions-grid
         acl_resource: [CREATE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
-        replace: [preactions]
+        replace: [preconditions, preactions]
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@is_workflow_configuration_clean':
+                    parameters: $.data
+                    message: 'oro.workflow.notification.workflow.could_not_be_cloned'
+                - '@or':
+                    - '@not_blank': $.routes[name]
+                    - '@not_blank': $.gridName
         preactions:
             - '@call_service_method':
                 service: oro_action.helper.default_operation_request
@@ -29,7 +39,7 @@ operations:
                     - '@call_service_method':
                         service: oro_workflow.translation.processor
                         method: translateWorkflowDefinitionFields
-                        method_parameters: [$.data]
+                        method_parameters: [$.data, true]
                     - '@clone_object':
                         target: $.data
                         attribute: $.clone
@@ -68,3 +78,98 @@ operations:
             attribute_fields:
                 entity:
                     form_type: form
+        form_init:
+            - '@assign_value': [$.entityFields, []]
+            - '@call_service_method':
+                conditions:
+                    '@not_blank': $.data.relatedEntity
+                parameters:
+                    service: oro_workflow.entity_field_list_provider
+                    method: getFields
+                    method_parameters: [false, false, true, false, true, true]
+                    attribute: $.entityFields
+            - '@assign_constant_value': [$.availableDestinations, Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver::AVAILABLE_DESTINATIONS]
+
+    oro_workflow_definition_configure:
+        label: oro.workflow.workflowdefinition.configuration.label
+        routes:
+            - oro_workflow_definition_view
+        datagrids:
+            - workflow-definitions-grid
+        acl_resource: [CONFIGURE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
+        order: 10
+        button_options:
+            icon: fa-cog
+        preactions:
+            - '@call_service_method':
+                service: oro_workflow.manager.system
+                method: getWorkflow
+                method_parameters: [$.data.name]
+                attribute: $.workflow
+            - '@call_method':
+                object: $.workflow
+                method: getVariables
+                attribute: $.variables
+        preconditions:
+            '@has_elements': $.variables
+        actions:
+            - '@redirect':
+                parameters:
+                    route: oro_workflow_definition_configure
+                    route_parameters:
+                        name: $name
+
+action_groups:
+    transit_workflow_by_record_group:
+        parameters:
+            entity:
+                type: object
+            transition:
+                type: string
+            recordGroup:
+                type: string
+        actions:
+            - '@get_available_workflow_by_record_group':
+                attribute: $.currentWorkflow
+                entity_class: $.entity
+                group_name: $.recordGroup
+
+            - '@transit_workflow':
+                entity: $.entity
+                workflow: $.currentWorkflow.name
+                transition: $.transition
+
+    update_workflow_item_by_record_group:
+        parameters:
+            entity:
+                type: object
+            recordGroup:
+                type: string
+            data:
+                type: array
+            flush:
+                type: bool
+                default: true
+        actions:
+            - '@get_available_workflow_by_record_group':
+                attribute: $.currentWorkflow
+                entity_class: $.entity
+                group_name: $.recordGroup
+
+            - '@call_service_method':
+                attribute: $.workflowItem
+                service: oro_workflow.manager
+                method: getWorkflowItem
+                method_parameters: [$.entity, $.currentWorkflow.name]
+
+            - '@copy_values': [$.workflowItem.data, $.data]
+
+            - '@call_method':
+                object: $.workflowItem
+                method: setUpdated
+
+            - '@flush_entity':
+                conditions:
+                    '@equal': [true, $.flush]
+                parameters:
+                    - $.workflowItem

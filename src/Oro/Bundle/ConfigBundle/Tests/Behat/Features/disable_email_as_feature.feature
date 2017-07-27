@@ -1,64 +1,38 @@
-@not-automated
-Feature: Disable Emails
+@fixture-OroConfigBundle:disable_emails_stuff.yml
+Feature: Disable Email system functionality
   In order to lightweight the system
   As Administrator
-  I need to turn off the Email functionality
+  I need have ability to turn off the Email functionality
 
-  Scenario: Feature background
-    Given "Recent Emails" widget is added to Dashboard
-    And "Recent Emails" sidebar widget is added to Dashboard
-    And "Email Synchronization" is set up and running
-    And "System Mailbox" is configured
+  Scenario: Emails functionality enabled
+    Given I login as administrator
+    When I go to Dashboards/Dashboard
+    Then should see "Recent Emails"
+    And I should see an "Recent Emails" element
+    When I go to System/Scheduled Tasks
+    Then I should see following records in grid:
+      | oro:cron:email-body-sync |
+      | oro:cron:imap-sync       |
+    And I should see My emails in user menu
+    When I go to Customers/Contacts
+    And click View Charlie in grid
+    And follow "More actions"
+    Then I should see "Send Email"
+    And I should see "Merry Christmas" email in activity list
 
   Scenario: Administrator disables Emails
-    Given I login as "Administrator" user
-    And I go to System/Configuration/Email Configuration
-    When I uncheck "Enable User Emails"
-    And I save setting
-    Then I see "User Menu"
-    But I can't see "My Emails" link in it
-    And I can't see "Recent Emails" menu
-    And I can't see "Emails" section in "System" menu
+    When I go to System/Configuration
+    And click "Email Configuration"
+    And I fill "System Config Form" with:
+      | Enable User Emails | false |
+    And I save form
+    Then I should not see My emails in user menu
 
   Scenario: Administrator see widgets disabled
-    Given I open Dashboard
-    Then I can't see "Recent Emails" widget
-
-  Scenario: Administrator see Email Synchronization Settings disabled
-    Given I go to System/Configuration
-    Then I can't see "Email Configuration" section
-    And I can't see Integrations related to Emails
+    When I go to Dashboards/Dashboard
+    Then I should not see "Recent Emails"
 
   Scenario: Administrator see Email Synchronization inactive
-    Given I go to System/Job Queue
-    Then I can't see active email sync jobs
-
-   Scenario:  Administrator see Email-unrelated items
-     Given I am on the homepage
-     And see Templates menu in System/Emails menu
-     And see Notification Rules menu in System/Emails menu
-     And see Maintenance Notifications menu in System/Emails menu
-     And see Email Campaign menu in Marketing menu
-
-  Scenario: Administrator enables Emails
-    Given I login as "Administrator" user
-    And I go to System/Configuration/Email Configuration
-    When I check "Enable User Emails"
-    And I save setting
-    Then I see "User Menu"
-    And I see "My Emails" link in it
-    And I see "Recent Emails" menu
-    And I see "Emails" section in "System" menu
-
-  Scenario: Administrator see widgets enabled
-    Given I open Dashboard
-    Then I see "Recent Emails" widget
-
-  Scenario: Administrator see Email Synchronization Settings enabled
-    Given I go to System/Configuration
-    Then I see "Email Configuration" section
-    And I see Integrations related to Emails
-
-  Scenario: Administrator see Email Synchronization active
-    Given I go to System/Job Queue
-    Then I see active email sync jobs
+    When I go to System/Scheduled Tasks
+    Then I should not see "oro:cron:email-body-sync"
+    And should not see "oro:cron:imap-sync"

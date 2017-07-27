@@ -6,7 +6,6 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,6 +16,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
+use Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
@@ -83,6 +84,12 @@ class AclRoleHandler
      */
     protected $extensionFilters = [];
 
+    /** @var string */
+    protected $configurableName;
+
+    /** @var AclPrivilegeConfigurableFilter */
+    protected $configurableFilter;
+
     /**
      * @param FormFactory $formFactory
      * @param AclCacheInterface $aclCache
@@ -93,6 +100,7 @@ class AclRoleHandler
         $this->formFactory = $formFactory;
         $this->aclCache = $aclCache;
         $this->privilegeConfig = $privilegeConfig;
+        $this->configurableName = ConfigurablePermissionProvider::DEFAULT_CONFIGURABLE_NAME;
     }
 
     /**
@@ -135,6 +143,22 @@ class AclRoleHandler
     public function setRequest(Request $request)
     {
         $this->request = $request;
+    }
+
+    /**
+     * @param string $configurableName
+     */
+    public function setConfigurableName($configurableName)
+    {
+        $this->configurableName = $configurableName;
+    }
+
+    /**
+     * @param AclPrivilegeConfigurableFilter $configurableFilter
+     */
+    public function setConfigurableFilter(AclPrivilegeConfigurableFilter $configurableFilter)
+    {
+        $this->configurableFilter = $configurableFilter;
     }
 
     /**
@@ -213,7 +237,7 @@ class AclRoleHandler
                 return true;
             }
         } else {
-            $formPrivileges = $this->prepareRolePrivilegies($role);
+            $formPrivileges = $this->prepareRolePrivileges($role);
             $this->form->get('privileges')->setData(json_encode($formPrivileges));
         }
 
@@ -256,7 +280,7 @@ class AclRoleHandler
      *
      * @return array
      */
-    protected function prepareRolePrivilegies(AbstractRole $role)
+    protected function prepareRolePrivileges(AbstractRole $role)
     {
         $allPrivileges = [];
         /**
@@ -304,7 +328,7 @@ class AclRoleHandler
      */
     protected function getRolePrivileges(AbstractRole $role)
     {
-        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
+        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role), $this->getAclGroup());
     }
 
     /**
@@ -330,7 +354,7 @@ class AclRoleHandler
 
         $this->privilegeRepository->savePrivileges(
             $this->aclManager->getSid($role),
-            new ArrayCollection($formPrivileges)
+            $this->configurableFilter->filter(new ArrayCollection($formPrivileges), $this->configurableName)
         );
 
         $this->aclCache->clearCache();
@@ -344,6 +368,8 @@ class AclRoleHandler
      */
     protected function filterPrivileges(ArrayCollection $privileges, array $rootIds)
     {
+        $privileges = $this->configurableFilter->filter($privileges, $this->configurableName);
+
         return $privileges->filter(
             function (AclPrivilege $entry) use ($rootIds) {
                 $extensionKey = $entry->getExtensionKey();
@@ -449,6 +475,7 @@ class AclRoleHandler
      * Encode array of AclPrivilege objects into array of plain privileges
      *
      * @param array $allPrivileges
+     * @param bool $addExtensionName
      *
      * @return array
      */

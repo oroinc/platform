@@ -2,6 +2,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
 use Oro\Bundle\UserBundle\Form\Type\EmailSettingsType;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,7 +58,10 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->once())->method('add')->with(
             'imapAccountType',
             'oro_imap_choice_account_type',
-            ['label' => false]
+            [
+                'label' => false,
+                'constraints' => [new Valid()],
+            ]
         );
         
         $this->type->buildForm($builder, []);
@@ -74,7 +78,10 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->once())->method('add')->with(
             'imapConfiguration',
             'oro_imap_configuration',
-            ['label' => false]
+            [
+                'label' => false,
+                'constraints' => [new Valid()],
+            ]
         );
         
         $this->type->buildForm($builder, []);

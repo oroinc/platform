@@ -2,10 +2,10 @@ navigation:
     menu_config:
         items:
             activities_tab:
-                label: 'oro.activity.menu.activities_tab.label'
-                uri: '#'
+                label:    'oro.activity.menu.activities_tab.label'
+                uri:      '#'
+                position: 30
                 extras:
-                    position: 30
                     icon: fa-puzzle-piece
 
         tree:

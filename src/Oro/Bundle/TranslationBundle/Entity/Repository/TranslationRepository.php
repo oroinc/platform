@@ -116,4 +116,24 @@ class TranslationRepository extends EntityRepository
 
         return $qb->getQuery()->getArrayResult();
     }
+
+    /**
+     * @param int $languageId
+     * @return array
+     */
+    public function getTranslationsData($languageId)
+    {
+        $translationsData = $this->createQueryBuilder('t')
+            ->select('IDENTITY(t.translationKey) as translation_key_id, t.scope, t.value')
+            ->where('t.language = :language')
+            ->setParameters(['language' => $languageId])
+            ->getQuery()
+            ->getArrayResult();
+        $translations = [];
+        foreach ($translationsData as $item) {
+            $translations[$item['translation_key_id']] = $item;
+        }
+
+        return $translations;
+    }
 }

@@ -5,12 +5,14 @@ define([
     'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',
     'oroui/js/mediator',
+    'oroui/js/error',
     'bootstrap'
-], function($, _, tools, MultiUseResourceManager, SHA256, mediator) {
+], function($, _, tools, MultiUseResourceManager, SHA256, mediator, error) {
     'use strict';
 
     var defaults = {
         container: '',
+        temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
         template: $.noop,
         insertMethod: 'appendTo',
@@ -19,13 +21,20 @@ define([
     var queue = [];
     var groupedMessages = {};
     var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
-    var console = window.console;
+    var noFlashTags = ['a'];
+
+    var resolveContainer = function(options) {
+        if ($(options.container).is(defaults.container) && $(defaults.temporaryContainer).length) {
+            options.container = defaults.temporaryContainer;
+        }
+    };
 
     /**
      * Same arguments as for Oro.NotificationMessage
      */
     function showMessage(type, message, options) {
         var opt = _.extend({}, defaults, options || {});
+        resolveContainer(opt);
         var $el = $(opt.template({
             type: type,
             message: message,
@@ -58,9 +67,12 @@ define([
      */
     return {
             /**
-             * Shows notification message
+             * Shows notification message.
+             * By default, the message is displayed until an user close it.
+             * If you want to close the message you can specify 'flash' or 'delay' option.
+             * Also in this case you can use `notificationFlashMessage` method.
              *
-             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} type 'error'|'success'|'warning'
              * @param {string} message text of message
              * @param {Object=} options
              *
@@ -80,6 +92,7 @@ define([
                 var afterReloadQueue = [];
                 var args = Array.prototype.slice.call(arguments);
                 var actions = {close: $.noop};
+
                 if (afterReload && window.localStorage) {
                     afterReloadQueue = JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]');
                     afterReloadQueue.push(args);
@@ -94,9 +107,11 @@ define([
             },
 
             /**
-             * Shows flash notification message
+             * Shows flash notification message.
+             * By default, the message is displayed for 5 seconds.
+             * To change this you can use `delay` option.
              *
-             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} type 'error'|'success'|'warning'
              * @param {string} message text of message
              * @param {Object=} options
              *
@@ -111,7 +126,7 @@ define([
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                var isFlash = notFlashTypes.indexOf(type) === -1;
+                var isFlash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
                 var namespace = (options || {}).namespace;
 
                 if (!namespace) {
@@ -141,25 +156,17 @@ define([
             showErrorMessage: function(message, err) {
                 var msg = message;
                 if (!_.isUndefined(err) && !_.isNull(err)) {
-                    if (!_.isUndefined(console)) {
-                        console.error(_.isUndefined(err.stack) ? err : err.stack);
-                    }
-                    if (tools.debug) {
-                        if (!_.isUndefined(err.message)) {
-                            msg += ': ' + err.message;
-                        } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
-                            msg += ': ' + err.errors.join();
-                        } else if (_.isString(err)) {
-                            msg += ': ' + err;
-                        }
-                    }
+                    error.showErrorInConsole(err);
                 }
                 return this.notificationFlashMessage('error', msg);
             },
 
             setup: function(options) {
                 _.extend(defaults, options);
+                $(document).on('remove', defaults.temporaryContainer, this.removeTemporaryContainer);
+            },
 
+            flushStoredMessages: function() {
                 if (window.localStorage) {
                     queue = queue.concat(JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]'));
                     localStorage.removeItem('oroAfterReloadMessages');
@@ -207,7 +214,24 @@ define([
              */
             clear: function(namespace, options) {
                 var opt = _.extend({}, defaults, options || {});
-                $(opt.container).find('[data-messenger-namespace=' + namespace + ']').remove();
+                $(opt.container).add(opt.temporaryContainer)
+                    .find('[data-messenger-namespace=' + namespace + ']').remove();
+            },
+
+            removeTemporaryContainer: function() {
+                $(defaults.container).append($(this).children());
+            },
+
+            /**
+             * Check if given string contains no flash tags
+             *
+             * @param {string} string
+             * @return {boolean}
+             */
+            _containsNoFlashTags: function(string) {
+                return _.some(noFlashTags, function(tag) {
+                    return $('<div>').append(string).find(tag).length > 0;
+                });
             }
         };
 });

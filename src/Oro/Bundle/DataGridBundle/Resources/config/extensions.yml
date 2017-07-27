@@ -13,7 +13,6 @@ parameters:
     oro_datagrid.extension.totals.class:           Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension
     oro_datagrid.extension.columns.class:          Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension
     oro_datagrid.extension.mode.class:             Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension
-    oro_datagrid.extension.postgresql_grid_modifier.class: Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier
     oro_datagrid.extension.board.class:            Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension
     oro_datagrid.extension.appearance.class:       Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension
 
@@ -32,6 +31,13 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_datagrid.extension.array_pager:
+        class: 'Oro\Bundle\DataGridBundle\Extension\Pager\ArrayPagerExtension'
+        arguments:
+            - '@oro_datagrid.extension.pager.array.pager'
+        tags:
+            - { name: oro_datagrid.extension }
+
     oro_datagrid.extension.pager.orm.pager:
         arguments:
             - '@oro_security.acl_helper'
@@ -39,8 +45,17 @@ services:
             - '@oro_entity.query_hint_resolver'
         class: %oro_datagrid.extension.pager.orm.pager.class%
 
+    oro_datagrid.extension.pager.array.pager:
+        public: false
+        class: Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager
+
     oro_datagrid.extension.orm_sorter:
         class: %oro_datagrid.extension.orm_sorter.class%
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.array_sorter:
+        class: Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension
         tags:
             - { name: oro_datagrid.extension }
 
@@ -48,21 +63,25 @@ services:
         class: %oro_datagrid.extension.inline_editing.class%
         arguments:
             - '@oro_datagrid.datagrid.inline_edit_column_options_guesser'
-            - '@oro_security.security_facade'
             - '@oro_entity.entity_class_name_helper'
             - '@security.authorization_checker'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.action:
-        class: %oro_datagrid.extension.action.class%
+        class: '%oro_datagrid.extension.action.class%'
         arguments:
-            - '@service_container'
-            - '@oro_security.security_facade'
-            - '@translator'
-            - '@oro_datagrid.event.dispatcher'
+            - '@oro_datagrid.extension.action.factory'
+            - '@oro_datagrid.extension.action.metadata_factory'
+            - '@security.authorization_checker'
+            - '@oro_security.owner.ownership_query_helper'
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_datagrid.action.callback_provider:
+        class: Oro\Bundle\DataGridBundle\Extension\Action\DatagridCallbackActionProvider
+        tags:
+            - { name: oro_datagrid.extension.action.provider, priority: 255 }
 
     oro_datagrid.extension.mass_delete_action:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension
@@ -73,8 +92,11 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.mass_action:
-        class: %oro_datagrid.extension.mass_action.class%
-        parent: oro_datagrid.extension.action
+        class: '%oro_datagrid.extension.mass_action.class%'
+        arguments:
+            - '@oro_datagrid.extension.mass_action.factory'
+            - '@oro_datagrid.extension.mass_action.metadata_factory'
+            - '@security.authorization_checker'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -89,7 +111,8 @@ services:
         class: %oro_datagrid.extension.views.class%
         arguments:
             - '@event_dispatcher'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@translator'
             - '@doctrine'
             - '@oro_security.acl_helper'
@@ -101,7 +124,8 @@ services:
         class: %oro_datagrid.extension.export.class%
         arguments:
             - '@translator'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@security.token_storage'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -124,7 +148,7 @@ services:
         class: %oro_datagrid.extension.columns.class%
         arguments:
             - '@doctrine'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
             - '@oro_datagrid.columns.helper'
         tags:
@@ -135,28 +159,37 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    oro_datagrid.extension.postgresql_grid_modifier:
-        class: %oro_datagrid.extension.postgresql_grid_modifier.class%
+    oro_datagrid.extension.precise_order_by:
+        class: Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension
         arguments:
-            - %database_driver%
-            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_entity.query_hint_resolver'
+            - 'HINT_PRECISE_ORDER_BY'
+            - -261
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.nulls_order:
+        class: Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension
+        arguments:
+            - '@oro_entity.query_hint_resolver'
+            - '@=constant("Oro\\Component\\DoctrineUtils\\ORM\\SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS")'
+            - -300
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.field_acl:
         class: Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension
         arguments:
-            - "@oro_security.owner.ownership_metadata_provider"
-            - "@oro_entity.orm.entity_class_resolver"
             - '@security.authorization_checker'
-            - '@oro_entity_config.provider.security'
+            - '@oro_entity_config.config_manager'
+            - '@oro_security.owner.ownership_query_helper'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.board:
         class: %oro_datagrid.extension.board.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@translator'
             - '@oro_datagrid.datagrid.board.restriction_manager'
             - '@oro_datagrid.datagrid.board.configuration'
@@ -172,5 +205,12 @@ services:
         arguments:
             - '@oro_datagrid.datagrid.appearance.configuration'
             - '@translator'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.feature:
+        class: Oro\Bundle\DataGridBundle\Extension\Feature\FeatureExtension
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: oro_datagrid.extension }

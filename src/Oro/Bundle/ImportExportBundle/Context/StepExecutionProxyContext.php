@@ -3,14 +3,20 @@
 namespace Oro\Bundle\ImportExportBundle\Context;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
 use Doctrine\Common\Collections\ArrayCollection;
 
-class StepExecutionProxyContext implements ContextInterface
+class StepExecutionProxyContext implements ContextInterface, BatchContextInterface
 {
     /**
      * @var StepExecution
      */
     protected $stepExecution;
+
+    /**
+     * @var array
+     */
+    private $postponedRows = [];
 
     public function __construct(StepExecution $stepExecution)
     {
@@ -41,6 +47,36 @@ class StepExecutionProxyContext implements ContextInterface
     public function getErrors()
     {
         return $this->stepExecution->getErrors();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRow(array $row)
+    {
+        $this->postponedRows[] = $row;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRows(array $rows)
+    {
+        foreach ($rows as $row) {
+            $this->addPostponedRow($row);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPostponedRows()
+    {
+        return $this->postponedRows;
     }
 
     /**
@@ -200,7 +236,8 @@ class StepExecutionProxyContext implements ContextInterface
     public function getConfiguration()
     {
         $stepName = $this->stepExecution->getStepName();
-        $rawConfiguration = $this->stepExecution->getJobExecution()->getJobInstance()->getRawConfiguration();
+        $jobInstance = $this->stepExecution->getJobExecution()->getJobInstance();
+        $rawConfiguration = $jobInstance ? $jobInstance->getRawConfiguration() : [];
 
         return !empty($rawConfiguration[$stepName]) ? $rawConfiguration[$stepName] : $rawConfiguration;
     }
@@ -211,6 +248,7 @@ class StepExecutionProxyContext implements ContextInterface
     public function hasOption($name)
     {
         $configuration = $this->getConfiguration();
+
         return isset($configuration[$name]);
     }
 
@@ -219,10 +257,11 @@ class StepExecutionProxyContext implements ContextInterface
      */
     public function getOption($name, $default = null)
     {
-        if ($this->hasOption($name)) {
-            $configuration = $this->getConfiguration();
+        $configuration = $this->getConfiguration();
+        if (isset($configuration[$name])) {
             return $configuration[$name];
         }
+
         return $default;
     }
 
@@ -231,10 +270,26 @@ class StepExecutionProxyContext implements ContextInterface
      */
     public function removeOption($name)
     {
-        if ($this->hasOption($name)) {
-            $configuration = $this->getConfiguration();
+        $configuration = $this->getConfiguration();
+        if (isset($configuration[$name])) {
             unset($configuration[$name]);
             $this->stepExecution->getJobExecution()->getJobInstance()->setRawConfiguration($configuration);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchSize()
+    {
+        return $this->getOption('batch_size');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchNumber()
+    {
+        return $this->getOption('batch_number');
     }
 }

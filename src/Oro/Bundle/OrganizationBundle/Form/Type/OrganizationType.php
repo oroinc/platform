@@ -9,19 +9,18 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class OrganizationType extends AbstractType
 {
-    /** @var SecurityContext */
-    protected $securityContext;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    public function __construct(SecurityContext $securityContext)
+    public function __construct(TokenAccessorInterface $tokenAccessor)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -63,9 +62,8 @@ class OrganizationType extends AbstractType
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
-                $currentOrganization = $this->securityContext->getToken()->getOrganizationContext();
                 $data = $event->getData();
-                if (is_object($data) && $data->getId() === $currentOrganization->getId()) {
+                if (is_object($data) && $data->getId() === $this->tokenAccessor->getOrganizationId()) {
                     $data->setEnabled(true);
                 }
             }
@@ -79,10 +77,7 @@ class OrganizationType extends AbstractType
     {
         $data = $form->getData();
         if ($data) {
-            /** @var UsernamePasswordOrganizationToken $token */
-            $token = $this->securityContext->getToken();
-            $currentOrganization = $token->getOrganizationContext();
-            if ($data->getId() == $currentOrganization->getId()) {
+            if ($data->getId() == $this->tokenAccessor->getOrganizationId()) {
                 $view->children['enabled']->vars['required'] = false;
                 $view->children['enabled']->vars['disabled'] = true;
                 $view->children['enabled']->vars['value']    = true;
@@ -99,7 +94,6 @@ class OrganizationType extends AbstractType
             array(
                 'data_class'         => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
                 'intention'          => 'organization',
-                'cascade_validation' => true,
             )
         );
     }

@@ -2,18 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
 {
-    /**
-     * FQCN of the entity being used for testing.
-     */
-    const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment';
-
     /**
      * {@inheritdoc}
      */
@@ -43,16 +35,11 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
             $expects['included'][0]['id'] = (string)(string)$department->getStaff()->first()->getId();
         }
 
-        $entityType = $this->getEntityType(self::ENTITY_CLASS);
+        $entityType = $this->getEntityType(TestDepartment::class);
 
         // test get list request
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1]),
-            $params
-        );
+        $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expects, json_decode($response->getContent(), true));
     }
 
@@ -65,7 +52,7 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
             'Related entity with table inheritance'            => [
                 'params'  => [
                     'fields' => [
-                        'testdepartments' => 'id,title,staff'
+                        'testapidepartments' => 'id,title,staff'
                     ],
                     'sort'   => '-id'
                 ],
@@ -75,8 +62,8 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
                 'params'  => [
                     'include' => 'staff',
                     'fields'  => [
-                        'testdepartments' => 'id,title,staff',
-                        'testemployees'   => 'id,name'
+                        'testapidepartments' => 'id,title,staff',
+                        'testapiemployees'   => 'id,name'
                     ],
                     'sort'    => '-id'
                 ],

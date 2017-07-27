@@ -1,33 +1,39 @@
 define([
+    'jquery',
     'underscore',
-    'backbone',
+    'oroui/js/app/views/base/view',
     'orotranslation/js/translator',
     'oroui/js/mediator', 'oroui/js/messenger',
     'oro/dialog-widget',
     'oroaddress/js/mapservice/googlemaps',
     'oroaddress/js/address/view',
-    'oroaddress/js/address/collection'
+    'oroaddress/js/address/collection',
+    'oroui/js/delete-confirmation'
 ], function(
+    $,
     _,
-    Backbone,
+    BaseView,
     __,
     mediator,
     messenger,
     DialogWidget,
     Googlemaps,
     AddressView,
-    AddressCollection
+    AddressCollection,
+    deleteConfirmation
 ) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oroaddress/js/address-book
      * @class   oroaddress.AddressBook
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return BaseView.extend({
+        isEmpty: false,
+
+        showMap: true,
+
         options: {
             'mapOptions': {
                 zoom: 12
@@ -36,11 +42,12 @@ define([
             'addressListUrl': null,
             'addressCreateUrl': null,
             'addressUpdateUrl': null,
+            'addressDeleteUrl': null,
             'mapView': Googlemaps,
             'addressMapOptions': {},
             'allowToRemovePrimary': false,
-            'confirmRemove': false,
-            'confirmRemoveComponent': null
+            'confirmRemove': true,
+            'confirmRemoveComponent': deleteConfirmation
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
@@ -59,23 +66,52 @@ define([
 
             this._initMainContainers();
 
+            if (this.showMap) {
+                this.initializeMap();
+            }
+        },
+
+        initializeMap: function() {
+            if (this.mapView) {
+                return;
+            }
+
+            this.$mapContainerFrame = this.$el.find('.map-visual-frame');
+            if (!this.$mapContainerFrame.length) {
+                this.$mapContainerFrame = $('<div class="map-visual-frame"/>').appendTo(this.$el);
+            }
+
+            this.$mapContainerFrame.toggle(!this.isEmpty);
+
             this.mapView = new this.options.mapView({
                 'mapOptions': this.options.mapOptions,
                 'el': this.$mapContainerFrame
             });
+
+            var activeAddress = this.getCollection().find({active: true});
+            if (activeAddress) {
+                this.activateAddress(activeAddress);
+            }
+        },
+
+        disposeMap: function() {
+            if (!this.mapView) {
+                return;
+            }
+
+            this.$mapContainerFrame.remove();
+            this.mapView.dispose();
+
+            delete this.$mapContainerFrame;
+            delete this.mapView;
         },
 
         _initMainContainers: function() {
             this.$noDataContainer = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
             this.$addressesContainer = $('<div class="map-address-list"/>');
-            this.$mapContainerFrame = $('<div class="map-visual-frame"/>');
 
             if (!this.$el.find('.map-address-list').length) {
                 this.$el.append(this.$addressesContainer);
-            }
-
-            if (!this.$el.find('.map-visual-frame').length) {
-                this.$el.append(this.$mapContainerFrame);
             }
 
             if (!this.$el.find('.no-data').length) {
@@ -124,17 +160,24 @@ define([
             } else {
                 this._activatePreviousAddress();
             }
+            this.$el.trigger('content:changed');
         },
 
         _hideEmptyMessage: function() {
+            this.isEmpty = false;
             this.$noDataContainer.hide();
-            this.$mapContainerFrame.show();
+            if (this.$mapContainerFrame) {
+                this.$mapContainerFrame.show();
+            }
             this.$addressesContainer.show();
         },
 
         _showEmptyMessage: function() {
+            this.isEmpty = true;
             this.$noDataContainer.show();
-            this.$mapContainerFrame.hide();
+            if (this.$mapContainerFrame) {
+                this.$mapContainerFrame.hide();
+            }
             this.$addressesContainer.hide();
         },
 
@@ -155,7 +198,8 @@ define([
                     template: this.options.template,
                     allowToRemovePrimary: this.options.allowToRemovePrimary,
                     confirmRemove: this.options.confirmRemove,
-                    confirmRemoveComponent: this.options.confirmRemoveComponent
+                    confirmRemoveComponent: this.options.confirmRemoveComponent,
+                    addressDeleteUrl: this._getUrl('addressDeleteUrl', address)
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);
@@ -211,6 +255,9 @@ define([
         activateAddress: function(address) {
             if (!address.get('primary')) {
                 this.activeAddress = address;
+            }
+            if (!this.mapView) {
+                return;
             }
             this.mapView.updateMap(address.getSearchableString(), address.get('label'));
         }

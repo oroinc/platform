@@ -2,34 +2,24 @@
     <script>
         require([
             'jquery',
-            'oroui/js/widget-manager',
-            'oroworkflow/js/transition-event-handlers',
+            'oroui/js/widget-manager'
         ], function(
-            $,
-            widgetManager,
-            TransitionEventHandlers
+                $,
+                widgetManager
         ) {
             var response = {{ response|json_encode|raw }};
             var responseCode = {{ responseCode|json_encode|raw }};
+            var responseMessage = {{ responseMessage|json_encode|raw }};
             var transitionSuccess = {{ transitionSuccess|json_encode|raw }};
 
             widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                if (widget._events['transitionSuccess']) {
-                    if (transitionSuccess) {
-                        widget.trigger('transitionSuccess', response);
+                if (transitionSuccess) {
+                    widget.trigger('transitionSuccess', response);
 
-                        return;
-                    }
-                    widget.trigger('transitionFailure', {status: responseCode});
-                } else {
-                    var element = $('<div>');
-                    if (transitionSuccess) {
-                        TransitionEventHandlers.getOnSuccess(element)(response);
-                    } else {
-                        TransitionEventHandlers.getOnFailure(element)({status: responseCode}, '', '');
-                    }
-                    widget.remove();
+                    return;
                 }
+
+                widget.trigger('transitionFailure', {status: responseCode, message: responseMessage});
             });
         });
     </script>

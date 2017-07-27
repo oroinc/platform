@@ -94,7 +94,7 @@ class ConfigFileValidator
     {
         $mimeTypes = explode("\n", $mimeString);
         if (count($mimeTypes) === 1 && $mimeTypes[0] === '') {
-            return '';
+            return [];
         }
 
         return $mimeTypes;

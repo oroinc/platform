@@ -2,27 +2,28 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
-
-use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
+use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class GridController extends Controller
 {
-    const EXPORT_BATCH_SIZE = 200;
-
     /**
      * @Route(
      *      "/widget/{gridName}",
@@ -63,7 +64,7 @@ class GridController extends Controller
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
-        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+        if ($acl && !$this->isGranted($acl)) {
             throw new AccessDeniedException('Access denied.');
         }
 
@@ -90,7 +91,7 @@ class GridController extends Controller
     /**
      * @Route("/{gridName}/filter-metadata", name="oro_datagrid_filter_metadata", options={"expose"=true})
      */
-    public function filterMetadata(Request $request, $gridName)
+    public function filterMetadataAction(Request $request, $gridName)
     {
         $filterNames = $request->query->get('filterNames', []);
 
@@ -98,7 +99,7 @@ class GridController extends Controller
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->getAclResource();
 
-        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+        if ($acl && !$this->isGranted($acl)) {
             throw new AccessDeniedException('Access denied.');
         }
 
@@ -136,18 +137,16 @@ class GridController extends Controller
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
         $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
-        $userId = $this->getUser()->getId();
+        $token = $this->getSecurityToken()->getToken();
 
-
-        $this->getMessageProducer()->send(Topics::EXPORT, [
+        $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
             'format' => $format,
-            'batchSize' => self::EXPORT_BATCH_SIZE,
             'parameters' => [
                 'gridName' => $gridName,
                 'gridParameters' => $gridParameters,
                 FormatterProvider::FORMAT_TYPE => $formatType,
             ],
-            'userId' => $userId,
+            'securityToken' => $this->getTokenSerializer()->serialize($token),
         ]);
 
         return new JsonResponse([
@@ -174,7 +173,12 @@ class GridController extends Controller
 
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
-        $response             = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
+
+        try {
+            $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
+        } catch (LogicException $e) {
+            return new JsonResponse(null, JsonResponse::HTTP_FORBIDDEN);
+        }
 
         $data = [
             'successful' => $response->isSuccessful(),
@@ -224,5 +228,21 @@ class GridController extends Controller
     protected function getRequestParametersFactory()
     {
         return $this->get('oro_datagrid.datagrid.request_parameters_factory');
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    protected function getSecurityToken()
+    {
+        return $this->get('security.token_storage');
+    }
+
+    /**
+     * @return TokenSerializerInterface
+     */
+    protected function getTokenSerializer()
+    {
+        return $this->get('oro_security.token_serializer');
     }
 }

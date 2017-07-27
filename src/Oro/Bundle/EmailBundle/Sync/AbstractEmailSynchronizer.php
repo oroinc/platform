@@ -23,7 +23,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
+abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -33,7 +33,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     const SYNC_CODE_IN_PROCESS_FORCE = 4;
 
     /** @var string */
-    static protected $messageQueueTopic;
+    protected static $messageQueueTopic;
 
     /** @var ManagerRegistry */
     protected $doctrine;

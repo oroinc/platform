@@ -1,5 +1,6 @@
+// @theme: blank;
+
 $use-base-style-for-select: true !default;
-$use-select-appearance: true !default;
 
 // Default
 $select-padding: 7px 24px 7px 9px !default;
@@ -10,6 +11,7 @@ $select-border: $base-ui-element-border !default;
 $select-border-radius: $base-ui-element-border-radius !default;
 $select-background-color: $base-ui-element-bg-color !default;
 $select-color: $base-ui-element-color !default;
+$select-disable-platform-style: true !default;
 $select-bg: url('#{$global-url}/oroform/blank/images/icons/arrow-down--gray.png') no-repeat right 8px center get-color('additional', 'ultra') !default;
 
 $select-border-color-hover-state: get-color('additional', 'dark') !default;

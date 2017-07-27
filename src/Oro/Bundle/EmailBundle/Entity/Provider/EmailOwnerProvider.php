@@ -44,4 +44,24 @@ class EmailOwnerProvider
 
         return $emailOwner;
     }
+
+    /**
+     * Find an entity objects which is an owner of the given email address
+     *
+     * @param \Doctrine\ORM\EntityManager $em
+     * @param string $email
+     *
+     * @return EmailOwnerInterface[]
+     */
+    public function findEmailOwners(EntityManager $em, $email)
+    {
+        $emailOwners = [];
+        foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
+            $emailOwner = $provider->findEmailOwner($em, $email);
+            if ($emailOwner !== null) {
+                $emailOwners[] = $emailOwner;
+            }
+        }
+        return $emailOwners;
+    }
 }

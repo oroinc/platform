@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
 use Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
@@ -32,14 +33,10 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
-
-        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->registry = $this->getMockBuilder(OperationRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $this->registry = $this->createMock(OperationRegistry::class);
+        $this->contextHelper = $this->createMock(ContextHelper::class);
 
         $this->extension = new DeleteMassActionExtension(
             $this->doctrineHelper,
@@ -79,7 +76,10 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->registry->expects($this->once())
             ->method('findByName')
-            ->with(DeleteMassActionExtension::OPERATION_NAME)
+            ->with(
+                DeleteMassActionExtension::OPERATION_NAME,
+                new OperationFindCriteria('TestEntity', null, 'test-grid', ['test_group'])
+            )
             ->willReturn($operation);
 
         $context = [

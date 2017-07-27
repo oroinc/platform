@@ -2,19 +2,24 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerView;
+    var template = require('tpl!orodatagrid/templates/column-manager/column-manager.html');
     var _ = require('underscore');
+    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerView = BaseView.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager.html'),
+        template: template,
         autoRender: true,
         className: 'dropdown-menu',
         events: {
-            'click [data-role="column-manager-select-all"]': 'onSelectAll'
+            'click [data-role="column-manager-select-all"]': 'onSelectAll',
+            'click [data-role="column-manager-unselect-all"]': 'onunselectAll',
+            'click [data-role="column-manager-reset"]': 'reset'
         },
 
         listen: {
-            'change:renderable collection': 'onRenderableChange'
+            'change:renderable collection': 'onRenderableChange',
+            'layout:reposition mediator': 'adjustListHeight'
         },
 
         initialize: function(options) {
@@ -37,9 +42,28 @@ define(function(require) {
         updateView: function() {
             var models = this._getFilteredModels();
             var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable');}));
+            var hasRenderable = Boolean(_.find(models, function(model) {return model.get('renderable');}));
+            var hasChanged = Boolean(_.find(models, function(model) {
+                return model.get('renderable') !== model.get('metadata').renderable;
+            }));
+
             this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
+            this.$('[data-role="column-manager-unselect-all"]').toggleClass('disabled', !hasRenderable);
+            this.$('[data-role="column-manager-reset"]').toggleClass('disabled', !hasChanged);
         },
 
+        adjustListHeight: function() {
+            var windowHeight = $(window).height();
+            var $wrapper = this.$('[data-role="column-manager-table-wrapper"]');
+            var $footerHeight = this.$('[data-role="column-manager-footer"]').outerHeight() || 0;
+            var rect = $wrapper[0].getBoundingClientRect();
+            var margin = (this.$('[data-role="column-manager-table"]').outerHeight(true) - rect.height) / 2;
+            $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight, 40) + 'px');
+        },
+
+        updateStateView: function() {
+            this.adjustListHeight();
+        },
         /**
          * Handles renderable change of column models
          *  - updates the view
@@ -52,6 +76,22 @@ define(function(require) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
                 model.set('renderable', true);
+            });
+        },
+
+        onunselectAll: function(e) {
+            e.preventDefault();
+            _.each(this._getFilteredModels(), function(model) {
+                if (!model.get('disabledVisibilityChange')) {
+                    model.set('renderable', false);
+                }
+            });
+        },
+
+        reset: function(e) {
+            e.preventDefault();
+            _.each(this._getFilteredModels(), function(model) {
+                model.set('renderable', model.get('metadata').renderable);
             });
         },
 

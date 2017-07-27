@@ -1,3 +1,5 @@
+// @theme: blank;
+
 @mixin placeholder {
     &::-webkit-input-placeholder {@content}
     &:-moz-placeholder           {@content}
@@ -6,8 +8,15 @@
 }
 
 @mixin appearance() {
-    appearance: none;
     -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+}
+
+@mixin base-disabled-style($opacity: .5) {
+    opacity: $opacity;
+
+    pointer-events: none;
 }
 
 @mixin base-ui-element(
@@ -19,7 +28,8 @@
     $border:           $base-ui-element-border,
     $border-radius:    $base-ui-element-border-radius,
     $background-color: $base-ui-element-bg-color,
-    $color:            $base-ui-element-color
+    $color:            $base-ui-element-color,
+    $appearance:       true
     ) {
     @if ($use-base-style) {
         display: inline-block;
@@ -40,13 +50,13 @@
 
         touch-action: manipulation;
 
-        white-space: nowrap;
-
         user-select: none;
 
         box-sizing: border-box;
 
-        -webkit-appearance: none;
+        @if ($appearance) {
+            @include appearance();
+        }
 
         &--full,
         &.full {
@@ -54,52 +64,3 @@
         }
     }
 }
-
-@mixin element-state($state) {
-    @if $state == 'active' {
-        &:active {
-            @content;
-        }
-    }
-
-    @else if $state == 'hover' {
-        &:hover {
-            @content;
-        }
-    }
-
-    @else if $state == 'focus' {
-        &:focus {
-            @content;
-        }
-    }
-
-    @else if $state == 'warning' {
-        &--warning,
-        &.warning {
-            @content;
-        }
-    }
-
-    @else if $state == 'success' {
-        &--success,
-        &.success {
-            @content;
-        }
-    }
-
-    @else if $state == 'error' {
-        &--error,
-        &.error {
-            @content;
-        }
-    }
-
-    @else if $state == 'disabled' {
-        &.disabled,
-        &:disabled {
-            @content;
-        }
-    }
-}
-

@@ -7,6 +7,7 @@ use Imagine\Image\ImageInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
@@ -16,9 +17,10 @@ use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
  */
 class ImageFilterLoader
 {
-    const IMAGE_QUALITY = 95;
+    const IMAGE_QUALITY = 85;
     const BACKGROUND_COLOR = '#fff';
     const RESIZE_MODE = ImageInterface::THUMBNAIL_INSET;
+    const INTERLACE_MODE = 'line';
 
     /** @var ImageTypeProvider */
     protected $imageTypeProvider;
@@ -49,7 +51,7 @@ class ImageFilterLoader
 
     public function load()
     {
-        foreach ($this->getAllDimensions() as $dimension) {
+        foreach ($this->imageTypeProvider->getImageDimensions() as $dimension) {
             $filterName = $dimension->getName();
             $this->filterConfiguration->set(
                 $filterName,
@@ -67,20 +69,6 @@ class ImageFilterLoader
     }
 
     /**
-     * @return ThemeImageTypeDimension[]
-     */
-    private function getAllDimensions()
-    {
-        $dimensions = [];
-
-        foreach ($this->imageTypeProvider->getImageTypes() as $imageType) {
-            $dimensions = array_merge($dimensions, $imageType->getDimensions());
-        }
-
-        return $dimensions;
-    }
-
-    /**
      * @param ThemeImageTypeDimension $dimension
      * @return array
      */
@@ -88,38 +76,61 @@ class ImageFilterLoader
     {
         $width = $dimension->getWidth();
         $height = $dimension->getHeight();
-        $withResize = $dimension->getWidth() && $dimension->getHeight();
 
         $filterSettings = [
             'quality' => self::IMAGE_QUALITY,
             'filters' => [
                 'strip' => [],
+                'interlace' => [
+                    'mode' => self::INTERLACE_MODE
+                ]
             ]
         ];
 
         foreach ($this->customFilterProviders as $provider) {
-            $filterSettings = array_merge_recursive($filterSettings, $provider->getFilterConfig());
+            if ($provider->isApplicable($dimension)) {
+                $filterSettings = array_replace_recursive($filterSettings, $provider->getFilterConfig());
+            }
         }
 
-        if ($withResize) {
+        if ($width && $height) {
             $filterSettings = array_merge_recursive(
-                [
-                    'filters' => [
-                        'thumbnail' => [
-                            'size' => [$width, $height],
-                            'mode' => self::RESIZE_MODE,
-                            'allow_upscale' => true
-                        ],
-                        'background' => [
-                            'size' => [$width, $height],
-                            'color' => self::BACKGROUND_COLOR
-                        ]
-                    ]
-                ],
+                ['filters' => $this->prepareResizeFilterSettings($width, $height)],
                 $filterSettings
             );
         }
 
         return $filterSettings;
+    }
+
+    /**
+     * @param mixed $width
+     * @param mixed $height
+     * @return array
+     */
+    private function prepareResizeFilterSettings($width, $height)
+    {
+        if (Configuration::AUTO === $width || Configuration::AUTO === $height) {
+            return [
+                'scale' => [
+                    'dim' => [
+                        Configuration::AUTO === $width ? null : $width,
+                        Configuration::AUTO === $height ? null : $height,
+                    ]
+                ]
+            ];
+        }
+
+        return [
+            'thumbnail' => [
+                'size' => [$width, $height],
+                'mode' => self::RESIZE_MODE,
+                'allow_upscale' => true
+            ],
+            'background' => [
+                'size' => [$width, $height],
+                'color' => self::BACKGROUND_COLOR
+            ]
+        ];
     }
 }

@@ -212,4 +212,20 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
         $this->userManager->setAuthStatus($user, UserManager::STATUS_EXPIRED);
         $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
     }
+
+    public function testGeneratePasswordWithCustomLength()
+    {
+        $password = $this->userManager->generatePassword(10);
+        $this->assertNotEmpty($password);
+        $this->assertRegExp('/\w+/', $password);
+        $this->assertLessThanOrEqual(10, strlen($password));
+    }
+
+    public function testGeneratePasswordWithDefaultLength()
+    {
+        $password = $this->userManager->generatePassword();
+        $this->assertNotEmpty($password);
+        $this->assertRegExp('/\w+/', $password);
+        $this->assertLessThanOrEqual(30, strlen($password));
+    }
 }

@@ -1,13 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    './text-filter'
-], function($, _, __, tools, TextFilter) {
+define(function(require) {
     'use strict';
 
     var ChoiceFilter;
+    var template = require('tpl!orofilter/templates/filter/choice-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var TextFilter = require('./text-filter');
 
     /**
      * Choice filter: filter type as option + filter value as string
@@ -22,6 +21,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#choice-filter-template',
 
         /**
@@ -114,9 +114,10 @@ define([
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value === value.type);
+                    return String(choice.value) === String(value.type);
                 });
-                selectedChoiceLabel = foundChoice.label;
+                foundChoice = foundChoice || _.first(this.choices);
+                selectedChoiceLabel = _.result(foundChoice, 'label') || '';
             }
             var $filter = $(this.template({
                 name: this.name,
@@ -128,18 +129,16 @@ define([
             this._appendFilter($filter);
             this._updateDOMValue();
             this._criteriaRenderd = true;
+            this._isRenderingInProgress = false;
         },
 
         _showCriteria: function() {
-            if (!this._criteriaRenderd) {
+            if (!this._criteriaRenderd && !this._isRenderingInProgress) {
+                this._isRenderingInProgress = true;
                 this._renderCriteria();
             }
-            ChoiceFilter.__super__._showCriteria.apply(this, arguments);
-        },
-
-        _onClickCriteriaSelector: function() {
-            ChoiceFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
             this._updateValueField();
+            ChoiceFilter.__super__._showCriteria.apply(this, arguments);
         },
 
         _onClickChoiceValue: function() {
@@ -232,8 +231,22 @@ define([
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+            if (!tools.isEqualsLoosely(newValue, oldValue) && (!this._isEmpty(newValue.value) ||
+                (!this._isEmpty(oldValue.value) && this._isEmpty(newValue.value)))) {
                 this.trigger('update');
+            }
+        },
+
+        /**
+         * Is a given integer, array, string, or object empty
+         * @param {Object} value
+         * @return {Boolean}
+         */
+        _isEmpty: function(value) {
+            if (_.isNumber(value)) {
+                return false;
+            } else {
+                return _.isEmpty(value);
             }
         },
 

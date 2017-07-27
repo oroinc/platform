@@ -31,7 +31,7 @@ class ScopeEntityStorageTest extends \PHPUnit_Framework_TestCase
     public function testScheduleForInsert()
     {
         $scope = new Scope();
-        $scopeCriteria = new ScopeCriteria(['test' => 1]);
+        $scopeCriteria = new ScopeCriteria(['test' => 1], ['test']);
 
         $this->storage->scheduleForInsert($scope, $scopeCriteria);
         $this->assertSame($scope, $this->storage->getScheduledForInsertByCriteria($scopeCriteria));
@@ -61,7 +61,7 @@ class ScopeEntityStorageTest extends \PHPUnit_Framework_TestCase
     public function testFlush()
     {
         $scope = new Scope();
-        $scopeCriteria = new ScopeCriteria(['test' => 1]);
+        $scopeCriteria = new ScopeCriteria(['test' => 1], ['test']);
 
         $this->storage->scheduleForInsert($scope, $scopeCriteria);
 

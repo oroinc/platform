@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Doctrine\ORM\EntityRepository;
+
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class LoadParentEntityTest extends GetSubresourceProcessorTestCase
 {
@@ -19,7 +23,7 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -47,6 +51,7 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
             ->willReturn(false);
 
         $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
+        $this->context->setParentConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         $this->assertFalse($this->context->hasParentEntity());
@@ -61,7 +66,7 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
             ->method('isManageableEntityClass')
             ->with(self::TEST_PARENT_CLASS_NAME)
             ->willReturn(true);
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $repo = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrineHelper->expects($this->once())
@@ -88,7 +93,7 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
             ->method('isManageableEntityClass')
             ->with(self::TEST_PARENT_CLASS_NAME)
             ->willReturn(true);
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $repo = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrineHelper->expects($this->once())
@@ -106,5 +111,65 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
 
         $this->assertNull($this->context->getParentEntity());
         $this->assertTrue($this->context->hasParentEntity());
+    }
+
+    public function testProcessForResourceBasedOnManageableEntity()
+    {
+        $parentResourceClass = 'Test\ParentResourceClass';
+        $parentId = 123;
+        $entity = new \stdClass();
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setParentResourceClass($parentResourceClass);
+
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('isManageableEntityClass')
+            ->willReturnMap([
+                [self::TEST_PARENT_CLASS_NAME, false],
+                [$parentResourceClass, true],
+            ]);
+        $repo = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->with($parentResourceClass)
+            ->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('find')
+            ->with($parentId)
+            ->willReturn($entity);
+
+        $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
+        $this->context->setParentId($parentId);
+        $this->context->setParentConfig($parentConfig);
+        $this->processor->process($this->context);
+
+        $this->assertSame($entity, $this->context->getParentEntity());
+    }
+
+    public function testProcessForResourceBasedOnNotManageableEntity()
+    {
+        $parentResourceClass = 'Test\ParentResourceClass';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setParentResourceClass($parentResourceClass);
+
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('isManageableEntityClass')
+            ->willReturnMap([
+                [self::TEST_PARENT_CLASS_NAME, false],
+                [$parentResourceClass, false],
+            ]);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityRepositoryForClass');
+
+        $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
+        $this->context->setParentId($parentId);
+        $this->context->setParentConfig($parentConfig);
+        $this->processor->process($this->context);
+
+        $this->assertNull($this->context->getParentEntity());
     }
 }

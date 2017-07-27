@@ -223,6 +223,62 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->visitDatasource($config, $this->datasource);
     }
 
+    public function testVisitDatasourceAllowingEmpty()
+    {
+        $config = DatagridConfiguration::create([
+            'properties' => [
+                'columnName' => [
+                    LocalizedValueProperty::TYPE_KEY => LocalizedValueProperty::NAME,
+                    LocalizedValueProperty::DATA_NAME_KEY => 'property',
+                    LocalizedValueProperty::ALLOW_EMPTY => 'true',
+                ],
+            ],
+            'source' => [
+                'query' => [
+                    'from' => [
+                        [
+                            'table' => 'Table1',
+                            'alias' => 'alias1',
+                        ],
+                    ],
+                ]
+            ],
+        ]);
+
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
+
+        $this->datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->at(0))
+            ->method('addSelect')
+            ->with('columnNames.string as columnName')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->at(1))
+            ->method('leftJoin')
+            ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->at(2))
+            ->method('andWhere')
+            ->willReturn(true);
+
+        $this->queryBuilder->expects($this->at(3))
+            ->method('getDQLPart')
+            ->with('groupBy')
+            ->willReturn(true);
+
+        $this->queryBuilder->expects($this->at(4))
+            ->method('addGroupBy')
+            ->with('columnName');
+
+        $this->extension->visitDatasource($config, $this->datasource);
+    }
+
     public function testVisitResultWithoutCurrentLocalization()
     {
         $config = DatagridConfiguration::create([]);

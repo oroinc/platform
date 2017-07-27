@@ -26,7 +26,7 @@ class MenuNodeDefinition extends ArrayNodeDefinition
                 ->children()
                     ->scalarNode('position')->end()
                     ->scalarNode('merge_strategy')
-                        ->defaultValue('append')
+                        ->defaultValue('move')
                     ->end()
                     ->menuNode('children')->menuNodeHierarchy($depth - 1)
                 ->end()

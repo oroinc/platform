@@ -5,9 +5,12 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Twig;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Twig\TagExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class TagExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /** @var TagExtension */
     protected $extension;
 
@@ -18,19 +21,23 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
     protected $helper;
 
     /**
-     * Set up test environment
+     * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
+        $this->manager = $this->getMockBuilder(TagManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->helper = $this->getMockBuilder(TaggableHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = self::getContainerBuilder()
+            ->add('oro_tag.tag.manager', $this->manager)
+            ->add('oro_tag.helper.taggable_helper', $this->helper)
+            ->getContainer($this);
 
-        $this->extension = new TagExtension($this->manager, $this->helper);
+        $this->extension = new TagExtension($container);
     }
 
     protected function tearDown()
@@ -44,20 +51,19 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_tag', $this->extension->getName());
     }
 
-    public function testGetFunctions()
-    {
-        $functionsKeys = array_keys($this->extension->getFunctions());
-        $this->assertEquals(['oro_tag_get_list', 'oro_is_taggable'], $functionsKeys);
-    }
-
     public function testGetList()
     {
         $entity = $this->createMock('Oro\Bundle\TagBundle\Entity\Taggable');
+        $expected = ['test tag'];
 
         $this->manager->expects($this->once())
             ->method('getPreparedArray')
-            ->with($entity);
+            ->with(self::identicalTo($entity))
+            ->willReturn($expected);
 
-        $this->extension->getList($entity);
+        self::assertEquals(
+            $expected,
+            self::callTwigFunction($this->extension, 'oro_tag_get_list', [$entity])
+        );
     }
 }

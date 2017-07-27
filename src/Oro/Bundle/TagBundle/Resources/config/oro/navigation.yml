@@ -2,22 +2,21 @@ navigation:
     menu_config:
         items:
             tags_management:
-                label: 'oro.tag.menu.tags_management.label'
-                uri: '#'
-                extras:
-                     position: 90
+                label:    'oro.tag.menu.tags_management.label'
+                uri:      '#'
+                position: 90
             oro_tag_list:
-                label: 'oro.tag.entity_plural_label'
-                route: 'oro_tag_index'
+                label:    'oro.tag.entity_plural_label'
+                route:    'oro_tag_index'
+                position: 10
                 extras:
-                    position:    10
                     routes:      ['oro_tag_*']
                     description: 'oro.tag.menu.tag_list.description'
             oro_taxonomy_list:
-                label: 'oro.taxonomy.entity_plural_label'
-                route: 'oro_taxonomy_index'
+                label:    'oro.taxonomy.entity_plural_label'
+                route:    'oro_taxonomy_index'
+                position: 20
                 extras:
-                    position:    20
                     routes:      ['oro_taxonomy_*']
                     description: 'oro.taxonomy.menu.tag_list.description'
             shortcut_new_tag:
@@ -46,6 +45,6 @@ navigation:
 
     titles:
         oro_tag_index:  ~
-        oro_tag_update: '%%tag.name%% Tag - Edit'
+        oro_tag_update: '%tag.name% Tag - Edit'
         oro_tag_create: 'Create Tag'
-        oro_tag_search: 'Records tagged as "%%tag.name%%"'
+        oro_tag_search: 'Records tagged as "%tag.name%"'

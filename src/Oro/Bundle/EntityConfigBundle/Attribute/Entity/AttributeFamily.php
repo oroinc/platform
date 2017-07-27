@@ -17,6 +17,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+use Oro\Component\Layout\ContextItemInterface;
+
 /**
  * @ORM\Table(name="oro_attribute_family")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository")
@@ -32,10 +34,18 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
  *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"="",
+ *              "category"="catalog"
+ *          }
  *      }
  * )
  */
-class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterface, OrganizationAwareInterface
+class AttributeFamily extends ExtendAttributeFamily implements
+    DatesAwareInterface,
+    OrganizationAwareInterface,
+    ContextItemInterface
 {
     use DatesAwareTrait;
 
@@ -106,8 +116,10 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
      *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup",
      *     mappedBy="attributeFamily",
      *     cascade={"ALL"},
-     *     orphanRemoval=true
+     *     orphanRemoval=true,
+     *     indexBy="code"
      * )
+     * @ORM\OrderBy({"id" = "ASC"})
      */
     private $attributeGroups;
 
@@ -265,7 +277,7 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|AttributeGroup[]
      */
     public function getAttributeGroups()
     {
@@ -284,15 +296,26 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     }
 
     /**
+     * @param string $code
+     * @return null|AttributeGroup
+     */
+    public function getAttributeGroup($code)
+    {
+        if (!isset($this->attributeGroups[$code])) {
+            return null;
+        }
+
+        return $this->attributeGroups[$code];
+    }
+
+    /**
      * @param AttributeGroup $attributeGroup
      * @return $this
      */
     public function addAttributeGroup(AttributeGroup $attributeGroup)
     {
-        if (!$this->attributeGroups->contains($attributeGroup)) {
-            $this->attributeGroups->add($attributeGroup);
-            $attributeGroup->setAttributeFamily($this);
-        }
+        $this->attributeGroups[$attributeGroup->getCode()] = $attributeGroup;
+        $attributeGroup->setAttributeFamily($this);
 
         return $this;
     }
@@ -335,5 +358,36 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     public function __toString()
     {
         return $this->getDefaultLabel()->getString();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString()
+    {
+        return 'code:'.$this->getCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
+        $data = [];
+
+        /** @var AttributeGroup $group */
+        $groups = $this->getAttributeGroups();
+
+        foreach ($groups as $group) {
+            $item = ['group' => $group->getId(), 'attributes' => [], 'visible' => $group->getIsVisible()];
+
+            /** @var AttributeGroupRelation $attributeRelation */
+            foreach ($group->getAttributeRelations() as $attributeRelation) {
+                $item['attributes'][] = $attributeRelation->getEntityConfigFieldId();
+            }
+            $data[] = $item;
+        }
+
+        return md5(serialize([$this->getId() => $data]));
     }
 }

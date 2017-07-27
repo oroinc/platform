@@ -1,0 +1,5 @@
+config:
+    paths:
+        'oroentityconfig/js/attribute-group-collection-component': 'bundles/oroentityconfig/js/components/attribute-group-collection-component.js'
+        'oroentityconfig/js/attribute-group-tabs-component': 'bundles/oroentityconfig/js/components/attribute-group-tabs-component.js'
+        'oroentityconfig/js/attribute-group-tab-content-component': 'bundles/oroentityconfig/js/components/attribute-group-tab-content-component.js'

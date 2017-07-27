@@ -3,17 +3,15 @@
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
-class PermissionListConfiguration implements ConfigurationInterface
+class PermissionListConfiguration implements PermissionConfigurationInterface
 {
     const ROOT_NODE_NAME = 'oro_permissions';
     const DEFAULT_GROUP_NAME = 'default';
 
     /**
-     * @param array $configs
-     * @return array
+     * {@inheritdoc}
      */
     public function processConfiguration(array $configs)
     {

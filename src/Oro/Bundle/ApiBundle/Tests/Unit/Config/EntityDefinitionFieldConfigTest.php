@@ -6,7 +6,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,21 +16,25 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config = new EntityDefinitionFieldConfig();
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, null);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
         $this->assertEquals([], $config->toArray());
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, false);
         $this->assertTrue($config->has($attrName));
         $this->assertFalse($config->get($attrName));
         $this->assertEquals([$attrName => false], $config->toArray());
+        $this->assertEquals([$attrName], $config->keys());
 
         $config->remove($attrName);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
-        $this->assertEquals([], $config->toArray());
+        $this->assertSame([], $config->toArray());
+        $this->assertSame([], $config->keys());
     }
 
     public function testExcluded()
@@ -227,6 +230,24 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setFormOptions(null);
         $this->assertNull($config->getFormOptions());
         $this->assertEquals([], $config->toArray());
+    }
+
+    public function testSetFormOption()
+    {
+        $config = new EntityDefinitionFieldConfig();
+
+        $config->setFormOption('option1', 'value1');
+        $config->setFormOption('option2', 'value2');
+        $this->assertEquals(
+            ['option1' => 'value1', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
+
+        $config->setFormOption('option1', 'newValue');
+        $this->assertEquals(
+            ['option1' => 'newValue', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
     }
 
     public function testAddFormConstraint()

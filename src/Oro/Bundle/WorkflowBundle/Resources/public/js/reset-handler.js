@@ -3,9 +3,8 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/modal',
-    'oroui/js/mediator',
-    'oroui/js/messenger'
-], function($, _, __, Modal, mediator, Messenger) {
+    'oroui/js/mediator'
+], function($, _, __, Modal, mediator) {
     'use strict';
 
     /**
@@ -38,8 +37,8 @@ define([
                 success: function() {
                     mediator.execute('refreshPage');
                 },
+                errorHandlerMessage: __('Cannot reset workflow item data.'),
                 error: function() {
-                    Messenger.notificationFlashMessage('error', __('Cannot reset workflow item data.'));
                     resetInProgress();
                 }
             });

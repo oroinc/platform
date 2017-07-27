@@ -1,5 +1,6 @@
 parameters:
     oro_address.address.entity.class:       Oro\Bundle\AddressBundle\Entity\Address
+    oro_address.country.entity.class:       Oro\Bundle\AddressBundle\Entity\Country
     oro_address.address.type.entity.class:  Oro\Bundle\AddressBundle\Entity\AddressType
     oro_address.address.manager.class:      Oro\Bundle\AddressBundle\Entity\Manager\AddressManager
     oro_address.provider.address.class:     Oro\Bundle\AddressBundle\Provider\AddressProvider
@@ -25,13 +26,37 @@ services:
         arguments:
             - '@oro_entity_config.provider.extend'
 
+    oro_address.provider.country:
+        class: 'Oro\Bundle\AddressBundle\Provider\CountryProvider'
+        arguments:
+            - '@oro_address.repository.country'
+
+    oro_address.repository.country:
+        class: 'Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_address.country.entity.class%'
+
     oro_address.validator.valid_region:
         class: %oro_address.validator.valid_region.class%
         tags:
             - { name: validator.constraint_validator, alias: oro_address_valid_region }
+
+    oro_address.validator.name_or_organization:
+        class: 'Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_address.validator.name_or_organization }
 
     oro_address.extension.action.type.map:
         class: '%oro_address.extension.action.type.map.class%'
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
+
+    oro_address.twig.extension.phone:
+        class: Oro\Bundle\AddressBundle\Twig\PhoneExtension
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }

@@ -11,7 +11,9 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
@@ -19,7 +21,6 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -35,34 +36,37 @@ class CommentApiManager extends ApiEntityManager
     /** @var Pager */
     protected $pager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
+    /** @var AttachmentManager */
+    protected $attachmentManager;
+
     /** @var AttachmentProvider */
     protected $attachmentProvider;
 
-    /** @var aclHelper */
+    /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var aclHelper */
+    /** @var ConfigManager */
     protected $configManager;
 
     /**
-     * @param Registry                 $doctrine
-     * @param SecurityFacade           $securityFacade
-     * @param EntityNameResolver       $entityNameResolver
-     * @param Pager                    $pager
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param AttachmentProvider       $attachmentProvider
-     * @param AclHelper                $aclHelper
-     * @param ConfigManager            $configManager
+     * @param Registry                      $doctrine
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param EntityNameResolver            $entityNameResolver
+     * @param Pager                         $pager
+     * @param EventDispatcherInterface      $eventDispatcher
+     * @param AttachmentProvider            $attachmentProvider
+     * @param AclHelper                     $aclHelper
+     * @param ConfigManager                 $configManager
      */
     public function __construct(
         Registry $doctrine,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         EntityNameResolver $entityNameResolver,
         Pager $pager,
         EventDispatcherInterface $eventDispatcher,
@@ -70,17 +74,25 @@ class CommentApiManager extends ApiEntityManager
         AclHelper $aclHelper,
         ConfigManager $configManager
     ) {
-        $this->em                 = $doctrine->getManager();
-        $this->securityFacade     = $securityFacade;
+        $this->em = $doctrine->getManager();
+        $this->authorizationChecker = $authorizationChecker;
         $this->entityNameResolver = $entityNameResolver;
-        $this->pager              = $pager;
+        $this->pager = $pager;
         $this->attachmentProvider = $attachmentProvider;
-        $this->aclHelper          = $aclHelper;
-        $this->configManager      = $configManager;
+        $this->aclHelper = $aclHelper;
+        $this->configManager = $configManager;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
         $this->setEventDispatcher($eventDispatcher);
+    }
+
+    /**
+     * @param AttachmentManager $attachmentManager
+     */
+    public function setAttachmentManager(AttachmentManager $attachmentManager)
+    {
+        $this->attachmentManager = $attachmentManager;
     }
 
     /**
@@ -202,8 +214,8 @@ class CommentApiManager extends ApiEntityManager
             'relationId'    => $entityId,
             'createdAt'     => $entity->getCreatedAt()->format('c'),
             'updatedAt'     => $entity->getUpdatedAt()->format('c'),
-            'editable'      => $this->securityFacade->isGranted('EDIT', $entity),
-            'removable'     => $this->securityFacade->isGranted('DELETE', $entity),
+            'editable'      => $this->authorizationChecker->isGranted('EDIT', $entity),
+            'removable'     => $this->authorizationChecker->isGranted('DELETE', $entity),
         ];
         $result = array_merge($result, $this->attachmentProvider->getAttachmentInfo($entity));
         $result = array_merge($result, $this->getCommentAvatarImageUrl($entity->getOwner()));
@@ -216,11 +228,12 @@ class CommentApiManager extends ApiEntityManager
      */
     public function isCommentable()
     {
-        return $this->securityFacade->isGranted('oro_comment_view');
+        return $this->authorizationChecker->isGranted('oro_comment_view');
     }
 
     /**
      * Get resized avatar
+     * @todo Should be moved after BAP-11405
      *
      * @param User $user
      *
@@ -229,7 +242,10 @@ class CommentApiManager extends ApiEntityManager
     protected function getCommentAvatarImageUrl($user)
     {
         $attachment = PropertyAccess::createPropertyAccessor()->getValue($user, self::AVATAR_FIELD_NAME);
-        if ($attachment && $attachment->getFilename()) {
+        if ($attachment &&
+            $attachment->getFilename() &&
+            ($this->attachmentManager instanceof AttachmentManager)
+        ) {
             $entityClass = ClassUtils::getRealClass($user);
             $config = $this->configManager
                 ->getProvider('attachment')

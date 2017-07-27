@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Processor\VariableProcessorRegistry;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
 
@@ -15,6 +16,9 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $variablesProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $variablesProcessorRegistry;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $cache;
@@ -55,6 +59,10 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $this->variablesProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\VariablesProvider')
             ->disableOriginalConstructor()->getMock();
+
+        $this->variablesProcessorRegistry = $this->getMockBuilder(VariableProcessorRegistry::class)
+            ->disableOriginalConstructor()->getMock();
+        $this->variablesProcessorRegistry->expects($this->any())->method('get')->willReturn(null);
 
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
             ->disableOriginalConstructor()
@@ -237,8 +245,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $result = $renderer->compileMessage(new EmailTemplate('', $content), ['entity' => $entity]);
 
         $this->assertEquals(
-            'content oro.email.variable.not.found, {{ entity.field1|oro_html_sanitize }}, ' .
-            '{{ entity.field2.field1|oro_html_sanitize }}, oro.email.variable.not.found, ' .
+            'content oro.email.variable.not.found, {{ entity.field1|oro_format_name }}, ' .
+            '{{ entity.field2.field1|oro_format_name }}, oro.email.variable.not.found, ' .
             '{{ system.currentDate }}',
             $renderedContent = $result[1]
         );
@@ -314,7 +322,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 $this->cache,
                 $this->cacheKey,
                 $this->sandbox,
-                $this->translation
+                $this->translation,
+                $this->variablesProcessorRegistry,
             ))
             ->getMock();
     }

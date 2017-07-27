@@ -4,9 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class EmailTemplateControllerTest extends WebTestCase
 {
     protected function setUp()
@@ -111,7 +108,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(9, $result);
+        $this->assertCount(10, $result);
     }
 
     /**

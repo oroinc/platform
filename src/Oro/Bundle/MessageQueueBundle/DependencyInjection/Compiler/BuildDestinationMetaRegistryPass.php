@@ -22,6 +22,7 @@ class BuildDestinationMetaRegistryPass implements CompilerPassInterface
 
         $configs = [];
         foreach ($container->findTaggedServiceIds($processorTagName) as $serviceId => $tagAttributes) {
+            $container->getDefinition($serviceId)->setPublic(true);
             $class = $container->getDefinition($serviceId)->getClass();
             if (is_subclass_of($class, TopicSubscriberInterface::class)) {
                 $this->addConfigsFromTopicSubscriber($configs, $class, $serviceId);

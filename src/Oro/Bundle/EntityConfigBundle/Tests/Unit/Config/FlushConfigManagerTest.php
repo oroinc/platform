@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
 
 class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -80,8 +81,10 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             $this->configCache
         );
 
-        $this->configManager->addProvider($this->entityConfigProvider);
-        $this->configManager->addProvider($this->testConfigProvider);
+        $configProviderBag = new ConfigProviderBagMock();
+        $configProviderBag->addProvider($this->entityConfigProvider);
+        $configProviderBag->addProvider($this->testConfigProvider);
+        $this->configManager->setProviderBag($configProviderBag);
     }
 
     public function testFlush()

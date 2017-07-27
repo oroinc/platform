@@ -1,0 +1,17 @@
+{% block _transition_form_wrapper_widget %}
+    {% set attr = attr|merge({
+    class: attr.class|default('') ~ " transition-form-widget"
+    }) %}
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _form_warning_message_widget %}
+    {% set attr = attr|merge({
+    class: attr.class|default('') ~ " transition-message alert"
+    }) %}
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}

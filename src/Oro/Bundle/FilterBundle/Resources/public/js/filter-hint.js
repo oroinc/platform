@@ -1,16 +1,14 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view',
-    'module',
-    'orofilter/js/filter-template'
-], function($, _, BaseView, module, FilterTemplate) {
+define(function(require) {
     'use strict';
 
+    var template = require('tpl!orofilter/templates/filter/filter-hint.html');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var module = require('module');
+    var FilterTemplate = require('orofilter/js/filter-template');
     var config = module.config();
     config = _.extend({
         inline: true,
-        templateSelector: '#filter-hint-template',
         selectors: {
             filters: '.filter-container',
             itemHint: '.filter-item-hint',
@@ -41,7 +39,7 @@ define([
         /**
          * @property {String}
          */
-        templateSelector: config.templateSelector,
+        template: template,
 
         /**
          * @property {Boolean}
@@ -78,7 +76,8 @@ define([
 
         render: function() {
             this.setElement(this.template({
-                label: this.inline ? null : this.label
+                label: this.inline ? null : this.label,
+                allowClear: this.filter.allowClear
             }));
 
             if (this.filter.selectWidget) {

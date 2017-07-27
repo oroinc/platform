@@ -119,4 +119,11 @@ oro:
             maintenance: 'The System is currently under maintenance and should be available in a few minutes.'
         filter:
             by: Filter By
+        jstree:
+            move:
+                source.label: 'Selected items'
+                target.label: 'Move to'
+                confirm_slug_change.title: 'Create 301 Redirect from old to new URLs'
 'Click to go back': 'Click to go back'
+'Show more': 'Show more'
+'Show less': 'Show less'

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
@@ -74,6 +75,11 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
             []
         );
+        $applications = $this->getConfigurationOption(
+            $configuration,
+            WorkflowConfiguration::NODE_APPLICATIONS,
+            [CurrentApplicationProviderInterface::DEFAULT_APPLICATION]
+        );
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -87,6 +93,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setEntityAttributeName($entityAttributeName)
             ->setExclusiveActiveGroups($activeGroups)
             ->setExclusiveRecordGroups($recordGroups)
+            ->setApplications($applications)
             ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
@@ -208,6 +215,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $configurationKeys = [
             WorkflowDefinition::CONFIG_SCOPES,
             WorkflowDefinition::CONFIG_DATAGRIDS,
+            WorkflowDefinition::CONFIG_FORCE_AUTOSTART,
             WorkflowConfiguration::NODE_DISABLE_OPERATIONS,
             WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,
@@ -217,6 +225,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_INIT_ENTITIES,
             WorkflowConfiguration::NODE_INIT_ROUTES,
             WorkflowConfiguration::NODE_INIT_DATAGRIDS,
+            WorkflowConfiguration::NODE_VARIABLES,
+            WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));

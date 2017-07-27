@@ -26,6 +26,16 @@ define(function(require) {
          */
         initialize: function(options) {
             this.select2Config = _.result(options, 'select2Config') || _.extend({}, this.select2Config);
+
+            var $placeholder = this.$el.find('option[value=""]');
+            if (this.select2Config.allowClear === undefined && (!this.$el[0].required || $placeholder.length)) {
+                this.select2Config.allowClear = true;
+            }
+            if (this.select2Config.allowClear && !this.select2Config.placeholderOption && $placeholder.length) {
+                this.select2Config.placeholderOption = function() {
+                    return $placeholder;
+                };
+            }
         },
 
         render: function() {

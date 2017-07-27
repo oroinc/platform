@@ -14,6 +14,7 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
+ *      mode="hidden",
  *      routeName="oro_process_definition_index",
  *      routeView="oro_process_definition_view",
  *      defaultValues={

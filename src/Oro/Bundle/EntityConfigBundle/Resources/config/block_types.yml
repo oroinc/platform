@@ -1,0 +1,127 @@
+services:
+    oro_entity_config.block_type.attribute_text:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeTextType'
+        arguments:
+            - '@oro_entity_config.manager.attribute_manager'
+        tags:
+             - { name: layout.block_type, alias: attribute_text }
+
+    oro_entity_config.block_type.attribute_percent:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_percent']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_percent }
+
+    oro_entity_config.block_type.attribute_currency:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_currency']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_currency }
+
+    oro_entity_config.block_type.attribute_date:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_date']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_date }
+
+    oro_entity_config.block_type.attribute_datetime:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_datetime']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_datetime }
+
+    oro_entity_config.block_type.attribute_decimal:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_decimal']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_decimal }
+
+    oro_entity_config.block_type.attribute_file:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_file']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_file }
+
+    oro_entity_config.block_type.attribute_image:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_image']]
+            - [setParent, ['attribute_text']]
+            -
+                - setOptionsConfig
+                -
+                    -
+                        width: {default: '=data["attachment_config"].getConfig(className, fieldName).get("width")'}
+                        height: {default: '=data["attachment_config"].getConfig(className, fieldName).get("height")'}
+        tags:
+             - { name: layout.block_type, alias: attribute_image }
+
+    oro_entity_config.block_type.attribute_boolean:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_boolean']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_boolean }
+
+    oro_entity_config.block_type.attribute_multiselect:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_multiselect']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_multiselect }
+
+    oro_entity_config.block_type.attribute_localized_fallback:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_localized_fallback']]
+            - [setParent, ['attribute_text']]
+            - [setOptionsConfig, [{translated_value: {default: '=data["locale"].getLocalizedValue(value)'}}]]
+        tags:
+             - { name: layout.block_type, alias: attribute_localized_fallback }
+
+    oro_entity_config.block_type.attribute_group:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType'
+        arguments:
+            - '@oro_entity_config.attribute_group_rendrer_registry'
+            - '@oro_entity_config.manager.attribute_manager'
+            - '@oro_entity_config.layout.chain_attribute_block_type_mapper'
+        calls:
+            -
+                - setNotRenderableAttributeTypes
+                -
+                    -
+                        - 'manyToMany'
+                        - 'manyToOne'
+                        - 'oneToMany'
+        tags:
+            - { name: layout.block_type, alias: attribute_group }
+
+    oro_entity_config.block_type.attribute_group_rest:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupRestType'
+        arguments:
+            - '@oro_entity_config.attribute_group_rendrer_registry'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: layout.block_type, alias: attribute_group_rest }
+
+    oro_entity_config.block_type.attribute_html_escaped:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_html_escaped']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_html_escaped }

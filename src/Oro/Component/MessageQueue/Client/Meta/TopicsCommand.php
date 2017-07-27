@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client\Meta;
 
 use Symfony\Component\Console\Command\Command;
@@ -6,23 +7,12 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class TopicsCommand extends Command
+class TopicsCommand extends Command implements ContainerAwareInterface
 {
-    /**
-     * @var TopicMetaRegistry
-     */
-    private $topicRegistry;
-
-    /**
-     * @param TopicMetaRegistry $topicRegistry
-     */
-    public function __construct(TopicMetaRegistry $topicRegistry)
-    {
-        parent::__construct('oro:message-queue:topics');
-
-        $this->topicRegistry = $topicRegistry;
-    }
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -30,8 +20,8 @@ class TopicsCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('A command shows all available topics and some information about them.')
-        ;
+            ->setName('oro:message-queue:topics')
+            ->setDescription('A command shows all available topics and some information about them.');
     }
 
     /**
@@ -44,8 +34,8 @@ class TopicsCommand extends Command
 
         $count = 0;
         $firstRow = true;
-        foreach ($this->topicRegistry->getTopicsMeta() as $topic) {
-            if (false == $firstRow) {
+        foreach ($this->getTopics() as $topic) {
+            if (!$firstRow) {
                 $table->addRow(new TableSeparator());
             }
 
@@ -58,5 +48,16 @@ class TopicsCommand extends Command
         $output->writeln(sprintf('Found %s topics', $count));
         $output->writeln('');
         $table->render();
+    }
+
+    /**
+     * @return TopicMeta[]
+     */
+    private function getTopics()
+    {
+        /** @var TopicMetaRegistry $topicRegistry */
+        $topicRegistry = $this->container->get('oro_message_queue.client.meta.topic_meta_registry');
+
+        return $topicRegistry->getTopicsMeta();
     }
 }

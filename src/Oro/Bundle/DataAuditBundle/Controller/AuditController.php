@@ -21,7 +21,7 @@ class AuditController extends Controller
      *      defaults={"_format" = "html"}
      * )
      * @Template
-     * @AclAncestor("oro_dataaudit_history")
+     * @AclAncestor("oro_dataaudit_view")
      */
     public function indexAction(Request $request)
     {
@@ -37,11 +37,10 @@ class AuditController extends Controller
      * )
      * @Template
      * @Acl(
-     *      id="oro_dataaudit_history",
-     *      type="action",
-     *      label="oro.dataaudit.acl.action.history.label",
-     *      group_name="",
-     *      category="account_management"
+     *      id="oro_dataaudit_view",
+     *      type="entity",
+     *      class="OroDataAuditBundle:AbstractAudit",
+     *      permission="VIEW"
      * )
      */
     public function historyAction($entity, $id)

@@ -116,7 +116,7 @@ services:
         class: %oro_form.type.multiple_entity.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
         tags:
             - { name: form.type, alias: oro_multiple_entity }
 
@@ -254,12 +254,24 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_form.extension.extra_fields_validation:
+        class: Oro\Bundle\FormBundle\Form\Extension\ExtraFieldsValidationExtension
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
     oro_form.type.encoded_password:
         class: %oro_form.type.encoded_password.class%
         arguments:
             - '@oro_security.encoder.mcrypt'
         tags:
             - { name: form.type, alias: oro_encoded_password }
+
+    oro_form.type.encoded_placeholder_password:
+        class: 'Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType'
+        arguments:
+            - '@oro_security.encoder.mcrypt'
+        tags:
+            - { name: form.type, alias: oro_encoded_placeholder_password }
 
     oro_form.type.textlist:
         class: %oro_form.type.textlist.class%
@@ -269,7 +281,7 @@ services:
     oro_form.type.oro_entity_create_or_select_inline:
         class: %oro_form.type.oro_entity_create_or_select_inline.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_entity_config.config_manager'
             - '@doctrine.orm.entity_manager'
             - '@oro_form.autocomplete.search_registry'
@@ -331,7 +343,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.entity_class_name_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
 
     oro_form.related_entity.form.type.api:
         class: Oro\Bundle\FormBundle\Form\Type\RelatedEntityApiType

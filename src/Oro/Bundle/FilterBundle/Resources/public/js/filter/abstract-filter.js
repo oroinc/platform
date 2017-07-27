@@ -101,7 +101,14 @@ define([
          *
          * @property {Array.<string|jQuery|HTMLElement>}
          */
-        dropdownFitContainers: ['.ui-dialog-content', '#container', 'body'],
+        dropdownFitContainers: ['.ui-dialog-content>*:first-child', '#container', 'body'],
+
+        /**
+         * Allow clear selected value
+         *
+         * @property {Boolean}
+         */
+        allowClear: true,
 
         /**
          * Initialize.
@@ -111,7 +118,7 @@ define([
          */
         initialize: function(options) {
             var opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
-                'templateSelector', 'templateTheme');
+                'templateSelector', 'templateTheme', 'template');
             _.extend(this, opts);
 
             this._defineTemplate();
@@ -122,8 +129,10 @@ define([
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {};
             }
-            // init raw value of filter
-            this.value = tools.deepClone(this.emptyValue);
+            // init raw value of filter if it was not initialized
+            if (_.isUndefined(this.value)) {
+                this.value = tools.deepClone(this.emptyValue);
+            }
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
 
@@ -207,6 +216,8 @@ define([
             this.$el.hide();
             return this;
         },
+
+        close: function() {},
 
         /**
          * Reset filter elements

@@ -38,10 +38,10 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
     public function testToString()
     {
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
-        $this->assertEquals(self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
-    public function testToStringWithAllParams()
+    public function testGetHash()
     {
         $formAccessor = new DependencyInjectionFormAccessor(
             $this->container,
@@ -52,7 +52,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             self::FORM_SERVICE_ID . ';action_route:test_route;method:post;enctype:multipart/form-data',
-            $formAccessor->toString()
+            $formAccessor->getHash()
         );
     }
 
@@ -89,7 +89,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertNull($formAccessor->getEnctype());
-        $this->assertEquals(self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
     public function testParamsInitializerForMultipartForm()
@@ -125,7 +125,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertEquals('multipart/form-data', $formAccessor->getEnctype());
-        $this->assertEquals(self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
     public function testGetView()

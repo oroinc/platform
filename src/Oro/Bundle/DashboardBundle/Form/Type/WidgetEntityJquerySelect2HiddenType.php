@@ -39,7 +39,6 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
         ConfigProvider $configProvider,
         DoctrineHelper $doctrineHelper
     ) {
-
         parent::__construct($entityManager, $registry, $configProvider);
         $this->doctrineHelper = $doctrineHelper;
     }
@@ -71,11 +70,13 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
             'excluded' => (array)$options['excluded']
         ];
 
+        $multiple = isset($options['configs']['multiple']) && $options['configs']['multiple'];
+
         if ($form->getData()) {
             $result = [];
             /** @var ConverterInterface $converter */
             $converter = $options['converter'];
-            if (isset($options['configs']['multiple']) && $options['configs']['multiple']) {
+            if ($multiple) {
                 $ids = $form->getData();
             } else {
                 $ids = [$form->getData()];
@@ -87,6 +88,10 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
                 $item     = $converter->convertItem($item);
                 $result[] = $item;
                 $ids[]    = $item[$identityField];
+            }
+
+            if (!$multiple && $result) {
+                $result = $result[0];
             }
 
             $vars['value'] = implode(',', $ids);

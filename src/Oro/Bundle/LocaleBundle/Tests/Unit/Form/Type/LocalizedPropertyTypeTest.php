@@ -113,7 +113,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                     LocalizedPropertyType::FIELD_DEFAULT => 5,
                     LocalizedPropertyType::FIELD_LOCALIZATIONS => [
                         1 => 10,
-                        2 => null,
+                        2 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                         3 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                     ]
                 ],

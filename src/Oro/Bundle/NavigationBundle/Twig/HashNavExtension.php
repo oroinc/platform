@@ -2,21 +2,23 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
-use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+
 class HashNavExtension extends \Twig_Extension
 {
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
+    /** @var Request */
     protected $request;
 
     /**
      * Listen to the 'kernel.request' event to get the main request.
      * The request can not be injected directly into a Twig extension,
      * this causes a ScopeWideningInjectionException
+     *
+     * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -26,24 +28,22 @@ class HashNavExtension extends \Twig_Extension
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
-        return array(
-            'oro_is_hash_navigation' => new \Twig_Function_Method(
-                $this,
-                'checkIsHashNavigation',
-                array('is_safe' => array('html'))
+        return [
+            new \Twig_SimpleFunction(
+                'oro_is_hash_navigation',
+                [$this, 'checkIsHashNavigation'],
+                ['is_safe' => ['html']]
             ),
-            'oro_hash_navigation_header' => new \Twig_Function_Method(
-                $this,
-                'getHashNavigationHeaderConst',
-                array('is_safe' => array('html'))
+            new \Twig_SimpleFunction(
+                'oro_hash_navigation_header',
+                [$this, 'getHashNavigationHeaderConst'],
+                ['is_safe' => ['html']]
             ),
-        );
+        ];
     }
 
     /**
@@ -53,12 +53,12 @@ class HashNavExtension extends \Twig_Extension
      */
     public function checkIsHashNavigation()
     {
-        return (!is_object($this->request)
-            || (
-                $this->request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER) != true
-                    && $this->request->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER) != true
-            )
-        ) ? false : true;
+        return
+            is_object($this->request)
+            && (
+                $this->request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
+                || $this->request->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
+            );
     }
 
     /**

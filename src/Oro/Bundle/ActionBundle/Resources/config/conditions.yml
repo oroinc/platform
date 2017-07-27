@@ -33,6 +33,8 @@ services:
         class: Oro\Component\Action\Condition\ExtendableCondition
         arguments:
             - '@event_dispatcher'
+            - '@session.flash_bag'
+            - '@translator'
         tags:
             - { name: oro_action.condition, alias: extendable }
 
@@ -86,6 +88,11 @@ services:
         tags:
             - { name: oro_action.condition, alias: has_value }
 
+    oro_action.expression.has_property:
+        class: Oro\Component\ConfigExpression\Condition\HasProperty
+        tags:
+            - { name: oro_action.condition, alias: has_property }
+
     oro_action.expression.in:
         class: Oro\Component\ConfigExpression\Condition\In
         tags:
@@ -124,7 +131,8 @@ services:
     oro_action.expression.acl_granted:
         class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@doctrine'
         tags:
             - { name: oro_action.condition, alias: acl|acl_granted }
@@ -164,3 +172,17 @@ services:
             - 'action_available'
         tags:
             - { name: oro_action.condition, alias: action_available }
+
+    oro_action.condition.route_exists:
+        class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
+        arguments:
+            - '@router'
+        tags:
+            - { name: oro_action.condition, alias: 'route_exists' }
+
+    oro_action.condition.service_exists:
+        class: 'Oro\Bundle\ActionBundle\Condition\ServiceExists'
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: oro_action.condition, alias: 'service_exists' }

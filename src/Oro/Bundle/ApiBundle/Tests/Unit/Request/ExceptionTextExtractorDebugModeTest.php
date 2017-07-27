@@ -6,6 +6,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
+use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
@@ -58,6 +61,10 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
             [new AccessDeniedException(), 403],
             [new ForbiddenException('test'), 403],
             [new \InvalidArgumentException(), 500],
+            [new RuntimeException(), 500],
+            [new ActionNotAllowedException(), 405],
+            [new ForbiddenException('Reason.'), 403],
+            [new ResourceNotAccessibleException(), 404],
         ];
     }
 
@@ -86,6 +93,10 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
             [new \InvalidArgumentException(), 'invalid argument exception'],
             [new BadRequestHttpException(), 'bad request http exception'],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 'bad request http exception'],
+            [new RuntimeException('Some error.'), 'runtime exception'],
+            [new ActionNotAllowedException(), 'action not allowed exception'],
+            [new ForbiddenException('Reason.'), 'forbidden exception'],
+            [new ResourceNotAccessibleException(), 'resource not accessible exception'],
         ];
     }
 
@@ -112,6 +123,17 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
                 null
             ],
             [
+                $this->createExecutionFailedException(new \Exception('some error')),
+                '*DEBUG ONLY* some error. Processor: processor1.'
+            ],
+            [
+                $this->createExecutionFailedException(
+                    $this->createExecutionFailedException(new \Exception('some error')),
+                    'processor0'
+                ),
+                '*DEBUG ONLY* some error. Processor: processor0->processor1.'
+            ],
+            [
                 new \UnexpectedValueException('some error'),
                 'some error.'
             ],
@@ -132,18 +154,34 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 new BadRequestHttpException('some error in request'),
-                '*DEBUG ONLY* some error in request.'
+                'some error in request.'
             ],
             [
                 $this->createExecutionFailedException(new BadRequestHttpException('some error in request')),
-                '*DEBUG ONLY* some error in request. Processor: processor1.'
+                'some error in request. Processor: processor1.'
             ],
             [
                 $this->createExecutionFailedException(
                     $this->createExecutionFailedException(new BadRequestHttpException('some error in request')),
                     'processor0'
                 ),
-                '*DEBUG ONLY* some error in request. Processor: processor0->processor1.'
+                'some error in request. Processor: processor0->processor1.'
+            ],
+            [
+                new RuntimeException('Some error.'),
+                'Some error.'
+            ],
+            [
+                new ActionNotAllowedException(),
+                'The action is not allowed.'
+            ],
+            [
+                new ForbiddenException('Reason.'),
+                'Reason.'
+            ],
+            [
+                new ResourceNotAccessibleException(),
+                'The resource is not accessible.'
             ],
         ];
     }

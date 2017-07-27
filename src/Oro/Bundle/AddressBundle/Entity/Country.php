@@ -20,7 +20,7 @@ use Oro\Bundle\AddressBundle\Model\ExtendCountry;
  * @ORM\Table("oro_dictionary_country", indexes={
  *      @ORM\Index(name="country_name_idx", columns={"name"})
  * })
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
  * @Config(
  *      defaultValues={

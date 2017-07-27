@@ -1,0 +1,58 @@
+oro_behat_extension:
+  elements:
+    Workflow Page Title:
+      selector: 'div.top-row h1, h1.page-title span.page-title__text'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Workflow Transition Form:
+      selector: 'form[name="oro_workflow_transition"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
+    Workflow Edit Form:
+      selector: 'form[name="oro_workflow_definition_form"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Name: 'oro_workflow_definition_form[label]'
+          Related Entity: 'oro_workflow_definition_form[related_entity]'
+          Display Steps Ordered: 'oro_workflow_definition_form[steps_display_ordered]'
+
+    Workflow Step Edit Form:
+      selector: 'div[id="step-form"] form'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Name: 'label'
+          Position: 'order'
+          
+    Workflow Transition Edit Info Form:
+      selector: 'div[id="transition-form"] form'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Name: 'label'
+          From step: 'step_from'
+          To step: 'step_to'
+          View form: 'display_type'
+          Destination Page: 'destination_page'
+          Warning message: 'message'
+          Button Label: 'button_label'
+          Button Title: 'button_title'
+
+    Workflow Transition Edit Attributes Form:
+      selector: 'div[id="transition-attributes"] form'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Entity field:
+            type: 'css'
+            locator: 'input[name="property_path"].select2-offscreen'
+          Label: 'label'
+
+    Workflow System Label:
+      selector: 'div.badge:contains("System") i.fa-circle'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Workflow Readonly Label:
+      selector: 'div.badge:contains("Read-only") i.fa-circle'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

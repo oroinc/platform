@@ -2,19 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-/**
- * @dbIsolation
- */
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+
 class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
 {
-    /**
-     * FQCN of the entity being used for testing.
-     */
-    const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment';
-
     public function testCreate()
     {
-        $entityType = $this->getEntityType(self::ENTITY_CLASS);
+        $entityType = $this->getEntityType(TestDepartment::class);
 
         $data = [
             'data' => [
@@ -25,14 +19,8 @@ class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
+        $response = $this->post(['entity' => $entityType], $data);
 
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department created by API', $result['data']['attributes']['title']);
         self::assertEquals([], $result['data']['relationships']['staff']['data']);
@@ -47,7 +35,7 @@ class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
      */
     public function testUpdate($id)
     {
-        $entityType = $this->getEntityType(self::ENTITY_CLASS);
+        $entityType = $this->getEntityType(TestDepartment::class);
 
         $data = [
             'data' => [
@@ -59,14 +47,8 @@ class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => $id]),
-            $data
-        );
+        $response = $this->patch(['entity' => $entityType, 'id' => $id], $data);
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department updated by API', $result['data']['attributes']['title']);
         self::assertEquals([], $result['data']['relationships']['staff']['data']);

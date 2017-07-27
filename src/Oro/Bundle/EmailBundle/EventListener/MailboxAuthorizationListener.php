@@ -2,31 +2,41 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EmailBundle\Controller\Configuration\MailboxController;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class MailboxAuthorizationListener
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
-    /** @var SecurityFacade */
-    protected $securityFacade;
+
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param Registry       $registry
-     * @param SecurityFacade $securityFacade
+     * @param ManagerRegistry               $registry
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
      */
-    public function __construct(Registry $registry, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor
+    ) {
         $this->registry = $registry;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -59,14 +69,14 @@ class MailboxAuthorizationListener
             } elseif (null !== $organizationId = $event->getRequest()->request->get('organization_id')) {
                 $organization = $this->getOrganizationRepository()->find($organizationId);
             } else {
-                $organization = $this->securityFacade->getOrganization();
+                $organization = $this->tokenAccessor->getOrganization();
             }
 
             /*
              * Access to fetched organization is then verified against update permission. If it's not granted, return
              * access denied response to user.
              */
-            if (!$organization || !$this->securityFacade->isGranted('oro_organization_update', $organization)) {
+            if (!$organization || !$this->authorizationChecker->isGranted('oro_organization_update', $organization)) {
                 throw new AccessDeniedHttpException();
             }
         }

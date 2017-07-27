@@ -62,7 +62,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                               'oro_type_date_range_filter'     =>
                                   new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber),
                               'oro_type_datetime_range'        => new DateTimeRangeType($localeSettings),
-                              'oro_type_date_range'            => new DateRangeType(),
+                              'oro_type_date_range'            => new DateRangeType($localeSettings),
                               'oro_type_filter'                => new FilterType($translator),
                          ),
                          array()

@@ -121,7 +121,7 @@ class ButtonSearchContext
     }
 
     /**
-     * @param string $group
+     * @param string|array $group
      *
      * @return $this
      */
@@ -130,5 +130,24 @@ class ButtonSearchContext
         $this->group = $group;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return md5(
+            serialize(
+                [
+                    $this->entityClass,
+                    $this->entityId,
+                    $this->routeName,
+                    $this->datagrid,
+                    $this->referrer,
+                    $this->group
+                ]
+            )
+        );
     }
 }

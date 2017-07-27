@@ -6,61 +6,56 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class ImportStrategyHelper
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var ValidatorInterface
-     */
+    /** @var ValidatorInterface */
     protected $validator;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var FieldHelper
-     */
+    /** @var FieldHelper */
     protected $fieldHelper;
 
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @var ConfigurableTableDataConverter
-     */
+    /** @var ConfigurableTableDataConverter */
     protected $configurableDataConverter;
 
-    /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /**
-     * @param ManagerRegistry $managerRegistry
-     * @param ValidatorInterface $validator
-     * @param TranslatorInterface $translator
-     * @param FieldHelper $fieldHelper
+     * @param ManagerRegistry                $managerRegistry
+     * @param ValidatorInterface             $validator
+     * @param TranslatorInterface            $translator
+     * @param FieldHelper                    $fieldHelper
      * @param ConfigurableTableDataConverter $configurableDataConverter
-     * @param SecurityFacade $securityFacade
+     * @param AuthorizationCheckerInterface  $authorizationChecker
+     * @param TokenAccessorInterface         $tokenAccessor
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -68,14 +63,16 @@ class ImportStrategyHelper
         TranslatorInterface $translator,
         FieldHelper $fieldHelper,
         ConfigurableTableDataConverter $configurableDataConverter,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
         $this->translator = $translator;
         $this->fieldHelper = $fieldHelper;
         $this->configurableDataConverter = $configurableDataConverter;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -93,21 +90,26 @@ class ImportStrategyHelper
      *                                    string in format "permission;descriptor"
      *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters
-     * @param  mixed          $obj        A domain object, object identity or object identity descriptor
+     * @param  object         $obj        A domain object, object identity or object identity descriptor
      *
      * @param  string         $property
      * @return bool
      */
     public function isGranted($attributes, $obj, $property = null)
     {
-        if (!$this->securityFacade->hasLoggedUser()) {
+        if (!$this->tokenAccessor->hasUser()) {
             return true;
         }
         if ($property && !($obj instanceof FieldVote)) {
             $obj = new FieldVote($obj, $property);
         }
 
-        return $this->securityFacade->isGranted($attributes, $obj);
+        try {
+            return $this->authorizationChecker->isGranted($attributes, $obj);
+        } catch (InvalidDomainObjectException $exception) {
+            // if object do not have identity we skipp check
+            return true;
+        }
     }
 
     /**
@@ -153,18 +155,7 @@ class ImportStrategyHelper
             if ($this->isDeletedField($basicEntityClass, $propertyName)) {
                 continue;
             }
-            if (!$this->isGranted('EDIT', $importedEntity, $propertyName)) {
-                $error = $this->translator->trans(
-                    'oro.importexport.import.errors.access_denied_property_entity',
-                    [
-                        '%property_name%' => $propertyName,
-                        '%entity_name%' => $basicEntityClass,
-                    ]
-                );
-                $this->context->addError($error);
 
-                continue;
-            }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
             $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
         }
@@ -209,17 +200,36 @@ class ImportStrategyHelper
      */
     public function addValidationErrors(array $validationErrors, ContextInterface $context, $errorPrefix = null)
     {
+        $batchSize = null;
+        $batchNumber = null;
+        if ($context instanceof BatchContextInterface) {
+            $batchSize = $context->getBatchSize();
+            $batchNumber = $context->getBatchNumber();
+        }
+
         if (null === $errorPrefix) {
+            $rowNumber = $context->getReadOffset();
+            if ($batchNumber && $batchSize) {
+                $rowNumber += --$batchNumber * $batchSize;
+            }
             $errorPrefix = $this->translator->trans(
                 'oro.importexport.import.error %number%',
                 array(
-                    '%number%' => $context->getReadOffset()
+                    '%number%' => $rowNumber
                 )
             );
         }
         foreach ($validationErrors as $validationError) {
             $context->addError($errorPrefix . ' ' . $validationError);
         }
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getLoggedUser()
+    {
+        return $this->tokenAccessor->getUser();
     }
 
     /**

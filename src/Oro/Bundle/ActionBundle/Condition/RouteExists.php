@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Condition;
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
+
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -12,6 +13,8 @@ use Symfony\Component\Routing\RouterInterface;
  * Check if route exists.
  * Usage:
  * @route_exists: route_name
+ *
+ * @deprecated since 2.1. Will be removed in 2.3.
  */
 class RouteExists extends AbstractCondition implements ContextAccessorAwareInterface
 {

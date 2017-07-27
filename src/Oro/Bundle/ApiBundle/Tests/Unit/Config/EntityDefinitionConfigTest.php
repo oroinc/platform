@@ -47,20 +47,43 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $config = new EntityDefinitionConfig();
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, null);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
         $this->assertEquals([], $config->toArray());
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, false);
         $this->assertTrue($config->has($attrName));
         $this->assertFalse($config->get($attrName));
         $this->assertEquals([$attrName => false], $config->toArray());
+        $this->assertEquals([$attrName], $config->keys());
 
         $config->remove($attrName);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
+        $this->assertSame([], $config->toArray());
+        $this->assertSame([], $config->keys());
+    }
+
+    public function testParentResourceClass()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getParentResourceClass());
+
+        $config->setParentResourceClass('Test\Class');
+        $this->assertEquals('Test\Class', $config->getParentResourceClass());
+        $this->assertEquals(['parent_resource_class' => 'Test\Class'], $config->toArray());
+
+        $config->setParentResourceClass(null);
+        $this->assertNull($config->getParentResourceClass());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setParentResourceClass('Test\Class');
+        $config->setParentResourceClass(null);
+        $this->assertNull($config->getParentResourceClass());
         $this->assertEquals([], $config->toArray());
     }
 
@@ -172,28 +195,60 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($config->findField('unknown'));
         $this->assertNull($config->findField('unknown', true));
         $this->assertNull($config->findFieldNameByPropertyPath('unknown'));
+        $this->assertNull($config->findFieldByPath('unknown'));
+        $this->assertNull($config->findFieldByPath('unknown', true));
 
         $this->assertSame($field1, $config->findField('field1'));
         $this->assertSame($field1, $config->findField('field1', true));
         $this->assertSame('field1', $config->findFieldNameByPropertyPath('field1'));
+        $this->assertSame($field1, $config->findFieldByPath('field1'));
+        $this->assertSame($field1, $config->findFieldByPath('field1', true));
 
         $this->assertSame($field2, $config->findField('field2'));
         $this->assertNull($config->findField('field2', true));
         $this->assertNull($config->findFieldNameByPropertyPath('field2'));
+        $this->assertSame($field2, $config->findFieldByPath('field2'));
+        $this->assertNull($config->findFieldByPath('field2', true));
         $this->assertNull($config->findField('realField2'));
         $this->assertSame($field2, $config->findField('realField2', true));
         $this->assertSame('field2', $config->findFieldNameByPropertyPath('realField2'));
+        $this->assertNull($config->findFieldByPath('realField2'));
+        $this->assertSame($field2, $config->findFieldByPath('realField2', true));
 
         $this->assertSame($field3, $config->findField('field3'));
         $this->assertSame($field3, $config->findField('field3', true));
         $this->assertSame('field3', $config->findFieldNameByPropertyPath('field3'));
+        $this->assertSame($field3, $config->findFieldByPath('field3'));
+        $this->assertSame($field3, $config->findFieldByPath('field3', true));
 
         $this->assertSame($swapField, $config->findField('swapField'));
         $this->assertSame($realSwapField, $config->findField('swapField', true));
         $this->assertSame('realSwapField', $config->findFieldNameByPropertyPath('swapField'));
+        $this->assertSame($swapField, $config->findFieldByPath('swapField'));
+        $this->assertSame($realSwapField, $config->findFieldByPath('swapField', true));
         $this->assertSame($realSwapField, $config->findField('realSwapField'));
         $this->assertSame($swapField, $config->findField('realSwapField', true));
         $this->assertSame('swapField', $config->findFieldNameByPropertyPath('realSwapField'));
+        $this->assertSame($realSwapField, $config->findFieldByPath('realSwapField'));
+        $this->assertSame($swapField, $config->findFieldByPath('realSwapField', true));
+    }
+
+    public function testFindFieldByPath()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $field1 = $config->addField('field1');
+        $field11 = $field1->createAndSetTargetEntity()->addField('field11');
+        $field11->setPropertyPath('realField11');
+        $field111 = $field11->createAndSetTargetEntity()->addField('field111');
+
+        $this->assertSame($field111, $config->findFieldByPath('field1.field11.field111'));
+        $this->assertNull($config->findFieldByPath('field1.field11.field111', true));
+        $this->assertSame($field111, $config->findFieldByPath('field1.realField11.field111', true));
+
+        $this->assertSame($field111, $config->findFieldByPath(['field1', 'field11', 'field111']));
+        $this->assertNull($config->findFieldByPath(['field1', 'field11', 'field111'], true));
+        $this->assertSame($field111, $config->findFieldByPath(['field1', 'realField11', 'field111'], true));
     }
 
     public function testGetOrAddField()
@@ -418,6 +473,24 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testSetFormOption()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $config->setFormOption('option1', 'value1');
+        $config->setFormOption('option2', 'value2');
+        $this->assertEquals(
+            ['option1' => 'value1', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
+
+        $config->setFormOption('option1', 'newValue');
+        $this->assertEquals(
+            ['option1' => 'newValue', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
+    }
+
     public function testAddFormConstraint()
     {
         $config = new EntityDefinitionConfig();
@@ -427,6 +500,39 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 
         $config->addFormConstraint(new NotBlank());
         $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+    }
+
+    public function testFormEventSubscribers()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getFormEventSubscribers());
+
+        $config->setFormEventSubscribers(['subscriber1']);
+        $this->assertEquals(['subscriber1'], $config->getFormEventSubscribers());
+        $this->assertEquals(['form_event_subscriber' => ['subscriber1']], $config->toArray());
+
+        $config->setFormEventSubscribers([]);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testSetNullToFormEventSubscribers()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setFormEventSubscribers(['subscriber1']);
+
+        $config->setFormEventSubscribers(null);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    /**
+     * @expectedException \TypeError
+     */
+    public function testSetInvalidValueToFormEventSubscribers()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setFormEventSubscribers('subscriber1');
     }
 
     public function testHints()

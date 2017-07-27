@@ -13,6 +13,12 @@ services:
             - '@oro_api.processor_bag'
             - get_relation_config
 
+    oro_api.merge_config_helper.parent_resource:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResourceHelper
+        public: false
+        arguments:
+            - '@oro_api.config_provider'
+
     oro_api.merge_config_helper.entity:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper
         public: false
@@ -40,6 +46,36 @@ services:
             - '@oro_api.merge_config_helper.action'
             - '@oro_api.merge_config_helper.filter'
 
+    oro_api.complete_definition_helper.entity:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper
+        public: false
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.complete_definition_helper.association'
+            - '@oro_api.complete_definition_helper.custom_association'
+            - '@oro_api.entity_exclusion_provider'
+            - '@oro_api.expanded_association_extractor'
+
+    oro_api.complete_definition_helper.object:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteObjectDefinitionHelper
+        public: false
+        arguments:
+            - '@oro_api.complete_definition_helper.association'
+
+    oro_api.complete_definition_helper.association:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAssociationHelper
+        public: false
+        arguments:
+            - '@oro_api.config_provider'
+
+    oro_api.complete_definition_helper.custom_association:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper
+        public: false
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.complete_definition_helper.association'
+            - '@oro_entity_extend.association_manager'
+
     #
     # get_config
     #
@@ -51,6 +87,8 @@ services:
             - '@oro_api.config_loader_factory'
             - '@oro_api.resource_hierarchy_provider'
             - '@oro_api.config_bag'
+            - '@oro_api.resources_provider'
+            - '@oro_api.merge_config_helper.parent_resource'
             - '@oro_api.merge_config_helper.entity'
             - '@oro_api.merge_config_helper.action'
             - '@oro_api.merge_config_helper.subresource'
@@ -130,6 +168,7 @@ services:
             - '@oro_api.api_doc.parser'
             - '@translator'
             - '@oro_entity_config.provider.ownership'
+            - '@oro_api.request_depended_text_processor'
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -210 }
 
@@ -180,9 +219,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_exclusion_provider'
-            - '@oro_api.config_provider'
-            - '@oro_entity_extend.association_manager'
+            - '@oro_api.complete_definition_helper.entity'
+            - '@oro_api.complete_definition_helper.object'
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }

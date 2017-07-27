@@ -31,6 +31,16 @@ class MultipleChoice extends AbstractGridFilterItem
     }
 
     /**
+     * @param string $filterItems
+     */
+    public function checkItemsInFilter($filterItems)
+    {
+        $filterItems = array_map('trim', explode(',', $filterItems));
+
+        $this->checkItems($filterItems);
+    }
+
+    /**
      * Get visible miltiselect checkboxes widget.
      * There are only one visible widget can be on the page
      *
@@ -62,7 +72,7 @@ class MultipleChoice extends AbstractGridFilterItem
     {
         /** @var NodeElement $input */
         foreach ($items as $input) {
-            if (preg_match(sprintf('/%s/i', $text), $input->getText())) {
+            if (stripos($input->getText(), $text) !== false) {
                 return $input;
             }
         }

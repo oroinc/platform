@@ -1,0 +1,45 @@
+oro_behat_extension:
+  elements:
+    TypeSelectButton:
+      selector: '#search-bar-button'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    TypeSelector:
+      selector: '#search-bar-dropdown'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    SearchSuggestionsDropdown:
+      selector: '#search-dropdown ul'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Search Form:
+      selector: '#oro_website_search_search'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Query: 'search'
+
+    Theme Form:
+      selector: 'div#container'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          ThemeUseDefault: 'theme[oro_frontend___frontend_theme][use_parent_scope_value]'
+          Theme: 'theme[oro_frontend___frontend_theme][value]'
+
+
+  pages:
+    Search Result:
+      class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
+      route: 'oro_search_results'
+
+  suites:
+    OroSearchBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroSearchBundle::SearchContext
+      paths:
+        - '@OroSearchBundle/Tests/Behat/Features'

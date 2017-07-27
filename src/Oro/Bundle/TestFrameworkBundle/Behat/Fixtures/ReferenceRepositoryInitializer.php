@@ -2,13 +2,20 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\EntityManager;
+
 use Nelmio\Alice\Instances\Collection as AliceCollection;
+
 use Oro\Bundle\EntityBundle\ORM\Registry;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Oro\Bundle\ProductBundle\Migrations\Data\ORM\LoadProductDefaultAttributeFamilyData;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
+
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class ReferenceRepositoryInitializer
@@ -40,16 +47,28 @@ class ReferenceRepositoryInitializer
     {
         $this->referenceRepository->clear();
 
-        $user = $this->getDefaultUser();
+        try {
+            $user = $this->getDefaultUser();
+            $userRole = $this->getRole(User::ROLE_DEFAULT);
+            $adminRole = $this->getRole(User::ROLE_ADMINISTRATOR);
+        } catch (TableNotFoundException $e) {
+            // Schema is not initialized yet
+            return;
+        }
 
         $this->referenceRepository->set('admin', $user);
-        $this->referenceRepository->set('userRole', $this->getRole(User::ROLE_DEFAULT));
-        $this->referenceRepository->set('adminRole', $this->getRole(User::ROLE_ADMINISTRATOR));
+        $this->referenceRepository->set('userRole', $userRole);
+        $this->referenceRepository->set('adminRole', $adminRole);
         $this->referenceRepository->set('organization', $user->getOrganization());
         $this->referenceRepository->set('business_unit', $user->getOwner());
         $this->referenceRepository->set(
             'adminEmailAddress',
             $this->getEntityManager()->getRepository(EmailAddressProxy::class)->findOneBy([])
+        );
+        $this->referenceRepository->set('defaultProductFamily', $this->getDefaultProductFamily());
+        $this->referenceRepository->set(
+            'en_language',
+            $this->getEntityManager()->getRepository(Language::class)->findOneBy(['code' => 'en'])
         );
     }
 
@@ -97,5 +116,23 @@ class ReferenceRepositoryInitializer
         }
 
         return $user;
+    }
+
+    /**
+     * @return AttributeFamily
+     * @throws \InvalidArgumentException
+     */
+    protected function getDefaultProductFamily()
+    {
+        $repository = $this->getEntityManager()->getRepository(AttributeFamily::class);
+        $attributeFamily = $repository->findOneBy([
+            'code' => LoadProductDefaultAttributeFamilyData::DEFAULT_FAMILY_CODE,
+        ]);
+
+        if (!$attributeFamily) {
+            throw new \InvalidArgumentException('Default product attribute family should exist.');
+        }
+
+        return $attributeFamily;
     }
 }

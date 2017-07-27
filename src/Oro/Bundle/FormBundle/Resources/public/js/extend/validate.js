@@ -5,11 +5,10 @@ define([
     'oroui/js/tools',
     'oroui/js/tools/logger',
     'oroform/js/optional-validation-groups-handler',
+    'oroui/js/error',
     'jquery.validate'
-], function($, _, __, tools, logger, validationHandler) {
+], function($, _, __, tools, logger, validationHandler, error) {
     'use strict';
-
-    var console = window.console;
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -74,8 +73,14 @@ define([
         if ($widgetContainer) {
             $target = $widgetContainer;
         }
-        if ($target.parent().is('.input-append, .input-prepend')) {
-            $target = $target.parent();
+        var $parent = $target.parent();
+        if ($parent.is('.input-append, .input-prepend')) {
+            $target = $parent;
+        }
+        var $validateGroup;
+        if ($target.is(element) && ($validateGroup = $target.closest('.validate-group')).length) {
+            // the element inside validate group -- pass delegate validation to it
+            $target = $validateGroup;
         }
 
         return $target;
@@ -110,8 +115,8 @@ define([
         _.each(validationsOf(element), function(param, method) {
             if ($.validator.methods[method]) {
                 rules[method] = {param: param};
-            } else if ($(element.form).data('validator').settings.debug && console) {
-                console.error('Validation method "' + method + '" does not exist');
+            } else if ($(element.form).data('validator').settings.debug) {
+                error.showErrorInConsole('Validation method "' + method + '" does not exist');
             }
         });
         // make sure required validators are at front
@@ -173,11 +178,11 @@ define([
      * @returns {jQuery}
      */
     $.validator.prototype.elementsOf = function(element) {
-        var $additionalElements = $(this.currentForm).find(':input[data-validate-element]');
-        return $(element).find('input, select, textarea')
+        var $element = $(element);
+        return $element.find('input, select, textarea')
             .not(':submit, :reset, :image, [disabled]')
             .not(this.settings.ignore)
-            .add($additionalElements);
+            .add($element.find(':input[data-validate-element]'));
     };
 
     // translates default messages
@@ -194,11 +199,16 @@ define([
 
     // updates place for message label before show message
     $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(func, element, message) {
+        if (!message) {
+            return;
+        }
+
+        message = '<span><span>' + message + '</span></span>';
         var label = this.errorsFor(element);
         if (message && label.length) {
             this.settings.errorPlacement(label, element);
         }
-        return func.apply(this, _.rest(arguments));
+        return func.call(this, element, message);
     });
 
     // fixes focus on select2 element
@@ -286,7 +296,13 @@ define([
             });
         })(errors);
 
-        this.showErrors(result);
+        result = _.omit(result, function(message, name) {
+            return !this.findByName(name)[0];
+        }, this);
+
+        if (!_.isEmpty(result)) {
+            this.showErrors(result);
+        }
     };
 
     $.validator.prototype.collectPristineValues = function() {
@@ -351,16 +367,24 @@ define([
         },
         unhighlight: function(element) {
             var $el = $(element);
-            $el.closest('.error').removeClass('error')
-                .closest('.controls').removeClass('validation-error');
+            $el.removeClass('error')
+                .closest('.controls')
+                .removeClass('validation-error')
+                .find('.error').removeClass('error');
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
         ignore: ':hidden:not([type=hidden])',
-        onfocusout: function(element, event) {
+        onfocusout: function(element) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
-                    var realField = $(element).closest('.select2-container').parent().find('.select2[type=hidden]')[0];
+                    var $selectContainer = $(element).closest('.select2-container');
+                    // prevent validation if selection still in progress
+                    if ($selectContainer.hasClass('select2-dropdown-open')) {
+                        return;
+                    }
+                    var realField = $selectContainer.parent()
+                        .find('.select2[type=hidden], select.select2')[0];
                     this.element(realField ? realField : element);
                 } else {
                     this.element(element);
@@ -390,7 +414,8 @@ define([
         'oroform/js/validator/repeated',
         'oroform/js/validator/time',
         'oroform/js/validator/url',
-        'oroform/js/validator/type'
+        'oroform/js/validator/type',
+        'oroform/js/validator/callback'
     ];
     $.validator.loadMethod(methods);
 
@@ -442,10 +467,47 @@ define([
         return rules;
     });
 
-    $.fn.validateDelegate = _.wrap($.fn.validateDelegate, function(validateDelegate, delegate, type, handler) {
-        return validateDelegate.call(this, delegate, type, function() {
-            return this[0] && this[0].form && $.data(this[0].form, 'validator') && handler.apply(this, arguments);
+    /**
+     * Extend original addMethod method and implements
+     *
+     * - validation methods:
+     *     method can resolve array of params in same validation method
+     *
+     * @type {Function}
+     */
+    $.validator.addMethod = _.wrap($.validator.addMethod, function(addMethod, name, method, message) {
+        method = _.wrap(method, function(method, value, element, params) {
+            if (!_.isArray(params)) {
+                return method.call(this, value, element, params);
+            }
+            return _.every(params, function(param, index) {
+                var result = method.call(this, value, element, param);
+                if (!result) {
+                    params.failedIndex = index;
+                }
+                return result;
+            }, this);
         });
+
+        if (_.isFunction(message)) {
+            message = _.wrap(message, function(message, params, element) {
+                if (!_.isArray(params)) {
+                    return message.call(this, params, element);
+                }
+                var param = params[params.failedIndex];
+                delete params.failedIndex;
+                if (param === undefined) {
+                    var e = new Error(
+                        'For multi-rule validations you should call rule "method" function before access to message.'
+                    );
+                    error.showErrorInConsole(e);
+                    throw e;
+                }
+                return message.call(this, param, element);
+            });
+        }
+
+        return addMethod.call(this, name, method, message);
     });
 
     /**

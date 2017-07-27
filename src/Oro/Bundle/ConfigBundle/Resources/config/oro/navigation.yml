@@ -2,9 +2,9 @@ navigation:
     menu_config:
         items:
             system_configuration:
-                label: 'oro.config.menu.system_configuration.label'
+                label:    'oro.config.menu.system_configuration.label'
+                position: 10
                 extras:
-                    position:    10
                     description: 'oro.config.menu.system_configuration.description'
                 route: 'oro_config_configuration_system'
 

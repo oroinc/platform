@@ -7,23 +7,26 @@ use Oro\Bundle\WorkflowBundle\Model\Tools\WorkflowStepHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
 class WorkflowDataProvider
 {
     /** @var TransitionDataProvider */
     private $transitionDataProvider;
 
-    /** @var WorkflowManager */
-    private $workflowManager;
+    /** @var WorkflowManagerRegistry */
+    private $workflowManagerRegistry;
 
     /**
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowManagerRegistry $workflowManagerRegistry
      * @param TransitionDataProvider $transitionDataProvider
      */
-    public function __construct(WorkflowManager $workflowManager, TransitionDataProvider $transitionDataProvider)
-    {
+    public function __construct(
+        WorkflowManagerRegistry $workflowManagerRegistry,
+        TransitionDataProvider $transitionDataProvider
+    ) {
         $this->transitionDataProvider = $transitionDataProvider;
-        $this->workflowManager = $workflowManager;
+        $this->workflowManagerRegistry = $workflowManagerRegistry;
     }
 
     /**
@@ -35,11 +38,15 @@ class WorkflowDataProvider
      */
     public function getWorkflowData($entity, Workflow $workflow, $showDisabled)
     {
-        $workflowItem = $this->workflowManager->getWorkflowItem($entity, $workflow->getName());
+        $workflowItem = $this->getWorkflowManager()->getWorkflowItem($entity, $workflow->getName());
 
-        $transitionData = $workflowItem
-            ? $this->transitionDataProvider->getAvailableTransitionsDataByWorkflowItem($workflowItem)
-            : $this->transitionDataProvider->getAvailableStartTransitionsData($workflow, $entity, $showDisabled);
+        $transitionData = [];
+
+        if ($this->isAvailableWorkflow($workflow, $entity)) {
+            $transitionData = $workflowItem
+                ? $this->transitionDataProvider->getAvailableTransitionsDataByWorkflowItem($workflowItem)
+                : $this->transitionDataProvider->getAvailableStartTransitionsData($workflow, $entity, $showDisabled);
+        }
 
         $isStepsDisplayOrdered = $workflow->getDefinition()->isStepsDisplayOrdered();
         $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
@@ -94,7 +101,8 @@ class WorkflowDataProvider
                 return [
                     'label' => $step->getLabel(),
                     'active' => $currentStep && $step->getName() === $currentStep->getName(),
-                    'possibleStepsCount' => count($helper->getStepsAfter($step))
+                    'possibleStepsCount' => count($helper->getStepsAfter($step)),
+                    'final' => $step->isFinal(),
                 ];
             },
             $steps
@@ -108,7 +116,34 @@ class WorkflowDataProvider
                 'isOrdered' => $isStepsDisplayOrdered,
                 'steps' => $steps
             ],
-            'transitionsData' => $transitionData
+            'transitionsData' => $transitionData,
         ];
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param object $entity
+     *
+     * @return bool
+     */
+    protected function isAvailableWorkflow(Workflow $workflow, $entity)
+    {
+        $workflows = array_map(
+            function (Workflow $workflow) {
+                return $workflow->getName();
+            },
+            $this->getWorkflowManager('default')->getApplicableWorkflows($entity)
+        );
+
+        return in_array($workflow->getName(), $workflows, true);
+    }
+
+    /**
+     * @param string|null $type
+     * @return WorkflowManager
+     */
+    protected function getWorkflowManager($type = null)
+    {
+        return $this->workflowManagerRegistry->getManager($type);
     }
 }

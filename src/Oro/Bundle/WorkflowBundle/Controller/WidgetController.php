@@ -2,53 +2,49 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Form;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
-use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
+use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
+use Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor;
+use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 
 /**
  * @Route("/workflowwidget")
  */
 class WidgetController extends Controller
 {
-    const DEFAULT_TRANSITION_TEMPLATE = 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig';
-
     /**
      * @Route("/entity-workflows/{entityClass}/{entityId}", name="oro_workflow_widget_entity_workflows")
      * @Template
      *
      * @param string $entityClass
      * @param int $entityId
+     *
      * @return array
      */
     public function entityWorkflowsAction($entityClass, $entityId)
     {
-        $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
+        $entity = $this->getTransitionWidgetHelper()->getOrCreateEntityReference($entityClass, $entityId);
         if (!$entity) {
             throw $this->createNotFoundException(
                 sprintf('Entity \'%s\' with id \'%d\' not found', $entityClass, $entityId)
             );
         }
 
-        $workflowManager = $this->get('oro_workflow.manager');
+        $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
         $applicableWorkflows = array_filter(
             $workflowManager->getApplicableWorkflows($entity),
             function (Workflow $workflow) use ($entity) {
@@ -56,10 +52,13 @@ class WidgetController extends Controller
             }
         );
 
+        /* @var $translationHelper TransitionTranslationHelper */
+        $translationHelper = $this->get('oro_workflow.translation.transition_translation_helper');
+
         return [
             'entityId' => $entityId,
             'workflows' => array_map(
-                function (Workflow $workflow) use ($entity) {
+                function (Workflow $workflow) use ($entity, $translationHelper) {
                     // extra case to show start transition (step name and disabled button)
                     // even if transitions performing is forbidden with ACL
                     $showDisabled = !$this->isWorkflowPermissionGranted(
@@ -68,11 +67,18 @@ class WidgetController extends Controller
                         $entity
                     );
 
-                    return $this->get('oro_workflow.workflow_data.provider')
+                    $workflowData = $this->get('oro_workflow.workflow_data.provider')
                         ->getWorkflowData($entity, $workflow, $showDisabled);
+
+                    foreach ($workflowData['transitionsData'] as $transitionData) {
+                        $translationHelper->processTransitionTranslations($transitionData['transition']);
+                    }
+
+                    return $workflowData;
                 },
                 $applicableWorkflows
-            )
+            ),
+            'originalUrl' => $this->get('oro_action.resolver.destination_page_resolver')->getOriginalUrl(),
         ];
     }
 
@@ -85,60 +91,19 @@ class WidgetController extends Controller
      * @param string $transitionName
      * @param string $workflowName
      * @param Request $request
+     *
      * @return Response
      */
     public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
-        $entityId = $request->get('entityId', 0);
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
-        $workflow = $workflowManager->getWorkflow($workflowName);
-        $entityClass = $workflow->getDefinition()->getRelatedEntity();
-        $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
-        $dataArray = [];
+        $processor = $this->getProcessor();
 
-        if (!$transition->isEmptyInitOptions()) {
-            $contextAttribute = $transition->getInitContextAttribute();
-            $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
-                ->getButtonSearchContext();
-            $entityId = null;
-        }
+        $context = $this->createProcessorContext($processor, $request, $transitionName);
+        $context->setWorkflowName($workflowName);
 
-        $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
-        $workflowItem = $workflow->createWorkflowItem($entity, $dataArray);
-        $transitionForm = $this->getTransitionForm($workflowItem, $transition);
-        $formOptions = $transition->getFormOptions();
+        $processor->process($context);
 
-        $attributeNames = array_keys($formOptions['attribute_fields']);
-
-        $saved = $this->get('oro_workflow.handler.transition.form')
-            ->handleTransitionForm($transitionForm, $attributeNames);
-
-        $data = null;
-        if ($saved) {
-            $formAttributes = $transitionForm->getData()->getValues($attributeNames);
-
-            $serializer = $this->get('oro_workflow.serializer.data.serializer');
-            $serializer->setWorkflowName($workflow->getName());
-            $data = $serializer->serialize(new WorkflowData(array_merge($formAttributes, $dataArray)), 'json');
-            $response = $this->get('oro_workflow.handler.start_transition_handler')
-                ->handle($workflow, $transition, $data, $entity);
-
-            if ($response) {
-                return $response;
-            }
-        }
-
-        return $this->render(
-            $transition->getDialogTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
-            [
-                'transition' => $transition,
-                'data' => $data,
-                'saved' => $saved,
-                'workflowItem' => $workflowItem,
-                'form' => $transitionForm->createView(),
-            ]
-        );
+        return $context->getResult();
     }
 
     /**
@@ -151,65 +116,45 @@ class WidgetController extends Controller
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
      * @param Request $request
+     *
      * @return Response
      */
     public function transitionFormAction($transitionName, WorkflowItem $workflowItem, Request $request)
     {
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
-        $workflow = $workflowManager->getWorkflow($workflowItem);
+        $processor = $this->getProcessor();
 
-        $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
-        $transitionForm = $this->getTransitionForm($workflowItem, $transition);
+        $context = $this->createProcessorContext($processor, $request, $transitionName);
+        $context->setWorkflowItem($workflowItem);
 
-        $saved = false;
-        if ($request->isMethod('POST')) {
-            $transitionForm->submit($request);
+        $processor->process($context);
 
-            if ($transitionForm->isValid()) {
-                $workflowItem->setUpdated();
-                $this->getEntityManager()->flush();
-
-                $saved = true;
-
-                $response = $this->get('oro_workflow.handler.transition_handler')->handle($transition, $workflowItem);
-                if ($response) {
-                    return $response;
-                }
-            }
-        }
-
-        return $this->render(
-            $transition->getDialogTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
-            [
-                'transition' => $transition,
-                'saved' => $saved,
-                'workflowItem' => $workflowItem,
-                'form' => $transitionForm->createView(),
-            ]
-        );
+        return $context->getResult();
     }
 
     /**
-     * Get transition form.
-     *
-     * @param WorkflowItem $workflowItem
-     * @param Transition $transition
-     * @return Form
+     * @return TransitActionProcessor
      */
-    protected function getTransitionForm(WorkflowItem $workflowItem, Transition $transition)
+    private function getProcessor()
     {
-        return $this->createForm(
-            $transition->getFormType(),
-            $workflowItem->getData(),
-            array_merge(
-                $transition->getFormOptions(),
-                [
-                    'workflow_item' => $workflowItem,
-                    'transition_name' => $transition->getName()
-                ]
-            )
-        );
+        return $this->get('oro_workflow.transit.action_processor');
+    }
+
+    /**
+     * @param TransitActionProcessor $processor
+     * @param Request $request
+     * @param string $transitionName
+     *
+     * @return TransitionContext
+     */
+    private function createProcessorContext(TransitActionProcessor $processor, Request $request, $transitionName)
+    {
+        /** @var TransitionContext $context */
+        $context = $processor->createContext();
+        $context->setTransitionName($transitionName);
+        $context->setRequest($request);
+        $context->setResultType(new TemplateResultType());
+
+        return $context;
     }
 
     /**
@@ -218,6 +163,7 @@ class WidgetController extends Controller
      *
      * @param string $entityClass
      * @param int $entityId
+     *
      * @return array
      */
     public function buttonsAction($entityClass, $entityId)
@@ -227,7 +173,7 @@ class WidgetController extends Controller
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $transitionDataProvider = $this->get('oro_workflow.transition_data.provider');
-        $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
+        $entity = $this->getTransitionWidgetHelper()->getOrCreateEntityReference($entityClass, $entityId);
 
         $workflows = $workflowManager->getApplicableWorkflows($entity);
         foreach ($workflows as $workflow) {
@@ -255,51 +201,25 @@ class WidgetController extends Controller
     }
 
     /**
-     * Try to get reference to entity
-     *
-     * @param string $entityClass
-     * @param mixed $entityId
-     * @throws BadRequestHttpException
-     * @return mixed
-     */
-    protected function getOrCreateEntityReference($entityClass, $entityId = null)
-    {
-        /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
-        try {
-            if ($entityId) {
-                $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
-            } else {
-                $entity = $doctrineHelper->createEntityInstance($entityClass);
-            }
-        } catch (NotManageableEntityException $e) {
-            throw new BadRequestHttpException($e->getMessage(), $e);
-        }
-
-        return $entity;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->getDoctrine()->getManagerForClass('OroWorkflowBundle:WorkflowItem');
-    }
-
-    /**
      * @param string $permission
      * @param string $workflowName
      * @param object $entity
+     *
      * @return bool
      */
     protected function isWorkflowPermissionGranted($permission, $workflowName, $entity)
     {
-        $securityFacade = $this->container->get('oro_security.security_facade');
-
-        return $securityFacade->isGranted(
+        return $this->isGranted(
             $permission,
             new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName))
         );
+    }
+
+    /**
+     * @return TransitionWidgetHelper
+     */
+    protected function getTransitionWidgetHelper()
+    {
+        return $this->get('oro_workflow.helper.transition_widget');
     }
 }

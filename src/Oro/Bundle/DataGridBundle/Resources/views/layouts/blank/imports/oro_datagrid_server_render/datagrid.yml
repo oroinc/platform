@@ -10,6 +10,10 @@ layout:
                 - 'server_render_datagrid.html.twig'
                 - 'server_render_datagrid_toolbar.html.twig'
 
+        - '@removeOption':
+            id: __datagrid
+            optionName: grid_render_parameters.cssClass
+
         - '@setOption':
             id: __datagrid
             optionName: split_to_cells

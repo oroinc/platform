@@ -12,7 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @dbIsolation
+ * @group schema
  */
 class SchemaTest extends WebTestCase
 {

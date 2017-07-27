@@ -26,6 +26,7 @@ define(function(require) {
     var scrollHelper = require('oroui/js/tools/scroll-helper');
     var PageableCollection =  require('../pageable-collection');
     var util = require('./util');
+    var tools = require('oroui/js/tools');
 
     /**
      * Basic grid class.
@@ -115,11 +116,28 @@ define(function(require) {
                     bottom: false
                 }
             },
+            actionOptions: {
+                refreshAction: {
+                    launcherOptions: {
+                        label: __('oro_datagrid.action.refresh'),
+                        className: 'btn refresh-action',
+                        iconClassName: 'fa-repeat'
+                    }
+                },
+                resetAction: {
+                    launcherOptions: {
+                        label: __('oro_datagrid.action.reset'),
+                        className: 'btn reset-action',
+                        iconClassName: 'fa-refresh'
+                    }
+                }
+            },
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
             massActions:            new Backbone.Collection(),
-            enableFullScreenLayout: false
+            enableFullScreenLayout: false,
+            scopeDelimiter:         ':'
         },
 
         /**
@@ -196,7 +214,7 @@ define(function(require) {
         },
 
         /**
-         * @param {Object} options
+         * @param {Object} opts
          * @private
          */
         _validateOptions: function(opts) {
@@ -226,6 +244,7 @@ define(function(require) {
 
             _.extend(this, this.defaults, opts);
             this._initToolbars(opts);
+            this._initActions(opts);
             this.exportOptions = {};
             _.extend(this.exportOptions, opts.exportOptions);
 
@@ -316,8 +335,10 @@ define(function(require) {
             });
         },
 
-        onCollectionUpdateState: function() {
-            this.selectState.reset();
+        onCollectionUpdateState: function(collection, state) {
+            if (this.stateIsResettable(collection.previousState, state)) {
+                this.selectNone();
+            }
         },
 
         onCollectionModelRemove: function(model) {
@@ -405,6 +426,20 @@ define(function(require) {
         },
 
         /**
+         * @param {*} previousState
+         * @param {*} state
+         * @returns {boolean} TRUE if values are not equal, otherwise - FALSE
+         */
+        stateIsResettable: function(previousState, state) {
+            var fields = ['filters', 'gridView', 'pageSize'];
+
+            return !tools.isEqualsLoosely(
+                _.pick(previousState, fields),
+                _.pick(state, fields)
+            );
+        },
+
+        /**
          * @param {Object} opts
          * @private
          */
@@ -412,6 +447,16 @@ define(function(require) {
             this.toolbars = {};
             this.toolbarOptions = {};
             _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
+        },
+
+        /**
+         * @param {Object} opts
+         * @private
+         */
+        _initActions: function(opts) {
+            if (_.isObject(opts.themeOptions)) {
+                _.extend(this.actionOptions, opts.themeOptions.actionOptions);
+            }
         },
 
         /**
@@ -591,6 +636,7 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
+            var ComponentConstructor =  this.collection.options.modules.columnManagerComponentCustom || null;
             var toolbar;
             var sortActions = this.sortActions;
             var toolbarOptions = {
@@ -598,6 +644,7 @@ define(function(require) {
                 actions:      this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
                 columns:      this.columns,
+                componentConstructor: ComponentConstructor,
                 addToolbarAction: function(action) {
                     toolbarOptions.actions.push(action);
                     sortActions(toolbarOptions.actions);
@@ -702,18 +749,14 @@ define(function(require) {
             if (!this.refreshAction) {
                 this.refreshAction = new RefreshCollectionAction({
                     datagrid: this,
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.refresh'),
-                        className: 'btn',
-                        iconClassName: 'fa-repeat'
-                    },
+                    launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
-                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
-                    if (this.$el.is(':visible')) {
+                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function(ignoreVisibility) {
+                    if (ignoreVisibility || this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
-                }, 100));
+                }, 100, true));
 
                 this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);
@@ -732,11 +775,7 @@ define(function(require) {
             if (!this.resetAction) {
                 this.resetAction = new ResetCollectionAction({
                     datagrid: this,
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.reset'),
-                        className: 'btn',
-                        iconClassName: 'fa-refresh'
-                    },
+                    launcherOptions: this.actionOptions.resetAction.launcherOptions,
                     order: 200
                 });
 
@@ -744,7 +783,7 @@ define(function(require) {
                     if (this.$el.is(':visible')) {
                         this.resetAction.execute();
                     }
-                }, 100));
+                }, 100, true));
 
                 this.listenTo(this.resetAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:reset:' + this.name, [action, options]);
@@ -898,6 +937,25 @@ define(function(require) {
                         });
                     }
                 });
+            });
+
+            this.listenTo(mediator, 'datagrid:changeColumnParam:' + this.name, function(columnName, option, value) {
+                this.changeColumnParam(columnName, option, value);
+            });
+        },
+
+        /**
+         * Changes column`s option  if such option exist
+         *
+         * @param columnName
+         * @param option
+         * @param value
+         */
+        changeColumnParam: function(columnName, option, value) {
+            this.columns.each(function(column) {
+                if (column.get('name') === columnName && option in column) {
+                    column.set(option, value);
+                }
             });
         },
 
@@ -1102,10 +1160,12 @@ define(function(require) {
          *
          * @private
          */
-        _onRemove: function(model) {
+        _onRemove: function(model, reset) {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.name, model);
 
-            this.collection.fetch({reset: true});
+            if (reset !== false) {
+                this.collection.fetch({reset: true});
+            }
 
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
         },
@@ -1312,6 +1372,21 @@ define(function(require) {
             }
 
             return this;
+        },
+
+        /**
+         * @return {String|null}
+         */
+        getGridScope: function() {
+            var nameParts = this.name.split(this.scopeDelimiter);
+            if (nameParts.length > 2) {
+                throw new Error(
+                    'Grid name is invalid, it should not contain more than one occurrence of "' +
+                    this.scopeDelimiter + '"'
+                );
+            }
+
+            return nameParts.length === 2 ? nameParts[1] : null;
         }
     });
 

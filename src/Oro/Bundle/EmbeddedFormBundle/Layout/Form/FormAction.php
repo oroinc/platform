@@ -149,6 +149,8 @@ class FormAction implements \ArrayAccess, ContextItemInterface
     /**
      * Implements \ArrayAccess
      *
+     * @param string $name
+     * @param mixed  $value
      * @throws \BadMethodCallException always as changing data is not allowed
      */
     public function offsetSet($name, $value)
@@ -159,6 +161,7 @@ class FormAction implements \ArrayAccess, ContextItemInterface
     /**
      * Implements \ArrayAccess
      *
+     * @param string $name
      * @throws \BadMethodCallException always as removing data is not allowed
      */
     public function offsetUnset($name)
@@ -172,5 +175,13 @@ class FormAction implements \ArrayAccess, ContextItemInterface
     protected function __construct(array $data)
     {
         $this->data = $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
+        return md5($this->toString());
     }
 }

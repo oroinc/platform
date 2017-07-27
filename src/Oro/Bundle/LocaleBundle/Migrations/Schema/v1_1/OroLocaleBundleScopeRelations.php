@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
-class OroAccountBundleScopeRelations implements Migration, ExtendExtensionAwareInterface
+class OroLocaleBundleScopeRelations implements Migration, ExtendExtensionAwareInterface
 {
     /**
      * @var ExtendExtension

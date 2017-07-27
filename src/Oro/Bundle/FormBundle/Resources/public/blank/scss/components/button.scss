@@ -1,6 +1,9 @@
+// @theme: blank;
+
 .button,
 .btn {
     cursor: pointer;
+    white-space: nowrap;
 
     @include base-ui-element($use-base-style-for-button,
                              $button-padding,
@@ -29,6 +32,6 @@
     }
 
     @include element-state('disabled') {
-        cursor: default;
+        @include base-disabled-style(.75);
     }
 }

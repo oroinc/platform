@@ -4,56 +4,28 @@ namespace Oro\Bundle\SegmentBundle\Query;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
-use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
 
 class DynamicSegmentQueryBuilder implements QueryBuilderInterface
 {
-    /** @var RestrictionBuilder */
-    protected $restrictionBuilder;
-
-    /** @var Manager */
-    protected $manager;
+    /** @var ServiceLink */
+    protected $segmentQueryConverterLink;
 
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var VirtualFieldProviderInterface */
-    protected $virtualFieldProvider;
-
-    /** @var VirtualRelationProviderInterface */
-    protected $virtualRelationProvider;
-
     /**
-     * @param RestrictionBuilder            $restrictionBuilder
-     * @param Manager                       $manager
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
+     * @param ServiceLink     $segmentQueryConverterLink
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(
-        RestrictionBuilder $restrictionBuilder,
-        Manager $manager,
-        VirtualFieldProviderInterface $virtualFieldProvider,
-        ManagerRegistry $doctrine
-    ) {
-        $this->restrictionBuilder   = $restrictionBuilder;
-        $this->manager              = $manager;
-        $this->virtualFieldProvider = $virtualFieldProvider;
-        $this->doctrine             = $doctrine;
-    }
-
-    /**
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     */
-    public function setVirtualRelationProvider($virtualRelationProvider)
+    public function __construct(ServiceLink $segmentQueryConverterLink, ManagerRegistry $doctrine)
     {
-        $this->virtualRelationProvider = $virtualRelationProvider;
+        $this->segmentQueryConverterLink = $segmentQueryConverterLink;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -71,19 +43,12 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
      */
     public function getQueryBuilder(Segment $segment)
     {
-        $converter = new SegmentQueryConverter(
-            $this->manager,
-            $this->virtualFieldProvider,
-            $this->doctrine,
-            $this->restrictionBuilder
-        );
-
-        if ($this->virtualRelationProvider) {
-            $converter->setVirtualRelationProvider($this->virtualRelationProvider);
-        }
-        /** @var EntityManager  $em */
+        /** @var EntityManager $em */
         $em = $this->doctrine->getManagerForClass($segment->getEntity());
-        $qb = $converter->convert(new RestrictionSegmentProxy($segment, $em));
+
+        /** @var SegmentQueryConverter $segmentQueryConverter */
+        $segmentQueryConverter = $this->segmentQueryConverterLink->getService();
+        $qb = $segmentQueryConverter->convert(new RestrictionSegmentProxy($segment, $em));
 
         return $qb;
     }

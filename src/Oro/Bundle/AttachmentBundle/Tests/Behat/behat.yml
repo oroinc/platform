@@ -1,0 +1,26 @@
+oro_behat_extension:
+  elements:
+    Attachment Form:
+      selector: 'form[id^="oro_attachment"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          File: 'oro_attachment[file][file]'
+          Comment: 'oro_attachment[comment]'
+          Owner: 'oro_attachment[owner]'
+
+    Attachment Grid:
+      selector: 'div[data-page-component-name="attachment-grid"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+
+    Close Large Image Preview:
+      selector: 'span.lg-close.lg-icon'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    AttachmentItem:
+      selector: '.attachment-item'
+      class: Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem
+
+    AttachmentListRow:
+      selector: '.attachment-list-row'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

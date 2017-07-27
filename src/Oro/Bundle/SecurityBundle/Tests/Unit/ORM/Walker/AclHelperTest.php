@@ -3,7 +3,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\PathExpression;
 
@@ -294,6 +293,70 @@ class AclHelperTest extends OrmTestCase
                 []
             ],
         ];
+    }
+
+    public function testApplyWhenCheckingOfRootEntityIsDisabled()
+    {
+        $queryBuilder = $this->getQueryBuilder()
+            ->select('u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->leftJoin('u.address', 'address', 'WITH', 'address.id = u.id');
+
+        $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $this->conditionBuilder = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->conditionBuilder->expects($this->once())
+            ->method('getAclConditionData')
+            ->with('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress')
+            ->willReturn([
+                'user',
+                [1],
+                PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                'organization',
+                1,
+                true
+            ]);
+
+        $conditionalFactorBuilder = new AclConditionalFactorBuilder();
+
+        $this->helper = new AclHelper($this->conditionBuilder, $eventDispatcher, $conditionalFactorBuilder);
+        $this->helper->setCheckRootEntity(false);
+        $query = $this->helper->apply($queryBuilder);
+
+        $hints = $query->getHints();
+        $this->assertEmpty($hints[AclWalker::ORO_ACL_CONDITION]->getWhereConditions());
+        $joinCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getJoinConditions()[0];
+        $this->assertEquals([1], $joinCondition->getValue());
+    }
+
+    public function testApplyWhenCheckingOfBothRootEntityAndRelationsIsDisabled()
+    {
+        $queryBuilder = $this->getQueryBuilder()
+            ->select('u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->leftJoin('u.address', 'address', 'WITH', 'address.id = u.id');
+
+        $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $this->conditionBuilder = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->conditionBuilder->expects($this->never())
+            ->method('getAclConditionData');
+
+        $conditionalFactorBuilder = new AclConditionalFactorBuilder();
+
+        $this->helper = new AclHelper($this->conditionBuilder, $eventDispatcher, $conditionalFactorBuilder);
+        $this->helper->setCheckRootEntity(false);
+        $query = $this->helper->apply($queryBuilder, 'VIEW', false);
+
+        $this->assertEmpty($query->getHints());
     }
 
     protected function getRequest0()

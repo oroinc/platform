@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PrePersist;
 
@@ -16,7 +17,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 /**
  * @ORM\Table(name="oro_attribute_group")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
- * @ORM\HasLifecycleCallbacks()
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *      mode="hidden"
  * )
@@ -64,19 +65,21 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="code", type="string", length=255, unique=false, nullable=true)
+     * @ORM\Column(name="code", type="string", length=255, unique=false)
      */
     private $code;
 
     /**
      * @var AttributeFamily
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups")
+     * @ORM\ManyToOne(
+     *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups"
+     * )
      * @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id")
      */
     private $attributeFamily;
 
     /**
-     * @var ArrayCollection
+     * @var Collection|AttributeGroupRelation[]
      * @ORM\OneToMany(
      *     targetEntity="AttributeGroupRelation",
      *     mappedBy="attributeGroup",
@@ -157,7 +160,7 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|AttributeGroupRelation[]
      */
     public function getAttributeRelations()
     {
@@ -216,16 +219,6 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @PrePersist
-     */
-    public function prePersist()
-    {
-        if (!$this->code) {
-            $this->code = uniqid('group_code', false); //Todo: should be removed in #BB-6143 for real code generating
-        }
     }
 
     /**

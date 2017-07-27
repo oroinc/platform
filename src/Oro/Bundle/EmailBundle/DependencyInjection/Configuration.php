@@ -65,6 +65,7 @@ class Configuration implements ConfigurationInterface
                 'attachment_sync_max_size' => ['value' => 50],
                 'attachment_preview_limit' => ['value' => 8],
                 'sanitize_html' => ['value' => false],
+                'threads_grouping' => ['value' => true],
                 self::KEY_SMTP_SETTINGS_HOST => ['value' => ''],
                 self::KEY_SMTP_SETTINGS_PORT => ['value' => null, 'type' => 'integer'],
                 self::KEY_SMTP_SETTINGS_ENC => ['value' => ''],

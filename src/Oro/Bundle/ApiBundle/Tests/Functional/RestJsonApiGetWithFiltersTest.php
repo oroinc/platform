@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
 {
     /**
@@ -111,7 +108,7 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                 'identifier'   => 'username'
             ],
             'filter by field of related entity with no result'                                             => [
-                'className'  => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
+                'className'  => TestEmployee::class,
                 'statusCode' => 200,
                 'params'     => [
                     'filter' => [
@@ -124,7 +121,7 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                 'expects'    => ['data' => []],
             ],
             'filter by wrong field name'                                                                   => [
-                'className'  => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
+                'className'  => TestEmployee::class,
                 'statusCode' => 400,
                 'params'     => [
                     'filter' => [
@@ -148,7 +145,7 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                 ],
             ],
             'filter by field of related entity (employee.department)'                                      => [
-                'className'    => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
+                'className'    => TestEmployee::class,
                 'statusCode'   => 200,
                 'params'       => [
                     'filter' => [

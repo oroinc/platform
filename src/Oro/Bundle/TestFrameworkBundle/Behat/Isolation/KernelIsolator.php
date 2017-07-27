@@ -43,11 +43,13 @@ class KernelIsolator implements IsolatorInterface
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->kernel->shutdown();
+        $this->kernel->boot();
     }
 
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
     {
+        $this->kernel->shutdown();
     }
 
     /** {@inheritdoc} */
@@ -77,5 +79,13 @@ class KernelIsolator implements IsolatorInterface
     public function getName()
     {
         return 'Kernel';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTag()
+    {
+        return 'kernel';
     }
 }

@@ -44,8 +44,11 @@ class ThemeProviderTest extends \PHPUnit_Framework_TestCase
             'assets' => [
                 'styles' => [
                     'output' => 'path/to/output/css'
-                ]
-            ]
+                ],
+                'styles_new' => [
+                    'output' => 'path/to/output/css/new'
+                ],
+            ],
         ]);
 
         $this->themeManager->expects($this->once())
@@ -54,6 +57,9 @@ class ThemeProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($theme);
 
         $this->assertSame('path/to/output/css', $this->provider->getStylesOutput($themeName));
+        $this->assertSame('path/to/output/css', $this->provider->getStylesOutput($themeName, 'styles'));
+        $this->assertSame('path/to/output/css/new', $this->provider->getStylesOutput($themeName, 'styles_new'));
+        $this->assertSame(null, $this->provider->getStylesOutput($themeName, 'undefined section'));
     }
 
     public function testGetStylesOutputNull()

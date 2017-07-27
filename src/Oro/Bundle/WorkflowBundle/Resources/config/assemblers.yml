@@ -1,29 +1,33 @@
-parameters:
-    oro_workflow.attribute_assembler.class: Oro\Bundle\WorkflowBundle\Model\AttributeAssembler
-    oro_workflow.step_assembler.class: Oro\Bundle\WorkflowBundle\Model\StepAssembler
-    oro_workflow.transition_assembler.class: Oro\Bundle\WorkflowBundle\Model\TransitionAssembler
-    oro_workflow.workflow_assembler.class: Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler
-    oro_workflow.form_options_assembler.class: Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler
-
 services:
     oro_workflow.attribute_assembler:
-        class: %oro_workflow.attribute_assembler.class%
+        class: 'Oro\Bundle\WorkflowBundle\Model\AttributeAssembler'
         arguments:
             - '@oro_action.attribute_guesser'
             - '@translator'
 
+    oro_workflow.variable_assembler:
+        class: 'Oro\Bundle\WorkflowBundle\Model\VariableAssembler'
+        public: false
+        arguments:
+            - '@oro_workflow.serializer.variable.normalizer'
+            - '@oro_workflow.variable_guesser'
+            - '@translator'
+        public: false
+
     oro_workflow.step_assembler:
-        class: %oro_workflow.step_assembler.class%
+        class: 'Oro\Bundle\WorkflowBundle\Model\StepAssembler'
 
     oro_workflow.transition_assembler:
-        class: %oro_workflow.transition_assembler.class%
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionAssembler'
         arguments:
             - '@oro_workflow.form_options_assembler'
             - '@oro_action.expression.factory'
             - '@oro_action.action_factory'
+            - '@oro_workflow.form_options_configuration_assembler'
+            - '@oro_workflow.resolver.transition_options_resolver'
 
     oro_workflow.workflow_assembler:
-        class: %oro_workflow.workflow_assembler.class%
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler'
         arguments:
             - '@service_container'
             - '@oro_workflow.attribute_assembler'
@@ -33,20 +37,20 @@ services:
             - '@translator'
 
     oro_workflow.form_options_assembler:
-        class: %oro_workflow.form_options_assembler.class%
+        class: 'Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler'
         arguments:
             - '@oro_action.action_factory'
         calls:
             - [addConfigurationPass,  ['@oro_action.configuration_pass.replace_property_path']]
 
     oro_workflow.assembler.transition_trigger.cron:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler'
         public: false
         arguments:
             - '@oro_workflow.transition_trigger.trigger_cron_verifier'
 
     oro_workflow.assembler.transition_trigger.event:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler'
         public: false
         arguments:
             - '@oro_workflow.transition_trigger.trigger_event_verifier'
@@ -59,3 +63,10 @@ services:
 
     oro_workflow.restriction_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler'
+
+    oro_workflow.form_options_configuration_assembler:
+        class: 'Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler'
+        arguments:
+            - '@form.registry'
+            - '@oro_form.registry.form_handler'
+            - '@oro_form.registry.form_template_data_provider'

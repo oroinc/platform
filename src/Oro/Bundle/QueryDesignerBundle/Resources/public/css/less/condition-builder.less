@@ -249,6 +249,7 @@
 
   & > div {
     display: flex;
+    display: -webkit-flex;
   }
   .left-area.filter-criteria {
     padding: 0 @contentPadding*0.5 @contentPadding*0.5-4;
@@ -256,6 +257,7 @@
   }
   .right-area {
     display: flex;
+    display: -webkit-flex;
     width: calc(~"100% - 150px");
     padding: 0 10px;
     border-left: 1px solid #c9c9c9;
@@ -263,6 +265,7 @@
     > div {
       position: relative;
       display: flex;
+      display: -webkit-flex;
       width: 100%;
     }
   }
@@ -270,4 +273,12 @@
 
 .deleted-field {
   color: @errorText;
+}
+
+#oro_report-designer .form-horizontal{
+  .query-designer-grouping-form {
+    .control-group {
+      float: none;
+    }
+  }
 }

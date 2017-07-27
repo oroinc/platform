@@ -10,7 +10,6 @@
                     {# Transaltions temporary disabled due to BAP-5355 #}
                     {% set transitionData = {
                         'enabled': data.isAllowed,
-                        'transition-label': data.transition.label|trans({},'workflows'),
                         'message': data.transition.message|trans({},'workflows')|nl2br,
                         'transition-condition-messages': data.errors
                     } %}

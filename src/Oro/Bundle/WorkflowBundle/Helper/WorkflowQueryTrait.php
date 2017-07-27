@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
+use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 trait WorkflowQueryTrait
@@ -16,17 +16,11 @@ trait WorkflowQueryTrait
      */
     public function joinWorkflowItem(QueryBuilder $queryBuilder, $workflowItemAlias = 'workflowItem')
     {
-        list($entityClass) = $queryBuilder->getRootEntities();
-        list($entityIdentifier) = $queryBuilder->getEntityManager()->getClassMetadata($entityClass)
-            ->getIdentifierFieldNames();
-
-        list($rootAlias) = $queryBuilder->getRootAliases();
-
         $queryBuilder->leftJoin(
             WorkflowItem::class,
             $workflowItemAlias,
             Join::WITH,
-            $this->getItemCondition($rootAlias, $entityClass, $entityIdentifier, $workflowItemAlias)
+            $this->getWorkflowItemJoinCondition($queryBuilder, $workflowItemAlias)
         );
 
         return $queryBuilder;
@@ -43,7 +37,6 @@ trait WorkflowQueryTrait
         $workflowStepAlias = 'workflowStep',
         $workflowItemAlias = 'workflowItem'
     ) {
-
         if (false === in_array($workflowItemAlias, $queryBuilder->getAllAliases(), true)) {
             $this->joinWorkflowItem($queryBuilder, $workflowItemAlias);
         }
@@ -94,6 +87,35 @@ trait WorkflowQueryTrait
     {
         return sprintf(
             'CAST(%s.%s as string) = CAST(%s.entityId as string) AND %s.entityClass = \'%s\'',
+            $entityAlias,
+            $entityIdentifier,
+            $itemAlias,
+            $itemAlias,
+            $entityClass
+        );
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $itemAlias
+     * @return string
+     */
+    private function getWorkflowItemJoinCondition(QueryBuilder $queryBuilder, $itemAlias)
+    {
+        list($entityAlias) = $queryBuilder->getRootAliases();
+        list($entityClass) = $queryBuilder->getRootEntities();
+
+        $metadata = $queryBuilder->getEntityManager()->getClassMetadata($entityClass);
+        list($entityIdentifier) = $metadata->getIdentifierFieldNames();
+
+        if ($metadata->getTypeOfField($entityIdentifier) === Type::INTEGER) {
+            $condition = '%s.%s = CAST(%s.entityId as int) AND %s.entityClass = \'%s\'';
+        } else {
+            $condition = 'CAST(%s.%s as string) = CAST(%s.entityId as string) AND %s.entityClass = \'%s\'';
+        }
+
+        return sprintf(
+            $condition,
             $entityAlias,
             $entityIdentifier,
             $itemAlias,

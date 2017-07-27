@@ -33,7 +33,8 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     {
         $this->cacheDir     = realpath($kernel->getCacheDir());
         $this->cacheTempDir = $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Temp';
-        $this->cacheDumpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'oro_application_cache_dump';
+        $this->cacheDumpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'oro_application_cache_dump_'.
+            TokenGenerator::generateToken('cache');
     }
 
     /** {@inheritdoc} */
@@ -56,7 +57,12 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
+        if (!$this->copyDumpToTempDirProcess) {
+            return;
+        }
+
         $this->waitForProcess();
+        $event->writeln('<info>Restore cache dirs</info>');
         $this->removeCacheDirs();
         $this->replaceCache();
         $this->startCopyDumpToTempDir();
@@ -65,6 +71,10 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
     {
+        if (!$this->copyDumpToTempDirProcess) {
+            return;
+        }
+
         $event->writeln('<info>Stop copying cache</info>');
         $this->copyDumpToTempDirProcess->stop();
         $event->writeln('<info>Remove Temp cache dir</info>');
@@ -101,6 +111,11 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         }
 
         return false;
+    }
+
+    public function getTag()
+    {
+        return 'cache';
     }
 
     /**

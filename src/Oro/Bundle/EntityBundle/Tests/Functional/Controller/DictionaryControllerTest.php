@@ -4,9 +4,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class DictionaryControllerTest extends WebTestCase
 {
     protected function setUp()

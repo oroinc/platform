@@ -1,0 +1,33 @@
+oro_behat_extension:
+  elements:
+    SystemConfigForm:
+      selector: "div[id^='configuration-options-block']"
+      class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm
+
+    SidebarConfigMenu:
+      selector: 'div.system-configuration-container div.left-panel'
+      class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu
+
+    ColorsConfigBlock:
+      class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\ColorsConfigBlock
+
+    Recent Emails:
+      selector: '.email-notification-menu'
+
+    WYSIWYG editor:
+      selector: '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
+
+    Entity pagination:
+      selector: '#entity-pagination'
+
+  suites:
+    OroConfigBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroConfigBundle::FeatureContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroNavigationBundle::FeatureContext
+        - OroActivityListBundle::ActivityContext
+      paths:
+        - '@OroConfigBundle/Tests/Behat/Features'

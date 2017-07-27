@@ -85,6 +85,23 @@ class AcmeTestBundle implements Migration
 }
 ```
 
+Extend fields can be also marked as unique:
+ ```php
+ <?php
+    $table->addColumn(
+    'phone',
+    'string',
+    [
+        'length' => 255,
+        'oro_options'   => [
+            'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM, 'unique' => true,],
+            'dataaudit' => ['auditable' => true]
+        ]
+    ]
+    );
+    $table->addUniqueIndex(['phone'], 'oro_idx_user_phone');
+ ```
+
 Add relation
 ------------
 Creating relations is more complex task than creation of regular field. Oro Platform provides a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php) to help you. To use this extension your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtensionAwareInterface.php). The following example shows how to create many-to-one relation:
@@ -182,8 +199,6 @@ Same principle applied to field name, in case above - it should be less than 27 
 To load a list of options you can use data fixtures, for example:
 
 ``` php
-<?php
-
 <?php
 
 namespace Oro\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
@@ -376,7 +391,7 @@ Before extend fields rendering in view page, event "oro.entity_extend_event.befo
 There is possibility for customize field rendering using this event.
 
 As example you can create Event Listener. Example:
-
+```yaml
     oro_entity_extend.listener.extend_field_value_render:
         class: %oro_entity_extend.listener.extend_field_value_render.class%
         arguments:
@@ -386,9 +401,10 @@ As example you can create Event Listener. Example:
             - @doctrine.orm.entity_manager
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
-
+```
 Each event listener try to made decision how we need to show field value and if it know how value need to be shown, he use `$event->setFieldViewValue($viewData);` to change field view value. Example:
-
+```php
+<?php
     $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
         if ($value && $underlyingFieldType == 'manyToOne') {
             $viewData = $this->getValueForManyToOne(
@@ -398,7 +414,7 @@ Each event listener try to made decision how we need to show field value and if 
 
             $event->setFieldViewValue($viewData);
         }
-
+```
 In this code we: 
 
 

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -16,8 +16,6 @@ use Symfony\Component\Process\Process;
 
 final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
-    const TIMEOUT = '240';
-
     /** @var string */
     protected $dbHost;
 
@@ -57,8 +55,8 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
         $this->dbName = $container->getParameter('database_name');
         $this->dbUser = $container->getParameter('database_user');
         $this->dbPass = $container->getParameter('database_password');
-        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName;
-        $this->dbTempName = $this->dbName.'_temp';
+        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName.TokenGenerator::generateToken('db');
+        $this->dbTempName = $this->dbName.'_temp'.TokenGenerator::generateToken('db');
     }
 
     /** {@inheritdoc} */
@@ -121,13 +119,19 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     {
         return
             $this->isApplicableOS()
-            && 'pdo_mysql' === $container->getParameter('database_driver');
+            && DatabaseDriverInterface::DRIVER_MYSQL === $container->getParameter('database_driver');
     }
 
     /** {@inheritdoc} */
     public function getName()
     {
         return "MySql DB";
+    }
+
+    /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
     }
 
     /** {@inheritdoc} */
@@ -153,7 +157,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
             $this->dbUser,
             $this->dbName,
             $this->dbDump
-        ));
+        ), 240);
     }
 
     /** {@inheritdoc} */

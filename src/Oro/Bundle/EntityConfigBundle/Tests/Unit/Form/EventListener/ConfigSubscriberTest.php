@@ -34,15 +34,9 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translationHelper = $this->getMockBuilder(ConfigTranslationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->translator = $this->createMock(Translator::class);
+        $this->translationHelper = $this->createMock(ConfigTranslationHelper::class);
 
         $this->subscriber = new ConfigSubscriber(
             $this->translationHelper,
@@ -170,9 +164,10 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         array $expectedTrans
     ) {
         $extendProvider = $this->getConfigProvider('extend', [], false);
+        $config = new Config(new EntityConfigId('extend'));
         $extendProvider->expects($this->once())
             ->method('getConfigById')
-            ->will($this->returnValue(new Config(new EntityConfigId('extend'))));
+            ->will($this->returnValue($config));
 
         $provider1 = $this->getConfigProvider(
             'entity',
@@ -264,6 +259,11 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->configManager->expects($this->never())
                 ->method('flush');
         }
+
+        $this->configManager->expects($this->any())->method('calculateConfigChangeSet')->with($config1);
+        $this->configManager->expects($this->any())->method('getConfigChangeSet')->with($config1)->willReturn([
+            'state' => ['Active', 'Requires update']
+        ]);
 
         $this->subscriber->postSubmit($event);
     }
@@ -565,6 +565,26 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                 [
                     'label_key' => 'translated label',
                 ]
+            ],
+            'existing model updated field' => [
+                [
+                    'entity' => [
+                        'label' => 'translated label',
+                        'icon'  => 'testIcon',
+                        'state' => 'Active',
+                    ]
+                ],
+                true,
+                $existingConfigModel,
+                [
+                    'label_key' => 'translated label'
+                ],
+                [
+                    'label' => 'label_key',
+                    'icon'  => 'testIcon',
+                    'state' => 'Requires update',
+                ],
+                []
             ],
         ];
     }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\DataGridBundle\Async\Topics;
-use Oro\Bundle\DataGridBundle\Controller\GridController;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -40,9 +39,8 @@ class GridControllerTest extends WebTestCase
         $this->assertCount(1, $result);
         $this->assertTrue($result['successful']);
 
-        $this->assertMessageSent(Topics::EXPORT, [
+        $this->assertMessageSent(Topics::PRE_EXPORT, [
             'format' => 'csv',
-            'batchSize' => GridController::EXPORT_BATCH_SIZE,
             'parameters' => [
                 'gridName' => 'accounts-grid',
                 'gridParameters' => [
@@ -59,7 +57,8 @@ class GridControllerTest extends WebTestCase
                 ],
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
-            'userId' => 1,
+            'securityToken' =>
+                'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
         ]);
     }
 }

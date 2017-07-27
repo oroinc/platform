@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowDefinitionClonerHelper as WDCHelper;
 
 class WorkflowDefinitionCloner
 {
@@ -51,17 +52,20 @@ class WorkflowDefinitionCloner
      */
     private static function copyMainFields(WorkflowDefinition $definition, WorkflowDefinition $source)
     {
+        $mergedConfiguration = WDCHelper::copyConfigurationVariables($definition, $source);
+
         $definition
             ->setName($source->getName())
             ->setLabel($source->getLabel())
             ->setRelatedEntity($source->getRelatedEntity())
             ->setEntityAttributeName($source->getEntityAttributeName())
-            ->setConfiguration($source->getConfiguration())
+            ->setConfiguration($mergedConfiguration)
             ->setStepsDisplayOrdered($source->isStepsDisplayOrdered())
             ->setSystem($source->isSystem())
             ->setPriority($source->getPriority())
             ->setExclusiveActiveGroups($source->getExclusiveActiveGroups())
-            ->setExclusiveRecordGroups($source->getExclusiveRecordGroups());
+            ->setExclusiveRecordGroups($source->getExclusiveRecordGroups())
+            ->setApplications($source->getApplications());
 
         return $definition;
     }

@@ -1,21 +1,19 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/modal'
-], function($, _, __, Modal) {
+define(function(require) {
     'use strict';
 
-    var ViewNameModal = Modal.extend({
-        contentTemplate: null,
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Modal = require('oroui/js/modal');
+    var contentTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-modal.html');
+    var nameErrorTemplate = require('tpl!orodatagrid/templates/datagrid/view-name-error-modal.html');
 
-        nameErrorTemplate: null,
+    var ViewNameModal = Modal.extend({
+        contentTemplate: contentTemplate,
+
+        nameErrorTemplate: nameErrorTemplate,
 
         initialize: function(options) {
             options = options || {};
-
-            this.contentTemplate = _.template($('#template-datagrid-view-name-modal').html());
-            this.nameErrorTemplate = _.template($('#template-datagrid-view-name-error-modal').html());
 
             options.title = options.title || __('oro.datagrid.name_modal.title');
             options.content = options.content || this.contentTemplate({
@@ -40,6 +38,7 @@ define([
 
         setNameError: function(error) {
             this.$('.validation-failed').remove();
+
             if (error) {
                 error = this.nameErrorTemplate({
                     error: error

@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
-use Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
 class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,6 +36,9 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
     /** @var AutoResponseManager */
     protected $autoResponseManager;
 
+    /** @var array|null */
+    protected $definitions;
+
     public function setUp()
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
@@ -54,141 +59,186 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnCallback(function ($id) {
+                return $id;
+            }));
+
         $this->autoResponseManager = new AutoResponseManager(
             $this->registry,
             $this->emailBuilder,
             $this->emailProcessor,
             $this->render,
             $this->logger,
+            $translator,
             'en'
         );
     }
 
-    public function testCreateRuleExpr()
+    /**
+     * @dataProvider definitionNamesProvider
+     */
+    public function testCreateRuleExpr($definition)
     {
-        $expectedExpr = [
-            '@and' => [
-                ['@empty' => ['$subject']],
-                ['@contains' => ['$emailBody.bodyContent', 'offer']],
-                ['@contains' => ['$emailBody.bodyContent', 'sale']],
-                ['@contains' => ['$emailBody.bodyContent', 'won']],
-            ],
-        ];
+        $expr = $this->autoResponseManager->createRuleExpr($this->getAutoResponseRule($definition), new Email());
+        $this->assertEquals($this->getExpectedExpression($definition), $expr);
+    }
 
-        $expr = $this->autoResponseManager->createRuleExpr($this->getAutoResponseRule(), new Email());
-        $this->assertEquals($expectedExpr, $expr);
+    public function definitionNamesProvider()
+    {
+        return [
+            ['and'],
+            ['combined'],
+        ];
     }
 
     /**
      * @dataProvider applicableEmailsProvider
      */
-    public function testGetApplicableRulesReturnsTheRule(Email $email)
+    public function testGetApplicableRulesReturnsTheRule($definition, Email $email)
     {
         $mailbox = new Mailbox();
-        $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule()]));
+        $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
 
         $rules = $this->autoResponseManager->getApplicableRules($mailbox, $email);
         $this->assertEquals(1, $rules->count());
     }
 
+    public function applicableEmailsProvider()
+    {
+        return $this->emailsProvider('applicable_emails');
+    }
+
     /**
      * @dataProvider inapplicableEmailsProvider
      */
-    public function testGetApplicableRulesDoesNotReturnTheRule(Email $email)
+    public function testGetApplicableRulesDoesNotReturnTheRule($definition, Email $email)
     {
         $mailbox = new Mailbox();
-        $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule()]));
+        $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
 
         $rules = $this->autoResponseManager->getApplicableRules($mailbox, $email);
         $this->assertEquals(0, $rules->count());
     }
 
-    public function applicableEmailsProvider()
-    {
-        $applicableBodies = [
-            'This is email body with offer, sale and won words.',
-            'This is email body with offer and won words.',
-            'This is email body with sale and won words.',
-        ];
-
-        $data = array_map(function ($bodyContent) {
-            $body = new EmailBody();
-            $body->setBodyContent($bodyContent);
-
-            $email = new Email();
-            $email->setEmailBody($body);
-            $email->setSentAt(new \DateTime('now', new \DateTimeZone('UTC')));
-
-            return [$email];
-        }, $applicableBodies);
-
-        return $data;
-    }
-
     public function inapplicableEmailsProvider()
     {
-        $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $oldEmailDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $oldEmailDate->sub(\DateInterval::createFromDateString('2 day'));
-        $applicableSubjectsAndBodies = [
-            ['not empty subject', 'This is email body with offer, sale and won words.', $date],
-            [null, 'This email has nothing.', $date],
-            [null, 'This is email body with sale and won words.', $oldEmailDate],
-        ];
-
-        $data = array_map(function ($subjectAndBody) {
-            list($subject, $bodyContent, $sentAt) = $subjectAndBody;
-
-            $body = new EmailBody();
-            $body->setBodyContent($bodyContent);
-
-            $email = new Email();
-            $email->setSubject($subject);
-            $email->setEmailBody($body);
-            $email->setSentAt($sentAt);
-
-            return [$email];
-        }, $applicableSubjectsAndBodies);
-
-        return $data;
+        return $this->emailsProvider('inapplicable_emails');
     }
 
-    protected function getAutoResponseRule()
+    /**
+     * @param string $definition
+     *
+     * @return AutoResponseRule
+     */
+    protected function getAutoResponseRule($definition = 'and')
     {
-        $subjectCondition = new AutoResponseRuleCondition();
-        $subjectCondition
-            ->setField('subject')
-            ->setFilterType(FilterUtility::TYPE_EMPTY);
-
-        $offerCondition = new AutoResponseRuleCondition();
-        $offerCondition
-            ->setField('emailBody.bodyContent')
-            ->setFilterType(TextFilterType::TYPE_CONTAINS)
-            ->setFilterValue('offer');
-        
-        $saleCondition = new AutoResponseRuleCondition();
-        $saleCondition
-            ->setField('emailBody.bodyContent')
-            ->setFilterType(TextFilterType::TYPE_CONTAINS)
-            ->setFilterValue('sale');
-
-        $wonCondition = new AutoResponseRuleCondition();
-        $wonCondition
-            ->setField('emailBody.bodyContent')
-            ->setFilterType(TextFilterType::TYPE_CONTAINS)
-            ->setFilterValue('won');
-
         $autoResponseRule = new AutoResponseRule();
-        $autoResponseRule->addConditions([
-            $subjectCondition,
-            $offerCondition,
-            $saleCondition,
-            $wonCondition,
-        ]);
-        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $createdAt->sub(\DateInterval::createFromDateString('1 day'));
+        $createdAt = new DateTime('now', new DateTimeZone('UTC'));
+        $createdAt->sub(DateInterval::createFromDateString('1 day'));
         $autoResponseRule->setCreatedAt($createdAt);
+        $autoResponseRule->setDefinition($this->getDefinition($definition));
 
         return $autoResponseRule;
+    }
+
+    public function testCreateEmailEntity()
+    {
+        $expected = [
+            'name' => 'email',
+            'fields' => [
+                [
+                    'label' => 'oro.email.subject.label',
+                    'name' => 'subject',
+                    'type' => 'text',
+                ],
+                [
+                    'label' => 'oro.email.email_body.label',
+                    'name' => 'emailBody.bodyContent',
+                    'type' => 'text',
+                ],
+                [
+                    'label' => 'From',
+                    'name' => 'fromName',
+                    'type' => 'text',
+                ],
+                [
+                    'label' => 'Cc',
+                    'name' => 'cc.__index__.name',
+                    'type' => 'text',
+                ],
+                [
+                    'label' => 'Bcc',
+                    'name' => 'bcc.__index__.name',
+                    'type' => 'text',
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $this->autoResponseManager->createEmailEntity());
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function getDefinition($name)
+    {
+        return json_encode($this->getDefinitions()[$name]['definition']);
+    }
+
+    /**
+     * @param string $definition
+     *
+     * @return array
+     */
+    protected function getExpectedExpression($definition)
+    {
+        return $this->getDefinitions()[$definition]['expression'];
+    }
+
+    private function emailsProvider($key)
+    {
+        $definitionNames = array_keys($this->getDefinitions());
+
+        $results = [];
+        foreach ($definitionNames as $definition) {
+            $results[] = array_map(function ($data) use ($definition) {
+                $body = new EmailBody();
+                $body->setBodyContent($data['body']);
+
+                $email = new Email();
+                $email->setSubject($data['subject']);
+                $email->setEmailBody($body);
+                $email->setSentAt(new DateTime($data['date'], new DateTimeZone('UTC')));
+
+                return [$definition, $email];
+            }, $this->getDefinitions()[$definition][$key]);
+        }
+
+        return call_user_func_array('array_merge', $results);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDefinitions()
+    {
+        if (!$this->definitions) {
+            $this->definitions = Yaml::parse(file_get_contents($this->getAutoResponseRuleDefinitionsPath()));
+        }
+
+        return $this->definitions;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAutoResponseRuleDefinitionsPath()
+    {
+        return __DIR__ . '/../Fixtures/autorResponseRuleDefinitions.yml';
     }
 }

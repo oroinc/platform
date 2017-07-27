@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\EventListener\ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 
 class LocalizationListener
@@ -15,11 +16,20 @@ class LocalizationListener
     private $localizationFallbackStrategy;
 
     /**
-     * @param LocalizationFallbackStrategy $localizationFallbackStrategy
+     * @var LocalizationManager
      */
-    public function __construct(LocalizationFallbackStrategy $localizationFallbackStrategy)
-    {
+    private $localizationManager;
+
+    /**
+     * @param LocalizationFallbackStrategy $localizationFallbackStrategy
+     * @param LocalizationManager $localizationManager
+     */
+    public function __construct(
+        LocalizationFallbackStrategy $localizationFallbackStrategy,
+        LocalizationManager $localizationManager
+    ) {
         $this->localizationFallbackStrategy = $localizationFallbackStrategy;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -55,5 +65,6 @@ class LocalizationListener
     private function handleChanges()
     {
         $this->localizationFallbackStrategy->clearCache();
+        $this->localizationManager->clearCache();
     }
 }

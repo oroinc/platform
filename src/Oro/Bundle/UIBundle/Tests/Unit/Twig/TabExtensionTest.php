@@ -2,82 +2,73 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Bundle\UIBundle\Twig\TabExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class TabExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $menuExtension;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $router;
-
-    /**
-     * @var TabExtension
-     */
-    protected $extension;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $environment;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $menuExtension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $router;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /**
-     * Set up test environment
-     */
+    /** @var TabExtension */
+    protected $extension;
+
     protected function setUp()
     {
-        $this->menuExtension = $this
-            ->getMockBuilder('Oro\Bundle\NavigationBundle\Twig\MenuExtension')
+        $this->environment = $this->createMock(\Twig_Environment::class);
+        $this->menuExtension = $this->getMockBuilder(MenuExtension::class)
             ->disableOriginalConstructor()
             ->setMethods(['getMenu'])
             ->getMock();
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->router = $this
-            ->getMockBuilder('Symfony\Component\Routing\RouterInterface')
-            ->getMock();
+        $container = self::getContainerBuilder()
+            ->add('oro_menu.twig.extension', $this->menuExtension)
+            ->add('router', $this->router)
+            ->add('security.authorization_checker', $this->authorizationChecker)
+            ->add('translator', $this->translator)
+            ->getContainer($this);
 
-        $this->securityFacade = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-
-        $this->extension = new TabExtension(
-            $this->menuExtension,
-            $this->router,
-            $this->securityFacade,
-            $this->translator
-        );
-
-        $this->environment = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extension = new TabExtension($container);
     }
 
     public function testTabPanel()
     {
-        $this->environment
-            ->expects($this->exactly(2))
-            ->method('render');
+        $expected = 'test';
 
-        $this->extension->tabPanel($this->environment, $tabs = []);
-        $this->extension->tabPanel($this->environment, $tabs = [], $options = []);
+        $this->environment->expects($this->exactly(2))
+            ->method('render')
+            ->willReturn($expected);
+
+        self::assertEquals(
+            $expected,
+            self::callTwigFunction($this->extension, 'tabPanel', [$this->environment, $tabs = []])
+        );
+        self::assertEquals(
+            $expected,
+            self::callTwigFunction($this->extension, 'tabPanel', [$this->environment, $tabs = [], $options = []])
+        );
     }
 
     /**
@@ -102,36 +93,38 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('render');
 
-        $this->extension->menuTabPanel($this->environment, []);
+        self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, []]);
     }
 
     public function testMenuTabPanel()
     {
-        $child  = $this->createMenuItem(null, ['uri' => 'test', 'widgetAcl' => 'testAcl']);
-        $child
-            ->expects($this->once())
+        $expected = 'test';
+        $child = $this->createMenuItem(null, ['uri' => 'test', 'widgetAcl' => 'testAcl']);
+        $child->expects($this->once())
             ->method('isDisplayed')
             ->will($this->returnValue(true));
 
-        $acl    = [['testAcl', null, true]];
+        $acl = [['testAcl', null, true]];
         $parent = $this->createMenuItem($child);
 
-        $this->menuExtension
-            ->expects($this->once())
+        $this->menuExtension->expects($this->once())
             ->method('getMenu')
             ->will($this->returnValue($parent));
 
-        $this->environment
-            ->expects($this->once())
-            ->method('render');
+        $this->environment->expects($this->once())
+            ->method('render')
+            ->willReturn($expected);
 
-        $this->securityFacade->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->will(
                 $this->returnValueMap($acl)
             );
 
-        $this->extension->menuTabPanel($this->environment, []);
+        self::assertEquals(
+            $expected,
+            self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, []])
+        );
     }
 
     /**
@@ -140,20 +133,17 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetTabs($options, $tab, $tabOptions, $acl, $isDisplayed = true)
     {
         $child = $this->createMenuItem(null, $options);
-        $child
-            ->expects($this->once())
+        $child->expects($this->once())
             ->method('isDisplayed')
             ->will($this->returnValue($isDisplayed));
 
         $parent = $this->createMenuItem($child);
 
-        $this->menuExtension
-            ->expects($this->once())
+        $this->menuExtension->expects($this->once())
             ->method('getMenu')
             ->will($this->returnValue($parent));
 
-        $this->router
-            ->expects($this->any())
+        $this->router->expects($this->any())
             ->method('generate')
             ->will(
                 $this->returnCallback(
@@ -163,7 +153,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->securityFacade->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->will(
                 $this->returnCallback(
@@ -278,12 +268,6 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function testName()
     {
         $this->assertEquals('oro_ui.tab_panel', $this->extension->getName());
-    }
-
-    public function testGetFunctions()
-    {
-        $this->assertArrayHasKey('menuTabPanel', $this->extension->getFunctions());
-        $this->assertArrayHasKey('tabPanel', $this->extension->getFunctions());
     }
 
     protected function createMenuItem($child = null, $options = [])

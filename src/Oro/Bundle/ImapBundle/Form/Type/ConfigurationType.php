@@ -9,13 +9,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -28,24 +29,24 @@ class ConfigurationType extends AbstractType
     /** @var Mcrypt */
     protected $encryptor;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var TranslatorInterface */
     protected $translator;
 
     /**
-     * @param Mcrypt              $encryptor
-     * @param SecurityFacade      $securityFacade
-     * @param TranslatorInterface $translator
+     * @param Mcrypt                 $encryptor
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param TranslatorInterface    $translator
      */
     public function __construct(
         Mcrypt $encryptor,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         TranslatorInterface $translator
     ) {
         $this->encryptor = $encryptor;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
         $this->translator = $translator;
     }
 
@@ -124,8 +125,12 @@ class ConfigurationType extends AbstractType
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('password', 'password', [
-                'label' => 'oro.imap.configuration.password.label', 'required' => true,
-                'attr' => ['class' => 'check-connection']
+                'label' => 'oro.imap.configuration.password.label',
+                'required' => true,
+                'attr' => [
+                    'class' => 'check-connection',
+                    'autocomplete' => 'new-password'
+                ]
             ]);
         if ($options['add_check_button']) {
             $builder->add('check_connection', 'oro_imap_configuration_check', [
@@ -235,12 +240,12 @@ class ConfigurationType extends AbstractType
                 $data = $event->getData();
                 if ($data !== null) {
                     if (($data->getOwner() === null) && ($data->getMailbox() === null)) {
-                        $data->setOwner($this->securityFacade->getLoggedUser());
+                        $data->setOwner($this->tokenAccessor->getUser());
                     }
                     if ($data->getOrganization() === null) {
-                        $organization = $this->securityFacade->getOrganization()
-                            ? $this->securityFacade->getOrganization()
-                            : $this->securityFacade->getLoggedUser()->getOrganization();
+                        $organization = $this->tokenAccessor->getOrganization()
+                            ? $this->tokenAccessor->getOrganization()
+                            : $this->tokenAccessor->getUser()->getOrganization();
                         $data->setOrganization($organization);
                     }
 
@@ -341,7 +346,9 @@ class ConfigurationType extends AbstractType
         $resolver->setDefaults([
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'          => false,
+            'constraints'       => new Valid(),
             'add_check_button'  => true,
+            'skip_folders_validation' => false,
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];
 
@@ -352,7 +359,9 @@ class ConfigurationType extends AbstractType
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Smtp';
                 }
-
+                if (!$form->getConfig()->getOption('skip_folders_validation')) {
+                    $groups[] = 'CheckFolderSelection';
+                }
                 return $groups;
             },
         ]);

@@ -2,25 +2,38 @@
 
 namespace Oro\Bundle\TagBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagExtension extends \Twig_Extension
 {
-    /** @var TagManager */
-    protected $tagManager;
-
-    /** @var TaggableHelper */
-    protected $taggableHelper;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param TagManager     $tagManager
-     * @param TaggableHelper $helper
+     * @param ContainerInterface $container
      */
-    public function __construct(TagManager $tagManager, TaggableHelper $helper)
+    public function __construct(ContainerInterface $container)
     {
-        $this->tagManager     = $tagManager;
-        $this->taggableHelper = $helper;
+        $this->container = $container;
+    }
+
+    /**
+     * @return TagManager
+     */
+    protected function getTagManager()
+    {
+        return $this->container->get('oro_tag.tag.manager');
+    }
+
+    /**
+     * @return TaggableHelper
+     */
+    protected function getTaggableHelper()
+    {
+        return $this->container->get('oro_tag.helper.taggable_helper');
     }
 
     /**
@@ -29,8 +42,8 @@ class TagExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'oro_tag_get_list' => new \Twig_Function_Method($this, 'getList'),
-            'oro_is_taggable'  => new \Twig_Function_Method($this, 'isTaggable'),
+            new \Twig_SimpleFunction('oro_tag_get_list', [$this, 'getList']),
+            new \Twig_SimpleFunction('oro_is_taggable', [$this, 'isTaggable']),
         ];
     }
 
@@ -43,7 +56,7 @@ class TagExtension extends \Twig_Extension
      */
     public function getList($entity)
     {
-        return $this->tagManager->getPreparedArray($entity);
+        return $this->getTagManager()->getPreparedArray($entity);
     }
 
     /**
@@ -61,6 +74,6 @@ class TagExtension extends \Twig_Extension
      */
     public function isTaggable($entity)
     {
-        return $this->taggableHelper->isTaggable($entity);
+        return $this->getTaggableHelper()->isTaggable($entity);
     }
 }

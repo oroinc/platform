@@ -39,10 +39,14 @@ class BreadcrumbManager implements BreadcrumbManagerInterface
     }
 
     /** {@inheritdoc} */
-    public function getBreadcrumbs($menuName, $isInverse = true)
+    public function getBreadcrumbs($menuName, $isInverse = true, $route = null)
     {
         $menu = $this->getMenu($menuName);
-        $currentItem = $this->getCurrentMenuItem($menu);
+        if ($route === null) {
+            $currentItem = $this->getCurrentMenuItem($menu);
+        } else {
+            $currentItem = $this->getMenuItemByRoute($menu, $route);
+        }
 
         if ($currentItem) {
             return $this->getBreadcrumbArray($menuName, $currentItem, $isInverse);

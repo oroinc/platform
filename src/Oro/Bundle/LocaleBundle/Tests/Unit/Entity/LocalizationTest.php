@@ -4,10 +4,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LocalizationTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
@@ -18,7 +22,7 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyAccessors(new Localization(), [
             ['id', 1],
             ['name', 'test_name'],
-            ['languageCode', 'language_test_code'],
+            ['language', new Language()],
             ['formattingCode', 'formatting_test_code'],
             ['parentLocalization', new Localization()],
             ['createdAt', new \DateTime()],
@@ -28,6 +32,17 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
             ['childLocalizations', new Localization()],
             ['titles', new LocalizedFallbackValue()],
         ]);
+    }
+
+    public function getLanguageCode()
+    {
+        $localization = new Localization();
+
+        $this->assertNull($localization->getLanguageCode());
+
+        $localization->setLanguage((new Language())->setCode('test'));
+
+        $this->assertEquals('test', $localization->getLanguageCode());
     }
 
     /**
@@ -182,5 +197,66 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $localization->setParentLocalization($parentLocalization);
 
         $this->assertEquals([$parentLocalizationId, null], $localization->getHierarchy());
+    }
+
+    /**
+     * @dataProvider getChildrenIdsDataProvider
+     *
+     * @param Localization $localization
+     * @param bool $withOwnId
+     * @param array $expected
+     */
+    public function testGetChildrenIds(Localization $localization, $withOwnId, array $expected)
+    {
+        $this->assertEquals($expected, $localization->getChildrenIds($withOwnId));
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getChildrenIdsDataProvider()
+    {
+        $localization = $this->getEntity(
+            Localization::class,
+            [
+                'id' => 42,
+                'childLocalizations' => [
+                    $this->getEntity(
+                        Localization::class,
+                        [
+                            'id' => 105,
+                            'childLocalizations' => [
+                                $this->getEntity(Localization::class, ['id' => 110])
+                            ]
+                        ]
+                    ),
+                    $this->getEntity(Localization::class, ['id' => 120])
+                ]
+            ]
+        );
+
+        yield 'empty localization without own id' => [
+            'localization' => $this->getEntity(Localization::class),
+            'withOwnId' => false,
+            'expected' => []
+        ];
+
+        yield 'empty localization with own id' => [
+            'localization' => $this->getEntity(Localization::class),
+            'withOwnId' => true,
+            'expected' => []
+        ];
+
+        yield 'localization without own id' => [
+            'localization' => $localization,
+            'withOwnId' => false,
+            'expected' => [105, 110, 120]
+        ];
+
+        yield 'localization with own id' => [
+            'localization' => $localization,
+            'withOwnId' => true,
+            'expected' => [42, 105, 110, 120]
+        ];
     }
 }

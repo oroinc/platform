@@ -12,6 +12,9 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $valueNormalizer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $resourcesProvider;
+
     /** @var NormalizeParentEntityClass */
     protected $processor;
 
@@ -22,8 +25,14 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->resourcesProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->processor = new NormalizeParentEntityClass($this->valueNormalizer);
+        $this->processor = new NormalizeParentEntityClass(
+            $this->valueNormalizer,
+            $this->resourcesProvider
+        );
     }
 
     public function testProcessWhenParentClassNameIsNotSet()
@@ -59,10 +68,33 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
             ->method('normalizeValue')
             ->with($this->context->getParentClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceAccessible')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
 
         $this->processor->process($this->context);
 
         $this->assertSame('Test\Class', $this->context->getParentClassName());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException
+     */
+    public function testProcessForNotAccessibleParentEntityType()
+    {
+        $this->context->setParentClassName('test');
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with($this->context->getParentClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn('Test\Class');
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceAccessible')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
+
+        $this->processor->process($this->context);
     }
 
     public function testProcessForInvalidParentEntityType()

@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 abstract class AbstractTransitionButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
+    const TRANSITION_JS_DIALOG_WIDGET = 'oroworkflow/transition-dialog-widget';
 
     /** @var Workflow */
     protected $workflow;
@@ -45,7 +46,7 @@ abstract class AbstractTransitionButton implements ButtonInterface
      */
     public function getLabel()
     {
-        return $this->transition->getLabel();
+        return $this->transition->getButtonLabel();
     }
 
     /**
@@ -81,9 +82,16 @@ abstract class AbstractTransitionButton implements ButtonInterface
     {
         $showDialog = $this->transition->getDisplayType() !== 'page';
 
+        $frontendOptions = $this->transition->getFrontendOptions();
+        if (isset($frontendOptions['dialog']['dialogOptions'])) {
+            $frontendOptions['options'] = isset($frontendOptions['options'])
+                ? array_merge($frontendOptions['options'], $frontendOptions['dialog']['dialogOptions'])
+                : $frontendOptions['dialog']['dialogOptions'];
+        }
+
         return array_merge(
             [
-                'frontendOptions' => $this->transition->getFrontendOptions(),
+                'frontendOptions' => $frontendOptions,
                 'hasForm' => $this->transition->hasForm(),
                 'showDialog' => $showDialog,
                 'routeParams' => [
@@ -94,12 +102,14 @@ abstract class AbstractTransitionButton implements ButtonInterface
                     'route' => $this->buttonContext->getRouteName(),
                     'datagrid' => $this->buttonContext->getDatagridName(),
                     'group' => $this->buttonContext->getGroup(),
+                    'originalUrl' => $showDialog ? null : $this->buttonContext->getOriginalUrl(),
                 ],
                 'executionRoute' => $this->buttonContext->getExecutionRoute(),
                 'dialogRoute' => $showDialog
                     ? $this->buttonContext->getFormDialogRoute()
                     : $this->buttonContext->getFormPageRoute(),
                 'additionalData' => $this->getDatagridData(),
+                'jsDialogWidget' => static::TRANSITION_JS_DIALOG_WIDGET,
             ],
             $customData
         );
@@ -151,5 +161,12 @@ abstract class AbstractTransitionButton implements ButtonInterface
     public function getTransition()
     {
         return $this->transition;
+    }
+
+    public function __clone()
+    {
+        if ($this->transition) {
+            $this->transition = clone $this->transition;
+        }
     }
 }

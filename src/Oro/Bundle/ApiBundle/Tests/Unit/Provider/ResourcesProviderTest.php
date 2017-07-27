@@ -337,4 +337,98 @@ class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
             $this->resourcesProvider->isResourceKnown('Test\Entity3', $version, $requestType)
         );
     }
+
+    public function testGetResourceExcludeActionsWhenCacheExists()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $cachedData = [
+            'Test\Entity1' => [],
+            'Test\Entity3' => ['delete']
+        ];
+
+        $this->processor->expects($this->never())
+            ->method('process');
+        $this->resourcesCache->expects($this->once())
+            ->method('getExcludedActions')
+            ->with($version, $this->identicalTo($requestType))
+            ->willReturn($cachedData);
+        $this->resourcesCache->expects($this->never())
+            ->method('saveResources');
+
+        $this->assertSame(
+            [],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
+        );
+        $this->assertSame(
+            [],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity2', $version, $requestType)
+        );
+        $this->assertSame(
+            ['delete'],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity3', $version, $requestType)
+        );
+    }
+
+    public function testGetResourceExcludeActionsWhenCacheDoesNotExist()
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $cachedData = [
+            'Test\Entity1' => [],
+            'Test\Entity3' => ['delete']
+        ];
+        $resource1 = new ApiResource('Test\Entity1');
+        $resource3 = new ApiResource('Test\Entity3');
+        $resource3->addExcludedAction('delete');
+        $expectedResources = [$resource1, $resource3];
+        $expectedAccessibleResources = ['Test\Entity3'];
+
+        $this->processor->expects($this->once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CollectResourcesContext $context) use ($version, $requestType) {
+                    $this->assertEquals($version, $context->getVersion());
+                    $this->assertEquals($requestType, $context->getRequestType());
+
+                    $resource1 = new ApiResource('Test\Entity1');
+                    $context->getResult()->add($resource1);
+                    $resource3 = new ApiResource('Test\Entity3');
+                    $resource3->addExcludedAction('delete');
+                    $context->getResult()->add($resource3);
+
+                    $context->setAccessibleResources(['Test\Entity3']);
+                }
+            );
+        $this->resourcesCache->expects($this->at(0))
+            ->method('getExcludedActions')
+            ->with($version, $this->identicalTo($requestType))
+            ->willReturn(null);
+        $this->resourcesCache->expects($this->at(1))
+            ->method('getResources')
+            ->with($version, $this->identicalTo($requestType))
+            ->willReturn(null);
+        $this->resourcesCache->expects($this->at(2))
+            ->method('saveResources')
+            ->with($version, $this->identicalTo($requestType), $expectedResources, $expectedAccessibleResources);
+        $this->resourcesCache->expects($this->at(3))
+            ->method('getExcludedActions')
+            ->with($version, $this->identicalTo($requestType))
+            ->willReturn($cachedData);
+
+        $this->assertSame(
+            [],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity1', $version, $requestType)
+        );
+        $this->assertSame(
+            [],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity2', $version, $requestType)
+        );
+        $this->assertSame(
+            ['delete'],
+            $this->resourcesProvider->getResourceExcludeActions('Test\Entity3', $version, $requestType)
+        );
+    }
 }

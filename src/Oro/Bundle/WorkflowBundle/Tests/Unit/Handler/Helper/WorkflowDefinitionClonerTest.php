@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
@@ -133,7 +135,12 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
         $restrictions = new ArrayCollection([$restriction1, $restriction2]);
 
         $definition = new WorkflowDefinition();
-        $definition->setSteps($steps)->setStartStep($step2)->setEntityAcls($entityAcls)->setRestrictions($restrictions);
+        $definition
+            ->setSteps($steps)
+            ->setStartStep($step2)
+            ->setEntityAcls($entityAcls)
+            ->setRestrictions($restrictions)
+            ->setApplications(['app1', 'app2']);
 
         return $definition;
     }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions;
 use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
@@ -83,7 +84,8 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             && $fieldConfigId->getFieldName() === ExtendHelper::buildAssociationName(
                 $relationData['target_entity'],
                 $this->getAssociationKind()
-            );
+            )
+            && ExtendScopeHelper::isStateAvailableForProcessing($relationData['state']);
     }
 
     /**

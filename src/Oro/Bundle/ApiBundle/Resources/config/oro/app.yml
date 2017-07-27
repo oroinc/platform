@@ -104,6 +104,8 @@ oro_api:
         date:
             form_type: date
             options:
+                model_timezone: UTC
+                view_timezone: UTC
                 widget: single_text
                 format: "yyyy-MM-dd" # HTML5
         time:
@@ -145,6 +147,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -164,6 +168,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -183,6 +189,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -202,6 +210,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -221,6 +231,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -242,6 +254,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -265,6 +279,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -284,6 +300,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -303,6 +321,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -322,6 +342,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -341,6 +363,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:

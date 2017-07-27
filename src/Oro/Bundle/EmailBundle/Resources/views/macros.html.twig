@@ -156,7 +156,8 @@
         }
     } %}
     <div data-page-component-module="oroemail/js/app/components/email-variable-component"
-         data-page-component-options="{{ options|json_encode }}"></div>
+         data-page-component-options="{{ options|json_encode }}"
+         data-page-component-name="email-template-variables"></div>
 {% endmacro %}
 
 {% macro renderPreviewDialog(formId, title) %}
@@ -232,23 +233,36 @@
 {%- endmacro -%}
 
 {#
-    Remders email address owner name as link based on owner type
+    Renders email address owner name as link based on owner type
     Parameters:
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
+        label - [optional] A text representation of email address
 #}
 {% macro email_address_link(emailAddress, label) -%}
-    {% set label = label|default(_self.email_address_text(emailAddress)) %}
-    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {{ _self.renderEmailAddressLink(
+        label|default(_self.email_address_text(emailAddress)),
+        emailAddress.owner.class,
+        emailAddress.owner.id) }}
+{%- endmacro -%}
+
+{#
+    Renders email address owner name as link based on owner type
+    Parameters:
+        label - The text representation of email address
+        ownerClass - The class name of email address owner
+        ownerId - The id of email address owner
+#}
+{% macro renderEmailAddressLink(label, ownerClass, ownerId) -%}
+    {% set route = oro_entity_route(ownerClass) %}
     {% if route is not null %}
-        <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
-            {{ label }}</a>
+        <a href="{{ path(route, {id: ownerId}) }}">{{ label }}</a>
     {% else %}
         {{ label }}
     {% endif %}
 {%- endmacro -%}
 
 {#
-    Remders email address name as link based on owner type
+    Renders email address name as link based on owner type
     Parameters:
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
@@ -627,6 +641,9 @@
 
 {#
     Wrap text to tag
+    @deprecated since 2.3, no replacement because this macro was used
+        only in OroEmailBundle:Email:Datagrid/Property/contacts.html.twig,
+        now renderEmailAddressCell macro is used in this temmplate
 #}
 {% macro wrapTextToTag(text, isWrap, tag) %}
     {% set tag = tag is not null ? tag : 'strong' %}

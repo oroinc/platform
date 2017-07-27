@@ -3,100 +3,98 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuItem;
+use Knp\Menu\Provider\MenuProviderInterface;
+use Knp\Menu\Twig\Helper;
+
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $helper
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $helper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $provider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $breadcrumbManager;
 
-    /**
-     * @var MenuExtension $menuExtension
-     */
-    protected $menuExtension;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $menuConfiguration;
+
+    /** @var MenuExtension */
+    protected $extension;
 
     protected function setUp()
     {
-        $this->breadcrumbManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager')
+        $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
+        $this->helper = $this->getMockBuilder(Helper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider = $this->createMock(MenuProviderInterface::class);
+        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = $this->getMockBuilder('Knp\Menu\Twig\Helper')
-            ->disableOriginalConstructor()
-            ->setMethods(array('render'))
-            ->getMock();
+        $container = self::getContainerBuilder()
+            ->add('knp_menu.helper', $this->helper)
+            ->add('oro_menu.builder_chain', $this->provider)
+            ->add('oro_navigation.chain_breadcrumb_manager', $this->breadcrumbManager)
+            ->add('oro_menu.configuration', $this->menuConfiguration)
+            ->getContainer($this);
 
-        $this->provider = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->menuExtension = new MenuExtension($this->helper, $this->provider, $this->breadcrumbManager);
-    }
-
-    public function testGetFunctions()
-    {
-        $functions = $this->menuExtension->getFunctions();
-        $this->assertArrayHasKey('oro_menu_render', $functions);
-        $this->assertInstanceOf('Twig_Function_Method', $functions['oro_menu_render']);
-        $this->assertAttributeEquals('render', 'method', $functions['oro_menu_render']);
-
-        $this->assertArrayHasKey('oro_menu_get', $functions);
-        $this->assertInstanceOf('Twig_Function_Method', $functions['oro_menu_get']);
-        $this->assertAttributeEquals('getMenu', 'method', $functions['oro_menu_get']);
+        $this->extension = new MenuExtension($container);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(MenuExtension::MENU_NAME, $this->menuExtension->getName());
+        $this->assertEquals(MenuExtension::MENU_NAME, $this->extension->getName());
     }
 
     public function testRenderBreadCrumbs()
     {
-        $environment = $this->getMockBuilder('\Twig_Environment')
+        $environment = $this->getMockBuilder(\Twig_Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $template = $this->getMockBuilder('\Twig_TemplateInterface')
+        $template = $this->getMockBuilder(\Twig_TemplateInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->breadcrumbManager->expects($this->once())
             ->method('getBreadcrumbs')
-            ->will($this->returnValue(array('test-breadcrumb')));
+            ->will($this->returnValue(['test-breadcrumb']));
 
         $environment->expects($this->once())
             ->method('loadTemplate')
             ->will($this->returnValue($template));
 
+        $result = 'test';
         $template->expects($this->once())
             ->method('render')
             ->with(
-                array(
-                    'breadcrumbs' => array(
+                [
+                    'breadcrumbs' => [
                         'test-breadcrumb'
-                    ),
+                    ],
                     'useDecorators' => true
-                )
-            );
-        ;
-        $this->menuExtension->renderBreadCrumbs($environment, 'test_menu');
+                ]
+            )->willReturn($result);
+
+        self::assertEquals(
+            $result,
+            self::callTwigFunction($this->extension, 'oro_breadcrumbs', [$environment, 'test_menu'])
+        );
     }
 
     public function testWrongBredcrumbs()
     {
-
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
             ->getMock();
@@ -105,15 +103,20 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getBreadcrumbs')
             ->will($this->returnValue(null));
 
-        $this->assertNull($this->menuExtension->renderBreadCrumbs($environment, 'test_menu'));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_breadcrumbs', [$environment, 'test_menu'])
+        );
     }
 
     public function testGetMenuAsString()
     {
-        $options = array();
+        $options = [];
         $menu = 'test';
         $menuInstance = $this->assertGetMenuString($menu, 'path', $options);
-        $this->assertSame($menuInstance, $this->menuExtension->getMenu($menu, array('path'), $options));
+        $this->assertSame(
+            $menuInstance,
+            self::callTwigFunction($this->extension, 'oro_menu_get', [$menu, ['path'], $options])
+        );
     }
 
     /**
@@ -122,15 +125,16 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetMenuException()
     {
-        $options = array();
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->setMethods(array('getChild'))
+        $options = [];
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
+            ->setMethods(['getChild'])
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
             ->method('getChild')
             ->with('path')
             ->will($this->returnValue(null));
-        $this->menuExtension->getMenu($menuInstance, array('path'), $options);
+
+        self::callTwigFunction($this->extension, 'oro_menu_get', [$menuInstance, ['path'], $options]);
     }
 
     /**
@@ -139,15 +143,15 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderException()
     {
-        $this->menuExtension->render(array());
+        self::callTwigFunction($this->extension, 'oro_menu_render', [[]]);
     }
 
     public function testRenderMenuInstance()
     {
-        $options = array();
+        $options = [];
         $renderer = 'test';
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->setMethods(array('getExtra'))
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
+            ->setMethods(['getExtra'])
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
             ->method('getExtra')
@@ -160,9 +164,9 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderMenuAsArray()
     {
-        $options = array();
+        $options = [];
         $renderer = 'test';
-        $menu = array('path', 'test');
+        $menu = ['path', 'test'];
         $menuInstance = $this->assertGetMenuString('path', 'test', $options);
         $menuInstance->expects($this->once())
             ->method('getExtra')
@@ -180,8 +184,8 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     public function testRenderMenuInstanceWithExtra($options)
     {
         $renderer = 'test';
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->setMethods(array('getExtra'))
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
+            ->setMethods(['getExtra'])
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
             ->method('getExtra')
@@ -191,38 +195,44 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getIterator')
             ->will($this->returnValue(new \ArrayIterator()));
 
-        $runtimeOptions = array(
+        $runtimeOptions = [
             'template' => 'test_runtime.tpl'
-        );
-        $this->menuExtension->setMenuConfiguration($options);
+        ];
+        $this->menuConfiguration->expects(self::once())
+            ->method('getTemplates')
+            ->willReturn($options);
+
         $this->assertRender($menuInstance, $menuInstance, $runtimeOptions, $renderer);
     }
 
+    /**
+     * @return array
+     */
     public function typeOptionsDataProvider()
     {
-        return array(
-            'empty' => array(
-                array()
-            ),
-            'has type config' => array(
-                array(
-                    'templates' => array(
-                        'type' => array(
+        return [
+            'empty' => [
+                []
+            ],
+            'has type config' => [
+                [
+                    'templates' => [
+                        'type' => [
                             'template' => 'test2.tpl'
-                        )
-                    )
-                )
-            ),
-            'has other type config' => array(
-                array(
-                    'templates' => array(
-                        'type_no' => array(
+                        ]
+                    ]
+                ]
+            ],
+            'has other type config' => [
+                [
+                    'templates' => [
+                        'type_no' => [
                             'template' => 'test2.tpl'
-                        )
-                    )
-                )
-            )
-        );
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -232,7 +242,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterUnallowedItems($items, $expected)
     {
-        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
+        $menu = $this->getMockBuilder(ItemInterface::class)
             ->getMockForAbstractClass();
 
         $menu->expects($this->atLeastOnce())
@@ -250,20 +260,24 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->menuExtension->render($menu);
+        self::callTwigFunction($this->extension, 'oro_menu_render', [$menu]);
     }
 
+    /**
+     * @param $item
+     * @return array
+     */
     protected function collectResultItemsData($item)
     {
-        $result = array();
+        $result = [];
         /** @var ItemInterface $sub */
         foreach ($item as $sub) {
-            $result[] = array(
+            $result[] = [
                 'label' => $sub->getLabel(),
                 'uri' => $sub->getUri(),
                 'isAllowed' => $sub->getExtra('isAllowed'),
                 'children' => $this->collectResultItemsData($sub)
-            );
+            ];
         }
 
         return $result;
@@ -275,171 +289,180 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function menuItemsDataProvider()
     {
-        return array(
-            array(
-                array(
+        return [
+            [
+                [
                     $this->getMenuItem('item_1'),
                     $this->getMenuItem(
                         'item_2',
                         true,
-                        array(
+                        [
                             $this->getMenuItem('item_2_1'),
                             $this->getMenuItem(''),
-                        )
+                        ]
                     ),
                     $this->getMenuItem(
                         'item_3',
                         true,
-                        array(
+                        [
                             $this->getMenuItem('item_3_1', false),
                             $this->getMenuItem('item_3_2'),
-                        )
+                        ]
                     ),
                     $this->getMenuItem(
                         'item_4',
                         true,
-                        array(
+                        [
                             $this->getMenuItem('item_4_1', false),
                             $this->getMenuItem(''),
-                        )
+                        ]
                     ),
                     $this->getMenuItem(
                         'item_5',
                         true,
-                        array(
+                        [
                             $this->getMenuItem(
                                 'item_5_1',
                                 true,
-                                array(
+                                [
                                     $this->getMenuItem('item_5_1_1', false),
-                                )
+                                ]
                             )
-                        ),
+                        ],
                         '#'
                     ),
                     $this->getMenuItem(
                         'item_6',
                         true,
-                        array(
+                        [
                             $this->getMenuItem('item_6_1', false),
                             $this->getMenuItem(''),
-                        ),
+                        ],
                         '/my-uri'
                     ),
-                ),
-                array(
-                    array(
+                ],
+                [
+                    [
                         'label' => 'item_1',
                         'uri' => '',
                         'isAllowed' => true,
-                        'children' => array()
-                    ),
-                    array(
+                        'children' => []
+                    ],
+                    [
                         'label' => 'item_2',
                         'uri' => '',
                         'isAllowed' => true,
-                        'children' => array(
-                            array(
+                        'children' => [
+                            [
                                 'label' => 'item_2_1',
                                 'uri' => '',
                                 'isAllowed' => true,
-                                'children' => array()
-                            ),
-                            array(
+                                'children' => []
+                            ],
+                            [
                                 'label' => '',
                                 'uri' => '',
                                 'isAllowed' => true,
-                                'children' => array()
-                            ),
-                        )
-                    ),
-                    array(
+                                'children' => []
+                            ],
+                        ]
+                    ],
+                    [
                         'label' => 'item_3',
                         'uri' => '',
                         'isAllowed' => true,
-                        'children' => array(
-                            array(
+                        'children' => [
+                            [
                                 'label' => 'item_3_1',
                                 'uri' => '',
                                 'isAllowed' => false,
-                                'children' => array()
-                            ),
-                            array(
+                                'children' => []
+                            ],
+                            [
                                 'label' => 'item_3_2',
                                 'uri' => '',
                                 'isAllowed' => true,
-                                'children' => array()
-                            ),
-                        )
-                    ),
-                    array(
+                                'children' => []
+                            ],
+                        ]
+                    ],
+                    [
                         'label' => 'item_4',
                         'uri' => '',
                         'isAllowed' => false,
-                        'children' => array(
-                            array(
+                        'children' => [
+                            [
                                 'label' => 'item_4_1',
                                 'uri' => '',
                                 'isAllowed' => false,
-                                'children' => array()
-                            ),
-                            array(
+                                'children' => []
+                            ],
+                            [
                                 'label' => '',
                                 'uri' => '',
                                 'isAllowed' => true,
-                                'children' => array()
-                            ),
-                        )
-                    ),
-                    array(
+                                'children' => []
+                            ],
+                        ]
+                    ],
+                    [
                         'label' => 'item_5',
                         'uri' => '#',
                         'isAllowed' => false,
-                        'children' => array(
-                            array(
+                        'children' => [
+                            [
                                 'label' => 'item_5_1',
                                 'uri' => '',
                                 'isAllowed' => false,
-                                'children' => array(
-                                    array(
+                                'children' => [
+                                    [
                                         'label' => 'item_5_1_1',
                                         'uri' => '',
                                         'isAllowed' => false,
-                                        'children' => array()
-                                    ),
-                                )
-                            )
-                        )
-                    ),
-                    array(
+                                        'children' => []
+                                    ],
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
                         'label' => 'item_6',
                         'uri' => '/my-uri',
                         'isAllowed' => true,
-                        'children' => array(
-                            array(
+                        'children' => [
+                            [
                                 'label' => 'item_6_1',
                                 'uri' => '',
                                 'isAllowed' => false,
-                                'children' => array()
-                            ),
-                            array(
+                                'children' => []
+                            ],
+                            [
                                 'label' => '',
                                 'uri' => '',
                                 'isAllowed' => true,
-                                'children' => array()
-                            ),
-                        )
-                    ),
-                )
-            )
-        );
+                                'children' => []
+                            ],
+                        ]
+                    ],
+                ]
+            ]
+        ];
     }
 
-    protected function getMenuItem($label, $isAllowed = true, $children = array(), $uri = '')
+    /**
+     * @param string $label
+     * @param bool   $isAllowed
+     * @param array  $children
+     * @param string $uri
+     *
+     * @return MenuItem|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getMenuItem($label, $isAllowed = true, $children = [], $uri = '')
     {
-        $menu = $this->getMockBuilder('Knp\Menu\MenuItem')
+        /** @var MenuItem|\PHPUnit_Framework_MockObject_MockObject $menu */
+        $menu = $this->getMockBuilder(MenuItem::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getLabel', 'getUri', 'hasChildren', 'getChildren', 'getIterator', 'count'))
+            ->setMethods(['getLabel', 'getUri', 'hasChildren', 'getChildren', 'getIterator', 'count'])
             ->getMock();
 
         $menu->expects($this->any())
@@ -477,19 +500,36 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
         return $menu;
     }
 
+    /**
+     * @param $menu
+     * @param $menuInstance
+     * @param $options
+     * @param $renderer
+     */
     protected function assertRender($menu, $menuInstance, $options, $renderer)
     {
         $this->helper->expects($this->once())
             ->method('render')
             ->with($menuInstance, $options, $renderer)
             ->will($this->returnValue('MENU'));
-        $this->assertEquals('MENU', $this->menuExtension->render($menu, $options, $renderer));
+
+        $this->assertEquals(
+            'MENU',
+            self::callTwigFunction($this->extension, 'oro_menu_render', [$menu, $options, $renderer])
+        );
     }
 
+    /**
+     * @param string $menu
+     * @param string $path
+     * @param array  $options
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function assertGetMenuString($menu, $path, $options)
     {
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->setMethods(array('getChild', 'getExtra'))
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
+            ->setMethods(['getChild', 'getExtra'])
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
             ->method('getChild')
@@ -499,6 +539,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with($menu, $options)
             ->will($this->returnValue($menuInstance));
+
         return $menuInstance;
     }
 }

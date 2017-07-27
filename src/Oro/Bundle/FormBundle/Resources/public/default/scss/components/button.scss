@@ -1,7 +1,7 @@
+// @theme: default;
+
 .button,
 .btn {
-    $btn-shadow: inset 0 3px 5px 0 rgba(0,0,0, .35) !default;
-
     text-align: center;
 
     @extend %base-transition;
@@ -11,14 +11,30 @@
     }
 
     @include element-state('active') {
-        box-shadow:  $btn-shadow;
+        box-shadow: $btn-shadow;
     }
 
-    @include element-state('disabled') {
-        opacity: .75;
+    &.active,
+    &.pressed {
+        box-shadow: $btn-shadow;
     }
 
-    //
+    &.caret {
+        &:after {
+            content: '';
+
+            display: inline-block;
+            width: 0;
+            height: 0;
+
+            border-top: 4px solid;
+            border-right: 4px solid transparent;
+            border-left: 4px solid transparent;
+
+            vertical-align: middle;
+        }
+    }
+
     &--action {
         border-color: get-color('additional', 'darker');
         background-color: get-color('additional', 'darker');
@@ -35,8 +51,24 @@
         }
     }
 
+    &--default {
+        border-color: get-color('additional', 'light');
+        background-color: get-color('additional', 'ultra');
+        color: lighten(get-color('additional', 'dark'), 21%);
+
+        @include element-state('hover') {
+            border-color: darken(get-color('additional', 'light'), 3%);
+            background-color: darken(get-color('additional', 'ultra'), 3%);
+            color: get-color('additional', 'dark');
+        }
+
+        @include element-state('focus') {
+            border-color: darken(get-color('additional', 'light'), 5%);
+        }
+    }
+
     &--info {
-        border-color: get-color('primary', 'base') ;
+        border-color: get-color('primary', 'base');
         background-color: get-color('primary', 'base');
         color: get-color('additional', 'ultra');
 
@@ -49,10 +81,14 @@
         @include element-state('focus') {
             border-color: lighten(get-color('primary', 'base'), 5%);
         }
+
+        [class*=" fa-"] {
+            margin-right: $offset-x-s;
+        }
     }
 
     &--primary {
-        border-color: get-color('additional', 'middle') ;
+        border-color: get-color('additional', 'middle');
         background-color: get-color('additional', 'middle');
         color: get-color('additional', 'ultra');
 
@@ -82,37 +118,89 @@
 
         @include element-state('focus') {
             background-color: transparent;
+            border-color: transparent;
         }
 
         @include element-state('active') {
             box-shadow: none;
         }
+
+        &.active,
+        &.pressed {
+            box-shadow: none;
+        }
     }
 
+    &--plain {
+        padding: 0 3px;
+
+        line-height: 1;
+
+        border-color: transparent;
+        background-color: transparent;
+        color: get-color('additional', 'middle');
+
+        cursor: pointer;
+
+        @include element-state('hover') {
+            background-color: transparent;
+            border-color: transparent;
+            color: get-color('additional', 'light');
+        }
+
+        @include element-state('focus') {
+            background-color: transparent;
+            border-color: transparent;
+        }
+
+        @include element-state('active') {
+            box-shadow: none;
+        }
+
+        &.active,
+        &.pressed {
+            box-shadow: none;
+        }
+    }
 
     &--large {
         min-width: 200px;
     }
 
     &--size {
-        &-s {
-            padding: 3px 10px;
+        &-xs {
+            padding: 3px 11px;
 
-            line-height: 24px;
+            font-size: $base-font-size - 1;
+            line-height: 18px;
+
+            @if ($button-border-radius) {
+                border-radius: 3px;
+            }
         }
+
+        &-s {
+            padding: 0 10px;
+
+            font-size: $base-font-size;
+            line-height: 30px;
+
+            @if ($button-border-radius) {
+                border-radius: 6px;
+            }
+        }
+
         &-m {
             font-size: 17px;
             line-height: 38px;
         }
 
         &-l {
-            padding: 10px 15px;
-
             font-size: $base-font-size--l;
+
+            padding: 10px 15px;
             line-height: 54px;
         }
-
-
     }
 
     &--offset {

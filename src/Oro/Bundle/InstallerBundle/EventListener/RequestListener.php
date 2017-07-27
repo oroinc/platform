@@ -3,7 +3,6 @@
 namespace Oro\Bundle\InstallerBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class RequestListener
@@ -32,9 +31,12 @@ class RequestListener
         $this->debug     = $debug;
     }
 
+    /**
+     * @param GetResponseEvent $event
+     */
     public function onRequest(GetResponseEvent $event)
     {
-        if (HttpKernel::MASTER_REQUEST != $event->getRequestType()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 
@@ -59,7 +61,7 @@ class RequestListener
                 );
             }
 
-            if (!in_array($event->getRequest()->get('_route'), $allowedRoutes)) {
+            if (!in_array($event->getRequest()->get('_route'), $allowedRoutes, true)) {
                 $event->setResponse(new RedirectResponse($event->getRequest()->getBasePath() . '/install.php'));
             }
 

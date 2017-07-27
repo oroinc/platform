@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityForNestedObjects as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects as TestEntity;
 
 /**
  * @dbIsolationPerTest
@@ -25,13 +25,8 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         $entity = $this->getReference('test_entity');
         $entityType = $this->getEntityType(TestEntity::class);
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => (string)$entity->getId()])
-        );
+        $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals((string)$entity->getId(), $result['data']['id']);
         self::assertEquals(
@@ -59,14 +54,8 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
+        $response = $this->post(['entity' => $entityType], $data);
 
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
@@ -93,14 +82,8 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
+        $response = $this->post(['entity' => $entityType], $data);
 
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertNull(
             $result['data']['attributes']['name']
@@ -132,14 +115,11 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => (string)$entity->getId()]),
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
@@ -172,14 +152,11 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => (string)$entity->getId()]),
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertNull(
             $result['data']['attributes']['name']
@@ -208,14 +185,11 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => (string)$entity->getId()]),
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [

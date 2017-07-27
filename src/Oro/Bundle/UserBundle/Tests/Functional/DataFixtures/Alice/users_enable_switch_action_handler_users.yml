@@ -1,0 +1,25 @@
+dependencies:
+  - Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadAllRolesData
+
+Oro\Bundle\OrganizationBundle\Entity\Organization:
+  organization.1:
+    name: 'Organization.1'
+    enabled: true
+
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+  business_unit.{1..10}:
+    name: 'business_unit.<current()>'
+    organization: '@organization.1'
+
+Oro\Bundle\UserBundle\Entity\User:
+  user.{1..10}:
+    firstName: <firstName()>
+    lastName: <lastName()>
+    username (unique): <username()>
+    organization: '@organization.1'
+    organizations: ['@organization.1']
+    roles: ['@role.role_administrator']
+    owner: '@business_unit.1'
+    businessUnits: ['@business_unit.1']
+    email (unique): <email()>
+    password: ''

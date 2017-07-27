@@ -5,14 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DbalMessageQueueIsolator;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
-use Oro\Bundle\EntityBundle\ORM\Registry;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class FixtureLoader implements SuiteAwareInterface
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class FixtureLoader
 {
     /**
      * @var AliceLoader
@@ -23,11 +22,6 @@ class FixtureLoader implements SuiteAwareInterface
      * @var KernelInterface
      */
     protected $kernel;
-
-    /**
-     * @var string
-     */
-    protected $fallbackPath;
 
     /**
      * @var Suite
@@ -45,7 +39,7 @@ class FixtureLoader implements SuiteAwareInterface
     protected $entitySupplement;
 
     /**
-     * @param Registry $registry
+     * @param KernelInterface $kernel
      * @param EntityClassResolver $entityClassResolver
      * @param EntitySupplement $entitySupplement
      * @param OroAliceLoader $aliceLoader
@@ -57,7 +51,6 @@ class FixtureLoader implements SuiteAwareInterface
         OroAliceLoader $aliceLoader
     ) {
         $this->kernel = $kernel;
-        $this->fallbackPath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__.'/../../Tests/Behat');
         $this->aliceLoader = $aliceLoader;
         $this->entityClassResolver = $entityClassResolver;
         $this->entitySupplement = $entitySupplement;
@@ -69,7 +62,7 @@ class FixtureLoader implements SuiteAwareInterface
      */
     public function loadFixtureFile($filename)
     {
-        $file = DoctrineIsolator::findFile($filename, $this->suite);
+        $file = $this->findFile($filename);
 
         $objects = $this->load($file);
         $this->persist($objects);
@@ -112,7 +105,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
     }
 
     /**
@@ -156,7 +148,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
 
         return $entities;
     }
@@ -170,7 +161,6 @@ class FixtureLoader implements SuiteAwareInterface
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         $this->aliceLoader->setDoctrine($doctrine);
         $result = $this->aliceLoader->load($dataOrFilename);
-        DbalMessageQueueIsolator::waitForMessageQueue($doctrine->getManager()->getConnection());
 
         return $result;
     }
@@ -196,15 +186,51 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $filename
+     * @return string Real path to file with fuxtures
+     * @throws \InvalidArgumentException
      */
-    public function setSuite(Suite $suite)
+    public function findFile($filename)
     {
-        $this->suite = $suite;
+        if (false === strpos($filename, ':')) {
+            throw new \InvalidArgumentException(
+                'Please define a bundle name for fixtures e.g. "BundleName:fixture.yml"'
+            );
+        }
+
+        list($bundleName, $filename) = explode(':', $filename);
+        $bundlePath = $this->kernel->getBundle('!'.$bundleName)->getPath();
+        $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
+
+        if (!$file = $this->findFileInPath($filename, $suitePaths)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Can\'t find "%s" in pahts "%s"',
+                $filename,
+                implode(',', $suitePaths)
+            ));
+        }
+
+        return $file;
+    }
+
+    /**
+     * @param string $filename
+     * @param array $paths
+     * @return string|null
+     */
+    private function findFileInPath($filename, array $paths)
+    {
+        foreach ($paths as $path) {
+            $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -229,5 +255,14 @@ class FixtureLoader implements SuiteAwareInterface
                 $entityReference => $values
             ]
         ];
+    }
+
+    /**
+     * @param $name
+     * @param $instance
+     */
+    public function addReference($name, $instance)
+    {
+        $this->aliceLoader->getReferenceRepository()->set($name, $instance);
     }
 }

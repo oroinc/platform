@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Symfony\Component\HttpFoundation\File\File;
 
 class HttpImportHandler extends AbstractImportHandler
 {
@@ -68,6 +67,7 @@ class HttpImportHandler extends AbstractImportHandler
         array $options = []
     ) {
         $jobResult = $this->executeJob($jobName, $processorAlias, $options);
+
         $counts = $this->getValidationCounts($jobResult);
         $importInfo = '';
 
@@ -92,60 +92,13 @@ class HttpImportHandler extends AbstractImportHandler
             $errors = array_merge($errors, $jobResult->getFailureExceptions());
         }
 
-        $errorsAndExceptions = array_slice($errors, 0, 100);
-
         return [
             'success'    => $jobResult->isSuccessful(),
             'message'    => $message,
             'importInfo' => $importInfo,
-            'errors'     => $errorsAndExceptions,
+            'errors'     => $errors,
             'counts'     => $counts,
+            'postponedRows' => $jobResult->getContext()->getPostponedRows(),
         ];
-    }
-
-
-    /**
-     * Saves the given file in a temporary directory and returns its name
-     *
-     * @param File $file
-     * @param $temporaryFilePrefix
-     *
-     * @return string
-     */
-    public function saveImportingFile(File $file, $temporaryFilePrefix)
-    {
-        $tmpFileName = $this->fileSystemOperator
-            ->generateTemporaryFileName($temporaryFilePrefix);
-        $file->move(dirname($tmpFileName), basename($tmpFileName));
-
-        return $tmpFileName;
-    }
-
-    /**
-     * @param array $counts
-     * @param string $entityName
-     * @return string
-     */
-    protected function getImportInfo($counts, $entityName)
-    {
-        $add = 0;
-        $update = 0;
-
-        if (isset($counts['add'])) {
-            $add += $counts['add'];
-        }
-        if (isset($counts['update'])) {
-            $update += $counts['update'];
-        }
-        if (isset($counts['replace'])) {
-            $update += $counts['replace'];
-        }
-
-        $importInfo = $this->translator->trans(
-            'oro.importexport.import.alert',
-            ['%added%' => $add, '%updated%' => $update, '%entities%' => $this->getEntityPluralName($entityName)]
-        );
-
-        return $importInfo;
     }
 }

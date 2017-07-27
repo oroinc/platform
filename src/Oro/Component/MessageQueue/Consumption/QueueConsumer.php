@@ -123,9 +123,7 @@ class QueueConsumer
                     $this->doConsume($extension, $context);
                 }
             } catch (ConsumptionInterruptedException $e) {
-                $logger->info(sprintf('Consuming interrupted'));
-
-                $context->setExecutionInterrupted(true);
+                $logger->warning(sprintf('Consuming interrupted, reason: %s', $e->getMessage()));
 
                 $extension->onInterrupted($context);
                 $session->close();
@@ -166,10 +164,10 @@ class QueueConsumer
         $extension->onBeforeReceive($context);
 
         if ($context->isExecutionInterrupted()) {
-            throw new ConsumptionInterruptedException();
+            throw new ConsumptionInterruptedException($context->getInterruptedReason());
         }
-
-        if ($message = $messageConsumer->receive($timeout = 1)) {
+        $logger->info('Pre receive Message');
+        if ($message = $messageConsumer->receive(1)) {
             $logger->info('Message received');
             $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
             $logger->debug('Properties: {properties}', ['properties' => new VarExport($message->getProperties())]);
@@ -178,6 +176,7 @@ class QueueConsumer
             $context->setMessage($message);
 
             $extension->onPreReceived($context);
+
             if (!$context->getStatus()) {
                 $status = $messageProcessor->process($message, $session);
                 $context->setStatus($status);
@@ -208,7 +207,7 @@ class QueueConsumer
         }
 
         if ($context->isExecutionInterrupted()) {
-            throw new ConsumptionInterruptedException();
+            throw new ConsumptionInterruptedException($context->getInterruptedReason());
         }
     }
 

@@ -7,6 +7,12 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
 
+/**
+ * Class Form
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @package Oro\Bundle\TestFrameworkBundle\Behat\Element
+ */
 class Form extends Element
 {
     /**
@@ -15,23 +21,48 @@ class Form extends Element
      */
     public function fill(TableNode $table)
     {
+        $isEmbeddedForm = isset($this->options['embedded-id']);
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToIFrame($this->options['embedded-id']);
+        }
         foreach ($table->getRows() as $row) {
-            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
-            $value = $this->normalizeValue($row[1]);
-            $this->fillField($locator, $value);
+            list($label, $value) = $row;
+            $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
+            $value = self::normalizeValue($value);
+
+            $field = $this->findField($locator);
+            if (null === $field) {
+                throw new ElementNotFoundException(
+                    $this->getDriver(),
+                    'form field',
+                    'id|name|label|value|placeholder',
+                    $locator
+                );
+            }
+
+            $field = $this->wrapField($label, $field);
+            $field->setValue($value);
+            $field->blur();
+        }
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToWindow();
         }
     }
 
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
+            list($label, $value) = $row;
+            $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
-            self::assertNotNull($field, "Field with '$locator' locator not found");
+            self::assertNotNull($field, sprintf("Field `%s` not found", $label));
 
-            $expectedValue = $this->normalizeValue($row[1]);
-            $fieldValue = $this->normalizeValue($field->getValue());
-            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
+            $field = $this->wrapField($label, $field);
+            echo $field->getOuterHtml();
+
+            $expectedValue = self::normalizeValue($value);
+            $fieldValue = self::normalizeValue($field->getValue());
+            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $label));
         }
     }
 
@@ -52,6 +83,11 @@ class Form extends Element
     public function saveAndClose()
     {
         $this->pressActionButton('Save and Close');
+    }
+
+    public function saveAndDuplicate()
+    {
+        $this->pressActionButton('Save And Duplicate');
     }
 
     public function save()
@@ -100,10 +136,16 @@ class Form extends Element
      * {@inheritdoc}
      * @todo Move behat elements to Driver layer. BAP-11887.
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function findField($locator)
     {
-        if ($field = parent::findField($locator)) {
+        $selector = is_array($locator)
+            ? $locator
+            : ['type' => 'named', 'locator' => ['field', $locator]];
+        $field = $this->find($selector['type'], $selector['locator']);
+
+        if ($field) {
             if ($field->hasAttribute('type') && 'file' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('FileField', $field);
             }
@@ -118,6 +160,10 @@ class Form extends Element
 
             if ($field->hasClass('select2-offscreen')) {
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
+            }
+
+            if ('select' === $field->getTagName()) {
+                return $this->elementFactory->wrapElement('Select', $field);
             }
 
             return $field;
@@ -158,6 +204,8 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif ($sndParent->hasClass('control-group-choice')) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
+            } elseif ($field = $sndParent->find('css', '#'.$label->getAttribute('for'))) {
+                return $field;
             } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
                 return $field;
             } else {
@@ -172,11 +220,11 @@ class Form extends Element
      * @param array|string $value
      * @return array|string
      */
-    protected function normalizeValue($value)
+    public static function normalizeValue($value)
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
-                $value[$key] = $this->normalizeValue($item);
+                $value[$key] = self::normalizeValue($item);
             }
 
             return $value;
@@ -185,11 +233,43 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return explode(',', trim($value, '[]'));
+            return array_map('trim', explode(',', trim($value, '[]')));
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
             return new \DateTime($value);
+        }
+
+        $value = self::checkAdditionalFunctions($value);
+
+        if (in_array($value, ['true', 'false', 'yes', 'no', 'on', 'off'])) {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Parse for string commands and execute they
+     * Example: "<DateTime:August 24 11:00 AM>" would be parsed to DateTime object with provided data
+     *          "Daily every 5 days, end by <Date:next month>" <> value will be replaced as well
+     *
+     * @param $value
+     * @return \DateTime|mixed
+     */
+    protected static function checkAdditionalFunctions($value)
+    {
+        $matches = [];
+        preg_match('/<(?P<function>[\w]+):(?P<value>.+)>/', $value, $matches);
+
+        if (!empty($matches['function']) && !empty($matches['value'])) {
+            if ('DateTime' === $matches['function']) {
+                $value = new \DateTime($matches['value']);
+            }
+            if ('Date' === $matches['function']) {
+                $parsed =  new \DateTime($matches['value']);
+                $value = str_replace($matches[0], $parsed->format('M j, Y'), $value);
+            }
         }
 
         return $value;
@@ -219,6 +299,58 @@ class Form extends Element
             $field = $this->find('css', $type);
             $i++;
         } while ($field === null && $i < $deep);
+
+        return $field;
+    }
+
+    /**
+     * Retrieves validation error message text for provided field name
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function getFieldValidationErrors($fieldName)
+    {
+        if (isset($this->options['mapping'][$fieldName])) {
+            $field = $this->findField($this->options['mapping'][$fieldName]);
+        } else {
+            $field = $this->findFieldByLabel($fieldName);
+        }
+        $fieldId = $field->getAttribute('id');
+
+        // This element doesn't count server side validation errors without "for" attribute
+        $errorSpan = $this->find('css', "span.validation-failed[id='$fieldId-error']");
+
+        if (!$errorSpan) {
+            // Get next validation error span after element
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/following-sibling::span[@class="validation-failed"]'
+                )
+            );
+        }
+
+        self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
+
+        return $errorSpan->getText();
+    }
+
+    /**
+     * @param $label
+     * @param NodeElement $field
+     * @return NodeElement
+     */
+    private function wrapField($label, NodeElement $field): NodeElement
+    {
+        if (isset($this->options['mapping'][$label]['element'])) {
+            $field = $this->elementFactory->wrapElement(
+                $this->options['mapping'][$label]['element'],
+                $field
+            );
+        }
 
         return $field;
     }

@@ -148,7 +148,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                     'property_path' => 'realField21'
                                 ]
                             ],
-                            'filters'    => [
+                            'filters'       => [
                                 'fields' => [
                                     'field21' => [
                                         'data_type' => 'string',
@@ -169,7 +169,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                             'property_path' => 'realField321',
                                         ]
                                     ],
-                                    'filters'    => [
+                                    'filters'       => [
                                         'fields' => [
                                             'field321' => [
                                                 'data_type' => 'string',
@@ -178,7 +178,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                     ]
                                 ]
                             ],
-                            'filters'    => [
+                            'filters'       => [
                                 'fields' => [
                                     'field32' => [
                                         'data_type' => 'string',
@@ -229,7 +229,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                     'property_path' => 'realField21',
                                 ]
                             ],
-                            'filters'    => [
+                            'filters'       => [
                                 'fields' => [
                                     'field21' => [
                                         'data_type'     => 'string',
@@ -348,7 +348,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'definition'      => [
                     'fields' => [
                         'toOne1'  => [
-                            'fields' => [
+                            'fields'  => [
                                 'toOne1_toOne11'  => [
                                     'filters' => [
                                         'fields' => [
@@ -374,7 +374,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                                     ]
                                 ],
                             ],
-                            'filters'    => [
+                            'filters' => [
                                 'fields' => [
                                     'toOne1_id'       => [
                                         'data_type' => 'integer'
@@ -394,7 +394,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                         'toMany1' => [
                             'filters' => [
                                 'fields' => [
-                                    'toMany1_id'    => [
+                                    'toMany1_id'     => [
                                         'data_type' => 'integer'
                                     ],
                                     'toMany1_field1' => [
@@ -430,5 +430,75 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 ]
             ],
         ];
+    }
+
+    public function testFiltersByRenamedIdField()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['renamedIdField'],
+            'fields'                 => [
+                'field1'         => [
+                    'property_path' => 'realField1'
+                ],
+                'renamedIdField' => [
+                    'property_path' => 'field2'
+                ],
+                'field10'        => [
+                    'property_path' => 'realField10'
+                ],
+                'anotherField11' => [
+                    'property_path' => 'field11'
+                ],
+            ]
+        ];
+        $filters = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'  => [
+                    'data_type' => 'string'
+                ],
+                'field2'  => [
+                    'data_type' => 'string'
+                ],
+                'field10' => [
+                    'data_type'     => 'string',
+                    'property_path' => 'filterField10'
+                ],
+                'field11' => [
+                    'data_type'     => 'string',
+                    'property_path' => 'filterField11'
+                ],
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1'         => [
+                        'data_type'     => 'string',
+                        'property_path' => 'realField1'
+                    ],
+                    'renamedIdField' => [
+                        'data_type'     => 'string',
+                        'property_path' => 'field2'
+                    ],
+                    'field10'        => [
+                        'data_type'     => 'string',
+                        'property_path' => 'filterField10'
+                    ],
+                    'field11'        => [
+                        'data_type'     => 'string',
+                        'property_path' => 'filterField11'
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
     }
 }

@@ -84,13 +84,13 @@
     {% endif %}
 
     {% if not entity.system %}
-        {% if resource_granted('EDIT', entity) %}
+        {% if edit_allowed and is_granted('EDIT', entity) %}
             {{ UI.editButton({
                 'path' : path('oro_workflow_definition_update', { 'name': entity.name }),
                 'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
             }) }}
         {% endif %}
-        {% if resource_granted('DELETE', entity) %}
+        {% if is_granted('DELETE', entity) %}
             {{ UI.deleteButton({
                 'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
                 'dataRedirect': path('oro_workflow_definition_index'),
@@ -122,6 +122,12 @@
     {{ parent() }}
 
     <div class="pull-left">
+        {% if entity.system %}
+            <div class="badge badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.system.label'|trans }}</div>
+        {% endif %}
+        {% if not edit_allowed %}
+            <div class="badge badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.readonly.label'|trans }}</div>
+        {% endif %}
         {% if isActive %}
             <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
         {% else %}
@@ -211,6 +217,14 @@
                     entity.priority
                 ) }}
 
+                {% set applications %}
+                    {% if entity.applications is not empty %}
+                        {{ UI.renderList(entity.applications) }}
+                    {% else %}
+                        {{ 'N/A'|trans }}
+                    {% endif %}
+                {% endset %}
+
                 {% set activeGroups %}
                     {% if entity.exclusiveActiveGroups is not empty %}
                         {{ UI.renderList(entity.exclusiveActiveGroups) }}
@@ -227,6 +241,7 @@
                     {% endif %}
                 {% endset %}
 
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.applications.label'|trans, applications) }}
                 {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_active_groups.label'|trans, activeGroups) }}
                 {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_record_groups.label'|trans, recordGroups) }}
             </div>
@@ -288,7 +303,12 @@
                     <div class="workflow-flowchart-controls clearfix"></div>
                     <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
                             'module': 'oroui/js/app/components/view-component',
-                            'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                            'options': {
+                                'view': 'oroui/js/app/views/zoomable-area-view',
+                                'autozoom': true,
+                                'minZoom': 0.05,
+                                'maxZoom': 5
+                            }
                         }) }}
                     >
                         <div class="workflow-flowchart clearfix"></div>
@@ -301,14 +321,14 @@
 
     {% set dataBlocks = [
         {
-            'title': 'General Information'|trans,
+            'title': 'oro.workflow.block.title.general_information'|trans,
             'class': 'active',
             'subblocks': [
                 {'data' : [workflowDefinitionInfo] },
             ]
         },
         {
-            'title': 'Configuration'|trans,
+            'title': 'oro.workflow.block.title.steps_and_transitions'|trans,
             'subblocks': [
                 {
                     'data':  [workflowStepsAndTransitions]
@@ -316,6 +336,41 @@
             ]
         },
     ] %}
+
+    {% if variables is defined and variables|length %}
+        {% set variablesInfo %}
+            <div class="widget-content">
+                <div class="row-fluid form-horizontal">
+                    <div class="responsive-block">
+                        {% for variable in variables %}
+                            <div class="control-group">
+                                <label class="control-label">
+                                    {% if variable.options.form_options is defined and variable.options.form_options.tooltip is defined %}
+                                        {{ UI.tooltip(variable.options.form_options.tooltip) }}
+                                    {% endif %}
+                                    {{ variable.label }}
+                                </label>
+                                <div class="controls">
+                                    <div class="control-label">
+                                        {{ ((variable.value is iterable) ? variable.value|join(', ') : variable.value) }}
+                                        {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.variable_definitions.variables[variable.name]) }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+            'subblocks': [
+                {'data':  [variablesInfo]},
+            ]
+        }]) %}
+
+    {% endif %}
 
     {% set id = 'workflowDefinitionView' %}
     {% set data = {'dataBlocks': dataBlocks} %}

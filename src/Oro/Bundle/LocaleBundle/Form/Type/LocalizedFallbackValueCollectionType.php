@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 
 class LocalizedFallbackValueCollectionType extends AbstractType
 {

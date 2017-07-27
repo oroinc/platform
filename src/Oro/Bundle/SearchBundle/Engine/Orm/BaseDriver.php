@@ -4,10 +4,10 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
@@ -17,8 +17,10 @@ use Oro\Bundle\SearchBundle\Query\Query;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class BaseDriver
+abstract class BaseDriver implements DBALPersisterInterface
 {
+    use DBALPersisterDriverTrait;
+
     const EXPRESSION_TYPE_OR  = 'OR';
     const EXPRESSION_TYPE_AND = 'AND';
 
@@ -28,9 +30,16 @@ abstract class BaseDriver
     protected $entityName;
 
     /**
-     * @var EntityManager
+     * @deprecated Please use the entityManager property instead
+     *
+     * @var EntityManagerInterface
      */
     protected $em;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
 
     /**
      * @var array
@@ -38,11 +47,11 @@ abstract class BaseDriver
     protected $associationMappings;
 
     /**
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param ClassMetadata $class
      * @throws \InvalidArgumentException
      */
-    public function initRepo(EntityManager $em, ClassMetadata $class)
+    public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
         if (!is_a($class->name, AbstractItem::class, true)) {
             throw new \InvalidArgumentException(
@@ -51,8 +60,9 @@ abstract class BaseDriver
         }
 
         $this->associationMappings = $class->associationMappings;
-        $this->entityName = $class->name;
-        $this->em = $em;
+        $this->entityName          = $class->name;
+        $this->em                  = $em;
+        $this->entityManager       = $em;
     }
 
     /**
@@ -64,7 +74,7 @@ abstract class BaseDriver
      */
     public function createQueryBuilder($alias)
     {
-        return $this->em->createQueryBuilder()
+        return $this->entityManager->createQueryBuilder()
             ->select($alias)
             ->from($this->entityName, $alias);
     }
@@ -120,7 +130,7 @@ abstract class BaseDriver
     public function truncateIndex()
     {
         /** @var Connection $connection */
-        $connection = $this->em->getConnection();
+        $connection = $this->entityManager->getConnection();
         $dbPlatform = $connection->getDatabasePlatform();
         $connection->beginTransaction();
         try {
@@ -205,7 +215,7 @@ abstract class BaseDriver
     protected function truncateTable(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
     {
         /** @var ClassMetadata $metadata */
-        $metadata = $this->em->getClassMetadata($entityName);
+        $metadata = $this->entityManager->getClassMetadata($entityName);
         $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
         $connection->executeUpdate($query);
     }
@@ -222,12 +232,17 @@ abstract class BaseDriver
     }
 
     /**
+     * @param string $fieldName
      * @param array|string $fieldValue
-     *
      * @return array|string
      */
-    protected function filterTextFieldValue($fieldValue)
+    protected function filterTextFieldValue($fieldName, $fieldValue)
     {
+        // BB-7272: do not clear fields other than `all_text_*`
+        if (strpos($fieldName, 'all_text') !== 0) {
+            return $fieldValue;
+        }
+
         if (is_string($fieldValue)) {
             $fieldValue = Query::clearString($fieldValue);
         } elseif (is_array($fieldValue)) {
@@ -256,7 +271,7 @@ abstract class BaseDriver
             $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . $joinAlias . '.value LIKE :value' . $index;
+        return sprintf('%s LOWER(%s.value) LIKE LOWER(:value%s)', $stringQuery, $joinAlias, $index);
     }
 
     /**
@@ -276,7 +291,7 @@ abstract class BaseDriver
             $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . $joinAlias . '.value NOT LIKE :value' . $index;
+        return sprintf('%s LOWER(%s.value) NOT LIKE LOWER(:value%s)', $stringQuery, $joinAlias, $index);
     }
 
     /**

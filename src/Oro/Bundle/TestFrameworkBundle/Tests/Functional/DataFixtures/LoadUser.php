@@ -16,12 +16,12 @@ class LoadUser extends AbstractFixture implements InitialFixtureInterface
      */
     public function load(ObjectManager $manager)
     {
-        $organization = $manager->getRepository('OroUserBundle:User')
+        $user = $manager->getRepository('OroUserBundle:User')
             ->createQueryBuilder('t')
             ->orderBy('t.id')
             ->getQuery()
             ->setMaxResults(1)
             ->getSingleResult();
-        $this->addReference('user', $organization);
+        $this->addReference('user', $user);
     }
 }

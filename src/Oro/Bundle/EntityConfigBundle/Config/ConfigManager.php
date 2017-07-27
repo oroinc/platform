@@ -22,6 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
@@ -49,11 +50,8 @@ class ConfigManager
     /** @var ConfigModelManager */
     protected $modelManager;
 
-    /** @var ConfigProvider[] */
-    protected $providers = [];
-
-    /** @var PropertyConfigContainer[] */
-    protected $propertyConfigs = [];
+    /** @var ConfigProviderBag */
+    private $providerBag;
 
     /** @var array */
     protected $originalValues = [];
@@ -108,7 +106,7 @@ class ConfigManager
      */
     public function getProviders()
     {
-        return $this->providers;
+        return $this->providerBag->getProviders();
     }
 
     /**
@@ -118,15 +116,15 @@ class ConfigManager
      */
     public function getProvider($scope)
     {
-        return isset($this->providers[$scope]) ? $this->providers[$scope] : null;
+        return $this->providerBag->getProvider($scope);
     }
 
     /**
-     * @param ConfigProvider $provider
+     * @param ConfigProviderBag $providerBag
      */
-    public function addProvider(ConfigProvider $provider)
+    public function setProviderBag(ConfigProviderBag $providerBag)
     {
-        $this->providers[$provider->getScope()] = $provider;
+        $this->providerBag = $providerBag;
     }
 
     /**
@@ -738,7 +736,8 @@ class ConfigManager
                         : ConfigModel::MODE_DEFAULT;
                 }
                 $entityModel = $this->modelManager->createEntityModel($className, $mode);
-                foreach ($this->providers as $scope => $provider) {
+                $providers = $this->getProviders();
+                foreach ($providers as $scope => $provider) {
                     $configKey = $scope . '.' . $className;
                     $config    = new Config(
                         new EntityConfigId($scope, $className),
@@ -801,7 +800,8 @@ class ConfigManager
                     : ConfigModel::MODE_DEFAULT;
             }
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
-            foreach ($this->providers as $scope => $provider) {
+            $providers = $this->getProviders();
+            foreach ($providers as $scope => $provider) {
                 $configKey = $scope . '.' . $className . '.' . $fieldName;
                 $config    = new Config(
                     new FieldConfigId($scope, $className, $fieldName, $fieldType),
@@ -861,7 +861,8 @@ class ConfigManager
         $metadata = $this->getEntityMetadata($className);
         $entityModel = $this->createConfigEntityModel($className, $metadata->mode);
         $entityModel->setMode($metadata->mode);
-        foreach ($this->providers as $scope => $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $scope => $provider) {
             $config        = $provider->getConfig($className);
             $defaultValues = $this->getEntityDefaultValues($scope, $className, $metadata);
             $hasChanges    = $this->updateConfigValues($config, $defaultValues, $force);
@@ -900,7 +901,8 @@ class ConfigManager
         }
 
         $metadata = $this->getFieldMetadata($className, $fieldName);
-        foreach ($this->providers as $scope => $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $scope => $provider) {
             $config = $provider->getConfig($className, $fieldName);
             /** @var FieldConfigId $configId */
             $configId      = $config->getId();
@@ -956,7 +958,8 @@ class ConfigManager
                 Events::RENAME_FIELD,
                 new Event\RenameFieldEvent($className, $fieldName, $newFieldName, $this)
             );
-            foreach ($this->providers as $scope => $provider) {
+            $providers = $this->getProviders();
+            foreach ($providers as $scope => $provider) {
                 $cachedConfig = $this->cache->getFieldConfig($scope, $className, $fieldName, true);
                 if ($cachedConfig) {
                     $this->cache->saveConfig($this->changeConfigFieldName($cachedConfig, $newFieldName), true);
@@ -1256,15 +1259,7 @@ class ConfigManager
      */
     protected function getPropertyConfig($scope)
     {
-        if (isset($this->propertyConfigs[$scope])) {
-            return $this->propertyConfigs[$scope];
-        }
-
-        $propertyConfig = $this->providers[$scope]->getPropertyConfig();
-
-        $this->propertyConfigs[$scope] = $propertyConfig;
-
-        return $propertyConfig;
+        return $this->providerBag->getProvider($scope)->getPropertyConfig();
     }
 
     /**

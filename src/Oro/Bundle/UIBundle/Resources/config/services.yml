@@ -1,10 +1,13 @@
 parameters:
+    # override TWIG services
+    twig.class: Oro\Bundle\UIBundle\Twig\Environment
+    twig.cache_warmer.class: Oro\Bundle\UIBundle\Cache\TemplateCacheCacheWarmer
+
     oro_ui.placeholder.provider.class:                     Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
     oro_ui.placeholder.resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
     oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
 
     oro_ui.router.class:                                   Oro\Bundle\UIBundle\Route\Router
-    oro_ui.view.listener.class:                            Oro\Bundle\UIBundle\EventListener\TemplateListener
     oro_ui.format_converter.date_time.jquery_ui.class:     Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
 
     oro_ui.label_provider.action_button.class:             Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider
@@ -16,16 +19,12 @@ parameters:
 
     oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
 
-    oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
-
     oro_ui.config_settings.listener.class:                 Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
 
     oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
     oro_ui.user_agent_provider.class:                      Oro\Bundle\UIBundle\Provider\UserAgentProvider
 
-    ## Formatters
     oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
-    oro_ui.twig.extension.formatter.class:                 Oro\Bundle\UIBundle\Twig\FormatExtension
 
 services:
     # Placeholder services
@@ -34,7 +33,7 @@ services:
         arguments:
             - %oro_ui.placeholders%
             - '@oro_ui.placeholder.resolver'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@oro_featuretoggle.checker.feature_checker'
 
     oro_ui.placeholder.resolver:
@@ -48,8 +47,10 @@ services:
     # Other services
     oro_ui.router:
         class: %oro_ui.router.class%
-        scope: request
-        arguments:  ['@request', '@router', '@oro_security.security_facade']
+        arguments:
+            - '@request_stack'
+            - '@router'
+            - '@security.authorization_checker'
 
     oro_ui.dynamic_asset_version_manager:
         class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
@@ -63,14 +64,14 @@ services:
             - [ setNamespace, [ 'oro_dynamic_asset_version' ] ]
 
     oro_ui.view.listener:
-        class: %oro_ui.view.listener.class%
+        class: Oro\Bundle\UIBundle\EventListener\TemplateListener
         arguments:
             - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:
-        class: %oro_ui.view.content_provider.listener.class%
+        class: Oro\Bundle\UIBundle\EventListener\ContentProviderListener
         arguments:
             - '@service_container'
         tags:
@@ -79,7 +80,7 @@ services:
     oro_ui.config_settings.listener:
         class: %oro_ui.config_settings.listener.class%
         tags:
-            - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onBeforeSave }
+            - { name: kernel.event_listener, event: oro_config.settings_before_save.oro_ui.application_url, method: onBeforeSave }
 
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
@@ -139,18 +140,63 @@ services:
         arguments:
             - '@request_stack'
 
-    ## Formatters
     oro_ui.formatter:
         class: %oro_ui.formatter.class%
-
-    oro_ui.twig.extension.formatter:
-        class: %oro_ui.twig.extension.formatter.class%
-        arguments:
-            - '@oro_ui.formatter'
-        tags:
-            - { name: twig.extension }
 
     oro_ui.config_extension.feature:
         class: 'Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension'
         tags:
             - { name: oro_feature.config_extension }
+
+    twig.extension.text:
+        class: Twig_Extensions_Extension_Text
+        public: false
+        tags:
+           - { name: twig.extension }
+
+    oro_ui.twig.extension.formatter:
+        class: Oro\Bundle\UIBundle\Twig\FormatExtension
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.tab_extension:
+        class: Oro\Bundle\UIBundle\Twig\TabExtension
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.html_tag:
+        class: Oro\Bundle\UIBundle\Twig\HtmlTagExtension
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.placeholder_extension:
+        class: Oro\Bundle\UIBundle\Twig\PlaceholderExtension
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.ui_extension:
+        class: Oro\Bundle\UIBundle\Twig\UiExtension
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.validator.move_to_child:
+        class: 'Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator'
+        arguments:
+            - '@translator'
+        tags:
+            - { name: validator.constraint_validator }

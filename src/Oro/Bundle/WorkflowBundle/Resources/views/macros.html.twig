@@ -1,16 +1,23 @@
 {% macro renderTransitionButton(workflow, transition, workflowItem, transitionData, onlyLink, noIcon, noIconText, aClass) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
 
-    {% if transition.displayType == 'dialog' and (transitionData['dialog-url'] is not defined or not transitionData['dialog-url']) and transition.hasForm() %}
-        {% set transitionData = transitionData|merge({
-            'dialog-url': path(
-                'oro_workflow_widget_transition_form',
-                {
-                    workflowItemId: workflowItem.id,
-                    transitionName: transition.name
-                }
-            )
-        }) %}
+    {% if transition.displayType == 'dialog' and transition.hasForm() %}
+        {% if transitionData['dialog-url'] is not defined or not transitionData['dialog-url'] %}
+            {% set transitionData = transitionData|merge({
+                'dialog-url': path(
+                    'oro_workflow_widget_transition_form',
+                    {
+                        workflowItemId: workflowItem.id,
+                        transitionName: transition.name
+                    }
+                )
+            }) %}
+        {% endif %}
+        {% if transitionData['jsDialogWidget'] is not defined or not transitionData['jsDialogWidget'] %}
+            {% set transitionData = transitionData|merge({
+                'jsDialogWidget': constant('Oro\\Bundle\\WorkflowBundle\\Button\\AbstractTransitionButton::TRANSITION_JS_DIALOG_WIDGET')
+            }) %}
+        {% endif %}
     {% endif %}
 
     {% if transitionData['transition-url'] is not defined or not transitionData['transition-url'] %}
@@ -48,12 +55,31 @@
 
     {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
         {% set data = data|merge({
-            'data-dialog-options': transition.frontendOptions.dialog|json_encode|raw
+            'dialog-options': transition.frontendOptions.dialog|json_encode|raw
         }) %}
     {% endif %}
 
-    {% set label = transition.label|trans({},'workflows') %}
+    {% set label = transition.buttonLabel|trans({},'workflows') %}
+    {% set title = transition.buttonTitle|trans({},'workflows') %}
 
+    {% if transition.frontendOptions.message is defined and transition.frontendOptions.message.content is defined %}
+        {% set frontendMessage = transition.frontendOptions.message %}
+
+        {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
+        {% if transitionMessage and transitionMessage != frontendMessage.content %}
+            {# if no translation for message then do not show message #}
+            {% set message = frontendMessage|merge({
+                content: transitionMessage|nl2br,
+                title: frontendMessage.title|default(title),
+            }) %}
+        {% endif %}
+    {% endif %}
+    
+    {% set data = data|merge({
+        message: (message|default({}))|json_encode,
+        'transition-label': label
+    }) %}
+    
     {% set class %}
         {{ aClass }}
         icons-holder-text
@@ -70,7 +96,7 @@
         'path': 'javascript:void(0);',
         'id': 'transition-%s-%s'|format(workflow.name, transition.name),
         'iCss': iCss,
-        'title': label,
+        'title': title,
         'class': class,
         'data': data,
         'label': label,

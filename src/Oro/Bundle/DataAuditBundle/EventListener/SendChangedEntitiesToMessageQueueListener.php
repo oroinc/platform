@@ -17,6 +17,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -71,31 +72,45 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     private $allCollectionUpdates;
 
     /**
+     * @var \SplObjectStorage
+     */
+    private $tokenStorage;
+
+    /**
      * @var boolean
      */
     private $enabled = true;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param MessageProducerInterface $messageProducer
      * @param TokenStorageInterface $securityTokenStorage
      * @param EntityToEntityChangeArrayConverter $entityToArrayConverter
      * @param AuditConfigProvider $configProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $securityTokenStorage,
         EntityToEntityChangeArrayConverter $entityToArrayConverter,
-        AuditConfigProvider $configProvider
+        AuditConfigProvider $configProvider,
+        LoggerInterface $logger
     ) {
         $this->messageProducer = $messageProducer;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->entityToArrayConverter = $entityToArrayConverter;
         $this->configProvider = $configProvider;
+        $this->logger = $logger;
 
         $this->allInsertions = new \SplObjectStorage;
         $this->allUpdates = new \SplObjectStorage;
         $this->allDeletions = new \SplObjectStorage;
         $this->allCollectionUpdates = new \SplObjectStorage;
+        $this->tokenStorage = new \SplObjectStorage;
     }
 
     /**
@@ -121,6 +136,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->findAuditableUpdates($em);
         $this->findAuditableDeletions($em);
         $this->findAuditableCollectionUpdates($em);
+
+        if ($token = $this->securityTokenStorage->getToken()) {
+            $this->tokenStorage[$em] = $token;
+        }
     }
 
     private function emHasChanges($em)
@@ -175,7 +194,8 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 'collections_updated' => [],
             ];
 
-            $securityToken = $this->securityTokenStorage->getToken();
+            //we need this solution as the token can be cleared by the mq extension
+            $securityToken = $this->getSecurityToken($em);
             if (null !== $securityToken) {
                 $user = $securityToken->getUser();
                 if ($user instanceof AbstractUser) {
@@ -188,6 +208,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
                 if ($securityToken->hasAttribute('IMPERSONATION')) {
                     $body['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
+                }
+
+                if ($securityToken->hasAttribute('owner_description')) {
+                    $body['owner_description'] = $securityToken->getAttribute('owner_description');
                 }
             }
             if (empty($body = $this->processMessageBody($em, $body))) {
@@ -203,7 +227,13 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $this->allUpdates->detach($em);
             $this->allDeletions->detach($em);
             $this->allCollectionUpdates->detach($em);
+            $this->tokenStorage->detach($em);
         }
+    }
+
+    private function getSecurityToken(EntityManager $em)
+    {
+        return $this->tokenStorage->contains($em) ? $this->tokenStorage[$em] : $this->securityTokenStorage->getToken();
     }
 
     /**
@@ -222,7 +252,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $insertions[$entity] = $uow->getEntityChangeSet($entity);
         }
 
-        /** it made for issue with ImportExportTagsSubscriber::postFlush (in this method run flush) */
         if (! $this->allInsertions->contains($em)) {
             $this->allInsertions[$em] = $insertions;
         } else {
@@ -368,7 +397,18 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $updates = [];
         foreach ($this->allUpdates[$em] as $entity) {
             $changeSet = $this->allUpdates[$em][$entity];
-            $updates[] = $this->convertEntityToArray($em, $entity, $changeSet);
+            $update = $this->convertEntityToArray($em, $entity, $changeSet);
+            if ($update['entity_id']) {
+                $updates[] = $this->convertEntityToArray($em, $entity, $changeSet);
+            } else {
+                $this->logger->error(
+                    sprintf(
+                        'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
+                        $update['entity_class']
+                    ),
+                    ['entity' => $entity, 'update' => $update]
+                );
+            }
         }
 
         return $updates;

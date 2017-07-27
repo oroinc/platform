@@ -40,7 +40,7 @@ operations:
     UPDATE:
         extends: CRUD_ACTION
         acl_resource: [EDIT, $.data]
-        order: 10
+        order: 510
         for_all_entities: true
         for_all_datagrids: true
         groups:
@@ -62,7 +62,7 @@ operations:
     DELETE:
         extends: CRUD_ACTION
         acl_resource: [DELETE, $.data]
-        order: 20
+        order: 520
         for_all_entities: true
         for_all_datagrids: true
         groups:
@@ -80,6 +80,8 @@ operations:
             confirmation:
                 title: oro.action.delete_entity
                 message: oro.action.delete_confirm
+                okText: oro.action.button.delete
+                component: oroui/js/delete-confirmation
                 message_parameters:
                     entityLabel: $.entityLabel
         button_options:

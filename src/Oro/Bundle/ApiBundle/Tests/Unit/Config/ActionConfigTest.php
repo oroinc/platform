@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -56,21 +57,25 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         $config = new ActionConfig();
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, null);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
         $this->assertEquals([], $config->toArray());
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, false);
         $this->assertTrue($config->has($attrName));
         $this->assertFalse($config->get($attrName));
         $this->assertEquals([$attrName => false], $config->toArray());
+        $this->assertEquals([$attrName], $config->keys());
 
         $config->remove($attrName);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
-        $this->assertEquals([], $config->toArray());
+        $this->assertSame([], $config->toArray());
+        $this->assertSame([], $config->keys());
     }
 
     public function testDescription()
@@ -298,6 +303,24 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testSetFormOption()
+    {
+        $config = new ActionConfig();
+
+        $config->setFormOption('option1', 'value1');
+        $config->setFormOption('option2', 'value2');
+        $this->assertEquals(
+            ['option1' => 'value1', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
+
+        $config->setFormOption('option1', 'newValue');
+        $this->assertEquals(
+            ['option1' => 'newValue', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
+    }
+
     public function testAddFormConstraint()
     {
         $config = new ActionConfig();
@@ -307,5 +330,86 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
 
         $config->addFormConstraint(new NotBlank());
         $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+    }
+
+    public function testFormEventSubscribers()
+    {
+        $config = new ActionConfig();
+        $this->assertNull($config->getFormEventSubscribers());
+
+        $config->setFormEventSubscribers(['subscriber1']);
+        $this->assertEquals(['subscriber1'], $config->getFormEventSubscribers());
+        $this->assertEquals(['form_event_subscriber' => ['subscriber1']], $config->toArray());
+
+        $config->setFormEventSubscribers([]);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testSetNullToFormEventSubscribers()
+    {
+        $config = new ActionConfig();
+        $config->setFormEventSubscribers(['subscriber1']);
+
+        $config->setFormEventSubscribers(null);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    /**
+     * @expectedException \TypeError
+     */
+    public function testSetInvalidValueToFormEventSubscribers()
+    {
+        $config = new ActionConfig();
+        $config->setFormEventSubscribers('subscriber1');
+    }
+
+    public function testFields()
+    {
+        $config = new ActionConfig();
+        $this->assertFalse($config->hasFields());
+        $this->assertEquals([], $config->getFields());
+        $this->assertTrue($config->isEmpty());
+        $this->assertEquals([], $config->toArray());
+
+        $field = $config->addField('field');
+        $this->assertTrue($config->hasFields());
+        $this->assertTrue($config->hasField('field'));
+        $this->assertEquals(['field' => $field], $config->getFields());
+        $this->assertSame($field, $config->getField('field'));
+        $this->assertFalse($config->isEmpty());
+        $this->assertEquals(['fields' => ['field' => null]], $config->toArray());
+
+        $config->removeField('field');
+        $this->assertFalse($config->hasFields());
+        $this->assertFalse($config->hasField('field'));
+        $this->assertEquals([], $config->getFields());
+        $this->assertTrue($config->isEmpty());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testGetOrAddField()
+    {
+        $config = new ActionConfig();
+
+        $field = $config->getOrAddField('field');
+        $this->assertSame($field, $config->getField('field'));
+
+        $field1 = $config->getOrAddField('field');
+        $this->assertSame($field, $field1);
+    }
+
+    public function testAddField()
+    {
+        $config = new ActionConfig();
+
+        $field = $config->addField('field');
+        $this->assertSame($field, $config->getField('field'));
+
+        $field1 = new ActionFieldConfig();
+        $field1 = $config->addField('field', $field1);
+        $this->assertSame($field1, $config->getField('field'));
+        $this->assertNotSame($field, $field1);
     }
 }

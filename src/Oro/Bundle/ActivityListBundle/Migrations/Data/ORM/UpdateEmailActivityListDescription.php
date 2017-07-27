@@ -11,7 +11,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
 class UpdateEmailActivityListDescription extends AbstractFixture implements ContainerAwareInterface
 {
@@ -45,7 +45,7 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
         /** @var QueryBuilder $activityListBuilder */
         $activityListBuilder = $manager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('e');
 
-        $iterator = new BufferedQueryResultIterator($activityListBuilder);
+        $iterator = new BufferedIdentityQueryResultIterator($activityListBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);
 
         $itemsCount = 0;

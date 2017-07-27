@@ -2,7 +2,6 @@ parameters:
     oro_search.index.class:                               Oro\Bundle\SearchBundle\Engine\Indexer
     oro_search.security_provider.class:                   Oro\Bundle\SearchBundle\Security\SecurityProvider
     oro_search.index_listener.class:                      Oro\Bundle\SearchBundle\EventListener\IndexListener
-    oro_search.twig_extension.class:                      Oro\Bundle\SearchBundle\Twig\OroSearchExtension
     oro_search.mapper.class:                              Oro\Bundle\SearchBundle\Engine\ObjectMapper
     oro_search.provider.result_statistics_provider.class: Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider
     oro_search.formatter.result_formatter.class:          Oro\Bundle\SearchBundle\Formatter\ResultFormatter
@@ -51,7 +50,7 @@ services:
         class:                        %oro_search.security_provider.class%
         public:                       false
         arguments:
-            - "@oro_security.security_facade"
+            - "@security.authorization_checker"
             - "@oro_security.entity_security_metadata_provider"
 
     oro_search.index_listener:
@@ -59,6 +58,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.async.indexer'
+            - '@property_accessor'
         calls:
             - [setEntitiesConfig, [%oro_search.entities_config%]]
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
@@ -68,7 +68,8 @@ services:
             - { name: doctrine.event_listener, event: onClear }
 
     oro_search.twig.search_extension:
-        class:                        %oro_search.twig_extension.class%
+        class: Oro\Bundle\SearchBundle\Twig\OroSearchExtension
+        public: false
         tags:
             - { name: twig.extension }
 
@@ -185,12 +186,13 @@ services:
 
     oro_search.entity.repository.search_index:
         class: %oro_search.entity.repository.search_index.class%
-        factory: ["@doctrine", getRepository]
+        parent: oro_entity.abstract_repository
         arguments:
             - %oro_search.entity.item.class%
             - 'search'
         calls:
             - [setRegistry,  ['@doctrine']]
+            - [setDriversClasses, [%oro_search.drivers%]]
         lazy: true
 
     oro_search.cache.search_mapping_cache:
@@ -249,6 +251,7 @@ services:
 
     oro_search.async.indexer:
         class: 'Oro\Bundle\SearchBundle\Async\Indexer'
+        public: false
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_entity.doctrine_helper'
@@ -271,3 +274,12 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_search_type_string_filter }
+
+    oro_search.migration.demo_data_fixtures_listener.reindex:
+        class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataFixturesListener
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+            - '@oro_search.search.engine.indexer'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }

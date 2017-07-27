@@ -85,7 +85,7 @@ In case you have one form which saves several different entities at once (e.g. c
 ```
 After that, validation for sub-entinty works only if some of fields is not blank. Otherwise it ignores all validation rules for fields elements of sub-entity.
 
-###Override of optional validation logic
+### Override of optional validation logic
 In case if you want to customize "optional validation group" behaviour you can override a handler which is responsible for
 handle field changes in specific optional validation group. In this case you need:
 1) add custom handler to requirejs.yml

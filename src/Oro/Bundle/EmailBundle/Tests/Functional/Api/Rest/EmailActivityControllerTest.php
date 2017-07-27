@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 
+use Oro\Bundle\EmailBundle\Tests\Functional\EmailFeatureTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class EmailActivityControllerTest extends WebTestCase
 {
+    use EmailFeatureTrait;
+
     /** @var string */
     protected $baseUrl;
 
@@ -21,6 +21,8 @@ class EmailActivityControllerTest extends WebTestCase
             ]
         );
         $this->baseUrl = $this->getUrl('oro_api_get_email_activity_relations_by_filters');
+
+        $this->enableEmailFeature();
     }
 
     public function testGetEntities()

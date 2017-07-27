@@ -1,3 +1,2 @@
 bundles:
-    - Knp\Bundle\GaufretteBundle\KnpGaufretteBundle
     - { name: Oro\Bundle\AttachmentBundle\OroAttachmentBundle, priority: -86 }

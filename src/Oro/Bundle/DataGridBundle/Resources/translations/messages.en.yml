@@ -1,9 +1,10 @@
 "Item deleted": "Item deleted"
 oro_datagrid:
     no_data_hint %entityHint%: "No %entityHint% exists."
-    not_found_hint %entityHint%:  "No %entityHint% was found to match your search. Try modifying your search criteria ..."
+    not_found_hint %entityHint%:  "No %entityHint% were found to match your search. Try modifying your search criteria ..."
     label_add_filter: Manage filters
     label_loading_mask: "Loading . . ."
+    label_reset_button: "Reset Filter"
 oro:
     datagrid:
         gridview:
@@ -19,11 +20,12 @@ oro:
             organization.label: Organization
             sorters_data.label: Sorters
             type.label: Type
+            discr_type.label: Discriminator Type
             shared_by: %name% (Shared by %owner%)
             columns_data.label: Columns data
             appearance_type.label: Appearance type
             appearance_data.label: Appearance data
-            duplicate.label: Duplicate %entity%
+            duplicate.label: Duplicated %entity%
         appearance:
             grid: Grid
             board: Kanban Board
@@ -31,11 +33,15 @@ oro:
             label: Page
             totalPages: of %totalPages%
             totalRecords: Total of %totalRecords% records
+            prev: Prev
+            next: Next
         pagesize:
             label: View per page
+            labelShort: Per page
     grid:
         mass_action:
             label: Mass Actions
+            button_label: "..."
             selected_rows: Selected Rows
             confirm_title: Mass Action Confirmation
             confirm_content: Are you sure you want to do this?
@@ -47,6 +53,8 @@ oro:
                 confirm_title: Mass Delete Confirmation
                 confirm_content: Are you sure you want to delete these items?
                 success_message: "{0} No entities were deleted|{1} One entity was deleted|]1,Inf[ %count% entities were deleted"
+            edit:
+                success_message: "{0} No entities were edited|{1} One entity was edited|]1,Inf[ %count% entities were edited"
         datagrid.page_size.all: All
         export.csv: CSV
         export.xlsx: XLSX
@@ -58,11 +66,8 @@ oro:
             delete: Delete
             clone: Clone
             gridview_create_public:
-                label: Share grid view
-                description: Share custom grid views with other users
-            gridview_edit_public:
-                label: Unshare grid view
-                description: Unshare custom grid views
+                label: Share data view
+                description: Share custom data views with other users
             gridview_export:
                 label: Export grid view
                 description: Export data from Grid view

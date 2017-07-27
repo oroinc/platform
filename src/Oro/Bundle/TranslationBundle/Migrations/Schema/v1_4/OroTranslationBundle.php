@@ -19,6 +19,9 @@ class OroTranslationBundle implements Migration, DatabasePlatformAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $queries->addQuery(new MigrateTranslationKeyPrefixQuery());
+
+        //Update all unaffected by migration query translation keys
         $query = 'UPDATE oro_translation_key '
             . 'SET %1$s = CONCAT(\'oro\', SUBSTR(%1$s, 7)) '
             . 'WHERE %1$s LIKE \'%2$s\' OR %1$s LIKE \'%3$s\'';

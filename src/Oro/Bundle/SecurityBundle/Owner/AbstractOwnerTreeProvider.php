@@ -3,87 +3,45 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 
-use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
-
-abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, OwnerTreeProviderInterface
+abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
 {
     const CACHE_KEY = 'data';
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    /** @var DatabaseChecker */
+    private $databaseChecker;
+
+    /** @var CacheProvider */
+    private $cache;
+
+    /** @var OwnerTreeInterface */
+    private $tree;
 
     /**
-     * @var OwnerTreeInterface
+     * @param DatabaseChecker $databaseChecker
+     * @param CacheProvider   $cache
      */
-    protected $tree;
-
-    /**
-     * @return CacheProvider
-     */
-    abstract public function getCache();
-
-    /**
-     * @return OwnerTreeInterface
-     *
-     * @deprecated since 1.10. Use createTreeObject method instead
-     */
-    protected function getTreeData()
+    public function __construct(DatabaseChecker $databaseChecker, CacheProvider $cache)
     {
-        return null;
+        $this->databaseChecker = $databaseChecker;
+        $this->cache = $cache;
     }
 
     /**
-     * @param OwnerTreeInterface $tree
+     * @param OwnerTreeBuilderInterface $tree
      */
-    abstract protected function fillTree(OwnerTreeInterface $tree);
+    abstract protected function fillTree(OwnerTreeBuilderInterface $tree);
 
     /**
-     * @return MetadataProviderInterface
-     */
-    abstract protected function getOwnershipMetadataProvider();
-
-    /**
-     * Returns empty instance of OwnerTree object
+     * Returns empty instance of the owner tree builder
      *
-     * @return OwnerTreeInterface
+     * @return OwnerTreeBuilderInterface
      */
-    protected function createTreeObject()
+    protected function createTreeBuilder()
     {
-        $tree = $this->getTreeData();
-        if ($tree) {
-            return $tree;
-        }
-
         return new OwnerTree();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
-    {
-        if (!$this->container) {
-            throw new \InvalidArgumentException('ContainerInterface is not injected');
-        }
-
-        return $this->container;
     }
 
     /**
@@ -91,7 +49,7 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
      */
     public function clear()
     {
-        $this->getCache()->deleteAll();
+        $this->cache->deleteAll();
     }
 
     /**
@@ -122,54 +80,29 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
             return;
         }
 
-        $cache = $this->getCache();
-        if (null === $cache) {
+        if (null === $this->cache) {
             $this->tree = $this->loadTree();
         } else {
-            $this->tree = $cache->fetch(self::CACHE_KEY);
+            $this->tree = $this->cache->fetch(self::CACHE_KEY);
             if (!$this->tree) {
                 $this->tree = $this->loadTree();
-                $cache->save(self::CACHE_KEY, $this->tree);
+                $this->cache->save(self::CACHE_KEY, $this->tree);
             }
         }
     }
 
     /**
-     * Loads tree data and save them in cache
+     * Loads tree data
      *
      * @return OwnerTreeInterface
      */
     protected function loadTree()
     {
-        $tree = $this->createTreeObject();
-        if ($this->checkDatabase()) {
-            $this->fillTree($tree);
+        $treeBuilder = $this->createTreeBuilder();
+        if ($this->databaseChecker->checkDatabase()) {
+            $this->fillTree($treeBuilder);
         }
 
-        return $tree;
-    }
-
-    /**
-     * Check if user table exists in db
-     *
-     * @return bool
-     */
-    protected function checkDatabase()
-    {
-        $className = $this->getOwnershipMetadataProvider()->getBasicLevelClass();
-
-        return SafeDatabaseChecker::tablesExist(
-            $this->getManagerForClass($className)->getConnection(),
-            SafeDatabaseChecker::getTableName($this->getContainer()->get('doctrine'), $className)
-        );
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectManager|EntityManager
-     */
-    protected function getManagerForClass($className)
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+        return $treeBuilder->getTree();
     }
 }

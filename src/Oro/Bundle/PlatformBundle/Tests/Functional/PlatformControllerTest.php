@@ -4,9 +4,6 @@ namespace Oro\Bundle\PlatformBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class PlatformControllerTest extends WebTestCase
 {
     protected function setUp()

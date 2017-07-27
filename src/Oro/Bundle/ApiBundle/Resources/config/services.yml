@@ -1,3 +1,6 @@
+parameters:
+    nelmio_api_doc.twig.extension.extra_markdown.class: Oro\Bundle\ApiBundle\Twig\MarkdownExtension
+
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -296,6 +299,7 @@ services:
             - '@oro_api.entity_serializer.field_accessor'
             - '@oro_api.entity_serializer.config_normalizer'
             - '@oro_api.entity_serializer.data_normalizer'
+            - '@oro_api.entity_serializer.config_converter'
         calls:
             - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
 
@@ -323,6 +327,10 @@ services:
 
     oro_api.entity_serializer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Util\ConfigNormalizer
+        public: false
+
+    oro_api.entity_serializer.config_converter:
+        class: Oro\Bundle\ApiBundle\Util\ConfigConverter
         public: false
 
     oro_api.entity_serializer.data_normalizer:
@@ -355,9 +363,6 @@ services:
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'
                 - '\OutOfBoundsException'
-                - 'Oro\Bundle\ApiBundle\Exception\ExceptionInterface'
-                - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
-                - 'Symfony\Component\PropertyAccess\Exception\ExceptionInterface'
                 - 'Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
@@ -520,6 +525,16 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
         arguments:
             - '@file_locator'
+
+    oro_api.request_expression_matcher:
+        class: Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher
+        public: false
+
+    oro_api.request_depended_text_processor:
+        class: Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor
+        public: false
+        arguments:
+            - '@oro_api.request_expression_matcher'
 
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory

@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
+use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
@@ -17,15 +17,17 @@ class OrmTranslationLoader implements LoaderInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var bool|null */
-    protected $dbCheck;
+    /** @var DatabaseChecker */
+    protected $databaseChecker;
 
     /**
      * @param ManagerRegistry $doctrine
+     * @param DatabaseChecker $databaseChecker
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, DatabaseChecker $databaseChecker)
     {
         $this->doctrine = $doctrine;
+        $this->databaseChecker = $databaseChecker;
     }
 
     /**
@@ -56,14 +58,7 @@ class OrmTranslationLoader implements LoaderInterface
      */
     protected function checkDatabase()
     {
-        if (null === $this->dbCheck) {
-            $this->dbCheck = SafeDatabaseChecker::tablesExist(
-                $this->getEntityManager()->getConnection(),
-                SafeDatabaseChecker::getTableName($this->doctrine, Translation::class)
-            );
-        }
-
-        return $this->dbCheck;
+        return $this->databaseChecker->checkDatabase();
     }
 
     /**

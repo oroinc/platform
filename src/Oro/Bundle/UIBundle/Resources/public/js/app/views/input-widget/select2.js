@@ -6,6 +6,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
     // current version: http://select2.github.io/select2/
     // last version: http://select2.github.io/examples.html
     require('jquery.select2');
@@ -25,6 +26,10 @@ define(function(require) {
                 }
                 return className.indexOf(containerCssClass) === 0;
             }
+        },
+
+        events: {
+            'select2-opening': 'disableKeyboard'
         },
 
         widgetFunctionName: 'select2',
@@ -99,8 +104,20 @@ define(function(require) {
             return this.applyWidgetFunction('search', arguments);
         },
 
-        disable: function() {
-            return this.applyWidgetFunction('enable', arguments);
+        disable: function(disable) {
+            return this.applyWidgetFunction('enable', [!disable]);
+        },
+
+        disableKeyboard: function() {
+            var select = this.$el;
+            var selectContainer = this.container();
+            var isSearchHidden = selectContainer.find('.select2-search-hidden').length;
+            var minimumResultsForSearch = this.initializeOptions.minimumResultsForSearch;
+            var optionsLength = select.find('option').length;
+
+            if (tools.isMobile() && (isSearchHidden || optionsLength < minimumResultsForSearch)) {
+                selectContainer.find('.select2-search, .select2-focusser').hide();
+            }
         }
     });
 

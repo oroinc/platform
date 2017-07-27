@@ -13,9 +13,9 @@ Table of Contents
  - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure nested object](#configure-nested-object)
  - [Configure nested association](#configure-nested-association)
- - [Turn on Extended Many-To-One Associations](#turn-on-extended-many-to-one-associations)
- - [Turn on Extended Many-To-Many Associations](#turn-on-extended-many-to-many-associations)
- - [Turn on Extended Multiple Many-To-One Associations](#turn-on-extended-multiple-many-to-one-associations)
+ - [Configure Extended Many-To-One Association](#configure-extended-many-to-one-association)
+ - [Configure Extended Many-To-Many Association](#configure-extended-many-to-many-association)
+ - [Configure Extended Multiple Many-To-One Association](#configure-extended-multiple-many-to-one-association)
 
 
 Turn on API for entity
@@ -64,10 +64,17 @@ By default, the following permissions are used to restrict access to an entity i
 
 | Action | Permission |
 | --- | --- |
-| get | VIEW |
-| get_list | VIEW |
-| delete | DELETE |
-| delete_list | DELETE |
+| [get](./actions.md#get-action) | VIEW |
+| [get_list](./actions.md#get_list-action) | VIEW |
+| [delete](./actions.md#delete-action) | DELETE |
+| [delete_list](./actions.md#delete_list-action) | DELETE |
+| [create](./actions.md#create-action) | CREATE and VIEW |
+| [update](./actions.md#update-action) | EDIT and VIEW |
+| [get_subresource](./actions.md#get_subresource-action) | VIEW |
+| [get_relationship](./actions.md#get_relationship-action) | VIEW |
+| [update_relationship](./actions.md#update_relationship-action) | EDIT and VIEW |
+| [add_relationship](./actions.md#add_relationship-action) | EDIT and VIEW |
+| [delete_relationship](./actions.md#delete_relationship-action) | EDIT and VIEW |
 
 In case if you want to change permission or disable access checks for some action, you can use the `acl_resource` option of `actions` configuration section.
 
@@ -122,7 +129,7 @@ api:
         Acme\Bundle\ProductBundle\Product:
             actions:
                 delete:
-                    excluded: true
+                    exclude: true
 ```
 
 Also, you can use short syntax:
@@ -265,8 +272,8 @@ Here is an example how the nested association looks in JSON.API:
 }
 ```
 
-Turn on Extended Many-To-One Associations
------------------------------------------
+Configure Extended Many-To-One Association
+------------------------------------------
 
 For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
 
@@ -290,8 +297,8 @@ The `data_type` parameter has format: `association:relationType:associationKind`
  - `relationType` part should have 'manyToOne' value for extended Many-To-One association;
  - `associationKind` - optional part. The association kind.
 
-Turn on Extended Many-To-Many Associations
-------------------------------------------
+Configure Extended Many-To-Many Association
+-------------------------------------------
 
 For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
 
@@ -325,8 +332,8 @@ The `data_type` parameter has format: `association:relationType:associationKind`
  - `relationType` part should have 'manyToMany' value for extended Many-To-Many association;
  - `associationKind` - optional part. The association kind.
 
-Turn on Extended Multiple Many-To-One Associations
---------------------------------------------------
+Configure Extended Multiple Many-To-One Association
+---------------------------------------------------
 
 For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
 

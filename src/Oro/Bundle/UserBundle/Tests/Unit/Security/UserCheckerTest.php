@@ -3,58 +3,36 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Security\UserChecker;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class UserCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var UserChecker|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var UserChecker|\PHPUnit_Framework_MockObject_MockObject */
     protected $userChecker;
 
-    /**
-     * @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityContextLink;
+    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
 
-    /**
-     * @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $flashBag;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $service;
 
     protected function setUp()
     {
-        $this->service = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->flashBag = $this->createMock(FlashBagInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->securityContextLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityContextLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->service);
-
-        $this->flashBag = $this->createMock('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
-
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
 
-        $this->userChecker = new UserChecker($this->securityContextLink, $this->flashBag, $translator);
+        $this->userChecker = new UserChecker($this->tokenStorage, $this->flashBag, $translator);
     }
 
     /**
@@ -67,7 +45,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckPreAuth(UserInterface $user, $getTokenCalls, $token, $exceptionThrown)
     {
-        $this->service->expects($this->exactly($getTokenCalls))
+        $this->tokenStorage->expects($this->exactly($getTokenCalls))
             ->method('getToken')
             ->willReturn($token);
 
@@ -81,6 +59,22 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->userChecker->checkPreAuth($user);
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param boolean       $exceptionThrown
+     *
+     * @dataProvider checkPostAuthProvider
+     */
+    public function testCheckPostAuth(UserInterface $user, $exceptionThrown)
+    {
+        if ($exceptionThrown) {
+            $this->expectException('Oro\Bundle\UserBundle\Exception\OrganizationException');
+            $this->expectExceptionMessage('');
+        }
+
+        $this->userChecker->checkPostAuth($user);
     }
 
     public function checkPreAuthProvider()
@@ -132,6 +126,38 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
             'user' => $user4,
             'getTokenCalls' => 1,
             'token' => 'not_null',
+            'exceptionThrown' => true,
+        ];
+
+        return $data;
+    }
+
+    public function checkPostAuthProvider()
+    {
+        $data = [];
+
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $data['invalid_user_class'] = [
+            'user' => $user,
+            'exceptionThrown' => false,
+        ];
+
+        $organization = new OrganizationStub();
+        $organization->setEnabled(true);
+        $user1 = new User();
+        $user1->addOrganization($organization);
+        $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $user1->setAuthStatus($authStatus);
+        $data['with_organization'] = [
+            'user' => $user1,
+            'exceptionThrown' => false,
+        ];
+
+        $user2 = new User();
+        $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $user2->setAuthStatus($authStatus);
+        $data['without_organization'] = [
+            'user' => $user2,
             'exceptionThrown' => true,
         ];
 

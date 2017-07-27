@@ -4,9 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class EmailActivitySuggestionControllerTest extends WebTestCase
 {
     protected function setUp()

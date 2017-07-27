@@ -19,6 +19,7 @@ use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
@@ -82,6 +83,7 @@ class User extends ExtendUser implements
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,
+    OrganizationAwareUserInterface,
     AdvancedApiUserInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
@@ -417,6 +419,24 @@ class User extends ExtendUser implements
      * Organization that user logged in
      */
     protected $currentOrganization;
+
+    /**
+     * @var Collection|Organization[]
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="users")
+     * @ORM\JoinTable(name="oro_user_organization",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $organizations;
 
     public function __construct()
     {
@@ -816,14 +836,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * @param int $id
      *
      * @return User
@@ -1171,5 +1183,73 @@ class User extends ExtendUser implements
     public function getFullName()
     {
         return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
+    }
+
+    /**
+     * Add Organization to User
+     *
+     * @param Organization $organization
+     * @return AbstractUser
+     */
+    public function addOrganization(Organization $organization)
+    {
+        if (!$this->hasOrganization($organization)) {
+            $this->getOrganizations()->add($organization);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Whether user in specified organization
+     *
+     * @param Organization $organization
+     * @return bool
+     */
+    public function hasOrganization(Organization $organization)
+    {
+        return $this->getOrganizations()->contains($organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganizations($onlyActive = false)
+    {
+        if ($onlyActive) {
+            return $this->organizations->filter(
+                function (Organization $organization) {
+                    return $organization->isEnabled() === true;
+                }
+            );
+        }
+
+        return $this->organizations;
+    }
+
+    /**
+     * @param Collection $organizations
+     * @return AbstractUser
+     */
+    public function setOrganizations(Collection $organizations)
+    {
+        $this->organizations = $organizations;
+
+        return $this;
+    }
+
+    /**
+     * Delete Organization from User
+     *
+     * @param Organization $organization
+     * @return AbstractUser
+     */
+    public function removeOrganization(Organization $organization)
+    {
+        if ($this->hasOrganization($organization)) {
+            $this->getOrganizations()->removeElement($organization);
+        }
+
+        return $this;
     }
 }

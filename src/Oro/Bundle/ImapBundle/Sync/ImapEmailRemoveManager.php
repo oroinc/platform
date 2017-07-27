@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
@@ -57,7 +57,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
                     ->setParameter('uids', $existingUids);
             }
 
-            $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
+            $staleImapEmails = (new BufferedIdentityQueryResultIterator($staleImapEmailsQb))
                 ->setPageCallback(function () {
                     $this->em->flush();
                     $clearClass = [

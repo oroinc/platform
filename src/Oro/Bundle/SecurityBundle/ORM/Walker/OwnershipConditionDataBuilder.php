@@ -5,28 +5,31 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 use Doctrine\ORM\Query\AST\PathExpression;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OwnershipConditionDataBuilder
 {
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var ObjectIdAccessor */
     protected $objectIdAccessor;
@@ -34,7 +37,7 @@ class OwnershipConditionDataBuilder
     /** @var AclVoter */
     protected $aclVoter;
 
-    /** @var MetadataProviderInterface */
+    /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;
 
     /** @var EntitySecurityMetadataProvider */
@@ -50,27 +53,30 @@ class OwnershipConditionDataBuilder
     protected $user = null;
 
     /**
-     * @param ServiceLink                    $securityContextLink
-     * @param ObjectIdAccessor               $objectIdAccessor
-     * @param EntitySecurityMetadataProvider $entityMetadataProvider
-     * @param MetadataProviderInterface      $metadataProvider
-     * @param OwnerTreeProviderInterface     $treeProvider
-     * @param AclVoter                       $aclVoter
+     * @param AuthorizationCheckerInterface      $authorizationChecker
+     * @param TokenStorageInterface              $tokenStorage
+     * @param ObjectIdAccessor                   $objectIdAccessor
+     * @param EntitySecurityMetadataProvider     $entityMetadataProvider
+     * @param OwnershipMetadataProviderInterface $metadataProvider
+     * @param OwnerTreeProviderInterface         $treeProvider
+     * @param AclVoter                           $aclVoter
      */
     public function __construct(
-        ServiceLink $securityContextLink,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage,
         ObjectIdAccessor $objectIdAccessor,
         EntitySecurityMetadataProvider $entityMetadataProvider,
-        MetadataProviderInterface $metadataProvider,
+        OwnershipMetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
         AclVoter $aclVoter = null
     ) {
-        $this->securityContextLink    = $securityContextLink;
-        $this->aclVoter               = $aclVoter;
-        $this->objectIdAccessor       = $objectIdAccessor;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
+        $this->aclVoter = $aclVoter;
+        $this->objectIdAccessor = $objectIdAccessor;
         $this->entityMetadataProvider = $entityMetadataProvider;
-        $this->metadataProvider       = $metadataProvider;
-        $this->treeProvider           = $treeProvider;
+        $this->metadataProvider = $metadataProvider;
+        $this->treeProvider = $treeProvider;
     }
 
     /**
@@ -84,8 +90,8 @@ class OwnershipConditionDataBuilder
     /**
      * Get data for query acl access level check
      *
-     * @param $entityClassName
-     * @param $permissions
+     * @param string $entityClassName
+     * @param string $permissions
      *
      * @return array Returns empty array if entity has full access,
      *               array with null values if user does't have access to the entity
@@ -119,12 +125,8 @@ class OwnershipConditionDataBuilder
                 $groupedEntityClassName = sprintf('%s@%s', $this->aclGroupProvider->getGroup(), $entityClassName);
             }
         }
-        $isGranted = $this->getSecurityContext()->isGranted(
-            $permissions,
-            new ObjectIdentity('entity', $groupedEntityClassName)
-        );
 
-        if ($isGranted) {
+        if ($this->isEntityGranted($permissions, $groupedEntityClassName)) {
             $condition = $this->buildConstraintIfAccessIsGranted(
                 $entityClassName,
                 $observer->getAccessLevel(),
@@ -135,6 +137,20 @@ class OwnershipConditionDataBuilder
         }
 
         return $condition;
+    }
+
+    /**
+     * @param string $permissions
+     * @param string $entityType
+     *
+     * @return bool
+     */
+    protected function isEntityGranted($permissions, $entityType)
+    {
+        return $this->authorizationChecker->isGranted(
+            $permissions,
+            new ObjectIdentity('entity', $entityType)
+        );
     }
 
     /**
@@ -160,7 +176,7 @@ class OwnershipConditionDataBuilder
             $constraint = [];
         } elseif (!$metadata->hasOwner()) {
             if (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getGlobalLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getOrganizationClass() === $targetEntityClassName) {
                     $orgIds     = $tree->getUserOrganizationIds($this->getUserId());
                     $constraint = $this->getCondition($orgIds, $metadata, 'id');
                 } else {
@@ -171,39 +187,39 @@ class OwnershipConditionDataBuilder
             }
         } else {
             if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getBasicLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getUserClass() === $targetEntityClassName) {
                     $constraint = $this->getCondition($this->getUserId(), $metadata, 'id');
-                } elseif ($metadata->isBasicLevelOwned()) {
+                } elseif ($metadata->isUserOwned()) {
                     $constraint = $this->getCondition($this->getUserId(), $metadata);
                 }
             } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getLocalLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getBusinessUnitClass() === $targetEntityClassName) {
                     $buIds      = $tree->getUserBusinessUnitIds($this->getUserId(), $this->getOrganizationId());
                     $constraint = $this->getCondition($buIds, $metadata, 'id');
-                } elseif ($metadata->isLocalLevelOwned()) {
+                } elseif ($metadata->isBusinessUnitOwned()) {
                     $buIds      = $tree->getUserBusinessUnitIds($this->getUserId(), $this->getOrganizationId());
                     $constraint = $this->getCondition($buIds, $metadata);
-                } elseif ($metadata->isBasicLevelOwned()) {
+                } elseif ($metadata->isUserOwned()) {
                     $userIds = [];
                     $this->fillBusinessUnitUserIds($this->getUserId(), $this->getOrganizationId(), $userIds);
                     $constraint = $this->getCondition($userIds, $metadata);
                 }
             } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-                if ($this->metadataProvider->getLocalLevelClass() === $targetEntityClassName) {
+                if ($this->metadataProvider->getBusinessUnitClass() === $targetEntityClassName) {
                     $buIds = [];
                     $this->fillSubordinateBusinessUnitIds($this->getUserId(), $this->getOrganizationId(), $buIds);
                     $constraint = $this->getCondition($buIds, $metadata, 'id');
-                } elseif ($metadata->isLocalLevelOwned()) {
+                } elseif ($metadata->isBusinessUnitOwned()) {
                     $buIds = [];
                     $this->fillSubordinateBusinessUnitIds($this->getUserId(), $this->getOrganizationId(), $buIds);
                     $constraint = $this->getCondition($buIds, $metadata);
-                } elseif ($metadata->isBasicLevelOwned()) {
+                } elseif ($metadata->isUserOwned()) {
                     $userIds = [];
                     $this->fillSubordinateBusinessUnitUserIds($this->getUserId(), $this->getOrganizationId(), $userIds);
                     $constraint = $this->getCondition($userIds, $metadata);
                 }
             } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                if ($metadata->isGlobalLevelOwned()) {
+                if ($metadata->isOrganizationOwned()) {
                     $constraint = $this->getCondition([$this->getOrganizationId()], $metadata, null, true);
                 } else {
                     $constraint = $this->getCondition(null, $metadata, null, true);
@@ -221,7 +237,7 @@ class OwnershipConditionDataBuilder
      */
     protected function getOrganizationId(OwnershipMetadataInterface $metadata = null)
     {
-        $token = $this->getSecurityContext()->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
             return $token->getOrganizationContext()->getId();
         }
@@ -307,44 +323,6 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * Adds all business unit ids within all organizations the given user is associated
-     *
-     * @param int|string $userId
-     * @param array      $result [output]
-     *
-     * @deprecated since 1.10. This method is not used and will be removed
-     */
-    protected function fillOrganizationBusinessUnitIds($userId, array &$result)
-    {
-        foreach ($this->getTree()->getUserOrganizationIds($userId) as $orgId) {
-            $buIds = $this->getTree()->getOrganizationBusinessUnitIds($orgId);
-            if (!empty($buIds)) {
-                $result = array_merge($result, $buIds);
-            }
-        }
-    }
-
-    /**
-     * Adds all user ids within all organizations the given user is associated
-     *
-     * @param int|string $userId
-     * @param array      $result [output]
-     *
-     * @deprecated since 1.10. This method is not used and will be removed
-     */
-    protected function fillOrganizationUserIds($userId, array &$result)
-    {
-        foreach ($this->getTree()->getUserOrganizationIds($userId) as $orgId) {
-            foreach ($this->getTree()->getOrganizationBusinessUnitIds($orgId) as $buId) {
-                $userIds = $this->getTree()->getBusinessUnitUserIds($buId);
-                if (!empty($userIds)) {
-                    $result = array_merge($result, $userIds);
-                }
-            }
-        }
-    }
-
-    /**
      * Gets SQL condition for the given owner id or ids
      *
      * @param int|int[]|null idOrIds
@@ -362,8 +340,8 @@ class OwnershipConditionDataBuilder
     ) {
         $organizationField = null;
         $organizationValue = null;
-        if ($metadata->getGlobalOwnerColumnName() && $this->getOrganizationId($metadata)) {
-            $organizationField = $metadata->getGlobalOwnerFieldName();
+        if ($metadata->getOrganizationColumnName() && $this->getOrganizationId($metadata)) {
+            $organizationField = $metadata->getOrganizationFieldName();
             $organizationValue = $this->getOrganizationId($metadata);
         }
 
@@ -425,14 +403,6 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * @return SecurityContextInterface
-     */
-    protected function getSecurityContext()
-    {
-        return $this->securityContextLink->getService();
-    }
-
-    /**
      * @return OwnerTree
      */
     protected function getTree()
@@ -451,12 +421,12 @@ class OwnershipConditionDataBuilder
             return $this->user;
         }
 
-        $token = $this->getSecurityContext()->getToken();
+        $token = $this->tokenStorage->getToken();
         if (!$token) {
             return null;
         }
         $user = $token->getUser();
-        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
+        if (!is_object($user) || !is_a($user, $this->metadataProvider->getUserClass())) {
             return null;
         }
 

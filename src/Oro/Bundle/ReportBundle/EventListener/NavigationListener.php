@@ -8,10 +8,11 @@ use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
@@ -19,30 +20,36 @@ class NavigationListener
     protected $em;
 
     /** @var ConfigProvider */
-    protected $entityConfigProvider = null;
+    protected $entityConfigProvider;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
-     * @param EntityManager    $entityManager
-     * @param ConfigProvider   $entityConfigProvider
-     * @param SecurityFacade   $securityFacade
-     * @param AclHelper        $aclHelper
+     * @param EntityManager          $entityManager
+     * @param ConfigProvider         $entityConfigProvider
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param AclHelper              $aclHelper
+     * @param FeatureChecker         $featureChecker
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
-        SecurityFacade $securityFacade,
-        AclHelper $aclHelper
+        TokenAccessorInterface $tokenAccessor,
+        AclHelper $aclHelper,
+        FeatureChecker $featureChecker
     ) {
-        $this->em                   = $entityManager;
+        $this->em = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
-        $this->securityFacade       = $securityFacade;
-        $this->aclHelper            = $aclHelper;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->aclHelper = $aclHelper;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -51,10 +58,18 @@ class NavigationListener
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         $reportsMenuItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'reports_tab');
-        if ($reportsMenuItem !== null && $this->securityFacade->hasLoggedUser()) {
+        if (null !== $reportsMenuItem && $this->tokenAccessor->hasUser()) {
             $qb = $this->em->getRepository('OroReportBundle:Report')
                 ->createQueryBuilder('report')
                 ->orderBy('report.name', 'ASC');
+
+            $excludedEntities = $this->featureChecker->getDisabledResourcesByType('entities');
+            if ($excludedEntities) {
+                $qb
+                    ->andWhere($qb->expr()->notIn('report.entity', ':excluded_entities'))
+                    ->setParameter('excluded_entities', $excludedEntities);
+            }
+
             $reports = $this->aclHelper->apply($qb)->execute();
 
             if (!empty($reports)) {

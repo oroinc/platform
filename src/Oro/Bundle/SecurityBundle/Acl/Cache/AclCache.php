@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\DoctrineAclCache;
 use Symfony\Component\Security\Acl\Domain\FieldEntry;
@@ -24,6 +25,11 @@ class AclCache extends DoctrineAclCache
      * @var UnderlyingAclCache
      */
     protected $underlyingCache;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @param CacheProvider $cache

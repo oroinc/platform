@@ -28,6 +28,7 @@ services:
 
     oro_filter.form.type.date_range:
         class: %oro_filter.form.type.date_range.class%
+        arguments: ["@oro_locale.settings"]
         tags:
             - { name: form.type, alias: oro_type_date_range }
 
@@ -130,3 +131,19 @@ services:
             - '@oro_entity_extend.enum_value_provider'
         tags:
             - { name: form.type, alias: oro_type_dictionary_filter }
+
+    oro_filter.form.type.date_grouping:
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType
+        arguments:
+            - '@translator'
+            - '@oro_filter.provider.datemodifierprovider'
+        tags:
+            - { name: form.type, alias: oro_type_date_grouping_filter }
+
+    oro_filter.form.type.skip_empty_periods:
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\SkipEmptyPeriodsFilterType
+        arguments:
+            - '@translator'
+            - '@oro_filter.provider.datemodifierprovider'
+        tags:
+            - { name: form.type, alias: oro_type_skip_empty_periods_filter }

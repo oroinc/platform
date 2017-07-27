@@ -28,17 +28,19 @@ class RootJobProgressCalculator
     {
         $rootJob = $job->isRoot() ? $job : $job->getRootJob();
         $children = $rootJob->getChildJobs();
-        $processed = 0;
-        if (!($numberOfChildren = (count($children)))) {
+        $numberOfChildren = count($children);
+        if (0 === $numberOfChildren) {
             return;
         }
 
+        $processed = 0;
         foreach ($children as $child) {
             if (in_array($child->getStatus(), self::$stopStatuses, true)) {
                 $processed++;
             }
         }
-        $progress = round($processed / $numberOfChildren * 100, 2);
+
+        $progress = round($processed / $numberOfChildren, 4);
         $this->jobStorage->saveJob($rootJob, function (Job $rootJob) use ($progress) {
             if ($progress !== $rootJob->getJobProgress()) {
                 $rootJob->setJobProgress($progress);

@@ -3,12 +3,10 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
+use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class UserMenuControllerTest extends WebTestCase
 {
     const MENU_NAME = 'application_menu';
@@ -20,9 +18,7 @@ class UserMenuControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
-        ]);
+        $this->loadFixtures([MenuUpdateData::class]);
     }
 
     public function testIndex()
@@ -42,7 +38,7 @@ class UserMenuControllerTest extends WebTestCase
 
         $this->assertContains(
             'Select existing menu item or create new.',
-            $crawler->filter('.content .text-center')->html()
+            $crawler->filter('[data-role="content"] .tree-empty-content')->html()
         );
     }
 
@@ -55,9 +51,9 @@ class UserMenuControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $form = $crawler->selectButton('Save')->form();
-        $form['oro_navigation_menu_update[titles][values][default]'] = 'menu_update.new.title.default';
-        $form['oro_navigation_menu_update[descriptions][values][default]'] = 'menu_update.new.description.default';
-        $form['oro_navigation_menu_update[uri]'] = '#menu_update.new';
+        $form['menu_update[titles][values][default]'] = 'menu_update.new.title.default';
+        $form['menu_update[descriptions][values][default]'] = 'menu_update.new.description.default';
+        $form['menu_update[uri]'] = '#menu_update.new';
 
         $this->client->followRedirects(true);
 
@@ -73,7 +69,7 @@ class UserMenuControllerTest extends WebTestCase
     {
         $url = $this->getUrl('oro_navigation_user_menu_create', [
             'menuName' => self::MENU_NAME,
-            'parentKey' => LoadMenuUpdateData::MENU_UPDATE_2
+            'parentKey' => MenuUpdateData::MENU_UPDATE_2
         ]);
         $crawler = $this->client->request('GET', $url);
         $result = $this->client->getResponse();
@@ -81,9 +77,9 @@ class UserMenuControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $form = $crawler->selectButton('Save')->form();
-        $form['oro_navigation_menu_update[titles][values][default]'] = 'menu_update.child.title.default';
-        $form['oro_navigation_menu_update[descriptions][values][default]'] = 'menu_update.child.description.default';
-        $form['oro_navigation_menu_update[uri]'] = '#menu_update.child';
+        $form['menu_update[titles][values][default]'] = 'menu_update.child.title.default';
+        $form['menu_update[descriptions][values][default]'] = 'menu_update.child.description.default';
+        $form['menu_update[uri]'] = '#menu_update.child';
 
         $this->client->followRedirects(true);
 
@@ -98,7 +94,7 @@ class UserMenuControllerTest extends WebTestCase
     public function testUpdateCustom()
     {
         /** @var MenuUpdate $reference */
-        $reference = $this->getReference(LoadMenuUpdateData::MENU_UPDATE_2);
+        $reference = $this->getReference(MenuUpdateData::MENU_UPDATE_2);
 
         $url = $this->getUrl('oro_navigation_user_menu_update', [
             'menuName' => self::MENU_NAME,
@@ -110,9 +106,9 @@ class UserMenuControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $form = $crawler->selectButton('Save')->form();
-        $form['oro_navigation_menu_update[titles][values][default]'] = 'menu_update.changed.title.default';
-        $form['oro_navigation_menu_update[descriptions][values][default]'] = 'menu_update.changed.description.default';
-        $form['oro_navigation_menu_update[uri]'] = '#menu_update.changed';
+        $form['menu_update[titles][values][default]'] = 'menu_update.changed.title.default';
+        $form['menu_update[descriptions][values][default]'] = 'menu_update.changed.description.default';
+        $form['menu_update[uri]'] = '#menu_update.changed';
 
         $this->client->followRedirects(true);
 
@@ -154,5 +150,47 @@ class UserMenuControllerTest extends WebTestCase
         $html = $crawler->html();
         $this->assertContains('Menu item saved successfully.', $html);
         $this->assertContains('menu_update.changed.title.default', $html);
+    }
+
+    public function testMove()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_navigation_user_menu_move',
+                ['menuName' => self::MENU_NAME]
+            ),
+            [
+                'selected' => [
+                    $this->getReference(MenuUpdateData::MENU_UPDATE_1_1)->getKey()
+                ],
+                '_widgetContainer' => 'dialog',
+            ],
+            [],
+            $this->generateWsseAuthHeader()
+        );
+
+        $form = $crawler->selectButton('Save')->form();
+        $form['tree_move[target]'] = $this->getReference(MenuUpdateData::MENU_UPDATE_1)->getKey();
+
+        $this->client->followRedirects(true);
+
+        /** TODO Change after BAP-1813 */
+        $form->getFormNode()->setAttribute(
+            'action',
+            $form->getFormNode()->getAttribute('action') . '?_widgetContainer=dialog'
+        );
+
+        $this->client->submit($form);
+        $result = $this->client->getResponse();
+
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        /** @var MenuUpdateRepository $repository */
+        $repository = $this->getContainer()->get('doctrine')
+            ->getManagerForClass('OroNavigationBundle:MenuUpdate')
+            ->getRepository('OroNavigationBundle:MenuUpdate');
+        $menuUpdate = $repository->findOneBy(['key' => MenuUpdateData::MENU_UPDATE_1_1]);
+        $this->assertEquals(MenuUpdateData::MENU_UPDATE_1, $menuUpdate->getParentKey());
     }
 }

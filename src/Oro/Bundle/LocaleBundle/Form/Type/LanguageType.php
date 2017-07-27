@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
@@ -42,8 +43,12 @@ class LanguageType extends AbstractType
             [
                 'choices' => $this->getLanguageChoices(true),
                 'choices_as_values' => true,
-                'empty_value' => 'Please select...',
-                'show_all' => false
+                'show_all' => false,
+                'empty_value' => '',
+                'translatable_options' => false,
+                'configs' => [
+                    'placeholder' => 'oro.locale.localization.form.placeholder.select_language',
+                ],
             ]
         );
     }
@@ -63,7 +68,7 @@ class LanguageType extends AbstractType
             $availableLanguages = (array)$this->cm->get(Configuration::getConfigKeyByName('languages'));
         }
 
-        $allLanguages = Intl::getLocaleBundle()->getLocaleNames('en');
+        $allLanguages = Intl::getLocaleBundle()->getLocaleNames($defaultValue);
 
         return array_flip(array_intersect_key($allLanguages, array_flip($availableLanguages)));
     }
@@ -88,7 +93,7 @@ class LanguageType extends AbstractType
      */
     public function getParent()
     {
-        return 'locale';
+        return OroChoiceType::NAME;
     }
 
     /**

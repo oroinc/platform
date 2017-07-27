@@ -22,6 +22,11 @@ class AttributeFamilyGroups extends Constraint
     public $defaultGroupIsNotExistMessage = 'oro.entity_config.validator.attribute_family.default_group_is_not_exist';
 
     /**
+     * @var string
+     */
+    public $sameLabelsMessage = 'oro.entity_config.validator.attribute_family.same_labels';
+
+    /**
      * {@inheritdoc}
      */
     public function getTargets()

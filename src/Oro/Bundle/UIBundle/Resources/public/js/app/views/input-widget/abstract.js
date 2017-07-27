@@ -117,6 +117,7 @@ define(function(require) {
         },
 
         disposeWidget: function() {
+            this.$container = null;
             if (this.destroyOptions) {
                 this.widgetFunction(this.destroyOptions);
             }
@@ -159,6 +160,7 @@ define(function(require) {
         refresh: function() {
             if (this.refreshOptions) {
                 this.widgetFunction(this.refreshOptions);
+                this.$container = this.findContainer();
             } else {
                 this.disposeWidget();
                 this.initializeWidget();

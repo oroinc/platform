@@ -246,6 +246,26 @@
     </div>
 {% endmacro %}
 
+{% macro query_designer_date_grouping_form(form, params) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
+    <div{{ UI.attributes(attr) }} {{ UI.renderPageComponentAttributes({
+        module: 'oroui/js/app/components/view-component',
+        options: {
+            view: 'oroquerydesigner/js/app/views/date-grouping-view'
+        }
+    }) }}>
+        {{ form_row(form.useDateGroupFilter) }}
+        {{ form_row(form.fieldName, {
+            'entity_choice_selector': '[data-ftid=' ~ params.entity_choice_id ~ ']',
+            'attr': {
+                'data-purpose': 'date-grouping-selector'
+            }
+        }) }}
+        {{form_row(form.useSkipEmptyPeriodsFilter)}}
+    </div>
+{% endmacro %}
+
 {% macro query_designer_column_chain_template(id) %}
     {% spaceless %}
     <script type="text/html" id="{{ id }}">

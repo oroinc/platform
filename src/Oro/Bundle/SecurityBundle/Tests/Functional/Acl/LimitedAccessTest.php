@@ -6,21 +6,18 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-/**
- * @dbIsolation
- */
 class LimitedAccessTest extends WebTestCase
 {
     /** @var TestEntity */
@@ -98,24 +95,24 @@ class LimitedAccessTest extends WebTestCase
     }
 
     /**
-     * @return SecurityFacade
+     * @return AuthorizationCheckerInterface
      */
-    protected function getSecurityFacade()
+    protected function getAuthorizationChecker()
     {
-        return $this->getContainer()->get('oro_security.security_facade');
+        return $this->getContainer()->get('security.authorization_checker');
     }
 
     public function testActionByDescriptor()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EXECUTE;action:test_action')
+            $this->getAuthorizationChecker()->isGranted('EXECUTE;action:test_action')
         );
     }
 
     public function testActionByObjectIdentityDescriptor()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EXECUTE', 'action:test_action')
+            $this->getAuthorizationChecker()->isGranted('EXECUTE', 'action:test_action')
         );
     }
 
@@ -124,35 +121,35 @@ class LimitedAccessTest extends WebTestCase
     {
         $aclAnnotation = new Acl(['id' => 'test_action', 'type' => 'action']);
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EXECUTE', $aclAnnotation)
+            $this->getAuthorizationChecker()->isGranted('EXECUTE', $aclAnnotation)
         );
     }
 
     public function testActionByAclAnnotationId()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('test_action')
+            $this->getAuthorizationChecker()->isGranted('test_action')
         );
     }
 
     public function testEntityByDescriptor()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('DELETE;entity:' . TestEntity::class)
+            $this->getAuthorizationChecker()->isGranted('DELETE;entity:' . TestEntity::class)
         );
     }
 
     public function testEntityByObjectIdentityDescriptor()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('DELETE', 'entity:' . TestEntity::class)
+            $this->getAuthorizationChecker()->isGranted('DELETE', 'entity:' . TestEntity::class)
         );
     }
 
     public function testEntityWhenAccessGranted()
     {
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', 'entity:' . TestEntity::class)
+            $this->getAuthorizationChecker()->isGranted('VIEW', 'entity:' . TestEntity::class)
         );
     }
 
@@ -165,28 +162,28 @@ class LimitedAccessTest extends WebTestCase
             'class'      => TestEntity::class
         ]);
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('DELETE', $aclAnnotation)
+            $this->getAuthorizationChecker()->isGranted('DELETE', $aclAnnotation)
         );
     }
 
     public function testEntityByAclAnnotationId()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('test_entity_delete')
+            $this->getAuthorizationChecker()->isGranted('test_entity_delete')
         );
     }
 
     public function testEntityRecord()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('DELETE', $this->testEntity)
+            $this->getAuthorizationChecker()->isGranted('DELETE', $this->testEntity)
         );
     }
 
     public function testEntityRecordWhenAccessGranted()
     {
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', $this->testEntity)
+            $this->getAuthorizationChecker()->isGranted('VIEW', $this->testEntity)
         );
     }
 
@@ -199,7 +196,7 @@ class LimitedAccessTest extends WebTestCase
             $this->testEntity->getOrganization()->getId()
         );
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('DELETE', $objectReference)
+            $this->getAuthorizationChecker()->isGranted('DELETE', $objectReference)
         );
     }
 
@@ -212,7 +209,7 @@ class LimitedAccessTest extends WebTestCase
             $this->testEntity->getOrganization()->getId()
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', $objectReference)
+            $this->getAuthorizationChecker()->isGranted('VIEW', $objectReference)
         );
     }
 
@@ -224,7 +221,7 @@ class LimitedAccessTest extends WebTestCase
             new ObjectIdentity($this->testEntity->getId(), TestEntity::class)
         );
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('DELETE', $objectWrapper)
+            $this->getAuthorizationChecker()->isGranted('DELETE', $objectWrapper)
         );
     }
 
@@ -236,21 +233,21 @@ class LimitedAccessTest extends WebTestCase
             new ObjectIdentity($this->testEntity->getId(), TestEntity::class)
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', $objectWrapper)
+            $this->getAuthorizationChecker()->isGranted('VIEW', $objectWrapper)
         );
     }
 
     public function testEntityField()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($this->testEntity, 'name'))
+            $this->getAuthorizationChecker()->isGranted('EDIT', new FieldVote($this->testEntity, 'name'))
         );
     }
 
     public function testEntityFieldWhenAccessGranted()
     {
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($this->testEntity, 'name'))
+            $this->getAuthorizationChecker()->isGranted('VIEW', new FieldVote($this->testEntity, 'name'))
         );
     }
 
@@ -263,7 +260,7 @@ class LimitedAccessTest extends WebTestCase
             $this->testEntity->getOrganization()->getId()
         );
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
+            $this->getAuthorizationChecker()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
         );
     }
 
@@ -276,7 +273,7 @@ class LimitedAccessTest extends WebTestCase
             $this->testEntity->getOrganization()->getId()
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($objectReference, 'name'))
+            $this->getAuthorizationChecker()->isGranted('VIEW', new FieldVote($objectReference, 'name'))
         );
     }
 
@@ -287,7 +284,7 @@ class LimitedAccessTest extends WebTestCase
             new ObjectIdentity($this->testEntity->getId(), TestEntity::class)
         );
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
+            $this->getAuthorizationChecker()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
         );
     }
 
@@ -298,7 +295,7 @@ class LimitedAccessTest extends WebTestCase
             new ObjectIdentity($this->testEntity->getId(), TestEntity::class)
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($objectReference, 'name'))
+            $this->getAuthorizationChecker()->isGranted('VIEW', new FieldVote($objectReference, 'name'))
         );
     }
 }

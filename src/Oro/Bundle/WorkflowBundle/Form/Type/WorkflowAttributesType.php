@@ -25,6 +25,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class WorkflowAttributesType extends AbstractType
 {
@@ -74,6 +75,11 @@ class WorkflowAttributesType extends AbstractType
      * @var TranslatorInterface
      */
     protected $translator;
+
+    /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
@@ -214,6 +220,11 @@ class WorkflowAttributesType extends AbstractType
             $fieldName = implode('.', $pathElements);
         }
 
+        // checking virtual attributes
+        if (!$this->getPropertyAccessor()->isWritable($entity, $fieldName)) {
+            return true;
+        }
+
         return $this->propertyPathSecurityHelper->isGrantedByPropertyPath(
             $entity,
             $fieldName,
@@ -278,7 +289,33 @@ class WorkflowAttributesType extends AbstractType
         }
 
         // update form label
-        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        $attributeOptions = $this->resolveLabel($attribute, $attributeOptions);
+
+        // update required option
+        if (!array_key_exists('required', $attributeOptions['options'])) {
+            $attributeOptions['options']['required'] = false;
+        }
+
+        // set disabled option
+        if ($options['disable_attribute_fields']) {
+            $attributeOptions['options']['disabled'] = true;
+        }
+
+        return $this->resolveContextValue($options['workflow_item'], $attributeOptions);
+    }
+
+    /**
+     * @param Attribute $attribute
+     * @param array $attributeOptions
+     * @return array
+     */
+    protected function resolveLabel(Attribute $attribute, array $attributeOptions)
+    {
+        if (isset($attributeOptions['options']['translation_domain'])) {
+            $domain = $attributeOptions['options']['translation_domain'];
+        } else {
+            $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        }
 
         if (isset($attributeOptions['label'])) {
             $attributeOptions['options']['label'] = $attributeOptions['label'];
@@ -300,17 +337,7 @@ class WorkflowAttributesType extends AbstractType
             $attributeOptions['options']['translation_domain'] = $domain;
         }
 
-        // update required option
-        if (!array_key_exists('required', $attributeOptions['options'])) {
-            $attributeOptions['options']['required'] = false;
-        }
-
-        // set disabled option
-        if ($options['disable_attribute_fields']) {
-            $attributeOptions['options']['disabled'] = true;
-        }
-
-        return $this->resolveContextValue($options['workflow_item'], $attributeOptions);
+        return $attributeOptions;
     }
 
     /**
@@ -408,6 +435,18 @@ class WorkflowAttributesType extends AbstractType
         $attributeOptions['options'] = array_merge_recursive($attributeOptions['options'], $typeGuess->getOptions());
 
         return $attributeOptions;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if ($this->propertyAccessor === null) {
+            $this->propertyAccessor = new PropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 
     /**

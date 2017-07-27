@@ -11,10 +11,8 @@ use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
-/**
- * @dbIsolation
- */
 class LocalizationRepositoryTest extends WebTestCase
 {
     /**
@@ -30,7 +28,7 @@ class LocalizationRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData']);
+        $this->loadFixtures([LoadLocalizationData::class]);
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass('OroLocaleBundle:Localization');
         $this->repository = $this->em->getRepository('OroLocaleBundle:Localization');
     }
@@ -53,7 +51,8 @@ class LocalizationRepositoryTest extends WebTestCase
         }
 
         $queries = $queryAnalyzer->getExecutedQueries();
-        $this->assertCount(1, $queries);
+
+        $this->assertCount(count($localizations) + 2, $queries);
 
         $this->em->getConnection()->getConfiguration()->setSQLLogger($prevLogger);
     }
@@ -70,13 +69,18 @@ class LocalizationRepositoryTest extends WebTestCase
     }
 
     /**
-     * @return null|Localization
+     * @return object|Localization
      */
     protected function getCurrentLocalization()
     {
         /* @var $localeSettings LocaleSettings */
         $localeSettings = $this->getContainer()->get('oro_locale.settings');
-        return $this->repository->findOneByLanguageCode($localeSettings->getLocale());
+
+        /* @var Language $language */
+        $language = $this->getReference('language.' . $localeSettings->getLocale());
+        $this->assertInstanceOf(Language::class, $language);
+
+        return $this->repository->findOneBy(['language' => $language]);
     }
 
     public function testGetLocalizationsCount()
@@ -86,33 +90,33 @@ class LocalizationRepositoryTest extends WebTestCase
         $this->assertInternalType('int', $result);
         $this->assertEquals(4, $result);
     }
-    
+
     public function testGetBatchIterator()
     {
         $expectedLocalizations = [$this->getDefaultLocalization()->getTitle()];
         foreach (LoadLocalizationData::getLocalizations() as $localization) {
             $expectedLocalizations[] = $localization['title'];
         }
-        
+
         $localizations = [];
         foreach ($this->repository->getBatchIterator() as $localization) {
             $localizations[] = $localization->getTitle();
         }
-        
+
         $this->assertEquals($expectedLocalizations, $localizations);
     }
 
     /**
-     * @return Localization
+     * @return object|Localization
      */
     protected function getDefaultLocalization()
     {
         $localeSettings = $this->getContainer()->get('oro_locale.settings');
-        $locale         = $localeSettings->getLocale();
+        $locale = $localeSettings->getLocale();
         list($language) = explode('_', $locale);
-        
+
         return $this->repository->findOneBy([
-            'languageCode'   => $language,
+            'language' => $this->getReference('language.' . $language),
             'formattingCode' => $locale
         ]);
     }

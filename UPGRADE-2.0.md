@@ -1,7 +1,7 @@
 UPGRADE FROM 1.10 to 2.0
 ========================
 
-####General
+#### General
 - **Upgrade to 2.0 is available only from 1.10 version**.
 
   To correctly upgrade to version 2.0 follow the steps in the guide [How to Upgrade to a New Version](https://www.orocrm.com/documentation/index/current/cookbook/how-to-upgrade-to-new-version).
@@ -22,7 +22,7 @@ UPGRADE FROM 1.10 to 2.0
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
 
-####SOAP API was removed
+#### SOAP API was removed
 - removed all dependencies to the `besimple/soap-bundle` bundle.
 - removed SOAP annotations from the entities. Updated entities:
     - Oro\Bundle\ActivityListBundle\Entity\ActivityList
@@ -93,7 +93,7 @@ UPGRADE FROM 1.10 to 2.0
     - Oro\Bundle\UserBundle\Tests\Functional\API\SoapUsersTest
     - Oro\Bundle\DataAuditBundle\Tests\Unit\Entity\AuditDataTest
 
-####Action Component
+#### Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
@@ -105,14 +105,17 @@ UPGRADE FROM 1.10 to 2.0
 - Class `Oro\Component\Action\Action\FlashMessage`
     - method `setRequest` now accepts null value.
 
-####Config Expression Component
+#### Config Expression Component
 - Added interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
 - Class `Oro\Component\ConfigExpression\ExpressionFactory` now implements interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 
-####EntitySerializer Component
+#### EntitySerializer Component
 - Method `isMetadataProperty` of `Oro\Component\EntitySerializer\ConfigUtil` marked as deprecated. Use `isMetadataProperty` of `Oro\Component\EntitySerializer\FieldAccessor` instead
 
-####ActionBundle
+#### OrganizationBundle
+- Changed signature of method `Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository::getEnabledOrganizations`.
+
+#### ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
 - Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
@@ -185,7 +188,7 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 - Changed signature of constructor of `Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 - Changed signature of constructor of `Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 
-####ApiBundle
+#### ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
 - The `oro_api.config_extension` DI tag was removed. To add a new configuration extension, use `oro_api.config_extensions` section of the ApiBundle configuration.
 
@@ -196,7 +199,7 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 - Removed method `public function setTranslator(TranslatorInterface $translator)` from `Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler`.
 - Method `setSourceIterator` of `Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader` now can set null value.
 
-####WorkflowBundle
+#### WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
     - construction signature was changed, now it takes the next arguments:
         - `WorkflowRegistry` $workflowRegistry,
@@ -415,7 +418,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed signature of constructor of `Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 - Changed signature of constructor of `Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener`. The argument `EntityClassResolver $entityClassResolver` was added.
 
-####LocaleBundle:
+#### LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
 - Added provider `Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider` for providing current localization
 - Added manager `Oro\Bundle\LocaleBundle\Manager\LocalizationManager` for providing localizations
@@ -434,7 +437,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed signature of constructor of `Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension`. The argument `EntityClassResolver $entityClassResolver` was added.
 - Removed methods `getRootEntityNameAndAlias` and `getEntityClassName` from `Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension`
 
-####SearchBundle
+#### SearchBundle
 - Changed all `private` fields and accessors to `protected` in `Oro/Bundle/SearchBundle/Entity/IndexDecimal`, `Oro/Bundle/SearchBundle/Entity/IndexInteger`,
 `Oro/Bundle/SearchBundle/Entity/IndexText`, `Oro/Bundle/SearchBundle/Entity/Item`
 - Constructor of class `Oro/Bundle/Engine/FulltextIndexManager` was changed. New optional arguments `$tableName` and `$indexName` was added.
@@ -449,7 +452,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed signature of the constructor of `Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener`. Removed `$databaseDriver` parameter.
 - Changed signature of the constructor of `Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener`. Added `Connection $connection` parameter.
 
-####OroIntegrationBundle:
+#### OroIntegrationBundle:
 - The option `--integration-id` renamed to `--integration` in `oro:cron:integration:sync` cli command.
 - The option `--force` were removed from `oro:cron:integration:sync` cli command. Pass it as connector option  `force=true`.
 - The option `--transport-batch-size force` were removed from `oro:cron:integration:sync` cli command.
@@ -459,7 +462,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - The parameter `oro_integration.genuine_sync_scheduler.class` was removed.
 - The parameter `oro_integration.reverse_sync.processor.class` was removed.
 
-####Layout Component:
+#### Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
 - Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
 - Methods `Oro\Component\Layout\DataAccessorInterface::getIdentifier()` and `Oro\Component\Layout\DataAccessorInterface::get()`  were removed.
@@ -492,7 +495,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Injected `BlockViewCache` into `LayoutFactoryBuilder` and passed as argument to `LayoutFactory`. From `LayoutFactory` `BlockViewCache` argument passed as argument to `LayoutBuilder` to save/fetch layout cache data.
 - Update interface method arguments `Oro\Component\Layout\BlockFactoryInterface::createBlockView` - removed `$rootId`.
 
-####LayoutBundle
+#### LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
 - Added class `Oro\Bundle\LayoutBundle\EventListener\ContainerListener`, register event `onKernelRequest` that helps to warm cache for layout updates resources.
 - Moved layout updates from container to `oro.cache.abstract`
@@ -543,7 +546,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added exception class `Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException`.
 - Added layout context configurator `Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator`.
 
-####ConfigBundle:
+#### ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
 - Class `Oro\Bundle\ConfigBundle\Config\ConfigManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `get`, `getInfo`, `set`, `reset`, `flush`, `save`, `calculateChangeSet`, `reload`, `getValue`, `buildChangeSet`
 - Class `Oro\Component\Config\Loader\FolderContentCumulativeLoader` now uses list of regular expressions as fourth argument instead of list of file extensions. For example, if you passed as fourth argument `['yml', 'php']` you should replace it with `['/\.yml$/', '/\.php$/']`
@@ -551,11 +554,11 @@ To migrate all labels from configuration translatable fields automatically you c
 - Root node for system configuration in `Resources/config/oro/system_configuration.yml` file were changed from `oro_system_configuration` to `system_configuration`.
 - Form type `Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType` added to allow file management in the system configuration
 
-####AttachmentBundle:
+#### AttachmentBundle:
 - Class `Oro\Bundle\AttachmentBundle\Resizer\ImageResizer` introduced to resize images by filter name
 - Removed constant `GRID_LEFT_JOIN_PATH` from `Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener`
 
-####DatagridBundle:
+#### DatagridBundle:
 - Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
     - construction signature was changed now it takes next arguments:
         - `SystemAwareResolver` $resolver,
@@ -597,7 +600,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Method `addSelect` of `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration` was marked as deprecated. Use `config->getOrmQuery()->addSelect()` instead
 - Method `joinTable` of `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration` was marked as deprecated. Use `config->getOrmQuery()->addInnerJoin()` or `config->getOrmQuery()->addLeftJoin()` instead
 
-####SecurityBundle
+#### SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
 - Added layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator`.
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
@@ -618,12 +621,12 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider`. Added `TranslatorInterface $translator` parameter.
 - Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider`. Added `TranslatorInterface $translator` parameter.
 
-####ImportExportBundle
+#### ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
 - For `Oro\Bundle\ImportExportBundle\Job\JobExecutor` added new public method `setEventDispatcher` for setting Event Dispatcher.
 - Options for import/export buttons configuration `dataGridName` was renamed to `datagridName`
 
-####TranslationBundle
+#### TranslationBundle
 - Added controller `Oro\Bundle\TranslationBundle\Controller\LanguageController` to manage Languages.
 - Added controller `Oro\Bundle\TranslationBundle\Controller\TranslationController` to manage Translations.
 - Added `Oro\Bundle\TranslationBundle\Controller\Api\Rest\TranslationController::updateAction` to update translations.
@@ -681,7 +684,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed signature of constructor of `Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 
 
-####EntityExtendBundle
+#### EntityExtendBundle
 - Extend fields default mode is `Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_READONLY`
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
@@ -714,28 +717,28 @@ tag if it works with extend classes
 - Method `addManyToOneRelationTargetSide` of `Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder` was marked as deprecated because it is not used anywhere.
 
 
-####ApiBundle:
+#### ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
 - `Resources/config/oro/api.yml` root node were renamed from `oro_api` to `api`.
 
-####QueryDesignerBundle:
+#### QueryDesignerBundle:
 - YAML Configuration for query designer now loads from `Resources/config/oro/query_designer.yml` file instead of `Resources/config/query_designer.yml`.
 
-####TestFrameworkBundle:
+#### TestFrameworkBundle:
 - Behat elements now loads from `Resources/config/oro/behat.yml` file instead of `Resources/config/behat_elements.yml`.
 - `Oro\Bundle\TestFrameworkBundle\Test\Client::requestGrid` accepts route to test grid as optional last argument. Request pushed to `@request_stack` for proper request emulation
 - Added `Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub` to be able to easily mock callbacks.
 
-####ChartBundle:
+#### ChartBundle:
 - Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
 - Root node for charts configuration in `Resources/config/oro/charts.yml` file were changed from `oro_chart` to `charts`.
 
-####IntegrationBundle:
+#### IntegrationBundle:
 - Integration configuration file now loads from `Resources/config/oro/integrations.yml` file instead of `Resources/config/integration_settings.yml`.
 - Root node for integration config file `Resources/config/oro/integrations.yml` were changed from `oro_integration` to `integrations`.
 - The `Oro\Bundle\IntegrationBundle\Command\ReverseSyncCommand` command was removed.
 
-####EntityConfigBundle:
+#### EntityConfigBundle:
 - Entity configuration now loads from `Resources/config/oro/entity_config.yml` file instead of `Resources/config/entity_config.yml`.
 - Root node for entity configuration in file `Resources/config/oro/entity_config.yml` were changed from `oro_entity_config` to `entity_config`.
 - Constructor of `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` changed. Now it takes as first argument instance of `Oro\Bundle\TranslationBundle\Manager\TranslationManager` and second argument still instance of `Symfony\Component\Translation\TranslatorInterface`.
@@ -749,11 +752,11 @@ tag if it works with extend classes
         - `EntityClassNameHelper` $entityClassNameHelper,
         - `DoctrineHelper` $doctrineHelper
 
-####HelpBundle:
+#### HelpBundle:
 - Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
 - Root node `help` were added for help configuration in `Resources/config/oro/help.yml` file.
 
-####SearchBundle:
+#### SearchBundle:
 - Search configuration now loads from `Resources/config/oro/search.yml` instead of `Resources/config/search.yml` file.
 - Root node `search` were added for search configuration in `Resources/config/oro/search.yml` file.
 - `oro_search.entity.repository.search_index` marked as lazy
@@ -789,20 +792,20 @@ tag if it works with extend classes
   - `Oro\Bundle\CalendarBundle\Form\DataTransformer\AttendeesToViewTransformer`
 - Removed (deprecated) usage of `title_fields` as they are not available on all search engines (e.g. elastic search). Entity titles will resolve using EntityNameResolver. This may affect search results (e.g. `recordTitle` and `record_string` in functional tests are changed).
 
-####ElasticSearchBundle
+#### ElasticSearchBundle
 - Changed constructor of `Oro\Bundle\ElasticSearchBundle\Engine\ElasticSearchIndexer`. Replaced `EntityTitleResolverInterface` with `EntityNameResolver`.
 
-####ActivityBundle:
+#### ActivityBundle:
 - Changed constructor of `Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler`. Replaced `ObjectMapper` with `EntityNameResolver`. Class now use EntityNameResolver instead of `title_fields`.
 - Removed method `getActivityTargetEntities` from `Oro\Bundle\ActivityBundle\Model\ActivityInterface` and `Oro\Bundle\ActivityBundle\Model\ExtendActivity`. To avoid BC break this method is still generated, but it is marked as deprecated.
 - Removed constant `GRID_EXTENDED_ENTITY_PATH` from `Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension`
 - Removed constant `GRID_FROM_PATH` from `Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension`
 - Changed signature of constructor of `Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 
-####ActivityListBundle:
+#### ActivityListBundle:
 - Removed method `getActivityListTargetEntities` from `Oro\Bundle\ActivityListBundle\Entity\ActivityList`. To avoid BC break this method is still generated, but it is marked as deprecated.
 
-####UIBundle:
+#### UIBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
 - Additional common root node `placeholders` were added for placeholders configurations in `Resources/config/oro/placeholders.yml` file.
    *Please node* that your configuration now should have two `placeholders` nodes (one nested in other) instead of single one.
@@ -825,13 +828,13 @@ placeholders:
         - `SecurityFacade` $securityFacade
         - `FeatureChecker` $featureChecker
 
-####RequireJS:
+#### RequireJS:
 - Updated RequireJS library to version 2.3.*
 
-####FormBundle:
+#### FormBundle:
 - Added `Oro\Bundle\FormBundle\Form\Extension\HintFormExtension` to support hints.
 
-####DashboardBundle:
+#### DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
 - Root node for dashboards configuration in `Resources/config/oro/dashboards.yml` file were changed from `oro_dashboard_config` to `dashboards`.
 - Class `Oro\Bundle\DashboardBundle\Model\WidgetConfigs`
@@ -848,7 +851,7 @@ placeholders:
         - $widgetName = null
 - Constructor of `Oro\Bundle\DashboardBundle\Model\Factory` was changed. Added `WidgetConfigs $widgetConfigs` as last argument.
 
-####NavigationBundle:
+#### NavigationBundle:
 - Navigation configuration now loads form `Resources/config/oro/navigation.yml` instead of `Resources/config/navigation.yml` file.
 - Configuration nodes in `Resources/config/oro/navigation.yml` were nested under single root node `navigation`.
 - Configuration nodes in `Resources/config/oro/navigation.yml` were renamed:
@@ -894,7 +897,7 @@ placeholders:
 - Added new entity repository `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository`.
 
 
-####EmailBundle
+#### EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` was changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` was changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` was changed. Added `ConfigManager $configManager` as last argument.
@@ -922,7 +925,9 @@ placeholders:
 - Added `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction`.
 - Added `Oro\Bundle\EmailBundle\Mailer\DirectMailer::afterPrepareSmtpTransport`.
 - Added `Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider` to get smtp settings from configuration.
-####EntityBundle
+- Added service `oro_email.command.email_body_sync` for `Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand` command.
+
+#### EntityBundle
 - Added possibility to define
 [entity repositories as a services](./src/Oro/Bundle/EntityBundle/Resources/doc/repositories_as_a_services.md)
 by the usage of `oro_entity.abstract_repository` as a parent service
@@ -972,20 +977,20 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title in form of 'Item #1' (translates `oro.entity.item`). Can use only single-column identifiers, else returns `false`. Should be kept as last provider.
 - Removed constant `PATH_FROM` from `Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid`
 
-####ContactBundle
+#### ContactBundle
 
 - `Oro\Bundle\ContactBundle\Provider\ContactEntityNameProvider` now uses phone and email as fallback when entity names are empty
 
-####CacheBundle
+#### CacheBundle
 - `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers
 
-####MigrationBundle
+#### MigrationBundle
 - `Oro\Bundle\MigrationBundle\Migration\MigrationExecutor` now clears cache at all cache providers after successful migration load
 
-####FeatureToggleBundle
+#### FeatureToggleBundle
 - Added class `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension` moved from `NavigationBundle`.
 
-####SyncBundle
+#### SyncBundle
 - Added class `Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass` compiler pass that add skipped entity classes to `oro_sync.event_listener.doctrine_tag` service.
 - Added class `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener` moved from `NavigationBundle`.
 - Added class `Oro\Bundle\SyncBundle\Twig\ContentTagsExtension` moved from `NavigationBundle`.
@@ -1001,17 +1006,17 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added DOC file `doc/content_outdating.md` moved from `NavigationBundle`.
 - Added DOC file `doc/mediator-handlers.md` moved from `NavigationBundle`.
 
-####DependencyInjection Component
+#### DependencyInjection Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
 
-####EntitySerializer Component
+#### EntitySerializer Component
 - Changed signature of `transform` method of `Oro\Component\EntitySerializer\DataTransformerInterface`. Added `array $context` as the last parameter.
 - Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
 - Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
 - Changed signature of `serialize` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
 - Changed signature of `serializeEntities` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
 
-####NotificationBundle
+#### NotificationBundle
 - Moved interface `Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
 - Moved interface `Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
 - Removed class `Oro\Bundle\NotificationBundle\Processor\AbstractNotificationProcessor`
@@ -1023,13 +1028,13 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Constructor of `Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
 - Constructor of `Oro\Bundle\NotificationBundle\Model\MassNotificationSender` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
 
-####CalendarBundle
+#### CalendarBundle
 - CalendarBundle moved to a separate package
 
-####ReminderBundle
+#### ReminderBundle
 - Constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
 
-####DataAuditBundle
+#### DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` was removed. Some logic moved to `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class and some backend processors.
 - `Oro\Bundle\DataAuditBundle\EventListener\EntityListener` was removed. Similar logic could be found in `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class.
 - `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` was removed.
@@ -1039,11 +1044,11 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener` was removed. Similar functionality can be found in `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider`.
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
 
-####ImapBundle
+#### ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+ - Added service `oro_imap.command.email_sync` for `Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand` command.
 
-
-####CronBundle
+#### CronBundle
 - Removed class `Oro\Bundle\CronBundle\Action\CreateJobAction`, service `oro_cron.action.create_job` and action `@create_job`
 - Removed class `Oro\Bundle\CronBundle\Controller\JobController`.
 - Removed class `Oro\Bundle\CronBundle\DependencyInjection\Compiler\JobSerializerMetadataPass`.
@@ -1062,7 +1067,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Removed listener `Oro\Bundle\CronBundle\EventListener\JobSubscriber`
 - Removed listener `Oro\Bundle\CronBundle\EventListener\LoadClassMetadataSubscriber` and service `oro_cron.listener.load_class_metadata_subscriber`
 
-####UserBundle
+#### UserBundle
 - Added `auth_status` extended enum property to `Oro\Bundle\UserBundle\Entity\User` entity.
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model.
 - User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
@@ -1072,13 +1077,13 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added method `setAuthStatus($user, $enumId)` to `Oro\Bundle\UserBundle\Entity\UserManager` method to set `auth_status` of a User by enum id.
 - Removed `Oro\Bundle\UserBundle\Security\WsseAuthListener` class.
 
-####ImapBundle
+#### ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
 - Removed action `@job_add_dependency`
 - Changed property name from `$possibleSentFolderNameMap` to `$knownFolderNameMap` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder`
 - Changed method name from `guessSentTypeByName` to `guessFolderTypeByName` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder`
 
-####OroInstallerBundle
+#### OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
 
 #### CurrencyBundle
@@ -1091,11 +1096,11 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigProvider`
 - Changed signature of constructor of `Oro\Bundle\CurrencyBundle\Datagrid\EventListener\ColumnConfigListener`. The argument `EntityClassResolver $entityClassResolver` was removed.
 
-####OroTrackingBundle
+#### OroTrackingBundle
 - Moved ``TrackingBundle`` to a separate ``marketing`` package, required by default in the CRM applications.
 - Deleted ``tracking.php`` front controllers from applications. This file is created in application's `/web` folder automatically duting an instalation.
 
-####OroNoteBundle
+#### OroNoteBundle
 - Implementation of activity list relation with entity  `Oro\Bundle\NoteBundle\Entity\Note` was changed. Now the entity is a regular activity entity like others: Email, Task, Call, Email, etc.
 
 Before

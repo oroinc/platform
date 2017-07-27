@@ -30,20 +30,24 @@ class Folder extends BaseFolder
         'INBOX'            => FolderType::INBOX,
 
         'Drafts'           => FolderType::DRAFTS,
+        'INBOX.Drafts'     => FolderType::DRAFTS,
 
         'Spam'             => FolderType::SPAM,
         'Junk'             => FolderType::SPAM,
         'Junk E-mail'      => FolderType::SPAM,
+        'INBOX.Junk'       => FolderType::SPAM,
 
         'Sent'             => FolderType::SENT,
         'SentBox'          => FolderType::SENT,
         'Sent Items'       => FolderType::SENT,
         'Sent Messages'    => FolderType::SENT,
+        'INBOX.Sent'       => FolderType::SENT,
 
         'Trash'            => FolderType::TRASH,
         'Deleted'          => FolderType::TRASH,
         'Deleted Items'    => FolderType::TRASH,
-        'Deleted Messages' => FolderType::TRASH
+        'Deleted Messages' => FolderType::TRASH,
+        'INBOX.Trash'      => FolderType::TRASH
     ];
 
     /** @var string[] */

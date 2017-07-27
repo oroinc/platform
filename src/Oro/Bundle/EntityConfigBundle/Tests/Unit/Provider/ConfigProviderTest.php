@@ -10,11 +10,11 @@ use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverMock;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 
 class ConfigProviderTest extends \PHPUnit_Framework_TestCase
@@ -58,7 +58,11 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->any())->method('persist')->will($this->returnValue(true));
         $this->configManager->expects($this->any())->method('flush')->will($this->returnValue(true));
 
-        $this->configProvider  = new ConfigProvider($this->configManager, 'testScope', array());
+        $this->configProvider  = new ConfigProvider(
+            $this->configManager,
+            'testScope',
+            new PropertyConfigBag([])
+        );
     }
 
     /**

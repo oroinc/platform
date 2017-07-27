@@ -8,9 +8,6 @@ use Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
-/**
- * @dbIsolation
- */
 class TranslationResetStrategyTest extends AbstractTranslationImportStrategyTest
 {
     public function testProcess()

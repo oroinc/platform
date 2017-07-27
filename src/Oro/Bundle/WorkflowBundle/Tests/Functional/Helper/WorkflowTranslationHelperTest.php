@@ -6,10 +6,12 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
 
 /**
- * @dbIsolation
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowTranslationHelperTest extends WebTestCase
 {
@@ -22,7 +24,7 @@ class WorkflowTranslationHelperTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures([LoadWorkflowTranslations::class]);
+        $this->loadFixtures([LoadWorkflowTranslations::class, LoadWorkflowDefinitions::class]);
 
         $this->helper = $this->getContainer()->get('oro_workflow.helper.translation');
     }
@@ -182,6 +184,49 @@ class WorkflowTranslationHelperTest extends WebTestCase
 
         $this->assertEquals('translation1.default', $this->helper->findTranslation($key, Translator::DEFAULT_LOCALE));
         $this->assertEquals('changed value', $this->helper->findTranslation($key, LoadLanguages::LANGUAGE2));
+    }
+
+    public function testGenerateDefinitionTranslationKeys()
+    {
+        $expected = [
+            'oro.workflow.test_flow.label',
+            'oro.workflow.test_flow.step.open.label',
+            'oro.workflow.test_flow.transition.start_transition.label',
+            'oro.workflow.test_flow.transition.start_transition.button_label',
+            'oro.workflow.test_flow.transition.start_transition.button_title',
+            'oro.workflow.test_flow.transition.start_transition.warning_message',
+        ];
+        $workflowDefinition = $this->getReference('workflow.' . LoadWorkflowDefinitions::NO_START_STEP);
+        $this->assertEquals($expected, $this->helper->generateDefinitionTranslationKeys($workflowDefinition));
+    }
+
+    /**
+     * @param array $expected
+     * @param array $keys
+     * @param string|null $default
+     *
+     * @dataProvider translationsDataProvider
+     */
+    public function testGenerateDefinitionTranslations(array $expected, array $keys, $default)
+    {
+        $this->assertSame($expected, $this->helper->generateDefinitionTranslations($keys, 'cn', $default));
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function translationsDataProvider()
+    {
+        yield [
+                'expected' => ['oro.workflow.test_flow.label' => 'oro.workflow.test_flow.label'],
+                'keys' => ['oro.workflow.test_flow.label'],
+                'default' => 'oro.workflow.test_flow.label',
+        ];
+        yield [
+                'expected' => ['oro.workflow.test_flow.label' => null],
+                'keys' => ['oro.workflow.test_flow.label'],
+                'default' => null,
+        ];
     }
 
     /**

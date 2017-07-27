@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class JobProcessor
 {
@@ -35,6 +35,19 @@ class JobProcessor
     public function findJobById($id)
     {
         return $this->jobStorage->findJobById($id);
+    }
+
+    /**
+     * Finds root non interrupted job by name and given statuses.
+     *
+     * @param string $jobName
+     * @param array  $statuses
+     *
+     * @return Job|null
+     */
+    public function findRootJobByJobNameAndStatuses($jobName, array $statuses)
+    {
+        return $this->jobStorage->findRootJobByJobNameAndStatuses($jobName, $statuses);
     }
 
     /**
@@ -97,6 +110,7 @@ class JobProcessor
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
+        $rootJob->addChildJob($job);
         $job->setJobProgress(0);
         $this->jobStorage->saveJob($job);
 
@@ -158,7 +172,7 @@ class JobProcessor
         }
 
         $job->setStatus(Job::STATUS_SUCCESS);
-        $job->setJobProgress(100);
+        $job->setJobProgress(1);
         $job->setStoppedAt(new \DateTime());
         $this->jobStorage->saveJob($job);
 
@@ -282,12 +296,33 @@ class JobProcessor
     }
 
     /**
+     * Cancels running for all child jobs that are not in run status.
+     *
+     * @param Job $job
+     */
+    public function cancelAllNotStartedChildJobs(Job $job)
+    {
+        if (!$job->isRoot() || !$job->getChildJobs()) {
+            return;
+        }
+
+        foreach ($job->getChildJobs() as $childJob) {
+            if (in_array(
+                $childJob->getStatus(),
+                [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED]
+            )) {
+                $this->cancelChildJob($childJob);
+            }
+        }
+    }
+
+    /**
      * @param Job  $job
      * @param bool $force
      */
     public function interruptRootJob(Job $job, $force = false)
     {
-        if (! $job->isRoot()) {
+        if (!$job->isRoot()) {
             throw new \LogicException(sprintf('Can interrupt only root jobs. id: "%s"', $job->getId()));
         }
 
@@ -305,6 +340,9 @@ class JobProcessor
             if ($force) {
                 $this->cancelAllActiveChildJobs($job);
                 $job->setStoppedAt(new \DateTime());
+            } else {
+                // we should mark all child jobs as canceled to speed-up the terminate process
+                $this->cancelAllNotStartedChildJobs($job);
             }
         });
     }

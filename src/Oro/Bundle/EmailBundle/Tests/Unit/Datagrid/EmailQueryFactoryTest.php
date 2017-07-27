@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -26,8 +29,8 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var EmailQueryFactory */
     protected $factory;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
     /** @var MailboxManager */
     protected $mailboxManager;
@@ -43,15 +46,20 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+
+        /** @var FormFactoryInterface $formFactory */
+        $formFactory   = $this->getMockForAbstractClass(FormFactoryInterface::class);
+
+        $filterUtility = new FilterUtility();
 
         $this->factory = new EmailQueryFactory(
             $this->providerStorage,
             $this->entityNameResolver,
             $this->mailboxManager,
-            $this->securityFacade
+            $this->tokenAccessor,
+            $formFactory,
+            $filterUtility
         );
     }
 
@@ -66,7 +74,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         );
     }
 
-    public function testPrepareQueryWithoutProviders()
+    public function testAddFromEmailAddressWithoutProviders()
     {
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
@@ -74,14 +82,16 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->from('OroEmailBundle:Email', 'e')
             ->leftJoin('e.fromEmailAddress', self::JOIN_ALIAS);
 
-        $this->factory->prepareQuery($qb);
+        $this->factory->addFromEmailAddress($qb);
         $this->assertEquals(
-            'SELECT e, a.email FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a',
+            'SELECT e, NULLIF(\'\', \'\') AS fromEmailAddressOwnerClass,'
+            . ' NULLIF(0, 0) AS fromEmailAddressOwnerId, a.email AS fromEmailAddress'
+            . ' FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a',
             $qb->getDQL()
         );
     }
 
-    public function testPrepareQueryOneProviderGiven()
+    public function testAddFromEmailAddressOneProviderGiven()
     {
         $provider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $provider->expects($this->any())->method('getEmailOwnerClass')
@@ -97,15 +107,20 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->from('OroEmailBundle:Email', 'e')
             ->leftJoin('e.fromEmailAddress', self::JOIN_ALIAS);
 
-        $this->factory->prepareQuery($qb);
+        $this->factory->addFromEmailAddress($qb);
 
         // @codingStandardsIgnoreStart
         $this->assertEquals(
-            "SELECT e, " .
-            "CONCAT('', CASE WHEN a.hasOwner = true THEN (" .
-                "CASE WHEN a.owner1 IS NOT NULL THEN CONCAT(a.firstName, CONCAT(a.lastName, '')) ELSE '' END" .
-            ") ELSE a.email END) as fromEmailExpression " .
-            "FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a LEFT JOIN a.owner1 owner1",
+            'SELECT e,'
+            . ' (CASE'
+            . ' WHEN a.owner1 IS NOT NULL THEN \'Oro\Bundle\UserBundle\Entity\User\''
+            . ' ELSE NULLIF(\'\', \'\') END) AS fromEmailAddressOwnerClass,'
+            . ' COALESCE(IDENTITY(a.owner1) ) AS fromEmailAddressOwnerId,'
+            . ' CONCAT(\'\','
+            . ' CASE WHEN a.hasOwner = true THEN (CASE'
+            . ' WHEN a.owner1 IS NOT NULL THEN CONCAT(a.firstName, CONCAT(a.lastName, \'\'))'
+            . ' ELSE \'\' END) ELSE a.email END) AS fromEmailAddress'
+            . ' FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a LEFT JOIN a.owner1 owner1',
             $qb->getDQL()
         );
         // @codingStandardsIgnoreEnd
@@ -119,11 +134,11 @@ class EmailQueryFactoryTest extends OrmTestCase
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
 
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
-        $this->securityFacade->expects($this->once())
+        $this->tokenAccessor->expects($this->exactly(2))
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 
@@ -152,11 +167,11 @@ class EmailQueryFactoryTest extends OrmTestCase
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
 
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $this->tokenAccessor->expects($this->once())
+            ->method('getUser')
             ->will($this->returnValue($user));
 
-        $this->securityFacade->expects($this->once())
+        $this->tokenAccessor->expects($this->exactly(2))
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 

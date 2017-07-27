@@ -10,14 +10,6 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class OroAliceLoader extends Loader
 {
     /**
-     * {@inheritdoc}
-     */
-    public function __construct($locale = 'en_US', array $providers = [], $seed = 1, array $parameters = [])
-    {
-        parent::__construct($locale, $providers, $seed, $parameters);
-    }
-
-    /**
      * @return AliceCollection
      */
     public function getReferenceRepository()

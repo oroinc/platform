@@ -4,25 +4,29 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var HtmlTagExtension
-     */
-    protected $extension;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var HtmlTagHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $htmlTagHelper;
+
+    /* @var HtmlTagExtension */
+    protected $extension;
 
     protected function setUp()
     {
-        $this->htmlTagHelper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
-            ->disableOriginalConstructor()->getMock();
+        $this->htmlTagHelper = $this->getMockBuilder(HtmlTagHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->extension = new HtmlTagExtension($this->htmlTagHelper);
+        $container = self::getContainerBuilder()
+            ->add('oro_ui.html_tag_helper', $this->htmlTagHelper)
+            ->getContainer($this);
+
+        $this->extension = new HtmlTagExtension($container);
     }
 
     public function testGetName()
@@ -30,15 +34,21 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_ui.html_tag', $this->extension->getName());
     }
 
-    public function testGetFilters()
+    public function testHtmlTagTrim()
     {
+        $tags = ['script','style'];
+        $html = <<<EOF
+<iframe src="https://www.somehost"></iframe><script>alert('Some script')</script><style type="text/css">
+   h1 { 
+    font-size: 120%; 
+   }
+</style><script>alert('Some script again!')</script>
+EOF;
+        $expectedResult = '<iframe src="https://www.somehost"></iframe>';
+
         $this->assertEquals(
-            [
-                new \Twig_SimpleFilter('oro_tag_filter', [$this->extension, 'tagFilter'], ['is_safe' => ['all']]),
-                new \Twig_SimpleFilter('oro_html_purify', [$this->extension, 'htmlPurify']),
-                new \Twig_SimpleFilter('oro_html_sanitize', [$this->extension, 'htmlSanitize'], ['is_safe' => ['html']])
-            ],
-            $this->extension->getFilters()
+            $expectedResult,
+            self::callTwigFilter($this->extension, 'oro_html_tag_trim', [$html, $tags])
         );
     }
 }

@@ -4,9 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class MassControllersTest extends WebTestCase
 {
     protected function setUp()

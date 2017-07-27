@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Twig;
 
-use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 
-use Twig_Extension;
-use Twig_SimpleFunction;
-
 use Oro\Bundle\IntegrationBundle\Event\LoadIntegrationThemesEvent;
+use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 
-class IntegrationExtension extends Twig_Extension
+class IntegrationExtension extends \Twig_Extension
 {
     const DEFAULT_THEME = 'OroIntegrationBundle:Form:fields.html.twig';
 
@@ -32,9 +29,9 @@ class IntegrationExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            new Twig_SimpleFunction('oro_integration_themes', [$this, 'getThemes']),
-            new Twig_SimpleFunction('oro_integration_is_switch_enabled', [$this, 'isSwitchEnabled']),
-            new Twig_SimpleFunction('oro_integration_is_delete_enabled', [$this, 'isDeleteEnabled']),
+            new \Twig_SimpleFunction('oro_integration_themes', [$this, 'getThemes']),
+            new \Twig_SimpleFunction('oro_integration_is_switch_enabled', [$this, 'isSwitchEnabled']),
+            new \Twig_SimpleFunction('oro_integration_is_delete_enabled', [$this, 'isDeleteEnabled']),
         ];
     }
 

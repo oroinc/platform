@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
-class NestedImportWithConditionsTest extends AbstractLayoutBuilderTest
+class NestedImportsWithConditionsTest extends AbstractLayoutBuilderTest
 {
     public function testLayoutTree()
     {
-        $expectedTree = [
-            'head' => [],
+        $expectedTree = ['head' => [],
             'body' => [
                 'wrapper' => [
                     'layout_1_wrapper' => [

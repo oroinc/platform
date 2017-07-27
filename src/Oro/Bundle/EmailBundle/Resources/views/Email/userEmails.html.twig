@@ -52,7 +52,7 @@
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_email_email_create') %}
+    {% if is_granted('oro_email_email_create') %}
         <div class="btn-group">
             {{ EmailActions.createEmailButton({
                 entityClass: oro_class_name(app.user, true),
@@ -123,16 +123,12 @@
                                     );
                                 }
                             },
+                            errorHandlerMessage: '{{ 'oro.email.action.message.error'|trans }}',
                             error: function () {
                                 clearInterval(loader);
 
                                 button.html('{{ actionSync|raw }}');
                                 button.removeAttr('disabled');
-
-                                messenger.notificationFlashMessage(
-                                    'error',
-                                    {{ 'oro.email.action.message.error'|trans|json_encode|raw }}
-                                );
                             }
                         })
                     };

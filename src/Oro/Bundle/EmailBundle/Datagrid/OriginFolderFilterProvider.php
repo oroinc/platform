@@ -2,34 +2,37 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class OriginFolderFilterProvider
 {
-    const EMAIL_ORIGIN = 'OroEmailBundle:EmailOrigin';
-    const EMAIL_MAILBOX = 'OroEmailBundle:Mailbox';
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    /** @var Registry */
+    /** @var ManagerRegistry */
     private $doctrine;
 
+    /** @var MailboxNameHelper */
+    private $mailboxNameHelper;
+
     /**
-     * @param Registry            $doctrine
-     * @param SecurityFacade      $securityFacade
+     * @param ManagerRegistry        $doctrine
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param MailboxNameHelper      $mailboxNameHelper
      */
     public function __construct(
-        Registry $doctrine,
-        SecurityFacade $securityFacade
+        ManagerRegistry $doctrine,
+        TokenAccessorInterface $tokenAccessor,
+        MailboxNameHelper $mailboxNameHelper
     ) {
         $this->doctrine = $doctrine;
-        $this->securityFacade = $securityFacade;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->mailboxNameHelper = $mailboxNameHelper;
     }
 
     /**
@@ -52,7 +55,7 @@ class OriginFolderFilterProvider
      */
     protected function getOrigins()
     {
-        return $this->doctrine->getRepository(self::EMAIL_ORIGIN)
+        return $this->doctrine->getRepository(EmailOrigin::class)
                 ->createQueryBuilder('eo')
                 ->select('eo, f, m')
                 ->leftJoin('eo.folders', 'f')
@@ -61,8 +64,8 @@ class OriginFolderFilterProvider
                 ->andWhere('eo.organization = :organization')
                 ->andWhere('eo.isActive = :isActive')
                 ->setParameters([
-                    'owner' => $this->securityFacade->getLoggedUser(),
-                    'organization' => $this->securityFacade->getOrganization(),
+                    'owner' => $this->tokenAccessor->getUser(),
+                    'organization' => $this->tokenAccessor->getOrganization(),
                     'isActive' => true,
                 ])
                 ->getQuery()
@@ -74,12 +77,12 @@ class OriginFolderFilterProvider
      */
     protected function getMailboxes()
     {
-        $repo = $this->doctrine->getRepository(self::EMAIL_MAILBOX);
+        $repo = $this->doctrine->getRepository(Mailbox::class);
 
         /** @var Mailbox[] $systemMailboxes */
         return $repo->findAvailableMailboxes(
-            $this->securityFacade->getLoggedUser(),
-            $this->securityFacade->getOrganization()
+            $this->tokenAccessor->getUser(),
+            $this->tokenAccessor->getOrganization()
         );
     }
 
@@ -93,15 +96,18 @@ class OriginFolderFilterProvider
     {
         $origins = $this->getOrigins();
         foreach ($origins as $origin) {
-            $folders = $origin->getFolders();
-            $mailbox = $origin->getMailboxName();
-            $folders = $this->filterFolders($folders->toArray());
+            $folders = $this->filterFolders($origin->getFolders()->toArray());
             if (count($folders) > 0) {
+                $mailbox = $this->mailboxNameHelper->getMailboxName(
+                    get_class($origin),
+                    $origin->getMailboxName(),
+                    null !== $origin->getMailbox() ? $origin->getMailbox()->getLabel() : null
+                );
                 $results[$mailbox] = [
                     'id' => $origin->getId(),
                     'active' => $origin->isActive(),
                 ];
-                $i=1;
+                $i = 1;
                 foreach ($folders as $folder) {
                     if ($extended) {
                         $results[$mailbox]['folder'][$i]['id'] = $folder->getId();

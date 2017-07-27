@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 
 /**
  * Special ConfigProvider mock used for testing purposes.
@@ -34,7 +35,7 @@ class ConfigProviderMock extends ConfigProvider
      */
     public function __construct(ConfigManager $configManager, $scope, array $config = [])
     {
-        parent::__construct($configManager, $scope, $config);
+        parent::__construct($configManager, $scope, new PropertyConfigBag([$scope => $config]));
     }
 
     /**

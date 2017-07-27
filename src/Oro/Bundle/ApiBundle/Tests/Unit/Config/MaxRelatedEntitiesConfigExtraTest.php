@@ -20,6 +20,14 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(MaxRelatedEntitiesConfigExtra::NAME, $this->extra->getName());
     }
 
+    public function testGetMaxRelatedEntities()
+    {
+        $this->assertEquals(
+            123,
+            $this->extra->getMaxRelatedEntities()
+        );
+    }
+
     public function testConfigureContext()
     {
         $context = new ConfigContext();

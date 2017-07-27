@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block navButtons %}
-    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
+    {% if form.vars.value.id and is_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_report', {'id': form.vars.value.id}),
             'dataRedirect': path('oro_report_index'),
@@ -35,12 +35,12 @@
         'route': 'oro_report_view',
         'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
     }) %}
-    {% if resource_granted('oro_report_create') %}
+    {% if is_granted('oro_report_create') %}
         {% set html = html ~ UI.saveAndNewButton({
             'route': 'oro_report_create'
         }) %}
     {% endif %}
-    {% if form.vars.value.id or resource_granted('oro_report_update') %}
+    {% if form.vars.value.id or is_granted('oro_report_update') %}
         {% set html = html ~ UI.saveAndStayButton({
             'route': 'oro_report_update',
             'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
@@ -142,6 +142,18 @@
                         '',
                         '',
                         type ~ '-columns'
+                    ),
+                    UI.scrollSubblock(
+                        'oro.report.form.date_group_section.label'|trans,
+                        [
+                            QD.query_designer_date_grouping_form(
+                                form.dateGrouping,
+                                {'entity_choice_id': 'oro_report_form_entity'}
+                            )
+                        ],
+                        '',
+                        '',
+                        type ~ '-columns'
                     )
                 ]
             },
@@ -195,7 +207,7 @@
         'hiddenData': form_widget(form.definition)
     } %}
 
-    {{ UI.scrollData(id, data, form) }}
+    {{ UI.scrollData(id, data, entity, form) }}
 
     {{ QD.query_designer_column_chain_template('column-chain-template') }}
     {{ segmentQD.initJsWidgets(type, form, entities, metadata) }}

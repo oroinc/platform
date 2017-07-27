@@ -11,7 +11,7 @@ class WorkflowConfigurationHandlerCompilerPassTest extends AbstractExtensionComp
     public function testProcess()
     {
         $this->assertServiceDefinitionMethodCalled('addHandler');
-        $this->assertConteinerBuilderCalled();
+        $this->assertContainerBuilderCalled();
 
         $this->getCompilerPass()->process($this->containerBuilder);
     }

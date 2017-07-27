@@ -98,8 +98,11 @@ datagrids:
 
     workflow-definitions-grid:
         options:
-            entityHint: workflowssss
+            entityHint: workflows
             export:     false
+            mass_actions:
+                delete:
+                    enabled: false
         acl_resource: oro_workflow_definition_view
         source:
             type: orm
@@ -112,10 +115,13 @@ datagrids:
                     - w.relatedEntity as entityClass
                     - w.active
                     - w.label
+                    - w.applications
                     - w.system
                     - w.priority
-                    - w.groups
+                    - w.exclusiveActiveGroups
+                    - w.exclusiveRecordGroups
                     - w.createdAt
+                    - w.configuration
                 from:
                     - { table: %oro_workflow.entity.workflow_definition.class%, alias: w }
         columns:
@@ -139,17 +145,20 @@ datagrids:
             priority:
                 label:         oro.workflow.workflowdefinition.priority.label
                 frontend_type: integer
+            applications:
+                label:         oro.workflow.workflowdefinition.applications.label
+                type:          twig
+                template:      OroWorkflowBundle:Datagrid:Column/applications.html.twig
+                frontend_type: html
             exclusiveActiveGroups:
                 label:         oro.workflow.workflowdefinition.exclusive_active_groups.label
-                data_name:     groups
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/exclusiveActiveGroups.html.twig
+                template:      OroWorkflowBundle:Datagrid:Column/exclusiveGroups.html.twig
                 frontend_type: html
             exclusiveRecordGroups:
                 label:         oro.workflow.workflowdefinition.exclusive_record_groups.label
-                data_name:     groups
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/exclusiveRecordGroups.html.twig
+                template:      OroWorkflowBundle:Datagrid:Column/exclusiveGroups.html.twig
                 frontend_type: html
             createdAt:
                 label:         oro.ui.created_at
@@ -233,6 +242,9 @@ datagrids:
                         field_options:
                             multiple: true
                             choices: "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
+                applications:
+                    type: string
+                    data_name: w.applications
                 active:
                     type: boolean
                     data_name: w.active
@@ -245,6 +257,12 @@ datagrids:
                 createdAt:
                     type:      datetime
                     data_name: w.createdAt
+                exclusiveActiveGroups:
+                    type: string
+                    data_name: w.exclusiveActiveGroups
+                exclusiveRecordGroups:
+                    type: string
+                    data_name: w.exclusiveRecordGroups
 
     workflow-permission-grid:
         acl_resource: oro_user_role_update

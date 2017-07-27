@@ -1,0 +1,5 @@
+services:
+    oro_ui.form.type.jstree_move:
+        class: 'Oro\Bundle\UIBundle\Form\Type\TreeMoveType'
+        tags:
+            - { name: form.type, alias: oro_jstree_move }

@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
 /**
  * Iterates results of Query using buffer, allows to iterate large query
- * results without risk of getting out of memory error
+ * results without risk of getting out of memory error.
+ *
+ * This class has problems when iterating through changing dataset.
+ * Use BufferedIdentityQueryResultIterator instead.
  */
-class BufferedQueryResultIterator implements \Iterator, \Countable
+class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
 {
     /**
      * Count of records that will be loaded on each page during iterations
@@ -26,30 +28,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     private $requestedBufferSize = self::DEFAULT_BUFFER_SIZE;
 
     /**
-     * Defines the processing mode to be used during hydration / result set transformation
-     * This is just recommended hydration mode because the real mode can be calculated automatically
-     * in case when the requested hydration mode is not specified
-     *
-     * @var integer
-     */
-    private $requestedHydrationMode;
-
-    /**
-     * The source Query or QueryBuilder
-     *
-     * @var mixed
-     */
-    private $source;
-
-    /**
-     * Query to iterate
-     *
-     * @var Query
-     */
-    private $query;
-
-    /**
-     * Total count of records in query
+     * Total count of records that should be iterated
      *
      * @var int
      */
@@ -84,13 +63,6 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     private $rows;
 
     /**
-     * Current record, populated from query result row
-     *
-     * @var mixed
-     */
-    private $current;
-
-    /**
      * @var int
      */
     protected $firstResult;
@@ -103,11 +75,6 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     protected $maxResults;
 
     /**
-     * @var bool|null
-     */
-    private $useCountWalker;
-
-    /**
      * Walk through results in reverse order
      * Useful when selected records are being updated in between page load
      *
@@ -116,95 +83,12 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     private $reverse = false;
 
     /**
-     * @var callable|null
-     */
-    protected $pageCallback;
-
-    /**
-     * @var callable|null
-     */
-    protected $pageLoadedCallback;
-
-    /**
-     * Constructor
-     *
-     * @param Query|QueryBuilder $source
-     * @param null|bool $useCountWalker
-     */
-    public function __construct($source, $useCountWalker = null)
-    {
-        if (null === $source) {
-            throw new \InvalidArgumentException('The $source must not be null');
-        } elseif (!($source instanceof Query) && !($source instanceof QueryBuilder)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The $source must be instance of "%s" or "%s", but "%s" given',
-                    is_object($this->source) ? get_class($this->source) : gettype($this->source),
-                    'Doctrine\ORM\Query',
-                    'Doctrine\ORM\QueryBuilder'
-                )
-            );
-        }
-        $this->source = $source;
-        $this->useCountWalker = $useCountWalker;
-    }
-
-    /**
-     * Sets size of buffer that is queried from storage to iterate results
-     *
-     * @param int $bufferSize
-     * @return BufferedQueryResultIterator
-     * @throws \InvalidArgumentException If buffer size is not greater than 0
+     * {@inheritDoc}
      */
     public function setBufferSize($bufferSize)
     {
-        $this->assertQueryWasNotExecuted('buffer size');
-        if ($bufferSize <= 0) {
-            throw new \InvalidArgumentException('$bufferSize must be greater than 0');
-        }
+        parent::setBufferSize($bufferSize);
         $this->requestedBufferSize = (int)$bufferSize;
-
-        return $this;
-    }
-
-    /**
-     * Sets callback to be called after page iteration was finished
-     *
-     * @param callable|null $callback
-     *
-     * @return $this
-     */
-    public function setPageCallback(callable $callback = null)
-    {
-        $this->pageCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Sets callback to be called after page is loaded
-     *
-     * @param callable|null $callback (array $rows): array $rows
-     *
-     * @return $this
-     */
-    public function setPageLoadedCallback(callable $callback = null)
-    {
-        $this->pageLoadedCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Sets query hydration mode to be used to iterate results
-     *
-     * @param integer $hydrationMode Processing mode to be used during the hydration process.
-     * @return BufferedQueryResultIterator
-     */
-    public function setHydrationMode($hydrationMode)
-    {
-        $this->assertQueryWasNotExecuted('hydration mode');
-        $this->requestedHydrationMode = $hydrationMode;
 
         return $this;
     }
@@ -213,7 +97,8 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      * Sets iteration order
      *
      * @param bool $reverse Determines the iteration order
-     * @return BufferedQueryResultIterator
+     *
+     * @return $this
      */
     public function setReverse($reverse)
     {
@@ -221,29 +106,6 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
         $this->reverse = $reverse;
 
         return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function current()
-    {
-        return $this->current;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function next()
-    {
-        $this->offset++;
-
-        if (!isset($this->rows[$this->offset]) && !$this->loadNextPage()) {
-            $this->current = null;
-        } else {
-            $this->current  = $this->rows[$this->offset];
-            $this->position = $this->offset + $this->getQuery()->getMaxResults() * $this->page;
-        }
     }
 
     /**
@@ -257,9 +119,16 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     /**
      * {@inheritDoc}
      */
-    public function valid()
+    public function next()
     {
-        return null !== $this->current;
+        $this->offset++;
+
+        if (!isset($this->rows[$this->offset]) && !$this->loadNextPage()) {
+            $this->current = null;
+        } else {
+            $this->current = $this->rows[$this->offset];
+            $this->position = $this->offset + $this->getQuery()->getMaxResults() * $this->page;
+        }
     }
 
     /**
@@ -269,13 +138,14 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     {
         // reset total count only if at least one item was loaded by this iterator
         // for example if we call count method and then start iteration the total count must be calculated once
-        if (null !== $this->totalCount && $this->offset != -1) {
+        if (null !== $this->totalCount && $this->offset !== -1) {
             $this->totalCount = null;
         }
-        $this->offset     = -1;
-        $this->page       = -1;
-        $this->position   = -1;
-        $this->current    = null;
+
+        $this->offset = -1;
+        $this->page = -1;
+        $this->position = -1;
+        $this->current = null;
 
         $this->next();
     }
@@ -297,67 +167,15 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     }
 
     /**
-     * Asserts that query was not executed, otherwise raise an exception
-     *
-     * @param string $optionLabel
-     * @throws \LogicException
+     * {@inheritdoc}
      */
-    protected function assertQueryWasNotExecuted($optionLabel)
+    protected function initializeQuery(Query $query)
     {
-        if (!$this->source) {
-            throw new \LogicException(sprintf('Cannot set %s object as query was already executed.', $optionLabel));
+        $this->maxResults = $query->getMaxResults();
+        if (!$this->maxResults || $this->requestedBufferSize < $this->maxResults) {
+            $query->setMaxResults($this->requestedBufferSize);
         }
-    }
-
-    /**
-     * @return Query
-     * @throws \LogicException If source of a query is not valid
-     */
-    protected function getQuery()
-    {
-        if (null === $this->query) {
-            if ($this->source instanceof Query) {
-                $this->query = $this->cloneQuery($this->source);
-            } elseif ($this->source instanceof QueryBuilder) {
-                $this->query = $this->source->getQuery();
-            } else {
-                throw new \LogicException('Unexpected source');
-            }
-            unset($this->source);
-
-            // initialize cloned query
-            $this->maxResults = $this->query->getMaxResults();
-            if (!$this->maxResults || $this->requestedBufferSize < $this->maxResults) {
-                $this->query->setMaxResults($this->requestedBufferSize);
-            }
-            if (null !== $this->requestedHydrationMode) {
-                $this->query->setHydrationMode($this->requestedHydrationMode);
-            }
-            $this->firstResult = (int)$this->query->getFirstResult();
-        }
-
-        return $this->query;
-    }
-
-    /**
-     * Makes full clone of the given query, including its parameters and hints
-     *
-     * @param Query $query
-     * @return Query
-     */
-    protected function cloneQuery(Query $query)
-    {
-        $result = clone $query;
-
-        // clone parameters
-        $result->setParameters(clone $query->getParameters());
-
-        // clone hints
-        foreach ($query->getHints() as $name => $value) {
-            $result->setHint($name, $value);
-        }
-
-        return $result;
+        $this->firstResult = (int)$query->getFirstResult();
     }
 
     /**

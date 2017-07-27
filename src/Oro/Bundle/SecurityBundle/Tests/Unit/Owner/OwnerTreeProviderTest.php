@@ -7,17 +7,17 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class OwnerTreeProviderTest extends OrmTestCase
 {
@@ -45,14 +45,17 @@ class OwnerTreeProviderTest extends OrmTestCase
     /** @var EntityManagerMock */
     protected $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DatabaseChecker */
+    protected $databaseChecker;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
     protected $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
-    protected $container;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
+    protected $ownershipMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    protected $tokenStorage;
 
     protected function setUp()
     {
@@ -72,77 +75,70 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('getManagerForClass')
             ->will($this->returnValue($this->em));
 
+        $this->databaseChecker = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\DatabaseChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->cache = $this->createMock('Doctrine\Common\Cache\CacheProvider');
         $this->cache->expects($this->any())->method('fetch')->will($this->returnValue(false));
         $this->cache->expects($this->any())->method('save');
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->ownershipMetadataProvider = $this->createMock(
+            'Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface'
+        );
+        $this->ownershipMetadataProvider->expects($this->any())
+            ->method('getUserClass')
+            ->willReturn(self::ENTITY_NAMESPACE . '\TestUser');
+        $this->ownershipMetadataProvider->expects($this->any())
+            ->method('getBusinessUnitClass')
+            ->willReturn(self::ENTITY_NAMESPACE . '\TestBusinessUnit');
 
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [
-                            'oro_security.ownership_tree_provider.cache',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->cache,
-                        ],
-                        [
-                            'oro_security.owner.ownership_metadata_provider',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            new OwnershipMetadataProviderStub(
-                                $this,
-                                [
-                                    'user'          => self::ENTITY_NAMESPACE . '\TestUser',
-                                    'business_unit' => self::ENTITY_NAMESPACE . '\TestBusinessUnit',
-                                ]
-                            ),
-                        ],
-                        [
-                            'doctrine',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $doctrine,
-                        ],
-                        [
-                            'oro_security.security_facade',
-                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            $this->securityFacade,
-                        ],
-                    ]
-                )
-            );
+        $this->tokenStorage = $this->createMock(
+            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
+        );
 
-        $this->treeProvider = new OwnerTreeProvider($this->em, $this->cache);
-        $this->treeProvider->setContainer($this->container);
+        $this->treeProvider = new OwnerTreeProvider(
+            $doctrine,
+            $this->databaseChecker,
+            $this->cache,
+            $this->ownershipMetadataProvider,
+            $this->tokenStorage
+        );
     }
 
-    /**
-     * @param object $user
-     * @param bool   $expected
-     *
-     * @dataProvider supportsDataProvider
-     */
-    public function testSupports($user, $expected)
+    public function testSupportsForSupportedUser()
     {
-        $this->securityFacade->expects($this->once())->method('getLoggedUser')->willReturn($user);
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+        $token->expects(self::once())
+            ->method('getUser')
+            ->willReturn(new User());
 
-        $this->assertEquals($expected, $this->treeProvider->supports());
+        $this->assertTrue($this->treeProvider->supports());
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function testSupportsForNotSupportedUser()
     {
-        return [
-            [null, false],
-            [new \stdClass(), false],
-            [new User(), true],
-        ];
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+        $token->expects(self::once())
+            ->method('getUser')
+            ->willReturn(new \stdClass());
+
+        $this->assertFalse($this->treeProvider->supports());
+    }
+
+    public function testSupportsWhenNoSecurityToken()
+    {
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        $this->assertFalse($this->treeProvider->supports());
     }
 
     /**
@@ -170,20 +166,6 @@ class OwnerTreeProviderTest extends OrmTestCase
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $connection
-     * @param string[]                                 $existingTables
-     */
-    protected function setTablesExistExpectation($connection, array $existingTables)
-    {
-        $this->setFetchAllQueryExpectationAt(
-            $connection,
-            0,
-            $this->em->getConnection()->getDatabasePlatform()->getListTablesSQL(),
-            $existingTables
-        );
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $connection
      * @param string[]                                 $businessUnits
      */
     protected function setGetBusinessUnitsExpectation($connection, array $businessUnits)
@@ -198,7 +180,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         }
         $this->setQueryExpectationAt(
             $connection,
-            1,
+            0,
             'SELECT t0_.id AS id_0, t0_.organization_id AS sclr_1, t0_.parent_id AS sclr_2,'
             . ' (CASE WHEN t0_.parent_id IS NULL THEN 0 ELSE 1 END) AS sclr_3'
             . ' FROM tbl_business_unit t0_'
@@ -224,7 +206,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         }
         $this->setQueryExpectationAt(
             $connection,
-            2,
+            1,
             'SELECT t0_.id AS id_0, t1_.id AS id_1, t0_.owner_id AS sclr_2, t2_.id AS id_3'
             . ' FROM tbl_user t0_'
             . ' INNER JOIN tbl_user_to_organization t3_ ON t0_.id = t3_.user_id'
@@ -253,8 +235,11 @@ class OwnerTreeProviderTest extends OrmTestCase
 
     public function testBusinessUnitsWithoutOrganization()
     {
+        $this->databaseChecker->expects(self::once())
+            ->method('checkDatabase')
+            ->willReturn(true);
+
         $connection = $this->getDriverConnectionMock($this->em);
-        $this->setTablesExistExpectation($connection, ['tbl_user', 'tbl_business_unit', 'tbl_organization']);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
         $this->setGetBusinessUnitsExpectation(
@@ -347,8 +332,11 @@ class OwnerTreeProviderTest extends OrmTestCase
      */
     public function testBusinessUnitTree()
     {
+        $this->databaseChecker->expects(self::once())
+            ->method('checkDatabase')
+            ->willReturn(true);
+
         $connection = $this->getDriverConnectionMock($this->em);
-        $this->setTablesExistExpectation($connection, ['tbl_user', 'tbl_business_unit', 'tbl_organization']);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
         $this->setGetBusinessUnitsExpectation(
@@ -443,8 +431,11 @@ class OwnerTreeProviderTest extends OrmTestCase
      */
     public function testBusinessUnitTreeWhenChildBusinessUnitAreLoadedBeforeParentBusinessUnit()
     {
+        $this->databaseChecker->expects(self::once())
+            ->method('checkDatabase')
+            ->willReturn(true);
+
         $connection = $this->getDriverConnectionMock($this->em);
-        $this->setTablesExistExpectation($connection, ['tbl_user', 'tbl_business_unit', 'tbl_organization']);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
         $this->setGetBusinessUnitsExpectation(
@@ -539,8 +530,11 @@ class OwnerTreeProviderTest extends OrmTestCase
      */
     public function testUserDoesNotHaveAssignedBusinessUnit()
     {
+        $this->databaseChecker->expects(self::once())
+            ->method('checkDatabase')
+            ->willReturn(true);
+
         $connection = $this->getDriverConnectionMock($this->em);
-        $this->setTablesExistExpectation($connection, ['tbl_user', 'tbl_business_unit', 'tbl_organization']);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
         $this->setGetBusinessUnitsExpectation(
@@ -609,8 +603,11 @@ class OwnerTreeProviderTest extends OrmTestCase
      */
     public function testSeveralOrganizations()
     {
+        $this->databaseChecker->expects(self::once())
+            ->method('checkDatabase')
+            ->willReturn(true);
+
         $connection = $this->getDriverConnectionMock($this->em);
-        $this->setTablesExistExpectation($connection, ['tbl_user', 'tbl_business_unit', 'tbl_organization']);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
         $this->setGetBusinessUnitsExpectation(
@@ -718,8 +715,11 @@ class OwnerTreeProviderTest extends OrmTestCase
      */
     public function testUsersAssignedToBusinessUnitsFromSeveralOrganizations()
     {
+        $this->databaseChecker->expects(self::once())
+            ->method('checkDatabase')
+            ->willReturn(true);
+
         $connection = $this->getDriverConnectionMock($this->em);
-        $this->setTablesExistExpectation($connection, ['tbl_user', 'tbl_business_unit', 'tbl_organization']);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
         $this->setGetBusinessUnitsExpectation(

@@ -45,11 +45,15 @@ define(function(require) {
         /** @property {String} */
         icon: undefined,
 
-        /** @property {Boolean} */
-        iconHideText: config.iconHideText,
-
         /** @property {String} */
         iconClassName: undefined,
+
+        /** @property {Boolean} */
+        /** @deprecated use launcherMode */
+        iconHideText: config.iconHideText,
+
+        /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
+        launcherMode: '',
 
         /** @property {String} */
         className: undefined,
@@ -90,6 +94,7 @@ define(function(require) {
          * @param {String} [options.label]
          * @param {String} [options.icon]
          * @param {Boolean} [options.iconHideText]
+         * @param {String} [options.launcherMode]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
          * @param {Boolean} [options.onClickReturnValue]
@@ -123,6 +128,9 @@ define(function(require) {
                 this.iconHideText = opts.iconHideText;
             }
 
+            if (opts.launcherMode) {
+                this.launcherMode = opts.launcherMode;
+            }
             if (opts.link) {
                 this.link = opts.link;
             }
@@ -152,6 +160,21 @@ define(function(require) {
         },
 
         /**
+         * @return {String}
+         */
+        _convertToLauncherMode: function() {
+            var str = '';
+
+            if (this.icon) {
+                str = this.iconHideText ? 'icon-only'  : 'icon-text';
+            } else {
+                str = 'text-only';
+            }
+
+            return str;
+        },
+
+        /**
          * @inheritDoc
          */
         dispose: function() {
@@ -166,13 +189,14 @@ define(function(require) {
         getTemplateData: function() {
             var label = this.label || this.action.label;
 
+            this.launcherMode = this.launcherMode || this._convertToLauncherMode();
             return {
                 label: label,
                 icon: this.icon,
-                iconHideText: this.iconHideText,
                 title: this.title || label,
                 className: this.className,
                 iconClassName: this.iconClassName,
+                launcherMode: this.launcherMode,
                 link: this.link,
                 links: this.links,
                 action: this.action,

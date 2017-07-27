@@ -19,6 +19,7 @@ workflows:
             - 'active_group1'
         exclusive_record_groups:
             - 'record_group1'
+        applications: ['default']
         steps:
             first_step:
                 order: 1
@@ -40,6 +41,32 @@ workflows:
                     delete: false
                 options:
                     class: DateTime
+
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    type: 'array'
+                    value: [1,2,3,4,5]
+                var3:
+                    type: 'string'
+                    value: null
+                first_object:
+                    type: object
+                    value: '2017-03-15 00:00:00'
+                    options:
+                        class: DateTime
+                var_entity:
+                    type: entity
+                    property_path: null
+                    value: 1
+                    entity_acl:
+                        delete: false
+                    options:
+                        class: Oro\Bundle\UserBundle\Entity\User
+
         disable_operations:
             operation1: [entity1, entity2]
         transitions:
@@ -55,8 +82,11 @@ workflows:
                     class: foo
                 form_type: custom_workflow_transition
                 display_type: page
+                destination_page: index
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
+                message_parameters:
+                    test: param
                 init_entities:
                     - entity1
                 init_routes:
@@ -90,7 +120,22 @@ workflows:
                     -
                         cron: 1 * * * *
                         filter: e.text = "string"
-
+            transition_with_form_options_configuration:
+                step_to: first_step
+                transition_definition: first_transition_definition
+                form_options:
+                    configuration:
+                        handler: 'handler'
+                        template: 'template'
+                        data_provider: 'data_provider'
+                        data_attribute: 'form_data'
+            transition_with_form_options_configuration_defaults:
+                step_to: first_step
+                transition_definition: first_transition_definition
+                form_options:
+                    configuration:
+                        data_provider: 'data_provider'
+                        data_attribute: 'form_data'
         transition_definitions:
             first_transition_definition:
                 preactions:
@@ -133,3 +178,5 @@ workflows:
         transition_definitions:
             -
                 name: second_transition_definition
+        applications: ['other_application']
+        force_autostart: true

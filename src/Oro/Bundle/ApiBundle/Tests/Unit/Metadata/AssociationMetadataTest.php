@@ -101,6 +101,64 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testToArrayWhenEmptyAcceptableTargetsAllowedAndAcceptableTargetClassNamesAreNotEmpty()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setAcceptableTargetClassNames(['Test\Target1']);
+
+        $this->assertEquals(
+            [
+                'name'                      => 'testName',
+                'nullable'                  => false,
+                'collapsed'                 => false,
+                'association_type'          => null,
+                'collection'                => false,
+                'acceptable_target_classes' => ['Test\Target1']
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
+    public function testToArrayWhenEmptyAcceptableTargetsNotAllowedAndAcceptableTargetClassNamesAreNotEmpty()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
+        $associationMetadata->setAcceptableTargetClassNames(['Test\Target1']);
+
+        $this->assertEquals(
+            [
+                'name'                      => 'testName',
+                'nullable'                  => false,
+                'collapsed'                 => false,
+                'association_type'          => null,
+                'collection'                => false,
+                'acceptable_target_classes' => ['Test\Target1']
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
+    public function testToArrayWhenEmptyAcceptableTargetsNotAllowedAndAcceptableTargetClassNamesAreEmpty()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
+
+        $this->assertEquals(
+            [
+                'name'                            => 'testName',
+                'nullable'                        => false,
+                'collapsed'                       => false,
+                'association_type'                => null,
+                'collection'                      => false,
+                'reject_empty_acceptable_targets' => true
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
     public function testNameInConstructor()
     {
         $fieldMetadata = new AssociationMetadata('associationName');
@@ -165,6 +223,15 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
             ['targetClassName2', 'targetClassName3'],
             $associationMetadata->getAcceptableTargetClassNames()
         );
+    }
+
+    public function testAcceptableTargetClassNames()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertTrue($associationMetadata->isEmptyAcceptableTargetsAllowed());
+        $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
+        $this->assertFalse($associationMetadata->isEmptyAcceptableTargetsAllowed());
     }
 
     public function testAssociationType()

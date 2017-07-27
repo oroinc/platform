@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+use Monolog\Logger;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -11,6 +13,7 @@ use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -26,6 +29,9 @@ class DirectMailer extends \Swift_Mailer
 
     /** @var ContainerInterface */
     protected $container;
+
+    /** @var ServiceLink  */
+    protected $loggerLink;
 
     /**
      * Constructor
@@ -57,6 +63,22 @@ class DirectMailer extends \Swift_Mailer
         }
 
         parent::__construct($transport);
+    }
+
+    /**
+     * @param ServiceLink $loggerLink
+     */
+    public function setLogger(ServiceLink $loggerLink)
+    {
+        $this->loggerLink = $loggerLink;
+    }
+
+    /**
+     * @return Logger
+     */
+    protected function getLogger()
+    {
+        return $this->loggerLink->getService();
     }
 
     /**
@@ -191,6 +213,17 @@ class DirectMailer extends \Swift_Mailer
             } else {
                 $result = parent::send($message, $failedRecipients);
             }
+        } catch (\Swift_TransportException $transportException) {
+            $logger = $this->getLogger();
+
+            $logger->crit(sprintf("Mail message: %s", $message));
+            $logger->crit(sprintf("Mail recipients: %s", implode(',', $failedRecipients)));
+            $logger->crit(
+                sprintf("Error message: %s", $transportException->getMessage()),
+                ['exception' => $transportException]
+            );
+
+            $sendException = $transportException;
         } catch (\Exception $unexpectedEx) {
             $sendException = $unexpectedEx;
         }
@@ -270,9 +303,13 @@ class DirectMailer extends \Swift_Mailer
      */
     protected function configureTransportLocalDomain(\Swift_Transport_AbstractSmtpTransport $transport)
     {
+        if (php_sapi_name() === 'cli') {
+            return;
+        }
+        $host = $this->container->get('request')->server->get('HTTP_HOST');
         // fix local domain when wild-card vhost is used and auto-detection fails
-        if (0 === strpos($transport->getLocalDomain(), '*') && !empty($_SERVER['HTTP_HOST'])) {
-            $transport->setLocalDomain($_SERVER['HTTP_HOST']);
+        if (0 === strpos($transport->getLocalDomain(), '*') && !empty($host)) {
+            $transport->setLocalDomain($host);
         }
     }
 }

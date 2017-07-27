@@ -8,6 +8,7 @@ use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
 use Behat\Testwork\EventDispatcher\Event\BeforeExerciseCompleted;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
@@ -18,10 +19,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class TestIsolationSubscriber implements EventSubscriberInterface
 {
+    use SkipIsolatorsTrait;
+
+    const ISOLATOR_THRESHOLD = 500;
+
     const YES_PATTERN = '/^Y/i';
 
     /** @var IsolatorInterface[] */
@@ -36,28 +41,17 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     /** @var InputInterface */
     protected $input;
 
-    /** @var  bool */
-    protected $skip;
+    /** @var Stopwatch */
+    private $stopwatch;
 
     /**
      * @param IsolatorInterface[] $isolators
      */
-    public function __construct(array $isolators, KernelInterface $kernel)
+    public function __construct(array $isolators)
     {
-        $kernel->boot();
-        $container = $kernel->getContainer();
-        $applicableIsolators = [];
-
-        foreach ($isolators as $isolator) {
-            if ($isolator->isApplicable($container)) {
-                $applicableIsolators[] = $isolator;
-            }
-        }
-
-        $this->reverseIsolators = $applicableIsolators;
-        $this->isolators = array_reverse($applicableIsolators);
-
-        $kernel->shutdown();
+        $this->reverseIsolators = $isolators;
+        $this->isolators = array_reverse($isolators);
+        $this->stopwatch = new Stopwatch();
     }
 
     /**
@@ -67,11 +61,11 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     {
         return [
             BeforeExerciseCompleted::BEFORE => ['beforeExercise', 100],
-            BeforeFeatureTested::BEFORE     => ['beforeFeature', 100],
-            BeforeScenarioTested::BEFORE    => ['beforeScenario', 100],
-            AfterScenarioTested::AFTER      => ['afterScenario', -100],
-            AfterFeatureTested::AFTER       => ['afterFeature', -100],
-            AfterExerciseCompleted::AFTER   => ['afterExercise', -100]
+            BeforeFeatureTested::BEFORE => ['beforeFeature', 100],
+            BeforeScenarioTested::BEFORE => ['beforeScenario', 100],
+            AfterScenarioTested::AFTER => ['afterScenario', -100],
+            AfterFeatureTested::AFTER => ['afterFeature', -100],
+            AfterExerciseCompleted::AFTER => ['afterExercise', -100],
         ];
     }
 
@@ -82,6 +76,10 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         }
 
         foreach ($this->isolators as $isolator) {
+            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+                continue;
+            }
+
             if ($isolator->isOutdatedState()) {
                 $helper = new QuestionHelper();
                 $question = new ConfirmationQuestion(
@@ -105,7 +103,21 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin isolating application state</comment>');
         foreach ($this->isolators as $isolator) {
-            $isolator->start($event);
+            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+                continue;
+            }
+
+            $this->stopwatch->start($isolator->getTag().'::start');
+            try {
+                $isolator->start($event);
+            } catch (TableNotFoundException $e) {
+                break;
+            } finally {
+                $eventResult = $this->stopwatch->stop($isolator->getTag().'::start');
+                if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
+                    $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
+                }
+            }
         }
         $this->output->writeln('<comment>Application ready for tests</comment>');
     }
@@ -119,10 +131,24 @@ class TestIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event = new BeforeIsolatedTestEvent($event->getFeature());
+        $event = new BeforeIsolatedTestEvent($this->output, $event->getFeature());
 
         foreach ($this->isolators as $isolator) {
-            $isolator->beforeTest($event);
+            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+                continue;
+            }
+
+            $this->stopwatch->start($isolator->getTag().'::beforeTest');
+            try {
+                $isolator->beforeTest($event);
+            } catch (TableNotFoundException $e) {
+                break;
+            } finally {
+                $eventResult = $this->stopwatch->stop($isolator->getTag().'::beforeTest');
+                if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
+                    $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
+                }
+            }
         }
     }
 
@@ -146,10 +172,24 @@ class TestIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event = new AfterIsolatedTestEvent();
+        $event = new AfterIsolatedTestEvent($this->output);
 
         foreach ($this->reverseIsolators as $isolator) {
-            $isolator->afterTest($event);
+            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+                continue;
+            }
+
+            $this->stopwatch->start($isolator->getTag().'::afterTest');
+            try {
+                $isolator->afterTest($event);
+            } catch (TableNotFoundException $e) {
+                break;
+            } finally {
+                $eventResult = $this->stopwatch->stop($isolator->getTag().'::afterTest');
+                if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
+                    $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
+                }
+            }
         }
     }
 
@@ -163,7 +203,21 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin clean up isolation environment</comment>');
         foreach ($this->reverseIsolators as $isolator) {
-            $isolator->terminate($event);
+            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+                continue;
+            }
+
+            $this->stopwatch->start($isolator->getTag().'::terminate');
+            try {
+                $isolator->terminate($event);
+            } catch (TableNotFoundException $e) {
+                break;
+            } finally {
+                $eventResult = $this->stopwatch->stop($isolator->getTag().'::terminate');
+                if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
+                    $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
+                }
+            }
         }
         $this->output->writeln('<comment>Isolation environment is clean</comment>');
     }
@@ -182,13 +236,5 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     public function setInput(InputInterface $input)
     {
         $this->input = $input;
-    }
-
-    /**
-     * @param bool $skip
-     */
-    public function setSkip($skip)
-    {
-        $this->skip = $skip;
     }
 }

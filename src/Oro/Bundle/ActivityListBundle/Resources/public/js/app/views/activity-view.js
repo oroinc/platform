@@ -165,8 +165,9 @@ define(function(require) {
         },
 
         _onContentChange: function() {
-            this.disposePageComponents();
-            this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+            this.$(this.options.infoBlock)
+                .trigger('content:remove') // to dispose only components related to infoBlock
+                .html(this.model.get('contentHTML'));
             this.initLayout().done(_.bind(function() {
                 // if the activity has an EmailTreadView -- handle comment count change in own way
                 var emailTreadView = this.getEmailThreadView();

@@ -115,7 +115,7 @@ label.disabled {
 }
 
 // Bootstrap - Form
-label, input, button, select, textarea { font-size:13px;}
+label, input, button, select, textarea { font-size:13px; color:#777;}
 .form-horizontal .control-label {
   font-size:13px;
   text-align:left;
@@ -125,7 +125,6 @@ label, input, button, select, textarea { font-size:13px;}
     float: none;
     .oro-popover-content {
       line-height: 20px;
-      color: #777;
     }
   }
 }
@@ -138,17 +137,13 @@ label, input, button, select, textarea { font-size:13px;}
       float:left;
       width:160px;
       padding-top: 7px;
-      color: #777;
       font-weight: normal;
-      font-size: 13px;
       text-align:right;
     }
     .control-label.wrap {
       float:left;
-      padding-top: 6px;
-      color: #777;
+      padding-top: 7px;
       font-weight: normal;
-      font-size: 13px;
       line-height: 20px;
       text-align: right;
       .tooltip-icon {
@@ -165,21 +160,31 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
-        padding-top: 7px;
         width: 100%;
         word-wrap: break-word;
         padding-left: 5px; // to get nice hover background
-        box-sizing: border-box;
+        padding-top: 7px;
         &.html-property {
           overflow: auto;
         }
       }
+      .control-subgroup {
+        .controls {
+          margin-left: 0;
+          float: left;
+        }
+      }
       .control-label.wrap {
-        width: 130px;
+        width: auto;
+        padding-left: 0;
+        padding-right: 5px;
       }
       label.control-label {
         width: auto;
       }
+    }
+    &.attribute-row label.control-label {
+      cursor: default;
     }
   }
 }
@@ -899,6 +904,7 @@ footer {
   min-width: 250px;
   width: 100% !important;
   height: calc(~"100% - 81px") !important;
+  min-height: 118px; // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
   .ui-resizable-handle {
     cursor: move;
   }
@@ -1315,6 +1321,7 @@ footer {
     width: 23px;
     height: 19px;
     float: left;
+
     &:hover,
     &:focus {
       border: 0;
@@ -1329,6 +1336,7 @@ footer {
     float: none;
     display: table-cell;
   }
+
   .nav-pills {
     padding:0 10px;
   }
@@ -1344,6 +1352,7 @@ footer {
     }
   }
 }
+
 .launchers-dropdown-menu {
   min-width: 35px;
   &.detach .nav {
@@ -1591,6 +1600,7 @@ footer {
 }
 
 .ui-dialog {
+  position: absolute;
   background-color: #fff;
   -webkit-box-shadow:  0px 2px 32px 1px rgba(0, 0, 0, 0.8);
   box-shadow:  0px 2px 32px 1px rgba(0, 0, 0, 0.8);
@@ -1643,7 +1653,16 @@ footer {
     border-bottom: 1px solid #000;
     background-color: @titleBackgroundStart;
     #gradient > .vertical(@titleBackgroundStart, @titleBackgroundEnd);
-    padding: 6px 15px;
+    padding: 6px 45px 6px 15px;
+    position: absolute;
+    width: 100%;
+    top: 1px;
+    left: 1px;
+    .ui-dialog-titlebar-close{
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
   }
   .ui-dialog-title {
     color: #fff;
@@ -1652,6 +1671,10 @@ footer {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .ui-dialog-content {
+    margin-top: 31px;
+    overflow: auto;
   }
   .ui-dialog-body {
     font-size: 14px;
@@ -1916,7 +1939,11 @@ footer {
     padding:0 4px 0 0;
   }
   .top-row {
-    overflow: hidden;
+    &:after {
+      clear: both;
+      display: block;
+      content:"";
+    }
   }
   .sub-title {
     font-size: 17px;
@@ -2138,7 +2165,12 @@ label.required em,
 .form-horizontal .span6 .oro-multiselect-holder input[type="password"] {
   margin: 0 0 5px 0;
 }*/
-input, textarea, .uneditable-input { width:280px; }
+input,
+textarea,
+.uneditable-input {
+  width: @widthInput;
+}
+
 body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
@@ -2555,6 +2587,9 @@ label.radio.error {
     float: left;
     margin: 0 0 0 4px;
   }
+  button.add-on {
+    float: none;
+  }
 }
 .choice-filter {
   select,
@@ -2583,6 +2618,7 @@ label.radio.error {
 }
 .input-append .add-on,
 .input-prepend .add-on {
+  float: none;
   height:30px;
   input[type='checkbox'],
   input[type='radio'] {
@@ -2961,13 +2997,6 @@ span.validation-failed {
 .create-select-entity.grid .entity-select-btn {
   display: none;
 }
-.fa-bars:before {
-  content: "\f0c9";
-  font-size: 14px;
-  font-family: 'FontAwesome';
-  line-height: 21px;
-  font-style: normal;
-}
 .oro-tabs {
   .nav-tabs {
     padding-left: 1px; // compensate tabs margin-left: -1px
@@ -3290,7 +3319,9 @@ label .popover-content {
 }
 
 .entity-create-or-select-container {
-  .entity-create-btn, .entity-create-btn[disabled], .entity-create-btn[disabled]:active {
+  .entity-create-btn,
+  .entity-create-btn[disabled],
+  .entity-create-btn[disabled]:active {
     padding: 0 6px;
     margin-left: 3px;
     height: 30px;
@@ -3328,9 +3359,11 @@ label .popover-content {
   }
 }
 
-.entity-create-enabled .input-prepend .select2-container,
-.entity-create-enabled .input-append .select2-container {
-  width: 228px;
+.entity-create-enabled {
+  .input-prepend .select2-container,
+  .input-append .select2-container {
+    width: 229px;
+  }
 }
 
 .invisible {
@@ -3400,5 +3433,41 @@ label .popover-content {
 .float-holder {
   label.add-on {
     margin-bottom: 0;
+  }
+}
+
+.collapse-block {
+  [data-collapse-container] {
+    overflow: hidden;
+    max-height: 69.4px; // 4 (lines) * 13px (font-size) * 1.2 (line-height) + 7px (padding)
+  }
+
+  &.expanded [data-collapse-container] {
+    overflow: auto;
+    max-height: none;
+  }
+
+  .toggle-more, .toggle-less, .toggle-collapse {
+    display: none;
+  }
+
+  &.expanded .toggle-less,
+  &.expanded .toggle-collapse,
+  &.overflows .toggle-more,
+  &.overflows .toggle-collapse {
+    display: block;
+  }
+}
+
+.customer-content {
+  .grid-views {
+    .edited-label {
+      vertical-align: top;
+      line-height: 21px;
+    }
+
+    .btn-link {
+      line-height: 21px;
+    }
   }
 }

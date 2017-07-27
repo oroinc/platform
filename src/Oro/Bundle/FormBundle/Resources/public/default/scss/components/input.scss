@@ -1,3 +1,5 @@
+// @theme: default;
+
 .input {
     @include placeholder {
         color: get-color('additional', 'middle');
@@ -20,6 +22,17 @@
         padding-left: 39px;
     }
 
+    &[type="number"] {
+        -moz-appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            margin: 0;
+
+            @include appearance();
+        }
+    }
+
     @include element-state('hover') {
         box-shadow: $input-box-shadow-hover-state;
     }
@@ -30,5 +43,11 @@
 
     @include element-state('error') {
         box-shadow: $input-box-shadow-error-state;
+    }
+
+    @include element-state('disabled') {
+        background: $input-background-color-disabled-state;
+        box-shadow: none;
+        border: $input-border;
     }
 }

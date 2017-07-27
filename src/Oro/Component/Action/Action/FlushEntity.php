@@ -79,6 +79,7 @@ class FlushEntity extends AbstractAction
         try {
             $entityManager->persist($entity);
             $entityManager->flush($entity);
+            $entityManager->refresh($entity);
             $entityManager->commit();
         } catch (\Exception $e) {
             $entityManager->rollback();

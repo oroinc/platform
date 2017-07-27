@@ -20,7 +20,7 @@ define(function(require) {
      *        insertEditorMethod: 'overlay', // Possible values are 'overlay' or [any of supported by the containerMethod](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod)
      *        metadata: {
      *            inline_editing: {
-     *                enable: resource_granted('oro_tag_assign_unassign'),
+     *                enable: is_granted('oro_tag_assign_unassign'),
      *                save_api_accessor: {
      *                    route: 'oro_api_post_taggable',
      *                    http_method: 'POST',
@@ -37,8 +37,7 @@ define(function(require) {
      *                editor: {
      *                    view_options: {
      *                        permissions: {
-     *                            oro_tag_create: resource_granted('oro_tag_create'),
-     *                            oro_tag_unassign_global: resource_granted('oro_tag_unassign_global')
+     *                            oro_tag_create: is_granted('oro_tag_create')
      *                        }
      *                    }
      *                }

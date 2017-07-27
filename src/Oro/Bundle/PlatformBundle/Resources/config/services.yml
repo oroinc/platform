@@ -7,12 +7,18 @@ parameters:
     oro_platform.maintenance.class:                 Oro\Bundle\PlatformBundle\Maintenance\Mode
     oro_platform.event_listener.driver_lock.class:  Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
 
-    oro_platform.twig.platform_extension.class:     Oro\Bundle\PlatformBundle\Twig\PlatformExtension
-
     oro_platform.optional_listeners.manager.class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
     oro_platform.event_listener.optional_listeners.class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener
+    jms_serializer.twig_extension.class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
 
 services:
+    jms_serializer.twig_extension.serializer:
+        class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }
+
     oro_platform.maintenance:
         class:                                %oro_platform.maintenance.class%
         arguments:
@@ -61,9 +67,10 @@ services:
             - '@oro_platform.composer.local_repo_factory'
 
     oro_platform.twig.platform_extension:
-        class: %oro_platform.twig.platform_extension.class%
+        class: Oro\Bundle\PlatformBundle\Twig\PlatformExtension
+        public: false
         arguments:
-            - '@oro_platform.composer.version_helper'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 

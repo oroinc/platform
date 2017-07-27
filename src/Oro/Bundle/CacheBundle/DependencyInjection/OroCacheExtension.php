@@ -23,7 +23,7 @@ class OroCacheExtension extends Extension implements PrependExtensionInterface
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }
 
@@ -34,10 +34,20 @@ class OroCacheExtension extends Extension implements PrependExtensionInterface
     {
         $validationConfig = [
             'validation' => [
-                'cache' => 'oro_cache.validation_cache.doctrine'
-            ]
+                'cache' => 'oro_cache.validation_cache.doctrine',
+            ],
+            'serializer' => [
+                'cache' => 'oro_cache.serializer',
+            ],
+            'annotations' => [
+                'cache' => 'oro_cache.annotations',
+            ],
         ];
 
         $container->prependExtensionConfig('framework', $validationConfig);
+        $container->prependExtensionConfig(
+            'jms_serializer',
+            ['metadata' => ['cache' => 'oro_cache.jms_serializer_adapter']]
+        );
     }
 }

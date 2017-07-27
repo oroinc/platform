@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler\ConfigProviderCompilerPass;
 use Oro\Bundle\RequireJSBundle\Provider\Config as ConfigProvider;
 
-class ConfigProviderCompilerTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ConfigProviderCompilerPass

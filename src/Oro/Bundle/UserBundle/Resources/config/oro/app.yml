@@ -17,6 +17,7 @@ security:
             pattern:                        ^/user/(login|reset-request|send-email|check-email)$
             provider:                       chain_provider
             anonymous:                      true
+            context:                        main
 
         reset_password:
             pattern:                        ^/user/reset/*

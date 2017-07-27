@@ -30,9 +30,6 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     /** @var MergeEntityConfigHelper */
     private $mergeEntityConfigHelper;
 
-    /** @var array */
-    private $configCache = [];
-
     /**
      * @param ConfigExtensionRegistry   $configExtensionRegistry
      * @param ConfigLoaderFactory       $configLoaderFactory
@@ -63,10 +60,16 @@ abstract class LoadFromConfigBag implements ProcessorInterface
             return;
         }
 
-        $this->saveConfig(
-            $context,
-            $this->loadConfig($context->getClassName(), $context->getVersion(), $context->getRequestType())
-        );
+        $this->processConfig($context);
+    }
+
+    /**
+     * @param ConfigContext $context
+     */
+    protected function processConfig(ConfigContext $context)
+    {
+        $config = $this->loadConfig($context->getClassName(), $context->getVersion(), $context->getRequestType());
+        $this->saveConfig($context, $config);
     }
 
     /**
@@ -89,7 +92,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
             }
         }
 
-        $sectionNames = $this->getAllConfigSectionNames();
+        $sectionNames = $this->configExtensionRegistry->getConfigSectionNames();
         foreach ($sectionNames as $sectionName) {
             unset($config[$sectionName]);
         }
@@ -106,19 +109,11 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      * @param string      $version
      * @param RequestType $requestType
      *
-     * @return array|mixed
+     * @return array
      */
     protected function loadConfig($entityClass, $version, RequestType $requestType)
     {
-        $cacheKey = (string)$requestType . '|' . $version . '|' . $entityClass;
-        if (isset($this->configCache[$cacheKey])) {
-            return $this->configCache[$cacheKey];
-        }
-
-        $config = $this->buildConfig($entityClass, $version, $requestType);
-        $this->configCache[$cacheKey] = $config;
-
-        return $config;
+        return $this->buildConfig($entityClass, $version, $requestType);
     }
 
     /**
@@ -142,7 +137,9 @@ abstract class LoadFromConfigBag implements ProcessorInterface
             $parentClasses = $this->resourceHierarchyProvider->getParentClassNames($entityClass);
             foreach ($parentClasses as $parentClass) {
                 $config = $this->getConfig($parentClass, $version, $requestType);
-                if (!empty($config)) {
+                if (false === $config) {
+                    break;
+                } elseif (!empty($config)) {
                     $isInherit = $this->getInheritAndThenRemoveIt($config);
                     $configs[] = $config;
                     if (!$isInherit) {
@@ -179,7 +176,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      *
      * @return bool
      */
-    public static function getInheritAndThenRemoveIt(array &$config)
+    protected function getInheritAndThenRemoveIt(array &$config)
     {
         if (array_key_exists(ConfigUtil::INHERIT, $config)) {
             $isInherit = $config[ConfigUtil::INHERIT];
@@ -189,25 +186,6 @@ abstract class LoadFromConfigBag implements ProcessorInterface
         }
 
         return $isInherit;
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getAllConfigSectionNames()
-    {
-        $sectionNameMap = [];
-        $extensions = $this->configExtensionRegistry->getExtensions();
-        foreach ($extensions as $extension) {
-            $sections = $extension->getEntityConfigurationSections();
-            foreach ($sections as $name => $configuration) {
-                if (!isset($sectionNameMap[$name])) {
-                    $sectionNameMap[$name] = true;
-                }
-            }
-        }
-
-        return array_keys($sectionNameMap);
     }
 
     /**
@@ -226,7 +204,9 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      * @param string      $version
      * @param RequestType $requestType
      *
-     * @return array|null
+     * @return array|false|null Returns an array if a configuration exists,
+     *                          null if if a configuration does not exist,
+     *                          and FALSE if loading of a configuration of parent classes should be stopped
      */
     abstract protected function getConfig($entityClass, $version, RequestType $requestType);
 }

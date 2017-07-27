@@ -19,3 +19,11 @@ Oro\Bundle\OrganizationBundle\Entity\Organization:
   commonOrganization:
     name: Common Organization
     enabled: true
+
+Oro\Bundle\UserBundle\Entity\User:
+  user{1..15}:
+    username: alice<current()>
+    email: 'fake_<current()>@example.com'
+    firstName: Alice<current()>
+    lastName: Williams<current()>
+    password: <password()>

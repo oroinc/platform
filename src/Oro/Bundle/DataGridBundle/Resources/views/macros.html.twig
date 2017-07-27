@@ -26,6 +26,11 @@
                 and oro_config_value('oro_data_grid.full_screen_layout_enabled') %}
             {% set metaData = metaData|merge({enableFullScreenLayout: true}) %}
         {% endif %}
+        {% if renderParams.enableFloatingHeaderPlugin is defined %}
+            {% set metaData = metaData|merge({enableFloatingHeaderPlugin: renderParams.enableFloatingHeaderPlugin}) %}
+        {% else %}
+            {% set metaData = metaData|merge({enableFloatingHeaderPlugin: isMobileVersion()}) %}
+        {% endif %}
         {% set data     = oro_datagrid_data(datagrid) %}
         {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
         {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
@@ -44,16 +49,18 @@
             data: data,
             enableFilters: enableFilters,
             enableToggleFilters: enableToggleFilters,
+            filterContainerSelector: renderParams.filterContainerSelector is defined ? renderParams.filterContainerSelector : null,
             filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : null,
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
+            showViewsInCustomElement: renderParams.showViewsInCustomElement is defined ? renderParams.showViewsInCustomElement : false,
             inputName: oro_datagrid_build_inputname(datagrid.name),
             themeOptions: renderParams.themeOptions|default({}),
-            toolbarOptions: renderParams.toolbarOptions|default({})
+            toolbarOptions: renderParams.toolbarOptions|default({}),
+            gridViewsOptions: renderParams.gridViewsOptions|default({}),
         } %}
-
         <div id="{{ gridId }}"
-             data-page-component-module="orodatagrid/js/app/components/datagrid-component"
+             data-page-component-module="{{ renderParams.datagridComponent|default("orodatagrid/js/app/components/datagrid-component") }}"
              data-page-component-name="{{ options.gridName }}"
              data-page-component-options="{{ options|json_encode }}"
              {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}>

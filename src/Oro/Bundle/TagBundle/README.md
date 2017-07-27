@@ -8,7 +8,7 @@ Entity Configuration
 
 Tags can only be enabled for Configurable entities. To enable tags for an entity, use the `@Config` annotation, e.g.:
 
-```
+``` php
 /**
 ...
  * @Config(
@@ -72,3 +72,36 @@ Only tags that have been assigned to records of this entity will be available. T
 Tags in report builder
 ----------------------
 Tags can be used in reports. If tags are enabled for the entity, virtual field `tags` and virtual relation `tags` will be available in the "Designer" section (Columns, Grouping Columns and Filters).
+
+Tags in views
+-------------
+By default Tags field is automatically added as the last element in the last sub-block of the first block in entity views.
+
+To disable this behavior set `enableDefaultRendering` option to _false_ in the entity `@Config` annotation
+
+``` php
+/**
+...
+ * @Config(
+ *      defaultValues={
+ *          ...
+ *          "tag"={
+ *              "enabled"=true,
+ *              "enableDefaultRendering"=false
+ *          }
+ *          ...
+ *      }
+ * )
+...
+ */
+```
+
+Then you are able to manually render tags somewhere else in the entity view template.
+
+``` twig
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+{% import 'OroTagBundle::macros.html.twig' as Tag %}
+...
+{{ ui.renderHtmlProperty('oro.tag.entity_plural_label'|trans, Tag.renderView(entity)) }}
+...
+```

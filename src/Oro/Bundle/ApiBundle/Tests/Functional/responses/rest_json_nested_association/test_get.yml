@@ -1,0 +1,10 @@
+data:
+    type: 'testapientityfornestedobjects'
+    id: '<toString(@test_entity->id)>'
+    attributes:
+        name: null
+    relationships:
+        relatedEntity:
+            data:
+                type: 'testapidefaultandnulls'
+                id: '<toString(@test_related_entity1->id)>'

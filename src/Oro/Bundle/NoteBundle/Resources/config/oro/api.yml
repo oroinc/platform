@@ -1,20 +1,7 @@
 api:
     entities:
         Oro\Bundle\NoteBundle\Entity\Note:
+            documentation_resource: '@OroNoteBundle/Resources/doc/api/note.md'
             fields:
                 activityTargets:
-                    description: A records to which the Note record associated with
                     data_type: association:manyToMany:activity
-            subresources:
-                activityTargets:
-                    actions:
-                        get_subresource:
-                            documentation: Get full information about records to which the note associated
-                        get_relationship:
-                            documentation: Get records to which the note associated
-                        add_relationship:
-                            documentation: Associate records with the note
-                        update_relationship:
-                            documentation: Completely replace association between records and the note
-                        delete_relationship:
-                            documentation: Delete association between records and the note

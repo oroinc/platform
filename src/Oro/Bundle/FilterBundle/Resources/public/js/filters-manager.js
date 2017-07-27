@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var FiltersManager;
+    var template = require('tpl!orofilter/templates/filters-container.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -34,14 +35,9 @@ define(function(require) {
         filters: null,
 
         /**
-         * Template selector
-         */
-        templateSelector: '#filter-container',
-
-        /**
          * Template
          */
-        template: null,
+        template: template,
 
         /**
          * Mode of filters displaying
@@ -66,11 +62,32 @@ define(function(require) {
         addButtonHint: __('oro_datagrid.label_add_filter'),
 
         /**
+         * Set label for reset button
+         *
+         * @property
+         */
+        multiselectResetButtonLabel: __('oro_datagrid.label_reset_button'),
+
+        /**
          * Select widget object
          *
          * @property {oro.MultiselectDecorator}
          */
         selectWidget: null,
+
+        /**
+         * Select widget constructor
+         *
+         * @property
+         */
+        MultiselectDecorator: MultiselectDecorator,
+
+        /**
+         *  Parameters Select widget constructor
+         *
+         * @property
+         */
+        multiselectParameters: {},
 
         /**
          * ImportExport button selector
@@ -90,7 +107,8 @@ define(function(require) {
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
             'click .reset-filter-button': '_onReset',
-            'click a[data-name="filters-dropdown"]': '_onDropdownToggle'
+            'click a[data-name="filters-dropdown"]': '_onDropdownToggle',
+            'click [data-role="reset-filters"]': '_onReset'
         },
 
         /**
@@ -101,11 +119,11 @@ define(function(require) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            this.template = _.template($(this.templateSelector).html());
-
+            var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
+            this.template = this.getTemplateFunction();
             this.filters = {};
 
-            _.extend(this, _.pick(options, ['addButtonHint', 'stateViewElement', 'viewMode']));
+            _.extend(this, _.pick(options, prop));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);
@@ -319,15 +337,20 @@ define(function(require) {
             return this;
         },
 
+        getTemplateData: function() {
+            return {filters: this.filters};
+        },
+
         /**
          * Render filter list
          *
          * @return {*}
          */
         render: function() {
-            this.$el.html(
-                this.template({filters: this.filters})
+            this.setElement(
+                $(this.template(this.getTemplateData()))
             );
+
             this.dropdownContainer = this.$el.find('.filter-container');
             var $filterItems = this.dropdownContainer.find('.filter-items');
 
@@ -390,31 +413,84 @@ define(function(require) {
          */
         _initializeSelectWidget: function() {
             var $button;
-            this.selectWidget = new MultiselectDecorator({
-                element: this.$(this.filterSelector),
-                parameters: {
-                    multiple: true,
-                    selectedList: 0,
+            var multiselectDefaults = {
+                multiple: true,
+                selectedList: 0,
+                classes: 'select-filter-widget',
+                position: {
+                    my: 'left top+2',
+                    at: 'left bottom'
+                }
+            };
+            var options = _.extend(
+                multiselectDefaults,
+                {
                     selectedText: this.addButtonHint,
-                    classes: 'select-filter-widget',
-                    position: {
-                        my: 'left top+2',
-                        at: 'left bottom'
-                    },
-                    open: $.proxy(function() {
+                    beforeopen: _.bind(function() {
+                        _.each(this.filters, function(filter) {
+                            filter.close();
+                        });
+                        this.selectWidget.onBeforeOpenDropdown();
+                    }, this),
+                    open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                     }, this),
+                    refresh: _.bind(function() {
+                        this.selectWidget.onRefresh();
+                    }, this),
                     appendTo: this.dropdownContainer
-                }
+                },
+                this.multiselectParameters
+            );
+
+            this.selectWidget = new this.MultiselectDecorator({
+                element: this.$(this.filterSelector),
+                parameters: options
             });
 
             this.selectWidget.setViewDesign(this);
             $button = this.selectWidget.multiselect('instance').button;
+            this._setButtonDesign($button);
+            this._setButtonReset();
+        },
+        /**
+         * Set design for filter manager button
+         *
+         * @protected
+         */
+        _setButtonDesign: function($button) {
             $button.find('span:first').replaceWith(
                 '<a class="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
-                    '<span class="caret"></span></a>'
+                '<span class="caret"></span></a>'
             );
+        },
+
+        /**
+         *  Create html node
+         *
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
+        _createButtonReset: function() {
+            return $(
+                '<div class="ui-multiselect-footer">' +
+                    '<a href="javascript:void(0);" class="ui-multiselect-reset" data-role="reset-filters">' +
+                        '<i class="fa-refresh"></i>' + this.multiselectResetButtonLabel + '' +
+                    '</a>' +
+                '</div>'
+            );
+        },
+
+        /**
+         * Set button for reset filters
+         *
+         * @protected
+         */
+        _setButtonReset: function() {
+            var $footerContainer = this._createButtonReset();
+            var instance = this.selectWidget.multiselect('instance');
+            instance.menu.append($footerContainer);
         },
 
         /**
@@ -462,7 +538,7 @@ define(function(require) {
          */
         _onDropdownToggle: function(e) {
             e.preventDefault();
-            this.$('.filter-box > .dropdown').toggleClass('open');
+            this.$el.find('> .dropdown').toggleClass('open');
         },
 
         /**

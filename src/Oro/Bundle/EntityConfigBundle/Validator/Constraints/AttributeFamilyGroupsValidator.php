@@ -21,13 +21,24 @@ class AttributeFamilyGroupsValidator extends ConstraintValidator
             return;
         }
 
-        /** @var \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup[] $attributeGroups */
+        /** @var AttributeGroup[] $attributeGroups */
         $attributeGroups = $value->getAttributeGroups()->getValues();
 
         if (!count($attributeGroups)) {
             $this->context->addViolation($constraint->emptyGroupsMessage);
 
             return;
+        }
+
+        $labels = [];
+        foreach ($attributeGroups as $group) {
+            $label = (string) $group->getDefaultLabel();
+            if (in_array($label, $labels, true)) {
+                $this->context->addViolation($constraint->sameLabelsMessage);
+
+                return;
+            }
+            $labels[] = $label;
         }
     }
 }

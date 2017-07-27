@@ -16,13 +16,13 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 class Loader
 {
     /** @var FixtureFactoryInterface */
-    private $factory;
+    protected $factory;
 
     /** @var FixtureIdentifierResolverInterface */
-    private $identifierResolver;
+    protected $identifierResolver;
 
     /** @var array [fixture id => fixture, ...] */
-    private $fixtures = [];
+    protected $fixtures = [];
 
     /** @var bool */
     private $orderFixturesByNumber = false;
@@ -53,16 +53,8 @@ class Loader
      */
     public function addFixture($fixture)
     {
-        $fixtureId = $this->identifierResolver->resolveId($fixture);
-        if (isset($this->fixtures[$fixtureId])) {
-            return null;
-        }
-
-        if (!is_object($fixture)) {
-            $fixture = $this->factory->createFixture($fixtureId);
-        }
-
         $this->assertFixture($fixture);
+        $fixtureId = $this->identifierResolver->resolveId($fixture);
         $this->fixtures[$fixtureId] = $fixture;
 
         if ($fixture instanceof OrderedFixtureInterface) {

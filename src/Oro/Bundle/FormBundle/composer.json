@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.0",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "genemu/form-bundle": "2.1.*",
         "oro/security-bundle": "dev-master",
@@ -19,7 +19,8 @@
         "oro/ui-bundle": "dev-master",
         "oro/entity-config-bundle": "dev-master",
         "oro/form-bundle": "dev-master",
-        "bower-asset/jquery-validate": "1.11.1"
+        "bower-asset/jquery-validate": "1.16.0",
+        "tinymce/tinymce": "4.6.*"
     },
     "autoload": {
         "psr-0": {"Oro\\Bundle\\FormBundle": ""}

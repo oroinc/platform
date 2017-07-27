@@ -34,9 +34,9 @@ class MenuUpdateBuilder implements BuilderInterface
     private $className;
 
     /**
-     * @param LocalizationHelper        $localizationHelper
-     * @param ScopeManager              $scopeManager
-     * @param ManagerRegistry $registry
+     * @param LocalizationHelper $localizationHelper
+     * @param ScopeManager       $scopeManager
+     * @param ManagerRegistry    $registry
      */
     public function __construct(
         LocalizationHelper $localizationHelper,
@@ -78,7 +78,7 @@ class MenuUpdateBuilder implements BuilderInterface
             $options[self::SCOPE_CONTEXT_OPTION] : null;
         $updates = $this->getUpdates($menu->getName(), $scopeType, $scopeContext);
         foreach ($updates as $update) {
-            MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
+            MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper, $options);
         }
 
         $this->applyDivider($menu);

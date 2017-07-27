@@ -2,11 +2,14 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as macros %}
 
-{% set pageParams = transition.frontendOptions.page is defined ?transition.frontendOptions.page : null  %}
+{% set pageParams = transition.frontendOptions.page is defined ? transition.frontendOptions.page : null  %}
 {% if pageParams.title is defined %}
     {% set pageTitle = pageParams.title|trans %}
 {% else %}
-    {% set pageTitle = transition.label|trans({},'workflows') %}
+    {% set pageTitle = transition.buttonLabel|trans({},'workflows') %}
+    {% if pageTitle is empty or pageTitle == transition.buttonLabel %}
+        {% set pageTitle = transition.label|trans({},'workflows') %}
+    {% endif %}
 {% endif %}
 
 {% if pageParams.parent_label is defined %}
@@ -18,10 +21,13 @@
 {% if pageParams.parent_route is defined %}
     {% set indexPath = path(pageParams.parent_route, pageParams.parent_route_parameters is defined ? pageParams.parent_route_parameters : []) %}
 {% else %}
-    {% set indexPath = null %}
+    {% set indexPath = app.request.query.get('originalUrl') %}
 {% endif %}
 
 {% oro_title_set({params : {"%workflow_title%": pageTitle ~ ' - ' ~ indexLabel} }) %}
+
+{% block pin_button %}
+{% endblock pin_button %}
 
 {% block navButtons %}
     {% if indexPath %}
@@ -66,8 +72,8 @@
             'loadingMaskEnabled': false
         }) }}
         <script type="text/javascript">
-            require(['jquery', 'oroui/js/mediator', 'oroui/js/widget-manager', 'oroworkflow/js/transition-executor'],
-            function($, mediator, widgetManager, performTransition) {
+            require(['jquery', 'oroui/js/mediator', 'oroui/js/widget-manager', 'oroworkflow/js/transition-executor', 'oroworkflow/js/transition-event-handlers'],
+            function($, mediator, widgetManager, performTransition, TransitionEventHandlers) {
                 var saveAndTransitBtn = $('#save-and-transit');
 
                 widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
@@ -82,6 +88,16 @@
                     widget.on('formSaveError', function() {
                         mediator.execute('hideLoading');
                     });
+
+                    widget.on('transitionSuccess', function(response) {
+                        var element = $('<div>');
+                        TransitionEventHandlers.getOnSuccess(element)(response);
+                    });
+
+                    widget.on('transitionFailure', function(responseCode) {
+                        var element = $('<div>');
+                        TransitionEventHandlers.getOnFailure(element)({status: responseCode}, '', '');
+                    });
                 });
 
                 saveAndTransitBtn.on('click', function(e) {
@@ -94,17 +110,19 @@
         </script>
         </div>
     {% endset %}
-
-    {% set dataBlocks = [
-        {
-            'title': 'General Information'|trans,
-            'class': 'active',
-            'subblocks': [{'data' : [transitionFormWidget] }]
-        }
-    ] %}
-
-    {% set id = 'transitionPage' %}
-    {% set data = {'dataBlocks': dataBlocks} %}
-
-    {{ parent() }}
+    {% if transition.hasFormConfiguration() %}
+        {{ transitionFormWidget }}
+    {% else %}
+        {% set dataBlocks = [
+            {
+                'title': 'General Information'|trans,
+                'class': 'active',
+                'subblocks': [{'data' : [transitionFormWidget] }]
+            }
+        ] %}
+    
+        {% set id = 'transitionPage' %}
+        {% set data = {'dataBlocks': dataBlocks} %}
+        {{ parent() }}
+    {% endif %}
 {% endblock content_data %}

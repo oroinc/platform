@@ -21,7 +21,7 @@ class WriterCompilerPass implements CompilerPassInterface
             foreach ($tags as $attributes) {
                 $definition->addMethodCall('addWriter', [
                     new Reference($id),
-                    $attributes["alias"]
+                    $attributes['alias']
                 ]);
             }
         }

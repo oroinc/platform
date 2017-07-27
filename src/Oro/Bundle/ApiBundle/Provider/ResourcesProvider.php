@@ -18,6 +18,9 @@ class ResourcesProvider
     /** @var array */
     protected $accessibleResources;
 
+    /** @var array */
+    protected $excludedActions;
+
     /**
      * @param ActionProcessorInterface $processor
      * @param ResourcesCache           $resourcesCache
@@ -117,6 +120,24 @@ class ResourcesProvider
     }
 
     /**
+     * Gets a list of actions that cannot be used in Data API from for a given entity.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return string[]
+     */
+    public function getResourceExcludeActions($entityClass, $version, RequestType $requestType)
+    {
+        $excludedActions = $this->loadExcludedActions($version, $requestType);
+
+        return array_key_exists($entityClass, $excludedActions)
+            ? $excludedActions[$entityClass]
+            : [];
+    }
+
+    /**
      * @param string      $version
      * @param RequestType $requestType
      *
@@ -133,5 +154,24 @@ class ResourcesProvider
         }
 
         return $this->accessibleResources;
+    }
+
+    /**
+     * @param string      $version
+     * @param RequestType $requestType
+     *
+     * @return array [entity class => [action name, ...]]
+     */
+    protected function loadExcludedActions($version, RequestType $requestType)
+    {
+        if (null === $this->excludedActions) {
+            $this->excludedActions = $this->resourcesCache->getExcludedActions($version, $requestType);
+            if (null === $this->excludedActions) {
+                $this->getResources($version, $requestType);
+                $this->excludedActions = $this->resourcesCache->getExcludedActions($version, $requestType);
+            }
+        }
+
+        return $this->excludedActions;
     }
 }

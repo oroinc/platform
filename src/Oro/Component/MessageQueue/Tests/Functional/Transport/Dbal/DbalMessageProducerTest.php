@@ -7,6 +7,9 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
 
+/**
+ * @dbIsolationPerTest
+ */
 class DbalMessageProducerTest extends WebTestCase
 {
     use DbalSchemaExtensionTrait;
@@ -18,15 +21,11 @@ class DbalMessageProducerTest extends WebTestCase
         $this->initClient();
 
         $this->ensureTableExists('message_queue');
-
-        $this->startTransaction();
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-
-        $this->rollbackTransaction();
 
         $this->dropTable('message_queue');
     }

@@ -1,16 +1,16 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
-{% oro_title_set({params : {"%name%": entity.defaultLabel }}) %}
+{% oro_title_set({params : {"%name%": entity.defaultLabel.string }}) %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_attribute_family_update') %}
+    {% if is_granted('oro_attribute_family_update') %}
         {{ UI.editButton({
             'path':  path('oro_attribute_family_update', { 'id': entity.id }),
             'entity_label': 'oro.entity_config.attribute_family.entity_label'|trans})
         }}
     {% endif %}
-    {% if resource_granted('oro_attribute_family_delete') and resource_granted('delete', entity) %}
+    {% if is_granted('oro_attribute_family_delete') and is_granted('delete', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_attribute_family_delete', {'id': entity.id}),
             'dataRedirect': path('oro_attribute_family_index', {'alias': entityAlias}),

@@ -3,492 +3,785 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
-use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
+use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    use EntityTrait;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var DynamicFieldsExtension
-     */
+    /** @var DynamicFieldsExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager
-     */
-    protected $configManager;
+    /** @var ConfigProviderMock */
+    protected $extendConfigProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
-     */
-    protected $configProvider;
+    /** @var ConfigProviderMock */
+    protected $entityConfigProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FieldTypeHelper
-     */
+    /** @var ConfigProviderMock */
+    protected $viewConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $fieldTypeHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dispatcher;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
-    protected $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker */
+    protected $featureChecker;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
+        $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
+        $this->entityConfigProvider = new ConfigProviderMock($configManager, 'entity');
+        $this->viewConfigProvider = new ConfigProviderMock($configManager, 'view');
+        $this->fieldTypeHelper = $this->createMock(FieldTypeHelper::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $propertyAccessor = new PropertyAccessor();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
-        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
 
-        $this->configManager
-            ->expects($this->any())
-            ->method('getProvider')
-            ->will($this->returnValue($this->configProvider));
+        $container = self::getContainerBuilder()
+            ->add('oro_entity_config.provider.extend', $this->extendConfigProvider)
+            ->add('oro_entity_config.provider.entity', $this->entityConfigProvider)
+            ->add('oro_entity_config.provider.view', $this->viewConfigProvider)
+            ->add('oro_entity_extend.extend.field_type_helper', $this->fieldTypeHelper)
+            ->add('property_accessor', $propertyAccessor)
+            ->add('event_dispatcher', $this->dispatcher)
+            ->add('security.authorization_checker', $this->authorizationChecker)
+            ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
+            ->getContainer($this);
 
-        $this->fieldTypeHelper = $this->getMockBuilder(FieldTypeHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extension = new DynamicFieldsExtension($container);
+    }
 
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
-        
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+    /**
+     * @param string $entityClass
+     * @param string $fieldName
+     *
+     * @return FieldConfigModel
+     */
+    protected function getFieldConfigModel($entityClass, $fieldName)
+    {
+        $entityModel = new EntityConfigModel($entityClass);
+        $fieldModel = new FieldConfigModel($fieldName);
+        $fieldModel->setEntity($entityModel);
 
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        return $fieldModel;
+    }
 
-        $this->extension = new DynamicFieldsExtension(
-            $this->configManager,
-            $this->fieldTypeHelper,
-            $this->dispatcher,
-            $this->securityFacade
+    public function testGetFieldWhenAccessDenied()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $field = $this->getFieldConfigModel($entityClass, $fieldName);
+
+        $this->extendConfigProvider->addFieldConfig($entityClass, $fieldName);
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(false);
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_field', [$entity, $field])
         );
     }
 
-    /**
-     * @param array $fields
-     * @param array $configValues
-     * @param array $expected
-     * @param array $nonAccessibleFields
-     *
-     * @dataProvider fieldsDataProviderWithNonAccessibleFields
-     */
-    public function testGetFieldsWithNonAccessibleFields(
-        array $fields,
-        array $configValues,
-        array $expected,
-        array $nonAccessibleFields
-    ) {
-        $entity = new \StdClass();
-        foreach ($fields as $field) {
-            /** @var ConfigInterface $field */
-            $fieldId = $field->getId();
-            /** @var FieldConfigId $fieldId */
-            $fieldName = $fieldId->getFieldName();
-            $entity->{$fieldName} = $fieldName;
-        }
-
-        $this->configProvider
-            ->expects($this->once())
-            ->method('filter')
-            ->will($this->returnValue($fields));
-
-        $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-
-        $this->configProvider
-            ->expects($this->any())
-            ->method('getConfigById')
-            ->will($this->returnValue($config));
-
-        $this->securityFacade->expects($this->any())
-            ->method('isGranted')
-            ->willReturnCallback(
-                function ($argument, FieldVote $field) use ($nonAccessibleFields) {
-                    return !in_array($field->getField(), $nonAccessibleFields);
-                }
-            );
-
-        foreach ($configValues as $key => $configValue) {
-            $config
-                ->expects($this->at(($key)))
-                ->method('get')
-                ->will(
-                    $this->returnCallback(
-                        function ($value, $strict, $default) use ($configValue) {
-                            if (!is_null($configValue)) {
-                                return $configValue;
-                            }
-
-                            return $default;
-                        }
-                    )
-                );
-        }
-
-        $rows = $this->extension->getFields($entity);
-
-        $this->assertEquals(json_encode($expected), json_encode($rows));
-    }
-
-    /**
-     * @return array
-     */
-    public function fieldsDataProviderWithNonAccessibleFields()
+    public function testGetFieldWhenFieldInvisible()
     {
-        return [
-            'one field' => [
-                [$this->getFieldMock('field', 'type1')],
-                [],
-                [],
-                ['field']
-            ],
-            'two fields without sorting' => [
-                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                [],
-                [
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                ],
-                ['field1']
-            ],
-            'two sorted fields' => [
-                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['type1', 'field1', 10],
-                [
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                ],
-                ['field2']
-            ],
-            'full' => [
-                [
-                    $this->getFieldMock('field1', 'type1'),
-                    $this->getFieldMock('field2', 'type2'),
-                    $this->getFieldMock('field3', 'type3'),
-                    $this->getFieldMock('field4', 'type4'),
-                    $this->getFieldMock('field5', 'type5'),
-                ],
-                [
-                    'type1', 'field1', -10, 'type2', 'field2', -5,
-                    'type3', 'field3', null
-                ],
-                [
-                    'field3' => ['type' => 'type3', 'label' => 'field3', 'value' => 'field3'],
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                ],
-                ['field5', 'field4']
-            ]
-        ];
-    }
+        $entity = new TestProduct();
+        $entity->setName('test');
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $field = $this->getFieldConfigModel($entityClass, $fieldName);
 
-    /**
-     * @param array $fields
-     * @param array $configValues
-     * @param array $expected
-     *
-     * @dataProvider fieldsDataProvider
-     */
-    public function testGetFields(array $fields, array $configValues, array $expected)
-    {
-        $entity = new \stdClass();
-        foreach ($fields as $field) {
-            /** @var ConfigInterface $field */
-            $fieldId = $field->getId();
-            /** @var FieldConfigId $fieldId */
-            $fieldName = $fieldId->getFieldName();
-            $entity->{$fieldName} = $fieldName;
-        }
+        $this->extendConfigProvider->addFieldConfig($entityClass, $fieldName);
 
-        $this->configProvider
-            ->expects($this->once())
-            ->method('filter')
-            ->will($this->returnValue($fields));
-
-        $config = $this->getMockBuilder(ConfigInterface::class)->getMock();
-
-        $this->configProvider
-            ->expects($this->any())
-            ->method('getConfigById')
-            ->will($this->returnValue($config));
-
-        $this->securityFacade->expects($this->any())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(true);
-
-        foreach ($configValues as $key => $configValue) {
-            $config
-                ->expects($this->at(($key)))
-                ->method('get')
-                ->will(
-                    $this->returnCallback(
-                        function ($value, $strict, $default) use ($configValue) {
-                            if (!is_null($configValue)) {
-                                return $configValue;
-                            }
-
-                            return $default;
-                        }
-                    )
-                );
-        }
-
-        $this->dispatcher
-            ->expects($this->exactly(sizeof($fields)))
-            ->method('dispatch');
-
-        $rows = $this->extension->getFields($entity);
-
-        $this->assertEquals(json_encode($expected), json_encode($rows));
-    }
-
-    /**
-     * @return array
-     */
-    public function getFieldDataProvider()
-    {
-        return [
-            'granted and visible field' => [
-                'fieldName' => 'name',
-                'fieldValue' => 'Nuts',
-                'fieldType' => 'bigint',
-                'isVisible' => true,
-                'isGranted' => true,
-                'expectedData' => [
-                    'type' => 'bigint',
-                    'label' => 'name',
-                    'value' => 'Nuts'
-                ],
-            ],
-            'granted and not visible field' => [
-                'fieldName' => 'name',
-                'fieldValue' => 'Nuts',
-                'fieldType' => 'bigint',
-                'isVisible' => false,
-                'isGranted' => true,
-                'expectedData' => false
-            ],
-            'not granted and visible field' => [
-                'fieldName' => 'name',
-                'fieldValue' => 'Nuts',
-                'fieldType' => 'bigint',
-                'isVisible' => true,
-                'isGranted' => false,
-                'expectedData' => false
-            ],
-            'not granted and not visible field' => [
-                'fieldName' => 'name',
-                'fieldValue' => 'Nuts',
-                'fieldType' => 'bigint',
-                'isVisible' => false,
-                'isGranted' => false,
-                'expectedData' => false
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider getFieldDataProvider
-     *
-     * @param string $fieldName
-     * @param mixed $fieldValue
-     * @param string $fieldType
-     * @param bool $isVisible
-     * @param bool $isGranted
-     * @param bool|array $expectedData
-     */
-    public function testGetField($fieldName, $fieldValue, $fieldType, $isVisible, $isGranted, $expectedData)
-    {
-        $config = $this->getFieldMock($fieldName, $fieldType);
-        /** @var FieldConfigModel $field */
-        $field = $this->getEntity(FieldConfigModel::class, [
-            'fieldname' => $fieldName,
-            'entity' => $this->getEntity(EntityConfigModel::class)
-        ]);
-
-        $entity = $this->getEntity(TestProduct::class, ['name' => $fieldValue]);
-
-        $this->configProvider
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($config);
-
-        $this->configProvider
-            ->expects($this->any())
-            ->method('getConfigById')
-            ->willReturn($config);
-
-        $this->securityFacade->expects($this->any())
-            ->method('isGranted')
-            ->willReturn($isGranted);
-
-        $this->dispatcher
-            ->expects($this->exactly((int)$isGranted))
+        $this->dispatcher->expects(self::once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) use ($isVisible) {
-                $event->setFieldVisibility($isVisible);
-            });
-
-        $this->assertEquals($expectedData, $this->extension->getField($entity, $field));
-    }
-
-    /**
-     * @return array
-     */
-    public function fieldsDataProvider()
-    {
-        return [
-            'one field' => [
-                [$this->getFieldMock('field', 'type1')],
-                [],
-                ['field' => ['type' => 'type1', 'label' => 'field', 'value' => 'field']]
-            ],
-            'two fields without sorting' => [
-                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                [],
-                [
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                ]
-            ],
-            'two sorted fields' => [
-                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['type1', 'field1', 10, 'type2', 'field2', 15],
-                [
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                ]
-            ],
-            'two sorted one without priority' => [
-                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['type1', 'field1', null, 'type2', 'field2', 5],
-                [
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                ]
-            ],
-            'two sorted another without priority' => [
-                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['type1', 'field1', 5, 'type2', 'field2', null],
-                [
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                ]
-            ],
-            'two sorted with less than zero' => [
-                [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['type1', 'field1', null, 'type2', 'field2', -10],
-                [
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                ]
-            ],
-            'full' => [
-                [
-                    $this->getFieldMock('field1', 'type1'),
-                    $this->getFieldMock('field2', 'type2'),
-                    $this->getFieldMock('field3', 'type3'),
-                    $this->getFieldMock('field4', 'type4'),
-                    $this->getFieldMock('field5', 'type5'),
-                ],
-                [
-                    'type1', 'field1', -10, 'type2', 'field2', -5,
-                    'type3', 'field3', null, 'type4', 'field4', 0, 'type5', 'field5', 10
-                ],
-                [
-                    'field5' => ['type' => 'type5', 'label' => 'field5', 'value' => 'field5'],
-                    'field3' => ['type' => 'type3', 'label' => 'field3', 'value' => 'field3'],
-                    'field4' => ['type' => 'type4', 'label' => 'field4', 'value' => 'field4'],
-                    'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
-                    'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $fieldType
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigInterface
-     */
-    public function getFieldMock($fieldName, $fieldType)
-    {
-        $field = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $configId = $this
-            ->getMockBuilder(FieldConfigId::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configId
-            ->expects($this->any())
-            ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
-
-        $configId
-            ->expects($this->any())
-            ->method('getFieldType')
-            ->will($this->returnValue($fieldType));
-
-        $field
-            ->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($configId));
-
-
-        return $field;
-    }
-
-    public function testSkipFieldIfNotVisible()
-    {
-        $this->securityFacade->expects($this->any())
-            ->method('isGranted')
-            ->willReturn(true);
-        
-        $this->dispatcher->expects($this->any())
-            ->method('dispatch')
-            ->willReturnCallback(function ($eventName, $event) {
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName)
+                )
+            )
+            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
                 $event->setFieldVisibility(false);
             });
 
-        $configFieldId = $this->getMockBuilder(FieldConfigId::class)->disableOriginalConstructor()->getMock();
-        $configFieldId->expects($this->once())
-            ->method('getFieldName')
-            ->willReturn('getFieldValue');
-        $configField = $this->getMockBuilder(ConfigInterface::class)->getMock();
-        $configField->expects($this->once())
-            ->method('getId')
-            ->willReturn($configFieldId);
-        $this->configProvider->expects($this->once())
-            ->method('filter')
-            ->willReturn([$configField]);
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_field', [$entity, $field])
+        );
+    }
 
-        $entityMock = $this->getMockBuilder(ValueRenderEvent::class)->disableOriginalConstructor()->getMock();
-        $entityMock->expects($this->once())
-            ->method('getFieldValue')
-            ->willReturn('testValue');
+    public function testGetFieldWhenFieldValueIsChangedByListener()
+    {
+        $entity = new TestProduct();
+        $entity->setName('test');
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+        $field = $this->getFieldConfigModel($entityClass, $fieldName);
 
-        $rows = $this->extension->getFields($entityMock, ValueRenderEvent::class);
-        $this->assertEmpty($rows);
+        $this->extendConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+        $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+        $this->viewConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(true);
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
+                )
+            )
+            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+                $event->setFieldViewValue('new value');
+            });
+
+        self::assertSame(
+            [
+                'type'  => $fieldType,
+                'label' => $fieldName,
+                'value' => 'new value',
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_field', [$entity, $field])
+        );
+    }
+
+    public function testGetFieldWhenNoLabelAndViewType()
+    {
+        $entity = new TestProduct();
+        $entity->setName('test');
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+        $field = $this->getFieldConfigModel($entityClass, $fieldName);
+
+        $this->extendConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+        $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+        $this->viewConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(true);
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
+                )
+            );
+
+        self::assertSame(
+            [
+                'type'  => $fieldType,
+                'label' => $fieldName,
+                'value' => $entity->getName(),
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_field', [$entity, $field])
+        );
+    }
+
+    public function testGetFieldWithLabelAndViewType()
+    {
+        $entity = new TestProduct();
+        $entity->setName('test');
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+        $field = $this->getFieldConfigModel($entityClass, $fieldName);
+
+        $this->extendConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+        $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType, ['label' => 'field.label']);
+        $this->viewConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType, ['type' => 'view.type']);
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(true);
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
+                )
+            );
+
+        self::assertSame(
+            [
+                'type'  => 'view.type',
+                'label' => 'field.label',
+                'value' => $entity->getName(),
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_field', [$entity, $field])
+        );
+    }
+
+    public function testGetFieldsForSystemField()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_SYSTEM]
+        );
+
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsForNotAccessibleField()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true, 'is_deleted' => true]
+        );
+
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsForNotDisplayableField()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => false]
+        );
+
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsForNotAccessibleRelation()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM, 'target_entity' => 'Test\TargetEntity']
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => true]
+        );
+
+        $this->extendConfigProvider->addEntityConfig(
+            'Test\TargetEntity',
+            ['is_extend' => true, 'is_deleted' => true]
+        );
+
+        $this->fieldTypeHelper->expects(self::once())
+            ->method('getUnderlyingType')
+            ->with($fieldType)
+            ->willReturn(RelationType::MANY_TO_ONE);
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsForAccessibleRelation()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM, 'target_entity' => 'Test\TargetEntity']
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => true]
+        );
+
+        $this->extendConfigProvider->addEntityConfig('Test\TargetEntity', []);
+
+        $this->fieldTypeHelper->expects(self::once())
+            ->method('getUnderlyingType')
+            ->with($fieldType)
+            ->willReturn(RelationType::MANY_TO_ONE);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(false);
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsWhenAccessDenied()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => true]
+        );
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(false);
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsForInvisibleField()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => true]
+        );
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(true);
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
+                )
+            )
+            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+                $event->setFieldVisibility(false);
+            });
+
+        self::assertSame(
+            [],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsWhenFieldValueIsChangedByListener()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => true]
+        );
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(true);
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
+                )
+            )
+            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+                $event->setFieldViewValue('new value');
+            });
+
+        self::assertSame(
+            [
+                $fieldName => [
+                    'type'  => $fieldType,
+                    'label' => $fieldName,
+                    'value' => 'new value',
+                ]
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsWhenNoLabelAndViewType()
+    {
+        $entity = new TestProduct();
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, $fieldType);
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => true]
+        );
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(true);
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
+                )
+            );
+
+        self::assertSame(
+            [
+                $fieldName => [
+                    'type'  => $fieldType,
+                    'label' => $fieldName,
+                    'value' => $entity->getName(),
+                ]
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsWithLabelAndViewType()
+    {
+        $entity = new TestProduct();
+        $entity->setName('test');
+        $entityClass = TestProduct::class;
+        $fieldName = 'name';
+        $fieldType = 'string';
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->entityConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['label' => 'field.label']
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            $fieldName,
+            $fieldType,
+            ['is_displayable' => true, 'type' => 'view.type']
+        );
+
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', new FieldVote($entity, $fieldName))
+            ->willReturn(true);
+        $this->dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                EntityExtendEvents::BEFORE_VALUE_RENDER,
+                new ValueRenderEvent(
+                    $entity,
+                    $entity->getName(),
+                    new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
+                )
+            );
+
+        self::assertSame(
+            [
+                $fieldName => [
+                    'type'  => 'view.type',
+                    'label' => 'field.label',
+                    'value' => $entity->getName(),
+                ]
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsShouldBeInOriginalOrderIfNoPriority()
+    {
+        $entity = new TestProduct();
+        $entity->setId(123);
+        $entity->setName('test');
+        $entityClass = TestProduct::class;
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            'id',
+            'integer',
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            'name',
+            'string',
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+
+        $this->entityConfigProvider->addFieldConfig(
+            $entityClass,
+            'id',
+            'integer',
+            ['label' => 'id.label']
+        );
+        $this->entityConfigProvider->addFieldConfig(
+            $entityClass,
+            'name',
+            'string',
+            ['label' => 'name.label']
+        );
+
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            'id',
+            'string',
+            ['is_displayable' => true]
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            'name',
+            'string',
+            ['is_displayable' => true]
+        );
+
+        $this->authorizationChecker->expects(self::exactly(2))
+            ->method('isGranted')
+            ->willReturn(true);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->with(EntityExtendEvents::BEFORE_VALUE_RENDER);
+
+        self::assertSame(
+            [
+                'id'   => [
+                    'type'  => 'integer',
+                    'label' => 'id.label',
+                    'value' => $entity->getId(),
+                ],
+                'name' => [
+                    'type'  => 'string',
+                    'label' => 'name.label',
+                    'value' => $entity->getName(),
+                ],
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
+    }
+
+    public function testGetFieldsShouldBeSortedByPriority()
+    {
+        $entity = new TestProduct();
+        $entity->setId(123);
+        $entity->setName('test');
+        $entityClass = TestProduct::class;
+
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            'id',
+            'integer',
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+        $this->extendConfigProvider->addFieldConfig(
+            $entityClass,
+            'name',
+            'string',
+            ['owner' => ExtendScope::OWNER_CUSTOM]
+        );
+
+        $this->entityConfigProvider->addFieldConfig(
+            $entityClass,
+            'id',
+            'integer',
+            ['label' => 'id.label']
+        );
+        $this->entityConfigProvider->addFieldConfig(
+            $entityClass,
+            'name',
+            'string',
+            ['label' => 'name.label']
+        );
+
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            'id',
+            'string',
+            ['is_displayable' => true, 'priority' => 10]
+        );
+        $this->viewConfigProvider->addFieldConfig(
+            $entityClass,
+            'name',
+            'string',
+            ['is_displayable' => true, 'priority' => 20]
+        );
+
+        $this->authorizationChecker->expects(self::exactly(2))
+            ->method('isGranted')
+            ->willReturn(true);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->with(EntityExtendEvents::BEFORE_VALUE_RENDER);
+
+        self::assertSame(
+            [
+                'name' => [
+                    'type'  => 'string',
+                    'label' => 'name.label',
+                    'value' => $entity->getName(),
+                ],
+                'id'   => [
+                    'type'  => 'integer',
+                    'label' => 'id.label',
+                    'value' => $entity->getId(),
+                ],
+            ],
+            self::callTwigFunction($this->extension, 'oro_get_dynamic_fields', [$entity])
+        );
     }
 }

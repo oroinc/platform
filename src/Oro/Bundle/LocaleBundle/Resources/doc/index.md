@@ -9,3 +9,4 @@ OroLocaleBundle Documentation
 - [Entities](./reference/entities.md)
 - [Localized Values](./reference/localized-values.md)
 - [Current Localization](./reference/current-localization.md)
+- [Managing Localizations](./reference/managing-localizations.md)

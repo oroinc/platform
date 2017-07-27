@@ -35,20 +35,30 @@
         function(_, __, WidgetManager, Messenger) {
             WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                 widget._onContentLoad = function (content) {
-                    if (_.has(content, 'success') && content.success) {
-                        Messenger.notificationFlashMessage(
-                            'success',
-                            __('oro.importexport.import_validation.success.message')
-                        );
+                    if (_.has(content, 'success')) {
+                        if(content.success) {
+                            Messenger.notificationFlashMessage(
+                                    'success',
+                                    __('oro.importexport.import_validation.success.message')
+                            );
+                        } else {
+                            Messenger.notificationFlashMessage(
+                                    'error',
+                                    __('oro.importexport.import_validation.form_fail.message')
+                            );
+                        }
+                        this.remove();
                     } else {
-                        Messenger.notificationFlashMessage(
-                            'error',
-                            __('oro.importexport.import_validation.fail.message')
-                        );
+                        delete this.loading;
+                        this.disposePageComponents();
+                        this.setContent(content, true);
+                        this._triggerContentLoadEvents();
                     }
-
-                    widget.remove();
                 };
+                widget._onContentLoadFail = function() {
+                    Messenger.notificationFlashMessage('error', __('oro.importexport.import.fail.message'));
+                    this.remove();
+                }
 
             });
         });

@@ -5,7 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
+use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -79,18 +80,20 @@ class MassDeleteLimiter
      */
     public function getLimitResult(MassActionHandlerArgs $args)
     {
-        $query              = $args->getResults()->getSource();
-        $resultsForSelected = new DeletionIterableResult($query);
-        $deletableQuery     = $this->cloneQuery($query);
+        $query = $args->getResults()->getSource();
+        if ($query instanceof QueryBuilder) {
+            $query = $query->getQuery();
+        }
+        $queryForDelete = $this->aclHelper->apply($this->cloneQuery($query), 'DELETE');
 
-        $accessLimitedQuery = $this->aclHelper->apply($deletableQuery, 'DELETE');
-        $resultsForDelete   = new DeletionIterableResult($accessLimitedQuery);
-
-        return new MassDeleteLimitResult($resultsForSelected->count(), $resultsForDelete->count());
+        return new MassDeleteLimitResult(
+            QueryCountCalculator::calculateCount($query),
+            QueryCountCalculator::calculateCount($queryForDelete)
+        );
     }
 
     /**
-     * Clones $query. Also clones parameters for Doctrine\ORM\Query case.
+     * Makes full clone of the given query, including its parameters and hints
      *
      * @param Query|QueryBuilder $query
      *
@@ -98,11 +101,10 @@ class MassDeleteLimiter
      */
     protected function cloneQuery($query)
     {
-        $cloned = clone $query;
         if ($query instanceof Query) {
-            $cloned->setParameters(clone $query->getParameters());
+            return QueryUtil::cloneQuery($query);
         }
 
-        return $cloned;
+        return clone $query;
     }
 }

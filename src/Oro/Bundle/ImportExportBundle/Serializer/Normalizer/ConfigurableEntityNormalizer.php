@@ -62,12 +62,16 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $fieldName = $field['name'];
             if (array_key_exists($fieldName, $data)) {
                 $value = $data[$fieldName];
-                if ($data[$fieldName] !== null
+                if ($value !== null
                     && ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field))
                 ) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {
                         $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
                     } elseif ($this->fieldHelper->isSingleRelation($field)) {
+                        // if data for object value is empty array we should not create empty object
+                        if ([] === $value) {
+                            continue;
+                        }
                         $entityClass = $field['related_entity_name'];
                     } else {
                         $entityClass = 'DateTime';
@@ -77,7 +81,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                     $value = $this->serializer->denormalize($value, $entityClass, $format, $context);
                 }
 
-                $this->fieldHelper->setObjectValue($result, $fieldName, $value);
+                $this->setObjectValue($result, $fieldName, $value);
             }
         }
 
@@ -126,7 +130,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                 continue;
             }
 
-            $fieldValue = $this->fieldHelper->getObjectValue($object, $fieldName);
+            $fieldValue = $this->getObjectValue($object, $fieldName);
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
 
@@ -266,5 +270,26 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         }
 
         return $result;
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     *
+     * @return mixed
+     */
+    protected function getObjectValue($object, $fieldName)
+    {
+        return $this->fieldHelper->getObjectValue($object, $fieldName);
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed $value
+     */
+    protected function setObjectValue($object, $fieldName, $value)
+    {
+        $this->fieldHelper->setObjectValue($object, $fieldName, $value);
     }
 }

@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\UIBundle\Route\Router;
-use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Bundle\FormBundle\Event\FormHandler\AfterFormProcessEvent;
 use Oro\Bundle\FormBundle\Event\FormHandler\Events;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
+use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
+use Oro\Bundle\FormBundle\Model\UpdateHandler;
+use Oro\Bundle\UIBundle\Route\Router;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -55,6 +57,14 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $resultCallbackInvoked;
 
+    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
+    protected $requestStack;
+
+    /**
+     * @var FormHandler
+     */
+    protected $formHandler;
+
     /**
      * @var UpdateHandler
      */
@@ -62,31 +72,29 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->router = $this->getMockBuilder('Oro\Bundle\UIBundle\Route\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $this->request = $this->createMock(Request::class);
+
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
+
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
+        $this->session = $this->createMock(Session::class);
+        $this->router = $this->createMock(Router::class);
+        $this->form = $this->createMock(FormInterface::class);
+
+        $this->formHandler = new FormHandler($this->eventDispatcher, $this->doctrineHelper);
 
         $this->resultCallbackInvoked = false;
 
         $this->handler = new UpdateHandler(
-            $this->request,
+            $this->requestStack,
             $this->session,
             $this->router,
             $this->doctrineHelper,
-            $this->eventDispatcher
+            $this->formHandler
         );
     }
 
@@ -237,7 +245,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
         $em->expects($this->once())
             ->method('commit');
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($entity)
             ->will($this->returnValue($em));
@@ -292,7 +300,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
         $em->expects($this->once())
             ->method('commit');
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($data)
             ->will($this->returnValue($em));
@@ -346,7 +354,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception('Test flush exception'));
         $em->expects($this->once())
             ->method('rollback');
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($entity)
             ->will($this->returnValue($em));
@@ -393,7 +401,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception('Test flush exception'));
         $em->expects($this->once())
             ->method('rollback');
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($data)
             ->will($this->returnValue($em));
@@ -514,9 +522,6 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleUpdateWorksWithRouteCallback()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
-        $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
-
         $entity = $this->getObject();
 
         $handler = $this->getHandlerStub($entity);

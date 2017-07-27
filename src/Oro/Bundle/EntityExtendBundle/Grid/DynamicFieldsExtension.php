@@ -2,14 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class DynamicFieldsExtension extends AbstractFieldsExtension
 {
@@ -48,48 +44,6 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     protected function getEntityName(DatagridConfiguration $config)
     {
         return $config->getExtendedEntityClassName();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFields(DatagridConfiguration $config)
-    {
-        $entityClassName = $this->entityClassResolver->getEntityClass($this->getEntityName($config));
-        if (!$this->configManager->hasConfig($entityClassName)) {
-            return [];
-        }
-
-        $entityConfigProvider   = $this->configManager->getProvider('entity');
-        $extendConfigProvider   = $this->configManager->getProvider('extend');
-        $viewConfigProvider     = $this->configManager->getProvider('view');
-        $datagridConfigProvider = $this->configManager->getProvider('datagrid');
-
-        $fields = [];
-        $fieldIds = $entityConfigProvider->getIds($entityClassName);
-        /** @var FieldConfigId $fieldId */
-        foreach ($fieldIds as $fieldId) {
-            $extendConfig = $extendConfigProvider->getConfigById($fieldId);
-            if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                && ExtendHelper::isFieldAccessible($extendConfig)
-                && $datagridConfigProvider->getConfigById($fieldId)->is('is_visible')
-            ) {
-                $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
-                $fields[] = [
-                    'id'       => $fieldId,
-                    'priority' => $viewConfig->get('priority', false, 0)
-                ];
-            }
-        }
-
-        ArrayUtil::sortBy($fields, true);
-
-        return array_map(
-            function ($field) {
-                return $field['id'];
-            },
-            $fields
-        );
     }
 
     /**

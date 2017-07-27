@@ -14,6 +14,7 @@
     <span class="deviation">
         {{ 'oro.dashboard.widget.big_number.compare_to.label'|trans }}:
     </span>
-    <span class="date-range">{{ oro_filter_date_range_view(item.value.previousRange) }}</span>
+    {% set range = oro_filter_date_range_view(item.value.previousRange) %}
+    <span class="date-range" title="{{ range }}">{{ range }}</span>
 </div>
 {% endif %}

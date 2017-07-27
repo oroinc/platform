@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
-use Doctrine\ORM\Query\Expr;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -22,7 +24,6 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
  */
 class TagManager
 {
-    const ACL_RESOURCE_REMOVE_ID_KEY = 'oro_tag_unassign_global';
     const ACL_RESOURCE_CREATE_ID_KEY = 'oro_tag_create';
     const ACL_RESOURCE_ASSIGN_ID_KEY = 'oro_tag_assign_unassign';
 
@@ -35,8 +36,11 @@ class TagManager
     /** @var string */
     protected $taggingClass;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var Router */
     protected $router;
@@ -45,24 +49,27 @@ class TagManager
     protected $storage = [];
 
     /**
-     * @param EntityManager  $em
-     * @param string         $tagClass     - FQCN
-     * @param string         $taggingClass - FQCN
-     * @param SecurityFacade $securityFacade
-     * @param Router         $router
+     * @param EntityManager                 $em
+     * @param string                        $tagClass     - FQCN
+     * @param string                        $taggingClass - FQCN
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param Router                        $router
      */
     public function __construct(
         EntityManager $em,
         $tagClass,
         $taggingClass,
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
         Router $router
     ) {
-        $this->em             = $em;
-        $this->tagClass       = $tagClass;
-        $this->taggingClass   = $taggingClass;
-        $this->securityFacade = $securityFacade;
-        $this->router         = $router;
+        $this->em = $em;
+        $this->tagClass = $tagClass;
+        $this->taggingClass = $taggingClass;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->router = $router;
     }
 
     /**
@@ -287,14 +294,12 @@ class TagManager
                 );
             }
 
-            $taggingCollection = $tag->getTagging()->filter(
-                function (Tagging $tagging) use ($entity) {
-                    // only use tagging entities that related to current entity
-                    return
-                        $tagging->getEntityName() === ClassUtils::getClass($entity) &&
-                        $tagging->getRecordId() === TaggableHelper::getEntityId($entity);
-                }
-            );
+            $criteria = Criteria::create()->where(Criteria::expr()->andX(
+                Criteria::expr()->eq('entityName', ClassUtils::getClass($entity)),
+                Criteria::expr()->eq('recordId', TaggableHelper::getEntityId($entity))
+            ));
+
+            $taggingCollection = $tag->getTagging()->matching($criteria);
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
@@ -360,34 +365,11 @@ class TagManager
      */
     protected function persistDeleteTags($entity, Collection $tags)
     {
-        $owner = $this->getUser();
-
-        // Current assigned tags(taggings) for this owner
-        $assignedOwnerTags = $this->fetchTags($entity, $owner, false);
-
-        $ownerTags = $tags->filter(
-            function (Tag $tag) use ($assignedOwnerTags) {
-                return $assignedOwnerTags->exists($this->getComparePredicate($tag));
-            }
-        );
-        if (!$ownerTags->isEmpty()) {
-            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
+        if (!$tags->isEmpty()) {
+            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
                 throw new AccessDeniedException("User does not have access to assign/unassign tags.");
             }
-            $this->deleteTagging($entity, $ownerTags, $owner);
-        }
-
-        $anotherTags = $tags->filter(
-            function (Tag $tag) use ($assignedOwnerTags) {
-                return !$assignedOwnerTags->exists($this->getComparePredicate($tag));
-            }
-        );
-        // Delete 'not mine' taggings
-        if (!$anotherTags->isEmpty()) {
-            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_REMOVE_ID_KEY)) {
-                throw new AccessDeniedException("User does not have access to remove another's tags.");
-            }
-            $this->deleteTagging($entity, $anotherTags);
+            $this->deleteTagging($entity, $tags);
         }
     }
 
@@ -451,12 +433,12 @@ class TagManager
      */
     protected function persistTags($entity, $tags)
     {
-        if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
+        if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
             throw new AccessDeniedException("User does not have access to assign/unassign tags.");
         }
 
         foreach ($tags as $tag) {
-            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()) {
+            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()) {
                 throw new AccessDeniedException("User does not have access to create tags.");
             }
 
@@ -519,23 +501,35 @@ class TagManager
     }
 
     /**
+     * @return null|OrganizationInterface
+     */
+    protected function getOrganizationByUser()
+    {
+        $user = $this->getUser();
+
+        return $user ? $user->getOrganization() : null;
+    }
+
+    /**
      * Return current user
      *
      * @return User
      */
     protected function getUser()
     {
-        return $this->securityFacade->getLoggedUser();
+        return $this->tokenAccessor->getUser();
     }
 
     /**
      * Return current organization
      *
-     * @return Organization
+     * @return OrganizationInterface
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
+        return $this->tokenAccessor->getOrganization()
+            ? $this->tokenAccessor->getOrganization()
+            : $this->getOrganizationByUser();
     }
 
     /**

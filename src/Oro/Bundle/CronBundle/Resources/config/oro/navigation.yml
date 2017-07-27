@@ -2,10 +2,10 @@ navigation:
     menu_config:
         items:
             oro_cron_schedule:
-                label: 'oro.cron.menu.cron_schedule.label'
-                route: 'oro_cron_schedule_index'
+                label:    'oro.cron.menu.cron_schedule.label'
+                route:    'oro_cron_schedule_index'
+                position: 70
                 extras:
-                    position:    70
                     description: 'oro.cron.menu.cron_schedule.description'
                     routes:      ['oro_cron_schedule_index']
 

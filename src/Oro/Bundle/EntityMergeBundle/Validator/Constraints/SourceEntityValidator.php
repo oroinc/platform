@@ -29,6 +29,9 @@ class SourceEntityValidator extends DoctrineHelperValidator
 
         foreach ($fields as $field) {
             $sourceEntity = $field->getSourceEntity();
+            if (!is_object($sourceEntity)) {
+                continue;
+            }
             foreach ($entities as $entity) {
                 if ($this->doctrineHelper->isEntityEqual($entity, $sourceEntity)) {
                     break 2;

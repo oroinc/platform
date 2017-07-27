@@ -208,7 +208,29 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
                     'country' => $this->createMockCountry('Ukraine'),
                 ),
                 'FirstName LastName , Street   some region , Ukraine 12345'
-            )
+            ),
+            array(
+                array(
+                    'firstName' => '',
+                    'lastName' => 'LastName',
+                    'street' => 'Street',
+                    'region' => $this->createMockRegion('some region'),
+                    'postalCode' => '',
+                    'country' => $this->createMockCountry('Ukraine'),
+                ),
+                'LastName , Street   some region , Ukraine'
+            ),
+            array(
+                array(
+                    'firstName' => '',
+                    'lastName' => '',
+                    'street' => '',
+                    'region' => '',
+                    'postalCode' => '',
+                    'country' => '',
+                ),
+                ''
+            ),
         );
     }
 
@@ -301,12 +323,9 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
 
         $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->once())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('test'));
-        $context->expects($this->once())
             ->method('addViolationAt')
             ->with(
-                'test.region',
+                'region',
                 'State is required for country {{ country }}',
                 ['{{ country }}' => 'Country']
             );

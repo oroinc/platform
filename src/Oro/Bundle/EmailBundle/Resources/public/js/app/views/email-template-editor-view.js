@@ -47,14 +47,9 @@ define(function(require) {
         },
 
         _onVariableClick: function(field, value) {
-            var fieldId = field.data('id');
-            if (this.options.isWysiwygEnabled && !_.isUndefined(fieldId)) {
+            if (this.options.isWysiwygEnabled) {
                 this.forEachComponent(function(component) {
-                    if (!_.isUndefined(component.view) &&
-                        !_.isUndefined(component.view.tinymceConnected) &&
-                        component.view.tinymceConnected === true &&
-                        component.view.el.id === fieldId
-                    ) {
+                    if (_.result(component.view, 'tinymceConnected') === true && component.view.$el.is(field)) {
                         component.view.tinymceInstance.execCommand('mceInsertContent', false, value);
                         component.view.tinymceInstance.execCommand('mceFocus', false, value);
                     }
@@ -65,16 +60,15 @@ define(function(require) {
         _onEditorBlur: function() {
             if (this.options.hasWysiwyg && this.options.isWysiwygEnabled) {
                 this.forEachComponent(function(component) {
-                    if (!_.isUndefined(component.view) &&
-                        !_.isUndefined(component.view.tinymceConnected) &&
-                        !_.isNull(this.options.emailVariableView) &&
-                        component.view.tinymceConnected === true
+                    if (_.result(component.view, 'tinymceConnected') === true &&
+                        !_.isNull(this.options.emailVariableView)
                     ) {
-                        $(component.view.tinymceInstance.getBody()).on(
+                        var tinymceInstance = component.view.tinymceInstance;
+                        $(tinymceInstance.getBody()).on(
                             'blur',
                             _.bind(
                                 function(e) {
-                                    this.options.emailVariableView.view._updateElementsMetaData(e);
+                                    $(tinymceInstance.targetElm).trigger(e);
                                 },
                                 this
                             )

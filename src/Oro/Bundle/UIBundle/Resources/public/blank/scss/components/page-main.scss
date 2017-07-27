@@ -1,11 +1,18 @@
-// @theme: blank
+// @theme: blank;
 
 .page-main {
     flex-grow: 1;
 
     &__content {
         display: flex;
+
         padding: $page-main-inner-offset;
+
+        flex-wrap: wrap;
+    }
+
+    &__header {
+        width: 100%;
     }
 }
 

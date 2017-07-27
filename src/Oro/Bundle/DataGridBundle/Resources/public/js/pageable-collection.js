@@ -3,10 +3,9 @@ define([
     'underscore',
     'backbone',
     'backbone-pageable-collection',
-    'oroui/js/mediator',
     'orotranslation/js/translator',
     'oroui/js/tools'
-], function($, _, Backbone, BackbonePageableCollection, mediator, __, tools) {
+], function($, _, Backbone, BackbonePageableCollection, __, tools) {
     'use strict';
 
     var PageableCollection;
@@ -106,12 +105,19 @@ define([
         /**
          * Default current state of collection
          *
-         * @property
+         * @property {Object}
          */
         state: _.extend({
             appearanceType: 'grid',
             appearanceData: {}
         }, BackbonePageableCollection.prototype.state),
+
+        /**
+         * Previous state of collection
+         *
+         * @property {Object}
+         */
+        previousState: {},
 
         /**
          * Declaration of URL parameters
@@ -543,8 +549,11 @@ define([
          * @param {Object} state
          */
         updateState: function(state) {
+            var previousState = _.clone(this.state);
             var newState = _.extend({}, this.state, state);
+
             this.state = this._checkState(newState);
+            this.previousState = previousState;
             this.trigger('updateState', this, this.state);
         },
 
@@ -724,9 +733,7 @@ define([
             options.data = data;
 
             if (!options.error) {
-                options.error = function() {
-                    mediator.execute('showMessage', 'error', __('oro.datagrid.loading_failed_message'));
-                };
+                options.errorHandlerMessage = __('oro.datagrid.loading_failed_message');
             }
 
             // @todo rewrite this, use mode=infinite (if possible)

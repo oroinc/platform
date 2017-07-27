@@ -5,9 +5,6 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Action;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
-/**
- * @dbIsolation
- */
 class UpdateTest extends WebTestCase
 {
     /**
@@ -51,7 +48,8 @@ class UpdateTest extends WebTestCase
                 'success' => true,
                 'message' => '',
                 'messages' => [],
-                'redirectUrl' => $this->getUrl('oro_test_item_update', ['id' => $item->getId()])
+                'redirectUrl' => $this->getUrl('oro_test_item_update', ['id' => $item->getId()]),
+                'pageReload' => true
             ],
             $response
         );

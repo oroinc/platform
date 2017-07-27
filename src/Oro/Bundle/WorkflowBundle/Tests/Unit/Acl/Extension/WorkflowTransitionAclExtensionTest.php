@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension\Stub\DomainObjectStub;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
@@ -18,48 +18,50 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectIdAccessor|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectIdAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityOwnerAccessor|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityOwnerAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var AccessLevelOwnershipDecisionMakerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $decisionMaker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowRegistry;
+    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionOptionsResolver */
+    protected $optionsResolver;
 
     /** @var WorkflowTransitionAclExtension */
     protected $extension;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->objectIdAccessor = $this->getMockBuilder(ObjectIdAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->createMock(MetadataProviderInterface::class);
-        $this->entityOwnerAccessor = $this->getMockBuilder(EntityOwnerAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
+        $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
         $this->decisionMaker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 
         $this->extension = new WorkflowTransitionAclExtension(
             $this->objectIdAccessor,
             $this->metadataProvider,
             $this->entityOwnerAccessor,
             $this->decisionMaker,
-            $this->workflowRegistry
+            $this->workflowManager
         );
     }
 
@@ -131,6 +133,9 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
     }
 
+    /**
+     * @return array
+     */
     public function getServiceBitsProvider()
     {
         return [
@@ -162,6 +167,9 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
     }
 
+    /**
+     * @return array
+     */
     public function removeServiceBitsProvider()
     {
         return [
@@ -194,6 +202,9 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertTrue($this->extension->decideIsGranting(0, $object, $securityToken));
     }
 
+    /**
+     * @return array
+     */
     public function notSupportedObjectProvider()
     {
         return [
@@ -225,9 +236,8 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadata')
             ->with(self::identicalTo($relatedEntity))
             ->willReturn(new OwnershipMetadata());
-        $this->workflowRegistry->expects(self::once())
+        $this->workflowManager->expects(self::once())
             ->method('getWorkflow')
-            ->willReturn('workflow1')
             ->willReturn($workflow);
 
         self::assertTrue(
@@ -260,7 +270,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(get_class($object))
             ->willReturn(new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org'));
         $this->decisionMaker->expects(self::once())
-            ->method('isAssociatedWithBasicLevelEntity')
+            ->method('isAssociatedWithUser')
             ->willReturn(true);
 
         self::assertTrue(
@@ -287,8 +297,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->willReturn($definition);
 
-
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
@@ -310,8 +319,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetAccessLevelNamesWithStartTransitionWithoutInitOptions()
     {
         $object = 'workflow:test_flow::trans1||step2';
-        $transition = new Transition();
-        $transition->setStart(true);
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
@@ -330,13 +337,13 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
 
         $transitionManager->expects($this->once())
             ->method('getTransition')
-            ->willReturn($transition);
+            ->willReturn($this->createStartTransition());
 
         $workflow->expects($this->once())
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
 
-        $this->workflowRegistry->expects($this->exactly(2))
+        $this->workflowManager->expects($this->exactly(2))
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
@@ -358,9 +365,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetAccessLevelNamesWithStartTransitionWithInitEntitiesInitOptions()
     {
         $object = 'workflow:test_flow::trans1||step2';
-        $transition = new Transition();
-        $transition->setStart(true);
-        $transition->setInitEntities(['\Acme\DemoBundle\Entity\TestEntity']);
+        $transition = $this->createStartTransition()->setInitEntities(['\Acme\DemoBundle\Entity\TestEntity']);
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
@@ -381,7 +386,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
@@ -403,9 +408,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetAccessLevelNamesWithStartTransitionWithInitRoutesInitOptions()
     {
         $object = 'workflow:test_flow::trans1||step2';
-        $transition = new Transition();
-        $transition->setStart(true);
-        $transition->setInitRoutes(['some_route']);
+        $transition = $this->createStartTransition()->setInitRoutes(['some_route']);
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
@@ -426,7 +429,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
@@ -443,5 +446,15 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
             [0 => 'NONE', 5 => 'SYSTEM'],
             $result
         );
+    }
+
+    /**
+     * @return Transition
+     */
+    protected function createStartTransition()
+    {
+        $transition = new Transition($this->optionsResolver);
+
+        return $transition->setStart(true);
     }
 }

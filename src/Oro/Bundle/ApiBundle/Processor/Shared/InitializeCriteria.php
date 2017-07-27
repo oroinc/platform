@@ -49,8 +49,11 @@ class InitializeCriteria implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
+            // only manageable entities or resources based on manageable entities are supported
+            $entityClass = $context->getConfig()->getParentResourceClass();
+            if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+                return;
+            }
         }
 
         $context->setCriteria(new Criteria($this->entityClassResolver));

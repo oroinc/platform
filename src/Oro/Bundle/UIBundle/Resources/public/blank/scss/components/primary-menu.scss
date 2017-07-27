@@ -10,24 +10,41 @@
 
         padding: $primary-menu-item-inner-offset;
 
-        &--current {}
+        &--current,
+        &.active {
+            > .primary-menu__link {
+                font-weight: $primary-menu-link-font-weight-current;
+            }
+
+            > .primary-menu {
+                display: block;
+            }
+        }
 
         &--offset-m {
             &:not(:first-child) {
                 margin-left: $offset-x-m;
             }
         }
+
+        .primary-menu {
+            display: none;
+        }
     }
 
     &__link {
         color: $primary-menu-link-color;
 
-        &--current {
-            color: $primary-menu-link-color-current;
+        @include element-state('hover') {
+            color: $primary-menu-link-color-hover;
         }
 
-        &:hover {
-            color: $primary-menu-link-color-hover;
+        &--current {
+            color: $primary-menu-link-color-current;
+
+            @include element-state('hover') {
+                color: $primary-menu-link-color-current;
+            }
         }
     }
 

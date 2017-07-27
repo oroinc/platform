@@ -3,8 +3,11 @@ datagrids:
         extended_entity_name: %oro_user.entity.class%
         views_list: "@oro_user.user.datagrid_view_list"
         options:
-            entityHint: user
+            entityHint: users
             entity_pagination: true
+            mass_actions:
+                delete:
+                    enabled: false
         acl_resource: oro_user_user_view
         source:
             type: orm
@@ -158,11 +161,12 @@ datagrids:
                 link:          delete_link
                 icon:          trash-o
                 acl_resource:  oro_user_user_delete
+        action_configuration: ['@oro_user.datagrid.action_checker', checkActions]
 
     groups-grid:
         extended_entity_name: %oro_user.group.entity.class%
         options:
-            entityHint: group
+            entityHint: groups
             entity_pagination: true
         acl_resource: oro_user_group_view
         source:
@@ -222,7 +226,7 @@ datagrids:
     roles-grid:
         extended_entity_name: %oro_user.role.entity.class%
         options:
-            entityHint: role
+            entityHint: roles
             entity_pagination: true
         acl_resource: oro_user_role_view
         source:
@@ -582,7 +586,7 @@ datagrids:
     users-select-grid:
         extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: user
+            entityHint: users
         acl_resource: oro_user_user_view
         source:
             type: orm
@@ -654,7 +658,7 @@ datagrids:
     owner-users-select-grid:
         extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: user
+            entityHint: users
         source:
             type: orm
             skip_acl_apply: true
@@ -716,12 +720,12 @@ datagrids:
             query:
                 where:
                     and:
-                        - u.id != @oro_security.security_facade->getLoggedUserId
+                        - u.id != @oro_security.token_accessor->getUserId
 
     users-for-context-grid:
         extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: user
+            entityHint: users
             entity_pagination: true
             toolbarOptions:
                 pageSize:
@@ -742,7 +746,7 @@ datagrids:
                     - { table: %oro_user.entity.class%, alias: u }
                 where:
                     and:
-                        - u.id != @oro_security.security_facade->getLoggedUserId
+                        - u.id != @oro_security.token_accessor->getUserId
         columns:
             id:
                 label:         oro.user.id.label

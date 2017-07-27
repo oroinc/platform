@@ -61,7 +61,11 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
 
         $entityClass = $value['class'];
         $acceptableClassNames = $this->metadata->getAcceptableTargetClassNames();
-        if (!empty($acceptableClassNames) && !in_array($entityClass, $acceptableClassNames, true)) {
+        if (empty($acceptableClassNames)) {
+            if (!$this->metadata->isEmptyAcceptableTargetsAllowed()) {
+                throw new TransformationFailedException('There are no acceptable classes.');
+            }
+        } elseif (!in_array($entityClass, $acceptableClassNames, true)) {
             throw new TransformationFailedException(
                 sprintf(
                     'The "%s" class is not acceptable. Acceptable classes: %s.',

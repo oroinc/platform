@@ -111,23 +111,37 @@ Different field types support different operators in `where` block.
 
 ### For string fields
 
-* ** ~ (CONTAINS)** - operator `~` is used for set text field value. If search value is string, it must be quoted.
+* **~ (CONTAINS)** - operator `~` is used for set text field value. If search value is string, it must be quoted.
 Examples:
 ```
 name ~ value
 name ~ "string value"
 ```
 
-* ** !~ (NOT CONTAINS)** - operator `!~` is used for search strings without value.
+* **!~ (NOT CONTAINS)** - operator `!~` is used for search strings without value.
 If search value is string, it must be quoted. Examples:
 ```
 name !~ value
 name !~ "string value"
 ```
 
+* **like** - operator `like` is used for finding records with specified substring in any position (`LIKE %value%` statement behaviour). If the search value is a multi-word string that contains whitespaces, it should be enclosed in quotes.
+Examples:
+```
+name like value
+name like "string value"
+```
+
+* **notlike** - operator `notlike` is used for finding records without specified substring in any position (`NOT LIKE %value%` statement behaviour). If the search value is a multi-word string that contains whitespaces, it should be enclosed in quotes.
+Examples:
+```
+name notlike value
+name notlike "string value"
+```
+
 ### For numeric fields
 
-* ** = (EQUALS)** - operator `=` is used for search records where field matches the specified value.
+* **= (EQUALS)** - operator `=` is used for search records where field matches the specified value.
 Examples:
 ```
 integer count = 100
@@ -135,14 +149,14 @@ decimal price = 12.5
 datetime create_date = "2013-01-01 00:00:00"
 ```
 
-* ** != (NOT EQUALS)** - operator `!=` is used for search records where field does not matches the specified value.
+* **!= (NOT EQUALS)** - operator `!=` is used for search records where field does not matches the specified value.
 Examples:
 ```
 integer count != 5
 decimal price != 45
 datetime create_date != "2012-01-01 00:00:00"
 ```
-* ** >, <, <=, >= ** - Operators is used to search for the records that have the specified field must be `greater`,
+* **>, <, <=, >=** - Operators are used to search for the records that have the specified field must be `greater`,
 `less`, `less than or equals` or `greater than or equals` of the specified value. Examples:
 ```
 integer count >= 5
@@ -164,7 +178,7 @@ integer count !in (1, 3, 5)
 decimal price !in (2.1, 55, 45.4)
 ```
 
-###Query brackets.
+### Query brackets.
 
 User can combine operators in search query with brackets.
 

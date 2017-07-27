@@ -372,6 +372,412 @@ class OrmQueryConfigurationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testConvertAssociationJoinToSubqueryForInnerJoin()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addInnerJoin('rootAlias.association', 'joinAlias');
+
+        $this->query->convertAssociationJoinToSubquery(
+            'joinAlias',
+            'testColumn',
+            'Test\JoinedEntity'
+        );
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            '(SELECT joinAlias1.name FROM Test\JoinedEntity AS joinAlias'
+                            . ' WHERE joinAlias = rootAlias.association) AS testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => ['inner' => []]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertAssociationJoinToSubqueryForLeftJoin()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin('rootAlias.association', 'joinAlias');
+
+        $this->query->convertAssociationJoinToSubquery(
+            'joinAlias',
+            'testColumn',
+            'Test\JoinedEntity'
+        );
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            '(SELECT joinAlias1.name FROM Test\JoinedEntity AS joinAlias'
+                            . ' WHERE joinAlias = rootAlias.association) AS testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => ['left' => []]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertAssociationJoinToSubqueryWhenAsKeywordIsNotLowercase()
+    {
+        $this->query->addSelect('joinAlias1.name As testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin('rootAlias.association', 'joinAlias');
+
+        $this->query->convertAssociationJoinToSubquery(
+            'joinAlias',
+            'testColumn',
+            'Test\JoinedEntity'
+        );
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            '(SELECT joinAlias1.name FROM Test\JoinedEntity AS joinAlias'
+                            . ' WHERE joinAlias = rootAlias.association) AS testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => ['left' => []]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertAssociationJoinToSubqueryForInvalidJoinAlias()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin('rootAlias.association', 'joinAlias');
+
+        $this->query->convertAssociationJoinToSubquery(
+            'invalidJoinAlias',
+            'testColumn',
+            'Test\JoinedEntity'
+        );
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            'joinAlias1.name as testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => [
+                            'left' => [
+                                ['join' => 'rootAlias.association', 'alias' => 'joinAlias']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertAssociationJoinToSubqueryForInvalidColumnAlias()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin('rootAlias.association', 'joinAlias');
+
+        $this->query->convertAssociationJoinToSubquery(
+            'joinAlias',
+            'invalidColumn',
+            'Test\JoinedEntity'
+        );
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            'joinAlias1.name as testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => [
+                            'left' => [
+                                ['join' => 'rootAlias.association', 'alias' => 'joinAlias']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertAssociationJoinToSubqueryForJoinWithConditions()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin(
+            'rootAlias.association',
+            'joinAlias',
+            'WITH',
+            'joinAlias.primary = true'
+        );
+
+        $this->query->convertAssociationJoinToSubquery(
+            'joinAlias',
+            'testColumn',
+            'Test\JoinedEntity'
+        );
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            '(SELECT joinAlias1.name FROM Test\JoinedEntity AS joinAlias'
+                            . ' WHERE joinAlias = rootAlias.association AND joinAlias.primary = true) AS testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => ['left' => []]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertEntityJoinToSubqueryForInnerJoin()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addInnerJoin(
+            'Test\JoinedEntity',
+            'joinAlias',
+            'WITH',
+            'joinAlias.id = rootAlias'
+        );
+
+        $this->query->convertEntityJoinToSubquery('joinAlias', 'testColumn');
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            '(SELECT joinAlias1.name FROM Test\JoinedEntity AS joinAlias'
+                            . ' WHERE joinAlias.id = rootAlias) AS testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => ['inner' => []]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertEntityJoinToSubqueryForLeftJoin()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin(
+            'Test\JoinedEntity',
+            'joinAlias',
+            'WITH',
+            'joinAlias.id = rootAlias'
+        );
+
+        $this->query->convertEntityJoinToSubquery('joinAlias', 'testColumn');
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            '(SELECT joinAlias1.name FROM Test\JoinedEntity AS joinAlias'
+                            . ' WHERE joinAlias.id = rootAlias) AS testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => ['left' => []]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertEntityJoinToSubqueryWhenAsKeywordIsNotLovercase()
+    {
+        $this->query->addSelect('joinAlias1.name As testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin(
+            'Test\JoinedEntity',
+            'joinAlias',
+            'WITH',
+            'joinAlias.id = rootAlias'
+        );
+
+        $this->query->convertEntityJoinToSubquery('joinAlias', 'testColumn');
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            '(SELECT joinAlias1.name FROM Test\JoinedEntity AS joinAlias'
+                            . ' WHERE joinAlias.id = rootAlias) AS testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => ['left' => []]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertEntityJoinToSubqueryWhenJoinDoesNotHaveCondition()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin(
+            'Test\JoinedEntity',
+            'joinAlias'
+        );
+
+        $this->query->convertEntityJoinToSubquery('joinAlias', 'testColumn');
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            'joinAlias1.name as testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => [
+                            'left' => [
+                                ['join' => 'Test\JoinedEntity', 'alias' => 'joinAlias']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertEntityJoinToSubqueryForInvalidJoinAlias()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin(
+            'Test\JoinedEntity',
+            'joinAlias',
+            'WITH',
+            'joinAlias.id = rootAlias'
+        );
+
+        $this->query->convertEntityJoinToSubquery('invalidJoinAlias', 'testColumn');
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            'joinAlias1.name as testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => [
+                            'left' => [
+                                [
+                                    'join'          => 'Test\JoinedEntity',
+                                    'alias'         => 'joinAlias',
+                                    'conditionType' => 'WITH',
+                                    'condition'     => 'joinAlias.id = rootAlias'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testConvertEntityJoinToSubqueryForInvalidColumnAlias()
+    {
+        $this->query->addSelect('joinAlias1.name as testColumn');
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin(
+            'Test\JoinedEntity',
+            'joinAlias',
+            'WITH',
+            'joinAlias.id = rootAlias'
+        );
+
+        $this->query->convertEntityJoinToSubquery('joinAlias', 'invalidColumn');
+
+        self::assertEquals(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => [
+                            'joinAlias1.name as testColumn'
+                        ],
+                        'from'   => [
+                            ['table' => 'Test\RootEntity', 'alias' => 'rootAlias']
+                        ],
+                        'join'   => [
+                            'left' => [
+                                [
+                                    'join'          => 'Test\JoinedEntity',
+                                    'alias'         => 'joinAlias',
+                                    'conditionType' => 'WITH',
+                                    'condition'     => 'joinAlias.id = rootAlias'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
     public function testInitialFrom()
     {
         self::assertSame([], $this->query->getFrom());

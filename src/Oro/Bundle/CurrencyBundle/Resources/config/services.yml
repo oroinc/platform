@@ -1,19 +1,18 @@
 parameters:
     oro_currency.price.model: Oro\Bundle\CurrencyBundle\Entity\Price
-    oro_currency.twig.currency.class: Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension
 
 services:
     oro_currency.twig.currency:
-        class: %oro_currency.twig.currency.class%
+        class: Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension
+        public: false
         arguments:
-            - '@oro_locale.formatter.number'
-            - '@oro_currency.provider.view_type'
-            - '@oro_currency.helper.currency_name'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
     oro_currency.twig.rate:
         class: Oro\Bundle\CurrencyBundle\Twig\RateConverterExtension
+        public: false
         tags:
             - { name: twig.extension }
 
@@ -38,7 +37,6 @@ services:
 
     oro_currency.provider.view_type:
         class: Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider
-        public: false
         lazy: true
         arguments:
             - '@oro_config.manager'
@@ -139,3 +137,12 @@ services:
               - '@translator'
           tags:
               - { name: kernel.event_listener, event: oro_security.event.load_fields_metadata.after, method: onLoad }
+
+    oro_currency.extension.doctrine_type_mapping:
+        class: 'Oro\Component\Action\Model\DoctrineTypeMappingExtension'
+        public: false
+        calls:
+            - [addDoctrineTypeMapping, ['currency', 'string']]
+            - [addDoctrineTypeMapping, ['money_value', 'float']]
+        tags:
+            - { name: oro.action.extension.doctrine_type_mapping }

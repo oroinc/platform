@@ -15,7 +15,7 @@
   input[type="number"],
   input[type="search"],
   input[type="email"]{
-    width: 100% !important;
+    width: 100%;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -45,10 +45,12 @@
     margin: 0 0 7px;
     .control-label {
       float: none;
+      width: auto;
+      padding-left: 0;
       text-align: left;
     }
     .controls {
-      margin-left: 0px;
+      margin-left: 0;
       .control-label {
         padding-top: 6px;
       }
@@ -84,8 +86,8 @@
     border-left: 1px solid #CCC;
     height: 28px;
     width: 28px;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
     color: #666;
     &:before{
       content: "\f00d";
@@ -102,7 +104,7 @@
 .oro-item-collection {
   input[type="email"],
   input[type="text"]{
-    width: 225px !important;
+    width: 225px;
   }
 }
 .oro-address-collection.oro-item-collection {

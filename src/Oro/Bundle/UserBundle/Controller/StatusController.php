@@ -80,7 +80,7 @@ class StatusController extends Controller
      * @Route("/set-current/{id}", name="oro_user_status_set_current", requirements={"id"="\d+"})
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function setCurrentStatus(Status $status)
+    public function setCurrentStatusAction(Status $status)
     {
         $this->get('oro_user.status_manager')->setCurrentStatus($this->getUser(), $status);
         $this->get('session')->getFlashBag()->add('success', 'Status set');
@@ -92,7 +92,7 @@ class StatusController extends Controller
      * @Route("/clear-current", name="oro_user_status_clear_current")
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function clearCurrentStatus()
+    public function clearCurrentStatusAction()
     {
         $this->get('oro_user.status_manager')->setCurrentStatus($this->getUser());
         $this->get('session')->getFlashBag()->add('success', 'Status unset');

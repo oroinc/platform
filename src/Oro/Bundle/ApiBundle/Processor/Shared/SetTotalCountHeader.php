@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -139,23 +140,18 @@ class SetTotalCountHeader implements ProcessorInterface
     }
 
     /**
+     * Makes full clone of the given query, including its parameters and hints
+     *
      * @param object $query
      *
      * @return object
      */
     protected function cloneQuery($query)
     {
-        $result = clone $query;
-
-        if ($result instanceof Query) {
-            // clone parameters
-            $result->setParameters(clone $query->getParameters());
-            // clone hints
-            foreach ($query->getHints() as $name => $value) {
-                $result->setHint($name, $value);
-            }
+        if ($query instanceof Query) {
+            return QueryUtil::cloneQuery($query);
         }
 
-        return $result;
+        return clone $query;
     }
 }

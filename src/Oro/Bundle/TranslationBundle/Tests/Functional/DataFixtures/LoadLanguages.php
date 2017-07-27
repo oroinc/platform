@@ -20,13 +20,16 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
      */
     protected $languages = [
         self::LANGUAGE1 => [
+            'enabled' => false,
+            'user' => 'admin'
         ],
         self::LANGUAGE2 => [
             'enabled' => true,
+            'user' => 'admin'
         ],
         self::LANGUAGE3 => [
             'enabled' => true,
-            'user' => LoadTranslationUsers::TRANSLATOR_USERNAME,
+            'user' => LoadTranslationUsers::TRANSLATOR_USERNAME
         ],
     ];
 
@@ -59,18 +62,13 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
      */
     protected function createLanguage(ObjectManager $manager, $code, array $options)
     {
-        $criteria = [];
-        if (!empty($options['user'])) {
-            $criteria = ['username' => $options['user']];
-        }
-
         /* @var $user User */
-        $user = $manager->getRepository(User::class)->findOneBy($criteria);
+        $user = $manager->getRepository(User::class)->findOneBy(['username' => $options['user']]);
 
         $language = new Language();
         $language
             ->setCode($code)
-            ->setEnabled(!empty($options['enabled']))
+            ->setEnabled($options['enabled'])
             ->setOwner($user)
             ->setOrganization($user->getOrganization());
 

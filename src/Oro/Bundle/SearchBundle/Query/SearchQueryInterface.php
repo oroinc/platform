@@ -10,7 +10,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 interface SearchQueryInterface
 {
     /**
-     * Returning the wrapped Query object.
+     * Returning the wrapped Query object. Should be used only for internal purposes.
      *
      * @return Query
      */
@@ -40,7 +40,7 @@ interface SearchQueryInterface
     /**
      * Adding a field to be selected from the Search Index database system.
      *
-     * @param      $fieldName
+     * @param string|array $fieldName
      * @param null $enforcedFieldType
      * @return SearchQueryInterface
      */
@@ -75,7 +75,7 @@ interface SearchQueryInterface
     public function getSelectDataFields();
 
     /**
-     * Returning the WHERE clause parts.
+     * Returning the WHERE clause parts. Should be used only for internal purposes.
      *
      * @return Criteria
      */
@@ -105,7 +105,7 @@ interface SearchQueryInterface
      * @param string $direction
      * @param string $type
      *
-     * @return Query
+     * @return SearchQueryInterface
      */
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT);
 
@@ -128,7 +128,7 @@ interface SearchQueryInterface
      *
      * @param int $firstResult
      *
-     * @return Query
+     * @return SearchQueryInterface
      */
     public function setFirstResult($firstResult);
 
@@ -144,7 +144,7 @@ interface SearchQueryInterface
      *
      * @param int $maxResults
      *
-     * @return Query
+     * @return SearchQueryInterface
      */
     public function setMaxResults($maxResults);
 

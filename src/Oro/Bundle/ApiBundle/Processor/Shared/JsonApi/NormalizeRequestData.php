@@ -148,7 +148,7 @@ class NormalizeRequestData implements ProcessorInterface
         $entityId = $data[JsonApiDoc::ID];
         if (false !== strpos($entityClass, '\\')) {
             if (null !== $associationMetadata
-                && $this->isAcceptableTargetClass($entityClass, $associationMetadata)
+                && !$this->isAcceptableTargetClass($entityClass, $associationMetadata)
             ) {
                 $this->addValidationError(Constraint::ENTITY_TYPE, $this->buildPointer($pointer, JsonApiDoc::TYPE))
                     ->setDetail('Not acceptable entity type.');
@@ -176,10 +176,11 @@ class NormalizeRequestData implements ProcessorInterface
     protected function isAcceptableTargetClass($entityClass, AssociationMetadata $associationMetadata)
     {
         $acceptableClassNames = $associationMetadata->getAcceptableTargetClassNames();
+        if (empty($acceptableClassNames)) {
+            return $associationMetadata->isEmptyAcceptableTargetsAllowed();
+        }
 
-        return
-            !empty($acceptableClassNames)
-            && !in_array($entityClass, $acceptableClassNames, true);
+        return in_array($entityClass, $acceptableClassNames, true);
     }
 
     /**

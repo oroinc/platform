@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -11,13 +12,17 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -30,24 +35,29 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     const COLUMN = 'workflowStepLabel';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $entityClassResolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $configProvider;
 
     /**
-     * @var \Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $workflowRegistry;
+    protected $workflowManager;
+
+    /**
+     * @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $workflowManagerRegistry;
 
     /**
      * @var WorkflowStepColumnListener
@@ -56,19 +66,23 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->workflowManagerRegistry = $this->getMockBuilder(WorkflowManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -76,13 +90,19 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->entityClassResolver,
             $this->configProvider,
-            $this->workflowRegistry
+            $this->workflowManagerRegistry
         );
     }
 
     protected function tearDown()
     {
-        unset($this->listener, $this->doctrineHelper, $this->configProvider, $this->workflowRegistry);
+        unset(
+            $this->listener,
+            $this->doctrineHelper,
+            $this->configProvider,
+            $this->workflowManager,
+            $this->workflowManagerRegistry
+        );
     }
 
     public function testAddWorkflowStepColumn()
@@ -115,7 +135,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     public function testBuildBeforeNoUpdate(array $config, $hasWorkflow = true, $hasConfig = true, $isShowStep = true)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY);
-        $this->setUpWorkflowRegistryMock(self::ENTITY, $hasWorkflow);
+        $this->setUpWorkflowManagerMock(self::ENTITY, $hasWorkflow);
         $this->setUpConfigProviderMock(self::ENTITY, $hasConfig, $isShowStep);
 
         $this->listener->addWorkflowStepColumn(self::COLUMN);
@@ -207,7 +227,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     public function testBuildBeforeAddColumn(array $inputConfig, array $expectedConfig, $multiWorkflows = true)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        $this->setUpWorkflowRegistryMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
+        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
@@ -346,7 +366,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                     'field_type' => WorkflowStepSelectType::NAME,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
-                                        'multiple' => true
+                                        'multiple' => true,
+                                        'translatable_options' => false
                                     ]
                                 ],
                                 'label' => 'oro.workflow.workflowstep.grid.label'
@@ -412,21 +433,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
                                 'left' => [
                                     ['join' => self::ALIAS . '.c', 'alias' => 'c'],
-                                    [
-                                        'join' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
-                                        'alias' => 'workflowItem',
-                                        'conditionType' => 'WITH',
-                                        'condition' => sprintf(
-                                            'CAST(%s.id as string) = CAST(workflowItem.entityId as string) ' .
-                                            'AND workflowItem.entityClass = %s',
-                                            self::ALIAS,
-                                            "'" . self::ENTITY_FULL_NAME . "'"
-                                        )
-                                    ],
-                                    [
-                                        'join' => 'workflowItem.currentStep',
-                                        'alias' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN
-                                    ]
                                 ]
                             ],
                         ],
@@ -455,7 +461,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                     'field_type' => WorkflowStepSelectType::NAME,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
-                                        'multiple' => true
+                                        'multiple' => true,
+                                        'translatable_options' => false
                                     ]
                                 ],
                                 'label' => 'oro.workflow.workflowstep.grid.label'
@@ -467,7 +474,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'rootField' => ['data_name' => self::ALIAS . '.rootField'],
                             'innerJoinField' => ['data_name' => 'b.innerJoinField'],
                             'leftJoinField' => ['data_name' => 'c.leftJoinField'],
-                            'workflowStepLabel' => ['data_name' => 'workflowStepLabel.stepOrder']
                         ],
                     ],
                 ],
@@ -484,7 +490,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     public function testBuildBeforeRemoveColumn(array $inputConfig, array $expectedConfig)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        $this->setUpWorkflowRegistryMock(self::ENTITY_FULL_NAME);
+        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME, true, false);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
@@ -753,11 +759,18 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->setUpWorkflowItemRepository();
         $repository->expects($this->once())
             ->method('getGroupedWorkflowNameAndWorkflowStepName')
-            ->with(self::ENTITY_FULL_NAME, [42, 100])
+            ->with(self::ENTITY_FULL_NAME, [42, 100], true, ['test1', 'test2'])
             ->willReturn([42 => $data]);
 
-        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByEntityClass')
-            ->with(WorkflowStepColumnListenerTest::ENTITY_FULL_NAME)->willReturn(new ArrayCollection());
+        $this->workflowManagerRegistry->expects($this->once())->method('getManager')
+            ->willReturn($this->workflowManager);
+
+        $this->workflowManager->expects($this->once())->method('getApplicableWorkflows')
+            ->with(WorkflowStepColumnListenerTest::ENTITY_FULL_NAME)
+            ->willReturn([
+                'test1' => $this->getWorkflowMock(),
+                'test2' => $this->getWorkflowMock(),
+            ]);
 
         $this->listener->onResultAfter($event);
 
@@ -838,7 +851,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      * @param bool $hasWorkflow
      * @param bool $multiWorkflow
      */
-    protected function setUpWorkflowRegistryMock($entityClass, $hasWorkflow = true, $multiWorkflow = true)
+    protected function setUpWorkflowManagerMock($entityClass, $hasWorkflow = true, $multiWorkflow = true)
     {
         $workflows = new ArrayCollection();
 
@@ -849,8 +862,12 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->workflowRegistry->expects($this->any())
-            ->method('getActiveWorkflowsByEntityClass')
+        $this->workflowManagerRegistry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->workflowManager);
+
+        $this->workflowManager->expects($this->any())
+            ->method('getApplicableWorkflows')
             ->with($entityClass)
             ->willReturn($workflows);
     }

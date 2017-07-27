@@ -9,9 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFam
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class FieldConfigModelRepositoryTest extends WebTestCase
 {
     /**

@@ -26,6 +26,8 @@ class FeatureContext extends OroFeatureContext implements
 
     /**
      * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
@@ -46,13 +48,24 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Logout user
+     *
+     * @Given I am logged out
+     */
+    public function iAmLoggedOut()
+    {
+        $uri = $this->getContainer()->get('router')->generate('oro_user_security_logout');
+        $this->visitPath($uri);
+    }
+
+    /**
      * Load "user.yml" alice fixture from UserBundle suite
      *
      * @Given (Charlie Sheen) (active) user exists in the system
      */
     public function charlieUserInTheSystem()
     {
-        $this->fixtureLoader->loadFixtureFile('user.yml');
+        $this->fixtureLoader->loadFixtureFile('OroUserBundle:user.yml');
     }
 
     /**

@@ -4,13 +4,17 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
+use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
+use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
+use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
+use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
 class ExportHandler extends AbstractHandler
 {
@@ -20,14 +24,27 @@ class ExportHandler extends AbstractHandler
     protected $mimeTypeGuesser;
 
     /**
-     * @var RouterInterface
+     * @var ReaderChain
      */
-    protected $router;
+    protected $readerChain;
 
     /**
-     * @var ConfigManager
+     * @var FileManager
      */
-    protected $configManager;
+    protected $fileManager;
+
+    /**
+     * @var WriterChain
+     */
+    protected $writerChain;
+    
+    /**
+     * @param FileManager $fileManager
+     */
+    public function setFileManager(FileManager $fileManager)
+    {
+        $this->fileManager = $fileManager;
+    }
 
     /**
      * @param MimeTypeGuesser $mimeTypeGuesser
@@ -38,21 +55,20 @@ class ExportHandler extends AbstractHandler
     }
 
     /**
-     * @param RouterInterface $router
+     * @param ReaderChain $readerChain
      */
-    public function setRouter(RouterInterface $router)
+    public function setReaderChain(ReaderChain $readerChain)
     {
-        $this->router = $router;
+        $this->readerChain = $readerChain;
     }
 
     /**
-     * @param ConfigManager $configManager
+     * @param WriterChain $writerChain
      */
-    public function setConfigManager(ConfigManager $configManager)
+    public function setWriterChain(WriterChain $writerChain)
     {
-        $this->configManager = $configManager;
+        $this->writerChain = $writerChain;
     }
-
     /**
      * Get export result
      *
@@ -73,9 +89,10 @@ class ExportHandler extends AbstractHandler
         array $options = []
     ) {
         if ($outputFilePrefix === null) {
-            $outputFilePrefix = $processorAlias;
+            $outputFilePrefix = $processorType;
         }
-        $fileName   = $this->generateExportFileName($outputFilePrefix, $outputFormat);
+        $fileName = FileManager::generateFileName($outputFilePrefix, $outputFormat);
+        $filePath = FileManager::generateTmpFilePath($fileName);
         $entityName = $this->processorRegistry->getProcessorEntityName(
             $processorType,
             $processorAlias
@@ -86,16 +103,15 @@ class ExportHandler extends AbstractHandler
                 array_merge(
                     [
                         'processorAlias' => $processorAlias,
-                        'entityName'     => $entityName,
-                        'filePath'       => $fileName
+                        'entityName' => $entityName,
+                        'filePath' => $filePath
                     ],
                     $options
                 )
         ];
-
-        $url         = null;
         $errorsCount = 0;
-        $readsCount  = 0;
+        $readsCount = 0;
+        $errors = [];
 
         $jobResult = $this->jobExecutor->executeJob(
             $processorType,
@@ -103,26 +119,103 @@ class ExportHandler extends AbstractHandler
             $configuration
         );
 
-        $url = $this->configManager->get('oro_ui.application_url');
-        if ($jobResult->isSuccessful()) {
-            $url .= $this->router->generate('oro_importexport_export_download', ['fileName' => basename($fileName)]);
-            $context = $jobResult->getContext();
-            if ($context) {
-                $readsCount = $context->getReadCount();
-            }
+        if ($context = $jobResult->getContext()) {
+            $errors = $context->getErrors();
+        }
+        if ($jobResult->getFailureExceptions()) {
+            $errors = array_merge($errors, $jobResult->getFailureExceptions());
+        }
+
+        $this->fileManager->writeFileToStorage($filePath, $fileName);
+        @unlink($filePath);
+
+        if ($jobResult->isSuccessful() && ($context = $jobResult->getContext())) {
+            $readsCount = $context->getReadCount();
         } else {
-            $url .= $this->router->generate('oro_importexport_error_log', ['jobCode' => $jobResult->getJobCode()]);
             $errorsCount = count($jobResult->getFailureExceptions());
+        }
+        
+        $errors = array_slice($errors, 0, 100);
+        
+        if (($writer = $this->writerChain->getWriter($outputFormat)) && $writer instanceof ClosableInterface) {
+            $writer->close();
         }
 
         return [
             'success' => $jobResult->isSuccessful(),
-            'url' => $url,
+            'file' => $fileName,
             'readsCount' => $readsCount,
             'errorsCount' => $errorsCount,
-            'entities' => $this->getEntityPluralName($entityName)
+            'entities' => $this->getEntityPluralName($entityName),
+            'errors' => $errors
         ];
     }
+
+    /**
+     * Method for getting ids for export
+     *
+     * @param string $jobName
+     * @param string $processorType
+     * @param string $processorAlias
+     * @param string $options
+     * @return array
+     */
+    public function getExportingEntityIds($jobName, $processorType, $processorAlias, $options)
+    {
+        if (! ($reader = $this->getJobReader($jobName, $processorType)) instanceof BatchIdsReaderInterface) {
+            return [];
+        }
+
+        $entityName = $this->processorRegistry->getProcessorEntityName(
+            $processorType,
+            $processorAlias
+        );
+        /** @var BatchIdsReaderInterface $reader */
+
+        return $reader->getIds($entityName, $options);
+    }
+
+    /**
+     * @param string $jobName
+     * @param string $processorType
+     * @param string $outputFormat
+     * @param array $files
+     * @return string
+     */
+    public function exportResultFileMerge($jobName, $processorType, $outputFormat, array $files)
+    {
+        $fileName = FileManager::generateFileName($processorType, $outputFormat);
+        $localFilePath = FileManager::generateTmpFilePath($fileName);
+
+        if (! ($writer = $this->writerChain->getWriter($outputFormat)) instanceof FileStreamWriter) {
+            throw new LogicException('Writer must be instance of FileStreamWriter');
+        }
+        if (! ($reader = $this->readerChain->getReader($outputFormat)) instanceof AbstractFileReader) {
+            throw new LogicException('Reader must be instance of AbstractFileReader');
+        }
+        $this->batchFileManager->setWriter($writer);
+        $this->batchFileManager->setReader($reader);
+
+        $localFiles = [];
+
+        foreach ($files as $file) {
+            $localFiles[] = $this->fileManager->writeToTmpLocalStorage($file);
+        }
+        $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
+
+        $this->fileManager->writeFileToStorage($localFilePath, $fileName, true);
+
+        foreach ($files as $file) {
+            $this->fileManager->deleteFile($file);
+        }
+        foreach ($localFiles as $localFile) {
+            @unlink($localFile);
+        }
+        @unlink($localFilePath);
+
+        return $fileName;
+    }
+
 
     /**
      * Handles export action
@@ -158,23 +251,19 @@ class ExportHandler extends AbstractHandler
     /**
      * Handles download export file action
      *
-     * @param $fileName
+     * @param string $fileName
      * @return Response
      */
     public function handleDownloadExportResult($fileName)
     {
-        $fullFileName = $this->fileSystemOperator
-            ->getTemporaryFile($fileName)
-            ->getRealPath();
-
+        $content = $this->fileManager->getContent($fileName);
         $headers     = [];
-        $contentType = $this->getFileContentType($fullFileName);
+        $contentType = $this->getFileContentType($fileName);
         if ($contentType !== null) {
             $headers['Content-Type'] = $contentType;
         }
 
-        $response = new BinaryFileResponse($fullFileName, 200, $headers);
-        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+        $response = new Response($content, 200, $headers);
 
         return $response;
     }
@@ -190,18 +279,5 @@ class ExportHandler extends AbstractHandler
         $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
         return $this->mimeTypeGuesser->guessByFileExtension($extension);
-    }
-
-    /**
-     * Builds a name of exported file
-     *
-     * @param string $prefix
-     * @param string $extension
-     * @return string
-     */
-    protected function generateExportFileName($prefix, $extension)
-    {
-        return $this->fileSystemOperator
-            ->generateTemporaryFileName($prefix, $extension);
     }
 }

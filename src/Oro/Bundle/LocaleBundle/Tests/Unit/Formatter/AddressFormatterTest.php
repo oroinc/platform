@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
-use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\AddressStub;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\AddressStub;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AddressFormatterTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +46,11 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['format'])
             ->getMock();
 
-        $this->addressFormatter = new AddressFormatter($this->localeSettings, $this->nameFormatter);
+        $this->addressFormatter = new AddressFormatter(
+            $this->localeSettings,
+            $this->nameFormatter,
+            PropertyAccess::createPropertyAccessor()
+        );
     }
 
     protected function tearDown()

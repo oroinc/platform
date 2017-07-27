@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
@@ -34,6 +35,18 @@ class QueryUtilsTest extends OrmTestCase
         );
     }
 
+    public function testCloneQuery()
+    {
+        $query = new Query($this->em);
+        $query->setDQL('SELECT e FROM Test:Item e WHERE e.id = :id');
+        $query->setHint('hint1', 'value1');
+        $query->setParameter('id', 123);
+
+        $clonedQuery = QueryUtils::cloneQuery($query);
+        self::assertNotSame($query, $clonedQuery);
+        self::assertEquals($query, $clonedQuery);
+    }
+
     public function testCreateResultSetMapping()
     {
         $platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
@@ -43,6 +56,70 @@ class QueryUtilsTest extends OrmTestCase
         $this->assertInstanceOf(
             'Oro\Component\DoctrineUtils\ORM\PlatformResultSetMapping',
             QueryUtils::createResultSetMapping($platform)
+        );
+    }
+
+    public function testAddTreeWalkerWhenQueryDoesNotHaveHints()
+    {
+        $query = new Query($this->em);
+
+        self::assertTrue(
+            QueryUtils::addTreeWalker($query, 'Test\Walker')
+        );
+        self::assertEquals(
+            [
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker']
+            ],
+            $query->getHints()
+        );
+    }
+
+    public function testAddTreeWalkerWhenQueryHasOtherHints()
+    {
+        $query = new Query($this->em);
+        $query->setHint('test', 'value');
+
+        self::assertTrue(
+            QueryUtils::addTreeWalker($query, 'Test\Walker')
+        );
+        self::assertEquals(
+            [
+                'test'                          => 'value',
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker']
+            ],
+            $query->getHints()
+        );
+    }
+
+    public function testAddTreeWalkerWhenQueryHasOtherTreeWalkers()
+    {
+        $query = new Query($this->em);
+        $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['Test\OtherWalker']);
+
+        self::assertTrue(
+            QueryUtils::addTreeWalker($query, 'Test\Walker')
+        );
+        self::assertEquals(
+            [
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\OtherWalker', 'Test\Walker']
+            ],
+            $query->getHints()
+        );
+    }
+
+    public function testAddTreeWalkerWhenQueryAlreadyHasTreeWalker()
+    {
+        $query = new Query($this->em);
+        $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['Test\Walker']);
+
+        self::assertFalse(
+            QueryUtils::addTreeWalker($query, 'Test\Walker')
+        );
+        self::assertEquals(
+            [
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker']
+            ],
+            $query->getHints()
         );
     }
 

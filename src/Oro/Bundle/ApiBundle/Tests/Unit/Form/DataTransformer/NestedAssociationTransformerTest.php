@@ -200,6 +200,18 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => 'Test\Class']);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage There are no acceptable classes.
+     */
+    public function testReverseTransformWhenAnyEntityTypeShouldBeRejected()
+    {
+        $metadata = $this->getAssociationMetadata([]);
+        $metadata->setEmptyAcceptableTargetsAllowed(false);
+        $transformer = new NestedAssociationTransformer($this->doctrine, $metadata);
+        $transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException

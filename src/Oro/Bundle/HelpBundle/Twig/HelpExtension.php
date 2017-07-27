@@ -2,20 +2,31 @@
 
 namespace Oro\Bundle\HelpBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
 
 class HelpExtension extends \Twig_Extension
 {
     const NAME = 'oro_help';
 
-    /**
-     * @var HelpLinkProvider
-     */
-    protected $linkProvider;
+    /** @var ContainerInterface */
+    protected $container;
 
-    public function __construct(HelpLinkProvider $linkProvider)
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->linkProvider = $linkProvider;
+        $this->container = $container;
+    }
+
+    /**
+     * @return HelpLinkProvider
+     */
+    protected function getHelpLinkProvider()
+    {
+        return $this->container->get('oro_help.model.help_link_provider');
     }
 
     /**
@@ -23,9 +34,9 @@ class HelpExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('get_help_link', array($this, 'getHelpLinkUrl')),
-        );
+        return [
+            new \Twig_SimpleFunction('get_help_link', [$this, 'getHelpLinkUrl']),
+        ];
     }
 
     /**
@@ -35,7 +46,7 @@ class HelpExtension extends \Twig_Extension
      */
     public function getHelpLinkUrl()
     {
-        return $this->linkProvider->getHelpLinkUrl();
+        return $this->getHelpLinkProvider()->getHelpLinkUrl();
     }
 
     /**

@@ -31,29 +31,25 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->searchIndexer = $this->createMock(
+        $this->searchIndexer = $this->createPartialMock(
             Indexer::class,
-            ['query'],
-            [],
-            '',
-            false
+            ['query']
         );
 
-        $this->innerQuery = $this->createMock(
+        $this->innerQuery = $this->createPartialMock(
             Query::class,
             [
                 'setFirstResult',
                 'getFirstResult',
                 'setMaxResults',
+                'setFrom',
                 'getMaxResults',
                 'getOrderBy',
                 'getOrderDirection',
                 'getCriteria',
-                'getOrderings'
-            ],
-            [],
-            '',
-            false
+                'getOrderings',
+                'addSelect'
+            ]
         );
 
         $this->criteria = $this->createMock(Criteria::class);
@@ -108,7 +104,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->method('setFirstResult')
             ->with(self::TEST_VALUE);
 
-        $this->query->setFirstResult(self::TEST_VALUE);
+        $this->assertEquals($this->query, $this->query->setFirstResult(self::TEST_VALUE));
     }
 
     public function testGetFirstResult()
@@ -126,7 +122,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->method('setMaxResults')
             ->with(self::TEST_VALUE);
 
-        $this->query->setMaxResults(self::TEST_VALUE);
+        $this->assertEquals($this->query, $this->query->setMaxResults(self::TEST_VALUE));
     }
 
     public function testGetMaxResults()
@@ -176,7 +172,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->method('andWhere')
             ->with($expression);
 
-        $this->query->addWhere($expression);
+        $this->assertEquals($this->query, $this->query->addWhere($expression));
     }
 
     public function testSetWhereOr()
@@ -191,6 +187,63 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->method('getCriteria')
             ->will($this->returnValue($this->criteria));
 
-        $this->query->addWhere($expression, AbstractSearchQuery::WHERE_OR);
+        $this->assertEquals($this->query, $this->query->addWhere($expression, AbstractSearchQuery::WHERE_OR));
+    }
+
+    /**
+     * @param array $arguments
+     * @param array $ordering
+     * @dataProvider orderByDataProvider
+     */
+    public function testSetOrderBy(array $arguments, array $ordering)
+    {
+        $this->criteria->expects($this->once())
+            ->method('orderBy')
+            ->with($ordering);
+
+        $this->assertEquals($this->query, call_user_func_array([$this->query, 'setOrderBy'], $arguments));
+    }
+
+    /**
+     * @return array
+     */
+    public function orderByDataProvider()
+    {
+        return [
+            'only field name' => [
+                'arguments' => ['field'],
+                'ordering'  => ['text.field' => 'asc'],
+            ],
+            'field and direction' => [
+                'arguments' => ['field', 'desc'],
+                'ordering'  => ['text.field' => 'desc'],
+            ],
+            'field, direction and type' => [
+                'arguments' => ['field', 'desc', 'decimal'],
+                'ordering'  => ['decimal.field' => 'desc'],
+            ],
+            'field with predefined type' => [
+                'arguments' => ['decimal.field', 'desc'],
+                'ordering'  => ['decimal.field' => 'desc'],
+            ],
+        ];
+    }
+
+    public function testAddSelect()
+    {
+        $this->innerQuery->expects($this->once())
+            ->method('addSelect')
+            ->with('field', 'decimal');
+
+        $this->assertEquals($this->query, $this->query->addSelect('field', 'decimal'));
+    }
+
+    public function setFrom()
+    {
+        $this->innerQuery->expects($this->once())
+            ->method('setFrom')
+            ->with(self::TEST_VALUE);
+
+        $this->assertEquals($this->query, $this->query->setFrom(self::TEST_VALUE));
     }
 }

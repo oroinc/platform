@@ -7,6 +7,13 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class UserMenu extends Element
 {
+    private $links = [];
+
+    protected function init()
+    {
+        $this->links = $this->findAll('css', 'ul.dropdown-menu li a');
+    }
+
     public function open()
     {
         $this->find('css', 'i.fa-sort-desc')->click();
@@ -17,17 +24,35 @@ class UserMenu extends Element
      */
     public function clickLink($locator)
     {
-        $links = $this->findAll('css', 'ul.dropdown-menu li a');
+        self::assertTrue(
+            $this->hasLink($locator),
+            sprintf('Can\'t find "%s" item in user menu', $locator)
+        );
 
+        $this->getLinkByTitle($locator)->click();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasLink($title)
+    {
+        return (bool) $this->getLinkByTitle($title);
+    }
+
+    /**
+     * @param $title
+     * @return NodeElement
+     */
+    private function getLinkByTitle($title)
+    {
         /** @var NodeElement $link */
-        foreach ($links as $link) {
-            if (preg_match(sprintf('/%s/i', $locator), $link->getText())) {
-                $link->click();
-
-                return;
+        foreach ($this->links as $link) {
+            if (preg_match(sprintf('/%s/i', $title), $link->getText())) {
+                return $link;
             }
         }
 
-        self::fail(sprintf('Can\'t find "%s" item in user menu', $locator));
+        return null;
     }
 }

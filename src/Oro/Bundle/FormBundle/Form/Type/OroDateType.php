@@ -25,6 +25,9 @@ class OroDateType extends AbstractType
         if (!empty($options['years'])) {
             $view->vars['years'] = sprintf('%d:%d', min($options['years']), max($options['years']));
         }
+
+        $view->vars['minDate'] = $options['minDate'];
+        $view->vars['maxDate'] = $options['maxDate'];
     }
 
     /**
@@ -40,6 +43,8 @@ class OroDateType extends AbstractType
                 'widget'         => 'single_text',
                 'placeholder'    => 'oro.form.click_here_to_select',
                 'years'          => [],
+                'minDate'        => null,
+                'maxDate'        => null,
             ]
         );
 
@@ -51,6 +56,9 @@ class OroDateType extends AbstractType
                 }
             ]
         );
+
+        $resolver->setAllowedTypes('minDate', ['string', 'null']);
+        $resolver->setAllowedTypes('maxDate', ['string', 'null']);
     }
 
     /**

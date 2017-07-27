@@ -2,12 +2,13 @@ define(function(require) {
     'use strict';
 
     var DictionaryFilter;
+    var template = require('tpl!orofilter/templates/filter/dictionary-filter.html');
+    var fieldTemplate = require('tpl!orofilter/templates/filter/select-field.html');
     var $ = require('jquery');
     var routing = require('routing');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('oro/filter/choice-filter');
-    var messenger = require('oroui/js/messenger');
     var tools = require('oroui/js/tools');
     require('jquery.select2');
 
@@ -29,6 +30,7 @@ define(function(require) {
          *
          * @property
          */
+        template: template,
         templateSelector: '#dictionary-filter-template',
 
         /**
@@ -36,6 +38,7 @@ define(function(require) {
          *
          * @property
          */
+        fieldTemplate: fieldTemplate,
         fieldTemplateSelector: '#select-field-template',
 
         /**
@@ -139,9 +142,6 @@ define(function(require) {
                     },
                     success: function(response) {
                         self.trigger(successEventName, response);
-                    },
-                    error: function(jqXHR) {
-                        messenger.showErrorMessage(__('Sorry, an unexpected error has occurred.'), jqXHR.responseJSON);
                     }
                 });
             } else {
@@ -299,10 +299,14 @@ define(function(require) {
                 config.data = {
                     results: this.select2ConfigData
                 };
+
+                if (config.data.results.length > 100) {
+                    config.minimumInputLength = 2;
+                }
             }
 
             if (this.templateTheme === '') {
-                config.width = 'resolve';
+                config.width = 'auto';
             }
 
             return config;
@@ -343,7 +347,7 @@ define(function(require) {
          */
         _getParts: function() {
             var value = _.extend({}, this.emptyValue, this.getValue());
-            var dictionaryPartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var dictionaryPartTemplate = this._getTemplate('fieldTemplate');
             var parts = [];
             var selectedPartLabel = this._getSelectedChoiceLabel('choices', this.value);
             // add date parts only if embed template used
@@ -395,20 +399,16 @@ define(function(require) {
             }
 
             var data = this.$(this.elementSelector).inputWidget('data');
-            _.each(value.value, function(id) {
-                if (this.selectedData[id]) {
+            _.each(data, function(elem) {
+                if (!('id' in elem)) {
                     return;
                 }
 
-                var item = _.find(data, function(item) {
-                    return item.id === id;
-                });
-
-                if (!item) {
+                if (this.selectedData[elem.id]) {
                     return;
                 }
 
-                this.selectedData[item.id] = item;
+                this.selectedData[elem.id] = elem;
             }, this);
         },
 

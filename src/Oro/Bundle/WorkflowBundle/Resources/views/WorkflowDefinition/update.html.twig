@@ -16,8 +16,11 @@
                     stepsDisplayOrdered: entity.stepsDisplayOrdered,
                     priority: entity.priority,
                     exclusive_active_groups: entity.exclusiveActiveGroups,
-                    exclusive_record_groups: entity.exclusiveRecordGroups
+                    exclusive_record_groups: entity.exclusiveRecordGroups,
+                    applications: entity.applications
                 },
+                entityFields: entityFields,
+                availableDestinations: availableDestinations,
                 system_entities: system_entities,
                 chartOptions: {},
                 connectionOptions: {
@@ -57,7 +60,7 @@
 {% set gridUrl = path('oro_workflow_definition_index') %}
 
 {% block navButtons %}
-    {% if entity.name and delete_allowed and resource_granted('DELETE', entity) %}
+    {% if entity.name and delete_allowed and is_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
             'dataRedirect': gridUrl,
@@ -197,12 +200,42 @@
                                     </div>
                                 </div>
 
+                                <div class="control-group destination-page-controls">
+                                    {{ _self.render_label("oro.workflow.form.destination_page.label"|trans, false) }}
+                                    <div class="controls">
+                                        <select name="destination_page">
+                                            {% for destination in availableDestinations %}
+                                                <option value="{{ destination }}" <% if (destination_page == '{{ destination }}') { %>selected="selected"<% } %>>{{ ('oro.workflow.workflowdefinition.transition.destination_page.' ~ (destination|default('default')) ~ '.label')|trans }}</value>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div class="control-group">
                                     {{ _self.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
                                     <div class="controls">
                                         <textarea name="message"><%= message %></textarea>
                                         <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.message) { %>
                                             {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.message %>', true) }}
+                                        <% } %>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    {{ _self.render_label("oro.workflow.form.button_label.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_label.tooltip") }}
+                                    <div class="controls">
+                                        <input type="text" name="button_label" value="<%- button_label %>">
+                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_label) { %>
+                                            {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.button_label %>', true) }}
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    {{ _self.render_label("oro.workflow.form.button_title.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_title.tooltip") }}
+                                    <div class="controls">
+                                        <input type="text" name="button_title" value="<%- button_title %>">
+                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.button_title) { %>
+                                            {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.button_title %>', true) }}
                                         <% } %>
                                     </div>
                                 </div>
@@ -510,6 +543,8 @@
                 'data': [
                     form_row(form.label),
                     form_row(form.related_entity),
+                    form_row(form.exclusive_active_groups),
+                    form_row(form.exclusive_record_groups),
                     startStepSelector,
                     form_row(form.steps_display_ordered)
                 ]
@@ -540,7 +575,12 @@
                 <div class="workflow-flowchart-controls clearfix"></div>
                 <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
                     'module': 'oroui/js/app/components/view-component',
-                    'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                    'options': {
+                        'view': 'oroui/js/app/views/zoomable-area-view',
+                        'autozoom': true,
+                        'minZoom': 0.05,
+                        'maxZoom': 5
+                    }
                 }) }}><div class="workflow-flowchart clearfix"></div></div>
             </div>
         </div>

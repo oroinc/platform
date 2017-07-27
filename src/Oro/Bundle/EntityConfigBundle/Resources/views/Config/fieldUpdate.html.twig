@@ -16,13 +16,13 @@
 {% set audit_show_change_history = true %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_entityconfig_manage') %}
+    {% if is_granted('oro_entityconfig_manage') %}
         {{ UI.cancelButton(path('oro_entityconfig_view', {id: field.entity.id})) }}
         {% set html = UI.saveAndCloseButton({
             'route': 'oro_entityconfig_view',
             'params': {'id': '$entity.id'}
         }) %}
-        {% if resource_granted('oro_entityextend_field_create') %}
+        {% if is_granted('oro_entityextend_field_create') %}
             {% set html = html ~ UI.saveAndNewButton({
                 'route': 'oro_entityextend_field_create',
                 'params': {'id': '$entity.id'}
@@ -75,5 +75,16 @@
         'hiddenData': form_rest(form)
     }%}
 
+    {% if non_extended_entities_classes is defined
+        and form.extend.relation is defined
+        and field.type != constant('Oro\\Bundle\\EntityExtendBundle\\Extend\\RelationType::ONE_TO_MANY')
+    %}
+        {% set options = {
+            'nonExtendedEntitiesClassNames': non_extended_entities_classes
+        } %}
+        <div data-page-component-module="oroentityextend/js/bidirectional-only-for-extended-component"
+             data-page-component-options="{{ options|json_encode }}">
+        </div>
+    {% endif %}
     {{ parent() }}
 {% endblock content_data %}

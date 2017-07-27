@@ -18,6 +18,10 @@
             &-m {
                 margin-bottom: $offset-y-m;
             }
+
+            &-l {
+                margin-bottom: 20px;
+            }
         }
 
         &--has-twin-row {
@@ -28,6 +32,12 @@
     }
 
     &__column {
+        float: left;
+
+        box-sizing: border-box;
+
+        padding: 0 $offset-x-m;
+
         &-half {
             float: left;
 
@@ -36,13 +46,6 @@
             &:first-child {
                 margin-right: $grid-offset;
             }
-
-            @media (max-width: 991px) {
-                clear: left;
-
-                width: 100%;
-                margin-right: auto;
-            }
         }
 
         &--both {
@@ -50,23 +53,54 @@
         }
 
         &--offset {
+            &-y {
+                margin-bottom: $offset-y;
+            }
+
             &-m {
                 margin-right: $grid-offset;
             }
         }
-    }
 
-    &__column {
-        float: left;
+        &--gutter {
+            &-l-s {
+                padding-left: $offset-x-s;
+            }
 
-        box-sizing: border-box;
+            &-r-s {
+                padding-right: $offset-x-s;
+            }
+        }
 
-        padding: 0 9px;
+        &--no-gutters {
+            padding: 0;
+        }
+
+        &--no-gutters-l {
+            padding-left: 0;
+        }
+
+        &--no-gutters-r {
+            padding-right: 0;
+        }
     }
 
     @for $i from 1 through $grid-count {
         &__column--#{$i} {
             width: (($i* 100%) / $grid-count);
+        }
+    }
+}
+
+@include breakpoint('tablet-small') {
+    .grid {
+        &__column {
+            &-half {
+                clear: left;
+
+                width: 100%;
+                margin-right: auto;
+            }
         }
     }
 }

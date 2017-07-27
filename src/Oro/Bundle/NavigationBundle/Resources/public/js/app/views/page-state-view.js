@@ -6,8 +6,9 @@ define([
     'oroui/js/mediator',
     'oroui/js/modal',
     'oroui/js/app/views/base/view',
-    'base64'
-], function($, _, routing, __, mediator, Modal, BaseView, base64) {
+    'base64',
+    'oroui/js/tools'
+], function($, _, routing, __, mediator, Modal, BaseView, base64, tools) {
     'use strict';
 
     var PageStateView;
@@ -41,7 +42,6 @@ define([
                 content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
                 okText: __('OK, got it.'),
                 className: 'modal modal-primary',
-                okButtonClass: 'btn-primary btn-large',
                 cancelText: __('Cancel')
             });
             this.subview('confirmModal', confirmModal);
@@ -345,8 +345,8 @@ define([
                     var selectedData = $item.inputWidget('data');
                     var itemData = {name: item.name, value: $item.val()};
 
-                    if (!_.isEmpty(selectedData) && $.isPlainObject(selectedData)) {
-                        itemData.selectedData = [selectedData];
+                    if (!_.isEmpty(selectedData)) {
+                        itemData.selectedData = selectedData;
                     }
 
                     data[index].push(itemData);
