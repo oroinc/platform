@@ -84,7 +84,7 @@
     {% endif %}
 
     {% if not entity.system %}
-        {% if is_granted('EDIT', entity) %}
+        {% if edit_allowed and is_granted('EDIT', entity) %}
             {{ UI.editButton({
                 'path' : path('oro_workflow_definition_update', { 'name': entity.name }),
                 'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
@@ -122,6 +122,12 @@
     {{ parent() }}
 
     <div class="pull-left">
+        {% if entity.system %}
+            <div class="badge badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.system.label'|trans }}</div>
+        {% endif %}
+        {% if not edit_allowed %}
+            <div class="badge badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-circle"></i>{{ 'oro.workflow.status.readonly.label'|trans }}</div>
+        {% endif %}
         {% if isActive %}
             <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
         {% else %}
