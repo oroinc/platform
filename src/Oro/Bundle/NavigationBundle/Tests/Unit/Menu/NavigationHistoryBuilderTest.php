@@ -116,11 +116,11 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('match')
             ->with($this->isType('string'))
             ->willReturn(['_route' => 'route']);
-        $this->featureChecker->expects($this->exactly(2))
+        $this->featureChecker->expects($this->exactly(0))
             ->method('isResourceEnabled')
             ->with($this->anything())
             ->willReturn(true);
-        $menu->expects($this->exactly(2))
+        $menu->expects($this->never())
             ->method('addChild');
         $menu->expects($this->once())
             ->method('setExtra')

@@ -160,9 +160,20 @@ services:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.precise_order_by:
-        class: Oro\Bundle\DataGridBundle\Extension\Sorter\PreciseOrderByExtension
+        class: Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension
         arguments:
             - '@oro_entity.query_hint_resolver'
+            - 'HINT_PRECISE_ORDER_BY'
+            - -261
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.nulls_order:
+        class: Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension
+        arguments:
+            - '@oro_entity.query_hint_resolver'
+            - '@=constant("Oro\\Component\\DoctrineUtils\\ORM\\SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS")'
+            - -300
         tags:
             - { name: oro_datagrid.extension }
 

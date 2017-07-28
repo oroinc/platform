@@ -75,6 +75,13 @@ services:
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: window }
 
+    oro_datagrid.extension.mass_action.type.massedit:
+        class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\MassEdit\MassEditAction
+        parrent: oro_datagrid.extension.mass_action.type.window
+        scope: prototype
+        tags:
+            - { name:  oro_datagrid.extension.mass_action.type, type: massedit }
+
     oro_datagrid.extension.mass_action.type.frontend:
         class: %oro_datagrid.extension.mass_action.type.frontend.class%
         scope: prototype
