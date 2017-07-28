@@ -122,7 +122,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row->setCellValue($field, $value);
         // click any where on the page
         $this->getPage()->find('css', '#container')->click();
-        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been successfully updated');
     }
 
     /**
@@ -175,7 +175,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row = $this->getGridRow($entityTitle);
 
         $row->setCellValueAndSave($field, $value);
-        $this->oroMainContext->iShouldSeeFlashMessage('Record has been succesfully updated');
+        $this->oroMainContext->iShouldSeeFlashMessage('Record has been successfully updated');
     }
 
     /**
