@@ -8,9 +8,6 @@
 
 namespace Oro\Component\PropertyAccess;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\PersistentCollection;
-use Oro\Bundle\ProductBundle\Entity\Product;
 use Symfony\Component\PropertyAccess\Exception;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
