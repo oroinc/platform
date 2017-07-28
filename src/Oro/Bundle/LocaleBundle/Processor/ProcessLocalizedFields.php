@@ -143,22 +143,4 @@ class ProcessLocalizedFields implements ProcessorInterface
 
         $em->persist($localizedFallbackValue);
     }
-
-    /**
-     * @param object $entity
-     * @param string $relationName
-     * @return string
-     */
-    private function getEntityAdderMethod($entity, $relationName)
-    {
-        $camelized = str_replace(' ', '', ucwords(str_replace('_', ' ', $relationName)));
-        $singulars = (array) StringUtil::singularify($camelized);
-        foreach ($singulars as $singular) {
-            $addMethod = 'add'.$singular;
-
-            if (is_callable([$entity, $addMethod])) {
-                return $addMethod;
-            }
-        }
-    }
 }

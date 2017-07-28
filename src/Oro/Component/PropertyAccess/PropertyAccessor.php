@@ -632,6 +632,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param array|\Traversable $collection   The collection to write
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
+     * @param boolean            $shouldRemoveItems Flag that tells if we want to remove existing items
      */
     protected function writeCollection(
         $object,
