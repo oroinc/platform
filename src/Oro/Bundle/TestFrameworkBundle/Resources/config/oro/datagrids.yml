@@ -16,6 +16,8 @@ datagrids:
 
     items-values-grid:
         source:
+            hints:
+                - { name: HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, value: false }
             type: orm
             query:
                 select:

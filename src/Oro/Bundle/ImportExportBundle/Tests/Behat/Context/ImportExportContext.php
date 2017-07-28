@@ -87,7 +87,7 @@ class ImportExportContext extends OroFeatureContext implements
     public function iDownloadDataTemplateFile($entity)
     {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
-        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export_template', $entityClass);
 
         self::assertCount(1, $processors, sprintf(
             'Too many processors ("%s") for export "%s" entity',
@@ -237,7 +237,7 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @Then /^(?:|I )don't see (?P<column>([\w\s]+)) column$/
      */
-    public function iDonTSeeBbCustomerNameColumn($column)
+    public function iDonTSeeColumn($column)
     {
         $csv = array_map('str_getcsv', file($this->template));
         self::assertNotContains($column, $csv[0]);
@@ -250,7 +250,7 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @Then /^(?:|I )see (?P<column>([\w\s]+)) column$/
      */
-    public function iSeeAccountColumn($column)
+    public function iSeeColumn($column)
     {
         $csv = array_map('str_getcsv', file($this->template));
         self::assertContains($column, $csv[0]);

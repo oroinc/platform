@@ -82,11 +82,13 @@ class OroSelenium2Driver extends Selenium2Driver
                 return;
             } elseif ('text' === $element->attribute('type')) {
                 $this->setTextInputElement($element, $value);
+                $this->triggerEvent($xpath, 'keyup');
 
                 return;
             }
         } elseif ('textarea' === $elementName && 'true' === $element->attribute('aria-hidden')) {
             $this->fillTinyMce($element, $value);
+            $this->triggerEvent($xpath, 'keyup');
 
             return;
         }
@@ -367,5 +369,40 @@ JS;
         } while (microtime(true) < $end && !$result);
 
         return (bool) $result;
+    }
+
+    /**
+     * Trigger given event $eventName on DOM element, found by $xpath
+     *
+     * This method created to trigger events instead of $this->keyup, $this->blur, etc, becaouse of "Syn" library error
+     * (in Syn.trigger function), used in these methods.
+     *
+     * @param string $xpath
+     * @param string $eventName
+     */
+    private function triggerEvent($xpath, $eventName)
+    {
+        $script = <<<JS
+// Function to triger an event. Cross-browser compliant. See http://stackoverflow.com/a/2490876/135494
+var triggerEvent = function (element, eventName) {
+    var event;
+    if (document.createEvent) {
+        event = document.createEvent("HTMLEvents");
+        event.initEvent(eventName, true, true);
+    } else {
+        event = document.createEventObject();
+        event.eventType = eventName;
+    }
+    event.eventName = eventName;
+    if (document.createEvent) {
+        element.dispatchEvent(event);
+    } else {
+        element.fireEvent("on" + event.eventType, event);
+    }
+}
+var node = {{ELEMENT}};
+triggerEvent(node, '$eventName');
+JS;
+        $this->executeJsOnXpath($xpath, $script);
     }
 }
