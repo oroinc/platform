@@ -11,6 +11,7 @@ $oro_breakpoints: (
     'mobile-landscape': '(max-width: ' +  $breakpoint-mobile-landscape + ')',
     'strict-mobile-landscape': '(max-width: ' +  $breakpoint-mobile-landscape + ') and (min-width: ' + ($breakpoint-mobile + 1) + ')',
     'mobile': '(max-width: ' + $breakpoint-mobile + ')',
+    'mobile-big': '(max-width: ' +  $breakpoint-mobile-big + ')',
     'strict-mobile': '(max-width: ' + $breakpoint-mobile + ')'
 );
 
