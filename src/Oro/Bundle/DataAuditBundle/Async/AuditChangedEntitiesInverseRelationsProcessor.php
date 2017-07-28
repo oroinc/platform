@@ -19,7 +19,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
 {
     /** @var ManagerRegistry */
     private $doctrine;
-    
+
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
@@ -200,12 +200,12 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
     }
 
     /**
-     * @param array  $sourceChange
+     * @param array $sourceChange
      * @param string $entityClass
      * @param string $fieldName
      * @param string $sourceEntityClass
-     * @param int    $sourceEntityId
-     * @param array  $map
+     * @param int $sourceEntityId
+     * @param array $map
      */
     private function processManyToManyRelation(
         $sourceChange,
@@ -226,8 +226,8 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
 
                 $change[1]['inserted'][] = [
                     'entity_class' => $sourceEntityClass,
-                    'entity_id'    => $sourceEntityId,
-                    'change_set'   => [],
+                    'entity_id' => $sourceEntityId,
+                    'change_set' => [],
                 ];
 
                 $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -236,7 +236,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
 
 
         if (is_array($new) && array_key_exists('deleted', $new) && is_array($new['deleted'])) {
-
             foreach ($new['deleted'] as $deletedEntityData) {
                 $entityId = $deletedEntityData['entity_id'];
 
@@ -244,10 +243,10 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
 
                 $change[1]['deleted'][] = [
                     'entity_class' => $sourceEntityClass,
-                    'entity_id'    => $sourceEntityId,
-                    'change_set'   => [],
+                    'entity_id' => $sourceEntityId,
+                    'change_set' => [],
                 ];
-                
+
                 $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
             }
         }
