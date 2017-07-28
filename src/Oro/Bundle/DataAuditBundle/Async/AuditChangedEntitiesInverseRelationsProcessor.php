@@ -222,8 +222,8 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
         if (is_array($new) && array_key_exists('inserted', $new) && is_array($new['inserted'])) {
             foreach ($new['inserted'] as $insertedEntityData) {
                 $entityId = $insertedEntityData['entity_id'];
-                $change   = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
 
+                $change   = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
                 $change[1]['inserted'][] = [
                     'entity_class' => $sourceEntityClass,
                     'entity_id' => $sourceEntityId,
@@ -240,7 +240,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                 $entityId = $deletedEntityData['entity_id'];
 
                 $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-
                 $change[1]['deleted'][] = [
                     'entity_class' => $sourceEntityClass,
                     'entity_id' => $sourceEntityId,
