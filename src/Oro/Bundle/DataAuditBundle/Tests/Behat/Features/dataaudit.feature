@@ -1,3 +1,5 @@
+@ticket-BAP-9497
+@ticket-BAP-15092
 Feature: DataAudit logs acl protection
   Scenario: Create different window session
     Given sessions active:
@@ -43,3 +45,11 @@ Feature: DataAudit logs acl protection
     And go to System/ Data Audit
     Then I should see following grid:
     |Create|1|Contact|testFname testLname|FName LName - admin@example.com|OroCRM|
+
+  Scenario: Ensure that Change History popup works
+    Given I proceed as the User
+    Then I go to Customers/ Contacts
+    And I click View testFname in grid
+    And I click "Change History"
+    Then number of records in "Audit History Grid" should be 1
+    And I close ui dialog

@@ -31,6 +31,7 @@
 //}
 @mixin breakpoint($type) {
     // $breakpoints - global variable;
+        'mobile-big': '(max-width: ' +  $breakpoint-mobile-big + ')',
 
     @if (map_has_key($breakpoints, $type)) {
         @media #{map-get($breakpoints, $type)} {

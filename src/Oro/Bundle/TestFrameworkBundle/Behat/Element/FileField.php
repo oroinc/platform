@@ -47,6 +47,7 @@ class FileField extends Element implements SuiteAwareInterface
         }
 
         foreach ($suitePaths as $suitePath) {
+            $suitePath = is_dir($suitePath) ? $suitePath : dirname($suitePath);
             $path = $suitePath.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
 
             if (file_exists($path)) {

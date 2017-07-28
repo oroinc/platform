@@ -214,7 +214,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $childJob1->setData($resultOfImportJob1);
         $childJob2->setData($resultOfImportJob2);
 
-        $em = $this->getContainer()->get('doctrine.orm.message_queue_job_entity_manager');
+        $em = $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
         $em->refresh($rootJob);
         $messageData = [
             'rootImportJobId' => $rootJob->getId(),

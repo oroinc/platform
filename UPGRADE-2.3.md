@@ -122,6 +122,10 @@ DataGridBundle
     - changed the constructor signature: `AbstractPager $pager` replaced on `PagerInterface $pager`
 - Interface `Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface`
     - method `init` was removed
+- Interface `Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface`
+    - new method `acceptDatasource` was added
+- Class `Oro\Bundle\DataGridBundle\Datagrid\Datagrid`
+    - new method `acceptDatasource` was added
 
 IntegrationBundle
 -----------------

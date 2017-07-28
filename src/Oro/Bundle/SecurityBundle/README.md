@@ -24,8 +24,8 @@ At first it is important to say that all benefits of Symfony ACL based security 
 
 Detailed information about Symfony ACL based security model you can read in the Symfony documentation:
 
- - [http://symfony.com/doc/current/cookbook/security/acl.html ]
- - [http://symfony.com/doc/current/cookbook/security/acl_advanced.html ]
+ - http://symfony.com/doc/current/cookbook/security/acl.html
+ - http://symfony.com/doc/current/cookbook/security/acl_advanced.html
 
 In additional Oro allows you to protect data on different levels:
 
@@ -51,13 +51,15 @@ And these permissions are supported for fields:
  - **VIEW**: Controls whether a user is allowed to view a field.
  - **EDIT**: Controls whether a user is allowed to modify a field.
 
-
+Features
+--------
+You can find additional information about the bundle's features in their dedicated sections:
 - [Implementation](./Resources/doc/implementation.md)
 - [UI](./Resources/doc/ui.md)
 - [ACL manager](./Resources/doc/acl-manager.md)
-- [Access levels] (./Resources/doc/access-levels.md)
+- [Access levels](./Resources/doc/access-levels.md)
 - [Field ACL](./Resources/doc/field-acl.md)
-- [Custom listeners] (./Resources/doc/custom-listeners.md)
+- [Custom listeners](./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
 
 Permissions
