@@ -423,8 +423,6 @@ class OroMainContext extends MinkContext implements
         $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
         self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
 
-        $attachmentItem->clickOnAttachmentThumbnail();
-
         $thumbnail = $this->getPage()->find('css', "div.thumbnail a[title='$text']");
         self::assertTrue($thumbnail->isValid(), sprintf('Thumbnail "%s" not found', $text));
 
