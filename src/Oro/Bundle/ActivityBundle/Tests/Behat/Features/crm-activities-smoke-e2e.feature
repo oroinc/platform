@@ -1,3 +1,4 @@
+@skip
 @regression
 @fixture-OroActivityBundle:activities-smoke-e2e.yml
 Feature: Activities
