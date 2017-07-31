@@ -1,0 +1,4 @@
+oro:
+    entity:
+        entity_field_fallback_value:
+            invalid: "The selected value is not valid."

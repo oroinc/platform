@@ -627,3 +627,11 @@ LocaleBundle
 ------------
 - Updated Moment.js to 2.18.* version
 - Updated Numeral.js to 2.0.6 version
+
+NavigationBundle
+----------------
+Class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder`:
+   - abstract service `oro_navigation.menu_update.builder.abstract` was removed, use instead class `MenuUpdateBuilder`
+   - changed constructor signature: parameters `ScopeManager $scopeManager`, `ManagerRegistry $registry` was replaced with `MenuUpdateProviderInterface $menuUpdateProvider`, get menu updates for menu item in `MenuUpdateProvider`
+   - methods `setClassName` and `setScopeType` was removed
+
