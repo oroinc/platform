@@ -1464,6 +1464,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Given /^I should see "(?P<gridName>[\s\w]+)" grid$/
+     */
+    public function iShouldSeeGrid($gridName = 'Grid')
+    {
+        $grid = $this->elementFactory->createElement($gridName);
+
+        self::assertTrue(
+            $grid->isIsset(),
+            sprintf('Grid "%s" was not found on page', $gridName)
+        );
+    }
+
+    /**
      * Example: I should see following elements in "Grid" grid:
      *            | Action System Button  |
      *            | Action Default Button |

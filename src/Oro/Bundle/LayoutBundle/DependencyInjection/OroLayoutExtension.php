@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\LayoutBundle\DependencyInjection;
 
+use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Component\Config\CumulativeResourceInfo;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
-
 class OroLayoutExtension extends Extension
 {
+    const ALIAS                         = 'oro_layout';
+
     const THEME_MANAGER_SERVICE_ID      = 'oro_layout.theme_manager';
     const THEME_RESOURCE_PROVIDER_SERVICE_ID = 'oro_layout.theme_extension.resource_provider.theme';
 
@@ -88,6 +89,14 @@ class OroLayoutExtension extends Extension
             'Oro\Bundle\LayoutBundle\EventListener\ThemeListener',
             'Oro\Bundle\LayoutBundle\Request\LayoutHelper'
         ]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAlias()
+    {
+        return self::ALIAS;
     }
 
     /**

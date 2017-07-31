@@ -186,11 +186,7 @@ class Element extends NodeElement
      */
     public function clickForce()
     {
-        $jsCode = sprintf(
-            '$(document.evaluate("%s",document,null,XPathResult.FIRST_ORDERED_NODE_TYPE).singleNodeValue).click();',
-            $this->getXpath()
-        );
-        $this->getDriver()->executeScript($jsCode);
+        $this->getDriver()->executeJsOnXpath($this->getXpath(), '{{ELEMENT}}.click()');
     }
 
     /**
