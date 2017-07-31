@@ -215,24 +215,7 @@ class BlockFactory implements BlockFactoryInterface
         $options   = $this->rawLayout->getProperty($id, RawLayout::OPTIONS, true);
         $types     = $this->typeHelper->getTypes($blockType);
 
-        // resolve options
-        $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
-
-        $this->processExpressions($resolvedOptions);
-        $resolvedOptions = $this->resolveValueBags($resolvedOptions);
-
-        if ($resolvedOptions->get('visible', false) !== false) {
-            // point the block builder state to the current block
-            $this->blockBuilder->initialize($id);
-            // iterate from parent to current
-            foreach ($types as $type) {
-                $type->buildBlock($this->blockBuilder, $resolvedOptions);
-                $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
-            }
-            $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
-        } else {
-            $this->rawLayout->remove($id);
-        }
+        $this->setBlockResolvedOptions($id, $blockType, $options, $types);
     }
 
     /**
@@ -245,17 +228,22 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function buildBlockView($id, BlockView $parentView = null)
     {
-        $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
-        $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
-        $types     = $this->typeHelper->getTypes($blockType);
-        $view      = new BlockView($parentView);
+        $blockType       = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
+        $resolvedOptions = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
+        $types           = $this->typeHelper->getTypes($blockType);
+        $view            = new BlockView($parentView);
+
+        if (is_null($resolvedOptions)) { // Try to resolve options again to render block
+            $options  = $this->rawLayout->getProperty($id, RawLayout::OPTIONS, true);
+            $resolvedOptions = $this->setBlockResolvedOptions($id, $blockType, $options, $types);
+        }
 
         // point the block view state to the current block
         $this->block->initialize($id);
         // build the view
         foreach ($types as $type) {
-            $type->buildView($view, $this->block, $options);
-            $this->registry->buildView($type->getName(), $view, $this->block, $options);
+            $type->buildView($view, $this->block, $resolvedOptions);
+            $this->registry->buildView($type->getName(), $view, $this->block, $resolvedOptions);
         }
 
         array_walk_recursive(
@@ -352,5 +340,39 @@ class BlockFactory implements BlockFactoryInterface
         }
 
         return $options;
+    }
+
+    /**
+     * Setting resolved options for block
+     *
+     * @param string $id
+     * @param string $blockType
+     * @param array  $options
+     * @param array  $types
+     *
+     * @return Options
+     */
+    protected function setBlockResolvedOptions($id, $blockType, $options, $types)
+    {
+        // resolve options
+        $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
+
+        $this->processExpressions($resolvedOptions);
+        $resolvedOptions = $this->resolveValueBags($resolvedOptions);
+
+        if ($resolvedOptions->get('visible', false) !== false) {
+            // point the block builder state to the current block
+            $this->blockBuilder->initialize($id);
+            // iterate from parent to current
+            foreach ($types as $type) {
+                $type->buildBlock($this->blockBuilder, $resolvedOptions);
+                $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
+            }
+            $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
+        } else {
+            $this->rawLayout->remove($id);
+        }
+
+        return $resolvedOptions;
     }
 }
