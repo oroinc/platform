@@ -110,7 +110,7 @@ class OroMainContext extends MinkContext implements
             fwrite(
                 STDOUT,
                 sprintf(
-                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                    "Wait for ajax %d seconds, and it assume that ajax was NOT passed\n",
                     $timeElapsedSecs
                 )
             );
@@ -574,6 +574,19 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Example: Given I wait 1 second
+     * Example: Given I wait 2 seconds
+     *
+     * @When /^(?:|I )wait (?P<timeout>\d) second(s){0,1}.*$/
+     *
+     * @param int $timeout
+     */
+    public function iWait($timeout = 1)
+    {
+        $this->getSession()->wait($timeout * 1000);
     }
 
     /**
@@ -1246,7 +1259,7 @@ class OroMainContext extends MinkContext implements
      * This method should be used only for debug
      * @When /^I wait for action$/
      */
-    public function iWait()
+    public function iWaitForAction()
     {
         fwrite(STDOUT, "Press [RETURN] to continue...");
         fgets(STDIN, 1024);
