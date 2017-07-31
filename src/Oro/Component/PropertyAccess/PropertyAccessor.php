@@ -8,9 +8,6 @@
 
 namespace Oro\Component\PropertyAccess;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\PersistentCollection;
-use Oro\Bundle\ProductBundle\Entity\Product;
 use Symfony\Component\PropertyAccess\Exception;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -635,6 +632,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param array|\Traversable $collection   The collection to write
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
+     * @param boolean            $shouldRemoveItems Flag that tells if we want to remove existing items
      */
     protected function writeCollection(
         $object,
