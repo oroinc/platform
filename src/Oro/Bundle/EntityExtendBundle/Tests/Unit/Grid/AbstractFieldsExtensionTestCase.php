@@ -307,7 +307,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             ],
                             'select' => [
                                 'IDENTITY(c.testField) as testField',
-                                'auto_rel_1.testRel',
+                                'auto_rel_1.testRel as auto_rel_1_testRel',
                             ],
                         ],
                     ],
@@ -323,7 +323,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                     'sorters' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => $relAlias.'.'.$targetFieldName,
+                                'data_name' => 'auto_rel_1_testRel',
                             ],
                         ],
                     ],
