@@ -546,29 +546,11 @@ class PropertyAccessor implements PropertyAccessorInterface
             $reflClass = new \ReflectionClass($object);
             $camelized = $this->camelize($property);
             $singulars = (array)StringUtil::singularify($camelized);
-            $shouldRemoveItems = true;
 
-            $objectValue = $this->getValue($object, $property);
-            //if the value we want to add is not an array and we try to add it to a collection,
-            // then we don't want to overwrite the old values, instead add the new value to the collection
-            if ((!is_array($value) && !$value instanceof \Traversable)
-                && ($objectValue instanceof \ArrayAccess || is_array($objectValue))
-            ) {
-                //we try to add a value to a collection and we don't want to remove old items
-                $value = [$value];
-                $shouldRemoveItems = false;
-            }
+            $isCollection = $this->checkValueIsCollection($object, $property, $value, $reflClass, $singulars);
 
-
-            if (is_array($value) || $value instanceof \Traversable) {
-                $methods = $this->findAdderAndRemover($reflClass, $singulars);
-
-                // Use addXxx() and removeXxx() to write the collection
-                if (null !== $methods) {
-                    $this->writeCollection($object, $property, $value, $methods[0], $methods[1], $shouldRemoveItems);
-
-                    return;
-                }
+            if (true === $isCollection) {
+                return;
             }
 
             $setter           = 'set' . $camelized;
@@ -622,6 +604,51 @@ class PropertyAccessor implements PropertyAccessorInterface
                 )
             );
         }
+    }
+
+    /**
+     * Checks if value is a collection and sets the value for the attribute
+     *
+     * @param array|object      $object   The object or array to write to
+     * @param mixed             $property The property or index to write
+     * @param mixed             $value    The value to write
+     * @param \ReflectionClass  $reflClass
+     * @param array             $singulars
+     * @return bool
+     */
+    protected function checkValueIsCollection($object, $property, $value, $reflClass, $singulars)
+    {
+        $shouldRemoveItems = true;
+
+        try {
+            $objectValue = $this->getValue($object, $property);
+        } catch (Exception\NoSuchPropertyException $ex) {
+            //property was not set so we cannot get a value that wasn't set already
+            $objectValue = null;
+        }
+        //if the value we want to add is not an array and we try to add it to a collection,
+        // then we don't want to overwrite the old values, instead add the new value to the collection
+        if ((!is_array($value) && !$value instanceof \Traversable)
+            && ($objectValue instanceof \ArrayAccess || is_array($objectValue))
+        ) {
+            //we try to add a value to a collection and we don't want to remove old items
+            $value = [$value];
+            $shouldRemoveItems = false;
+        }
+
+
+        if (is_array($value) || $value instanceof \Traversable) {
+            $methods = $this->findAdderAndRemover($reflClass, $singulars);
+
+            // Use addXxx() and removeXxx() to write the collection
+            if (null !== $methods) {
+                $this->writeCollection($object, $property, $value, $methods[0], $methods[1], $shouldRemoveItems);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
