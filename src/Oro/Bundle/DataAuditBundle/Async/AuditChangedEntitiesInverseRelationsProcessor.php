@@ -19,7 +19,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
 {
     /** @var ManagerRegistry */
     private $doctrine;
-    
+
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
@@ -217,7 +217,9 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
     ) {
         list($old, $new) = $sourceChange;
 
-        if (isset($new['inserted']) && is_array($new['inserted'])) {
+        unset($old);
+
+        if (is_array($new) && array_key_exists('inserted', $new) && is_array($new['inserted'])) {
             foreach ($new['inserted'] as $insertedEntityData) {
                 $entityId = $insertedEntityData['entity_id'];
 
@@ -232,7 +234,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             }
         }
 
-        if (isset($new['deleted']) && is_array($new['deleted'])) {
+        if (is_array($new) && array_key_exists('deleted', $new) && is_array($new['deleted'])) {
             foreach ($new['deleted'] as $deletedEntityData) {
                 $entityId = $deletedEntityData['entity_id'];
 

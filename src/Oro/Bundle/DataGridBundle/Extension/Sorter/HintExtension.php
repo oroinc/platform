@@ -7,31 +7,33 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration as OrmQuery;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
-/**
- * @see Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker
- */
-class PreciseOrderByExtension extends AbstractExtension
+class HintExtension extends AbstractExtension
 {
-    const HINT_PRECISE_ORDER_BY = 'HINT_PRECISE_ORDER_BY';
-
-    /** @var QueryHintResolver */
+    /**
+     * @var QueryHintResolver
+     */
     protected $queryHintResolver;
 
     /**
-     * @param QueryHintResolver $queryHintResolver
+     * @var string
      */
-    public function __construct(QueryHintResolver $queryHintResolver)
-    {
-        $this->queryHintResolver = $queryHintResolver;
-    }
+    protected $hintName;
 
     /**
-     * {@inheritdoc}
+     * @var int
      */
-    public function getPriority()
+    protected $priority;
+
+    /**
+     * @param QueryHintResolver $queryHintResolver
+     * @param string $hintName
+     * @param int $priority
+     */
+    public function __construct(QueryHintResolver $queryHintResolver, $hintName, $priority)
     {
-        // should visit after all extensions and after SorterExtension
-        return -261;
+        $this->queryHintResolver = $queryHintResolver;
+        $this->hintName = $hintName;
+        $this->priority = $priority;
     }
 
     /**
@@ -45,17 +47,25 @@ class PreciseOrderByExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function processConfigs(DatagridConfiguration $config)
     {
         $query = $config->getOrmQuery();
 
         $addHint = true;
-        $resolvedHintName = $this->queryHintResolver->resolveHintName(self::HINT_PRECISE_ORDER_BY);
+        $resolvedHintName = $this->queryHintResolver->resolveHintName($this->hintName);
         $hints = $query->getHints();
         foreach ($hints as $hintKey => $hint) {
             if (is_array($hint)) {
                 $hintName = $this->getHintAttribute($hint, OrmQuery::NAME_KEY);
-                if (self::HINT_PRECISE_ORDER_BY === $hintName || $resolvedHintName === $hintName) {
+                if ($this->hintName === $hintName || $resolvedHintName === $hintName) {
                     $addHint = false;
                     $hintValue = $this->getHintAttribute($hint, OrmQuery::VALUE_KEY);
                     if (false === $hintValue) {
@@ -65,13 +75,13 @@ class PreciseOrderByExtension extends AbstractExtension
                     }
                     break;
                 }
-            } elseif (self::HINT_PRECISE_ORDER_BY === $hint || $resolvedHintName === $hint) {
+            } elseif ($this->hintName === $hint || $resolvedHintName === $hint) {
                 $addHint = false;
                 break;
             }
         }
         if ($addHint) {
-            $query->addHint(self::HINT_PRECISE_ORDER_BY);
+            $query->addHint($this->hintName);
         }
     }
 

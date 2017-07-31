@@ -436,6 +436,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: When I click on "Help Icon" with title "Help"
+     *
+     * @When /^(?:|I )click on "(?P<selector>[^"]+)" with title "(?P<title>[^"]+)"$/
+     *
+     * @param string $selector
+     * @param string $title
+     */
+    public function iClickOnElementWithTitle($selector, $title)
+    {
+        $element = $this->findElementContains($selector, $title);
+
+        self::assertTrue(
+            $element->isValid(),
+            sprintf('Element "%s" with title "%s" not found on page', $selector, $title)
+        );
+
+        $element->click();
+    }
+
+    /**
      * Hover on element on page
      * Example: When I hover on "Help Icon"
      *
@@ -478,8 +498,6 @@ class OroMainContext extends MinkContext implements
         /** @var AttachmentItem $attachmentItem */
         $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
         self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
-
-        $attachmentItem->clickOnAttachmentThumbnail();
 
         $thumbnail = $this->getPage()->find('css', "div.thumbnail a[title='$text']");
         self::assertTrue($thumbnail->isValid(), sprintf('Thumbnail "%s" not found', $text));
@@ -892,7 +910,7 @@ class OroMainContext extends MinkContext implements
         $section = $this->fixStepArgument($section);
         $page = $this->getSession()->getPage();
 
-        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]/..')->getParent();
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
 
         if ($sectionContainer->hasButton($button)) {
             $sectionContainer->pressButton($button);
