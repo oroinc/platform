@@ -28,7 +28,7 @@
 
 // Mixin for include caret triangle anywhere
 // @param $size set caret size
-// @parem $color set caret color
+// @param $color set caret color
 @mixin caret($size: 4px, $color: null) {
     &:after {
         content: '';
