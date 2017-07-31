@@ -10,6 +10,9 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class RestJsonApiTestCase extends ApiTestCase
 {
     const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
@@ -44,10 +47,11 @@ class RestJsonApiTestCase extends ApiTestCase
      * @param string $method
      * @param string $uri
      * @param array  $parameters
+     * @param array  $server
      *
      * @return Response
      */
-    protected function request($method, $uri, array $parameters = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [])
     {
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
@@ -64,7 +68,7 @@ class RestJsonApiTestCase extends ApiTestCase
             $uri,
             $parameters,
             [],
-            ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]
+            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE])
         );
 
         return $this->client->getResponse();
@@ -75,22 +79,31 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function get(array $routeParameters = [], array $parameters = [])
-    {
+    protected function get(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
             $this->getUrl('oro_rest_api_get', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get');
+            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        }
 
         return $response;
     }
@@ -100,22 +113,31 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function getRelationship(array $routeParameters = [], array $parameters = [])
-    {
+    protected function getRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
             $this->getUrl('oro_rest_api_get_relationship', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get relationship');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get relationship');
+            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        }
 
         return $response;
     }
@@ -125,22 +147,31 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function getSubresource(array $routeParameters = [], array $parameters = [])
-    {
+    protected function getSubresource(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
             $this->getUrl('oro_rest_api_get_subresource', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get subresource');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get subresource');
+            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        }
 
         return $response;
     }
@@ -150,22 +181,31 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function cget(array $routeParameters = [], array $parameters = [])
-    {
+    protected function cget(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
             $this->getUrl('oro_rest_api_cget', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
+            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        }
 
         return $response;
     }
@@ -173,26 +213,35 @@ class RestJsonApiTestCase extends ApiTestCase
     /**
      * Sends POST request for an entity resource.
      *
-     * @param array        $routeParameters
+     * @param array $routeParameters
      * @param array|string $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function post(array $routeParameters = [], $parameters = [])
-    {
+    protected function post(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'POST',
             $this->getUrl('oro_rest_api_post', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
         $this->getEntityManager()->clear();
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_CREATED, $entityType, 'post');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_CREATED, $entityType, 'post');
+            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        }
 
         return $response;
     }
@@ -202,23 +251,37 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function postRelationship(array $routeParameters = [], array $parameters = [])
-    {
+    protected function postRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'POST',
             $this->getUrl('oro_rest_api_post_relationship', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
         $this->getEntityManager()->clear();
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'post relationship');
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'post relationship'
+            );
+        }
 
         return $response;
     }
@@ -228,11 +291,17 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array        $routeParameters
      * @param array|string $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function patch(array $routeParameters = [], $parameters = [])
-    {
+    protected function patch(
+        array $routeParameters = [],
+        $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
@@ -241,14 +310,17 @@ class RestJsonApiTestCase extends ApiTestCase
                 'oro_rest_api_patch',
                 $routeParameters
             ),
-            $parameters
+            $parameters,
+            $server
         );
 
         $this->getEntityManager()->clear();
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'patch');
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'patch');
+            self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        }
 
         return $response;
     }
@@ -258,28 +330,37 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function patchRelationship(array $routeParameters = [], array $parameters = [])
-    {
+    protected function patchRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'PATCH',
             $this->getUrl('oro_rest_api_patch_relationship', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
         $this->getEntityManager()->clear();
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals(
-            $response,
-            Response::HTTP_NO_CONTENT,
-            $entityType,
-            'patch relationship'
-        );
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'patch relationship'
+            );
+        }
 
         return $response;
     }
@@ -289,23 +370,32 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function delete(array $routeParameters = [], array $parameters = [])
-    {
+    protected function delete(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'DELETE',
             $this->getUrl('oro_rest_api_delete', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
         $this->getEntityManager()->clear();
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'delete');
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'delete');
+        }
 
         return $response;
     }
@@ -315,23 +405,32 @@ class RestJsonApiTestCase extends ApiTestCase
      *
      * @param array $routeParameters
      * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
      *
      * @return Response
      */
-    protected function cdelete(array $routeParameters = [], array $parameters = [])
-    {
+    protected function cdelete(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'DELETE',
             $this->getUrl('oro_rest_api_cdelete', $routeParameters),
-            $parameters
+            $parameters,
+            $server
         );
 
         $this->getEntityManager()->clear();
 
-        $entityType = $this->extractEntityType($routeParameters);
-        self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'delete list');
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT, $entityType, 'delete list');
+        }
 
         return $response;
     }

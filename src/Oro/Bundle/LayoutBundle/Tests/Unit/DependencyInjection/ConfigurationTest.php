@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -71,12 +70,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                     'enabled' => false
                                 ]
                             ],
-                            'titles' => [
-                                'route_1' => 'Title for route 1',
-                                'route_2' => 'Title for route 2',
-                            ]
+                            'titles' => ['route_1' => 'Title for route 1', 'route_2' => 'Title for route 2'],
                         ],
                         'assets' => [],
+                        'extra_config' => ['label' => 'Sample label'],
                     ],
                     'groups' => []
                 ]
@@ -103,11 +100,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                         'enabled' => false
                                     ],
                                 ],
-                                'titles' => [
-                                    'route_1' => 'Title for route 1',
-                                    'route_2' => 'Title for route 2',
-                                ]
-                            ]
+                                'titles' => ['route_1' => 'Title for route 1', 'route_2' => 'Title for route 2'],
+                            ],
+                            'extra_config' => ['label' => 'Sample label'],
                         ]
                     ]
                 ]

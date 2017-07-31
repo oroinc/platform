@@ -141,7 +141,7 @@
         entity - the entitty instance on wich Field ACL should be checked
         fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName) %}
+{% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
     {% if is_granted('VIEW', entity, fieldName) %}
         {% set collapseView = {
                 widgetModule: 'oroui/js/widget/collapse-widget',
@@ -159,8 +159,8 @@
                 '<div class="control-label" data-collapse-container>' ~
                     data|default('oro.ui.empty'|trans) ~
                 '</div>' ~
-                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ 'Show more'|trans ~ '</a>' ~
-                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ 'Show less'|trans ~ '</a>'
+                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ moreText|trans ~ '</a>' ~
+                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ lessText|trans ~ '</a>'
             ) }}
         </div>
     {% endif %}
@@ -1110,17 +1110,20 @@
     {% endspaceless %}
 {%- endmacro -%}
 
-{%- macro renderUrl(url, title, class) -%}
+{%- macro renderUrl(url, text, class, title) -%}
     {% spaceless %}
+        {% if text is empty %}
+            {% set text = url %}
+        {% endif %}
         {% if title is empty %}
-            {% set title = url %}
+            {% set title = text %}
         {% endif %}
         {% if class is empty %}
             {% set class = '' %}
         {% endif %}
         {% if url is not empty %}
             <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
-                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ title }}</a>
+                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ text }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
