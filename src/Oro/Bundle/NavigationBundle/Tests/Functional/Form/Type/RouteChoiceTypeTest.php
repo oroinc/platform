@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class RouteChoiceTypeTest extends WebTestCase
 {
     /** @var FormFactoryInterface */
@@ -32,8 +35,6 @@ class RouteChoiceTypeTest extends WebTestCase
      */
     public function testCreateView(array $options, array $expectedChoices)
     {
-        $this->markTestSkipped('To be resolved in BAP-15086');
-
         $form = $this->formFactory->create(RouteChoiceType::NAME, null, $options);
 
         $formView = $form->createView();

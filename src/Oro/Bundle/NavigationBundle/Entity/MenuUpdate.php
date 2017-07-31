@@ -76,7 +76,9 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 class MenuUpdate extends ExtendMenuUpdate implements
     MenuUpdateInterface
 {
-    use MenuUpdateTrait;
+    use MenuUpdateTrait {
+        MenuUpdateTrait::__construct as traitConstructor;
+    }
 
     /**
      * {@inheritdoc}
@@ -84,9 +86,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
     public function __construct()
     {
         parent::__construct();
-
-        $this->titles = new ArrayCollection();
-        $this->descriptions = new ArrayCollection();
+        $this->traitConstructor();
     }
 
     /**

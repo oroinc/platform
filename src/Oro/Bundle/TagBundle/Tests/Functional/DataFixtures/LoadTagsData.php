@@ -12,6 +12,7 @@ class LoadTagsData extends AbstractFixture
 {
     const FIRST_ACTIVITY = 'firstActivity';
     const SECOND_ACTIVITY = 'secondActivity';
+    const THIRD_ACTIVITY = 'thirdActivity';
 
     const FIRST_TAG = 'firstTag';
 
@@ -68,6 +69,11 @@ class LoadTagsData extends AbstractFixture
         $activity->setMessage(self::SECOND_ACTIVITY);
         $manager->persist($activity);
         $this->addReference(self::SECOND_ACTIVITY, $activity);
+
+        $activity = new TestActivity();
+        $activity->setMessage(self::THIRD_ACTIVITY);
+        $manager->persist($activity);
+        $this->addReference(self::THIRD_ACTIVITY, $activity);
 
         $manager->flush();
     }

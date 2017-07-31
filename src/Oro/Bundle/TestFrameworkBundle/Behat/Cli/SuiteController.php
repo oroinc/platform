@@ -3,55 +3,33 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
-use Behat\Testwork\Suite\Exception\SuiteConfigurationException;
-use Behat\Testwork\Suite\Exception\SuiteNotFoundException;
 use Behat\Testwork\Suite\SuiteRegistry;
-use Behat\Testwork\Suite\SuiteRepository;
-use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class SuiteController implements Controller
 {
     /**
+     * @var SuiteConfigurationRegistry
+     */
+    protected $suiteConfigRegistry;
+
+    /**
      * @var SuiteRegistry
      */
-    private $registry;
+    protected $behatSuiteRegistry;
 
     /**
-     * @var array
+     * @param SuiteConfigurationRegistry $suiteConfigRegistry
+     * @param SuiteRegistry $behatSuiteRegistry
      */
-    private $suiteConfigurations = [];
-
-    /**
-     * @var SpecificationDivider
-     */
-    private $divider;
-
-    /**
-     * @var KernelInterface
-     */
-    protected $kernel;
-
-    /**
-     * Initializes controller.
-     *
-     * @param SuiteRegistry $registry
-     * @param array $suiteConfigurations
-     */
-    public function __construct(
-        SuiteRegistry $registry,
-        array $suiteConfigurations,
-        SpecificationDivider $divider,
-        KernelInterface $kernel
-    ) {
-        $this->registry = $registry;
-        $this->suiteConfigurations = $suiteConfigurations;
-        $this->divider = $divider;
-        $this->kernel = $kernel;
+    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry, SuiteRegistry $behatSuiteRegistry)
+    {
+        $this->suiteConfigRegistry = $suiteConfigRegistry;
+        $this->behatSuiteRegistry = $behatSuiteRegistry;
     }
 
     /**
@@ -67,78 +45,62 @@ class SuiteController implements Controller
                 'Only execute a specific suite.'
             )
             ->addOption(
-                '--suite-divider',
-                '-sd',
+                '--suite-set',
+                '-ss',
                 InputOption::VALUE_REQUIRED,
-                'Divide suite to several.'.PHP_EOL.
-                'e.g. if AcmeDemo suite has 13 features, and suites-divider is 5, so 3 suites will be created'.PHP_EOL.
-                'AcmeDemo#1 and AcmeDemo#2 suites with 5 features, and AcmeDemo#3 with 3 features'.PHP_EOL.
-                'Original AcmeDemo suite will be excluded from list.'
+                'Only execute a specific set of suites'
             )
         ;
     }
 
     /**
      * {@inheritdoc}
-     * @throws SuiteNotFoundException in case when suite name provided by suite option is not configured
-     * @throws SuiteConfigurationException It should be never happen until someone configure suite with <bundle>#0 name
+     * @throws \InvalidArgumentException
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $exerciseSuiteName = $input->getOption('suite');
-        $suiteConfigurations = $this->getSuiteConfigurations($input->getOption('suite-divider'));
-
-        if (null !== $exerciseSuiteName && !isset($suiteConfigurations[$exerciseSuiteName])) {
-            throw new SuiteNotFoundException(sprintf(
-                '`%s` suite is not found or has not been properly registered.',
-                $exerciseSuiteName
-            ), $exerciseSuiteName);
+        if ($suiteName = $input->getOption('suite')) {
+            $this->registerSuite($suiteName);
         }
 
-        foreach ($suiteConfigurations as $name => $config) {
-            if (null !== $exerciseSuiteName && $exerciseSuiteName !== $name) {
-                continue;
-            }
+        if ($suiteSet = $input->getOption('suite-set')) {
+            $this->registerSuiteSet($suiteSet);
+        }
 
-            $this->registry->registerSuiteConfiguration(
-                $name,
-                $config['type'],
-                $config['settings']
+        if (!$suiteName && !$suiteSet) {
+            $this->registerAll();
+        }
+    }
+
+    private function registerSuite($suiteName)
+    {
+        $suiteConfig = $this->suiteConfigRegistry->getSuiteConfig($suiteName);
+        $this->behatSuiteRegistry->registerSuiteConfiguration(
+            $suiteConfig->getName(),
+            $suiteConfig->getType(),
+            $suiteConfig->getSettings()
+        );
+    }
+
+    private function registerSuiteSet($suiteSet)
+    {
+        foreach ($this->suiteConfigRegistry->getSet($suiteSet) as $suiteConfig) {
+            $this->behatSuiteRegistry->registerSuiteConfiguration(
+                $suiteConfig->getName(),
+                $suiteConfig->getType(),
+                $suiteConfig->getSettings()
             );
         }
     }
 
-    /**
-     * @param int $divideNumber
-     * @return array
-     */
-    private function getSuiteConfigurations($divideNumber)
+    private function registerAll()
     {
-        if (null === $divideNumber) {
-            return $this->suiteConfigurations;
+        foreach ($this->suiteConfigRegistry->getSuiteConfigurations() as $suiteConfig) {
+            $this->behatSuiteRegistry->registerSuiteConfiguration(
+                $suiteConfig->getName(),
+                $suiteConfig->getType(),
+                $suiteConfig->getSettings()
+            );
         }
-
-        $suiteConfigurations = [];
-
-        foreach ($this->suiteConfigurations as $name => $config) {
-            try {
-                $this->kernel->getBundle($name);
-                $type = 'symfony_bundle';
-                $bundleName = $name;
-            } catch (\InvalidArgumentException $e) {
-                $type = null;
-                $bundleName = null;
-            }
-            $dividedConfiguration = $this->divider->divideSuite($name, $config['settings']['paths'], $divideNumber);
-            foreach ($dividedConfiguration as $generatedSuiteName => $paths) {
-                $suiteConfig = $config;
-                $suiteConfig['type'] = $type;
-                $suiteConfig['settings']['paths'] = $paths;
-                $suiteConfig['settings']['bundle'] = $bundleName;
-                $suiteConfigurations[$generatedSuiteName] = $suiteConfig;
-            }
-        }
-
-        return $suiteConfigurations;
     }
 }

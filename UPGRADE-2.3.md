@@ -122,6 +122,10 @@ DataGridBundle
     - changed the constructor signature: `AbstractPager $pager` replaced on `PagerInterface $pager`
 - Interface `Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface`
     - method `init` was removed
+- Interface `Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface`
+    - new method `acceptDatasource` was added
+- Class `Oro\Bundle\DataGridBundle\Datagrid\Datagrid`
+    - new method `acceptDatasource` was added
 
 IntegrationBundle
 -----------------
@@ -623,3 +627,11 @@ LocaleBundle
 ------------
 - Updated Moment.js to 2.18.* version
 - Updated Numeral.js to 2.0.6 version
+
+NavigationBundle
+----------------
+Class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder`:
+   - abstract service `oro_navigation.menu_update.builder.abstract` was removed, use instead class `MenuUpdateBuilder`
+   - changed constructor signature: parameters `ScopeManager $scopeManager`, `ManagerRegistry $registry` was replaced with `MenuUpdateProviderInterface $menuUpdateProvider`, get menu updates for menu item in `MenuUpdateProvider`
+   - methods `setClassName` and `setScopeType` was removed
+
