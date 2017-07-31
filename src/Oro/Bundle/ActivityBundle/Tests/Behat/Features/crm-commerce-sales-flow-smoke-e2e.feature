@@ -1,3 +1,4 @@
+@skip
 @regression
 Feature: Sales Flow
   In order to check Sales Flow on admin panel

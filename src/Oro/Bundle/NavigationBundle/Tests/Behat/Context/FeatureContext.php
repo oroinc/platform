@@ -420,7 +420,8 @@ class FeatureContext extends OroFeatureContext implements
      * Example: And choose Favorites tab
      * Example: And choose History tab
      *
-     * @When /^(?:|I )choose (?P<link>(History|Most Viewed|Favorites)) tab$/
+     * @When /^(?:|I )choose (?P<link>[^"]*) tab$/
+     * @When /^(?:|I )choose "(?P<link>[^"]*)" tab$/
      */
     public function chooseQuickMenuTab($link)
     {

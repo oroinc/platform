@@ -116,6 +116,7 @@ define([
                     self._callViewMethod(eventBlockIds, 'setContent', function(blockId) {
                         return [content[blockId] || ''];
                     });
+                    self._callViewMethod(eventBlockIds, 'afterContentLoading');
                     if (options.layoutSubtreeCallback) {
                         options.layoutSubtreeCallback();
                     }
