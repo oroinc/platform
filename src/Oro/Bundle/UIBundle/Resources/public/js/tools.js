@@ -178,6 +178,13 @@ define(function(require) {
         },
 
         /**
+         * Are we currently on desktop
+         */
+        isDesktop: function() {
+            return _.isDesktop();
+        },
+
+        /**
          * Are we have touch screen
          */
         isTouchDevice: function()  {

@@ -23,6 +23,13 @@ define(['underscore', 'asap'], function(_, asap) {
                     .indexOf(' mobile-version ') !== -1;
         },
 
+        isDesktop: function() {
+            var elem = document.getElementsByTagName('body')[0];
+            return elem && (' ' + elem.className + ' ')
+                    .replace(/[\t\r\n\f]/g, ' ')
+                    .indexOf(' desktop-version ') !== -1;
+        },
+
         trim: function(text) {
             return text.replace(/^\s*/, '').replace(/\s*$/, '');
         },
