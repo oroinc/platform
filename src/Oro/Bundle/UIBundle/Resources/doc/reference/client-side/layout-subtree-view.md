@@ -23,7 +23,8 @@ Add LayoutSubtreeView in block template:
         data-page-component-options="{{ {
             view: 'oroui/js/app/views/layout-subtree-view',
             blockId : id,
-            reloadEvents: ['reload-on-event']
+            reloadEvents: ['reload-on-event'],
+            restoreFormState: true
         }|json_encode }}"
         >
         {{ block_widget(block) }}
@@ -37,7 +38,8 @@ Or initialize in JavaScript:
     var layoutSubtree = new LayoutSubtreeView({
         el: '#block_id',
         blockId: 'layout_block_id',
-        reloadEvents: ['reload-on-event']
+        reloadEvents: ['reload-on-event'],
+        restoreFormState: true
     });
 
     //then call reload method
