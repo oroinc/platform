@@ -3,8 +3,9 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
-    'oroui/js/app/components/base/component'
-], function($, _, __, tools, BaseComponent) {
+    'oroui/js/app/components/base/component',
+    'oroui/js/app/modules/simple-widgets',
+], function($, _, __, tools, BaseComponent, simpleWidgets) {
     'use strict';
 
     var console = window.console;
@@ -17,6 +18,8 @@ define([
 
     ComponentManager.prototype = {
         eventNamespace: '.component-manager',
+
+        simpleWidgets: simpleWidgets.getWidgets(),
 
         /**
          * Initializes Page Components for DOM element
@@ -98,21 +101,45 @@ define([
          */
         _collectElements: function() {
             var elements = [];
-            var el = this.$el[0];
+            var self = this;
 
             this.$el.find('[data-page-component-module]').each(function() {
                 var $elem = $(this);
 
-                // find nearest marked container with separate layout
-                var $separateLayout = $elem.parents('[data-layout="separate"]:first');
-
-                // collects container elements from current layout
-                if (!$separateLayout.length || !_.contains($separateLayout.parents(), el)) {
+                if (!self._isSeparatedLayout($elem)) {
                     elements.push($elem);
                 }
             });
 
+            // collect simple widgets by selector
+            _.each(this.simpleWidgets, function(widget) {
+                this.$el.find(widget.selector).each(function() {
+                    var $elem = $(this);
+
+                    if (self._isSeparatedLayout($elem)) {
+                        return;
+                    }
+
+                    $elem.data('pageComponentModule', widget.Module);
+                    $elem.data('pageComponentOptions', _.extend({
+                        widgetModule: widget.Widget
+                    }, $elem.data(widget.data)));
+
+                    elements.push($elem);
+                });
+            }, this);
+
             return elements;
+        },
+
+        _isSeparatedLayout: function($element) {
+            var el = this.$el[0];
+
+            // find nearest marked container with separate layout
+            var $separateLayout = $element.parents('[data-layout="separate"]:first');
+
+            // collects container elements from current layout
+            return $separateLayout.length || _.contains($separateLayout.parents(), el);
         },
 
         /**
