@@ -16,7 +16,7 @@ require(['oroui/js/mediator'], function(mediator) {
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
         'oroui/js/mediator', 'oroui/js/layout',
         'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
-        'bootstrap', 'jquery-ui', 'orofrontend/default/js/widgets/expand-text-widget'
+        'bootstrap', 'jquery-ui'
     ], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
@@ -44,7 +44,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     };
 
     $(function() {
-        $('.expand-text').expandLongTexWidget();
         var $pageTitle = $('#page-title');
         if ($pageTitle.length) {
             document.title = $('<div.>').html($('#page-title').text()).text();
