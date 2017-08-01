@@ -21,7 +21,11 @@ class InstallationStep extends AbstractStep
             case 'fixtures':
                 return $this->handleAjaxAction('oro:migration:data:load', array('--fixtures-type' => 'demo'));
             case 'translation-load':
-                return $this->handleAjaxAction('oro:translation:load');
+                //Load all translations from bundled YML files
+                $translationsLoadResult = $this->handleAjaxAction('oro:translation:load');
+                //Load "remote" translations for all installed languages
+                $this->handleAjaxAction('oro:language:update', ['--all' => true]);
+                return $translationsLoadResult;
             case 'js-routing':
                 return $this->handleAjaxAction('fos:js-routing:dump');
             case 'localization':
