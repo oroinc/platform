@@ -26,7 +26,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (null === $value) {
-            return 0;
+            return null;
         } elseif (is_array($value)) {
             foreach ($value as &$val) {
                 if ($val === '') {
