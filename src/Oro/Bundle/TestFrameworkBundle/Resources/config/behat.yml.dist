@@ -59,7 +59,7 @@ chromedriver:
                                 chromeOptions:
                                     args:
                                         - "--single-process"
-                                        - "-–no-proxy-server"
+                                        - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
@@ -76,7 +76,7 @@ chromedriver:
                                 chromeOptions:
                                     args:
                                         - "--single-process"
-                                        - "-–no-proxy-server"
+                                        - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
@@ -93,7 +93,7 @@ chromedriver:
                                 chromeOptions:
                                     args:
                                         - "--single-process"
-                                        - "-–no-proxy-server"
+                                        - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
@@ -111,7 +111,7 @@ chromedriver:
                                 chromeOptions:
                                     args:
                                         - "--single-process"
-                                        - "-–no-proxy-server"
+                                        - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
                                         - "--no-first-run"
