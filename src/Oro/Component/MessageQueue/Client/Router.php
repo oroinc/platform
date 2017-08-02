@@ -111,14 +111,11 @@ class Router implements RecipientListRouterInterface
      */
     protected function createRecipient(MessageInterface $message, $processorName, $queueName)
     {
+        $newMessage = clone $message;
         $properties = $message->getProperties();
         $properties[Config::PARAMETER_PROCESSOR_NAME] = $processorName;
         $properties[Config::PARAMETER_QUEUE_NAME] = $queueName;
-
-        $newMessage = $this->driver->createTransportMessage();
         $newMessage->setProperties($properties);
-        $newMessage->setHeaders($message->getHeaders());
-        $newMessage->setBody($message->getBody());
 
         $queue = $this->driver->createQueue($queueName);
 

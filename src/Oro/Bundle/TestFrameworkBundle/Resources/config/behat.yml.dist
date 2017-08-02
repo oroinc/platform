@@ -7,10 +7,16 @@ default: &default
             sessions:
                 second_session:
                     oroSelenium2:
-                        wd_host: "http://localhost:8643/wd/hub"
+                        wd_host: 'http://localhost:4444/wd/hub'
                 first_session:
                     oroSelenium2:
-                        wd_host: "http://localhost:8643/wd/hub"
+                        wd_host: 'http://localhost:4444/wd/hub'
+                320_session:
+                    oroSelenium2:
+                        wd_host: 'http://localhost:4444/wd/hub'
+                640_session:
+                    oroSelenium2:
+                        wd_host: 'http://localhost:4444/wd/hub'
         Behat\Symfony2Extension:
             kernel:
                 env: 'prod'
@@ -39,14 +45,78 @@ default: &default
                 - OroAddressBundle::AddressContext
     suites: []
 
-selenium2:
+chromedriver:
     <<: *default
     extensions:
         Behat\MinkExtension:
+            browser_name: chrome
             sessions:
                 second_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
+                        wd_host: 'http://localhost:9515'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--single-process"
+                                        - "--no-proxy-server"
+                                        - "--no-sandbox"
+                                        - "--dns-prefetch-disable"
+                                        - "--no-first-run"
+                                        - "--disable-gpu"
+                                        - "--headless"
+                                        - "--window-size=1920,1080"
+                                        - "--no-pings"
+                                        - "--disable-renderer-backgrounding"
                 first_session:
                     oroSelenium2:
-                        wd_host: 'http://localhost:4444/wd/hub'
+                        wd_host: 'http://localhost:9515'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--single-process"
+                                        - "--no-proxy-server"
+                                        - "--no-sandbox"
+                                        - "--dns-prefetch-disable"
+                                        - "--no-first-run"
+                                        - "--disable-gpu"
+                                        - "--headless"
+                                        - "--window-size=1920,1080"
+                                        - "--no-pings"
+                                        - "--disable-renderer-backgrounding"
+                320_session:
+                    oroSelenium2:
+                        wd_host: 'http://localhost:9515'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--single-process"
+                                        - "--no-proxy-server"
+                                        - "--no-sandbox"
+                                        - "--dns-prefetch-disable"
+                                        - "--no-first-run"
+                                        - "--disable-gpu"
+                                        - "--headless"
+                                        - "--window-size=320,640"
+                                        - "--no-pings"
+                                        - "--disable-renderer-backgrounding"
+
+                640_session:
+                    oroSelenium2:
+                        wd_host: 'http://localhost:9515'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--single-process"
+                                        - "--no-proxy-server"
+                                        - "--no-sandbox"
+                                        - "--dns-prefetch-disable"
+                                        - "--no-first-run"
+                                        - "--disable-gpu"
+                                        - "--headless"
+                                        - "--window-size=640,1100"
+                                        - "--no-pings"
+                                        - "--disable-renderer-backgrounding"
