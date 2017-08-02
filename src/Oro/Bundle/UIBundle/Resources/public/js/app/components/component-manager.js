@@ -4,8 +4,8 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     'oroui/js/app/components/base/component',
-    'oroui/js/app/modules/simple-widgets',
-], function($, _, __, tools, BaseComponent, simpleWidgets) {
+    'oroui/js/app/modules/widget-mappings'
+], function($, _, __, tools, BaseComponent, widgetMappings) {
     'use strict';
 
     var console = window.console;
@@ -19,7 +19,7 @@ define([
     ComponentManager.prototype = {
         eventNamespace: '.component-manager',
 
-        simpleWidgets: simpleWidgets.getWidgets(),
+        widgetMappings: widgetMappings.getMappings(),
 
         /**
          * Initializes Page Components for DOM element
@@ -103,29 +103,24 @@ define([
             var elements = [];
             var self = this;
 
-            this.$el.find('[data-page-component-module]').each(function() {
-                var $elem = $(this);
-
-                if (!self._isSeparatedLayout($elem)) {
-                    elements.push($elem);
-                }
-            });
-
-            // collect simple widgets by selector
-            _.each(this.simpleWidgets, function(widget) {
-                this.$el.find(widget.selector).each(function() {
+            _.each(this.widgetMappings, function(mapping) {
+                this.$el.find(mapping.selector).each(function() {
                     var $elem = $(this);
 
-                    if (self._isSeparatedLayout($elem)) {
+                    if (!self._isSeparatedLayout($elem)) {
+                        elements.push($elem);
+                    }
+
+                    if (!mapping.Module) {
                         return;
                     }
 
-                    $elem.data('pageComponentModule', widget.Module);
-                    $elem.data('pageComponentOptions', _.extend({
-                        widgetModule: widget.Widget
-                    }, $elem.data(widget.data)));
+                    $elem.data({
+                        pageComponentModule: mapping.Module,
+                        pageComponentOptions: _.extend(mapping.options, $elem.data(mapping.dataAttribute))
+                    });
 
-                    elements.push($elem);
+                    $elem.removeData(mapping.dataAttribute);
                 });
             }, this);
 
