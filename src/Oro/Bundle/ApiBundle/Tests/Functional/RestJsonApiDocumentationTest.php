@@ -102,6 +102,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             'Oro\Bundle\ProductBundle\Entity\Product',
             'Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision',
             'Oro\Bundle\ProductBundle\Entity\ProductUnit',
+            'Oro\Bundle\ProductBundle\Entity\RelatedItem\RelatedProduct',
             'Extend\Entity\EV_Prod_Inventory_Status',
             'Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote',
             'Oro\Bundle\RFPBundle\Entity\RequestProductItem',
