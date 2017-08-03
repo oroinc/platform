@@ -131,7 +131,10 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         if (self::WINDOWS_OS === $this->getOs()) {
             $killCommand = sprintf('TASKKILL /IM %s/console /T /F', realpath($this->kernel->getRootDir()));
         } else {
-            $killCommand = sprintf('pkill -9 -f %s/[c]onsole', realpath($this->kernel->getRootDir()));
+            $killCommand = sprintf(
+                "pkill -9 -f '%s/[c]onsole oro:message-queue:consume'",
+                realpath($this->kernel->getRootDir())
+            );
         }
 
         try {
