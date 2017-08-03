@@ -12,7 +12,7 @@
         </script>
     {% else %}
         {% block messages %}
-            {% if messages|length %}
+            {% if messages is defined and messages|length %}
                 {% for type, items in messages %}
                 <div class="alert alert-{{ type }}">
                     <ul>
@@ -25,7 +25,7 @@
             {% endif %}
         {% endblock %}
         {% block errors %}
-            {% if errors|length %}
+            {% if errors is defined and errors|length %}
                 <div class="alert alert-error">
                     <ul>
                     {% block errors_inner %}

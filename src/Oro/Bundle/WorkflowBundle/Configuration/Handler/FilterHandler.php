@@ -46,7 +46,8 @@ class FilterHandler implements ConfigurationHandlerInterface
         'name',
         'preactions',
         'preconditions',
-        'actions'
+        'actions',
+        'conditions'
     ];
 
     /** @var array */

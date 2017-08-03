@@ -6,13 +6,13 @@ use Doctrine\ORM\EntityManager;
 
 use Knp\Menu\ItemInterface;
 
+use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -272,7 +272,7 @@ abstract class AbstractAjaxMenuController extends Controller
     protected function getMenu($menuName, array $context)
     {
         $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context,
+            MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $context,
             BuilderChainProvider::IGNORE_CACHE_OPTION => true
         ];
         $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);

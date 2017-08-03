@@ -43,6 +43,9 @@ class Rfc6455
             throw new \RuntimeException(sprintf('WebSocket connection error (%u): %s', $errno, $errstr));
         }
 
+        stream_set_blocking($this->socket, false);
+        stream_set_timeout($this->socket, self::SOCKET_TIMEOUT);
+
         if (!fwrite($this->socket, $header)) {
             throw new \RuntimeException('WebSocket write error');
         }
@@ -59,8 +62,6 @@ class Rfc6455
                 $serverHandshake
             ));
         }
-
-        stream_set_blocking($this->socket, false);
 
         return $this->socket;
     }

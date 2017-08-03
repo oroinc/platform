@@ -121,6 +121,7 @@ datagrids:
                     - w.exclusiveActiveGroups
                     - w.exclusiveRecordGroups
                     - w.createdAt
+                    - w.configuration
                 from:
                     - { table: %oro_workflow.entity.workflow_definition.class%, alias: w }
         columns:

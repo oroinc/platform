@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
-use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle\TestBundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -194,6 +191,12 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('gold.ico', $result->getIcon());
         $this->assertSame('gold', $result->getDirectory());
         $this->assertEquals(['main', 'another'], $result->getGroups());
+    }
+
+    public function testGetAlias()
+    {
+        $extension = new OroLayoutExtension();
+        $this->assertEquals('oro_layout', $extension->getAlias());
     }
 
     protected function normalizeResources(array &$resources)

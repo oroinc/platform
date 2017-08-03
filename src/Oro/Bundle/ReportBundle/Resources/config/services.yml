@@ -9,6 +9,10 @@ parameters:
     oro_report.listener.segment_subscriber.class:      Oro\Bundle\ReportBundle\EventListener\SegmentSubscriber
 
     oro_report.grid.datagrid_configuration_builder.class: Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder
+
+    # Cache keys
+    oro_report.cache.report_grid_config_key: 'oro_report.report_grid_config_key'
+
 services:
     oro_report.entity_provider:
         alias: oro_entity.entity_provider
@@ -18,8 +22,16 @@ services:
         arguments:
             - '@oro_report.grid.datagrid_configuration_builder'
             - '@doctrine'
+            - '@oro_report.cache'
+            - '%oro_report.cache.report_grid_config_key%'
         tags:
             - { name: oro_datagrid.configuration.provider }
+
+    oro_report.cache:
+          parent: oro.cache.abstract
+          public: false
+          calls:
+              - [setNamespace, [ 'oro_report' ] ]
 
     oro_report.listener.navigation_listener:
         class: %oro_report.listener.navigation_listener.class%
@@ -31,6 +43,15 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_report.listener.report_cache_cleaner_listener:
+        class: Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener
+        public: false
+        arguments:
+            - '@oro_report.cache'
+            - '%oro_report.cache.report_grid_config_key%'
+        tags:
+            - { name: doctrine.event_listener, event: postUpdate }
 
     oro_report.report_manager:
         class: %oro_report.report_manager.class%

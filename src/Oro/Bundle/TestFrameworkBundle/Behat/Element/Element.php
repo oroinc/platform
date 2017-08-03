@@ -182,6 +182,14 @@ class Element extends NodeElement
     }
 
     /**
+     * Executes JS code that force click on element
+     */
+    public function clickForce()
+    {
+        $this->getDriver()->executeJsOnXpath($this->getXpath(), '{{ELEMENT}}.click()');
+    }
+
+    /**
      * @return self
      */
     protected function getPage()

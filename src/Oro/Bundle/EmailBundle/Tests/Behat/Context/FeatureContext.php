@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
-use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
