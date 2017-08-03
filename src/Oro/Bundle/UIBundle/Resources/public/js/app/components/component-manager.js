@@ -4,8 +4,8 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     'oroui/js/app/components/base/component',
-    'oroui/js/app/modules/widget-mappings'
-], function($, _, __, tools, BaseComponent, widgetMappings) {
+    'oroui/js/app/modules/components-shortcuts'
+], function($, _, __, tools, BaseComponent, componentsShortcuts) {
     'use strict';
 
     var console = window.console;
@@ -18,8 +18,6 @@ define([
 
     ComponentManager.prototype = {
         eventNamespace: '.component-manager',
-
-        widgetMappings: widgetMappings.getMappings(),
 
         /**
          * Initializes Page Components for DOM element
@@ -103,38 +101,41 @@ define([
             var elements = [];
             var self = this;
 
-            _.each(this.widgetMappings, function(mapping) {
-                this.$el.find(mapping.selector).each(function() {
+            this.$el.find('[data-page-component-module]').each(function() {
+                var $elem = $(this);
+
+                if (self._isInOwnLayout($elem)) {
+                    elements.push($elem);
+                }
+            });
+
+            _.each(componentsShortcuts.getAll(), function(shortcut, shortcutName) {
+                this.$el.find('[data-' + shortcutName + ']').each(function() {
                     var $elem = $(this);
 
-                    if (!self._isSeparatedLayout($elem)) {
+                    if (self._isInOwnLayout($elem)) {
+                        var dataAttribute = $.camelCase(shortcutName);
+
+                        $elem.data({
+                            pageComponentModule: shortcut.moduleName,
+                            pageComponentOptions: _.defaults($elem.data(dataAttribute), shortcut.options)
+                        });
+
+                        $elem.removeData(dataAttribute);
+
                         elements.push($elem);
                     }
-
-                    if (!mapping.Module) {
-                        return;
-                    }
-
-                    $elem.data({
-                        pageComponentModule: mapping.Module,
-                        pageComponentOptions: _.extend(mapping.options, $elem.data(mapping.dataAttribute))
-                    });
-
-                    $elem.removeData(mapping.dataAttribute);
                 });
             }, this);
 
             return elements;
         },
 
-        _isSeparatedLayout: function($element) {
-            var el = this.$el[0];
-
+        _isInOwnLayout: function($element) {
             // find nearest marked container with separate layout
             var $separateLayout = $element.parents('[data-layout="separate"]:first');
-
             // collects container elements from current layout
-            return $separateLayout.length || _.contains($separateLayout.parents(), el);
+            return !$separateLayout.length || !_.contains($separateLayout.parents(), this.$el[0]);
         },
 
         /**
