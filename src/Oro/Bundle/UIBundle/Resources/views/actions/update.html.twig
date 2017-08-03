@@ -37,10 +37,12 @@
           {{ form_enctype(form) }}
           {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         {% if isWidgetContext %}
+            {% block page_widget_actions %}
             <div class="widget-actions">
                 <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
                 <button type="submit" class="btn btn-success">{{ 'Save'|trans }}</button>
             </div>
+            {% endblock page_widget_actions %}
         {% else %}
         <div class="container-fluid page-title">
             <div class="navigation clearfix navbar-extra navbar-extra-right">

@@ -108,6 +108,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
         $stringFilter->init('test', [
             FilterUtility::DATA_NAME_KEY => 'foo',
             FilterUtility::MIN_LENGTH_KEY => 0,
+            FilterUtility::MAX_LENGTH_KEY => 100,
             FilterUtility::FORCE_LIKE_KEY => false,
         ]);
 

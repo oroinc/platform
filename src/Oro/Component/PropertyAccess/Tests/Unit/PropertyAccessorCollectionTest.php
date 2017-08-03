@@ -25,6 +25,25 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $this->assertEquals($axesMergedCopy, $axesMerged);
     }
 
+    public function testAddValueToCollections()
+    {
+        $axesBefore     = $this->getContainer(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
+        $axesMerged     = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axesAfter      = $this->getContainer(array(1 => 'second', 3 => 'fourth', 4 => 'fifth', 5 => 'first'));
+        $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
+
+        // Don't use a mock in order to test whether the collections are
+        // modified while iterating them
+        $car = new Car($axesBefore);
+
+        $this->propertyAccessor->setValue($car, 'axes', 'first');
+
+        $this->assertEquals($axesAfter, $car->getAxes());
+
+        // The passed collection was not modified
+        $this->assertEquals($axesMergedCopy, $axesMerged);
+    }
+
     public function testSetValueCallsAdderAndRemoverForNestedCollections()
     {
         $car        = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CompositeCar');
@@ -40,12 +59,15 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
             ->method('getAxes')
             ->will($this->returnValue($axesBefore));
         $structure->expects($this->at(1))
+            ->method('getAxes')
+            ->will($this->returnValue($axesBefore));
+        $structure->expects($this->at(2))
             ->method('removeAxis')
             ->with('fourth');
-        $structure->expects($this->at(2))
+        $structure->expects($this->at(3))
             ->method('addAxis')
             ->with('first');
-        $structure->expects($this->at(3))
+        $structure->expects($this->at(4))
             ->method('addAxis')
             ->with('third');
 

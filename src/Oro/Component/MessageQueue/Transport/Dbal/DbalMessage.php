@@ -1,48 +1,31 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
-use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class DbalMessage implements MessageInterface
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     private $id;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $body;
 
-    /**
-     * @var array
-     */
-    private $properties;
+    /** @var array */
+    private $properties = [];
 
-    /**
-     * @var array
-     */
-    private $headers;
+    /** @var array */
+    private $headers = [];
 
-    /**
-     * @var boolean
-     */
-    private $redelivered;
+    /** @var bool */
+    private $redelivered = false;
 
-    /**
-     * @var int
-     */
+    /** @var int */
+    private $priority = 0;
+
+    /** @var int */
     private $delay;
-
-    public function __construct()
-    {
-        $this->properties = [];
-        $this->headers = [];
-        $this->redelivered = false;
-        $this->delay = null;
-    }
 
     /**
      * @return int
@@ -61,7 +44,7 @@ class DbalMessage implements MessageInterface
     }
 
     /**
-     * @param string $body
+     * {@inheritdoc}
      */
     public function setBody($body)
     {
@@ -77,7 +60,7 @@ class DbalMessage implements MessageInterface
     }
 
     /**
-     * @param array $properties
+     * {@inheritdoc}
      */
     public function setProperties(array $properties)
     {
@@ -101,7 +84,7 @@ class DbalMessage implements MessageInterface
     }
 
     /**
-     * @param array $headers
+     * {@inheritdoc}
      */
     public function setHeaders(array $headers)
     {
@@ -125,7 +108,7 @@ class DbalMessage implements MessageInterface
     }
 
     /**
-     * @return boolean
+     * {@inheritdoc}
      */
     public function isRedelivered()
     {
@@ -133,7 +116,7 @@ class DbalMessage implements MessageInterface
     }
 
     /**
-     * @param boolean $redelivered
+     * {@inheritdoc}
      */
     public function setRedelivered($redelivered)
     {
@@ -145,7 +128,7 @@ class DbalMessage implements MessageInterface
      */
     public function getPriority()
     {
-        return (int) $this->getHeader('priority', MessagePriority::VERY_LOW);
+        return $this->priority;
     }
 
     /**
@@ -153,9 +136,7 @@ class DbalMessage implements MessageInterface
      */
     public function setPriority($priority)
     {
-        $headers = $this->getHeaders();
-        $headers['priority'] = (int) $priority;
-        $this->setHeaders($headers);
+        $this->priority = $priority;
     }
 
     /**
@@ -231,5 +212,14 @@ class DbalMessage implements MessageInterface
         $headers['timestamp'] = (int) $timestamp;
 
         $this->setHeaders($headers);
+    }
+
+    /**
+     * Makes a copy of this message.
+     */
+    public function __clone()
+    {
+        // the cloned message should not be associated to the source message
+        $this->id = null;
     }
 }

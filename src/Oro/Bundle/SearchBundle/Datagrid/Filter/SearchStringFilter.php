@@ -30,7 +30,9 @@ class SearchStringFilter extends AbstractFilter
             throw new \RuntimeException('Invalid filter datasource adapter provided: '.get_class($ds));
         }
 
-        if (strlen($data['value']) < $this->get(FilterUtility::MIN_LENGTH_KEY)) {
+        $length = strlen($data['value']);
+        if ($length < $this->get(FilterUtility::MIN_LENGTH_KEY)
+            || $length > $this->get(FilterUtility::MAX_LENGTH_KEY)) {
             return;
         }
 
