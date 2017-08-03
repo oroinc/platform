@@ -1,0 +1,58 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'filters-templats.html.twig'
+
+        - '@addTree':
+            items:
+                filter_container_tpl:
+                    blockType: block
+                filter_wrapper_tpl:
+                    blockType: block
+                filter_hint_tpl:
+                    blockType: block
+                filter_none_tpl:
+                    blockType: block
+                filter_text_tpl:
+                    blockType: block
+                filter_choice_tpl:
+                    blockType: block
+                filter_number_range_tpl:
+                    blockType: block
+                filter_many_to_many_tpl:
+                    blockType: block
+                filter_select_field_tpl:
+                    blockType: block
+                filter_data_tpl:
+                    blockType: block
+                filter_data_picker_itemized_tpl:
+                    blockType: block
+                filter_data_dropdown_tpl:
+                    blockType: block
+                filter_select_tpl:
+                    blockType: block
+                filter_multiselect_tpl:
+                    blockType: block
+                filter_choice_tree_tpl:
+                    blockType: block
+                filter_dictionary_tpl:
+                    blockType: block
+
+            tree:
+                head:
+                    filter_container_tpl: ~
+                    filter_wrapper_tpl: ~
+                    filter_hint_tpl: ~
+                    filter_none_tpl: ~
+                    filter_text_tpl: ~
+                    filter_choice_tpl: ~
+                    filter_number_range_tpl: ~
+                    filter_many_to_many_tpl: ~
+                    filter_select_field_tpl: ~
+                    filter_data_tpl: ~
+                    filter_data_picker_itemized_tpl: ~
+                    filter_data_dropdown_tpl: ~
+                    filter_select_tpl: ~
+                    filter_multiselect_tpl: ~
+                    filter_choice_tree_tpl: ~
+                    filter_dictionary_tpl: ~

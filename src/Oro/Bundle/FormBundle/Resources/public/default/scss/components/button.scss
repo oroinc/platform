@@ -41,13 +41,13 @@
         color: get-color('additional', 'ultra');
 
         @include element-state('hover') {
-            border-color: lighten(get-color('additional', 'darker'), 5%);
-            background: lighten(get-color('additional', 'darker'), 5%);
+            border-color: lighten(get-color('additional', 'darker'), 15%);
+            background: lighten(get-color('additional', 'darker'), 15%);
             color: get-color('additional', 'ultra');
         }
 
         @include element-state('focus') {
-            border-color: lighten(get-color('additional', 'darker'), 5%);
+            border-color: lighten(get-color('additional', 'darker'), 15%);
         }
     }
 

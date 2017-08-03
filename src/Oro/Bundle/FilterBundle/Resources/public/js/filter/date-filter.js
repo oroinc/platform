@@ -14,6 +14,11 @@ define(function(require) {
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var localeSettings = require('orolocale/js/locale-settings');
     var layout = require('oroui/js/layout');
+    var config = require('module').config();
+
+    config = _.extend({
+        inputClass: 'date-visual-element'
+    }, config);
 
     require('orofilter/js/datevariables-widget');
 
@@ -62,7 +67,7 @@ define(function(require) {
          *
          * @property
          */
-        inputClass: 'date-visual-element',
+        inputClass: config.inputClass,
 
         /**
          * Date widget options

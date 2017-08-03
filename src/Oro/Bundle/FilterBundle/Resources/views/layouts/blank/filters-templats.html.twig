@@ -1,0 +1,452 @@
+{% block _filter_container_tpl_widget %}
+    <script type="text/html" id="filter-container">
+        <% if (!_.isEmpty(filters)) { %>
+        {% if isMobileVersion() %}
+            <div class="filter-box toggle-mode" {{ block('block_attributes') }}>
+                <div class="filter-container">
+                    <div class="filter-items"></div>
+                    <div class="filter-items-hint">
+                        <button type="button"
+                                class="btn btn--link reset-filter-button"
+                        >
+                            <span class="fa-close"></span>
+                            {{ 'oro.filter.reset.label'|trans|e('html')|raw }}
+                        </button>
+                    </div>
+                    <select data-action="add-filter-select" multiple data-skip-input-widgets>
+                        <% _.each(filters, function (filter, name) { %>
+                            <% if (filter.visible) { %>
+                                <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                    <%- filter.label %>
+                                </option>
+                            <% } %>
+                        <% }); %>
+                    </select>
+                </div>
+            </div>
+        {% else %}
+            <div class="filter-box dropdown-mode" {{ block('block_attributes') }}>
+                <div class="filter-container">
+                    <select data-action="add-filter-select"
+                            multiple
+                            {% if isMobileVersion() %}
+                                data-skip-input-widgets
+                            {% endif %}
+                    >
+                        <% _.each(filters, function (filter, name) { %>
+                            <% if (filter.visible) { %>
+                                <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                    <%- filter.label %>
+                                </option>
+                            <% } %>
+                        <% }); %>
+                    </select>
+                    <div class="filter-items"></div>
+                    <div class="filter-items-hint">
+                        <button type="button"
+                                class="btn btn--link reset-filter-button"
+                        >
+                            <span class="fa-close"></span>
+                            {{ 'oro.filter.reset.label'|trans|e('html')|raw }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <% } %>
+    </script>
+{% endblock %}
+
+{% block _filter_wrapper_tpl_widget %}
+    <script type="text/template" id="filter-wrapper-template">
+        {% if isMobileVersion() %}
+            <div class="filter-item" data-filter-wrapper-template>
+                <div class="filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>" data-zoom-disable>
+                    <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
+                    <div class="filter-criteria-selector-icon-wrap">
+                        {% if isMobileVersion() %}
+                            <span class="filter-criteria-selector-icon fa-plus fa--large"></span>
+                            <span class="filter-criteria-selector-icon fa-minus fa--large"></span>
+                        {% else %}
+                            <span class="filter-criteria-selector-icon fa-caret-down fa--large"></span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="filter-criteria"></div>
+            </div>
+        {% else %}
+            <div class="filter-item" data-filter-wrapper-template>
+                <div class="filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>" data-zoom-disable>
+                    <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
+                    <div class="filter-criteria-selector-icon-wrap">
+                        {% if isMobileVersion() %}
+                            <span class="filter-criteria-selector-icon fa-plus fa--large"></span>
+                            <span class="filter-criteria-selector-icon fa-minus fa--large"></span>
+                        {% else %}
+                            <span class="filter-criteria-selector-icon fa-caret-down fa--large"></span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="filter-criteria dropdown-menu"></div>
+            </div>
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block _filter_hint_tpl_widget %}
+    <script type="text/template" id="filter-hint-template">
+        <span class="filter-criteria-hint-item">
+            <span class="filter-criteria-hint-label">
+                <%- label %>:
+            </span>
+            <span class="filter-criteria-hint"></span>
+            <% if (allowClear) { %>
+                <button class="button button--plain reset-filter"
+                    title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                >
+                    <i class="fa-close hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i>
+                </button>
+            <% } %>
+        </span>
+    </script>
+{% endblock %}
+
+{% block _filter_none_tpl_widget %}
+    <script type="text/template" id="none-filter-template">
+        <div><%= popupHint %></div>
+    </script>
+{% endblock %}
+
+{% block _filter_text_tpl_widget %}
+    <script type="text/template" id="text-filter-template">
+        <div data-text-filter-template>
+            <input class="input input--size-m input--full" type="text" name="value" value=""/>
+            <div class="filter-action-row">
+                {% if isMobileVersion() %}
+                    <button type="button" class="btn btn--info btn--full filter-update"><%- _.__("Update") %></button>
+                {% else %}
+                    <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                {% endif %}
+            </div>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_choice_tpl_widget %}
+    <script type="text/template" id="choice-filter-template">
+        <div class="choice-filter" data-choice-filter-template>
+            <div class="filter-trigger-wrapper">
+                <button class="btn btn--link dropdown-toggle" data-toggle="dropdown">
+                    <%- selectedChoiceLabel %><span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <% _.each(choices, function (option) { %>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                    <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
+                    <% }); %>
+                </ul>
+            </div>
+            <div class="value-field-frame">
+                <input class="input input--size-m input--full" type="text" name="value" value="">
+                <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+                <div class="filter-action-row">
+                    {% if isMobileVersion() %}
+                        <button type="button" class="btn btn--info btn--full filter-update"><%- _.__("Update") %></button>
+                    {% else %}
+                        <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_number_range_tpl_widget %}
+    <script type="text/template" id="number-range-filter-template">
+        <div class="choice-filter number-range-filter" data-number-range-filter-template>
+            <div class="filter-trigger-wrapper">
+                <button class="btn btn--link dropdown-toggle" data-toggle="dropdown">
+                    <%- selectedChoiceLabel %><span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <% _.each(choices, function (option) { %>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                    <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
+                    <% }); %>
+                </ul>
+            </div>
+            <div class="value-field-frame">
+                <div class="filter-value">
+                    <div class="filter-start">
+                        <input class="input input--size-m input--full" type="text" class="" value="<%= value.value %>" name="value">
+                    </div>
+                    <span class="filter-separator">-</span>
+                    <div class="filter-end">
+                        <input class="input input--size-m input--full" type="text" value="<%= value.value_end %>" name="value_end">
+                    </div>
+                </div>
+                <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+                <div class="filter-action-row">
+                    {% if isMobileVersion() %}
+                        <button type="button" class="btn btn--info btn--full filter-update"><%- _.__("Update") %></button>
+                    {% else %}
+                        <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_many_to_many_tpl_widget %}
+    <script type="text/template" id="many-to-many-filter-template">
+        <div class="choice-filter" data-many-to-many-filter-template>
+            <div class="filter-trigger-wrapper">
+                <button class="btn btn--link dropdown-toggle" data-toggle="dropdown">
+                    <%- selectedChoiceLabel %><span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <% _.each(choices, function (option) { %>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                    <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
+                    <% }); %>
+                </ul>
+            </div>
+            <div class="value-field-frame">
+                <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+                <div class="filter-action-row">
+                    {% if isMobileVersion() %}
+                        <button type="button" class="btn btn--info btn--full filter-update"><%- _.__("Update") %></button>
+                    {% else %}
+                        <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_select_field_tpl_widget %}
+    <script type="text/template" id="select-field-template">
+        <div class="filter-select-oro-wrapper" data-select-field-template>
+            <select {% if isMobileVersion() %}
+                        data-skip-input-widgets
+                    {% endif %}
+                    name="<%= name %>"
+                    <% if (typeof(dataName) !== "undefined") { %>data-name="<%= dataName %>"<% } %>
+                    class="select select--size-m select--full"
+            >
+                <% _.each(choices, function (option) { %>
+                <option value="<%= option.value %>"
+                    <% if (option.value == selectedChoice) { %>
+                        selected="selected"
+                    <% } %>
+                >
+                    <%- option.label %>
+                </option>
+            <% }); %>
+            </select>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_data_tpl_widget %}
+    <script type="text/template" id="date-filter-template">
+        <div data-date-filter-template>
+            <%= parts.join('') %>
+            {% if isMobileVersion() %}
+                <div class="filter-date-range">
+                    <div class="filter-start-date">
+                        <input type="text" class="<%= inputClass %>"
+                               value="<%= value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
+                    </div>
+                    <span class="filter-separator">-</span>
+                    <div class="filter-end-date">
+                        <input type="text" class="<%= inputClass %>"
+                               value="<%= value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
+                    </div>
+                </div>
+                <div class="filter-action-row">
+                    <button class="btn btn--info btn--full filter-update" type="button"><%- _.__("Update") %></button>
+                </div>
+            {% else %}
+                <div class="filter-date-range">
+                    <div class="filter-start-date">
+                        <div class="datepicker-box">
+                            <span class="datepicker-box__icon">
+                                <i class="fa-calendar"></i></span>
+                                <input type="text"
+                                       class="<%= inputClass %>"
+                                       value="<%= value.value.start %>"
+                                       name="start"
+                                       placeholder="<%- _.__('from') %>"
+                                >
+                        </div>
+                    </div>
+                    <span class="filter-separator">-</span>
+                    <div class="filter-end-date">
+                        <div class="datepicker-box">
+                            <span class="datepicker-box__icon">
+                                <i class="fa-calendar"></i></span>
+                                <input type="text" class="<%= inputClass %>"
+                                       value="<%= value.value.end %>"
+                                       name="end"
+                                       placeholder="<%- _.__('to') %>"
+                                >
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="filter-action-row">
+                    <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                </div>
+            {% endif %}
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_data_picker_itemized_tpl_widget %}
+    <script type="text/template" id="date-picker-itemized-content">
+        <div class="ui-datevariables-div" data-date-picker-itemized-content>
+            <b><%= title %></b>
+            <ul>
+                <% _.each(items, function (label, value) { %>
+                <li><a data-value="<%= value %>" href="#"><%= label %></a></li>
+                <% }); %>
+            </ul>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_data_dropdown_tpl_widget %}
+    <script type="text/template" id="date-filter-dropdown-template">
+        <% if (!tabs.length) { %>
+        <div id="calendar<%= suffix %>"></div>
+        <% } else { %>
+        <ul class="nav nav-tabs nav-tabs-oro">
+            <% _.each(tabs, function (tab, i) { %>
+            <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
+            <% }); %>
+        </ul>
+        <div class="tab-content">
+            <% _.each(tabs, function (tab, i) { %>
+            <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
+            <% }); %>
+        </div>
+        <% } %>
+    </script>
+{% endblock %}
+
+{% block _filter_select_tpl_widget %}
+    <script type="text/template" id="select-filter-template">
+        <div class="filter-item" data-select-filter-template>
+            <div class="filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+                <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
+                <select {% if isMobileVersion() %}
+                            data-skip-input-widgets
+                        {% endif %}
+                >
+                    <% _.each(options, function (option) { %>
+                    <option value="<%= option.value %>" title="<%- option.label %>"
+                    <% if (option.value == selected.value) { %> selected="selected"<% } %>>
+                    <%- option.label %>
+                    </option>
+                    <% }); %>
+                </select>
+                <div class="filter-criteria-selector-icon-wrap">
+                    {% if isMobileVersion() %}
+                        <span class="filter-criteria-selector-icon fa-plus fa--large"></span>
+                        <span class="filter-criteria-selector-icon fa-minus fa--large"></span>
+                    {% else %}
+                        <span class="filter-criteria-selector-icon fa-caret-down fa--large"></span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if isMobileVersion() %}
+                <div class="filter-criteria"></div>
+            {% endif %}
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_multiselect_tpl_widget %}
+    <script type="text/template" id="multiselect-filter-template">
+        <div class="filter-item" data-multiselect-filter-template>
+            <div class="filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+                <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
+                <select multiple
+                        {% if isMobileVersion() %}
+                            data-skip-input-widgets
+                        {% endif %}
+                >
+                    <% _.each(options, function (option) { %>
+                    <option value="<%= option.value %>" title="<%- option.label %>"
+                    <% if (_.isArray(selected.value)) { %><% if (_.indexOf(selected.value, option.value) !== -1) { %> selected="selected"<% } %>
+                    <% } else if (option.value == selected.value) { %> selected="selected"<% } %>>
+                    <%- option.label %>
+                    </option><% }); %>
+                </select>
+                <div class="filter-criteria-selector-icon-wrap">
+                    {% if isMobileVersion() %}
+                        <span class="filter-criteria-selector-icon fa-plus fa--large"></span>
+                        <span class="filter-criteria-selector-icon fa-minus fa--large"></span>
+                    {% else %}
+                        <span class="filter-criteria-selector-icon fa-caret-down fa--large"></span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if isMobileVersion() %}
+                <div class="filter-criteria"></div>
+            {% endif %}
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_choice_tree_tpl_widget %}
+    <script type="text/template" id="choice-tree-template">
+        <div class="filter-item choice-tree-filter" data-choice-tree-template>
+            <input type="hidden" name="value">
+            <input type="hidden" name="type">
+            <div class="filter-action-row">
+                {% if isMobileVersion() %}
+                    <button type="button" class="btn btn--info btn--full filter-update"><%- _.__("Update") %></button>
+                {% else %}
+                    <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                {% endif %}
+            </div>
+        </div>
+    </script>
+{% endblock %}
+
+{% block _filter_dictionary_tpl_widget %}
+    <script type="text/template" id="dictionary-filter-template">
+        <div class="choice-filter" data-dictionary-filter-template>
+            <div class="filter-trigger-wrapper">
+                <button class="btn btn--link dropdown-toggle" data-toggle="dropdown">
+                    <%- selectedChoiceLabel %><span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <% _.each(choices, function (option) { %>
+                    <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                    <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    </li>
+                    <% }); %>
+                </ul>
+            </div>
+            <div class="value-field-frame">
+                <input type="hidden" name="select-values-autocomplete" class="select-values-autocomplete" value="" />
+                <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+                <div class="filter-action-row">
+                    {% if isMobileVersion() %}
+                        <button type="button" class="btn btn--info btn--full filter-update"><%- _.__("Update") %></button>
+                    {% else %}
+                        <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </script>
+{% endblock %}

@@ -259,7 +259,7 @@ define([
                             }
                         }, this), 100);
                     }, this),
-                    appendTo: this.dropdownContainer,
+                    appendTo: this._setDropdownContainer(),
                     refreshNotOpened: this.templateTheme !== ''
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
@@ -271,6 +271,14 @@ define([
                     this._onClickFilterArea(e);
                 }
             }, this));
+        },
+
+        /**
+         * Set container for dropdown
+         * @return {jQuery}
+         */
+        _setDropdownContainer: function() {
+            return this.dropdownContainer;
         },
 
         /**

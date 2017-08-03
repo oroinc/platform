@@ -1,0 +1,124 @@
+// @theme: blank;
+
+.toggle-mode {
+    .filters-manager-trigger {
+        display: none;
+    }
+
+    .ui-multiselect-menu {
+        // Break inline styles
+        position: static !important;
+        // Break inline styles
+        max-width: 100% !important;
+        // Break inline styles
+        width: 100% !important;
+
+        .ui-multiselect-header {
+            display: none;
+        }
+
+        .ui-multiselect-checkboxes {
+            overflow: visible !important;
+            height: auto !important;
+        }
+    }
+
+    .filter-criteria-selector {
+        padding: $filter-toggle-mode-criteria-selector-offset-inner;
+
+        border-bottom: $filter-toggle-mode-criteria-selector-border-bottom;
+        color: $filter-toggle-mode-criteria-selector-color;
+    }
+
+    .filter-criteria-selector-icon-wrap {
+        top: $filter-toggle-mode-criteria-selector-icon-top-pos;
+        right: $filter-toggle-mode-criteria-selector-icon-right-pos;
+    }
+
+    .filter-criteria-selector-icon {
+        &:last-child {
+            display: none;
+        }
+    }
+
+    .fields-row {
+        min-width: $filter-toggle-mode-fields-row-min-width;
+    }
+
+    .filter-items {
+        margin-bottom: $offset-y-m;
+    }
+
+    .filter-criteria-hint-item {
+        display: block;
+        margin-bottom: $filter-toggle-mode-criteria-hint-item-offset-bottom;
+        padding: $filter-toggle-mode-criteria-hint-item-offset-inner;
+        border-radius: $filter-toggle-mode-criteria-hint-item-border-radius;
+    }
+
+    .reset-filter {
+        position: absolute;
+        right: $filter-toggle-mode-reset-filter-right-pos;
+    }
+
+    .reset-filter-button {
+        width: $filter-toggle-mode-reset-filter-button-width;
+
+        border-color: $filter-toggle-mode-reset-filter-button-border-color;
+    }
+
+    .filter-start-date,
+    .filter-end-date {
+        width: $filter-toggle-mode-start-end-max-width;
+    }
+
+    .datepicker-input {
+        max-width: $filter-toggle-mode-datepicker-input-max-width;
+        width: $filter-toggle-mode-datepicker-input-width;
+    }
+
+    .timepicker-input {
+        max-width: $filter-toggle-mode-timepicker-input-max-width;
+        width: $filter-toggle-mode-timepicker-input-width;
+        margin-left: $filter-toggle-mode-timepicker-input-offset-left;
+    }
+
+    .filter-criteria {
+        display: none;
+        padding: $filter-toggle-mode-criteria-offset-inner;
+
+        border-bottom: $filter-toggle-mode-criteria-border-bottom;
+
+        .value-field-frame {
+            width: $filter-toggle-mode-criteria-value-field-frame-width;
+            // Break inline styles
+            margin-left: initial !important;
+            // Break inline styles
+            padding-right: initial !important;
+        }
+    }
+
+    .filter-items-hint {
+        padding: $filter-toggle-mode-items-hint-offset-inner;
+    }
+
+    .open-filter {
+        .filter-criteria-selector {
+            border-bottom-color: $filter-toggle-mode-open-filter-criteria-selector-border-bottom-color;
+        }
+
+        .filter-criteria-selector-icon {
+            &:first-child {
+                display: none;
+            }
+
+            &:last-child {
+                display: block;
+            }
+        }
+
+        .filter-criteria {
+            display: block;
+        }
+    }
+}

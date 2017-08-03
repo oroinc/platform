@@ -1,10 +1,17 @@
 define([
     'jquery',
     'underscore',
+    'module',
     'jquery.multiselect',
     'jquery.multiselect.filter'
-], function($, _) {
+], function($, _, module) {
     'use strict';
+
+    var config = module.config();
+
+    config = _.extend({
+        additionalClass: true
+    }, config);
 
     /**
      * Multiselect decorator class.
@@ -35,6 +42,10 @@ define([
          */
         contextSearch: true,
 
+        /**
+         * @property {Boolean}
+         */
+        additionalClass: config.additionalClass,
         /**
          * Initialize all required properties
          */
@@ -101,7 +112,9 @@ define([
          */
         _setDropdownDesign: function() {
             var widget = this.getWidget();
-            widget.addClass('dropdown-menu');
+            if (this.additionalClass) {
+                widget.addClass('dropdown-menu');
+            }
             widget.removeClass('ui-widget-content');
             widget.removeClass('ui-widget');
             widget.find('.ui-widget-header').removeClass('ui-widget-header');
