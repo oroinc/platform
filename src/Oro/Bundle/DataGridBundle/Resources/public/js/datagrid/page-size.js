@@ -135,6 +135,8 @@ define([
                 currentSizeLabel: currentSizeLabel
             })));
 
+            this.initLayout();
+
             if (this.hidden) {
                 this.$el.hide();
             }
