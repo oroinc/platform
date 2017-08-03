@@ -99,12 +99,3 @@
         </div>
     {% endif %}
 {% endblock %}
-
-{% block __oro_datagrid_server_render__datagrid_toolbar_actions_widget %}
-    {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
-    {% if toolbarPosition != 'bottom' %}
-        <div{{ block('block_attributes') }}>
-            {{ block_widget(block) }}
-        </div>
-    {% endif %}
-{% endblock %}

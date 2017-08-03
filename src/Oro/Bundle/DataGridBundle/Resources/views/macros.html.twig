@@ -34,8 +34,8 @@
         {% set data     = oro_datagrid_data(datagrid) %}
         {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
         {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
-        {% if isMobileVersion() %}
-            {% set enableToggleFilters = true %}
+        {% if isMobileVersion() and renderParams.enableToggleFilters is not defined %}
+            {% set enableToggleFilters = false %}
         {% elseif renderParams.enableToggleFilters is defined %}
             {% set enableToggleFilters = renderParams.enableToggleFilters %}
         {% else %}
