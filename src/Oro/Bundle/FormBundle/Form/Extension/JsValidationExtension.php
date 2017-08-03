@@ -96,6 +96,12 @@ class JsValidationExtension extends AbstractTypeExtension
     {
         $data = $this->getConstraintsDataAsArray($form);
 
+        if (isset($data['Callback'])) {
+            // Since there is no way to transform backend callback function to frontend one don't add it into
+            // validation attribute
+            unset($data['Callback']);
+        }
+
         if ($data) {
             if (!empty($data['NotBlank'])) {
                 $view->vars['attr']['data-required'] = true;

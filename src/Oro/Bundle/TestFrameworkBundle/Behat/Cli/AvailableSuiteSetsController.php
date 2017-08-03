@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfiguration;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,8 +49,24 @@ class AvailableSuiteSetsController implements Controller
             return;
         }
 
-        foreach (array_keys($this->suiteConfigRegistry->getSets()) as $set) {
+        /**
+         * @var string $set
+         * @var SuiteConfiguration[] $chunks
+         */
+        foreach ($this->suiteConfigRegistry->getSets() as $set => $chunks) {
             $output->writeln($set);
+
+            if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                foreach ($chunks as $chunk) {
+                    $output->writeln(sprintf('    %s', $chunk->getName()));
+
+                    if ($output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
+                        foreach ($chunk->getPaths() as $path) {
+                            $output->writeln(sprintf('        %s', $path));
+                        }
+                    }
+                }
+            }
         }
 
         return 0;
