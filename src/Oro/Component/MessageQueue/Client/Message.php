@@ -1,55 +1,34 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
 class Message
 {
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     private $body;
 
-    /**
-     * @var string|null
-     */
+    /** @var string|null */
     private $contentType;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $messageId;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $timestamp;
 
-    /**
-     * @var string|null
-     */
+    /** @var string|null */
     private $priority;
 
-    /**
-     * The number of seconds the message should be removed from the queue without processing
-     *
-     * @var int|null
-     */
+    /** @var int|null */
     private $expire;
 
-    /**
-     * The number of seconds the message should be delayed before it will be send to a queue
-     *
-     * @var int|null
-     */
+    /** @var int|null */
     private $delay;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $headers = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $properties = [];
 
     /**
@@ -60,8 +39,6 @@ class Message
     {
         $this->body = $body;
         $this->priority = $priority;
-        $this->headers = [];
-        $this->properties = [];
     }
 
     /**
@@ -167,7 +144,7 @@ class Message
     }
 
     /**
-     * Gets the number of seconds the message should be removed from the queue without processing
+     * Gets the number of seconds the message should be removed from the queue without processing.
      *
      * @return int|null
      */
@@ -177,6 +154,8 @@ class Message
     }
 
     /**
+     * Sets the number of seconds the message should be removed from the queue without processing.
+     *
      * @param int|null $expire
      *
      * @return self
@@ -189,7 +168,7 @@ class Message
     }
 
     /**
-     * Gets the number of seconds the message should be delayed before it will be send to a queue
+     * Gets the number of seconds the message should be delayed before it will be send to a queue.
      *
      * @return int|null
      */
@@ -199,7 +178,7 @@ class Message
     }
 
     /**
-     * Set delay in seconds
+     * Sets the number of seconds the message should be delayed before it will be send to a queue.
      *
      * @param int|null $delay
      *
@@ -222,7 +201,7 @@ class Message
 
     /**
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -233,7 +212,7 @@ class Message
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return self
      */
@@ -278,7 +257,7 @@ class Message
 
     /**
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -289,7 +268,7 @@ class Message
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return self
      */

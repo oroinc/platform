@@ -1,7 +1,6 @@
 <?php
-namespace Oro\Component\MessageQueue\Transport;
 
-use Oro\Component\MessageQueue\Transport\Exception\Exception;
+namespace Oro\Component\MessageQueue\Transport;
 
 /**
  * The Message interface is the root interface of all transport messages.
@@ -11,6 +10,8 @@ use Oro\Component\MessageQueue\Transport\Exception\Exception;
  * the payload contains the application data being sent.
  *
  * Within this general form, the definition of a message varies significantly across products.
+ *
+ * A class implements this interface should be cloneable.
  *
  * @link https://docs.oracle.com/javaee/1.4/api/javax/jms/Message.html
  */
@@ -42,7 +43,7 @@ interface MessageInterface
 
     /**
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -62,7 +63,7 @@ interface MessageInterface
 
     /**
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -90,8 +91,6 @@ interface MessageInterface
      *
      * @param string $correlationId the message ID of a message being referred to
      *
-     * @throws Exception if the provider fails to set the correlation ID due to some internal error.
-     *
      * @return void
      */
     public function setCorrelationId($correlationId);
@@ -101,7 +100,6 @@ interface MessageInterface
      * This method is used to return correlation ID values that are either provider-specific message IDs
      * or application-specific String values.
      *
-     * @throws Exception if the provider fails to get the correlation ID due to some internal error.
      * @return string
      */
     public function getCorrelationId();
@@ -113,8 +111,6 @@ interface MessageInterface
      *
      * @param string $messageId the ID of the message
      *
-     * @throws Exception if the provider fails to set the message ID due to some internal error.
-     *
      * @return void
      */
     public function setMessageId($messageId);
@@ -124,8 +120,6 @@ interface MessageInterface
      * The MessageId header field contains a value that uniquely identifies each message sent by a provider.
      *
      * When a message is sent, MessageId can be ignored.
-     *
-     * @throws Exception if the provider fails to get the message ID due to some internal error.
      *
      * @return string
      */
@@ -147,8 +141,6 @@ interface MessageInterface
      * This method can be used to change the value for a message that has been received.
      *
      * @param int $timestamp
-     *
-     * @throws Exception if the provider fails to set the timestamp due to some internal error.
      *
      * @return void
      */
