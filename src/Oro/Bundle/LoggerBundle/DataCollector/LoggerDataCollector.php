@@ -4,6 +4,14 @@ namespace Oro\Bundle\LoggerBundle\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector as BaseDataCollector;
 
+/**
+ * Should be remove after update Symfony version 3.3+ and merge PR
+ *
+ * https://github.com/symfony/symfony/pull/23683
+ * https://github.com/symfony/symfony/pull/23659
+ *
+ * TODO: https://magecore.atlassian.net/browse/BAP-15133
+ */
 class LoggerDataCollector extends BaseDataCollector
 {
     /**
