@@ -110,11 +110,11 @@ define([
             });
 
             _.each(componentsShortcuts.getAll(), function(shortcut, shortcutName) {
-                this.$el.find('[data-' + shortcutName + ']').each(function() {
+                this.$el.find('[data-page-component-shortcut-' + shortcutName + ']').each(function() {
                     var $elem = $(this);
 
                     if (self._isInOwnLayout($elem)) {
-                        var dataAttribute = $.camelCase(shortcutName);
+                        var dataAttribute = $.camelCase('page-component-shortcut-' + shortcutName);
 
                         $elem.data({
                             pageComponentModule: shortcut.moduleName,
