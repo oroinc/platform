@@ -36,6 +36,10 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     const API_FORM_TYPE_GUESSER_TAG                = 'oro.api.form.type_guesser';
     const API_FORM_METADATA_GUESSER_SERVICE_ID     = 'oro_api.form.guesser.metadata';
 
+    const VALIDATOR_FACTORY_SERVICE_ID     = 'validator.validator_factory';
+    const EXPECTED_VALIDATOR_FACTORY_CLASS = 'Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory';
+    const API_VALIDATOR_FACTORY_CLASS      = 'Oro\Bundle\ApiBundle\Validator\ConstraintValidatorFactory';
+
     /**
      * {@inheritdoc}
      */
@@ -46,6 +50,7 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         $this->registerProcessingGroups($container, $config);
         $this->registerFilters($container, $config);
         $this->configureForms($container, $config);
+        $this->configureValidators($container, $config);
     }
 
     /**
@@ -183,6 +188,31 @@ class ConfigurationCompilerPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    protected function configureValidators(ContainerBuilder $container, array $config)
+    {
+        if (!$container->hasDefinition(self::VALIDATOR_FACTORY_SERVICE_ID) ||
+            !$container->hasDefinition(self::API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID)
+        ) {
+            return;
+        }
+
+        $validatorFactoryDef = $container->getDefinition(self::VALIDATOR_FACTORY_SERVICE_ID);
+
+        $this->assertExistingValidatorFactory($validatorFactoryDef, $container);
+        $validatorFactoryDef->setClass(self::API_VALIDATOR_FACTORY_CLASS);
+        $validatorFactoryDef->addMethodCall(
+            'setFormExtensionChecker',
+            [new Reference(self::API_FORM_EXTENSION_STATE_SERVICE_ID)]
+        );
+        foreach ($config['validator_replacements'] as $oldClass => $newClass) {
+            $validatorFactoryDef->addMethodCall('replaceValidatorClass', [$oldClass, $newClass]);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
      */
     protected function decorateFormTypeFactory(ContainerBuilder $container)
     {
@@ -246,6 +276,28 @@ class ConfigurationCompilerPass implements CompilerPassInterface
                             $formExtensions
                         )
                     )
+                )
+            );
+        }
+    }
+
+    /**
+     * @param Definition       $validatorFactoryDef
+     * @param ContainerBuilder $container
+     */
+    protected function assertExistingValidatorFactory(Definition $validatorFactoryDef, ContainerBuilder $container)
+    {
+        $validatorFactoryClass = $validatorFactoryDef->getClass();
+        if (0 === strpos($validatorFactoryClass, '%')) {
+            $validatorFactoryClass = $container->getParameter(substr($validatorFactoryClass, 1, -1));
+        }
+        if (self::EXPECTED_VALIDATOR_FACTORY_CLASS !== $validatorFactoryClass) {
+            throw new LogicException(
+                sprintf(
+                    'Expected class of the "%s" service is "%s", actual class is "%s".',
+                    self::VALIDATOR_FACTORY_SERVICE_ID,
+                    self::EXPECTED_VALIDATOR_FACTORY_CLASS,
+                    $validatorFactoryClass
                 )
             );
         }
