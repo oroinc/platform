@@ -120,7 +120,7 @@ define([
 
                         $elem.data({
                             pageComponentModule: shortcut.moduleName,
-                            pageComponentOptions: _.defaults($elem.data(dataAttribute), shortcut.options)
+                            pageComponentOptions: _.defaults({}, $elem.data(dataAttribute), shortcut.options)
                         });
 
                         $elem.removeAttr(namespace);

@@ -10,6 +10,13 @@ define(function(require) {
         moduleName: 'oroui/js/app/components/jquery-widget-component'
     });
 
+    ComponentsShortcutsManager.add('line-clamp', {
+        options: {
+            widgetModule: 'orofrontend/default/js/widgets/line-clamp-widget'
+        },
+        moduleName: 'oroui/js/app/components/jquery-widget-component'
+    });
+
     ComponentsShortcutsManager.add('collapse', {
         options: {
             widgetModule: 'oroui/js/widget/collapse-widget'
