@@ -1,0 +1,4 @@
+Oro\Bundle\UserBundle\Entity\Role:
+  role{1..5}:
+    role: Buyer<current()>
+    label: Buyer<current()>
