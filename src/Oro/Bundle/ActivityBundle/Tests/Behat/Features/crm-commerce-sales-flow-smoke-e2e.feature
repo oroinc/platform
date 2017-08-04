@@ -1,4 +1,6 @@
 @regression
+# TODO: unskip after fix in BAP-14958
+@skip
 Feature: Sales Flow
   In order to check Sales Flow on admin panel
   As a Admin
