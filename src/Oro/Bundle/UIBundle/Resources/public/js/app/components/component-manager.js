@@ -110,7 +110,9 @@ define([
             });
 
             _.each(componentsShortcuts.getAll(), function(shortcut, shortcutName) {
-                this.$el.find('[data-page-component-shortcut-' + shortcutName + ']').each(function() {
+                var namespace = 'data-page-component-shortcut-' + shortcutName;
+
+                this.$el.find('[' + namespace + ']').each(function() {
                     var $elem = $(this);
 
                     if (self._isInOwnLayout($elem)) {
@@ -121,7 +123,7 @@ define([
                             pageComponentOptions: _.defaults($elem.data(dataAttribute), shortcut.options)
                         });
 
-                        $elem.removeData(dataAttribute);
+                        $elem.removeAttr(namespace);
 
                         elements.push($elem);
                     }

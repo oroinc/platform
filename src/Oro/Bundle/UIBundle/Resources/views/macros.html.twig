@@ -144,7 +144,6 @@
 {% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
     {% if is_granted('VIEW', entity, fieldName) %}
         {% set collapseView = {
-                widgetModule: 'oroui/js/widget/collapse-widget',
                 storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
                 uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
                 animationSpeed: 0,
@@ -152,9 +151,7 @@
                 checkOverflow: true,
                 open: false
             } %}
-        <div class="collapse-block"
-             data-page-component-module="oroui/js/app/components/jquery-widget-component"
-             data-page-component-options="{{ collapseView|json_encode }}">
+        <div class="collapse-block" data-page-component-shortcut-collapse="{{ collapseView|json_encode }}">
             {{ _self.renderAttribute(title,
                 '<div class="control-label" data-collapse-container>' ~
                     data|default('oro.ui.empty'|trans) ~
@@ -1245,12 +1242,7 @@
             view: 'oroui/js/app/views/jstree/base-tree-view'
         }
     } %}
-    <div class="jstree-wrapper collapse-view expanded"
-        data-page-component-module="oroui/js/app/components/jquery-widget-component"
-        data-page-component-options="{{ {
-            widgetModule: 'oroui/js/widget/collapse-widget'
-        }|json_encode() }}"
-        data-role="jstree-wrapper">
+    <div class="jstree-wrapper collapse-view expanded" data-role="jstree-wrapper">
         <div data-page-component-module="oroui/js/app/components/view-component"
              data-page-component-options="{{ defaultTreeData.treeOptions|merge(data.treeOptions)|json_encode }}">
             {% if data.label|default('') %}

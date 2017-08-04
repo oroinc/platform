@@ -10,5 +10,12 @@ define(function(require) {
         moduleName: 'oroui/js/app/components/jquery-widget-component'
     });
 
+    ComponentsShortcutsManager.add('collapse', {
+        options: {
+            widgetModule: 'oroui/js/widget/collapse-widget'
+        },
+        moduleName: 'oroui/js/app/components/jquery-widget-component'
+    });
+
     return ComponentsShortcutsManager;
 });
