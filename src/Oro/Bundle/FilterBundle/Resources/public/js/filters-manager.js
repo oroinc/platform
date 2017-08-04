@@ -162,7 +162,11 @@ define(function(require) {
                 });
             }
 
-            mediator.on('filterManager:selectedFilters:calculate:' + this.collection.options.gridName, this._countSelectedFilters, this);
+            mediator.on(
+                'filterManager:selectedFilters:calculate:' + this.collection.options.gridName,
+                this._countSelectedFilters,
+                this
+            );
 
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
