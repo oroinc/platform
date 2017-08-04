@@ -1,6 +1,7 @@
 api:
     entities:
         Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue:
+            documentation_resource: '@OroEntityBundle/Resources/doc/api/entity_field_fallback_value.md'
             actions:
                 delete_list: false
                 delete: false
