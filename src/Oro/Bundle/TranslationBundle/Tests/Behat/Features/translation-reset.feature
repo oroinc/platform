@@ -1,3 +1,4 @@
+@regression
 Feature: Confirmation while resetting translations
   Scenario: Reset translation for key oro.ui.create_entity
     Given I login as administrator

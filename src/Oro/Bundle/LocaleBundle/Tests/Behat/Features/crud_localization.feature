@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-14021
 @automatically-ticket-tagged
 @fixture-OroLocaleBundle:japanese-language.yml
