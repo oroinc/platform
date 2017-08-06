@@ -23,17 +23,6 @@ In case if input data violates some validation constraints, these constraints wi
 - Implement [ConstraintWithStatusCodeInterface](../../Validator/Constraints/ConstraintWithStatusCodeInterface.php) in you constraint class.
 - Implement own constraint text extractor. The API bundle has the [default implementation of constraint text extractor](../../Request/ConstraintTextExtractor.php). To add new extractor just create a class implements [ConstraintTextExtractorInterface](../../Request/ConstraintTextExtractorInterface.php) and tag it with the `oro.api.constraint_text_extractor` in the dependency injection container. Also this service can be used to change an error code and type for a validation constraint.
 
-Sometime it is required to modify behaviour of existing validators to conform API needs. For example, by default `NotBlank` constraint is used to validate that a value is not equal to a blank string, a blank array or *null*, but in API, arrays are converted to an instance of `ArrayCollection` class. To fix this we need to modify the validator of this constraint and add a check for empty collection there. This is achieved by the following configuration in *Resources/config/oro/app.yml* file:
-
-```yaml
-api:
-    validator_replacements:
-        # replace a default validator for NotBlank constraint with modified validator
-        'Symfony\Component\Validator\Constraints\NotBlankValidator': 'Oro\Bundle\ApiBundle\Validator\Constraints\NotBlankValidator'
-```
-
-If needed, you can do the same by adding *Resources/config/oro/app.yml* in any bundle or using *app/config/config.yml* of your application.
-
 Forms
 -----
 

@@ -141,9 +141,6 @@ oro_api:
         money:
             form_type: money
 
-    validator_replacements:
-        'Symfony\Component\Validator\Constraints\NotBlankValidator': 'Oro\Bundle\ApiBundle\Validator\Constraints\NotBlankValidator'
-
     actions:
         get_list:
             processor_service_id: oro_api.get_list.processor

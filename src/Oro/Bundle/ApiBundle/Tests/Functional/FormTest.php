@@ -3,12 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
-use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
@@ -173,32 +171,6 @@ class FormTest extends WebTestCase
 
         $this->assertSame(123, $object->getId());
         $this->assertSame('test', $object->getTitle());
-    }
-
-    public function testNotBlankValidationConstraintForApiForm()
-    {
-        $this->switchToApiFormExtension();
-
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(TestObjectForNotBlankConstraintValidation::class);
-        $itemsField = new AssociationMetadata();
-        $itemsField->setName('items');
-        $itemsField->setDataType('integer');
-        $itemsField->setIsCollection(true);
-        $metadata->addAssociation($itemsField);
-        $this->setMetadataAccessor(new TestMetadataAccessor([$metadata]));
-
-        $form = $this->getRootForm(['data_class' => TestObjectForNotBlankConstraintValidation::class]);
-        $form->add('items');
-        $object = new TestObjectForNotBlankConstraintValidation();
-        $form->setData($object);
-
-        $form->submit(['items' => []]);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertFalse($form->isValid(), 'isValid');
-        $errors = $form->get('items')->getErrors();
-        $this->assertCount(1, $errors, 'number of errors');
-        $this->assertInstanceOf(NotBlank::class, $errors[0]->getCause()->getConstraint(), 'error type');
     }
 
     protected function switchToDefaultFormExtension()
