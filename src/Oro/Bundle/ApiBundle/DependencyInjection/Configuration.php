@@ -25,7 +25,6 @@ class Configuration implements ConfigurationInterface
         $this->appendFormTypeExtensionsNode($node);
         $this->appendFormTypeGuessersNode($node);
         $this->appendFormTypeGuessesNode($node);
-        $this->appendValidatorsNode($node);
 
         return $treeBuilder;
     }
@@ -254,23 +253,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end();
-    }
-
-    /**
-     * @param NodeBuilder $node
-     */
-    protected function appendValidatorsNode(NodeBuilder $node)
-    {
-        $node
-            ->arrayNode('validator_replacements')
-                ->info('The validators that should be used in Data API instead of default validators')
-                ->example([
-                    'Symfony\Component\Validator\Constraints\NotBlankValidator' =>
-                        'Oro\Bundle\ApiBundle\Validator\Constraints\NotBlankValidator'
-                ])
-                ->useAttributeAsKey('name')
-                ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
     }
 }
