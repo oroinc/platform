@@ -164,8 +164,7 @@ define(function(require) {
 
             mediator.on(
                 'filterManager:selectedFilters:calculate:' + this.collection.options.gridName,
-                this._countSelectedFilters,
-                this
+                _.bind(this._countSelectedFilters, this)
             );
 
             FiltersManager.__super__.initialize.apply(this, arguments);
