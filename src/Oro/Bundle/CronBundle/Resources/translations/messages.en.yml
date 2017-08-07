@@ -76,7 +76,7 @@ oro:
             definition.label: 'Definition'
 
         schedule_interval:
-            active_at.label: 'Active At'
+            active_at.label: 'Activate At'
             deactivate_at.label: 'Deactivate At'
             add: 'Add'
             was_activated: 'Was activated on %date%.'

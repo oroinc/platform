@@ -1,9 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Processor;
-
-use Symfony\Component\PropertyAccess\StringUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+namespace Oro\Bundle\LocaleBundle\Api\Processor;
 
 use Doctrine\ORM\EntityManager;
 
@@ -18,6 +15,7 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class ProcessLocalizedFields implements ProcessorInterface
 {
@@ -27,7 +25,7 @@ class ProcessLocalizedFields implements ProcessorInterface
     /** @var  DoctrineHelper */
     protected $doctrinHelper;
 
-    /** @var  PropertyAccess */
+    /** @var  PropertyAccessor */
     protected $propertyAccessor;
 
     /**
@@ -38,7 +36,7 @@ class ProcessLocalizedFields implements ProcessorInterface
     {
         $this->localizationHelper = $localizationHelper;
         $this->doctrinHelper = $doctrineHelper;
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -46,9 +44,7 @@ class ProcessLocalizedFields implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        if (!$context instanceof CreateContext) {
-            return;
-        }
+        /** @var CreateContext $context */
 
         /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getMetadata();
@@ -139,27 +135,8 @@ class ProcessLocalizedFields implements ProcessorInterface
                 $parent !== null ? FallbackType::PARENT_LOCALIZATION : FallbackType::SYSTEM
             );
         }
-        $addMethod = $this->getEntityAdderMethod($entity, $relationName);
-        $entity->{$addMethod}($localizedFallbackValue);
+        $this->propertyAccessor->setValue($entity, $relationName, $localizedFallbackValue);
 
         $em->persist($localizedFallbackValue);
-    }
-
-    /**
-     * @param object $entity
-     * @param string $relationName
-     * @return string
-     */
-    private function getEntityAdderMethod($entity, $relationName)
-    {
-        $camelized = str_replace(' ', '', ucwords(str_replace('_', ' ', $relationName)));
-        $singulars = (array) StringUtil::singularify($camelized);
-        foreach ($singulars as $singular) {
-            $addMethod = 'add'.$singular;
-
-            if (is_callable([$entity, $addMethod])) {
-                return $addMethod;
-            }
-        }
     }
 }

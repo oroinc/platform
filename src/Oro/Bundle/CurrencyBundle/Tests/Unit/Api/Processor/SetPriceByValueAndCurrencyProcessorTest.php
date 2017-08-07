@@ -1,14 +1,13 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Processor;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Processor\ContextInterface;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Entity\SettablePriceAwareInterface;
-use Oro\Bundle\CurrencyBundle\Processor\SetPriceByValueAndCurrencyProcessor;
+use Oro\Bundle\CurrencyBundle\Api\Processor\SetPriceByValueAndCurrencyProcessor;
 
-class SetPriceByValueAndCurrencyProcessorTest extends \PHPUnit_Framework_TestCase
+class SetPriceByValueAndCurrencyProcessorTest extends FormProcessorTestCase
 {
     /** @var SetPriceByValueAndCurrencyProcessor */
     protected $processor;
@@ -18,38 +17,29 @@ class SetPriceByValueAndCurrencyProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function setUp()
     {
+        parent::setUp();
+
         $this->processor = new SetPriceByValueAndCurrencyProcessor();
-    }
-
-    public function testProcessWithNotFormContext()
-    {
-        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->never())->method($this->anything());
-
-        $this->processor->process($context);
     }
 
     public function testProcessWithoutRequestData()
     {
-        /** @var FormContext|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->createMock(FormContext::class);
-        $context->expects($this->any())->method('getRequestData')->willReturn([]);
-        $context->expects($this->never())->method('setRequestData');
+        $requestData = [];
 
-        $this->processor->process($context);
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals($requestData, $this->context->getRequestData());
     }
 
     public function testProcessWithoutRequestSettablePriceAwareItem()
     {
-        /** @var FormContext|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->createMock(FormContext::class);
-        $context->expects($this->any())->method('getRequestData')
-            ->willReturn(['currency' => 'USD', 'value' => 10]);
-        $context->expects($this->any())->method('getResult')->willReturn(null);
-        $context->expects($this->never())->method('setRequestData');
+        $requestData = ['currency' => 'USD', 'value' => 10];
 
-        $this->processor->process($context);
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertEquals($requestData, $this->context->getRequestData());
     }
 
     /**
@@ -62,13 +52,12 @@ class SetPriceByValueAndCurrencyProcessorTest extends \PHPUnit_Framework_TestCas
     {
         $actualItem = $this->createSettablePriceAwareMock();
 
-        /** @var FormContext|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->createMock(FormContext::class);
-        $context->expects($this->any())->method('getRequestData')->willReturn($requestData);
-        $context->expects($this->any())->method('getResult')->willReturn($actualItem);
+        $this->context->setRequestData($requestData);
+        $this->context->setResult($actualItem);
+        $this->processor->process($this->context);
 
-        $this->processor->process($context);
-        $this->assertEquals($expectedItem, $actualItem);
+        self::assertEquals($requestData, $this->context->getRequestData());
+        self::assertEquals($expectedItem, $actualItem);
     }
 
     /**
