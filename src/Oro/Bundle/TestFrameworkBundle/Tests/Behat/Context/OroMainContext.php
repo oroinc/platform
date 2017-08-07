@@ -80,9 +80,6 @@ class OroMainContext extends MinkContext implements
     public function beforeStep(BeforeStepScope $scope)
     {
         $session = $this->getMink()->getSession();
-        if (false === $session->isStarted()) {
-            return;
-        }
 
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
@@ -110,7 +107,7 @@ class OroMainContext extends MinkContext implements
             fwrite(
                 STDOUT,
                 sprintf(
-                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                    "Wait for ajax %d seconds, and it assume that ajax was NOT passed\n",
                     $timeElapsedSecs
                 )
             );
@@ -380,6 +377,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: When I click on "Help Icon" with title "Help"
+     *
+     * @When /^(?:|I )click on "(?P<selector>[^"]+)" with title "(?P<title>[^"]+)"$/
+     *
+     * @param string $selector
+     * @param string $title
+     */
+    public function iClickOnElementWithTitle($selector, $title)
+    {
+        $element = $this->findElementContains($selector, $title);
+
+        self::assertTrue(
+            $element->isValid(),
+            sprintf('Element "%s" with title "%s" not found on page', $selector, $title)
+        );
+
+        $element->click();
+    }
+
+    /**
      * Hover on element on page
      * Example: When I hover on "Help Icon"
      *
@@ -554,6 +571,19 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Example: Given I wait 1 second
+     * Example: Given I wait 2 seconds
+     *
+     * @When /^(?:|I )wait (?P<timeout>\d) second(s){0,1}.*$/
+     *
+     * @param int $timeout
+     */
+    public function iWait($timeout = 1)
+    {
+        $this->getSession()->wait($timeout * 1000);
     }
 
     /**
@@ -954,8 +984,8 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^(I |)operate as "(?P<actor>[^"]*)" under "(?P<session>[^"])"$/
-     * @Given /^here is the "(?P<actor>[^"]*)" under "(?P<session>[^"])"$/
+     * @Given /^(I |)operate as "(?P<actor>[^"]*)" under "(?P<session>[^"]*)"$/
+     * @Given /^here is the "(?P<actor>[^"]*)" under "(?P<session>[^"]*)"$/
      *
      * @param string $actor
      * @param string $session
@@ -1226,7 +1256,7 @@ class OroMainContext extends MinkContext implements
      * This method should be used only for debug
      * @When /^I wait for action$/
      */
-    public function iWait()
+    public function iWaitForAction()
     {
         fwrite(STDOUT, "Press [RETURN] to continue...");
         fgets(STDIN, 1024);
@@ -1239,8 +1269,27 @@ class OroMainContext extends MinkContext implements
      * @param int $width
      * @param int $height
      */
-    public function iSetWindowSize($width, $height)
+    public function iSetWindowSize(int $width = 1920, int $height = 1080)
     {
-        $this->getSession()->resizeWindow((int)$width, (int)$height, 'current');
+        $this->getSession()->resizeWindow($width, $height, 'current');
+    }
+
+    /**
+     * Ensures that given iframe is fully loaded and ready.
+     *
+     * @Given /^(?:|I )wait for iframe "(?P<iframeElement>[\w\s]*)" to load$/
+     *
+     * @param string $iframeElement
+     *
+     * @throws ElementNotFoundException
+     */
+    public function waitForIframeToLoad($iframeElement)
+    {
+        $iframeId = $this->elementFactory->createElement($iframeElement)->getAttribute('id');
+        $driver = $this->getSession()->getDriver();
+
+        $driver->switchToIFrame($iframeId);
+        $driver->waitPageToLoad();
+        $driver->switchToWindow();
     }
 }

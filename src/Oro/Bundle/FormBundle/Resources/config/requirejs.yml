@@ -6,11 +6,8 @@ config:
         'jquery.validate-additional-methods':
             deps:
                 - 'jquery.validate'
-        'tinymce/jquery.tinymce':
-            deps:
-                - 'jquery'
-                - 'tinymce/tinymce'
-            exports: 'jQuery'
+        'tinymce/tinymce':
+            exports: 'tinymce'
     map:
         '*':
             'jquery.validate': 'oroform/js/extend/validate'
@@ -18,7 +15,6 @@ config:
             'jquery.validate': 'jquery.validate'
     paths:
         'tinymce/tinymce': 'bundles/tinymce/tinymce.min.js'
-        'tinymce/jquery.tinymce': 'bundles/tinymce/jquery.tinymce.min.js'
         'jquery.validate': 'bundles/bowerassets/jquery-validate/dist/jquery.validate.js'
         'jquery.validate-additional-methods': 'bundles/bowerassets/jquery-validate/dist/additional-methods.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
