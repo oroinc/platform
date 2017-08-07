@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Processor;
-
-use Symfony\Component\PropertyAccess\StringUtil;
+namespace Oro\Bundle\LocaleBundle\Api\Processor;
 
 use Doctrine\ORM\EntityManager;
 
@@ -46,9 +44,7 @@ class ProcessLocalizedFields implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        if (!$context instanceof CreateContext) {
-            return;
-        }
+        /** @var CreateContext $context */
 
         /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getMetadata();

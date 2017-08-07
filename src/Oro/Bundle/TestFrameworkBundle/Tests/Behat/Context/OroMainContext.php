@@ -1273,4 +1273,23 @@ class OroMainContext extends MinkContext implements
     {
         $this->getSession()->resizeWindow($width, $height, 'current');
     }
+
+    /**
+     * Ensures that given iframe is fully loaded and ready.
+     *
+     * @Given /^(?:|I )wait for iframe "(?P<iframeElement>[\w\s]*)" to load$/
+     *
+     * @param string $iframeElement
+     *
+     * @throws ElementNotFoundException
+     */
+    public function waitForIframeToLoad($iframeElement)
+    {
+        $iframeId = $this->elementFactory->createElement($iframeElement)->getAttribute('id');
+        $driver = $this->getSession()->getDriver();
+
+        $driver->switchToIFrame($iframeId);
+        $driver->waitPageToLoad();
+        $driver->switchToWindow();
+    }
 }

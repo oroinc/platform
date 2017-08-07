@@ -58,7 +58,6 @@ chromedriver:
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--single-process"
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
@@ -75,7 +74,6 @@ chromedriver:
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--single-process"
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
@@ -92,7 +90,6 @@ chromedriver:
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--single-process"
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
@@ -110,7 +107,6 @@ chromedriver:
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--single-process"
                                         - "--no-proxy-server"
                                         - "--no-sandbox"
                                         - "--dns-prefetch-disable"
