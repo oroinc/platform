@@ -38,6 +38,8 @@ class RegisterConfiguredFilters extends RegisterFilters
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function process(ContextInterface $context)
     {
