@@ -129,10 +129,6 @@ class GridRow extends TableRow
         $cell = $this->getCell($header);
 
         $cell->mouseOver();
-
-        // This doesn't work properly with chromedriver as it doesn't generate a pair of mouseDown/mouseUp events
-        // for the double click and only generates one. So our logic for mouseUp event doesn't work.
-        // This works with PhantomJs fine.
         $cell->doubleClick();
 
         $this->getElement('OroForm')->fillField(
