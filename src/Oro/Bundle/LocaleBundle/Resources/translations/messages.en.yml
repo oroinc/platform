@@ -40,10 +40,18 @@ oro.locale:
         entity_label: 'Localized fallback value'
         entity_plural_label: 'Localized fallback values'
         id.label: 'ID'
-        fallback.label: 'Fallback'
-        localization.label: 'Localization'
-        string.label: 'String value'
-        text.label: 'Text value'
+        fallback:
+            label: 'Fallback'
+            description: The value for the fallback
+        localization:
+            label: 'Localization'
+            description: The value for the localization, selected language
+        string:
+            label: 'String value'
+            description: The string value for the curent localization
+        text:
+            label: 'Text value'
+            description: The text value for the curent localization, can contain html tags
 
     fallback:
         type:
