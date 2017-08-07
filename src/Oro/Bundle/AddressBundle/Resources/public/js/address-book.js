@@ -47,7 +47,8 @@ define([
             'addressMapOptions': {},
             'allowToRemovePrimary': false,
             'confirmRemove': true,
-            'confirmRemoveComponent': deleteConfirmation
+            'confirmRemoveComponent': deleteConfirmation,
+            'enableMapPreview': true
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
@@ -66,7 +67,7 @@ define([
 
             this._initMainContainers();
 
-            if (this.showMap) {
+            if (this.showMap && this.options.enableMapPreview) {
                 this.initializeMap();
             }
         },
