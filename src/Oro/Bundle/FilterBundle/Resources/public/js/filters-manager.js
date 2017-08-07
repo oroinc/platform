@@ -162,6 +162,11 @@ define(function(require) {
                 });
             }
 
+            mediator.on(
+                'filterManager:selectedFilters:calculate:' + this.collection.options.gridName,
+                _.bind(this._countSelectedFilters, this)
+            );
+
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
 
@@ -193,6 +198,10 @@ define(function(require) {
         _onFilterUpdated: function(filter) {
             this._resetHintContainer();
             this.trigger('updateFilter', filter);
+            mediator.trigger(
+                'filterManager:selectedFilters:count:' + this.collection.options.gridName,
+                _.bind(this._countSelectedFilters, this)
+            );
         },
 
         /**
@@ -205,6 +214,10 @@ define(function(require) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
             this.trigger('afterDisableFilter', filter);
+            mediator.trigger(
+                'filterManager:selectedFilters:count:' + this.collection.options.gridName,
+                _.bind(this._countSelectedFilters, this)
+            );
         },
 
         _onFilterShowCriteria: function(shownFilter) {
@@ -213,6 +226,10 @@ define(function(require) {
                     _.result(filter, 'ensurePopupCriteriaClosed');
                 }
             });
+            mediator.trigger(
+                'filterManager:selectedFilters:count:' + this.collection.options.gridName,
+                _.bind(this._countSelectedFilters, this)
+            );
         },
 
         /**
@@ -390,6 +407,18 @@ define(function(require) {
             return this;
         },
 
+        /**
+         * @returns {Number} count of selected filters
+         * @private
+         */
+        _countSelectedFilters: function() {
+            return _.reduce(this.filters, function(memo, filter) {
+                var num = (filter.enabled && !_.isEqual(filter.emptyValue, filter.value)) ? 1 : 0;
+
+                return memo + num;
+            }, 0);
+        },
+
         _resetHintContainer: function() {
             var $container = this.dropdownContainer.find('.filter-items-hint');
             var show = false;
@@ -404,6 +433,11 @@ define(function(require) {
             } else {
                 $container.hide();
             }
+
+            mediator.trigger(
+                'filterManager:selectedFilters:count:' + this.collection.options.gridName,
+                _.bind(this._countSelectedFilters, this)
+            );
         },
 
         /**
