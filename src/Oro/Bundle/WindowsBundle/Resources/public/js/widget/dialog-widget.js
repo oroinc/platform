@@ -418,6 +418,10 @@ define(function(require) {
          * Resets dialog position to default
          */
         resetDialogPosition: function() {
+            if (!this.widget) {
+                // widget is not initialized -- where's nothing to position yet
+                return;
+            }
             if (this.options.position) {
                 this.setPosition(_.extend(this.options.position, {
                     of: '#container',

@@ -1,6 +1,6 @@
-@skip
 @regression
 @fixture-OroActivityBundle:activities-smoke-e2e.yml
+# @TODO split this feature and move to the regular test suite, or create small features in addition there
 Feature: Activities
   In order to check Activity entity on admin panel
   As a Admin
