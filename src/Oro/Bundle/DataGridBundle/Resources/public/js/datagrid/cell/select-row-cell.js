@@ -1,22 +1,20 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'backgrid'
-], function($, _, Backbone, Backgrid) {
+define(function(require) {
     'use strict';
 
     var SelectRowCell;
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var Backgrid = require('backgrid');
+    var template = require('tpl!orodatagrid/templates/datagrid/select-row-cell.html');
 
     /**
      * Renders a checkbox for row selection.
      *
      * @export  oro/datagrid/cell/select-row-cell
      * @class   oro.datagrid.cell.SelectRowCell
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    SelectRowCell = Backbone.View.extend({
-
+    SelectRowCell = BaseView.extend({
         /** @property */
         className: 'select-row-cell renderable',
 
@@ -24,7 +22,7 @@ define([
         tagName: 'td',
 
         /** @property */
-        template: '#template-select-row-cell',
+        template: template,
 
         /** @property */
         checkboxSelector: '[data-role="select-row-cell"]',
@@ -49,7 +47,7 @@ define([
                 this.column = new Backgrid.Column(this.column);
             }
 
-            this.template = _.template($(options.template || this.template).html());
+            this.template = this.getTemplateFunction();
 
             this.listenTo(this.model, 'backgrid:select', function(model, checked) {
                 this.$(':checkbox').prop('checked', checked).change();

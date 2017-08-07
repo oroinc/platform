@@ -54,18 +54,15 @@ class MailboxRepository extends EntityRepository
      * @param User|integer $user User or user id
      * @param Organization $organization
      *
-     * @return array Array of ids
+     * @return int[] Array of ids
      */
     public function findAvailableMailboxIds($user, $organization)
     {
-        $mailboxes = $this->findAvailableMailboxes($user, $organization);
+        $qb = $this->createAvailableMailboxesQuery($user, $organization);
+        $qb->resetDQLPart('select')->select('mb.id');
+        $mailboxes = $qb->getQuery()->getArrayResult();
 
-        $ids = [];
-        foreach ($mailboxes as $mailbox) {
-            $ids[] = $mailbox->getId();
-        }
-
-        return $ids;
+        return array_column($mailboxes, 'id');
     }
 
     /**

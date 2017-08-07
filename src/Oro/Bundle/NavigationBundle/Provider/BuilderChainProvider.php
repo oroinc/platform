@@ -107,8 +107,8 @@ class BuilderChainProvider implements MenuProviderInterface
         $this->assertAlias($alias);
         $ignoreCache = array_key_exists(self::IGNORE_CACHE_OPTION, $options);
         $cacheAlias = $alias;
-        if (array_key_exists(self::MENU_LOCAL_CACHE_PREFIX, $options)) {
-            $cacheAlias = $options[self::MENU_LOCAL_CACHE_PREFIX] . $cacheAlias;
+        if (!empty($options)) {
+            $cacheAlias = $cacheAlias . md5(serialize($options));
         }
 
         if (!array_key_exists($cacheAlias, $this->menus)) {
@@ -118,11 +118,7 @@ class BuilderChainProvider implements MenuProviderInterface
             } else {
                 $menu = $this->buildMenu($alias, $options);
             }
-
-            // Add menu to the stack only if check_access is not set to false.
-            if (!isset($options['check_access']) || $options['check_access'] == true) {
-                $this->menus[$cacheAlias] = $menu;
-            }
+            $this->menus[$cacheAlias] = $menu;
         } else {
             $menu = $this->menus[$cacheAlias];
         }

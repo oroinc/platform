@@ -1,38 +1,23 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport\Null;
 
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class NullMessage implements MessageInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $body;
     
-    /**
-     * @var array
-     */
-    private $properties;
+    /** @var array */
+    private $properties = [];
 
-    /**
-     * @var array
-     */
-    private $headers;
+    /** @var array */
+    private $headers = [];
 
-    /**
-     * @var boolean
-     */
-    private $redelivered;
+    /** @var bool */
+    private $redelivered = false;
 
-    public function __construct()
-    {
-        $this->properties = [];
-        $this->headers = [];
-
-        $this->redelivered = false;
-    }
-    
     /**
      * {@inheritdoc}
      */

@@ -8,9 +8,12 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
@@ -37,6 +40,41 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Form $form */
         $form = $this->createElement($formName);
         $form->fill($table);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iOpenSelectEntityPopup($fieldName, $formName = "OroForm")
+    {
+        /** @var Select2Entity $field */
+        $field = $this->getFieldInForm($fieldName, $formName);
+        $field->openSelectEntityPopup();
+    }
+
+    /**
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field$/
+     */
+    public function iClearField($fieldName, $formName = "OroForm")
+    {
+        /** @var ClearableInterface $field */
+        $field = $this->getFieldInForm($fieldName, $formName);
+
+        if (!$field instanceof ClearableInterface) {
+            throw new \RuntimeException(sprintf(
+                'Element "%s" doesn\'t have ability to clear himself. 
+                Behat element "%s" must implement "%s" interface to do this',
+                $fieldName,
+                is_object($field) ? get_class($field) : gettype($field),
+                ClearableInterface::class
+            ));
+        }
+
+        $field->clear();
     }
 
     /**
@@ -240,6 +278,19 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert that field is not required
+     * Example: Then Opportunity Name is not required field
+     * Example: Then Opportunity Name is not required field
+     *
+     * @Then /^(?P<label>[\w\s]+) is not required field$/
+     */
+    public function fieldIsNotRequired($label)
+    {
+        $labelElement = $this->getPage()->findElementContains('Label', $label);
+        self::assertFalse($labelElement->hasClass('required'));
+    }
+
+    /**
      * Type value in field chapter by chapter. Imitate real user input from keyboard
      * Example: And type "Common" in "search"
      * Example: When I type "Create" in "Enter shortcut action"
@@ -332,11 +383,121 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $element->check();
     }
 
+    /**
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
+     *
+     * @param string    $field
+     * @param TableNode $options
+     */
+    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    {
+        $this->assertSelectContainsOptions($field, array_merge(...$options->getRows()));
+    }
+
+    /**
+     * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
+     *
+     * @param string $field
+     * @param TableNode $options
+     */
+    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options)
+    {
+        $this->assertSelectNotContainsOptions($field, array_merge(...$options->getRows()));
+    }
+
+    /**
+     * @Then /^I should see "([^"]*)" for "([^"]*)" select$/
+     * @param string $label
+     * @param string $field
+     */
+    public function iShouldSeeOptionForSelect($label, $field)
+    {
+        $this->assertSelectContainsOptions($field, [$label]);
+    }
+
+    /**
+     * @Then /^I should not see "([^"]*)" for "([^"]*)" select$/
+     * @param string $label
+     * @param string $field
+     */
+    public function iShouldNotSeeOptionForSelect($label, $field)
+    {
+        $this->assertSelectNotContainsOptions($field, [$label]);
+    }
+
+    /**
+     * @param string $selectField
+     * @param array  $optionLabels
+     */
+    protected function assertSelectContainsOptions($selectField, array $optionLabels)
+    {
+        $selectOptionsText = $this->getSelectOptionsText($selectField);
+
+        foreach ($optionLabels as $optionLabel) {
+            static::assertContains($optionLabel, $selectOptionsText);
+        }
+    }
+
+    /**
+     * @param string $selectField
+     * @param array  $optionLabels
+     */
+    protected function assertSelectNotContainsOptions($selectField, array $optionLabels)
+    {
+        $selectOptionsText = $this->getSelectOptionsText($selectField);
+
+        foreach ($optionLabels as $optionLabel) {
+            static::assertNotContains($optionLabel, $selectOptionsText);
+        }
+    }
+
+    /**
+     * @param string $selectField
+     *
+     * @return array
+     */
+    protected function getSelectOptionsText($selectField)
+    {
+        /** @var Select $element */
+        $element = $this->createElement($selectField);
+        /** @var NodeElement[] $options */
+        $options = $element->findAll('css', 'option');
+
+        return array_map(function (NodeElement $option) {
+            return $option->getText();
+        }, $options);
+    }
+
     /**.
      * @return OroForm
      */
     protected function createOroForm()
     {
         return $this->createElement('OroForm');
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $formName
+     * @return NodeElement|mixed|null|Element
+     * @throws ElementNotFoundException
+     */
+    protected function getFieldInForm($fieldName, $formName)
+    {
+        /** @var Form $form */
+        $form = $this->createElement($formName);
+        $field = $form->findField($fieldName);
+
+        if (null === $field) {
+            $driver = $this->getSession()->getDriver();
+            throw new ElementNotFoundException(
+                $driver,
+                'form field',
+                'id|name|label|value|placeholder|element',
+                $fieldName
+            );
+        }
+
+        return $field;
     }
 }

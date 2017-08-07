@@ -1,13 +1,14 @@
-define([
-    'jquery',
-    'underscore',
-    'base64',
-    'orotranslation/js/translator',
-    'oro/filter/choice-filter',
-    'oro/filter/multiselect-filter',
-    'oroquerydesigner/js/field-condition'
-], function($, _, base64, __, ChoiceFilter, MultiSelectFilter) {
+define(function(require) {
     'use strict';
+
+    var choiceTemplate = require('tpl!orofilter/templates/filter/embedded/simple-choice-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var base64 = require('base64');
+    var __ = require('orotranslation/js/translator');
+    var ChoiceFilter = require('oro/filter/choice-filter');
+    var MultiSelectFilter = require('oro/filter/multiselect-filter');
+    require('oroquerydesigner/js/field-condition');
 
     $.widget('oroactivity.activityCondition', $.oroquerydesigner.fieldCondition, {
         options: {
@@ -43,7 +44,7 @@ define([
 
                 this.activityFilter = new ChoiceFilter({
                     caret: '',
-                    templateSelector: '#simple-choice-filter-template-embedded',
+                    template: choiceTemplate,
                     choices: {
                         hasActivity: __('oro.activityCondition.hasActivity'),
                         hasNotActivity: __('oro.activityCondition.hasNotActivity')

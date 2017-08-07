@@ -9,18 +9,19 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator implements
     IsolatorInterface,
     MessageQueueIsolatorInterface
 {
+    const CONSUMERS_AMOUNT = 1;
+
     /** @var KernelInterface */
     protected $kernel;
 
-    /** @var Process */
-    protected $process;
+    /** @var Process[] */
+    protected $processes = [];
 
     /** @var LoggerInterface */
     protected $logger;
@@ -32,49 +33,86 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
     {
         $this->kernel = $kernel;
         $this->logger = $this->kernel->getContainer()->get('logger');
-
-        $command = sprintf(
-            'php %s/console oro:message-queue:consume -vvv --env=%s %s >> %s/mq.log',
-            realpath($this->kernel->getRootDir()),
-            $this->kernel->getEnvironment(),
-            $this->kernel->isDebug() ? '' : '--no-debug',
-            realpath($this->kernel->getLogDir())
-        );
-
-        $this->process = new Process($command);
     }
 
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
-        $this->startProcess();
+        $this->startMessageQueue();
+        $this->waitWhileProcessingMessages();
     }
 
     /** {@inheritdoc} */
     public function start(BeforeStartTestsEvent $event)
     {
+        $this->startMessageQueue();
+        $event->writeln('<info>Run message queue</info>');
     }
 
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
     {
+        try {
+            $this->startMessageQueue();
+            $this->waitWhileProcessingMessages();
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            $event->writeln('<info>Stop message queue</info>');
+            $this->stopMessageQueue();
+        }
     }
 
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         try {
+            $this->startMessageQueue();
             $this->waitWhileProcessingMessages();
         } catch (\Exception $e) {
             throw $e;
         } finally {
-            $this->killProcess();
+            $event->writeln('<info>Process message queue</info>');
+            $this->stopMessageQueue();
         }
     }
 
-    protected function startProcess()
+    public function startMessageQueue()
     {
-        $this->process
+        // start processes if they are not initialized
+        // lazy loading, allows to start MQ without status control
+        if (!$this->processes) {
+            $command = sprintf(
+                'php %s/console oro:message-queue:consume -vvv --env=%s %s >> %s/mq.log',
+                realpath($this->kernel->getRootDir()),
+                $this->kernel->getEnvironment(),
+                $this->kernel->isDebug() ? '' : '--no-debug',
+                realpath($this->kernel->getLogDir())
+            );
+
+            for ($i = 1; $i <= self::CONSUMERS_AMOUNT; $i++) {
+                $process = new Process($command);
+                $this->startProcess($process);
+
+                $this->processes[$i] = $process;
+            }
+        }
+
+        // make sure processes are running
+        // update status (case when process terminated by pkill but status is still running)
+        // ignore already running exception, it's our goal to ensure MQ is running
+        foreach ($this->processes as $process) {
+            if ($process->getStatus() && $process->isRunning()) {
+                continue;
+            }
+
+            $this->startProcess($process);
+        }
+    }
+
+    private function startProcess(Process $process)
+    {
+        $process
             ->setTimeout(null)
             ->start(
                 function ($type, $buffer) {
@@ -85,29 +123,43 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
             );
     }
 
-    protected function killProcess()
+    public function stopMessageQueue()
     {
         if (self::WINDOWS_OS === $this->getOs()) {
-            $killCommand = sprintf('TASKKILL /PID %d /T /F', $this->process->getPid());
+            $killCommand = sprintf('TASKKILL /IM %s/console /T /F', realpath($this->kernel->getRootDir()));
         } else {
-            $killCommand = sprintf('pkill -9 -f %s/[c]onsole', realpath($this->kernel->getRootDir()));
+            $killCommand = sprintf(
+                "pkill -9 -f '%s/[c]onsole oro:message-queue:consume'",
+                realpath($this->kernel->getRootDir())
+            );
         }
 
         try {
             // Process::stop() might not work as expected
             // See https://github.com/symfony/symfony/issues/5030
             $process = new Process($killCommand);
-            $process->run();
+            $process
+                ->run(
+                    function ($type, $buffer) {
+                        if (Process::ERR === $type) {
+                            $this->logger->error($buffer);
+                        }
+                    }
+                );
+
+            // wait for kill process, database isolator running to fast and stopped my MQ ping query
+            sleep(1);
         } catch (\Exception $e) {
             throw $e;
         } finally {
+            $this->cleanUp();
+
             /**
              * Update origin process status, mark it terminated to disable
-             * \Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueRunCheckSubscriber
              */
-            $this->process->stop();
-
-            $this->cleanUp();
+            foreach ($this->processes as $process) {
+                $process->stop();
+            }
         }
     }
 
@@ -116,65 +168,14 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
     /**
      * {@inheritdoc}
      */
-    public function waitWhileProcessingMessages($timeLimit = 600)
-    {
-        $isIdleOutput = 0;
-
-        while ($timeLimit >= 0) {
-            if ($this->isIdleOutput()) {
-                $isIdleOutput++;
-            } else {
-                $isIdleOutput = 0;
-            }
-
-            if ($isIdleOutput >= 5) {
-                return;
-            }
-
-            if ($timeLimit <= 0) {
-                throw new RuntimeException('Message Queue was not process messages during time limit');
-            }
-
-            sleep(1);
-            $timeLimit -= 1;
-        }
-    }
-
-    private function isIdleOutput()
-    {
-        $output = trim($this->process->getIncrementalOutput());
-
-        // skip debug messages
-        $buffers = explode(PHP_EOL, $output);
-        foreach ($buffers as $buffer) {
-            if (!$buffer) {
-                continue;
-            }
-
-            if (false !== stripos($buffer, '[debug]')) {
-                continue;
-            }
-
-            if (false !== stripos($buffer, '[info] Pre receive Message')) {
-                continue;
-            }
-
-            if (false !== stripos($buffer, '[info] Idle')) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return !empty($output);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function isOutdatedState()
     {
-        return $this->process->isRunning();
+        $isRunning = false;
+        foreach ($this->processes as $process) {
+            $isRunning = $isRunning || ($process->getStatus() && $process->isRunning());
+        }
+
+        return $isRunning;
     }
 
     /**
@@ -187,7 +188,7 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         } catch (\Exception $e) {
             throw $e;
         } finally {
-            $this->killProcess();
+            $this->stopMessageQueue();
         }
     }
 
@@ -209,13 +210,5 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
             self::LINUX_OS,
             self::MAC_OS,
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getProcess()
-    {
-        return $this->process;
     }
 }

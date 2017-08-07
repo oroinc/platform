@@ -1,10 +1,4 @@
 services:
-    oro_test.listener.messagequeue_run_check_subscriber:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueRunCheckSubscriber
-        tags:
-            - { name: event_dispatcher.subscriber, priority: 20 }
-            - { name: 'message_queue_isolator_aware' }
-
     oro_test.listener.step_duration_measure_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
         arguments:
@@ -12,6 +6,14 @@ services:
 
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
+
+    oro_test.listener.js_logger_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\JsLogSubscriber'
+        arguments:
+            - '@mink'
+            - '%kernel.log_dir%'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
 
     oro_test.listener.suite_aware_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
@@ -111,8 +113,15 @@ services:
 
     oro_behat_extension.specification.specification_divider:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider
+
+    oro_behat_extension.suite.suite_configuration_registry:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry
         arguments:
-          - '@specifications.finder'
+            - '@symfony2_extension.kernel'
+            - '@specifications.finder'
+            - '@oro_behat_extension.specification.specification_divider'
+        calls:
+            - [setSuiteConfigurations, ['%suite.configurations%']]
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader

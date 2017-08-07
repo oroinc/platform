@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class RouteChoiceTypeTest extends WebTestCase
 {
     /** @var FormFactoryInterface */

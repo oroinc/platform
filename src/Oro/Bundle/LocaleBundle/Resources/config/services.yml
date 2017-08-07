@@ -307,13 +307,6 @@ services:
             - '@oro_translation.provider.language'
             - '@oro_locale.manager.localization'
 
-    oro_locale.decorator.localization_cache:
-        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator'
-        public: false
-        arguments:
-            - '@oro_locale.cache'
-            - '@jms_serializer'
-
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
         arguments:

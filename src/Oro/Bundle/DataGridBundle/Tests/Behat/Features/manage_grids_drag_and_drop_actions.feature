@@ -1,8 +1,9 @@
+@regression
 @fixture-OroCustomerBundle:CustomerUserAmandaRCole.yml
 Feature: Improve manage grid swipe actions
   Scenario: Checked drag and drop option in "Manage grid" popup on mobile view
-    Given set window size to 640x1100
-    And I signed in as AmandaRCole@example.org on the store frontend
+    Given I login as AmandaRCole@example.org the "Buyer" at "640_session" session
+    And I set window size to 640x1100
     And click "Account Mobile Button"
     And click "Users"
     Then I should see following grid with exact columns order:

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\FormBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Oro\Bundle\FormBundle\Tests\Behat\Context\ClearableInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
 
-class Select2Entity extends Element
+class Select2Entity extends Element implements ClearableInterface
 {
     /**
      * {@inheritdoc}
@@ -31,6 +32,7 @@ class Select2Entity extends Element
             foreach ($results as $result) {
                 if (trim($result->getText()) == $value) {
                     $result->click();
+                    $this->getDriver()->waitForAjax();
 
                     return;
                 }
@@ -179,5 +181,10 @@ class Select2Entity extends Element
         $this->getDriver()->waitForAjax();
 
         return $this->elementFactory->createElement('UiDialog');
+    }
+
+    public function clear()
+    {
+        $this->getParent()->find('css', '.select2-search-choice-close')->click();
     }
 }

@@ -1,0 +1,9 @@
+<div class="horizontal clearfix">
+    <span class="filter-select-oro-wrapper">
+        <select name="<%= name %>" <% if (typeof(dataName) !== "undefined") { %>data-name="<%= dataName %>"<% } %> class="filter-select-oro">
+            <% _.each(choices, function (option) { %>
+            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
+        <% }); %>
+        </select>
+    </span>
+</div>

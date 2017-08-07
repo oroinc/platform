@@ -1,0 +1,20 @@
+<div>
+    <%= parts.join('') %>
+    <div class="filter-date-range">
+        <div class="filter-start-date">
+            <input type="text" class="<%= inputClass %>"
+                   value="<%= value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
+        </div>
+        <span class="filter-separator">-</span>
+        <div class="filter-end-date">
+            <input type="text" class="<%= inputClass %>"
+                   value="<%= value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
+        </div>
+    </div>
+    <div class="oro-action">
+        <div class="btn-group">
+            <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+        </div>
+    </div>
+</div>
+

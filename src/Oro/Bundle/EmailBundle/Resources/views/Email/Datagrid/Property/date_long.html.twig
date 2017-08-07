@@ -4,12 +4,8 @@
 {% set isNew = record.getValue('is_new') %}
 
 <span class="nowrap">
-    {% if isNew == 1 %}
-    <strong>
-        {% endif %}
-        {{ date|oro_format_datetime }}
-        {% if isNew == 1 %}
-    </strong>
-    {% endif %}
+    {%- if isNew %}<strong>{% endif -%}
+    {{ date|oro_format_datetime }}
+    {%- if isNew %}</strong>{% endif -%}
 </span>
 

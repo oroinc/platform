@@ -207,8 +207,8 @@ class EntityNameProvider implements EntityNameProviderInterface
             return $entity->$getterName();
         }
 
-        if (property_exists($entity, $fieldName)) {
-            return $entity->$fieldName;
+        if (isset($entity->{$fieldName})) {
+            return $entity->{$fieldName};
         }
 
         return null;

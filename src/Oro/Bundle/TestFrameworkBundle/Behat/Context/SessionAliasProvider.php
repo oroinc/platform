@@ -56,7 +56,7 @@ class SessionAliasProvider implements MultiSessionAwareInterface
      * @param Mink $mink
      * @param string $sessionName
      */
-    private function switchSession(Mink $mink, $sessionName)
+    public function switchSession(Mink $mink, $sessionName)
     {
         $mink->setDefaultSessionName($sessionName);
         $mink->getSession($sessionName)->switchToWindow(0);

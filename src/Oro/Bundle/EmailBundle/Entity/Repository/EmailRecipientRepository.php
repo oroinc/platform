@@ -16,6 +16,7 @@ class EmailRecipientRepository extends EntityRepository
      * @param EmailThread $thread
      *
      * @return EmailRecipient[]
+     * @deprecated since 2.3. Use EmailGridResultHelper::addEmailRecipients instead
      */
     public function getThreadUniqueRecipients(EmailThread $thread)
     {
