@@ -37,9 +37,9 @@
                   'view': 'oroimportexport/js/app/views/import-export-buttons-view',
                   'selectors': {
                       'container': '[data-target="import-export-container"]',
-                      'importButton': '#importButton' ~ counter,
+                      'importButton': '.importButton' ~ counter,
                       'importValidationButton': '#importValidationButton' ~ counter,
-                      'exportButton': '#exportButton' ~ counter,
+                      'exportButton': '.exportButton' ~ counter,
                       'templateButton': '#templateButton' ~ counter
                   },
                   'data': {
@@ -65,7 +65,7 @@
         >
             {% if exportAllowed %}
                 {% set html %}
-                    <a type="button" class="btn export-btn icons-holder-text no-hash" href="#" id="exportButton{{ counter }}">
+                    <a type="button" class="btn export-btn icons-holder-text no-hash exportButton{{ counter }}" href="#">
                         <i class="fa-upload hide-text">{{ configuration.exportButtonLabel }}</i>{{ configuration.exportButtonLabel }}
                     </a>
                 {% endset %}
@@ -76,7 +76,7 @@
             {% if importAllowed %}
                 {% set html %}
 
-                    <a type="button" class="btn import-btn icons-holder-text no-hash" href="#" id="importButton{{ counter }}">
+                    <a type="button" class="btn import-btn icons-holder-text no-hash importButton{{ counter }}" href="#">
                         <i class="fa-download hide-text">{{ configuration.importButtonLabel }}</i>{{ configuration.importButtonLabel }}
                     </a>
 
