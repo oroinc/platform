@@ -397,10 +397,11 @@ define(function(require) {
         },
 
         /**
+         * @param {Number} count
          * @private
          */
-        _publishCountSelectedFilters: function() {
-            var countFilters = this._calculateSelectedFilters();
+        _publishCountSelectedFilters: function(count) {
+            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateSelectedFilters();
             mediator.trigger(
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
                 countFilters
@@ -434,7 +435,7 @@ define(function(require) {
                 $container.hide();
             }
 
-            this._publishCountSelectedFilters();
+            this._publishCountSelectedFilters(0);
         },
 
         /**
