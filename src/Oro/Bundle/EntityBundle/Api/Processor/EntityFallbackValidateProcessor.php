@@ -140,6 +140,11 @@ class EntityFallbackValidateProcessor implements ProcessorInterface
         $valueType = $this->fallbackResolver->getType(new $mainEntityClass(), $relationName);
         // Choose which field of a fallback definition is required
         $requiredValueField = $this->fallbackResolver->getRequiredFallbackFieldByType($valueType);
+        //we have special cases when the required field is scalar value but the value type is array
+        //check pageTemplate, we have data transformer that converts the scalar value to array value
+        if (in_array($relationName, EntityFieldFallbackValue::$specialRelations)) {
+            $requiredValueField = EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD;
+        }
 
         // Check if valid scalar data provided
         if ($requiredValueField === EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD) {

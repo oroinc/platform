@@ -19,6 +19,10 @@ class EntityFieldFallbackValue
     const FALLBACK_ARRAY_FIELD = 'arrayValue';
     const FALLBACK_PARENT_FIELD = 'fallback';
 
+    const PAGE_TEMPLATE = 'pageTemplate';
+
+    public static $specialRelations = [self::PAGE_TEMPLATE];
+
     /**
      * @var integer
      *
