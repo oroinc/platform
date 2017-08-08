@@ -402,8 +402,12 @@ define(function(require) {
             return this;
         },
 
-        _publishCountSelectedFilters: function() {
-            var selectedFilters = this._calculateSelectedFilters();
+        /**
+         * @param {Number} count
+         * @private
+         */
+        _publishCountSelectedFilters: function(count) {
+            var selectedFilters = count || this._calculateSelectedFilters();
             mediator.trigger(
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
                 selectedFilters
@@ -437,7 +441,7 @@ define(function(require) {
                 $container.hide();
             }
 
-            mediator.trigger('filterManager:selectedFilters:count:' + this.collection.options.gridName, 0);
+            this._publishCountSelectedFilters(0);
         },
 
         /**
