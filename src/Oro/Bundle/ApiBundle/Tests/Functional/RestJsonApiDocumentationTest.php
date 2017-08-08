@@ -118,6 +118,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             'Oro\Bundle\LocaleBundle\Entity\Localization',
             'Oro\Bundle\TaxBundle\Entity\ProductTaxCode',
             'Oro\Bundle\CatalogBundle\Entity\Category',
+            'Oro\Bundle\PricingBundle\Entity\PriceAttributePriceList',
         ];
 
         return

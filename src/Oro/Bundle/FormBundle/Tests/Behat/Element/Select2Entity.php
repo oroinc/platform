@@ -187,4 +187,14 @@ class Select2Entity extends Element implements ClearableInterface
     {
         $this->getParent()->find('css', '.select2-search-choice-close')->click();
     }
+
+    /**
+     * @return string|null
+     */
+    public function getChosenValue()
+    {
+        $span = $this->getParent()->find('css', 'span.select2-chosen');
+
+        return $span ? $span->getText() : null;
+    }
 }
