@@ -18,6 +18,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -838,6 +839,23 @@ class OroMainContext extends MinkContext implements
         } else {
             $sectionContainer->clickLink($button);
         }
+    }
+
+    /**
+     * Remove collection's element in a specified row
+     * Example: I remove element in row #2 from Product Price collection
+     *
+     * @When /^(?:|I )remove element in row #(?P<rowNumber>\d+) from (?P<collectionFieldName>[^"]+) collection$/
+     *
+     * @param string $collectionFieldName
+     * @param int $rowNumber
+     */
+    public function removeCollectionElement($collectionFieldName, $rowNumber)
+    {
+        /** @var CollectionField $collection */
+        $collection = $this->createOroForm()->findField($collectionFieldName);
+
+        $collection->removeRow($rowNumber);
     }
 
     /**.

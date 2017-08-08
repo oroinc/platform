@@ -181,4 +181,14 @@ class Select2Entity extends Element
 
         return $this->elementFactory->createElement('UiDialog');
     }
+
+    /**
+     * @return string|null
+     */
+    public function getChosenValue()
+    {
+        $span = $this->getParent()->find('css', 'span.select2-chosen');
+
+        return $span ? $span->getText() : null;
+    }
 }
