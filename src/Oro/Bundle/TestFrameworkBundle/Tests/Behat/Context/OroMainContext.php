@@ -1276,4 +1276,50 @@ class OroMainContext extends MinkContext implements
     {
         $this->getSession()->resizeWindow((int)$width, (int)$height, 'current');
     }
+
+    /**
+     * Example: Then I should see "Map container" element inside "Default Addresses" element
+     *
+     * @Then /^(?:|I )should see "(?P<childElementName>[^"]+)" element inside "(?P<parentElementName>[^"]+)" element$/
+     * @param string $parentElementName
+     * @param string $childElementName
+     */
+    public function iShouldSeeElementInsideElement($childElementName, $parentElementName)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->getElement($childElementName);
+        self::assertTrue($childElement->isIsset() && $childElement->isVisible(), sprintf(
+            'Element "%s" not found inside element "%s"',
+            $childElementName,
+            $parentElementName
+        ));
+    }
+
+    /**
+     * Example: Then I should not see "Map container" element inside "Default Addresses" element
+     *
+     * @Then /^(?:|I )should not see "(?P<childElementName>[^"]+)" element inside "(?P<parentElementName>[^"]+)" element$/
+     * @param string $parentElementName
+     * @param string $childElementName
+     */
+    public function iShouldNotSeeElementInsideElement($childElementName, $parentElementName)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->getElement($childElementName);
+        self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
+            'Element "%s" exists inside element "%s" when it should not',
+            $childElementName,
+            $parentElementName
+        ));
+    }
 }

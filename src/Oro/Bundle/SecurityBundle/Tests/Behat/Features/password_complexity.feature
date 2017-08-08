@@ -7,7 +7,7 @@ Feature: Password complexity feature
   Scenario: Set up user password complexity
     Given I login as "Administraror" user
     And I go to System/Configuration/User Settings
-    And uncheck Use Default for "Minimal Password Length" field
+    And uncheck "Use default" for "Minimal Password Length" field
     And I fill in "Minimal Password Length" with "3"
     And I check "Require A Special Character"
     And I save setting
@@ -26,8 +26,8 @@ Feature: Password complexity feature
   Scenario: Change user password complexity
     Given I login as "Administraror" user
     And I go to System/Configuration/User Settings
-    And uncheck Use Default for "Require A Special Character" field
-    And uncheck Use Default for "Require A Lowercase Letter" field
+    And uncheck "Use default" for "Require A Special Character" field
+    And uncheck "Use default" for "Require A Lowercase Letter" field
     And uncheck "Require A Lowercase Letter"
     And I check "Require A Special Character"
     And I save setting
