@@ -144,6 +144,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Find and assert that field value is empty
+     *
+     * @When /^(?P<fieldName>[\w\s]*) field is empty$/
+     */
+    public function fieldIsEmpty($fieldName)
+    {
+        return $this->fieldShouldHaveValue($fieldName, "");
+    }
+
+    /**
      * This is available for collection fields
      * See Emails and Phones in Contact create page
      * Example: And set "charlie@gmail.com" as primary email

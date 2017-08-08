@@ -4,10 +4,11 @@ define(function(require) {
     var WysiwygEditorView;
     var BaseView = require('oroui/js/app/views/base/view');
     var _ = require('underscore');
-    var $ = require('tinymce/jquery.tinymce');
+    var $ = require('jquery');
     var tools = require('oroui/js/tools');
     var txtHtmlTransformer = require('./txt-html-transformer');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var tinyMCE = require('tinymce/tinymce');
 
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 3,
@@ -39,7 +40,7 @@ define(function(require) {
         initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
-            this.options = _.omit(options, ['enabled']);
+            this.options = _.omit(options, 'enabled', 'el');
             if (tools.isIOS()) {
                 this.options.plugins = _.without(this.options.plugins, 'fullscreen');
                 this.options.toolbar = this.options.toolbar.map(function(toolbar) {
@@ -99,10 +100,9 @@ define(function(require) {
             if ($(this.$el).prop('disabled') || $(this.$el).prop('readonly')) {
                 options.readonly = true;
             }
-            this.$el.tinymce(_.extend({
-                'init_instance_callback': function(editor) {
-                    self.removeSubview('loadingMask');
-                    self.tinymceInstance = editor;
+            tinyMCE.init(_.extend({
+                target: this.el,
+                setup: function(editor) {
                     editor.on('keydown', function(e) {
                         if (e.keyCode === 27) {
                             _.defer(function() {
@@ -111,6 +111,16 @@ define(function(require) {
                             });
                         }
                     });
+                    editor.on('change', function() {
+                        editor.save({'no_events': true});
+                    });
+                    editor.on('SetContent', function() {
+                        editor.save({'no_events': true});
+                    });
+                },
+                'init_instance_callback': function(editor) {
+                    self.removeSubview('loadingMask');
+                    self.tinymceInstance = editor;
                     if (!tools.isMobile()) {
                         self.tinymceInstance.on('FullscreenStateChanged', function(e) {
                             if (e.state) {

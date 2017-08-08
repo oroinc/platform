@@ -185,12 +185,6 @@ define([
             .add($element.find(':input[data-validate-element]'));
     };
 
-    // translates default messages
-    $.validator.prototype.defaultMessage = _.wrap($.validator.prototype.defaultMessage, function(func) {
-        var message = func.apply(this, _.rest(arguments));
-        return _.isString(message) ? __(message) : message;
-    });
-
     // saves name of validation rule which is violated
     $.validator.prototype.formatAndAdd = _.wrap($.validator.prototype.formatAndAdd, function(func, element, rule) {
         $(element).data('violated', rule.method);
@@ -211,15 +205,26 @@ define([
         return func.call(this, element, message);
     });
 
-    // fixes focus on select2 element
+    // fixes focus on select2 element and problem with focus on hidden inputs
     $.validator.prototype.focusInvalid = _.wrap($.validator.prototype.focusInvalid, function(func) {
+        if (!this.settings.focusInvalid) {
+            return func.apply(this, _.rest(arguments));
+        }
+
         var $elem = $(this.findLastActive() || (this.errorList.length && this.errorList[0].element) || []);
-        if (this.settings.focusInvalid && $elem.is('.select2[type=hidden]')) {
+        var $firstValidationError = $('.validation-failed').filter(':visible').first();
+
+        if ($elem.is('.select2[type=hidden]')) {
             $elem.parent().find('input.select2-focusser')
                 .focus()
                 .trigger('focusin');
-        } else {
-            func.apply(this, _.rest(arguments));
+        } else if (!$elem.filter(':visible').length && $firstValidationError) {
+            var $scrollableContainer = $firstValidationError.closest('.scrollable-container');
+            var scrollTop = $firstValidationError.offset().top + $scrollableContainer.scrollTop();
+
+            $scrollableContainer.animate({
+                scrollTop: scrollTop
+            }, scrollTop / 2);
         }
     });
 
@@ -505,6 +510,11 @@ define([
                 }
                 return message.call(this, param, element);
             });
+        } else if (_.isString(message)) {
+            var translated = __(message);
+            message = function() {
+                return translated;
+            };
         }
 
         return addMethod.call(this, name, method, message);

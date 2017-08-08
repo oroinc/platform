@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
+use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -40,7 +40,7 @@ class MaxNestedLevelValidator extends ConstraintValidator
     {
         $options = [
             'ignoreCache' => true,
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $entity->getScope()
+            MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $entity->getScope()
         ];
 
         $menu = $this->builderChainProvider->get($entity->getMenu(), $options);

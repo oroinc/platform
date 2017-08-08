@@ -675,6 +675,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             // removing multiple spaces, newlines, tabs
             $actualValue = trim(preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue));
 
+            $html = trim($columns[$columnNumber - 1]->html());
+            // remove "Edit" suffix from value, if it comes from editable cell
+            if (preg_match('/<i[^>]+>Edit<\/i>$/iu', $html) === 1) {
+                $actualValue = substr($actualValue, 0, -4);
+            }
+
             self::assertEquals(
                 $value,
                 $actualValue,
@@ -1460,6 +1466,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         self::assertFalse(
             $grid->isIsset(),
             sprintf('Grid "%s" was found on page, but it should not.', $gridName)
+        );
+    }
+
+    /**
+     * @Given /^I should see "(?P<gridName>[\s\w]+)" grid$/
+     */
+    public function iShouldSeeGrid($gridName = 'Grid')
+    {
+        $grid = $this->elementFactory->createElement($gridName);
+
+        self::assertTrue(
+            $grid->isIsset(),
+            sprintf('Grid "%s" was not found on page', $gridName)
         );
     }
 

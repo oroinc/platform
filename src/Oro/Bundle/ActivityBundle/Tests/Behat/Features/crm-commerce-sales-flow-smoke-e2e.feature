@@ -1,4 +1,6 @@
+@skip
 @regression
+# @TODO split this feature and move to the regular test suite, or create small features in addition there
 Feature: Sales Flow
   In order to check Sales Flow on admin panel
   As a Admin
