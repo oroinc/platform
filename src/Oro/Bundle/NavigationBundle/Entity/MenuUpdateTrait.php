@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -114,6 +115,12 @@ trait MenuUpdateTrait
      * @ORM\Column(name="is_custom", type="boolean")
      */
     protected $custom = false;
+
+    public function __construct()
+    {
+        $this->titles = new ArrayCollection();
+        $this->descriptions = new ArrayCollection();
+    }
 
     /**
      * @return int

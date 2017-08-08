@@ -64,13 +64,12 @@ See more information about [page object pattern](http://www.seleniumhq.org/docs/
 
 ***@OroTestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension*** provides integration with Oro BAP based applications.
 
-***Selenium2Driver*** Selenium2Driver provides a bridge for the Selenium2 (webdriver) tool.
+***Selenium2Driver*** Selenium2Driver provides a bridge for the WebDriver's wire protocol.
 See [Driver Feature Support](http://mink.behat.org/en/latest/guides/drivers.html)
 
-***Selenium2*** browser automation tool with object oriented API.
-
-***PhantomJS*** is a headless WebKit scriptable with a JavaScript API that is fast and originally supports various web standards,
-like DOM handling, CSS selector, JSON, Canvas, and SVG.
+***ChromeDriver*** WebDriver is an open source tool for automated testing of webapps across many browsers. 
+It provides capabilities for navigating to web pages, user input, JavaScript execution, and more. 
+[Website](https://sites.google.com/a/chromium.org/chromedriver/)
 
 ## Conventions
 
@@ -172,13 +171,6 @@ imports:
 default: &default
     extensions: &default_extensions
         Behat\MinkExtension:
-            base_url: "http://your-domain.local"
-
-selenium2:
-    <<: *default
-    extensions:
-        <<: *default_extensions
-        Behat\MinkExtension:
             browser_name: chrome
             base_url: "http://your-domain.local"
 
@@ -214,57 +206,36 @@ app/console oro:install  --drop-database --user-name=admin --user-email=admin@ex
 
 #### Install Test Automation Tools
 
-To execute scenarios that use Oro application features, run browser-automation server (Selenium Web Driver) or headless WebKit browser (PhantomJs).
-PhantomJs is more efficient but is headless and is not observable for a human.
-However, it make screenshots when anything goes wrong.
-Selenium server runs feature tests in a real browser.
-
-To install PhantomJs, run the following commands:
+To execute scenarios that use Oro application features run WebKit browser (using ChromeDriver).
+To install ChromeDriver, run the following commands:
 
 ```bash
-mkdir $HOME/phantomjs
-wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
-tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/phantomjs
-sudo ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
+mkdir -p "$HOME/chrome" || true
+wget "http://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O "$HOME/chrome/chromedriver_linux64_${CHROME_DRIVER_VERSION}.zip"
+unzip "$HOME/chrome/chromedriver_linux64_${CHROME_DRIVER_VERSION}.zip" -d "$HOME/chrome"
+sudo ln -s "$HOME/chrome/chromedriver" /usr/local/bin/chromedriver
 ```
 
-**Note:** These commands create a subdirectory for phantomjs in your home directory,
-          downloads phantomjs into directory that you just created, uncompress files,
+**Note:** These commands create a subdirectory for chrome in your home directory,
+          downloads chromedriver into directory that you just created, uncompress files,
           creates symbolic link.
 
-After the command execution is complete, you can use ```phantomjs``` in the terminal.
-
-To install Selenium Web Driver, use the following commands:
-
-```bash
-mkdir $HOME/selenium-server-standalone-3.4.0
-curl -L https://selenium-release.storage.googleapis.com/3.4/selenium-server-standalone-3.4.0.jar > $HOME/selenium-server-standalone-3.4.0/selenium.jar
-```
-
-Next, download Chrome Driver from http://chromedriver.storage.googleapis.com/index.html?path=2.29/ and save it into your bin directory e.g. /usr/local/bin.
+After the command execution is complete, you can use ```chromedriver``` in the terminal.
 
 ### Test Execution
 
 #### Prerequisites
 
-Run PhantomJs:
+Run ChromeDriver:
 
 ```bash
-phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1
+chromedriver --url-base=wd/hub --port=4444 > /tmp/driver.log 2>&1
 ``` 
-OR
 
-Run Standalone Selenium Server:
-
-```bash
-java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1
-```
-
-> To run PhantomJs or Selenium server in background, append ampersand symbol (&) to the end of line, like in the following examples:
+> To run ChromeDriver in background, append ampersand symbol (&) to the end of line, like in the following examples:
 > ```bash
-> phantomjs --webdriver=8643 > /dev/null 2>&1 &
->
-> java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar > /dev/null 2>&1 &
+> chromedriver --url-base=wd/hub --port=4444 > /tmp/driver.log 2>&1 &
 > ```
 
 #### Run tests
@@ -272,21 +243,15 @@ java -Dwebdriver.gecko.driver=/usr/local/bin/chromedriver -jar $HOME/selenium-se
 Before you begin, it is highly recommended to make yourself familiar with behat arguments and options.
 Run ```bin/behat --help``` for a detailed description.
 
-When the Oro application is installed without demo data and is running, and the PhantomJs or Selenium Server is running,
+When the Oro application is installed without demo data and is running, and the ChromeDriver is running,
 you can start running the behat tests by feature from the root of the application.
 
 You may use one of the following commands.
 
-Run feature test scenarios with PhantomJs:
+Run feature test scenario:
 
 ```bash
 bin/behat vendor/oro/platform/src/Oro/Bundle/UserBundle/Tests/Behat/Features/login.feature -vvv
-```
-
-Run feature test scenarios with Selenium:
-
-```bash
-bin/behat vendor/oro/platform/src/Oro/Bundle/UserBundle/Tests/Behat/Features/login.feature -vvv -p selenium2
 ```
 
 Preview all available feature steps:
@@ -432,7 +397,7 @@ where:
     $this->elementFactory->createElement('Login')
  ```
 
-2. ```selector``` defines how selenium driver shall find the element on the page.
+2. ```selector``` defines how web driver shall find the element on the page.
 By default, when the selector type is not specified, the [css selector](http://mink.behat.org/en/latest/guides/traversing-pages.html#css-selector) is used.
 XPath selector is also supported and may be provided with the following configuration:
 

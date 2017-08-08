@@ -2,65 +2,46 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\UserBundle\Entity\UserApi;
-
-class LoadUserData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserData extends AbstractLoadUserData
 {
     const USER_NAME = 'user_wo_permissions';
     const USER_PASSWORD = 'user_api_key';
 
+    const USER_NAME_2 = 'system_user_2';
+    const USER_PASSWORD_2 = 'system_user_2_api_key';
+
     /**
-     * @var ContainerInterface
+     * return array
      */
-    private $container;
-
-    public function setContainer(ContainerInterface $container = null)
+    protected function getUsersData()
     {
-        $this->container = $container;
-    }
-
-    public function load(ObjectManager $manager)
-    {
-        /** @var \Oro\Bundle\UserBundle\Entity\UserManager $userManager */
-        $userManager = $this->container->get('oro_user.manager');
-        $role = $userManager->getStorageManager()
-            ->getRepository('OroUserBundle:Role')
-            ->findOneBy(array('role' => 'IS_AUTHENTICATED_ANONYMOUSLY'));
-
-        $group = $userManager->getStorageManager()
-            ->getRepository('OroUserBundle:Group')
-            ->findOneBy(array('name' => 'Administrators'));
-
-        $user = $userManager->createUser();
-
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-
-        $api = new UserApi();
-        $api->setApiKey('user_api_key')
-            ->setOrganization($organization)
-            ->setUser($user);
-
-        $user
-            ->setUsername(self::USER_NAME)
-            ->setPlainPassword(self::USER_PASSWORD)
-            ->setFirstName('Simple')
-            ->setLastName('User')
-            ->addRole($role)
-            ->addGroup($group)
-            ->setEmail('simple@example.com')
-            ->setOrganization($organization)
-            ->setOrganizations(new ArrayCollection([$organization]))
-            ->addApiKey($api)
-            ->setSalt('');
-
-        $userManager->updateUser($user);
+        return [
+            [
+                'username' => 'user_wo_permissions',
+                'email' => 'simple@example.com',
+                'firstName' => 'Simple',
+                'lastName' => 'User',
+                'plainPassword' => 'user_api_key',
+                'apiKey' => 'user_api_key',
+                'reference' => 'oro_user:user:system_user_1',
+                'enabled' => true,
+                'role' => 'IS_AUTHENTICATED_ANONYMOUSLY',
+                'group' => 'Administrators',
+            ],
+            [
+                'username' => 'system_user_2',
+                'email' => 'system_user_2@example.com',
+                'firstName' => 'Giffard',
+                'lastName' => 'Gray',
+                'plainPassword' => 'system_user_2_api_key',
+                'apiKey' => 'system_user_2_api_key',
+                'reference' => 'oro_user:user:system_user_2',
+                'enabled' => true,
+                'role' => LoadRolesData::ROLE_USER,
+                'group' => 'Administrators',
+            ]
+        ];
     }
 }

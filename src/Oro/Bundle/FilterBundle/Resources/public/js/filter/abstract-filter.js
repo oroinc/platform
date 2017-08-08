@@ -129,8 +129,10 @@ define([
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {};
             }
-            // init raw value of filter
-            this.value = tools.deepClone(this.emptyValue);
+            // init raw value of filter if it was not initialized
+            if (_.isUndefined(this.value)) {
+                this.value = tools.deepClone(this.emptyValue);
+            }
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
 

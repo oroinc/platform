@@ -352,6 +352,10 @@ class RawLayout
     public function getProperty($id, $name, $directAccess = false)
     {
         if ($directAccess) {
+            if (!isset($this->items[$id][$name])) {
+                return null;
+            }
+
             return $this->items[$id][$name];
         }
 

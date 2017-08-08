@@ -9,9 +9,11 @@ use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
@@ -38,6 +40,41 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Form $form */
         $form = $this->createElement($formName);
         $form->fill($table);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iOpenSelectEntityPopup($fieldName, $formName = "OroForm")
+    {
+        /** @var Select2Entity $field */
+        $field = $this->getFieldInForm($fieldName, $formName);
+        $field->openSelectEntityPopup();
+    }
+
+    /**
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field$/
+     */
+    public function iClearField($fieldName, $formName = "OroForm")
+    {
+        /** @var ClearableInterface $field */
+        $field = $this->getFieldInForm($fieldName, $formName);
+
+        if (!$field instanceof ClearableInterface) {
+            throw new \RuntimeException(sprintf(
+                'Element "%s" doesn\'t have ability to clear himself. 
+                Behat element "%s" must implement "%s" interface to do this',
+                $fieldName,
+                is_object($field) ? get_class($field) : gettype($field),
+                ClearableInterface::class
+            ));
+        }
+
+        $field->clear();
     }
 
     /**
@@ -104,6 +141,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         self::fail(sprintf('Can\'t find field with "%s" label', $fieldName));
+    }
+
+    /**
+     * Find and assert that field value is empty
+     *
+     * @When /^(?P<fieldName>[\w\s]*) field is empty$/
+     */
+    public function fieldIsEmpty($fieldName)
+    {
+        return $this->fieldShouldHaveValue($fieldName, "");
     }
 
     /**
@@ -437,5 +484,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     protected function createOroForm()
     {
         return $this->createElement('OroForm');
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $formName
+     * @return NodeElement|mixed|null|Element
+     * @throws ElementNotFoundException
+     */
+    protected function getFieldInForm($fieldName, $formName)
+    {
+        /** @var Form $form */
+        $form = $this->createElement($formName);
+        $field = $form->findField($fieldName);
+
+        if (null === $field) {
+            $driver = $this->getSession()->getDriver();
+            throw new ElementNotFoundException(
+                $driver,
+                'form field',
+                'id|name|label|value|placeholder|element',
+                $fieldName
+            );
+        }
+
+        return $field;
     }
 }

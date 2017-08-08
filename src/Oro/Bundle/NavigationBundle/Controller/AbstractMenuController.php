@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormError;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
+use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
@@ -291,7 +291,7 @@ abstract class AbstractMenuController extends Controller
     protected function getMenu($menuName, array $context)
     {
         $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context,
+            MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $context,
             BuilderChainProvider::IGNORE_CACHE_OPTION => true,
             BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];

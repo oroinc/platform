@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-13807
 @automatically-ticket-tagged
 Feature: Managing users roles
