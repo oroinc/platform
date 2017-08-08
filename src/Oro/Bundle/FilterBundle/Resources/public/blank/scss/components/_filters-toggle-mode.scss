@@ -5,6 +5,10 @@
         display: none;
     }
 
+    .select2-container {
+        display: block;
+    }
+
     .ui-multiselect-menu {
         // Break inline styles
         position: static !important;
