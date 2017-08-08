@@ -218,13 +218,15 @@ define([
             $elem.parent().find('input.select2-focusser')
                 .focus()
                 .trigger('focusin');
-        } else if (!$elem.filter(':visible').length && $firstValidationError) {
+        } else if (!$elem.filter(':visible').length && $firstValidationError.length) {
             var $scrollableContainer = $firstValidationError.closest('.scrollable-container');
             var scrollTop = $firstValidationError.offset().top + $scrollableContainer.scrollTop();
 
             $scrollableContainer.animate({
                 scrollTop: scrollTop
             }, scrollTop / 2);
+        } else {
+            return func.apply(this, _.rest(arguments));
         }
     });
 
