@@ -162,12 +162,6 @@ define(function(require) {
                 });
             }
 
-            var selectedFilters = this._calculateSelectedFilters();
-            mediator.on(
-                'filterManager:selectedFilters:count:' + this.collection.options.gridName,
-                selectedFilters
-            );
-
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
 
@@ -403,14 +397,13 @@ define(function(require) {
         },
 
         /**
-         * @param {Number} count
          * @private
          */
-        _publishCountSelectedFilters: function(count) {
-            var selectedFilters = count || this._calculateSelectedFilters();
+        _publishCountSelectedFilters: function() {
+            var countFilters = this._calculateSelectedFilters();
             mediator.trigger(
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
-                selectedFilters
+                countFilters
             );
         },
 
@@ -441,7 +434,7 @@ define(function(require) {
                 $container.hide();
             }
 
-            this._publishCountSelectedFilters(0);
+            this._publishCountSelectedFilters();
         },
 
         /**

@@ -5,6 +5,8 @@ $filter-criteria-hint-max-width: 250px !default;
 $filter-criteria-hint-item-color: get-color('additional', 'ultra') !default;
 $filter-criteria-hint-item-bg: get-color('additional', 'middle') !default;
 
+$filter-dropdown-mode-items-hint-inner-offset: 7px 130px 2px 10px !default;
+
 $filter-trigger-wrapper-display: inline-block !default;
 $filter-trigger-wrapper-dropdown-toggle-color: get-color('primary', 'dark') !default;
 
@@ -24,6 +26,9 @@ $filter-start-end-display: inline-block !default;
 $filter-action-row-offset-top: $offset-y !default;
 
 $filter-dropdown-menu-calendar-max-width: 270px !default;
+$filter-dropdown-item-active-weight: bold !default;
+
+$align-filter-dropdown-to-right-side: true !default;
 
 // Filters Dropdown Mode
 $apply-filters-dropdown-mode-design: true !default;

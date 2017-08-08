@@ -91,6 +91,21 @@
         .dropdown-toggle {
             color: $filter-trigger-wrapper-dropdown-toggle-color;
         }
+
+        .active {
+            .dropdown-item {
+                font-weight: $filter-dropdown-item-active-weight;
+            }
+        }
+
+        @if ($align-filter-dropdown-to-right-side) {
+            &.open {
+                .dropdown-menu {
+                    left: auto;
+                    right: 0;
+                }
+            }
+        }
     }
 
     .filter-separator {
