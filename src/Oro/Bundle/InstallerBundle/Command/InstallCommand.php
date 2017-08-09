@@ -73,6 +73,11 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 null,
                 InputOption::VALUE_NONE,
                 'Determines whether translation data need to be downloaded or not'
+            )->addOption(
+                'timeout',
+                null,
+                InputOption::VALUE_NONE,
+                'Timeout for "oro:migration:load" command, use 0 for no timeout'
             );
 
         parent::configure();
