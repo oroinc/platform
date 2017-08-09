@@ -372,21 +372,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * This step used for system configuration field on nested level (Organization, Website)
-     * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use System for "Position" field
-     *
-     * @Given uncheck Use System for :label field
-     */
-    public function uncheckUseSystemForField($label)
-    {
-        /** @var SystemConfigForm $form */
-        $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label);
-    }
-
-
-    /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
      */
     public function iUncheckElement($elementName)

@@ -1314,7 +1314,7 @@ class OroMainContext extends MinkContext implements
     /**
      * Example: Then I should see "Map container" element inside "Default Addresses" element
      *
-     * @Then /^(?:|I )should see "(?P<childElementName>[^"]+)" element inside "(?P<parentElementName>[^"]+)" element$/
+     * @Then I should see :childElementName element inside :parentElementName element
      * @param string $parentElementName
      * @param string $childElementName
      */
@@ -1337,7 +1337,7 @@ class OroMainContext extends MinkContext implements
     /**
      * Example: Then I should not see "Map container" element inside "Default Addresses" element
      *
-     * @Then /^(?:|I )should not see "(?P<childElementName>[^"]+)" element inside "(?P<parentElementName>[^"]+)" element$/
+     * @Then I should not see :childElementName element inside :parentElementName element
      * @param string $parentElementName
      * @param string $childElementName
      */
