@@ -83,7 +83,7 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         // lazy loading, allows to start MQ without status control
         if (!$this->processes) {
             $command = sprintf(
-                'php %s/console oro:message-queue:consume -vvv --env=%s %s >> %s/mq.log',
+                'php %s/console oro:message-queue:consume -vv --env=%s %s >> %s/mq.log',
                 realpath($this->kernel->getRootDir()),
                 $this->kernel->getEnvironment(),
                 $this->kernel->isDebug() ? '' : '--no-debug',
@@ -128,7 +128,10 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         if (self::WINDOWS_OS === $this->getOs()) {
             $killCommand = sprintf('TASKKILL /IM %s/console /T /F', realpath($this->kernel->getRootDir()));
         } else {
-            $killCommand = sprintf('pkill -9 -f %s/[c]onsole', realpath($this->kernel->getRootDir()));
+            $killCommand = sprintf(
+                "pkill -9 -f '%s/[c]onsole oro:message-queue:consume'",
+                realpath($this->kernel->getRootDir())
+            );
         }
 
         try {

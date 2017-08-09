@@ -1,3 +1,4 @@
+@regression
 Feature: Mobile menu
   In order to simplify navigation on smaller device screens and touch screen devices
   As a Customer

@@ -46,10 +46,7 @@ class CommandRunnerMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('critical')
             ->with(
-                'Got invalid message: empty command',
-                [
-                    'message' => $message
-                ]
+                'Got invalid message: empty command'
             )
         ;
 

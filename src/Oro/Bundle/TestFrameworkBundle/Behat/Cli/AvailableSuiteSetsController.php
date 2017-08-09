@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\Statistic\FilesystemStatisticRepository;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfiguration;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -17,12 +18,17 @@ class AvailableSuiteSetsController implements Controller
      */
     private $suiteConfigRegistry;
 
+    private $statisticRepository;
+
     /**
      * @param SuiteConfigurationRegistry $suiteConfigRegistry
      */
-    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry)
-    {
+    public function __construct(
+        SuiteConfigurationRegistry $suiteConfigRegistry,
+        FilesystemStatisticRepository $statisticRepository
+    ) {
         $this->suiteConfigRegistry = $suiteConfigRegistry;
+        $this->statisticRepository = $statisticRepository;
     }
 
     /**
@@ -62,7 +68,9 @@ class AvailableSuiteSetsController implements Controller
 
                     if ($output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
                         foreach ($chunk->getPaths() as $path) {
-                            $output->writeln(sprintf('        %s', $path));
+                            $time = $this->statisticRepository->getFeatureDuration($path);
+
+                            $output->writeln(sprintf('        %s - %s sec', $path, $time));
                         }
                     }
                 }
