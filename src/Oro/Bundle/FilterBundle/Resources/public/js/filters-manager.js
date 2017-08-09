@@ -162,12 +162,6 @@ define(function(require) {
                 });
             }
 
-            var selectedFilters = this._calculateSelectedFilters();
-            mediator.on(
-                'filterManager:selectedFilters:count:' + this.collection.options.gridName,
-                selectedFilters
-            );
-
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
 
@@ -407,10 +401,10 @@ define(function(require) {
          * @private
          */
         _publishCountSelectedFilters: function(count) {
-            var selectedFilters = count || this._calculateSelectedFilters();
+            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateSelectedFilters();
             mediator.trigger(
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
-                selectedFilters
+                countFilters
             );
         },
 
