@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var tinyMCE = require('tinymce/tinymce');
 
     /**
      * @export orolocale/js/app/views/fallback-view
@@ -113,7 +114,7 @@ define(function(require) {
                 .keyup(_.bind(this.cloneValueToChildrenEvent, this));
 
             this.$el.find(this.options.selectors.itemValue).find('.mce-tinymce').each(function() {
-                self.getValueEl(self.getItemEl(this)).tinymce()
+                tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
                     .on('change', function() {
                         $(this.targetElm).change();
                     })
@@ -272,7 +273,7 @@ define(function(require) {
 
             var editor;
             if ($valueContainer.find('.mce-tinymce').length > 0) {
-                editor = $valueContainer.find('textarea').tinymce();
+                editor = tinyMCE.get($valueContainer.find('textarea').attr('id'));
             }
 
             if (enable) {

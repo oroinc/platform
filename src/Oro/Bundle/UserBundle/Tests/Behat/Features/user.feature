@@ -1,4 +1,4 @@
-# features/user.feature
+@regression
 Feature: User
   In order to create users
   As a OroCRM Admin user

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Processor;
+namespace Oro\Bundle\CurrencyBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
@@ -15,9 +15,7 @@ class SetPriceByValueAndCurrencyProcessor implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        if (!$context instanceof FormContext) {
-            return;
-        }
+        /** @var FormContext $context */
 
         $requestData = $context->getRequestData();
         $productItem = $context->getResult();

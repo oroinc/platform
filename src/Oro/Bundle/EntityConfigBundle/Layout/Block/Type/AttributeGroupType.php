@@ -3,8 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
-use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
+use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
 use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AttributeBlockTypeMapperInterface;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 
@@ -20,8 +19,8 @@ class AttributeGroupType extends AbstractContainerType
 {
     const NAME = 'attribute_group';
 
-    /** @var AttributeGroupRenderRegistry */
-    protected $groupRenderRegistry;
+    /** @var AttributeRenderRegistry */
+    protected $attributeRenderRegistry;
 
     /** @var AttributeBlockTypeMapperInterface */
     protected $blockTypeMapper;
@@ -33,16 +32,16 @@ class AttributeGroupType extends AbstractContainerType
     protected $notRenderableAttributeTypes = [];
 
     /**
-     * @param AttributeGroupRenderRegistry      $groupRenderRegistry
+     * @param AttributeRenderRegistry      $attributeRenderRegistry
      * @param AttributeManager                  $attributeManager
      * @param AttributeBlockTypeMapperInterface $blockTypeMapper
      */
     public function __construct(
-        AttributeGroupRenderRegistry $groupRenderRegistry,
+        AttributeRenderRegistry $attributeRenderRegistry,
         AttributeManager $attributeManager,
         AttributeBlockTypeMapperInterface $blockTypeMapper
     ) {
-        $this->groupRenderRegistry = $groupRenderRegistry;
+        $this->attributeRenderRegistry = $attributeRenderRegistry;
         $this->attributeManager = $attributeManager;
         $this->blockTypeMapper = $blockTypeMapper;
     }
@@ -75,7 +74,7 @@ class AttributeGroupType extends AbstractContainerType
         $options['visible'] = $attributeGroup->getIsVisible();
 
         if ($excludeFromRest) {
-            $this->groupRenderRegistry->setRendered($attributeFamily, $attributeGroup);
+            $this->attributeRenderRegistry->setGroupRendered($attributeFamily, $attributeGroup);
         }
 
         $layoutManipulator = $builder->getLayoutManipulator();
@@ -83,6 +82,10 @@ class AttributeGroupType extends AbstractContainerType
         $attributes = $this->attributeManager->getAttributesByGroup($attributeGroup);
         foreach ($attributes as $attribute) {
             if (in_array($attribute->getType(), $this->notRenderableAttributeTypes, true)) {
+                continue;
+            }
+
+            if ($this->attributeRenderRegistry->isAttributeRendered($attributeFamily, $attribute->getFieldName())) {
                 continue;
             }
 

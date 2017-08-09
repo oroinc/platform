@@ -42,9 +42,9 @@ class SystemConfigForm extends Form
      * @param string $checkbox
      * @throws ElementNotFoundException
      */
-    public function uncheckCheckboxByLabel($label, $checkbox)
+    public function uncheckUseDefaultCheckbox($label, $checkboxLabel = 'Use default')
     {
-        $this->getSettingControlByLabel($label, $checkbox)->uncheck();
+        $this->getSettingControlByLabel($label, $checkboxLabel)->uncheck();
     }
 
     /**

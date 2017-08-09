@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-10860
 @automatically-ticket-tagged
 Feature: Change menu view

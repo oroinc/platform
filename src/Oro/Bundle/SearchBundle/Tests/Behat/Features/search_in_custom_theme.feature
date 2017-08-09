@@ -1,14 +1,11 @@
+@regression
 Feature: Mobile menu
   In order to simplify navigation on smaller device screens and touch screen devices
   As a Customer
   I want to see the menu expanced full-screen with large, easily clickable items.
 
-  Scenario: Create different window session
-    Given sessions active:
-      |Admin          |first_session |
-      |User           |second_session|
-    Scenario: Change theme to Custom
-    Given I proceed as the Admin
+  Scenario: Change theme to Custom
+    Given here is the "Admin" under "first_session"
     And login as administrator
     And I go to System/Configuration
     And click "Commerce" on configuration sidebar
@@ -20,7 +17,7 @@ Feature: Mobile menu
     And submit form
 
   Scenario: Check that search option places in fullscreen popup in custom theme
-    Given I proceed as the User
+    Given here is the "User" under "320_session"
     And I set window size to 320x640
     When I am on homepage
     Then I should not see an "Search Form" element

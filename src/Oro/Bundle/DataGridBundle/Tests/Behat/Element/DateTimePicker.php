@@ -14,8 +14,9 @@ class DateTimePicker extends Element
      */
     public function setValue($dateTime)
     {
-        $this->getDatePicker()->click();
-
+        if (!$this->isOpened()) {
+            $this->getDatePicker()->click();
+        }
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
         $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getCalendarDate($dateTime->format('j'))->click();
@@ -70,5 +71,19 @@ class DateTimePicker extends Element
     protected function getCalendarDate($dateValue)
     {
         return $this->getCalendar()->find('css', "tbody a:contains('$dateValue')");
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isOpened()
+    {
+        $class = $this->getDatePicker()->getAttribute('class');
+
+        if ($class !== null) {
+            return preg_match('/\bui-datepicker-dialog-is-(below|above)\b/', $class) === 1;
+        }
+
+        return false;
     }
 }

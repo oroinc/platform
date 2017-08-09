@@ -241,11 +241,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $driverMock = $this->createMock(DriverInterface::class);
         $driverMock
             ->expects($this->any())
-            ->method('createTransportMessage')
-            ->willReturn(new NullMessage())
-        ;
-        $driverMock
-            ->expects($this->any())
             ->method('createQueue')
             ->willReturnCallback(function ($queueName) {
                 return new NullQueue($queueName);

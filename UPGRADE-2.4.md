@@ -9,7 +9,6 @@ Some inline underscore templates from next bundles, were moved to separate .html
  - FilterBundle
  - UIBundle
 
-
 MessageQueue component
 ----------------------
 - Class `Oro\Component\MessageQueue\Job\JobStorage`
@@ -42,6 +41,10 @@ datagrids:
            hints:
                - { name: HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, value: false }
 ```
+
+FormBundle
+----------
+- Removed usage of `'tinymce/jquery.tinymce'` extension. Use `'tinymce/tinymce'` directly instead
 
 MessageQueueBundle
 ------------------
