@@ -8,7 +8,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
-use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
+use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupRestType;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
@@ -21,9 +21,9 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 {
     /**
-     * @var AttributeGroupRenderRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributeRenderRegistry
      */
-    protected $attributeGroupRenderRegistry;
+    protected $attributeRenderRegistry;
 
     /**
      * @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject
@@ -37,12 +37,12 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
 
-        $this->attributeGroupRenderRegistry = new AttributeGroupRenderRegistry;
+        $this->attributeRenderRegistry = new AttributeRenderRegistry;
         $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $restBlockType = new AttributeGroupRestType($this->attributeGroupRenderRegistry, $this->localizationHelper);
+        $restBlockType = new AttributeGroupRestType($this->attributeRenderRegistry, $this->localizationHelper);
 
         $groupBlockTypeStub = new ConfigurableType();
         $groupBlockTypeStub->setName(AttributeGroupType::NAME);
@@ -76,7 +76,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
         $attributeFamily->addAttributeGroup($attributeGroup2);
         $attributeFamily->addAttributeGroup($attributeGroup3);
 
-        $this->attributeGroupRenderRegistry->setRendered($attributeFamily, $attributeGroup1);
+        $this->attributeRenderRegistry->setGroupRendered($attributeFamily, $attributeGroup1);
 
         $this->localizationHelper->expects($this->exactly(2))
             ->method('getLocalizedValue')
@@ -124,7 +124,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
         $attributeFamily->setCode('family_code');
         $attributeFamily->addAttributeGroup($attributeGroup);
 
-        $this->attributeGroupRenderRegistry->setRendered($attributeFamily, $attributeGroup);
+        $this->attributeRenderRegistry->setGroupRendered($attributeFamily, $attributeGroup);
         $view = $this->getBlockView(
             AttributeGroupRestType::NAME,
             [
