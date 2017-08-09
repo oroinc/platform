@@ -350,6 +350,17 @@
             }
 
             /**
+             * Hide the request body and add a button to display it
+             */
+            $('.request-body', $result).hide();
+            var $requestBodyHeader = $('.request-body-header', $result);
+            if ($('.toggle-request-body', $requestBodyHeader).length) {
+                $('.toggle-request-body', $requestBodyHeader).text('Show');
+            } else {
+                $requestBodyHeader.append('&nbsp;<small>[<a href="" class="toggle-request-body">Show</a>]</small>');
+            }
+
+            /**
              * Update "Curl Command Line" section
              */
             displayCurl(
@@ -359,6 +370,16 @@
                 options.data,
                 $('.curl-command', $result)
             );
+        });
+
+        /**
+         * Add the request body visibility handler
+         */
+        $('.pane.sandbox').on('click', '.toggle-request-body', function(e) {
+            $(this).text(
+                $('.request-body', $(this).parents('.result')).toggle().is(':visible') ? 'Hide' : 'Show'
+            );
+            e.preventDefault();
         });
     });
 </script>
