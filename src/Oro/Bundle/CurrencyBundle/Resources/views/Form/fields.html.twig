@@ -1,15 +1,19 @@
 {% block oro_currency_price_widget %}
     {% if hide_currency %}
-        {{ form_widget(form.value) }}
-        {{ form_widget(form.currency) }}
-        {{ form_errors(form.value) }}
-        {{ form_errors(form.currency) }}
+        <div class="currency-price-value">
+            {{ form_widget(form.value) }}
+            {{ form_widget(form.currency) }}
+            {{ form_errors(form.value) }}
+            {{ form_errors(form.currency) }}
+        </div>
     {% else %}
         <table>
             <tr>
                 <td>
-                    {{ form_widget(form.value) }}
-                    {{ form_errors(form.value) }}
+                    <div class="currency-price-value">
+                        {{ form_widget(form.value) }}
+                        {{ form_errors(form.value) }}
+                    </div>
                 </td>
                 <td>
                     {{ form_widget(form.currency) }}

@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-11235
 @automatically-ticket-tagged
 Feature: Shortcuts feature

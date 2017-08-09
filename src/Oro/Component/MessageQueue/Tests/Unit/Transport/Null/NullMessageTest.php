@@ -23,7 +23,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new NullMessage();
 
-        $this->assertSame(null, $message->getBody());
+        $this->assertNull($message->getBody());
     }
 
     public function testShouldNewMessageReturnEmptyProperties()
@@ -31,6 +31,13 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
         $message = new NullMessage();
 
         $this->assertSame([], $message->getProperties());
+    }
+
+    public function testShouldNewMessageReturnRedeliveredFalse()
+    {
+        $message = new NullMessage();
+
+        $this->assertFalse($message->isRedelivered());
     }
 
     public function testShouldNewMessageReturnEmptyHeaders()
@@ -101,13 +108,6 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
         $message->setHeaders(['foo' => 'fooVal']);
 
         $this->assertSame('barDefault', $message->getHeader('bar', 'barDefault'));
-    }
-
-    public function testShouldSetRedeliveredFalseInConstructor()
-    {
-        $message = new NullMessage();
-
-        $this->assertFalse($message->isRedelivered());
     }
 
     public function testShouldAllowGetPreviouslySetRedelivered()
@@ -185,5 +185,24 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
         $message->setTimestamp('123');
 
         self::assertSame(123, $message->getTimestamp());
+    }
+
+    public function testClone()
+    {
+        $message = new NullMessage();
+        $message->setBody('theBody');
+        $message->setProperties(['foo' => 'fooVal']);
+        $message->setHeaders(['header' => 'headerVal']);
+        $message->setRedelivered(true);
+
+        $clonedMessage = clone $message;
+
+        self::assertNotSame($message, $clonedMessage);
+        self::assertSame($message->getBody(), $clonedMessage->getBody());
+        self::assertCount(1, $clonedMessage->getProperties());
+        self::assertSame($message->getProperty('foo'), $clonedMessage->getProperty('foo'));
+        self::assertCount(1, $clonedMessage->getHeaders());
+        self::assertSame($message->getHeader('header'), $clonedMessage->getHeader('header'));
+        self::assertSame($message->isRedelivered(), $clonedMessage->isRedelivered());
     }
 }

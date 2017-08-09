@@ -292,4 +292,22 @@ class AttributeManager
             );
         }
     }
+
+    /**
+     * @param AttributeFamily $attributeFamily
+     * @param $attributeName
+     * @return null|FieldConfigModel
+     */
+    public function getAttributeByFamilyAndName(AttributeFamily $attributeFamily, $attributeName)
+    {
+        $attributes = $this->getAttributesByFamily($attributeFamily);
+
+        foreach ($attributes as $attribute) {
+            if ($attribute->getFieldName() === $attributeName) {
+                return $attribute;
+            }
+        }
+
+        return null;
+    }
 }
