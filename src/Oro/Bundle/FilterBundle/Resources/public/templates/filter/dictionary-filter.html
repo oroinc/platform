@@ -1,13 +1,3 @@
-    <div class="filter-select-oro-wrapper">
-        <select name="<%= name %>" data-choice-value-select
-            class="select select--size-m select--full">
-                <option value="<%= option.value %>"
-                <% if (option.value == selectedChoice) { %>
-                selected="selected"
-                <% } %>
-                >
-                <%- option.label %>
-                </option>
 <div class="choice-filter">
     <div class="btn-group btn-block">
         <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -19,9 +9,9 @@
             <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
             </li>
             <% }); %>
-        </select>
+        </ul>
     </div>
-    <div class="value-field-frame ">
+    <div class="value-field-frame">
         <input type="hidden" name="select-values-autocomplete" class="select-values-autocomplete" value="" />
         <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
         <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>

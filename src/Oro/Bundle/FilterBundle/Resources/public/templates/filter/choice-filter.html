@@ -1,7 +1,3 @@
-    <div class="filter-select-oro-wrapper">
-        <select name="<%= name %>" data-choice-value-select
-            <% if (typeof(dataName) !== "undefined") { %>data-name="<%= dataName %>"<% } %>
-            class="select select--size-m select--full">
 <div class="choice-filter">
     <div class="btn-group btn-block">
         <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -9,21 +5,15 @@
         </button>
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
-                 <option value="<%= option.value %>"
-                    <% if (option.value == selectedChoice) { %>
-                    selected="selected"
-                    <% } %>
-                    >
-                    <%- option.label %>
-                </option>
+            <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+            <a class="dropdown-item choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+            </li>
             <% }); %>
-        </select>
+        </ul>
     </div>
     <div class="value-field-frame">
         <input type="text" name="value" value="">
-        <input type="text" name="value" value="" class="input input--size-m input--full" data-choice-filter-name>
-        <input type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"
-            class="name_input" data-choice-filter-type>
+        <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
         <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
     </div>
 </div>
