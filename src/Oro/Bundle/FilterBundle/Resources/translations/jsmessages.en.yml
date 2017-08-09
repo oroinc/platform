@@ -74,3 +74,4 @@ oro:
         datagrid-toolbar:
             filters: Filters
             filters_count: Filters ({{ count }})
+            save_filters: Save Filters

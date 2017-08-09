@@ -153,6 +153,8 @@
     @if ($apply-filters-toggle-mode-design) {
         &.toggle-mode {
             padding-bottom: $offset-y-m;
+
+            @import "filter-manager-toggle-mode";
         }
     }
 }
