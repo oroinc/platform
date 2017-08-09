@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\Expr;
+
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
@@ -514,6 +517,21 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('setMaxResults')
             ->with($maxConcurrentTasks + 1)
             ->will($this->returnValue($qb));
+
+        $expr = $this->getMockBuilder(Expr::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->at($index++))
+            ->method('expr')->willReturn($expr);
+        $qb->expects($this->at($index++))
+            ->method('leftJoin')->willReturn($qb);
+        $qb->expects($this->at($index++))
+            ->method('andWhere')->willReturn($qb);
+        $qb->expects($this->at($index++))
+            ->method('setParameter')
+            ->with('isOwnerEnabled', $this->equalTo(true))
+            ->willReturn($qb);
+
         $qb->expects($this->at($index++))
             ->method('getQuery')
             ->will($this->returnValue($q));

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\QueryBuilder;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -480,7 +481,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         //   the next sync is performed only after 30 minutes)
         // - "In Process" items are moved at the end
         $repo   = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
-        $query = $repo->createQueryBuilder('o')
+        $queryBuilder = $repo->createQueryBuilder('o')
             ->select(
                 'o'
                 . ', CASE WHEN o.syncCode = :inProcess OR o.syncCode = :inProcessForce THEN 0 ELSE 1 END AS HIDDEN p1'
@@ -497,11 +498,12 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             ->setParameter('min', $min)
             ->setParameter('border', $border)
             ->setParameter('timeShift', $timeShift)
-            ->setMaxResults($maxConcurrentTasks + 1)
-            ->getQuery();
+            ->setMaxResults($maxConcurrentTasks + 1);
+
+        $this->addOwnerFilter($queryBuilder);
 
         /** @var EmailOrigin[] $origins */
-        $origins = $query->getResult();
+        $origins = $queryBuilder->getQuery()->getResult();
         $result = null;
         foreach ($origins as $origin) {
             $syncCode = $origin->getSyncCode();
@@ -524,6 +526,30 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     }
 
     /**
+     * Modifies QueryBuilder to filter origins by enabled owner
+     *
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function addOwnerFilter(QueryBuilder $queryBuilder)
+    {
+        $expr = $queryBuilder->expr();
+
+        $queryBuilder->leftJoin('o.owner', 'owner')
+            ->andWhere(
+                $expr->orX(
+                    $expr->andX(
+                        $expr->isNull('owner.id')
+                    ),
+                    $expr->andX(
+                        $expr->isNotNull('owner.id'),
+                        $expr->eq('owner.enabled', ':isOwnerEnabled')
+                    )
+                )
+            )
+            ->setParameter('isOwnerEnabled', true);
+    }
+
+    /**
      * Finds active email origin by its id
      *
      * @param int $originId
@@ -534,13 +560,15 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $this->logger->info(sprintf('Finding an email origin (id: %d) ...', $originId));
 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
-        $query = $repo->createQueryBuilder('o')
+        $queryBuilder = $repo->createQueryBuilder('o')
             ->where('o.isActive = :isActive AND o.id = :id')
             ->setParameter('isActive', true)
             ->setParameter('id', $originId)
-            ->setMaxResults(1)
-            ->getQuery();
-        $origins = $query->getResult();
+            ->setMaxResults(1);
+
+        $this->addOwnerFilter($queryBuilder);
+
+        $origins = $queryBuilder->getQuery()->getResult();
 
         /** @var EmailOrigin $result */
         $result = !empty($origins) ? $origins[0] : null;
