@@ -78,7 +78,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 null,
                 InputOption::VALUE_NONE,
                 'Timeout for "oro:migration:load" command, use 0 for no timeout'
-            );;
+            );
 
         parent::configure();
     }
