@@ -382,7 +382,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label, 'Use System');
+        $form->uncheckUseDefaultCheckbox($label);
     }
 
 
