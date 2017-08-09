@@ -10,11 +10,6 @@ config:
         'bootstrap-popover':
             deps:
                 - 'bootstrap-tooltip'
-        'backbone-bootstrap-modal':
-            deps:
-                - 'jquery'
-                - 'underscore'
-                - 'backbone'
         'jquery.datepair':
             deps:
                 - 'jquery'
@@ -228,6 +223,5 @@ config:
 
 build:
     paths:
-        'backbone-bootstrap-modal': 'empty:'
         'jquery.multiselect': 'empty:'
         'jquery.multiselect.filter': 'empty:'
