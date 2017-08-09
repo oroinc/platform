@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
-use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
+use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
@@ -22,18 +22,18 @@ class AttributeGroupRestType extends AbstractContainerType
     /** @var LocalizationHelper */
     protected $localizationHelper;
 
-    /** @var AttributeGroupRenderRegistry */
-    protected $attributeGroupRenderRegistry;
+    /** @var AttributeRenderRegistry */
+    protected $attributeRenderRegistry;
 
     /**
-     * @param AttributeGroupRenderRegistry $attributeGroupRenderRegistry
+     * @param AttributeRenderRegistry $attributeRenderRegistry
      * @param LocalizationHelper           $localizationHelper
      */
     public function __construct(
-        AttributeGroupRenderRegistry $attributeGroupRenderRegistry,
+        AttributeRenderRegistry $attributeRenderRegistry,
         LocalizationHelper $localizationHelper
     ) {
-        $this->attributeGroupRenderRegistry = $attributeGroupRenderRegistry;
+        $this->attributeRenderRegistry = $attributeRenderRegistry;
         $this->localizationHelper = $localizationHelper;
     }
 
@@ -50,7 +50,7 @@ class AttributeGroupRestType extends AbstractContainerType
         $layoutManipulator = $builder->getLayoutManipulator();
 
         /** @var AttributeGroup[] $groups */
-        $groups = $this->attributeGroupRenderRegistry->getNotRenderedGroups($attributeFamily);
+        $groups = $this->attributeRenderRegistry->getNotRenderedGroups($attributeFamily);
         $blockId = $builder->getId();
         foreach ($groups as $group) {
             $layoutManipulator->add(
@@ -92,7 +92,7 @@ class AttributeGroupRestType extends AbstractContainerType
      */
     private function getTabsOptions(AttributeFamily $attributeFamily)
     {
-        $groups = $this->attributeGroupRenderRegistry->getNotRenderedGroups($attributeFamily);
+        $groups = $this->attributeRenderRegistry->getNotRenderedGroups($attributeFamily);
         $tabListOptions = array_map(
             function (AttributeGroup $group) {
                 return [
