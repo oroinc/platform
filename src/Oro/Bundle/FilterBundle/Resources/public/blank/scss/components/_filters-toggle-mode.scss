@@ -41,6 +41,11 @@
         min-width: $filter-toggle-mode-fields-row-min-width;
     }
 
+    .filter-item{
+        // fix after filter enabling, using Filter manager
+        width: 100%;
+    }
+
     .filter-items {
         margin-bottom: $offset-y-m;
     }
