@@ -3,7 +3,9 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Suite;
 
 use Behat\Testwork\Specification\SpecificationFinder;
-use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationCountDivider;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\Statistic\FilesystemStatisticRepository;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SuiteConfigurationDivider;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfiguration;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification\Stub\SpecificationLocatorFilesystemStub;
@@ -37,15 +39,15 @@ class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider generateSetsProvider
+     * @dataProvider generateSetsDividedByCountProvider
      * @param $divider
      * @param $expectedSets
      */
-    public function testGenerateSets($divider, $expectedSets)
+    public function testGenerateSetsDividedByCount($divider, $expectedSets)
     {
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->divideSuites(1);
-        $suiteConfigRegistry->genererateSets($divider);
+        $suiteConfigRegistry->generateSetsDividedByCount($divider);
 
         $sets = $suiteConfigRegistry->getSets();
         $this->assertCount(count($expectedSets), $sets);
@@ -61,7 +63,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function generateSetsProvider()
+    public function generateSetsDividedByCountProvider()
     {
         return [
             [
@@ -183,7 +185,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetSet()
     {
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
-        $suiteConfigRegistry->genererateSets(8);
+        $suiteConfigRegistry->generateSetsDividedByCount(8);
 
         $this->assertInternalType(
             'array',
@@ -236,7 +238,8 @@ class SuiteConfigurationRegistryTest extends \PHPUnit_Framework_TestCase
         $suiteConfigRegistry = new SuiteConfigurationRegistry(
             new KernelStub([['name' => 'AcmeSuite3']]),
             $finder,
-            new SpecificationDivider()
+            new SpecificationCountDivider(),
+            new SuiteConfigurationDivider(new FilesystemStatisticRepository(''))
         );
 
         $suiteConfigRegistry->setSuiteConfigurations($this->getSuiteConfigs());

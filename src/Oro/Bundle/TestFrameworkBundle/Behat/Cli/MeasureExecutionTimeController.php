@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
+use Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureDurationSubscriber;
 use Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +16,12 @@ class MeasureExecutionTimeController implements Controller
     /**
      * @var StepDurationMeasureSubscriber
      */
-    protected $subscriber;
+    protected $stepDurationSubscriber;
+
+    /**
+     * @var FeatureDurationSubscriber
+     */
+    protected $featureDurationSubscriber;
 
     /**
      * @var EventDispatcherInterface
@@ -23,12 +29,17 @@ class MeasureExecutionTimeController implements Controller
     private $eventDispatcher;
 
     /**
-     * @param StepDurationMeasureSubscriber $subscriber
+     * @param StepDurationMeasureSubscriber $stepDurationSubscriber
+     * @param FeatureDurationSubscriber $featureDurationSubscriber
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(StepDurationMeasureSubscriber $subscriber, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->subscriber = $subscriber;
+    public function __construct(
+        StepDurationMeasureSubscriber $stepDurationSubscriber,
+        FeatureDurationSubscriber $featureDurationSubscriber,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        $this->stepDurationSubscriber = $stepDurationSubscriber;
+        $this->featureDurationSubscriber = $featureDurationSubscriber;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -37,12 +48,20 @@ class MeasureExecutionTimeController implements Controller
      */
     public function configure(SymfonyCommand $command)
     {
-        $command->addOption(
-            '--show-execution-time',
-            null,
-            InputOption::VALUE_NONE,
-            'Measure execution time for each step and show results in table sorted by average time'
-        );
+        $command
+            ->addOption(
+                '--show-execution-time',
+                null,
+                InputOption::VALUE_NONE,
+                'Measure execution time for each step and show results in table sorted by average time'
+            )
+            ->addOption(
+                '--log-feature-execution-time',
+                null,
+                InputOption::VALUE_NONE,
+                'Measure and log execution time for each feature'
+            )
+        ;
     }
 
     /**
@@ -50,11 +69,13 @@ class MeasureExecutionTimeController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$input->getOption('show-execution-time')) {
-            return;
+        if ($input->getOption('show-execution-time')) {
+            $this->stepDurationSubscriber->setOutput($output);
+            $this->eventDispatcher->addSubscriber($this->stepDurationSubscriber);
         }
 
-        $this->subscriber->setOutput($output);
-        $this->eventDispatcher->addSubscriber($this->subscriber);
+        if ($input->getOption('log-feature-execution-time')) {
+            $this->eventDispatcher->addSubscriber($this->featureDurationSubscriber);
+        }
     }
 }
