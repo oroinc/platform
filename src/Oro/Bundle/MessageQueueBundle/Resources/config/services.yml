@@ -1,12 +1,14 @@
 parameters:
     oro_message_queue.maintance.idle_time: 5
     oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
+
 services:
     oro_message_queue.consumption.extensions:
-        class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension'
         public: false
         arguments:
             - []
+            - '@oro_message_queue.log.consumer_state'
 
     oro_message_queue.consumption.docrine_ping_connection_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
@@ -37,11 +39,6 @@ services:
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
-
-    oro_message_queue.command.consume_messages:
-        class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
-        tags:
-            - { name: console.command }
 
     oro_message_queue.consumption.extension.maintance:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'

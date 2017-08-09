@@ -1,0 +1,71 @@
+services:
+    oro_message_queue.log.consumer_state:
+        class: Oro\Bundle\MessageQueueBundle\Log\ConsumerState
+
+    oro_message_queue.log.consumption_extension:
+        class: Oro\Bundle\MessageQueueBundle\Log\ConsumptionExtension
+        public: false
+        arguments:
+            - '@oro_message_queue.log.consumer_state'
+        tags:
+            - { name: oro_message_queue.consumption.extension }
+
+    oro_message_queue.log.job_extension:
+        class: Oro\Bundle\MessageQueueBundle\Log\JobExtension
+        public: false
+        arguments:
+            - '@oro_message_queue.log.consumer_state'
+        tags:
+            - { name: oro_message_queue.job.extension }
+
+    oro_message_queue.log.message_to_array_converter:
+        class: Oro\Bundle\MessageQueueBundle\Log\Converter\ChainMessageToArrayConverter
+        arguments:
+            - []
+
+    oro_message_queue.log.message_to_array_converter.base:
+        class: Oro\Bundle\MessageQueueBundle\Log\Converter\MessageToArrayConverter
+        public: false
+        tags:
+            - { name: oro_message_queue.log.message_to_array_converter, priority: 1 }
+
+    oro_message_queue.log.message_to_array_converter.dbal:
+        class: Oro\Bundle\MessageQueueBundle\Log\Converter\DbalMessageToArrayConverter
+        public: false
+        tags:
+            - { name: oro_message_queue.log.message_to_array_converter }
+
+    oro_message_queue.log.processor.restore_original_channel:
+        class: Oro\Bundle\MessageQueueBundle\Log\Processor\RestoreOriginalChannelProcessor
+        public: false
+        tags:
+            - { name: monolog.processor, channel: mq_job_transitive }
+
+    oro_message_queue.log.processor.add_consumer_state:
+        class: Oro\Bundle\MessageQueueBundle\Log\Processor\AddConsumerStateProcessor
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: monolog.processor }
+
+    oro_message_queue.log.handler.console:
+        class: Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleHandler
+        arguments:
+            - '@oro_message_queue.log.consumer_state'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_message_queue.log.handler.resend_job:
+        class: Oro\Bundle\MessageQueueBundle\Log\Handler\ResendJobHandler
+        public: false
+        arguments:
+            - '@monolog.logger.mq_job_transitive'
+            - '@oro_message_queue.log.consumer_state'
+
+# review this in BAP-8624
+#    oro_message_queue.log.job_file_formatter:
+#        class: Monolog\Formatter\LineFormatter
+#        public: false
+#        arguments:
+#            - "[%%datetime%%] %%extra.job_id%% %%channel%%.%%level_name%%: %%message%% %%context%% %%extra%%\n"

@@ -69,7 +69,7 @@ class SendImportErrorNotificationMessageProcessor implements MessageProcessorInt
         if (! isset($body['file'], $body['error']) &&
             ! (isset($body['userId']) || isset($body['notifyEmail']))
         ) {
-            $this->logger->critical('Invalid message', ['message' => $body]);
+            $this->logger->critical('Invalid message');
 
             return self::REJECT;
         }
@@ -78,8 +78,7 @@ class SendImportErrorNotificationMessageProcessor implements MessageProcessorInt
             $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
             if (! $user instanceof User) {
                 $this->logger->error(
-                    sprintf('User not found. Id: %s', $body['userId']),
-                    ['message' => $message]
+                    sprintf('User not found. Id: %s', $body['userId'])
                 );
 
                 return self::REJECT;
@@ -111,7 +110,7 @@ class SendImportErrorNotificationMessageProcessor implements MessageProcessorInt
             $message
         );
 
-        $this->logger->info('Sent notification message.', ['message' => $message]);
+        $this->logger->info('Sent notification message.');
     }
 
     /**
