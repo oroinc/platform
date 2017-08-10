@@ -6,10 +6,13 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+
+use Oro\Component\DependencyInjection\ServiceLink;
 
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
@@ -22,8 +25,6 @@ use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
@@ -206,16 +207,31 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $doctrine = $doctrine ? : $this->getDoctrine();
 
         $serviceLink = $this->getMockBuilder(ServiceLink::class)->disableOriginalConstructor()->getMock();
-        $serviceLink->expects($this->once())
-            ->method('getService')
-            ->willReturn(new SegmentQueryConverter(
-                $manager,
-                $virtualFieldProvider,
-                $doctrine,
-                new RestrictionBuilder($manager)
-            ));
+        $serviceLink->expects($this->never())->method('getService');
 
-        return new DynamicSegmentQueryBuilder($serviceLink, $doctrine);
+        $segmentQueryConverterFactory = $this->getMockBuilder(SegmentQueryConverterFactory::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $segmentQueryConverterFactory->expects($this->once())
+            ->method('createInstance')
+            ->willReturn(
+                new SegmentQueryConverter(
+                    $manager,
+                    $virtualFieldProvider,
+                    $doctrine,
+                    new RestrictionBuilder($manager)
+                )
+            );
+
+        $factoryServiceLink = $this->getMockBuilder(ServiceLink::class)->disableOriginalConstructor()->getMock();
+        $factoryServiceLink->expects($this->once())
+            ->method('getService')
+            ->willReturn($segmentQueryConverterFactory);
+
+        $dynamicSegmentQueryBuilder = new DynamicSegmentQueryBuilder($serviceLink, $doctrine);
+        $dynamicSegmentQueryBuilder->setSegmentQueryConverterFactoryLink($factoryServiceLink);
+
+        return $dynamicSegmentQueryBuilder;
     }
 
 
