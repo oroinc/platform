@@ -47,8 +47,8 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $expectedResult = true;
 
         $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->will($this->returnValue(true));
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -66,8 +66,8 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $expectedResult = true;
 
         $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->will($this->returnValue(true));
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -90,8 +90,8 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->will($this->returnValue(true));
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -132,8 +132,8 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->will($this->returnValue(true));
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -172,8 +172,8 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->will($this->returnValue(true));
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -214,8 +214,8 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->will($this->returnValue(true));
+            ->method('getToken')
+            ->will($this->returnValue(new \stdClass()));
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -232,8 +232,8 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $context = [];
 
         $this->tokenAccessor->expects($this->once())
-            ->method('hasUser')
-            ->will($this->returnValue(false));
+            ->method('getToken')
+            ->will($this->returnValue(null));
 
         $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
