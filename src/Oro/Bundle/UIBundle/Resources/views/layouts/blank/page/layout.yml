@@ -61,7 +61,7 @@ layout:
                 app_script:
                     blockType: script
                     options:
-                        content: 'require(["oroui/js/app"]); require(["oroui/js/init-layout"]);'
+                        content: 'require(["oroui/js/app"]);'
             tree:
                 root:
                     head:

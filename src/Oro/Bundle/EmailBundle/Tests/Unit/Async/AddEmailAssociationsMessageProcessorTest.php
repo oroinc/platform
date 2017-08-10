@@ -29,8 +29,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddEmailAssociationsMessageProcessor]'
-                .' Got invalid message: "{"targetClass":"class","targetId":123}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();
@@ -56,7 +55,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddEmailAssociationsMessageProcessor] Got invalid message: "{"emailIds":[],"targetId":123}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();
@@ -82,8 +81,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddEmailAssociationsMessageProcessor]'
-                .' Got invalid message: "{"emailIds":[],"targetClass":"class"}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();
@@ -113,7 +111,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $logger
             ->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('[AddEmailAssociationsMessageProcessor] Sent "2" messages'))
+            ->with($this->equalTo('Sent "2" messages'))
         ;
 
         $producer = $this->createMessageProducerMock();

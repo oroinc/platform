@@ -5,6 +5,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var Modal = require('oroui/js/modal');
     var template = require('tpl!oroui/templates/delete-confirmation.html');
+    var DeleteConfirmation;
 
     /**
      * Delete confirmation dialog
@@ -13,7 +14,7 @@ define(function(require) {
      * @class   oroui.DeleteConfirmation
      * @extends oroui.Modal
      */
-    return Modal.extend({
+    DeleteConfirmation = Modal.extend({
 
         /** @property {String} */
         template: template,
@@ -30,18 +31,16 @@ define(function(require) {
         /** @property {String} */
         cancelText: __('Cancel'),
 
+        okButtonClass: 'btn ok btn-danger',
+
         /**
          * @param {Object} options
          */
         initialize: function(options) {
-            options = _.extend({
-                title: this.title,
-                okText: this.okText,
-                cancelText: this.cancelText
-            }, options);
-
-            arguments[0] = options;
-            Modal.prototype.initialize.apply(this, arguments);
+            _.defaults(options, _.pick(DeleteConfirmation.prototype, 'title', 'okText', 'okButtonClass', 'cancelText'));
+            DeleteConfirmation.__super__.initialize.call(this, options);
         }
     });
+
+    return DeleteConfirmation;
 });

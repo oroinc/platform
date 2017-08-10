@@ -28,8 +28,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddEmailAssociationMessageProcessor]'
-                .' Got invalid message: "{"targetClass":"class","targetId":123}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();
@@ -55,7 +54,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddEmailAssociationMessageProcessor] Got invalid message: "{"emailId":1,"targetId":123}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();
@@ -81,8 +80,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddEmailAssociationMessageProcessor]'
-                .' Got invalid message: "{"emailId":1,"targetClass":"class"}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();

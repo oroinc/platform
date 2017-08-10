@@ -1,5 +1,6 @@
 config:
     paths:
+        'oroentityextend/js/app/views/enum-values-view': 'bundles/oroentityextend/js/app/views/enum-values-view.js'
         'oroentityextend/js/schema-update-action-component': 'bundles/oroentityextend/js/components/schema-update-action-component.js'
         'oroentityextend/js/init-entity-extend-relation': 'bundles/oroentityextend/js/init-entity-extend-relation.js'
         'oro/datagrid/action/ajaxdeletefield-action': 'bundles/oroentityextend/js/datagrid/action/ajaxdeletefield-action.js'

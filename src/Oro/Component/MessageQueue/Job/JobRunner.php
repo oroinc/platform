@@ -4,23 +4,24 @@ namespace Oro\Component\MessageQueue\Job;
 
 class JobRunner
 {
-    /**
-     * @var JobProcessor
-     */
+    /** @var JobProcessor */
     private $jobProcessor;
 
-    /**
-     * @var Job
-     */
+    /** @var ExtensionInterface */
+    private $jobExtension;
+
+    /** @var Job */
     private $rootJob;
 
     /**
-     * @param JobProcessor $jobProcessor
-     * @param Job          $rootJob
+     * @param JobProcessor       $jobProcessor
+     * @param ExtensionInterface $jobExtension
+     * @param Job                $rootJob
      */
-    public function __construct(JobProcessor $jobProcessor, Job $rootJob = null)
+    public function __construct(JobProcessor $jobProcessor, ExtensionInterface $jobExtension, Job $rootJob = null)
     {
         $this->jobProcessor = $jobProcessor;
+        $this->jobExtension = $jobExtension;
         $this->rootJob = $rootJob;
     }
 
@@ -46,6 +47,8 @@ class JobRunner
             return null;
         }
 
+        $this->jobExtension->onPreRunUnique($childJob);
+
         if ($this->isReadyForStart($childJob)) {
             $this->jobProcessor->startChildJob($childJob);
         }
@@ -57,6 +60,8 @@ class JobRunner
                 ? $this->jobProcessor->successChildJob($childJob)
                 : $this->jobProcessor->failChildJob($childJob);
         }
+
+        $this->jobExtension->onPostRunUnique($childJob, $result);
 
         return $result;
     }
@@ -71,9 +76,13 @@ class JobRunner
     {
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $this->rootJob);
 
-        $jobRunner = new JobRunner($this->jobProcessor, $this->rootJob);
+        $jobRunner = $this->getJobRunnerForChildJob($this->rootJob);
 
-        return call_user_func($startCallback, $jobRunner, $childJob);
+        $createResult = call_user_func($startCallback, $jobRunner, $childJob);
+
+        $this->jobExtension->onCreateDelayed($childJob, $createResult);
+
+        return $createResult;
     }
 
     /**
@@ -99,6 +108,8 @@ class JobRunner
             return null;
         }
 
+        $this->jobExtension->onPreRunDelayed($job);
+
         if ($this->isReadyForStart($job)) {
             $this->jobProcessor->startChildJob($job);
         }
@@ -111,7 +122,19 @@ class JobRunner
                 : $this->jobProcessor->failChildJob($job);
         }
 
+        $this->jobExtension->onPostRunDelayed($job, $result);
+
         return $result;
+    }
+
+    /**
+     * @param Job $rootJob
+     *
+     * @return JobRunner
+     */
+    private function getJobRunnerForChildJob(Job $rootJob)
+    {
+        return new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
     }
 
     /**
@@ -134,7 +157,7 @@ class JobRunner
      */
     private function callbackResult($runCallback, $job)
     {
-        $jobRunner = new JobRunner($this->jobProcessor, $job->getRootJob());
+        $jobRunner = $this->getJobRunnerForChildJob($job->getRootJob());
         try {
             $result = call_user_func($runCallback, $jobRunner, $job);
         } catch (\Exception $e) {

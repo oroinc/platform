@@ -22,17 +22,31 @@ class SuiteSetDividerControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($command->getDefinition()->hasOption('suite-set-divider'));
         $this->assertTrue($command->getDefinition()->getOption('suite-set-divider')->isValueRequired());
+
+        $this->assertTrue($command->getDefinition()->hasOption('max_suite_set_execution_time'));
+        $this->assertTrue($command->getDefinition()->getOption('max_suite_set_execution_time')->isValueRequired());
     }
 
-    public function testExecute()
+    public function testDivideByCount()
     {
         $suiteConfigRegistry = $this->getMockBuilder(SuiteConfigurationRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $suiteConfigRegistry->expects($this->once())->method('genererateSets')->with(5);
+        $suiteConfigRegistry->expects($this->once())->method('generateSetsDividedByCount')->with(5);
 
         $controller = new SuiteSetDividerController($suiteConfigRegistry);
         $controller->execute(new InputStub('', [], ['suite-set-divider' => 5]), new OutputStub());
+    }
+
+    public function testDivideByTimeExecution()
+    {
+        $suiteConfigRegistry = $this->getMockBuilder(SuiteConfigurationRegistry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $suiteConfigRegistry->expects($this->once())->method('generateSetsByMaxExecutionTime')->with(500);
+
+        $controller = new SuiteSetDividerController($suiteConfigRegistry);
+        $controller->execute(new InputStub('', [], ['max_suite_set_execution_time' => 500]), new OutputStub());
     }
 
     public function testNotExecute()
@@ -40,7 +54,8 @@ class SuiteSetDividerControllerTest extends \PHPUnit_Framework_TestCase
         $suiteConfigRegistry = $this->getMockBuilder(SuiteConfigurationRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $suiteConfigRegistry->expects($this->never())->method('genererateSets');
+        $suiteConfigRegistry->expects($this->never())->method('generateSetsDividedByCount');
+        $suiteConfigRegistry->expects($this->never())->method('generateSetsByMaxExecutionTime');
 
         $controller = new SuiteSetDividerController($suiteConfigRegistry);
         $controller->execute(new InputStub('', [], []), new OutputStub());
