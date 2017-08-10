@@ -37,6 +37,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('js_engine')->defaultNull()->end()
                 ->scalarNode('build_path')->defaultValue('js/app.min.js')->end()
                 ->integerNode('building_timeout')->min(1)->defaultValue(60)->end()
+                ->booleanNode('build_logger')->defaultValue(false)->end()
                 ->arrayNode('build')
                     ->addDefaultsIfNotSet()
                     ->children()

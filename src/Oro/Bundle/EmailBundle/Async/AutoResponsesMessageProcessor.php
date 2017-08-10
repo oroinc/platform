@@ -49,10 +49,7 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['ids']) || ! is_array($data['ids'])) {
-            $this->logger->critical(sprintf(
-                '[AutoResponsesMessageProcessor] Got invalid message. "%s"',
-                $message->getBody()
-            ), ['message' => $message]);
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }

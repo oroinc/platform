@@ -144,6 +144,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Find and assert that field value is empty
+     *
+     * @When /^(?P<fieldName>[\w\s]*) field is empty$/
+     */
+    public function fieldIsEmpty($fieldName)
+    {
+        return $this->fieldShouldHaveValue($fieldName, "");
+    }
+
+    /**
      * This is available for collection fields
      * See Emails and Phones in Contact create page
      * Example: And set "charlie@gmail.com" as primary email
@@ -360,6 +370,21 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $form = $this->createElement('SystemConfigForm');
         $form->uncheckUseDefaultCheckbox($label);
     }
+
+    /**
+     * This step used for system configuration field on nested level (Organization, Website)
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And uncheck Use System for "Position" field
+     *
+     * @Given uncheck Use System for :label field
+     */
+    public function uncheckUseSystemForField($label)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->uncheckUseDefaultCheckbox($label, 'Use System');
+    }
+
 
     /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/

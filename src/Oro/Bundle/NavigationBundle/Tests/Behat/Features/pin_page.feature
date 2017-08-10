@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-11237
 @automatically-ticket-tagged
 Feature: Pin page

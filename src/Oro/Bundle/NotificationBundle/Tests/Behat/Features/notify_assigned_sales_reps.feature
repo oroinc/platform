@@ -1,3 +1,4 @@
+@regression
 Feature: Notify assigned Sales Representatives
   As an Administrator
   When I create email notification for Contact Request

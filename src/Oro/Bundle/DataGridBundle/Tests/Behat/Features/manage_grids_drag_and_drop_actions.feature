@@ -1,3 +1,4 @@
+@regression
 @fixture-OroCustomerBundle:CustomerUserAmandaRCole.yml
 Feature: Improve manage grid swipe actions
   Scenario: Checked drag and drop option in "Manage grid" popup on mobile view

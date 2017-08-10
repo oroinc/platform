@@ -1,3 +1,4 @@
+@regression
 @fixture-OroUserBundle:user.yml
 Feature: Actions applicability in grid
 

@@ -47,10 +47,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['jobId'])) {
-            $this->logger->critical(sprintf(
-                '[DependentJobMessageProcessor] Got invalid message. body: "%s"',
-                $message->getBody()
-            ));
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
@@ -58,7 +55,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         $job = $this->jobStorage->findJobById($data['jobId']);
         if (! $job) {
             $this->logger->critical(sprintf(
-                '[DependentJobMessageProcessor] Job was not found. id: "%s"',
+                'Job was not found. id: "%s"',
                 $data['jobId']
             ));
 
@@ -67,7 +64,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
 
         if (! $job->isRoot()) {
             $this->logger->critical(sprintf(
-                '[DependentJobMessageProcessor] Expected root job but got child. id: "%s"',
+                'Expected root job but got child. id: "%s"',
                 $data['jobId']
             ));
 
@@ -85,7 +82,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         foreach ($dependentJobs as $dependentJob) {
             if (! isset($dependentJob['topic']) || ! isset($dependentJob['message'])) {
                 $this->logger->critical(sprintf(
-                    '[DependentJobMessageProcessor] Got invalid dependent job data. job: "%s", dependentJob: "%s"',
+                    'Got invalid dependent job data. job: "%s", dependentJob: "%s"',
                     $job->getId(),
                     JSON::encode($dependentJob)
                 ));

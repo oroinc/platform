@@ -5,6 +5,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Collects consumption and job extensions.
+ */
 class BuildExtensionsPass implements CompilerPassInterface
 {
     /**
@@ -12,7 +15,27 @@ class BuildExtensionsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $tags = $container->findTaggedServiceIds('oro_message_queue.consumption.extension');
+        $this->processExtensions(
+            $container,
+            'oro_message_queue.consumption.extension',
+            'oro_message_queue.consumption.extensions'
+        );
+
+        $this->processExtensions(
+            $container,
+            'oro_message_queue.job.extension',
+            'oro_message_queue.job.extensions'
+        );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $tag
+     * @param string           $targetService
+     */
+    protected function processExtensions(ContainerBuilder $container, $tag, $targetService)
+    {
+        $tags = $container->findTaggedServiceIds($tag);
 
         $groupByPriority = [];
         foreach ($tags as $serviceId => $tagAttributes) {
@@ -30,6 +53,6 @@ class BuildExtensionsPass implements CompilerPassInterface
             $flatExtensions = array_merge($flatExtensions, $extension);
         }
 
-        $container->getDefinition('oro_message_queue.consumption.extensions')->replaceArgument(0, $flatExtensions);
+        $container->getDefinition($targetService)->replaceArgument(0, $flatExtensions);
     }
 }

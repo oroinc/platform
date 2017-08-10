@@ -33,7 +33,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AutoResponseMessageProcessor] Got invalid message. "{"key":"value"}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new AutoResponseMessageProcessor(
@@ -134,7 +134,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('[AutoResponseMessageProcessor] Email was not found. id: "123"')
+            ->with('Email was not found. id: "123"')
         ;
 
         $processor = new AutoResponseMessageProcessor(

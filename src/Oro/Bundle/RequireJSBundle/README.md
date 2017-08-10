@@ -106,6 +106,7 @@ Build configuration starts in ```app/config.yml```
         build_path: "js/oro.min.js"     # relative path from document root folder to project built
         building_timeout: 3600
         js_engine: "node"               # can be configured to use other engine, e.g. Rhino
+        build_logger: false             # show in browser console not optimized RequireJS modules 
         build:                          # build.js's common options
             optimize: "uglify2"
             preserveLicenseComments: true
