@@ -123,10 +123,10 @@ define(function(require) {
                     editor.component = defaultOptions.cell_editor.component;
                 }
                 if (!editor.view) {
-                    options.metadata.inline_editing.defaultEditorsLoadPromise.then(function(defaultEditors) {
-                        var realization = defaultEditors[columnMeta.type || inlineEdititngBuilder.DEFAULT_COLUMN_TYPE];
-                        editor.view = realization;
-                        if (realization === void 0) {
+                    promises.push(options.metadata.inline_editing.defaultEditorsLoadPromise.then(function(editors) {
+                        var editorView = editors[columnMeta.type || inlineEdititngBuilder.DEFAULT_COLUMN_TYPE];
+                        editor.view = editorView;
+                        if (editorView === void 0) {
                             columnMeta.inline_editing.enable = false;
                             columnMeta.inline_editing.enable$changeReason =
                                 'Automatically disabled due to absent editor realization';
@@ -141,30 +141,30 @@ define(function(require) {
                             }
                             return;
                         }
-                        if (_.isFunction(realization.processMetadata)) {
-                            return realization.processMetadata(columnMeta);
+                        if (_.isFunction(editorView.processMetadata)) {
+                            return editorView.processMetadata(columnMeta);
                         }
-                        return realization;
-                    });
+                        return editorView;
+                    }));
                 } else {
                     promises.push(tools.loadModule(editor.view)
-                        .then(function(realization) {
-                            editor.view = realization;
-                            if (_.isFunction(realization.processMetadata)) {
-                                return realization.processMetadata(columnMeta);
+                        .then(function(editorView) {
+                            editor.view = editorView;
+                            if (_.isFunction(editorView.processMetadata)) {
+                                return editorView.processMetadata(columnMeta);
                             }
-                            return realization;
+                            return editorView;
                         }));
                 }
 
                 if (_.isString(editor.component)) {
                     promises.push(tools.loadModule(editor.component)
-                        .then(function(realization) {
-                            editor.component = realization;
-                            if (_.isFunction(realization.processMetadata)) {
-                                return realization.processMetadata(columnMeta);
+                        .then(function(editorComponent) {
+                            editor.component = editorComponent;
+                            if (_.isFunction(editorComponent.processMetadata)) {
+                                return editorComponent.processMetadata(columnMeta);
                             }
-                            return realization;
+                            return editorComponent;
                         }));
                 } else {
                     if (_.isFunction(editor.component.processMetadata)) {
