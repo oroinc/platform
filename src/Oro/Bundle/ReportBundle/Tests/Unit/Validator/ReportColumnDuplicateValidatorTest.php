@@ -6,9 +6,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\ReportBundle\Entity\Report;
-use Oro\Bundle\ReportBundle\Validator\ReportColumnDublicateValidator;
+use Oro\Bundle\ReportBundle\Validator\ReportColumnDuplicateValidator;
 
-class ReportColumnDublicateValidatorTest extends \PHPUnit_Framework_TestCase
+class ReportColumnDuplicateValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Constraint|\PHPUnit_Framework_MockObject_MockObject
@@ -16,7 +16,7 @@ class ReportColumnDublicateValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var ReportColumnDublicateValidator
+     * @var ReportColumnDuplicateValidator
      */
     protected $validator;
 
@@ -29,7 +29,7 @@ class ReportColumnDublicateValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->constraint = $this->getMockBuilder(Constraint::class)->getMock();
         $this->context = $this->getMockBuilder(ExecutionContextInterface::class)->getMock();
-        $this->validator = new ReportColumnDublicateValidator();
+        $this->validator = new ReportColumnDuplicateValidator();
         $this->validator->initialize($this->context);
     }
 
@@ -60,7 +60,7 @@ class ReportColumnDublicateValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(null, $this->constraint);
     }
 
-    public function testValidateShouldDoNothingIfColumnsNotDublicated()
+    public function testValidateShouldDoNothingIfColumnsNotDuplicated()
     {
         $this->context->expects($this->never())->method('addViolation');
         $report = new Report();
