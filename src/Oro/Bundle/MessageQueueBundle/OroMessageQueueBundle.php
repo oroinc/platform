@@ -5,6 +5,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageToArrayConverterPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
@@ -27,6 +28,7 @@ class OroMessageQueueBundle extends Bundle
         $container->addCompilerPass(new BuildMessageProcessorRegistryPass());
         $container->addCompilerPass(new BuildTopicMetaSubscribersPass());
         $container->addCompilerPass(new BuildDestinationMetaRegistryPass());
+        $container->addCompilerPass(new BuildMessageToArrayConverterPass());
 
         /** @var OroMessageQueueExtension $extension */
         $extension = $container->getExtension('oro_message_queue');

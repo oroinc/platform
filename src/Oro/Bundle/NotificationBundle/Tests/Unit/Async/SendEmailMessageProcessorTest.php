@@ -46,8 +46,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[SendEmailMessageProcessor] Got invalid message: ' .
-                '"{"toEmail":"to@email.com","fromEmail":"from@email.com"}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new SendEmailMessageProcessor(
@@ -75,7 +74,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[SendEmailMessageProcessor] Got invalid message: "{"body":"body","toEmail":"to@email.com"}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new SendEmailMessageProcessor(
@@ -103,7 +102,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[SendEmailMessageProcessor] Got invalid message: "{"body":"body","fromEmail":"from@email.com"}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new SendEmailMessageProcessor(
@@ -131,8 +130,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[SendEmailMessageProcessor] Got invalid message: ' .
-                '"{"fromEmail":"from@email.com","toEmail":"to@email.com","template":"template_name"}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new SendEmailMessageProcessor(
@@ -168,8 +166,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('[SendEmailMessageProcessor] '.
-                'Cannot send message: "{"body":"Message body","toEmail":"to@email.com","fromEmail":"from@email.com"}"')
+            ->with('Cannot send message')
         ;
 
         $processor = new SendEmailMessageProcessor(

@@ -9,6 +9,7 @@ use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 class OroRequireJSExtension extends \Twig_Extension
 {
     const DEFAULT_PROVIDER_ALIAS = 'oro_requirejs_config_provider';
+    const BUILD_LOGGER_TEMPLATE = 'OroRequireJSBundle::requirejs_build_logger.html.twig';
 
     /** @var ContainerInterface */
     protected $container;
@@ -16,14 +17,19 @@ class OroRequireJSExtension extends \Twig_Extension
     /** @var string */
     protected $webRoot;
 
+    /** @var boolean */
+    protected $buildLogger;
+
     /**
      * @param ContainerInterface $container
      * @param string             $webRoot
+     * @param boolean            $buildLogger
      */
-    public function __construct(ContainerInterface $container, $webRoot)
+    public function __construct(ContainerInterface $container, $webRoot, $buildLogger)
     {
         $this->container = $container;
         $this->webRoot = $webRoot;
+        $this->buildLogger = $buildLogger;
     }
 
     /**
@@ -52,6 +58,10 @@ class OroRequireJSExtension extends \Twig_Extension
             new \Twig_SimpleFunction(
                 'requirejs_build_exists',
                 [$this, 'isRequireJSBuildExists']
+            ),
+            new \Twig_SimpleFunction(
+                'requirejs_build_logger',
+                [$this, 'getRequireJSBuildLogger']
             ),
         ];
     }
@@ -104,6 +114,35 @@ class OroRequireJSExtension extends \Twig_Extension
         $filePath = $this->getRequireJSBuildPath($this->getDefaultAliasIfEmpty($alias));
 
         return file_exists($this->webRoot . DIRECTORY_SEPARATOR . $filePath);
+    }
+
+    /**
+     * Get require.js build logger script
+     *
+     * @param string $alias
+     *
+     * @return string
+     */
+    public function getRequireJSBuildLogger($alias = null)
+    {
+        $provider = $this->getManager()->getProvider($this->getDefaultAliasIfEmpty($alias));
+        if (null === $provider || !$this->buildLogger) {
+            return '';
+        }
+
+        $configs = $provider->getConfig()->getBuildConfig();
+        $excludeList = array_filter(
+            $configs['paths'],
+            function ($config) {
+                return $config === 'empty:';
+            }
+        );
+
+        $parameters = [];
+        $parameters['excludeList'] = array_keys($excludeList);
+
+        return $this->container->get('twig')
+            ->render(static::BUILD_LOGGER_TEMPLATE, $parameters);
     }
 
     /**

@@ -29,7 +29,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AutoResponsesMessageProcessor] Got invalid message. "{"key":"value"}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new AutoResponsesMessageProcessor(

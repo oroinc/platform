@@ -49,12 +49,12 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
      */
     public function waitWhileProcessingMessages($timeLimit = self::TIMEOUT)
     {
-        $isRunning = $this->isOutdatedState();
-        if (!$isRunning) {
-            throw new RuntimeException('Message Queue is not running');
-        }
-
         while ($timeLimit > 0) {
+            $isRunning = $this->isOutdatedState();
+            if (!$isRunning) {
+                throw new RuntimeException('Message Queue is not running');
+            }
+
             $isQueueEmpty = $this->isQueueEmpty();
             if ($isQueueEmpty) {
                 return;

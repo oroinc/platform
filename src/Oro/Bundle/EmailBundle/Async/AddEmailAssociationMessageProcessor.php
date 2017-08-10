@@ -51,13 +51,7 @@ class AddEmailAssociationMessageProcessor implements MessageProcessorInterface, 
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['jobId'], $data['emailId'], $data['targetClass'], $data['targetId'])) {
-            $this->logger->critical(
-                sprintf(
-                    '[AddEmailAssociationMessageProcessor] Got invalid message: "%s"',
-                    $message->getBody()
-                ),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
