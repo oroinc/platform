@@ -135,6 +135,8 @@ abstract class AbstractImportExportTest extends WebTestCase
         string $importCsvFilePath,
         string $errorsFilePath = ''
     ) {
+        $this->markTestSkipped();
+
         $this->assertPreImportValidationActionExecuted($configuration, $importCsvFilePath);
 
         $preImportValidateMessageData = $this->getOneSentMessageWithTopic(Topics::PRE_HTTP_IMPORT);
