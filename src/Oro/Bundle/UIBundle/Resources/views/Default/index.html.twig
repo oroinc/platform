@@ -34,7 +34,7 @@
                 </script>
                 {% endblock %}
                 <script type="text/javascript">
-                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
+                    require(['orouser/js/init-user', 'oroui/js/widget-manager']);
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
@@ -90,11 +90,10 @@
                                 <div class="flash-messages-holder"></div>
                             </div>
                             <script type="text/javascript">
-                                require(['jquery', 'oroui/js/messenger', 'tpl!oroui/templates/message-item.html'],
+                                require(['jquery', 'oroui/js/messenger'],
                                         function($, messenger, template) {
                                             messenger.setup({
-                                                container: '#flash-messages .flash-messages-holder',
-                                                template: template
+                                                container: '#flash-messages .flash-messages-holder'
                                             });
                                             {% if app.session.flashbag.peekAll|length > 0 %}
                                             $(function() {

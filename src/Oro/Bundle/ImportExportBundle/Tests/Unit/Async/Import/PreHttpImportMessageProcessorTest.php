@@ -68,7 +68,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[PreHttpImportMessageProcessor] Got invalid message. body: []')
+            ->with('Got invalid message')
         ;
 
         $processor = new PreHttpImportMessageProcessor(
@@ -99,7 +99,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('warning')
-            ->with('[PreHttpImportMessageProcessor] Not supported format: "test", using default')
+            ->with('Not supported format: "test", using default')
         ;
         $fileManager = $this->createFileManagerMock();
         $fileManager
@@ -254,7 +254,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[PreHttpImportMessageProcessor] An error occurred while reading file test.csv: "test Error"');
+            ->with('An error occurred while reading file test.csv: "test Error"');
 
         $producer = $this->createMessageProducerInterfaceMock();
         $producer

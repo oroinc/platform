@@ -105,13 +105,7 @@ class ReversSyncIntegrationProcessor implements
         );
 
         if (! $body['integration_id'] || ! $body['connector']) {
-            $this->logger->critical(
-                sprintf(
-                    'Invalid message: integration_id and connector should not be empty: %s',
-                    $message->getBody()
-                ),
-                ['message' => $message]
-            );
+            $this->logger->critical('Invalid message: integration_id and connector should not be empty');
 
             return self::REJECT;
         }
@@ -125,10 +119,7 @@ class ReversSyncIntegrationProcessor implements
         /** @var Integration $integration */
         $integration = $em->find(Integration::class, $body['integration_id']);
         if (! $integration || ! $integration->isEnabled()) {
-            $this->logger->critical(
-                sprintf('Integration should exist and be enabled: %s', $body['integration_id']),
-                ['message' => $message]
-            );
+            $this->logger->critical('Integration should exist and be enabled');
 
             return self::REJECT;
         }
@@ -140,8 +131,9 @@ class ReversSyncIntegrationProcessor implements
         } catch (LogicException $e) { //can't find the connector
             $this->logger->critical(
                 sprintf('Connector not found: %s', $body['connector']),
-                ['message' => $message]
+                ['exception' => $e]
             );
+
             return self::REJECT;
         }
         if (!$connector instanceof TwoWaySyncConnectorInterface) {
@@ -150,8 +142,7 @@ class ReversSyncIntegrationProcessor implements
                     'Unable to perform reverse sync for integration "%s" and connector type "%s"',
                     $integration->getId(),
                     $body['connector']
-                ),
-                ['message' => $message]
+                )
             );
 
             return self::REJECT;
