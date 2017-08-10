@@ -84,7 +84,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($options['acl_resource_id'])
+            ->with($options['extras']['acl_resource_id'])
             ->will($this->returnValue($isAllowed));
 
         $item = $this->factory->createItem('test', $options);
@@ -99,35 +99,35 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'allowed' => [
-                ['acl_resource_id' => 'test'],
+                ['extras' => ['acl_resource_id' => 'test']],
                 true
             ],
             'not allowed' => [
-                ['acl_resource_id' => 'test'],
+                ['extras' => ['acl_resource_id' => 'test']],
                 false
             ],
             'allowed with uri' => [
-                ['acl_resource_id' => 'test', 'uri' => '#'],
+                ['uri' => '#', 'extras' => ['acl_resource_id' => 'test']],
                 true
             ],
             'not allowed with uri' => [
-                ['acl_resource_id' => 'test', 'uri' => '#'],
+                ['uri' => '#', 'extras' => ['acl_resource_id' => 'test']],
                 false
             ],
             'allowed with route' => [
-                ['acl_resource_id' => 'test', 'route' => 'test'],
+                ['route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
                 true
             ],
             'not allowed with route' => [
-                ['acl_resource_id' => 'test', 'route' => 'test'],
+                ['route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
                 false
             ],
             'allowed with route and uri' => [
-                ['acl_resource_id' => 'test', 'uri' => '#', 'route' => 'test'],
+                ['uri' => '#', 'route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
                 true
             ],
             'not allowed with route and uri' => [
-                ['acl_resource_id' => 'test', 'uri' => '#', 'route' => 'test'],
+                ['uri' => '#', 'route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
                 false
             ],
         ];
@@ -169,6 +169,10 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
                 ['check_access' => false, 'extras' => []],
                 true,
             ],
+            'check access' => [
+                ['check_access_not_logged_in' => true, 'extras' => []],
+                true,
+            ]
         ];
     }
 
@@ -400,7 +404,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAclCacheByResourceId()
     {
-        $options = ['acl_resource_id' => 'resource_id'];
+        $options = ['extras' => ['acl_resource_id' => 'resource_id']];
 
         $this->tokenAccessor->expects($this->any())
             ->method('hasUser')
@@ -408,7 +412,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($options['acl_resource_id'])
+            ->with($options['extras']['acl_resource_id'])
             ->will($this->returnValue(true));
 
         for ($i = 0; $i < 2; $i++) {
@@ -418,7 +422,11 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertAttributeCount(1, 'aclCache', $this->factoryExtension);
-        $this->assertAttributeEquals([$options['acl_resource_id'] => true], 'aclCache', $this->factoryExtension);
+        $this->assertAttributeEquals(
+            [$options['extras']['acl_resource_id'] => true],
+            'aclCache',
+            $this->factoryExtension
+        );
     }
 
     public function testAclCacheByKey()
