@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
     /**#@+
@@ -112,6 +115,8 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      * @param array $options
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processAcl(array &$options = array())
     {
@@ -123,7 +128,9 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             return;
         }
 
-        if ($this->hideAllForNotLoggedInUsers && !$securityFacade->hasLoggedUser()) {
+        $checkAccessNotLoggedIn = isset($options['check_access_not_logged_in'])
+            && $options['check_access_not_logged_in'];
+        if (!$checkAccessNotLoggedIn && $this->hideAllForNotLoggedInUsers && !$securityFacade->hasLoggedUser()) {
             if (!empty($options['extras']['show_non_authorized'])) {
                 return;
             }
@@ -134,12 +141,13 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
                 $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
             }
 
-            if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
-                if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
-                    $isAllowed = $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]];
+            if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options['extras'])) {
+                $aclResourceId = $options['extras'][self::ACL_RESOURCE_ID_KEY];
+                if (array_key_exists($aclResourceId, $this->aclCache)) {
+                    $isAllowed = $this->aclCache[$aclResourceId];
                 } else {
-                    $isAllowed = $securityFacade->isGranted($options[self::ACL_RESOURCE_ID_KEY]);
-                    $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]] = $isAllowed;
+                    $isAllowed = $securityFacade->isGranted($aclResourceId);
+                    $this->aclCache[$aclResourceId] = $isAllowed;
                 }
             } else {
                 $routeInfo = $this->getRouteInfo($options);
