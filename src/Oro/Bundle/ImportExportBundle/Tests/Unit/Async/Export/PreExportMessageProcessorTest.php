@@ -34,18 +34,15 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'loggerMessage' => '[PreExportMessageProcessor] ' .
-                    'Got invalid message: "{"processorAlias":"alias","securityToken":"token"}"',
+                'loggerMessage' => 'Got invalid message',
                 'messageBody' => ['processorAlias' => 'alias', 'securityToken' => 'token'],
             ],
             [
-                'loggerMessage' => '[PreExportMessageProcessor] ' .
-                    'Got invalid message: "{"jobName":"name","securityToken":"token"}"',
+                'loggerMessage' => 'Got invalid message',
                 'messageBody' => ['jobName' => 'name', 'securityToken' => 'token'],
             ],
             [
-                'loggerMessage' => '[PreExportMessageProcessor] ' .
-                    'Got invalid message: "{"jobName":"name","processorAlias":"alias"}"',
+                'loggerMessage' => 'Got invalid message',
                 'messageBody' => ['jobName' => 'name', 'processorAlias' => 'alias'],
             ],
         ];
@@ -89,7 +86,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[PreExportMessageProcessor] Cannot set security token');
+            ->with('Cannot set security token');
 
         $processor = new PreExportMessageProcessor(
             $this->createJobRunnerMock(),

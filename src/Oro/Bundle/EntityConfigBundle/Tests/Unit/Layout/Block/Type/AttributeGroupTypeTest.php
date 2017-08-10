@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
+use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
 use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AttributeBlockTypeMapperInterface;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
@@ -20,8 +20,8 @@ use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 
 class AttributeGroupTypeTest extends BlockTypeTestCase
 {
-    /** @var AttributeGroupRenderRegistry */
-    protected $attributeGroupRenderRegistry;
+    /** @var AttributeRenderRegistry */
+    protected $attributeRenderRegistry;
 
     /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject $attributeManager */
     protected $attributeManager;
@@ -34,7 +34,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
      */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
-        $this->attributeGroupRenderRegistry = new AttributeGroupRenderRegistry();
+        $this->attributeRenderRegistry = new AttributeRenderRegistry();
 
         $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
             ->setMethods(['getAttributesByGroup'])
@@ -44,7 +44,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->blockTypeMapper = $this->createMock(AttributeBlockTypeMapperInterface::class);
 
         $attributeGroupType = new AttributeGroupType(
-            $this->attributeGroupRenderRegistry,
+            $this->attributeRenderRegistry,
             $this->attributeManager,
             $this->blockTypeMapper
         );
@@ -72,6 +72,8 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $firstAttribute->setEntity(new EntityConfigModel('firstAttributeClassName'));
         $secondAttribute = new FieldConfigModel('second_attribute', 'integer');
         $secondAttribute->setEntity(new EntityConfigModel('secondAttributeClassName'));
+        $thirdAttribute = new FieldConfigModel('third_attribute', 'integer');
+        $thirdAttribute->setEntity(new EntityConfigModel('thirdAttributeClassName'));
 
         $attributeGroup = new AttributeGroup();
         $attributeGroup->setCode('group_code');
@@ -79,7 +81,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->attributeManager->expects($this->once())
             ->method('getAttributesByGroup')
             ->with($attributeGroup)
-            ->willReturn([$firstAttribute, $secondAttribute]);
+            ->willReturn([$firstAttribute, $secondAttribute, $thirdAttribute]);
 
         $this->blockTypeMapper->expects($this->any())
             ->method('getBlockType')
@@ -89,9 +91,11 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $attributeFamily->setCode('family_code');
         $attributeFamily->addAttributeGroup($attributeGroup);
 
+        $this->attributeRenderRegistry->setAttributeRendered($attributeFamily, 'third_attribute');
+
         $entityValue = new Expression('context["entity"]');
 
-        $this->assertFalse($this->attributeGroupRenderRegistry->isRendered($attributeFamily, $attributeGroup));
+        $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
 
         $view = $this->getBlockView(
             AttributeGroupType::NAME,
@@ -120,7 +124,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertEquals('secondAttributeClassName', $secondAttributeView->vars['className']);
         $this->assertEquals('bar', $secondAttributeView->vars['foo']);
 
-        $this->assertTrue($this->attributeGroupRenderRegistry->isRendered($attributeFamily, $attributeGroup));
+        $this->assertTrue($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
     }
 
     public function testGetBlockViewWithNonExistentAttributeGroup()
@@ -171,7 +175,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $attributeFamily->setCode('family_code');
         $attributeFamily->addAttributeGroup($attributeGroup);
 
-        $this->assertFalse($this->attributeGroupRenderRegistry->isRendered($attributeFamily, $attributeGroup));
+        $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
 
         $entityValue = new Expression('context["entity"]');
         $view = $this->getBlockView(
@@ -190,7 +194,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertEquals($entityValue, $firstAttributeView->vars['entity']);
         $this->assertEquals('attribute', $firstAttributeView->vars['fieldName']);
         $this->assertEquals('attributeClassName', $firstAttributeView->vars['className']);
-        $this->assertFalse($this->attributeGroupRenderRegistry->isRendered($attributeFamily, $attributeGroup));
+        $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
     }
 
     public function testGetName()

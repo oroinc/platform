@@ -56,10 +56,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
         $body = JSON::decode($message->getBody());
 
         if (! isset($body['jobId'], $body['ids']) || ! is_array($body['ids'])) {
-            $this->logger->critical(
-                sprintf('[PurgeEmailAttachmentsByIdsMessageProcessor] Got invalid message: "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }

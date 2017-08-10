@@ -58,10 +58,7 @@ class CalculateRootJobProgressProcessor implements MessageProcessorInterface, To
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['jobId'])) {
-            $this->logger->critical(
-                sprintf('Got invalid message. body: "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
@@ -69,8 +66,7 @@ class CalculateRootJobProgressProcessor implements MessageProcessorInterface, To
         $job = $this->jobStorage->findJobById($data['jobId']);
         if (! $job) {
             $this->logger->critical(
-                sprintf('Job was not found. id: "%s"', $data['jobId']),
-                ['message' => $message]
+                sprintf('Job was not found. id: "%s"', $data['jobId'])
             );
 
             return self::REJECT;

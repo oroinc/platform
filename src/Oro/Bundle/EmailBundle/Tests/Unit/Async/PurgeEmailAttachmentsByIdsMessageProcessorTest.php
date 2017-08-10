@@ -37,8 +37,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit_Framework_
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[PurgeEmailAttachmentsByIdsMessageProcessor]'
-                .' Got invalid message: "[]"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();

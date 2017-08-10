@@ -1,0 +1,34 @@
+monolog:
+    channels:
+        - 'mq_job_transitive' # internal channel, do not use it directly
+    handlers:
+        # write all log records to the consume CLI command console output
+        message_queue.consumer.console:
+            type: service
+            id: oro_message_queue.log.handler.console
+            channels: ['!mq_job_transitive']
+            # should be one of the first handlers to avoid cancelling of this handler
+            # by another not bubbled handler with higher priority
+            priority: 256
+
+# uncomment this in BAP-8624
+#        # duplicate all log records related to a message queue job to the "mq_job_transitive" channel
+#        message_queue.job.resend:
+#            type: service
+#            id: oro_message_queue.log.handler.resend_job
+#            channels: ['!mq_job_transitive']
+#            # should be one of the first handlers to avoid cancelling of this handler
+#            # by another not bubbled handler with higher priority
+#            priority: 256
+
+# replace this with correct handler(s) in BAP-8624
+#        # write all log records from the "mq_job_transitive" channel to a separate log file
+#        message_queue.job.file:
+#            type: stream
+#            path: '%kernel.logs_dir%/message_queue_job.%kernel.environment%.log'
+#            channels: ['mq_job_transitive']
+#            formatter: oro_message_queue.log.job_file_formatter
+#            # register this handler with high priority and disable bubbling
+#            # because we do not need to handle message queue job related records by common handlers
+#            priority: 256
+#            bubble: false

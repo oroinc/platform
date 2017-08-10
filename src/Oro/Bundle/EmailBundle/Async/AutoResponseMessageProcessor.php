@@ -63,10 +63,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['jobId'], $data['id'])) {
-            $this->logger->critical(sprintf(
-                '[AutoResponseMessageProcessor] Got invalid message. "%s"',
-                $message->getBody()
-            ), ['message' => $message]);
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
@@ -74,10 +71,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
         /** @var Email $email */
         $email = $this->getEmailRepository()->find($data['id']);
         if (! $email) {
-            $this->logger->error(sprintf(
-                '[AutoResponseMessageProcessor] Email was not found. id: "%s"',
-                $data['id']
-            ), ['message' => $message]);
+            $this->logger->error(sprintf('Email was not found. id: "%s"', $data['id']));
 
             return self::REJECT;
         }

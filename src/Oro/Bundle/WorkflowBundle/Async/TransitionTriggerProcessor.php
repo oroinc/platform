@@ -56,16 +56,16 @@ class TransitionTriggerProcessor implements MessageProcessorInterface
 
             if (!$this->handler->process($trigger, $triggerMessage)) {
                 $this->logger->warning(
-                    '[TransitionTriggerProcessor] Transition not allowed.',
-                    ['message_body' => $message->getBody(), 'trigger' => $trigger]
+                    'Transition not allowed.',
+                    ['trigger' => $trigger]
                 );
 
                 $result = self::REJECT;
             }
         } catch (\Exception $e) {
             $this->logger->error(
-                '[TransitionTriggerProcessor] Queue message could not be processed.',
-                ['message_body' => $message->getBody(), 'exception' => $e]
+                'Queue message could not be processed.',
+                ['exception' => $e]
             );
 
             $result = self::REJECT;

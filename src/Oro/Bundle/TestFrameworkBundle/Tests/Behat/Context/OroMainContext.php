@@ -19,6 +19,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -926,6 +927,23 @@ class OroMainContext extends MinkContext implements
         }
     }
 
+    /**
+     * Remove collection's element in a specified row
+     * Example: I remove element in row #2 from Product Price collection
+     *
+     * @When /^(?:|I )remove element in row #(?P<rowNumber>\d+) from (?P<collectionFieldName>[^"]+) collection$/
+     *
+     * @param string $collectionFieldName
+     * @param int $rowNumber
+     */
+    public function removeCollectionElement($collectionFieldName, $rowNumber)
+    {
+        /** @var CollectionField $collection */
+        $collection = $this->createOroForm()->findField($collectionFieldName);
+
+        $collection->removeRow($rowNumber);
+    }
+
     /**.
      * @return OroForm
      */
@@ -1325,5 +1343,24 @@ class OroMainContext extends MinkContext implements
     public function iSetWindowSize(int $width = 1920, int $height = 1080)
     {
         $this->getSession()->resizeWindow($width, $height, 'current');
+    }
+
+    /**
+     * Ensures that given iframe is fully loaded and ready.
+     *
+     * @Given /^(?:|I )wait for iframe "(?P<iframeElement>[\w\s]*)" to load$/
+     *
+     * @param string $iframeElement
+     *
+     * @throws ElementNotFoundException
+     */
+    public function waitForIframeToLoad($iframeElement)
+    {
+        $iframeId = $this->elementFactory->createElement($iframeElement)->getAttribute('id');
+        $driver = $this->getSession()->getDriver();
+
+        $driver->switchToIFrame($iframeId);
+        $driver->waitPageToLoad();
+        $driver->switchToWindow();
     }
 }
