@@ -13,6 +13,12 @@ MessageQueue component
 ----------------------
 - Class `Oro\Component\MessageQueue\Job\JobStorage`
     - removed unused method `updateJobProgress`
+- Class `Oro\Component\MessageQueue\Consumption\QueueConsumer`
+    - changed the constructor signature: parameter `ExtensionInterface $extension = null` was replaces with `ExtensionInterface $extension`
+- Added interface `Oro\Component\MessageQueue\Job\ExtensionInterface` that can be used to do some additional work before and after job processing
+- Class `Oro\Component\MessageQueue\Job\JobRunner`
+    - changed the constructor signature: added parameter `ExtensionInterface $jobExtension`
+- Class `Oro\Component\MessageQueue\Util\VarExport` was removed
 
 
 BatchBundle
@@ -62,6 +68,8 @@ FormBundle
 MessageQueueBundle
 ------------------
 - The entity manager `message_queue_job` was removed. The default entity manager is used instead
+- Service `oro_message_queue.client.consume_messages_command` was removed
+- Service `oro_message_queue.command.consume_messages` was removed
 
 SyncBundle
 ----------

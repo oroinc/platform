@@ -43,7 +43,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message. body: ""')
+            ->with('Got invalid message')
         ;
 
         $processor = new CalculateRootJobStatusProcessor(

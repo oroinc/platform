@@ -13,7 +13,7 @@ use Guzzle\Iterator\ChunkedIterator;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class SpecificationDivider
+class SpecificationCountDivider implements SpecificationDividerInterface
 {
     /**
      * Divide suite by features count
@@ -27,7 +27,7 @@ class SpecificationDivider
      *
      * @param string $baseName e.g. AcmeSuite
      * @param array $array Paths to feature files or directories with feature files
-     * @param int $divider
+     * @param int $divider count of features per one set
      * @return array [
      *                 'AcmeSuite#0' => ['/path/to/first.feature', '/path/to/second.feature],
      *                 'AcmeSuite#1' => ['/path/to/third.feature'],
