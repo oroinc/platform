@@ -32,12 +32,13 @@ class FeatureContext extends OroFeatureContext implements
      *
      * Example: Given I click "Inventory" on configuration sidebar
      *
-     * @When /^(?:|I )click "(?P<link>(?:[^"]|\\")*)" on configuration sidebar$/
+     * @When /^(?:|I )follow (?P<path>(?:[^"]|\\")*) on configuration sidebar$/
      */
-    public function clickLinkOnConfigurationSidebar($link)
+    public function clickLinkOnConfigurationSidebar($path)
     {
+        /** @var SidebarConfigMenu $sidebarConfigMenu */
         $sidebarConfigMenu = $this->createElement('SidebarConfigMenu');
-        $sidebarConfigMenu->clickLink($link);
+        $sidebarConfigMenu->openAndClick($path);
     }
 
     /**

@@ -7,14 +7,40 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class SidebarConfigMenu extends Element
 {
-    public function clickLink($locator)
+    public function openAndClick($path)
     {
-        $this->find('css', 'a[data-action="accordion:expand-all"]')->click();
-        $link = $this->findLink($locator);
-        $link->waitFor(60, function (NodeElement $link) {
-            return $link->isVisible();
+        $this->find('css', 'a[data-action="accordion:collapse-all"]')->click();
+
+        // wait for links will collapsed
+        $this->spin(function (SidebarConfigMenu $element) {
+            $linksCount = count($element->findAll('css', 'a[data-toggle="collapse"]'));
+            $collapsedLinksCount = count($element->findAll('css', 'a.collapsed'));
+
+            return $linksCount === $collapsedLinksCount;
         });
-        $link->click();
+
+        $items = explode('/', $path);
+        $context = $this->find('css', 'ul.system-configuration-accordion');
+        $lastLink = array_pop($items);
+
+        while ($item = trim(array_shift($items))) {
+            $link = $context->findLink($item);
+
+            $link->click();
+
+            $isUnrolled = $this->spin(function () use ($link) {
+                $style = $link->getParent()
+                    ->getParent()
+                    ->find('css', 'div.accordion-body')
+                    ->getAttribute('style');
+
+                return false !== strpos($style, 'height: auto');
+            }, 5);
+
+            self::assertTrue($isUnrolled, sprintf('Menu "%s" is still collapsed', $item));
+        }
+
+        $context->clickLink($lastLink);
     }
 
     /**
