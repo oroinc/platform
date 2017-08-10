@@ -4,8 +4,8 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     'oroui/js/app/components/base/component',
-    'oroui/js/app/modules/components-shortcuts'
-], function($, _, __, tools, BaseComponent, componentsShortcuts) {
+    'oroui/js/component-shortcuts-manager'
+], function($, _, __, tools, BaseComponent, ComponentShortcutsManager) {
     'use strict';
 
     var console = window.console;
@@ -101,32 +101,23 @@ define([
             var elements = [];
             var self = this;
 
-            this.$el.find('[data-page-component-module]').each(function() {
-                var $elem = $(this);
+            _.each(ComponentShortcutsManager.getAll(), function(shortcut, shortcutName) {
+                var dataKey = 'page-component-' + shortcutName;
+                var dataAttr = 'data-' + dataKey;
 
-                if (self._isInOwnLayout($elem)) {
-                    elements.push($elem);
-                }
-            });
-
-            _.each(componentsShortcuts.getAll(), function(shortcut, shortcutName) {
-                var namespace = 'data-page-component-shortcut-' + shortcutName;
-
-                this.$el.find('[' + namespace + ']').each(function() {
+                this.$el.find('[' + dataAttr + ']').each(function() {
                     var $elem = $(this);
-
                     if (self._isInOwnLayout($elem)) {
-                        var dataAttribute = $.camelCase('page-component-shortcut-' + shortcutName);
-
-                        $elem.data({
-                            pageComponentModule: shortcut.moduleName,
-                            pageComponentOptions: _.defaults({}, $elem.data(dataAttribute), shortcut.options)
-                        });
-
-                        $elem.removeAttr(namespace);
-
-                        elements.push($elem);
+                        return;
                     }
+
+                    var data = ComponentShortcutsManager.getComponentData(shortcut, $elem.data(dataKey));
+                    data.pageComponentOptions = $.extend(true, data.pageComponentOptions, $elem.data('pageComponentOptions'));
+                    $elem.removeAttr(dataAttr)
+                        .removeData(dataKey)
+                        .data(data);
+
+                    elements.push($elem);
                 });
             }, this);
 
@@ -137,7 +128,7 @@ define([
             // find nearest marked container with separate layout
             var $separateLayout = $element.parents('[data-layout="separate"]:first');
             // collects container elements from current layout
-            return !$separateLayout.length || !_.contains($separateLayout.parents(), this.$el[0]);
+            return $separateLayout.length && _.contains($separateLayout.parents(), this.$el[0]);
         },
 
         /**

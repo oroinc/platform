@@ -151,7 +151,7 @@
                 checkOverflow: true,
                 open: false
             } %}
-        <div class="collapse-block" data-page-component-shortcut-collapse="{{ collapseView|json_encode }}">
+        <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
             {{ _self.renderAttribute(title,
                 '<div class="control-label" data-collapse-container>' ~
                     data|default('oro.ui.empty'|trans) ~
