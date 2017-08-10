@@ -162,6 +162,7 @@ config:
         'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
         'oroui/js/app/modules/ajax-error-module': 'bundles/oroui/js/app/modules/ajax-error-module.js'
         'oroui/js/app/modules/init-layout': 'bundles/oroui/js/app/modules/init-layout.js'
+        'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -216,6 +217,7 @@ config:
         - oroui/js/app/modules/widgets-module
         - oroui/js/app/modules/ajax-error-module
         - oroui/js/app/modules/input-widgets
+        - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
 
         #layouts only
