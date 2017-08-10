@@ -33,7 +33,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DependentJobMessageProcessor] Got invalid message. body: "{"key":"value"}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();
@@ -61,7 +61,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DependentJobMessageProcessor] Job was not found. id: "12345"')
+            ->with('Job was not found. id: "12345"')
         ;
 
         $message = new NullMessage();
@@ -93,7 +93,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DependentJobMessageProcessor] Expected root job but got child. id: "12345"')
+            ->with('Expected root job but got child. id: "12345"')
         ;
 
         $message = new NullMessage();
@@ -164,7 +164,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DependentJobMessageProcessor] Got invalid dependent job data. job: "123", dependentJob: "[]"')
+            ->with('Got invalid dependent job data. job: "123", dependentJob: "[]"')
         ;
 
         $message = new NullMessage();
@@ -207,7 +207,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DependentJobMessageProcessor] Got invalid dependent job data. '.
+            ->with('Got invalid dependent job data. '.
              'job: "123", dependentJob: "{"topic":"topic-name"}"')
         ;
 

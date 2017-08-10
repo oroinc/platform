@@ -41,10 +41,7 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
             $body['fileName'],
             $body['originFileName']
         )) {
-            $this->logger->critical(
-                sprintf('[PreHttpImportMessageProcessor] Got invalid message. body: %s', JSON::encode($body)),
-                ['body' => $body]
-            );
+            $this->logger->critical('Got invalid message');
 
             return false;
         }
@@ -123,12 +120,12 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
     protected function sendErrorNotification(array $body, $error)
     {
         $errorMessage = sprintf(
-            '[PreHttpImportMessageProcessor] An error occurred while reading file %s: "%s"',
+            'An error occurred while reading file %s: "%s"',
             $body['originFileName'],
             $error
         );
 
-        $this->logger->critical($errorMessage, ['message' => $body]);
+        $this->logger->critical($errorMessage);
 
         $user = $this->managerRegistry
             ->getManagerForClass(User::class)
@@ -137,8 +134,7 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
 
         if (! $user instanceof User) {
             $this->logger->critical(
-                sprintf('[PreHttpImportMessageProcessor] User not found. Id: %s', $body['userId']),
-                ['body' => $body]
+                sprintf('User not found. Id: %s', $body['userId'])
             );
 
             return;

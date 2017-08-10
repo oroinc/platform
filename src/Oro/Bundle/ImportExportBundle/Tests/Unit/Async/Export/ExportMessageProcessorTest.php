@@ -30,21 +30,19 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                '[ExportMessageProcessor] Got invalid message: ' .
-                    '"{"jobName":"name","processorAlias":"alias","securityToken":"token"}"',
+                'Got invalid message',
                 ['jobName' => 'name', 'processorAlias' => 'alias', 'securityToken' => 'token'],
             ],
             [
-                '[ExportMessageProcessor] Got invalid message: ' .
-                '"{"jobId":1,"processorAlias":"alias","securityToken":"token"}"',
+                'Got invalid message',
                 ['jobId' => 1, 'processorAlias' => 'alias', 'securityToken' => 'token'],
             ],
             [
-                '[ExportMessageProcessor] Got invalid message: "{"jobId":1,"jobName":"name","securityToken":"token"}"',
+                'Got invalid message',
                 ['jobId' => 1, 'jobName' => 'name', 'securityToken' => 'token'],
             ],
             [
-                '[ExportMessageProcessor] Got invalid message: "{"jobId":1,"jobName":"name","processorAlias":"alias"}"',
+                'Got invalid message',
                 ['jobId' => 1, 'jobName' => 'name', 'processorAlias' => 'alias'],
             ],
         ];
@@ -87,7 +85,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[ExportMessageProcessor] Cannot set security token')
+            ->with('Cannot set security token')
         ;
 
         $tokenSerializer = $this->createTokenSerializerMock();

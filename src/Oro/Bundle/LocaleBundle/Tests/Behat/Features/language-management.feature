@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-14163
 @automatically-ticket-tagged
 Feature: Language management

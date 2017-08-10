@@ -86,14 +86,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
     public function process(MessageInterface $message, SessionInterface $session)
     {
         if (! $body = $this->getNormalizeBody($message)) {
-            $this->logger->critical(
-                sprintf(
-                    '[%s] Got invalid message. body: %s',
-                    (new \ReflectionClass($this))->getShortName(),
-                    $message->getBody()
-                ),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
@@ -164,8 +157,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
                 array_merge(['originFileName' => $body['originFileName']], $result),
                 $body['process'],
                 $this->logger
-            ),
-            ['message' => $body]
+            )
         );
 
         return !!$result['success'];

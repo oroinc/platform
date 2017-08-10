@@ -1496,6 +1496,8 @@ services:
 
 `setOptionsConfig` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
 
+**IMPORTANT!** Note that options that have `null` value will be undefined in template.
+
 Container block type:
 ```yaml
 services:
