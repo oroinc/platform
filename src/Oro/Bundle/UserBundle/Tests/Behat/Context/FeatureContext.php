@@ -92,7 +92,13 @@ class FeatureContext extends OroFeatureContext implements
     {
         $this->getMink()->setDefaultSessionName('second_session');
         $this->oroMainContext->loginAsUserWithPassword('charlie');
-        $this->waitForAjax();
+
+        $error = $this->spin(function (FeatureContext $context) {
+            return $context->getPage()->find('css', 'div.alert-error');
+        }, 5);
+
+        self::assertNotNull($error, 'Expect to find error on page, but it not found');
+        self::assertEquals('Account is locked.', $error->getText());
 
         $this->oroMainContext->assertPage('Login');
         $this->getSession('second_session')->stop();
