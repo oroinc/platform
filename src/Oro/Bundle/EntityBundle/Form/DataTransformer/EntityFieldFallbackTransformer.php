@@ -13,10 +13,6 @@ class EntityFieldFallbackTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (!$value instanceof EntityFieldFallbackValue) {
-            return $value;
-        }
-
         return $value;
     }
 
