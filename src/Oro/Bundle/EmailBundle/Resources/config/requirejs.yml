@@ -6,6 +6,8 @@ config:
         'oroemail/js/app/models/email-attachment-collection': 'bundles/oroemail/js/app/models/email-attachment-collection.js'
         'oroemail/js/app/models/check-smtp-connection-model': 'bundles/oroemail/js/app/models/check-smtp-connection-model.js'
 
+        'oroemail/js/app/views/email-body-view': 'bundles/oroemail/js/app/views/email-body-view.js'
+        'oroemail/js/app/views/email-thread-view': 'bundles/oroemail/js/app/views/email-thread-view.js'
         'oroemail/js/app/views/email-template-view': 'bundles/oroemail/js/app/views/email-template-view.js'
         'oroemail/js/app/views/email-attachment-link-view': 'bundles/oroemail/js/app/views/email-attachment-link-view.js'
         'oroemail/js/app/views/email-attachment-collection-view': 'bundles/oroemail/js/app/views/email-attachment-collection-view.js'

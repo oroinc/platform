@@ -220,7 +220,7 @@ define([
                 .trigger('focusin');
         } else if (!$elem.filter(':visible').length && $firstValidationError.length) {
             var $scrollableContainer = $firstValidationError.closest('.scrollable-container');
-            var scrollTop = $firstValidationError.offset().top + $scrollableContainer.scrollTop();
+            var scrollTop = $firstValidationError.position().top + $scrollableContainer.scrollTop();
 
             $scrollableContainer.animate({
                 scrollTop: scrollTop

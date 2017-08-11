@@ -71,10 +71,8 @@ class HttpImportMessageProcessor extends ImportMessageProcessor
     protected function handleImport(array $body, Job $job, JobRunner $jobRunner)
     {
         if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical(
-                sprintf('[HttpImportMessageProcessor] Cannot set security token'),
-                ['message' => $body]
-            );
+            $this->logger->critical('Cannot set security token');
+
             return null;
         }
 

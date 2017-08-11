@@ -26,22 +26,19 @@ class DoctrinePingConnectionExtension extends AbstractExtension
      */
     public function onPreReceived(Context $context)
     {
-        /** @var Connection $connection */
-        foreach ($this->registry->getConnections() as $connection) {
+        /** @var Connection[] $connections */
+        $connections = $this->registry->getConnections();
+        foreach ($connections as $name => $connection) {
             if ($connection->ping()) {
                 return;
             }
 
-            $context->getLogger()->debug(
-                '[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.'
-            );
+            $context->getLogger()->debug(sprintf('Connection "%s" is not active, trying to reconnect.', $name));
 
             $connection->close();
             $connection->connect();
 
-            $context->getLogger()->debug(
-                '[DoctrinePingConnectionExtension] Connection is active now.'
-            );
+            $context->getLogger()->debug(sprintf('Connection "%s" is active now.', $name));
         }
     }
 }

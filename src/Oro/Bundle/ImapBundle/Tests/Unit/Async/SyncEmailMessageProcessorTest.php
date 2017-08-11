@@ -26,7 +26,7 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message. "{"key":"value"}"')
+            ->with('Got invalid message')
         ;
 
         $synchronizer = $this->createImapEmailSynchronizerMock();
