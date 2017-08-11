@@ -8,24 +8,19 @@ use Oro\Component\MessageQueue\Consumption\Context;
 
 class MaintenanceExtension extends AbstractExtension
 {
-    /**
-     * @var Mode
-     */
+    /** @var Mode */
     private $maintenance;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $filePathServerLock;
 
-    /**
-     * @var integer (seconds)
-     */
+    /** @var int */
     private $idleTime;
 
     /**
-     * @param Mode $maintenance
-     * @param integer $idleTime
+     * @param Mode $maintenance The maintenance mode state
+     * @param int  $idleTime    The sleep time in seconds between checks
+     *                          whether the system is still in the maintenance mode
      */
     public function __construct(Mode $maintenance, $idleTime)
     {
@@ -50,7 +45,7 @@ class MaintenanceExtension extends AbstractExtension
             foreach ($matches as $match) {
                 $varName = current($match);
                 $envVarName = str_replace('$', '', $varName);
-                if (! isset($iniArray[$envVarName])) {
+                if (!isset($iniArray[$envVarName])) {
                     throw new \InvalidArgumentException(sprintf(
                         'variable %s must be configured in %s file.',
                         $envVarName,
@@ -66,6 +61,7 @@ class MaintenanceExtension extends AbstractExtension
 
     /**
      * @param string $var
+     *
      * @return string
      */
     private function trimComment($var)
@@ -79,18 +75,18 @@ class MaintenanceExtension extends AbstractExtension
     public function onBeforeReceive(Context $context)
     {
         $interrupt = false;
-        while ($this->isMaintenance()) {
-            $context->getLogger()->debug(
-                '[MaintenanceExtension] Maintenance mode has been activated.',
-                ['context' => $context]
-            );
+        if ($this->isMaintenance()) {
+            $context->getLogger()->notice('The maintenance mode has been activated.');
             $interrupt = true;
-            sleep($this->idleTime);
+            do {
+                $context->getLogger()->info('Waiting for the maintenance mode deactivation.');
+                sleep($this->idleTime);
+            } while ($this->isMaintenance());
         }
 
         if ($interrupt) {
             $context->setExecutionInterrupted(true);
-            $context->setInterruptedReason('Maintenance mode has been deactivated.');
+            $context->setInterruptedReason('The Maintenance mode has been deactivated.');
         }
     }
 

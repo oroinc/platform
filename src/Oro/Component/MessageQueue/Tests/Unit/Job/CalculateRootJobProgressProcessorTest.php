@@ -43,12 +43,12 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message. body: ""')
+            ->with('Got invalid message')
         ;
 
         $message = $this->createMessageMock();
         $message
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getBody')
             ->willReturn('')
         ;

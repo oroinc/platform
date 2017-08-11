@@ -28,7 +28,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[UpdateEmailOwnerAssociationMessageProcessor] Got invalid message: "{"ownerId":[1]}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();
@@ -53,7 +53,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[UpdateEmailOwnerAssociationMessageProcessor] Got invalid message: "{"ownerClass":"class"}"')
+            ->with('Got invalid message')
         ;
 
         $message = new NullMessage();

@@ -88,7 +88,8 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         ], $body);
 
         if (! $body['integration_id']) {
-            $this->logger->critical('Invalid message: integration_id is empty', ['message' => $message]);
+            $this->logger->critical('Invalid message: integration_id is empty');
+
             return self::REJECT;
         }
 
@@ -98,18 +99,14 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         /** @var Integration $integration */
         $integration = $em->find(Integration::class, $body['integration_id']);
         if (! $integration) {
-            $this->logger->error(
-                sprintf('Integration with id "%s" is not found', $body['integration_id']),
-                ['message' => $message]
-            );
+            $this->logger->error(sprintf('Integration with id "%s" is not found', $body['integration_id']));
+
             return self::REJECT;
         }
 
         if (! $integration->isEnabled()) {
-            $this->logger->error(
-                sprintf('Integration with id "%s" is not enabled', $body['integration_id']),
-                ['message' => $message]
-            );
+            $this->logger->error(sprintf('Integration with id "%s" is not enabled', $body['integration_id']));
+
             return self::REJECT;
         }
 
@@ -117,10 +114,8 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         $ownerId = $message->getMessageId();
 
         if (! $ownerId) {
-            $this->logger->critical(
-                'Internal error: ownerId is empty',
-                ['message' => $message]
-            );
+            $this->logger->critical('Internal error: ownerId is empty');
+
             return self::REJECT;
         }
 

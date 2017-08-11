@@ -41,10 +41,7 @@ class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubs
         $body = JSON::decode($message->getBody());
 
         if (! isset($body['ids']) || ! is_array($body['ids'])) {
-            $this->logger->critical(
-                sprintf('Got invalid message. "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }

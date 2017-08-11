@@ -12,15 +12,6 @@
     {% placeholder head_style %}
 
     {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
-    <script type="text/javascript">
-        require(['jquery', 'oroui/js/init-layout'],
-        function($) {
-            $(function() {
-                // emulates 'document ready state' for selenium tests
-                document['page-rendered'] = true;
-            });
-        });
-    </script>
     {% endblock %}
     {% placeholder scripts_after %}
 </head>
