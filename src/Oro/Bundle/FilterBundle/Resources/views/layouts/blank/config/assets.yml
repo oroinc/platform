@@ -3,7 +3,6 @@ styles:
         - 'bundles/orofilter/blank/scss/variables/filters-config.scss'
         - 'bundles/orofilter/blank/scss/variables/filters-dropdown-mode-config.scss'
         - 'bundles/orofilter/blank/scss/variables/filters-toggle-mode-config.scss'
-        - 'bundles/orofilter/blank/scss/variables/filter-manager-toggle-mode-config.scss'
         - 'bundles/orofilter/blank/scss/variables/ui-timepicker-list-config.scss'
 
         - 'bundles/orofilter/blank/scss/styles.scss'

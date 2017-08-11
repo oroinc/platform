@@ -23,3 +23,7 @@ $filter-toggle-mode-timepicker-input-width: 100% !default;
 $filter-toggle-mode-timepicker-input-offset-left: $offset-y-s !default;
 $filter-toggle-mode-items-hint-offset-inner: 0 $offset-x-m !default;
 $filter-toggle-mode-open-filter-criteria-selector-border-bottom-color: transparent !default;
+
+$filter-manager-toggle-mode-trigger-side-offset: $offset-x-m !default;
+$filter-manager-toggle-mode-trigger-offset: 0 $filter-manager-toggle-mode-trigger-side-offset !default;
+$filter-manager-toggle-mode-trigger-font: $base-font-size $base-font !default;

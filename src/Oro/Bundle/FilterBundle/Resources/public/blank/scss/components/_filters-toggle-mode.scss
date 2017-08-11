@@ -45,7 +45,7 @@
         min-width: $filter-toggle-mode-fields-row-min-width;
     }
 
-    .filter-item{
+    .filter-item {
         // fix after filter enabling, using Filter manager
         width: 100%;
     }
@@ -124,6 +124,20 @@
 
         .filter-criteria {
             display: block;
+        }
+    }
+
+    .filters-manager-trigger {
+        width: calc(100% - (#{$filter-manager-toggle-mode-trigger-side-offset} * 2)) !important;
+        margin: $filter-manager-toggle-mode-trigger-offset;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            &:before {
+                content: none;
+            }
+
+            font: $filter-manager-toggle-mode-trigger-font;
         }
     }
 }
