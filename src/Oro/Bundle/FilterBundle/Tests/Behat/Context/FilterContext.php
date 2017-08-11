@@ -75,7 +75,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
             return null;
         }, 5);
 
-        self::assertNotNull($searchResult, sprintf('No search results fo "%s"', $column));
+        self::assertNotNull($searchResult, sprintf('No search results for "%s"', $column));
         $searchResult->click();
     }
 
