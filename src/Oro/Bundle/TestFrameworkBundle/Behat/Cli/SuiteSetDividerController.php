@@ -33,7 +33,15 @@ class SuiteSetDividerController implements Controller
             ->addOption(
                 '--suite-set-divider',
                 '-ssd',
-                InputOption::VALUE_REQUIRED
+                InputOption::VALUE_REQUIRED,
+                'Group suites in sets by number of suites per set'
+            )
+            ->addOption(
+                '--max_suite_set_execution_time',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Group suites in sets based on feature duration statistics.'.PHP_EOL.
+                'Maximum time in seconds of execution one suite set'
             )
         ;
     }
@@ -43,10 +51,14 @@ class SuiteSetDividerController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$divider = (int) $input->getOption('suite-set-divider')) {
+        if ($divider = (int) $input->getOption('suite-set-divider')) {
+            $this->suiteConfigRegistry->generateSetsDividedByCount($divider);
             return;
         }
 
-        $this->suiteConfigRegistry->genererateSets($divider);
+        if ($maxExecutionTime = (int) $input->getOption('max_suite_set_execution_time')) {
+            $this->suiteConfigRegistry->generateSetsByMaxExecutionTime($maxExecutionTime);
+            return;
+        }
     }
 }

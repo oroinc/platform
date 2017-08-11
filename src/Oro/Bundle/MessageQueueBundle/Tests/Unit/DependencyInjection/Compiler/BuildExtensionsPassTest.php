@@ -26,25 +26,40 @@ class BuildExtensionsPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $extensions = new Definition();
-        $extensions->addArgument([]);
-        $container->setDefinition('oro_message_queue.consumption.extensions', $extensions);
+        $consumptionExtensions = new Definition();
+        $consumptionExtensions->addArgument([]);
+        $container->setDefinition('oro_message_queue.consumption.extensions', $consumptionExtensions);
 
-        $extension = new Definition();
-        $extension->addTag('oro_message_queue.consumption.extension');
-        $container->setDefinition('foo_extension', $extension);
+        $consumptionExtension = new Definition();
+        $consumptionExtension->addTag('oro_message_queue.consumption.extension');
+        $container->setDefinition('foo_extension', $consumptionExtension);
 
-        $extension = new Definition();
-        $extension->addTag('oro_message_queue.consumption.extension');
-        $container->setDefinition('bar_extension', $extension);
+        $consumptionExtension = new Definition();
+        $consumptionExtension->addTag('oro_message_queue.consumption.extension');
+        $container->setDefinition('bar_extension', $consumptionExtension);
 
+        $jobExtensions = new Definition();
+        $jobExtensions->addArgument([]);
+        $container->setDefinition('oro_message_queue.job.extensions', $jobExtensions);
+
+        $jobExtension = new Definition();
+        $jobExtension->addTag('oro_message_queue.job.extension');
+        $container->setDefinition('foo_job_extension', $jobExtension);
+
+        $jobExtension = new Definition();
+        $jobExtension->addTag('oro_message_queue.job.extension');
+        $container->setDefinition('bar_job_extension', $jobExtension);
 
         $pass = new BuildExtensionsPass();
         $pass->process($container);
 
         $this->assertEquals(
             [new Reference('foo_extension'), new Reference('bar_extension')],
-            $extensions->getArgument(0)
+            $consumptionExtensions->getArgument(0)
+        );
+        $this->assertEquals(
+            [new Reference('foo_job_extension'), new Reference('bar_job_extension')],
+            $jobExtensions->getArgument(0)
         );
     }
 
@@ -67,6 +82,14 @@ class BuildExtensionsPassTest extends \PHPUnit_Framework_TestCase
         $extension = new Definition();
         $extension->addTag('oro_message_queue.consumption.extension', ['priority' => 2]);
         $container->setDefinition('baz_extension', $extension);
+
+        $jobExtensions = new Definition();
+        $jobExtensions->addArgument([]);
+        $container->setDefinition('oro_message_queue.job.extensions', $jobExtensions);
+
+        $jobExtension = new Definition();
+        $jobExtension->addTag('oro_message_queue.job.extension');
+        $container->setDefinition('foo_job_extension', $jobExtension);
 
         $pass = new BuildExtensionsPass();
         $pass->process($container);
@@ -97,6 +120,14 @@ class BuildExtensionsPassTest extends \PHPUnit_Framework_TestCase
         $extension = new Definition();
         $extension->addTag('oro_message_queue.consumption.extension', ['priority' => -1]);
         $container->setDefinition('baz_extension', $extension);
+
+        $jobExtensions = new Definition();
+        $jobExtensions->addArgument([]);
+        $container->setDefinition('oro_message_queue.job.extensions', $jobExtensions);
+
+        $jobExtension = new Definition();
+        $jobExtension->addTag('oro_message_queue.job.extension');
+        $container->setDefinition('foo_job_extension', $jobExtension);
 
         $pass = new BuildExtensionsPass();
         $pass->process($container);

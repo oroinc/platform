@@ -46,6 +46,23 @@ class CollectionField extends Element
     }
 
     /**
+     * @param int $number starts from 1
+     * @throws \InvalidArgumentException
+     */
+    public function removeRow($number)
+    {
+        $removeRowButton = $this->find('xpath', sprintf('(//button[contains(@class, "removeRow")])[%s]', $number));
+
+        if (!$removeRowButton) {
+            throw new \InvalidArgumentException(
+                sprintf('Cannot remove collection element with %s number', $number)
+            );
+        }
+
+        $removeRowButton->click();
+    }
+
+    /**
      * Find any text inputs. Type can be text, email, password etc.
      *
      * @return NodeElement[]

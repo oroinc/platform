@@ -54,10 +54,7 @@ class CommandRunnerMessageProcessor implements MessageProcessorInterface, TopicS
         $body = JSON::decode($message->getBody());
 
         if (!isset($body['command'])) {
-            $this->logger->critical(
-                'Got invalid message: empty command',
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message: empty command');
 
             return self::REJECT;
         }

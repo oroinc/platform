@@ -277,6 +277,18 @@ JS;
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function doubleClick($xpath)
+    {
+        // Original method doesn't work properly with chromedriver,
+        // as it doesn't generate a pair of mouseDown/mouseUp events
+        // mouseDown event is used to postpone single click handler
+        $script = 'Syn.trigger("dblclick", {}, {{ELEMENT}})';
+        $this->withSyn()->executeJsOnXpath($xpath, $script);
+    }
+
+    /**
      * @param string $xpath
      *
      * @return Element

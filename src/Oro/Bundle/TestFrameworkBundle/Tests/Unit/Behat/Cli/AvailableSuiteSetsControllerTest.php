@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteSetsController;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\Statistic\FilesystemStatisticRepository;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
@@ -15,7 +16,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
         $suiteConfigRegistry = $this->getMockBuilder(SuiteConfigurationRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $controller = new AvailableSuiteSetsController($suiteConfigRegistry);
+        $controller = new AvailableSuiteSetsController($suiteConfigRegistry, new FilesystemStatisticRepository(''));
         $command = new Command('test');
 
         $controller->configure($command);
@@ -32,7 +33,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
         $suiteConfigRegistry->method('getSets')->willReturn(['one' => 1, 'two' => 2, 'three' => 3]);
         $output = new OutputStub();
 
-        $controller = new AvailableSuiteSetsController($suiteConfigRegistry);
+        $controller = new AvailableSuiteSetsController($suiteConfigRegistry, new FilesystemStatisticRepository(''));
         $returnCode = $controller->execute(new InputStub('', [], ['available-suite-sets' => true]), $output);
 
         $this->assertSame(0, $returnCode);
@@ -44,7 +45,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit_Framework_TestCase
         $suiteConfigRegistry = $this->getMockBuilder(SuiteConfigurationRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $controller = new AvailableSuiteSetsController($suiteConfigRegistry);
+        $controller = new AvailableSuiteSetsController($suiteConfigRegistry, new FilesystemStatisticRepository(''));
         $returnCode = $controller->execute(new InputStub(), new OutputStub());
 
         $this->assertNotSame(0, $returnCode);

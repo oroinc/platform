@@ -62,7 +62,7 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
     {
         $messageData = JSON::decode($message->getBody());
         if (!isset($messageData['attributeFamilyId'])) {
-            $this->logger->critical('Invalid message: key "attributeFamilyId" is missing.', ['message' => $message]);
+            $this->logger->critical('Invalid message: key "attributeFamilyId" is missing.');
 
             return self::REJECT;
         }

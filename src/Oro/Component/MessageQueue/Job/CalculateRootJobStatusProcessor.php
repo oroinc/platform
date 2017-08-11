@@ -57,7 +57,7 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['jobId'])) {
-            $this->logger->critical(sprintf('Got invalid message. body: "%s"', $message->getBody()));
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }

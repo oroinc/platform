@@ -26,10 +26,7 @@ class DoctrineClearIdentityMapExtension extends AbstractExtension
     public function onPreReceived(Context $context)
     {
         foreach ($this->registry->getManagers() as $name => $manager) {
-            $context->getLogger()->debug(sprintf(
-                '[DoctrineClearIdentityMapExtension] Clear identity map for manager "%s"',
-                $name
-            ));
+            $context->getLogger()->debug(sprintf('Clear identity map for manager "%s"', $name));
 
             $manager->clear();
         }

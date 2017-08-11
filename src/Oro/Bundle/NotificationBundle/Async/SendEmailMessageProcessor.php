@@ -86,10 +86,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         if (empty($data['body']) || ! isset($data['fromEmail'], $data['toEmail'])
             || (isset($data['template']) && ! is_array($data['body']))
         ) {
-            $this->logger->critical(
-                sprintf('[SendEmailMessageProcessor] Got invalid message: "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
@@ -112,10 +109,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         //toDo: can possibly send duplicate replies. See BAP-12503
 
         if (! $this->mailer->send($emailMessage)) {
-            $this->logger->error(
-                sprintf('[SendEmailMessageProcessor] Cannot send message: "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->error('Cannot send message');
 
             return self::REJECT;
         }
