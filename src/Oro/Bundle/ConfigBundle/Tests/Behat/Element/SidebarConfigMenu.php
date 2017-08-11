@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class SidebarConfigMenu extends Element
 {
-    public function openAndClick($path)
+    public function openNestedMenu($path)
     {
         $this->find('css', 'a[data-action="accordion:collapse-all"]')->click();
 
@@ -38,6 +38,7 @@ class SidebarConfigMenu extends Element
             }, 5);
 
             self::assertTrue($isUnrolled, sprintf('Menu "%s" is still collapsed', $item));
+            $context = $link->getParent()->getParent()->find('css', 'div.accordion-body');
         }
 
         $context->clickLink($lastLink);
