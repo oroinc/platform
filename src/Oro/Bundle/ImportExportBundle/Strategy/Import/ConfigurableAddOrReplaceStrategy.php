@@ -427,6 +427,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function combineIdentityValues($entity, $entityClass, array $searchContext)
     {
+        if (!$this->isSearchContextValid($searchContext)) {
+            return null;
+        }
+
         $identityValues = $searchContext;
         $identityValues += $this->fieldHelper->getIdentityValues($entity);
         $notEmptyValues     = [];
@@ -492,5 +496,33 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 $errorContext
             );
         }
+    }
+
+    /**
+     * We shouldn't allow to search related entity in cache of `newEntitiesHelper`
+     * if main entity is not in db and
+     * main entity has one of next relations to current entity: ONE_TO_ONE or ONE_TO_MANY
+     * because in another case we can face with issue of resetting inversed
+     *
+     * @param array $searchContext
+     *
+     * @return bool
+     */
+    protected function isSearchContextValid(array $searchContext)
+    {
+        foreach ($searchContext as $identityValue) {
+            if (null === $identityValue || '' === $identityValue) {
+                return false;
+            }
+
+            if (is_object($identityValue)) {
+                $identifier = $this->databaseHelper->getIdentifier($identityValue);
+                if ($identifier === null) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
