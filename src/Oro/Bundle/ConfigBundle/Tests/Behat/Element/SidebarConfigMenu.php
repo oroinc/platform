@@ -9,7 +9,9 @@ class SidebarConfigMenu extends Element
 {
     public function openNestedMenu($path)
     {
-        $this->find('css', 'a[data-action="accordion:collapse-all"]')->click();
+        $collapseAllLink = $this->find('css', 'a[data-action="accordion:collapse-all"]');
+        self::assertNotNull($collapseAllLink, 'Collapse All link not found');
+        $collapseAllLink->click();
 
         // wait for links will collapsed
         $this->spin(function (SidebarConfigMenu $element) {
@@ -21,17 +23,19 @@ class SidebarConfigMenu extends Element
 
         $items = explode('/', $path);
         $context = $this->find('css', 'ul.system-configuration-accordion');
+        self::assertNotNull($context, 'System configuration not found');
         $lastLink = array_pop($items);
 
         while ($item = trim(array_shift($items))) {
             $link = $context->findLink($item);
+            self::assertNotNull($link, sprintf('Link "%s" was not found in configuration menu', $item));
 
             $link->click();
 
             $accordionBody = $link->getParent()->getParent()->find('css', 'div.accordion-body');
 
             $isUnrolled = $this->spin(function () use ($accordionBody) {
-                 return false !== strpos($accordionBody->getAttribute('style'), 'height: auto');
+                return false !== strpos($accordionBody->getAttribute('style'), 'height: auto');
             }, 5);
 
             self::assertTrue($isUnrolled, sprintf('Menu "%s" is still collapsed', $item));
