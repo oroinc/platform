@@ -3,11 +3,7 @@
 <div class="widget-content widget-content-bordered">
     <div {% if workflows|length > 1 %}
         class="workflow-collapse"
-        data-page-component-module="oroui/js/app/components/jquery-widget-component"
-        data-page-component-options="{{ {
-            widgetModule: 'oroui/js/widget/collapse-widget',
-            storageKey: 'entityWorkflow' ~ entityId
-        }|json_encode() }}"
+        data-page-component-collapse="{{ { storageKey: 'entityWorkflow' ~ entityId }|json_encode() }}"
     {% endif %}>
         {% if workflows|length > 1 %}
         <span class="workflow-collapse-button" data-collapse-trigger></span>

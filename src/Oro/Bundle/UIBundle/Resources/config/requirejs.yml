@@ -190,6 +190,7 @@ config:
         'oroui/js/app/modules/jstree-actions-module': 'bundles/oroui/js/app/modules/jstree-actions-module.js'
         'oroui/js/app/modules/init-layout': 'bundles/oroui/js/app/modules/init-layout.js'
         'oroui/js/app/modules/init-lightgallery': 'bundles/oroui/js/app/modules/init-lightgallery.js'
+        'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -283,6 +284,7 @@ config:
         - oroui/js/app/modules/ajax-error-module
         - oroui/js/app/modules/input-widgets
         - oroui/js/app/modules/jstree-actions-module
+        - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
 
 build:
