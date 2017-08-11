@@ -411,6 +411,36 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('expectedValue', $this->resolver->getFallbackValue($entity, 'testProperty'));
     }
 
+    /**
+     * @param string $type
+     * @param string $expectedFieldName
+     * @param bool $throwException
+     * @dataProvider getRequiredFallbackFieldByTypeProvider
+     */
+    public function testGetRequiredFallbackFieldByType($type, $expectedFieldName, $throwException = false)
+    {
+        if ($throwException) {
+            $this->expectException(InvalidFallbackTypeException::class);
+        }
+
+        $result = $this->resolver->getRequiredFallbackFieldByType($type);
+        if (!$throwException) {
+            $this->assertEquals($expectedFieldName, $result);
+        }
+    }
+
+    public function getRequiredFallbackFieldByTypeProvider()
+    {
+        return [
+            [EntityFallbackResolver::TYPE_BOOLEAN, EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD],
+            [EntityFallbackResolver::TYPE_INTEGER, EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD],
+            [EntityFallbackResolver::TYPE_DECIMAL, EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD],
+            [EntityFallbackResolver::TYPE_STRING, EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD],
+            [EntityFallbackResolver::TYPE_ARRAY, EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD],
+            ['invalidType', null, true],
+        ];
+    }
+
     protected function setUpTypeResolution($type = 'boolean')
     {
         $this->configInterface->expects($this->any())

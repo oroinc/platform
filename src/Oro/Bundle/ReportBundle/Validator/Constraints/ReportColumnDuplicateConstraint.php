@@ -4,12 +4,12 @@ namespace Oro\Bundle\ReportBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class ReportColumnDublicateConstraint extends Constraint
+class ReportColumnDuplicateConstraint extends Constraint
 {
     /**
      * @var string
      */
-    public $columnIsDublicate = 'oro.report.dublicate.columns';
+    public $columnIsDuplicate = 'oro.report.duplicate.columns';
 
     /**
      * {@inheritdoc}
@@ -24,6 +24,6 @@ class ReportColumnDublicateConstraint extends Constraint
      */
     public function validatedBy()
     {
-        return 'oro_report.report_column_dublicate_validator';
+        return 'oro_report.report_column_duplicate_validator';
     }
 }

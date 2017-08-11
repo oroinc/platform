@@ -80,3 +80,29 @@ SyncBundle
 UIBundle
 --------
 - `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
+
+SegmentBundle
+-------------
+- Services `oro_segment.query_converter.segment` and `oro_segment.query_converter.segment.link` were removed.
+- Factory Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory was created. it was registered as the service `oro_segment.query.segment_query_converter_factory`.
+    services.yml
+    ```yml
+    oro_segment.query.segment_query_converter_factory:
+        class: 'Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory'
+        arguments:
+            - '@oro_query_designer.query_designer.manager'
+            - '@oro_entity.virtual_field_provider.chain'
+            - '@doctrine'
+            - '@oro_query_designer.query_designer.restriction_builder'
+            - '@oro_entity.virtual_relation_provider.chain'
+        public: false
+    ```
+- Service `oro_segment.query.segment_query_converter_factory.link` was created to initialize the service `oro_segment.query.segment_query_converter_factory` in `Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder`.
+    services.yml
+    ```yml
+    oro_segment.query.segment_query_converter_factory.link:
+        tags:
+            - { name: oro_service_link,  service: oro_segment.query.segment_query_converter_factory }
+     ```
+- Class `Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder` was changed to use `oro_segment.query.segment_query_converter_factory.link` instead of `oro_segment.query_converter.segment.link`.
+    - public method `setSegmentQueryConverterFactoryLink(ServiceLink $segmentQueryConverterFactoryLink)` was removed.
