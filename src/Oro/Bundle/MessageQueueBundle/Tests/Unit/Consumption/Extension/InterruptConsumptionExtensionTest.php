@@ -67,7 +67,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('info')
             ->with(
-                $this->stringContains('cache was cleared'),
+                'Execution interrupted: the cache was cleared.',
                 ['context' => $context]
             )
         ;
@@ -99,7 +99,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('info')
             ->with(
-                $this->stringContains('cache was invalidated'),
+                'Execution interrupted: the cache was invalidated.',
                 ['context' => $context]
             )
         ;

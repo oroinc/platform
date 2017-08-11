@@ -23,7 +23,7 @@ define(
             init: function(id, wampEnable) {
                 var self = this;
 
-                mediator.on('page-rendered page:afterChange', function() {
+                mediator.on('page:afterChange', function() {
                     self.showReminders();
                 });
 

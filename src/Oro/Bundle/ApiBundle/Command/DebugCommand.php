@@ -32,6 +32,11 @@ class DebugCommand extends AbstractDebugCommand
                 InputArgument::OPTIONAL,
                 'Shows a list of processors for a specified action'
             )
+            ->addArgument(
+                'group',
+                InputArgument::OPTIONAL,
+                'Shows a list of processors for a specified action and from a specified group'
+            )
             ->addOption(
                 'attribute',
                 null,
@@ -62,7 +67,12 @@ class DebugCommand extends AbstractDebugCommand
         if (empty($action)) {
             $this->dumpActions($output);
         } else {
-            $this->dumpProcessors($output, $action, $this->getRequestType($input), $input->getOption('attribute'));
+            $attributes = $input->getOption('attribute');
+            $group = $input->getArgument('group');
+            if ($group) {
+                $attributes[] = sprintf('group:%s', $group);
+            }
+            $this->dumpProcessors($output, $action, $this->getRequestType($input), $attributes);
         }
     }
 
@@ -119,7 +129,8 @@ class DebugCommand extends AbstractDebugCommand
         $output->writeln('');
         $output->writeln(
             sprintf(
-                'To run show a list of processors for some action run <info>%s ACTION</info>',
+                'To show a list of processors for a specific action, run <info>%1$s ACTION</info>,'
+                . ' e.g. <info>%1$s get_list</info>',
                 $this->getName()
             )
         );

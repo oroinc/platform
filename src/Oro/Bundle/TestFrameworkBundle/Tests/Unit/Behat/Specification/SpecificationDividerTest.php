@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification;
 
-use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationCountDivider;
 
 class SpecificationDividerTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +17,7 @@ class SpecificationDividerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDivide($array, $divider, array $expectedResult)
     {
-        $suiteDivider = new SpecificationDivider();
+        $suiteDivider = new SpecificationCountDivider();
         $actualResult = $suiteDivider->divide(self::BASE_NAME, $array, $divider);
 
         $this->assertTrue(is_array($actualResult));
