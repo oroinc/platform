@@ -28,17 +28,14 @@ class SidebarConfigMenu extends Element
 
             $link->click();
 
-            $isUnrolled = $this->spin(function () use ($link) {
-                $style = $link->getParent()
-                    ->getParent()
-                    ->find('css', 'div.accordion-body')
-                    ->getAttribute('style');
+            $accordionBody = $link->getParent()->getParent()->find('css', 'div.accordion-body');
 
-                return false !== strpos($style, 'height: auto');
+            $isUnrolled = $this->spin(function () use ($accordionBody) {
+                 return false !== strpos($accordionBody->getAttribute('style'), 'height: auto');
             }, 5);
 
             self::assertTrue($isUnrolled, sprintf('Menu "%s" is still collapsed', $item));
-            $context = $link->getParent()->getParent()->find('css', 'div.accordion-body');
+            $context = $accordionBody;
         }
 
         $context->clickLink($lastLink);
