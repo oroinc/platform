@@ -8,7 +8,7 @@ Feature: Mobile menu
     Given here is the "Admin" under "first_session"
     And login as administrator
     And I go to System/Configuration
-    And I follow Commerce/Design/Theme on configuration sidebar
+    And I follow "Commerce/Design/Theme" on configuration sidebar
     And fill "Theme Form" with:
       |ThemeUseDefault|false       |
       |Theme          |Custom theme|

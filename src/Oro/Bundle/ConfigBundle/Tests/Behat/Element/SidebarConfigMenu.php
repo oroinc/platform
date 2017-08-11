@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class SidebarConfigMenu extends Element
 {
-    public function openAndClick($path)
+    public function openNestedMenu($path)
     {
         $this->find('css', 'a[data-action="accordion:collapse-all"]')->click();
 
@@ -28,16 +28,14 @@ class SidebarConfigMenu extends Element
 
             $link->click();
 
-            $isUnrolled = $this->spin(function () use ($link) {
-                $style = $link->getParent()
-                    ->getParent()
-                    ->find('css', 'div.accordion-body')
-                    ->getAttribute('style');
+            $accordionBody = $link->getParent()->getParent()->find('css', 'div.accordion-body');
 
-                return false !== strpos($style, 'height: auto');
+            $isUnrolled = $this->spin(function () use ($accordionBody) {
+                 return false !== strpos($accordionBody->getAttribute('style'), 'height: auto');
             }, 5);
 
             self::assertTrue($isUnrolled, sprintf('Menu "%s" is still collapsed', $item));
+            $context = $accordionBody;
         }
 
         $context->clickLink($lastLink);
