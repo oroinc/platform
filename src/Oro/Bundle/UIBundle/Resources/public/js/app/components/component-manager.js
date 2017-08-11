@@ -112,7 +112,11 @@ define([
                     }
 
                     var data = ComponentShortcutsManager.getComponentData(shortcut, $elem.data(dataKey));
-                    data.pageComponentOptions = $.extend(true, data.pageComponentOptions, $elem.data('pageComponentOptions'));
+                    data.pageComponentOptions = $.extend(
+                        true,
+                        data.pageComponentOptions,
+                        $elem.data('pageComponentOptions')
+                    );
                     $elem.removeAttr(dataAttr)
                         .removeData(dataKey)
                         .data(data);
