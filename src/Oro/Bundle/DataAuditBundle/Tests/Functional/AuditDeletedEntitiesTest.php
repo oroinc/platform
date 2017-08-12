@@ -3,8 +3,8 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\User;

@@ -107,7 +107,7 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider'
         public: false
         arguments:
-            - '@oro_entity_config.provider.dataaudit'
+            - '@oro_entity_config.config_manager'
 
     oro_dataaudit.entity_name_provider:
         class: 'Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider'
