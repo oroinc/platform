@@ -35,6 +35,11 @@ DashboardBundle
     - In method `addDatePartsSelect` removed the last one argument `$useCurrentTimeZone`
     - In method `getEnforcedTimezoneFunction` removed the last one argument `$useCurrentTimeZone`
 
+DataAuditBundle
+---------------
+- Class `Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider`
+    - changed the constructor signature: parameter `ConfigProvider $configProvider` was replaces with `ConfigManager $configManager`
+
 DataGridBundle
 --------------
 - Class `Oro\Bundle\DataGridBundle\Extension\Sorter\PreciseOrderByExtension` was renamed to `Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension`.
