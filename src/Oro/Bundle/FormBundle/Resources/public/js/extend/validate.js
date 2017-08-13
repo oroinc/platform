@@ -205,15 +205,28 @@ define([
         return func.call(this, element, message);
     });
 
-    // fixes focus on select2 element
+    // fixes focus on select2 element and problem with focus on hidden inputs
     $.validator.prototype.focusInvalid = _.wrap($.validator.prototype.focusInvalid, function(func) {
+        if (!this.settings.focusInvalid) {
+            return func.apply(this, _.rest(arguments));
+        }
+
         var $elem = $(this.findLastActive() || (this.errorList.length && this.errorList[0].element) || []);
-        if (this.settings.focusInvalid && $elem.is('.select2[type=hidden]')) {
+        var $firstValidationError = $('.validation-failed').filter(':visible').first();
+
+        if ($elem.is('.select2[type=hidden]')) {
             $elem.parent().find('input.select2-focusser')
                 .focus()
                 .trigger('focusin');
+        } else if (!$elem.filter(':visible').length && $firstValidationError.length) {
+            var $scrollableContainer = $firstValidationError.closest('.scrollable-container');
+            var scrollTop = $firstValidationError.position().top + $scrollableContainer.scrollTop();
+
+            $scrollableContainer.animate({
+                scrollTop: scrollTop
+            }, scrollTop / 2);
         } else {
-            func.apply(this, _.rest(arguments));
+            return func.apply(this, _.rest(arguments));
         }
     });
 

@@ -40,7 +40,6 @@ services:
 
     oro_message_queue.client.message_processor_registry:
         class: 'Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry'
-        public: false
         calls:
             - ['setContainer', ['@service_container']]
 
@@ -79,11 +78,6 @@ services:
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
-
-    oro_message_queue.client.consume_messages_command:
-        class: 'Oro\Component\MessageQueue\Client\ConsumeMessagesCommand'
-        tags:
-            - { name: console.command }
 
     oro_message_queue.client.meta.topics_command:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicsCommand'

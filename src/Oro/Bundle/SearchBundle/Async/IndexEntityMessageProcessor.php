@@ -48,19 +48,13 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
         $body = JSON::decode($message->getBody());
 
         if (empty($body['class'])) {
-            $this->logger->error(
-                'Message is invalid. Class was not found.',
-                ['message' => $message]
-            );
+            $this->logger->error('Message is invalid. Class was not found.');
 
             return self::REJECT;
         }
 
         if (empty($body['id'])) {
-            $this->logger->error(
-                'Message is invalid. Id was not found.',
-                ['message' => $message]
-            );
+            $this->logger->error('Message is invalid. Id was not found.');
 
             return self::REJECT;
         }
@@ -69,8 +63,7 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
         $entityManager = $this->doctrine->getManagerForClass($body['class']);
         if (null === $entityManager) {
             $this->logger->error(
-                sprintf('Entity manager is not defined for class: "%s"', $body['class']),
-                ['message' => $message]
+                sprintf('Entity manager is not defined for class: "%s"', $body['class'])
             );
 
             return self::REJECT;

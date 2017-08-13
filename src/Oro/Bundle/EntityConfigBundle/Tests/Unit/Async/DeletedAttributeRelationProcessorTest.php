@@ -77,7 +77,7 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityRepositoryForClass');
         $this->logger->expects($this->once())
             ->method('critical')
-            ->with('Invalid message: key "attributeFamilyId" is missing.', ['message' => $message]);
+            ->with('Invalid message: key "attributeFamilyId" is missing.');
 
         /** @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject $session */
         $session = $this->createMock(SessionInterface::class);

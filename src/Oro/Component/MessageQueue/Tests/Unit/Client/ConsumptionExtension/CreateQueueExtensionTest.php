@@ -29,7 +29,7 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $loggerMock
             ->expects($this->once())
             ->method('debug')
-            ->with('[CreateQueueExtension] Make sure the queue theQueueName exists on a broker side.')
+            ->with('Make sure the queue "theQueueName" exists on a broker side.')
         ;
 
         $context = new Context($this->createSessionMock());
@@ -66,12 +66,12 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $loggerMock
             ->expects($this->at(0))
             ->method('debug')
-            ->with('[CreateQueueExtension] Make sure the queue theQueueName1 exists on a broker side.')
+            ->with('Make sure the queue "theQueueName1" exists on a broker side.')
         ;
         $loggerMock
             ->expects($this->at(1))
             ->method('debug')
-            ->with('[CreateQueueExtension] Make sure the queue theQueueName2 exists on a broker side.')
+            ->with('Make sure the queue "theQueueName2" exists on a broker side.')
         ;
 
         $extension = new CreateQueueExtension($driverMock);

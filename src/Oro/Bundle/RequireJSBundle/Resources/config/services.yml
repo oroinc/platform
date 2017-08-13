@@ -9,6 +9,7 @@ services:
         arguments:
             - '@service_container'
             - '%oro_require_js.web_root%'
+            - '%oro_require_js.build_logger%'
         tags:
             - { name: twig.extension }
 

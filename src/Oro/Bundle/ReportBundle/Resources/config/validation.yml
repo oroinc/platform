@@ -5,7 +5,7 @@ Oro\Bundle\ReportBundle\Entity\Report:
     constraints:
         - Oro\Bundle\ReportBundle\Validator\Constraints\ReportDefinitionConstraint:
             groups: [PreQueryValidate]
-        - Oro\Bundle\ReportBundle\Validator\Constraints\ReportColumnDublicateConstraint:
+        - Oro\Bundle\ReportBundle\Validator\Constraints\ReportColumnDuplicateConstraint:
             groups: [PreQueryValidate]
         - Oro\Bundle\ReportBundle\Validator\Constraints\ReportDateGroupingConstraint:
             groups: [PreQueryValidate]
