@@ -152,11 +152,14 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
+        if (!$this->getMink()->isSessionStarted()) {
+            return;
+        }
+
         $session = $this->getMink()->getSession();
 
         /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-
+        $driver = $session->getDriver();
         $url = $session->getCurrentUrl();
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
