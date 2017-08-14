@@ -1,3 +1,4 @@
+@regression
 @ticket-CRM-8143
 Feature: Email Navigation Items
   In order to manage Email feature

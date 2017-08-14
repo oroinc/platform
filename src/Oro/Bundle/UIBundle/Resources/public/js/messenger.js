@@ -1,20 +1,21 @@
 define([
     'jquery',
     'underscore',
+    'tpl!oroui/templates/message-item.html',
     'oroui/js/tools',
     'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',
     'oroui/js/mediator',
     'oroui/js/error',
     'bootstrap'
-], function($, _, tools, MultiUseResourceManager, SHA256, mediator, error) {
+], function($, _, template, tools, MultiUseResourceManager, SHA256, mediator, error) {
     'use strict';
 
     var defaults = {
         container: '',
         temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
-        template: $.noop,
+        template: template,
         insertMethod: 'appendTo',
         style: 'default'
     };

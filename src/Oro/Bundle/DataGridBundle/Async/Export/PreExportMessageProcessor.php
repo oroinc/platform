@@ -116,19 +116,13 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
         ], $body);
 
         if (! isset($body['securityToken'], $body['parameters']['gridName'], $body['format'])) {
-            $this->logger->critical(
-                sprintf('[DataGridPreExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return false;
         }
 
         if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical(
-                sprintf('[DataGridPreExportMessageProcessor] Cannot set security token'),
-                ['message' => $message]
-            );
+            $this->logger->critical('Cannot set security token');
 
             return false;
         }

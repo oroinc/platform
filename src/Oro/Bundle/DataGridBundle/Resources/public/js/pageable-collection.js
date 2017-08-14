@@ -802,6 +802,17 @@ define([
 
                 // silent the first reset from backbone
                 return BBColProto.fetch.call(self, _.extend({}, options, {silent: true}));
+            } else {
+                var currentPage = state.currentPage;
+                options.success = function(col, resp, opts) {
+                    if (currentPage > 1 && _.isEmpty(resp.data) && col.state.totalRecords > 0) {
+                        //load last page, if records not found for current page(for example after records delete)
+                        self.getLastPage();
+                    }
+                    if (success) {
+                        success(col, resp, opts);
+                    }
+                };
             }
 
             return BBColProto.fetch.call(this, options);

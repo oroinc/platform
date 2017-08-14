@@ -385,15 +385,22 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
         $this->processorBag->addGroup('group1', 'action1');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The ProcessorBag is frozen.
-     */
     public function testAddApplicableCheckerToFrozenBag()
     {
-        $this->processorBag->getProcessors(new Context());
+        $context = new Context();
+        $context->setAction('action1');
 
+        $this->processorBag->addProcessor('processor1', ['disabled' => true], 'action1');
+        $this->processorBag->addProcessor('processor2', [], 'action1');
+
+        // freeze the processor bag
+        // and make sure that the applicable checker is initialized and not blocks any processor
+        self::assertCount(2, $this->processorBag->getProcessors($context));
+
+        // add additional applicable checker that blocks disabled processors
+        // and make sure that it is used from now
         $this->processorBag->addApplicableChecker(new NotDisabledApplicableChecker());
+        self::assertCount(1, $this->processorBag->getProcessors($context));
     }
 
     /**

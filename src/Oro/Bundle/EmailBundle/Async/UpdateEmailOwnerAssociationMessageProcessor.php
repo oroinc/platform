@@ -48,10 +48,7 @@ class UpdateEmailOwnerAssociationMessageProcessor implements MessageProcessorInt
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['jobId'], $data['ownerClass'], $data['ownerId'])) {
-            $this->logger->critical(sprintf(
-                '[UpdateEmailOwnerAssociationMessageProcessor] Got invalid message: "%s"',
-                $message->getBody()
-            ), ['message' => $message]);
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }

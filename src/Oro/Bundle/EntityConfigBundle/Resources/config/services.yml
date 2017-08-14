@@ -296,8 +296,8 @@ services:
         arguments:
             - '@translator'
 
-    oro_entity_config.attribute_group_rendrer_registry:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry'
+    oro_entity_config.attribute_render_registry:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry'
 
     oro_entity_config.form.extension.dynamic_attributes:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\DynamicAttributesExtension

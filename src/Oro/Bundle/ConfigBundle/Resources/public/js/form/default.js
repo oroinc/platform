@@ -1,35 +1,21 @@
-define([
-    'jquery',
-    'underscore'
-], function($, _) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var tinyMCE = require('tinymce/tinymce');
 
     return function() {
         $(function() {
             function prepareTinymce(textareas) {
                 if (textareas.length > 0) {
                     $(textareas).each(function(i, el) {
-                        if ($(el).tinymce) {
-                            var settings;
-                            var tinymceInstance = $(el).tinymce();
-                            if (tinymceInstance) {
-                                if ($(el).prop('disabled')) {
-                                    settings = tinymceInstance.editorManager.activeEditor.settings;
-                                    settings.readonly = true;
-                                    tinymceInstance.editorManager.activeEditor.remove();
-                                    $(el).tinymce(settings);
-                                } else {
-                                    settings = tinymceInstance.editorManager.activeEditor.settings;
-                                    settings.readonly = false;
-                                    tinymceInstance.editorManager.activeEditor.remove();
-                                    $(el).tinymce(settings);
-                                }
-                            }
+                        var editor = tinyMCE.get(el.id);
+                        if (editor) {
+                            editor.setMode($(el).prop('disabled') ? 'readonly' : 'code');
                         }
                     });
                 }
             }
-            prepareTinymce($.find('textarea'));
             var value;
             var valueEls;
             var checkboxEls = $('.parent-scope-checkbox input');
