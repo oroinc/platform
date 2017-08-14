@@ -4,6 +4,6 @@ Feature: Settings label must be clickable
     Given I login as administrator
     And I go to System/ Configuration
     And I follow "System configuration/General setup/Localization" on configuration sidebar
-    And uncheck Use Default for "Format address per country" field
+    And uncheck "Use default" for "Format address per country" field
     When I uncheck "Format address per country"
     Then the "Format address per country" checkbox should not be checked

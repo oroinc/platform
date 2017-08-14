@@ -3,19 +3,21 @@
 namespace Oro\Bundle\DataAuditBundle\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class AuditConfigProvider
 {
-    /** @var ConfigProvider */
-    private $configProvider;
+    const DATA_AUDIT_SCOPE = 'dataaudit';
+
+    /** @var ConfigManager */
+    private $configManager;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigManager $configManager
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->configProvider = $configProvider;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -28,8 +30,10 @@ class AuditConfigProvider
     public function isAuditableEntity($entityClass)
     {
         return
-            $this->configProvider->hasConfig($entityClass)
-            && $this->isAuditable($this->configProvider->getConfig($entityClass));
+            $this->configManager->hasConfig($entityClass)
+            && $this->isAuditable(
+                $this->configManager->getEntityConfig(self::DATA_AUDIT_SCOPE, $entityClass)
+            );
     }
 
     /**
@@ -43,8 +47,10 @@ class AuditConfigProvider
     public function isAuditableField($entityClass, $fieldName)
     {
         return
-            $this->configProvider->hasConfig($entityClass, $fieldName)
-            && $this->isAuditable($this->configProvider->getConfig($entityClass, $fieldName));
+            $this->configManager->hasConfig($entityClass, $fieldName)
+            && $this->isAuditable(
+                $this->configManager->getFieldConfig(self::DATA_AUDIT_SCOPE, $entityClass, $fieldName)
+            );
     }
 
     /**
@@ -55,7 +61,7 @@ class AuditConfigProvider
     public function getAllAuditableEntities()
     {
         $result = [];
-        $configs = $this->configProvider->getConfigs(null, true);
+        $configs = $this->configManager->getConfigs(self::DATA_AUDIT_SCOPE, null, true);
         foreach ($configs as $config) {
             if ($this->isAuditable($config)) {
                 $result[] = $config->getId()->getClassName();
