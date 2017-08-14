@@ -346,45 +346,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * This step is used for system configuration field
      * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And check Use Default for "Position" field
+     * Example: And check "Use default" for "Position" field
      *
-     * @Given check Use Default for :label field
+     * @Given check :checkbox for :label field
      */
-    public function checkUseDefaultForField($label)
+    public function checkUseDefaultForField($label, $checkbox)
     {
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
-        $form->checkUseDefaultCheckbox($label);
+        $form->checkCheckboxByLabel($label, $checkbox);
     }
 
     /**
      * This step used for system configuration field
      * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use Default for "Position" field
+     * Example: And uncheck "Use default" for "Position" field
      *
-     * @Given uncheck Use Default for :label field
+     * @Given uncheck :checkbox for :label field
      */
-    public function uncheckUseDefaultForField($label)
+    public function uncheckUseDefaultForField($label, $checkbox)
     {
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label);
+        $form->uncheckCheckboxByLabel($label, $checkbox);
     }
-
-    /**
-     * This step used for system configuration field on nested level (Organization, Website)
-     * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use System for "Position" field
-     *
-     * @Given uncheck Use System for :label field
-     */
-    public function uncheckUseSystemForField($label)
-    {
-        /** @var SystemConfigForm $form */
-        $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label, 'Use System');
-    }
-
 
     /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/

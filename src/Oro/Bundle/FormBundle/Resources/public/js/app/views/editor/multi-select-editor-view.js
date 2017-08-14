@@ -8,7 +8,7 @@ define(function(require) {
      *
      * ### Column configuration samples:
      * ``` yml
-     * datagrid:
+     * datagrids:
      *   {grid-uid}:
      *     inline_editing:
      *       enable: true
@@ -18,13 +18,18 @@ define(function(require) {
      *       {column-name-1}:
      *         inline_editing:
      *           editor:
-     *             view: oroform/js/app/views/editor/multi-relation-editor-view
+     *             view: oroform/js/app/views/editor/multi-select-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'
      *               maximumSelectionLength: 3
      *           validation_rules:
      *             NotBlank: true
+     *           save_api_accessor:
+     *               route: '<route>'
+     *               query_parameter_names:
+     *                  - '<parameter1>'
+     *                  - '<parameter2>'
      * ```
      *
      * ### Options in yml:
@@ -35,19 +40,19 @@ define(function(require) {
      * inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.view_options.maximumSelectionLength | Optional. Maximum selection length
-     * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
+     * inline_editing.validation_rules          | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+     * inline_editing.save_api_accessor                    | Optional. Sets accessor module, route, parameters etc.
      *
      * ### Constructor parameters
      *
      * @class
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
-     * @param {Backgrid.Cell} options.cell - Current datagrid cell
-     * @param {Backgrid.Column} options.column - Current datagrid column
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {string} options.maximumSelectionLength - Maximum selection length
-     * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
+     * @param {Object} options.validationRules - Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+     * @param {string} options.value - initial value of edited field
      *
      * @augments [SelectEditorView](./select-editor-view.md)
      * @exports MultiSelectEditorView

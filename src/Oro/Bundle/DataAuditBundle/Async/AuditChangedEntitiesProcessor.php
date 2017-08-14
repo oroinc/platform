@@ -2,27 +2,19 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
-use Oro\Bundle\DataAuditBundle\Model\EntityReference;
-use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicSubscriberInterface
-{
-    /** @var ManagerRegistry */
-    private $doctrine;
+use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
+use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 
+class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
+{
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
@@ -30,16 +22,13 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
     private $messageProducer;
 
     /**
-     * @param ManagerRegistry                    $doctrine
      * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
      * @param MessageProducerInterface           $messageProducer
      */
     public function __construct(
-        ManagerRegistry $doctrine,
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
         MessageProducerInterface $messageProducer
     ) {
-        $this->doctrine = $doctrine;
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
         $this->messageProducer = $messageProducer;
     }
@@ -51,63 +40,57 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
     {
         $body = JSON::decode($message->getBody());
 
-        $loggedAt = \DateTime::createFromFormat('U', $body['timestamp']);
-        $transactionId = $body['transaction_id'];
+        $loggedAt = $this->getLoggedAt($body);
+        $transactionId = $this->getTransactionId($body);
+        $user = $this->getUserReference($body);
+        $organization = $this->getOrganizationReference($body);
+        $impersonation = $this->getImpersonationReference($body);
+        $ownerDescription = $this->getOwnerDescription($body);
 
-        $user = new EntityReference();
-        if (isset($body['user_id'])) {
-            $user = new EntityReference($body['user_class'], $body['user_id']);
+        if ($body['entities_inserted']) {
+            $this->entityChangesToAuditEntryConverter->convert(
+                $body['entities_inserted'],
+                $transactionId,
+                $loggedAt,
+                $user,
+                $organization,
+                $impersonation,
+                $ownerDescription,
+                AbstractAudit::ACTION_CREATE
+            );
         }
 
-        $organization = new EntityReference();
-        if (isset($body['organization_id'])) {
-            $organization = new EntityReference(Organization::class, $body['organization_id']);
+        if ($body['entities_updated']) {
+            $this->entityChangesToAuditEntryConverter->convert(
+                $body['entities_updated'],
+                $transactionId,
+                $loggedAt,
+                $user,
+                $organization,
+                $impersonation,
+                $ownerDescription,
+                AbstractAudit::ACTION_UPDATE
+            );
         }
 
-        $impersonation = new EntityReference();
-        if (isset($body['impersonation_id'])) {
-            $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
+        if ($body['entities_deleted']) {
+            $this->entityChangesToAuditEntryConverter->convertSkipFields(
+                $body['entities_deleted'],
+                $transactionId,
+                $loggedAt,
+                $user,
+                $organization,
+                $impersonation,
+                $ownerDescription,
+                AbstractAudit::ACTION_REMOVE
+            );
         }
 
-        $ownerDescription = isset($body['owner_description']) ? $body['owner_description'] : null;
-
-        $this->entityChangesToAuditEntryConverter->convert(
-            $body['entities_inserted'],
-            $transactionId,
-            $loggedAt,
-            $user,
-            $organization,
-            $impersonation,
-            $ownerDescription,
-            AbstractAudit::ACTION_CREATE
-        );
-
-        $this->entityChangesToAuditEntryConverter->convert(
-            $body['entities_updated'],
-            $transactionId,
-            $loggedAt,
-            $user,
-            $organization,
-            $impersonation,
-            $ownerDescription,
-            AbstractAudit::ACTION_UPDATE
-        );
-
-        $this->entityChangesToAuditEntryConverter->convertSkipFields(
-            $body['entities_deleted'],
-            $transactionId,
-            $loggedAt,
-            $user,
-            $organization,
-            $impersonation,
-            $ownerDescription,
-            AbstractAudit::ACTION_REMOVE
-        );
-
-        $message = new Message($body, MessagePriority::VERY_LOW);
-
-        $this->messageProducer->send(Topics::ENTITIES_RELATIONS_CHANGED, $message);
-        $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $message);
+        $nextMessage = new Message($body, MessagePriority::VERY_LOW);
+        if ($body['collections_updated']) {
+            $this->messageProducer->send(Topics::ENTITIES_RELATIONS_CHANGED, $nextMessage);
+        }
+        $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $nextMessage);
 
         return self::ACK;
     }

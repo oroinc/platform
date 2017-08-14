@@ -36,6 +36,11 @@ datagrids:
                 key-2: Second
           validation_rules:
             NotBlank: ~
+          save_api_accessor:
+              route: '<route>'
+              query_parameter_names:
+                 - '<parameter1>'
+                 - '<parameter2>'
     properties:
       # this line is required to add {column-name-value} to data sent to client
       {column-name-value}: ~
@@ -50,7 +55,8 @@ inline_editing.editor.view_options.value_field_name | Related value field name.
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
 inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
+inline_editing.validation_rules | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+inline_editing.save_api_accessor                    | Optional. Sets accessor module, route, parameters etc.
 
 
 ### Constructor parameters
@@ -61,10 +67,11 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
+| options.className | <code>string</code> | CSS class name for editor element |
 | options.fieldName | <code>string</code> | Field name to edit in model |
 | options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
 | options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
 | options.choices | <code>Object</code> | Key-value set of available choices |
 | options.value_field_name | <code>Object</code> | Related value field name |
 

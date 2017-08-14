@@ -5,6 +5,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesRelationsProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
@@ -30,7 +31,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
         $this->assertInstanceOf(AuditChangedEntitiesRelationsProcessor::class, $processor);
     }
 
-    public function testShouldDoNothingIfAnythingChangedInMessage()
+    public function testShouldReturnRejectWhenNoCollectionsUpdated()
     {
         $message = $this->createMessage([
             'timestamp' => time(),
@@ -44,8 +45,9 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
         /** @var AuditChangedEntitiesRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
 
-        $processor->process($message, new NullSession());
+        $result = $processor->process($message, new NullSession());
 
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
         $this->assertStoredAuditCount(0);
     }
 
@@ -57,13 +59,18 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
             'entities_inserted' => [],
             'entities_updated' => [],
             'entities_deleted' => [],
-            'collections_updated' => [],
+            'collections_updated' => [
+                ['entity_class' => Organization::class, 'entity_id' => 1, 'change_set' => []]
+            ],
         ]);
 
         /** @var AuditChangedEntitiesRelationsProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $processor->process($message, new NullSession()));
+        $result = $processor->process($message, new NullSession());
+
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        $this->assertStoredAuditCount(0);
     }
 
     private function assertStoredAuditCount($expected)
