@@ -107,7 +107,7 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider'
         public: false
         arguments:
-            - '@oro_entity_config.provider.dataaudit'
+            - '@oro_entity_config.config_manager'
 
     oro_dataaudit.entity_name_provider:
         class: 'Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider'
@@ -137,7 +137,6 @@ services:
     oro_dataaudit.async.audit_changed_entities:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor'
         arguments:
-            - '@doctrine'
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
             - '@oro_message_queue.message_producer'
         tags:
@@ -146,8 +145,8 @@ services:
     oro_dataaudit.async.audit_changed_entities_relations:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesRelationsProcessor'
         arguments:
-            - '@doctrine'
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
+            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

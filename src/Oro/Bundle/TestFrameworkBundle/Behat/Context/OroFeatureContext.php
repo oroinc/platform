@@ -33,12 +33,9 @@ class OroFeatureContext extends RawMinkContext
         return null;
     }
 
-    /**
-     * @param int $time
-     */
-    public function waitForAjax($time = 60000)
+    public function waitForAjax()
     {
-        $this->getDriver()->waitForAjax($time);
+        $this->getDriver()->waitForAjax();
     }
 
     /**

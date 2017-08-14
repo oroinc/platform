@@ -1,22 +1,25 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Listener;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @dbIsolationPerTest
@@ -24,7 +27,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 {
     use MessageQueueExtension;
-    
+
     protected function setUp()
     {
         parent::setUp();
@@ -32,27 +35,68 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->initClient();
     }
 
+    /**
+     * @return SendChangedEntitiesToMessageQueueListener
+     */
+    protected function getListener()
+    {
+        return $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->getContainer()->get('doctrine.orm.entity_manager');
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    protected function getTokenStorage()
+    {
+        return $this->getContainer()->get('security.token_storage');
+    }
+
+    /**
+     * @param array $expectedChanges
+     */
+    protected static function assertSentChanges(array $expectedChanges)
+    {
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
+        self::assertEquals(
+            $expectedChanges,
+            [
+                'entities_inserted'   => $body['entities_inserted'],
+                'entities_deleted'    => $body['entities_deleted'],
+                'entities_updated'    => $body['entities_updated'],
+                'collections_updated' => $body['collections_updated']
+            ]
+        );
+    }
+
     public function testCouldBeGetAsServiceFromContainer()
     {
-        $listener = $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
+        $listener = $this->getListener();
 
-        $this->assertInstanceOf(SendChangedEntitiesToMessageQueueListener::class, $listener);
+        self::assertInstanceOf(SendChangedEntitiesToMessageQueueListener::class, $listener);
     }
 
     public function testShouldBeEnabledByDefault()
     {
-        /** @var SendChangedEntitiesToMessageQueueListener $listener */
-        $listener = $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
+        $listener = $this->getListener();
 
-        $this->assertAttributeEquals(true, 'enabled', $listener);
+        self::assertAttributeEquals(true, 'enabled', $listener);
     }
 
     public function testShouldDoNothingIfListenerDisabled()
     {
         $em = $this->getEntityManager();
 
-        /** @var SendChangedEntitiesToMessageQueueListener $listener */
-        $listener = $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
+        $listener = $this->getListener();
         $listener->setEnabled(false);
 
         $owner = new TestAuditDataOwner();
@@ -60,7 +104,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        $this->assertEmpty(self::getSentMessages());
+        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
     }
 
     /**
@@ -69,8 +113,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
      */
     public function testShouldPostFlushNotThrowExceptionIfFlushIsCalledInPostFlushListener()
     {
-        /** @var SendChangedEntitiesToMessageQueueListener $listener */
-        $listener = $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
+        $listener = $this->getListener();
 
         $listener->postFlush(new PostFlushEventArgs($this->getEntityManager()));
     }
@@ -89,32 +132,27 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
-
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
-
         /** @var Message $message */
-        $message = $sentMessages[0]['message'];
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
 
         self::assertInstanceOf(Message::class, $message);
 
         $body = $message->getBody();
-        $this->assertArrayHasKey('timestamp', $body);
-        $this->assertArrayHasKey('transaction_id', $body);
 
-        $this->assertArrayHasKey('entities_updated', $body);
-        $this->assertInternalType('array', $body['entities_updated']);
+        self::assertArrayHasKey('timestamp', $body);
+        self::assertArrayHasKey('transaction_id', $body);
 
-        $this->assertArrayHasKey('entities_deleted', $body);
-        $this->assertInternalType('array', $body['entities_deleted']);
+        self::assertArrayHasKey('entities_updated', $body);
+        self::assertInternalType('array', $body['entities_updated']);
 
-        $this->assertArrayHasKey('entities_inserted', $body);
-        $this->assertInternalType('array', $body['entities_inserted']);
+        self::assertArrayHasKey('entities_deleted', $body);
+        self::assertInternalType('array', $body['entities_deleted']);
 
-        $this->assertArrayHasKey('collections_updated', $body);
-        $this->assertInternalType('array', $body['collections_updated']);
+        self::assertArrayHasKey('entities_inserted', $body);
+        self::assertInternalType('array', $body['entities_inserted']);
+
+        self::assertArrayHasKey('collections_updated', $body);
+        self::assertInternalType('array', $body['collections_updated']);
     }
 
     public function testShouldSendMessageWithVeryLowPriority()
@@ -127,10 +165,9 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $sentMessages[0]['message']->getPriority());
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        self::assertEquals(MessagePriority::VERY_LOW, $message->getPriority());
     }
 
     public function testShouldSetTimestampToMessage()
@@ -147,18 +184,15 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
 
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
+        self::assertArrayHasKey('timestamp', $body);
+        self::assertNotEmpty($body['timestamp']);
 
-        $message = $sentMessages[0]['message'];
-        $this->assertArrayHasKey('timestamp', $message->getBody());
-        $this->assertNotEmpty($message->getBody()['timestamp']);
-        
-        $this->assertGreaterThan(time() - 10, $message->getBody()['timestamp']);
-        $this->assertLessThan(time() + 10, $message->getBody()['timestamp']);
+        self::assertGreaterThan(time() - 10, $body['timestamp']);
+        self::assertLessThan(time() + 10, $body['timestamp']);
     }
 
     public function testShouldSetTransactionIdToMessage()
@@ -175,82 +209,470 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
 
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
-
-        $message = $sentMessages[0]['message'];
-        $this->assertArrayHasKey('transaction_id', $message->getBody());
-        $this->assertNotEmpty($message->getBody()['transaction_id']);
+        self::assertArrayHasKey('transaction_id', $body);
+        self::assertNotEmpty($body['transaction_id']);
     }
 
-    public function testShouldSendInsertedEntityToMessageQueue()
+    public function testShouldSendInsertedEntity()
     {
+        $em = $this->getEntityManager();
+
         $owner = new TestAuditDataOwner();
         $owner->setStringProperty('aString');
-
-        $em = $this->getEntityManager();
         $em->persist($owner);
         $em->flush();
 
-        self::assertMessageSent(Topics::ENTITIES_CHANGED);
+        self::assertSentChanges([
+            'entities_inserted'   => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'stringProperty' => [null, 'aString']
+                    ]
+                ]
+            ],
+            'entities_deleted'    => [],
+            'entities_updated'    => [],
+            'collections_updated' => []
+        ]);
     }
 
-    public function testShouldSendUpdatedEntityToMessageQueue()
+    public function testShouldSendUpdatedEntity()
     {
+        $em = $this->getEntityManager();
+
         $owner = new TestAuditDataOwner();
         $owner->setStringProperty('aString');
-
-        $em = $this->getEntityManager();
         $em->persist($owner);
         $em->flush();
-
         self::getMessageCollector()->clear();
 
         $owner->setStringProperty('anotherString');
         $em->flush();
 
-        self::assertMessageSent(Topics::ENTITIES_CHANGED);
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'stringProperty' => ['aString', 'anotherString']
+                    ]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
     }
 
-    public function testShouldSendDeletedEntityToMessageQueue()
+    public function testShouldSendDeletedEntity()
     {
+        $em = $this->getEntityManager();
+
         $owner = new TestAuditDataOwner();
         $owner->setStringProperty('aString');
-
-        $em = $this->getEntityManager();
         $em->persist($owner);
         $em->flush();
-
         self::getMessageCollector()->clear();
 
+        $removedOwnerId = $owner->getId();
         $em->remove($owner);
         $em->flush();
 
-        self::assertMessageSent(Topics::ENTITIES_CHANGED);
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $removedOwnerId,
+                    'change_set'   => []
+                ]
+            ],
+            'entities_updated'    => [],
+            'collections_updated' => []
+        ]);
     }
 
-    public function testShouldSendUpdatedCollectionToMessageQueue()
+    public function testShouldSendEntityAddedToManyToManyAssociation()
     {
         $em = $this->getEntityManager();
 
         $toBeAddedChild = new TestAuditDataChild();
         $em->persist($toBeAddedChild);
-
         $owner = new TestAuditDataOwner();
         $em->persist($owner);
-
         $em->flush();
-
         self::getMessageCollector()->clear();
 
         $owner->getChildrenManyToMany()->add($toBeAddedChild);
-
         $em->flush();
 
-        self::assertMessageSent(Topics::ENTITIES_CHANGED);
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => []
+                ]
+            ],
+            'collections_updated' => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'childrenManyToMany' => [
+                            null,
+                            [
+                                'inserted' => [
+                                    [
+                                        'entity_class' => get_class($toBeAddedChild),
+                                        'entity_id'    => $toBeAddedChild->getId(),
+                                        'change_set'   => []
+                                    ]
+                                ],
+                                'deleted'  => [],
+                                'changed'  => []
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    public function testShouldSendEntityRemovedFromManyToManyAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $toBeRemovedChild = new TestAuditDataChild();
+        $em->persist($toBeRemovedChild);
+        $owner = new TestAuditDataOwner();
+        $em->persist($owner);
+        $owner->getChildrenManyToMany()->add($toBeRemovedChild);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $owner->getChildrenManyToMany()->removeElement($toBeRemovedChild);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => []
+                ]
+            ],
+            'collections_updated' => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'childrenManyToMany' => [
+                            null,
+                            [
+                                'inserted' => [],
+                                'deleted'  => [
+                                    [
+                                        'entity_class' => get_class($toBeRemovedChild),
+                                        'entity_id'    => $toBeRemovedChild->getId(),
+                                        'change_set'   => []
+                                    ]
+                                ],
+                                'changed'  => []
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    public function testShouldNotSendEntityAddedToInverseSideOfManyToManyAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $child = new TestAuditDataChild();
+        $em->persist($child);
+        $toBeAddedOwner = new TestAuditDataOwner();
+        $em->persist($toBeAddedOwner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $child->getOwners()->add($toBeAddedOwner);
+        $em->flush();
+
+        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+    }
+
+    public function testShouldNotSendEntityRemovedFromInverseSideOfManyToManyAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $child = new TestAuditDataChild();
+        $em->persist($child);
+        $toBeRemovedOwner = new TestAuditDataOwner();
+        $em->persist($toBeRemovedOwner);
+        $child->getOwners()->add($toBeRemovedOwner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $child->getOwners()->removeElement($toBeRemovedOwner);
+        $em->flush();
+
+        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+    }
+
+    public function testShouldSendEntitySetToOneToOneAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $toBeSetChild = new TestAuditDataChild();
+        $em->persist($toBeSetChild);
+        $owner = new TestAuditDataOwner();
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $owner->setChild($toBeSetChild);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'child' => [
+                            null,
+                            [
+                                'entity_class' => get_class($toBeSetChild),
+                                'entity_id'    => $toBeSetChild->getId(),
+                                'change_set'   => []
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+    }
+
+    public function testShouldSendEntityUnsetToOneToOneAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $toBeUnsetChild = new TestAuditDataChild();
+        $em->persist($toBeUnsetChild);
+        $owner = new TestAuditDataOwner();
+        $em->persist($owner);
+        $owner->setChild($toBeUnsetChild);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $owner->setChild(null);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'child' => [
+                            [
+                                'entity_class' => get_class($toBeUnsetChild),
+                                'entity_id'    => $toBeUnsetChild->getId(),
+                                'change_set'   => []
+                            ],
+                            null
+                        ]
+                    ]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+    }
+
+    public function testShouldNotSendEntitySetToInverseSideOfOneToOneAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $toBeSetChild = new TestAuditDataChild();
+        $em->persist($toBeSetChild);
+        $owner = new TestAuditDataOwner();
+        $em->persist($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $toBeSetChild->setOwner($owner);
+        $em->flush();
+
+        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+    }
+
+    public function testShouldSendEntitySetToManyToOneAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataChild();
+        $em->persist($owner);
+        $toBeSetChild = new TestAuditDataOwner();
+        $em->persist($toBeSetChild);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $owner->setOwnerManyToOne($toBeSetChild);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'ownerManyToOne' => [
+                            null,
+                            [
+                                'entity_class' => get_class($toBeSetChild),
+                                'entity_id'    => $toBeSetChild->getId(),
+                                'change_set'   => []
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+    }
+
+    public function testShouldSendEntityUnsetToManyToOneAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataChild();
+        $em->persist($owner);
+        $toBeUnsetChild = new TestAuditDataOwner();
+        $em->persist($toBeUnsetChild);
+        $owner->setOwnerManyToOne($toBeUnsetChild);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $owner->setOwnerManyToOne(null);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'ownerManyToOne' => [
+                            [
+                                'entity_class' => get_class($toBeUnsetChild),
+                                'entity_id'    => $toBeUnsetChild->getId(),
+                                'change_set'   => []
+                            ],
+                            null
+                        ]
+                    ]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+    }
+
+    public function testShouldSendOnlyOwnerSideEntityWhenEntityAddedToInverseSideOfManyToOneAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataChild();
+        $em->persist($owner);
+        $child = new TestAuditDataOwner();
+        $em->persist($child);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $child->addChildrenOneToMany($owner);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'ownerManyToOne' => [
+                            null,
+                            [
+                                'entity_class' => get_class($child),
+                                'entity_id'    => $child->getId(),
+                                'change_set'   => []
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+    }
+
+    public function testShouldSendOnlyOwnerSideEntityWhenEntityRemovedFromInverseSideOfManyToOneAssociation()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataChild();
+        $em->persist($owner);
+        $child = new TestAuditDataOwner();
+        $em->persist($child);
+        $child->addChildrenOneToMany($owner);
+        $em->flush();
+        self::getMessageCollector()->clear();
+
+        $child->removeChildrenOneToMany($owner);
+        $em->flush();
+
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [
+                [
+                    'entity_class' => get_class($owner),
+                    'entity_id'    => $owner->getId(),
+                    'change_set'   => [
+                        'ownerManyToOne' => [
+                            [
+                                'entity_class' => get_class($child),
+                                'entity_id'    => $child->getId(),
+                                'change_set'   => []
+                            ],
+                            null
+                        ]
+                    ]
+                ]
+            ],
+            'collections_updated' => []
+        ]);
     }
 
     public function testShouldSendOneMessagePerFlush()
@@ -260,16 +682,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $toBeUpdateEntity = new TestAuditDataOwner();
         $toBeUpdateEntity->setStringProperty('aString');
         $em->persist($toBeUpdateEntity);
-
         $toBeDeletedEntity = new TestAuditDataOwner();
         $toBeDeletedEntity->setStringProperty('aString');
         $em->persist($toBeUpdateEntity);
         $em->flush();
-
         self::getMessageCollector()->clear();
 
         $toBeUpdateEntity->setStringProperty('anotherString');
-
         $em->remove($toBeDeletedEntity);
 
         $toBeInsertedEntity = new TestAuditDataOwner();
@@ -285,8 +704,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     {
         $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'someCredentinals', 'aProviderKey');
 
-        /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = $this->getContainer()->get('security.token_storage');
+        $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
 
         $em = $this->getEntityManager();
@@ -296,16 +714,12 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
 
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
-
-        $message = $sentMessages[0]['message'];
-
-        $this->assertArrayNotHasKey('user_id', $message->getBody());
-        $this->assertArrayNotHasKey('user_class', $message->getBody());
+        self::assertArrayNotHasKey('user_id', $body);
+        self::assertArrayNotHasKey('user_class', $body);
     }
 
     public function testShouldSendLoggedInUserInfoIfPresent()
@@ -315,8 +729,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $token = new UsernamePasswordToken($user, 'someCredentinals', 'aProviderKey');
 
-        /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = $this->getContainer()->get('security.token_storage');
+        $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
 
         $em = $this->getEntityManager();
@@ -326,19 +739,15 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
 
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
+        self::assertArrayHasKey('user_id', $body);
+        self::assertSame(123, $body['user_id']);
 
-        $message = $sentMessages[0]['message'];
-
-        $this->assertArrayHasKey('user_id', $message->getBody());
-        $this->assertSame(123, $message->getBody()['user_id']);
-
-        $this->assertArrayHasKey('user_class', $message->getBody());
-        $this->assertSame(User::class, $message->getBody()['user_class']);
+        self::assertArrayHasKey('user_class', $body);
+        self::assertSame(User::class, $body['user_class']);
     }
 
     public function testShouldSendOwnerDescriptionIfPresent()
@@ -347,8 +756,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $token = new OrganizationToken($organization);
         $token->setAttribute('owner_description', 'Test Description');
 
-        /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = $this->getContainer()->get('security.token_storage');
+        $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
 
         $em = $this->getEntityManager();
@@ -358,16 +766,12 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
 
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
-
-        $message = $sentMessages[0]['message'];
-
-        $this->assertArrayHasKey('owner_description', $message->getBody());
-        $this->assertSame('Test Description', $message->getBody()['owner_description']);
+        self::assertArrayHasKey('owner_description', $body);
+        self::assertSame('Test Description', $body['owner_description']);
     }
 
     public function testShouldSendOrganizationInfoIfPresent()
@@ -377,8 +781,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $token = new OrganizationToken($organization);
 
-        /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = $this->getContainer()->get('security.token_storage');
+        $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
 
         $em = $this->getEntityManager();
@@ -388,16 +791,12 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
 
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
-
-        $message = $sentMessages[0]['message'];
-
-        $this->assertArrayHasKey('organization_id', $message->getBody());
-        $this->assertSame(123, $message->getBody()['organization_id']);
+        self::assertArrayHasKey('organization_id', $body);
+        self::assertSame(123, $body['organization_id']);
     }
 
     public function testShouldSendImpersonationInfoIfPresent()
@@ -408,8 +807,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $token = new OrganizationToken($organization);
         $token->setAttribute('IMPERSONATION', 69);
 
-        /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = $this->getContainer()->get('security.token_storage');
+        $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
 
         $em = $this->getEntityManager();
@@ -419,23 +817,11 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        $sentMessages = self::getSentMessages();
-        $this->assertCount(1, $sentMessages);
+        /** @var Message $message */
+        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $body = $message->getBody();
 
-        //guard
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
-
-        $message = $sentMessages[0]['message'];
-
-        $this->assertArrayHasKey('impersonation_id', $message->getBody());
-        $this->assertSame(69, $message->getBody()['impersonation_id']);
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        return $this->getContainer()->get('doctrine.orm.entity_manager');
+        self::assertArrayHasKey('impersonation_id', $body);
+        self::assertSame(69, $body['impersonation_id']);
     }
 }
