@@ -103,6 +103,13 @@ define(function(require) {
          */
         dropdownContainer: 'body',
 
+        /**
+         * Flag for close previous open filters
+         *
+         * @property
+         */
+        hidePreviousOpenFilters: true,
+
         /** @property */
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
@@ -212,11 +219,13 @@ define(function(require) {
         },
 
         _onFilterShowCriteria: function(shownFilter) {
-            _.each(this.filters, function(filter) {
-                if (filter !== shownFilter) {
-                    _.result(filter, 'ensurePopupCriteriaClosed');
-                }
-            });
+            if (this.hidePreviousOpenFilters) {
+                _.each(this.filters, function(filter) {
+                    if (filter !== shownFilter) {
+                        _.result(filter, 'ensurePopupCriteriaClosed');
+                    }
+                });
+            }
 
             this._publishCountSelectedFilters();
         },
@@ -397,11 +406,12 @@ define(function(require) {
         },
 
         /**
-         * @param {Number} count
+         * @param {Number} [count]
          * @private
          */
         _publishCountSelectedFilters: function(count) {
             var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateSelectedFilters();
+
             mediator.trigger(
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
                 countFilters
