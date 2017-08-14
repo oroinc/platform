@@ -335,6 +335,8 @@ Feature: Activities
       | Guests        | Charlie Sheen (Charlie1@example.com)|
       | All-day event | No                                  |
 
+  @skip
+#  todo: Unskip after resolve OPI-138
   Scenario: Manage Calendar Events
     Given go to Activities/ Calendar Events
     And click edit "Stand-Up" in grid

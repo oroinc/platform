@@ -32,8 +32,6 @@ define([
     return BaseView.extend({
         isEmpty: false,
 
-        showMap: true,
-
         options: {
             'mapOptions': {
                 zoom: 12
@@ -47,7 +45,8 @@ define([
             'addressMapOptions': {},
             'allowToRemovePrimary': false,
             'confirmRemove': true,
-            'confirmRemoveComponent': deleteConfirmation
+            'confirmRemoveComponent': deleteConfirmation,
+            showMap: true
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
@@ -66,7 +65,7 @@ define([
 
             this._initMainContainers();
 
-            if (this.showMap) {
+            if (this.options.showMap) {
                 this.initializeMap();
             }
         },
