@@ -44,13 +44,19 @@ define([
         if (opt.onClose) {
             $el.find('button.close').click(opt.onClose);
         }
+
+        if (opt.hideCloseButton) {
+            $el.find('[data-dismiss="alert"]').remove();
+        }
+
         var delay = opt.delay || (opt.flash && 5000);
         var actions = {
             close: function() {
                 var result = $el.alert('close');
                 mediator.trigger('layout:adjustHeight');
                 return result;
-            }
+            },
+            namespace: opt.namespace
         };
         if (opt.namespace) {
             $el.attr('data-messenger-namespace', opt.namespace);
