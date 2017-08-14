@@ -336,24 +336,13 @@ invalid_field_collapse:
     expected: []
     error: 'Invalid type for path "entity.fields.field1.collapse". Expected boolean, but got integer.'
 
-field_data_transformer:
+data_transformer_should_not_be_supported:
     config:
         fields:
             field1:
-                data_transformer: ~
-            field2:
-                data_transformer: ""
-            field3:
-                data_transformer: []
-            field4:
-                data_transformer: [service1, [class, method]]
-    expected:
-        fields:
-            field1: []
-            field2: []
-            field3: []
-            field4:
-                data_transformer: [service1, [class, method]]
+                data_transformer: 'test_data_transformer'
+    expected: []
+    error: 'Unrecognized option "data_transformer" under "entity.fields.field1"'
 
 field_description:
     config:

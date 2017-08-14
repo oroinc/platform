@@ -20,6 +20,9 @@ MessageQueue component
     - changed the constructor signature: added parameter `ExtensionInterface $jobExtension`
 - Class `Oro\Component\MessageQueue\Util\VarExport` was removed
 
+ApiBundle
+---------
+- The `data_transformer` option for fields was removed from `Resources/config/oro/api.yml`. This option is required very very rarely and it is quite confusing for developers because its name is crossed with data transformers used in Symfony Forms, but the purpose of this option was very different and it was used to transform a field value from one data type to another during loading data. If you used this option for some of your API resources, please replace it with a processor for [customize_loaded_data](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md#customize_loaded_data-action) action.
 
 BatchBundle
 -----------
@@ -31,6 +34,11 @@ DashboardBundle
 - Class `Oro\Bundle\DashboardBundle\Helper\DateHelper`
     - In method `addDatePartsSelect` removed the last one argument `$useCurrentTimeZone`
     - In method `getEnforcedTimezoneFunction` removed the last one argument `$useCurrentTimeZone`
+
+DataAuditBundle
+---------------
+- Class `Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider`
+    - changed the constructor signature: parameter `ConfigProvider $configProvider` was replaces with `ConfigManager $configManager`
 
 ImportExportBundle
 --------
