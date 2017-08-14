@@ -569,6 +569,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
      * @When /^(?:|when )(?:|I )sort "(?P<gridName>[\w\s]+)" by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
+     * @When /^(?:|I )sort grid by "(?P<field>.*)"(?:| again)$/
      */
     public function sortGridBy($field, $gridName = null)
     {

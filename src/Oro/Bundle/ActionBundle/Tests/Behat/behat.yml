@@ -1,0 +1,13 @@
+oro_behat_extension:
+    elements:
+        PageActionButtonsContainer:
+            class: Oro\Bundle\ActionBundle\Tests\Behat\Element\PageActionButtonsContainerElement
+            selector: 'div.title-buttons-container'
+
+        PageAction:
+            selector: 'div.btn-group'
+
+    suites:
+        OroActionBundle:
+            paths:
+                - '@OroActionBundle/Tests/Behat/Features'
