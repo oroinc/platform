@@ -205,7 +205,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                 ->values(['to-many', 'to-one', 'collection'])
             ->end()
             ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end()
-            ->variableNode(EntityDefinitionFieldConfig::DATA_TRANSFORMER)->end()
             ->scalarNode(EntityDefinitionFieldConfig::FORM_TYPE)->end()
             ->arrayNode(EntityDefinitionFieldConfig::FORM_OPTIONS)
                 ->useAttributeAsKey('name')
@@ -224,9 +223,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      */
     protected function postProcessFieldConfig(array $config)
     {
-        if (empty($config[EntityDefinitionFieldConfig::DATA_TRANSFORMER])) {
-            unset($config[EntityDefinitionFieldConfig::DATA_TRANSFORMER]);
-        }
         if (empty($config[EntityDefinitionFieldConfig::FORM_TYPE])) {
             unset($config[EntityDefinitionFieldConfig::FORM_TYPE]);
         }

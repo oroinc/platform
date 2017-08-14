@@ -1,21 +1,23 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Entity;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation as OroEntityConfig;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
  * @ORM\Table(name="oro_test_dataaudit_owner")
  * @ORM\Entity
- * @OroEntityConfig\Config(defaultValues={"dataaudit"={"auditable"=true}})
+ * @Config(defaultValues={"dataaudit"={"auditable"=true}})
  */
 class TestAuditDataOwner implements TestFrameworkEntityInterface
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -27,7 +29,7 @@ class TestAuditDataOwner implements TestFrameworkEntityInterface
      * @var string
      *
      * @ORM\Column(name="string_property", type="text", nullable=true)
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $stringProperty;
 
@@ -43,7 +45,7 @@ class TestAuditDataOwner implements TestFrameworkEntityInterface
      * @var string
      *
      * @ORM\Column(name="int_property", type="integer", nullable=true)
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $intProperty;
 
@@ -51,7 +53,7 @@ class TestAuditDataOwner implements TestFrameworkEntityInterface
      * @var string
      *
      * @ORM\Column(name="serialized_property", type="object", nullable=true)
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $serializedProperty;
 
@@ -59,7 +61,7 @@ class TestAuditDataOwner implements TestFrameworkEntityInterface
      * @var string
      *
      * @ORM\Column(name="json_property", type="json_array", nullable=true)
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $jsonProperty;
 
@@ -67,33 +69,30 @@ class TestAuditDataOwner implements TestFrameworkEntityInterface
      * @var string
      *
      * @ORM\Column(name="date_property", type="datetime", nullable=true)
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $dateProperty;
 
     /**
-     * @ORM\OneToOne(targetEntity="\Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild", inversedBy="owner")
+     * @ORM\OneToOne(targetEntity="TestAuditDataChild", inversedBy="owner")
      * @ORM\JoinColumn(name="child_id", referencedColumnName="id")
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $child;
 
     /**
-     * @ORM\ManyToMany(targetEntity="\Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild", inversedBy="owners")
+     * @ORM\ManyToMany(targetEntity="TestAuditDataChild", inversedBy="owners")
      * @ORM\JoinTable(name="oro_test_dataaudit_many2many",
      *      joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="child_id", referencedColumnName="id", unique=true)}
      * )
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $childrenManyToMany;
 
     /**
-     * @ORM\OneToMany(
-     *     targetEntity="\Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild",
-     *     mappedBy="ownerManyToOne"
-     * )
-     * @OroEntityConfig\ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ORM\OneToMany(targetEntity="TestAuditDataChild", mappedBy="ownerManyToOne")
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $childrenOneToMany;
 

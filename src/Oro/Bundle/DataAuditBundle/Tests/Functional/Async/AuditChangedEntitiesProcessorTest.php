@@ -5,8 +5,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -72,6 +73,63 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
     public function testShouldSendSameMessageToProcessEntitiesRelationsAndInverseRelations()
     {
+        /**
+         * Message content is similar to case when BusinessUnit was edited and a new User was added into BusinessUnit.
+         */
+        $message = $this->createMessage([
+            'timestamp' => time(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [],
+            'entities_updated' => [
+                [
+                    'entity_class' => TestAuditDataChild::class,
+                    'entity_id' => 1,
+                    'change_set' => [],
+                ]
+            ],
+            'entities_deleted' => [],
+            'collections_updated' => [
+                [
+                    'entity_class' => TestAuditDataChild::class,
+                    'entity_id' => 1,
+                    'change_set' => [
+                        'owner' => [
+                            null,
+                            [
+                                'inserted' => [
+                                    [
+                                        'entity_class' => TestAuditDataOwner::class,
+                                        'entity_id' => 1,
+                                        'change_set' => [],
+                                    ]
+                                ],
+                                'deleted' => [],
+                                'changed' => [],
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+        ]);
+        $expectedBody = json_decode($message->getBody(), true);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertMessageSent(
+            Topics::ENTITIES_RELATIONS_CHANGED,
+            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+        );
+        $this->assertMessageSent(
+            Topics::ENTITIES_INVERSED_RELATIONS_CHANGED,
+            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+        );
+    }
+
+    public function testShouldSendSameMessageToProcessEntitiesInverseRelations()
+    {
         $message = $this->createMessage([
             'timestamp' => time(),
             'transaction_id' => 'aTransactionId',
@@ -87,10 +145,6 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
         $processor->process($message, new NullSession());
         
-        $this->assertMessageSent(
-            Topics::ENTITIES_RELATIONS_CHANGED,
-            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
-        );
         $this->assertMessageSent(
             Topics::ENTITIES_INVERSED_RELATIONS_CHANGED,
             $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
