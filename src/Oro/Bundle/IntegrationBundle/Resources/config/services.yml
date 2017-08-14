@@ -322,7 +322,6 @@ services:
     oro_integration.generator.prefixed_identifier_generator:
         class: 'Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator'
         abstract: true
-        public: false
 
     oro_integration.utils.edit_mode:
         class: 'Oro\Bundle\IntegrationBundle\Utils\EditModeUtils'
