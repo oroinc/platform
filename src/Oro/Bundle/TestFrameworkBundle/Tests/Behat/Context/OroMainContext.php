@@ -860,6 +860,36 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I should see "Address Select" with options:
+     *            | Value     |
+     *            | Address 1 |
+     * Example: Then I should see "User Address Select" with options:
+     *            | Value                | Type   |
+     *            | Organization Address | Group  |
+     *            | Address 1            | Option |
+     *            | Address 2            | Option |
+     *            | User Address         | Group  |
+     *            | User Address 1       | Option |
+     *
+     * @When /^(?:|I )should see "(?P<select>[^"]+)" with options:$/
+     */
+    public function shouldSeeSelectWithOptions($select, TableNode $options)
+    {
+        $field = $this->createElement($select);
+        $this->assertTrue($field->isValid(), sprintf('Select "%s" not found on page', $select));
+
+        foreach ($options as $option) {
+            if (isset($option['Type']) && $option['Type'] === 'Group') {
+                $opt = $field->find('named', ['optgroup', $option['Value']]);
+                $this->assertNotNull($opt, sprintf('Optgroup with value|text "%s" not found', $option['Value']));
+            } else {
+                $opt = $field->find('named', ['option', $option['Value']]);
+                $this->assertNotNull($opt, sprintf('Options with value|text "%s" not found', $option['Value']));
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function fillField($field, $value)
