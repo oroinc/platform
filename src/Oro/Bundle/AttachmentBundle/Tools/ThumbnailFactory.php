@@ -3,24 +3,39 @@
 namespace Oro\Bundle\AttachmentBundle\Tools;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
-
 use Oro\Bundle\AttachmentBundle\Model\Thumbnail;
+use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
+use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
 
 class ThumbnailFactory
 {
-    /** @var ImageFactory */
-    protected $imageFactory;
+    /**
+     * @var ImagineBinaryByFileContentFactoryInterface
+     */
+    protected $imagineBinaryFactory;
 
-    /** @var FilterConfiguration */
+    /**
+     * @var ImagineBinaryFilterInterface
+     */
+    protected $imagineBinaryFilter;
+
+    /**
+     * @var FilterConfiguration
+     */
     protected $filterConfig;
 
     /**
-     * @param ImageFactory        $imageFactory
-     * @param FilterConfiguration $filterConfig
+     * @param ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory
+     * @param ImagineBinaryFilterInterface               $imagineBinaryFilter
+     * @param FilterConfiguration                        $filterConfig
      */
-    public function __construct(ImageFactory $imageFactory, FilterConfiguration $filterConfig)
-    {
-        $this->imageFactory = $imageFactory;
+    public function __construct(
+        ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory,
+        ImagineBinaryFilterInterface $imagineBinaryFilter,
+        FilterConfiguration $filterConfig
+    ) {
+        $this->imagineBinaryFactory = $imagineBinaryFactory;
+        $this->imagineBinaryFilter = $imagineBinaryFilter;
         $this->filterConfig = $filterConfig;
     }
 
@@ -45,8 +60,12 @@ class ThumbnailFactory
             ]
         );
 
+        $imagineBinary = $this->imagineBinaryFactory->createImagineBinary($content);
+
+        $resizedImagineBinary = $this->imagineBinaryFilter->applyFilter($imagineBinary, $filter);
+
         return new Thumbnail(
-            $this->imageFactory->createImage($content, $filter),
+            $resizedImagineBinary,
             $width,
             $height,
             $filter

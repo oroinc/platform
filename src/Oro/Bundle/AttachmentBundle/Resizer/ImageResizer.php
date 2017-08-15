@@ -3,13 +3,12 @@
 namespace Oro\Bundle\AttachmentBundle\Resizer;
 
 use Liip\ImagineBundle\Binary\BinaryInterface;
-
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\AttachmentBundle\Tools\ImageFactory;
+use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
+use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 class ImageResizer implements LoggerAwareInterface
 {
@@ -21,20 +20,28 @@ class ImageResizer implements LoggerAwareInterface
     protected $fileManager;
 
     /**
-     * @var ImageFactory
+     * @var ImagineBinaryByFileContentFactoryInterface
      */
-    protected $imageFactory;
+    protected $imagineBinaryFactory;
 
     /**
-     * @param FileManager $fileManager
-     * @param ImageFactory $imageFactory
+     * @var ImagineBinaryFilterInterface
+     */
+    protected $imagineBinaryFilter;
+
+    /**
+     * @param FileManager                                $fileManager
+     * @param ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory
+     * @param ImagineBinaryFilterInterface               $imagineBinaryFilter
      */
     public function __construct(
         FileManager $fileManager,
-        ImageFactory $imageFactory
+        ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory,
+        ImagineBinaryFilterInterface $imagineBinaryFilter
     ) {
         $this->fileManager = $fileManager;
-        $this->imageFactory = $imageFactory;
+        $this->imagineBinaryFactory = $imagineBinaryFactory;
+        $this->imagineBinaryFilter = $imagineBinaryFilter;
     }
 
     /**
@@ -60,7 +67,8 @@ class ImageResizer implements LoggerAwareInterface
 
             return false;
         }
+        $binary = $this->imagineBinaryFactory->createImagineBinary($content);
 
-        return $this->imageFactory->createImage($content, $filterName);
+        return $this->imagineBinaryFilter->applyFilter($binary, $filterName);
     }
 }
