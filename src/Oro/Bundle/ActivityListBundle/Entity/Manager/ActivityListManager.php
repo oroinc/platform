@@ -132,7 +132,7 @@ class ActivityListManager
         if ($ids) {
             $qb->setParameters([]);
             $qb->resetDQLParts(['join', 'where']);
-            $qb->where($qb->expr()->in('activity.id', implode(',', $ids)));
+            $qb->where($qb->expr()->in('activity.id', ':activitiesIds'))->setParameter('activitiesIds', $ids);
             $qb->orderBy(
                 'activity.' . $this->config->get('oro_activity_list.sorting_field'),
                 $this->config->get('oro_activity_list.sorting_direction')

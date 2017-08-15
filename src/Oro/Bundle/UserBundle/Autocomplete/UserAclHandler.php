@@ -324,10 +324,12 @@ class UserAclHandler implements SearchHandlerInterface
     protected function applyAcl(QueryBuilder $queryBuilder, $accessLevel, User $user, Organization $organization)
     {
         if ($accessLevel == AccessLevel::BASIC_LEVEL) {
-            $queryBuilder->andWhere($queryBuilder->expr()->in('user.id', [$user->getId()]));
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('user.id', ':aclUserId'))
+                ->setParameter('aclUserId', $user->getId());
         } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
             $queryBuilder->join('user.organizations', 'org')
-                ->andWhere($queryBuilder->expr()->in('org.id', [$organization->getId()]));
+                ->andWhere($queryBuilder->expr()->eq('org.id', ':aclOrganizationId'))
+                ->setParameter('aclOrganizationId', $organization->getId());
         } elseif ($accessLevel !== AccessLevel::SYSTEM_LEVEL) {
             if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
                 $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds(
@@ -342,7 +344,9 @@ class UserAclHandler implements SearchHandlerInterface
                 );
             }
             $queryBuilder->join('user.businessUnits', 'bu')
-                ->andWhere($queryBuilder->expr()->in('bu.id', $resultBuIds));
+                ->andWhere($queryBuilder->expr()->in('bu.id', ':resultBuIds'))
+                ->setParameter('resultBuIds', $resultBuIds);
+
         }
 
         return $queryBuilder->getQuery();
