@@ -161,13 +161,15 @@ class SearchIndexRepository extends EntityRepository implements DBALPersisterInt
         $parameterCounter = 0;
 
         foreach ($identifiers as $class => $entityIds) {
-            $parameterName = 'class_' . $parameterCounter;
+            $entityPlaceholderName = 'class_' . $parameterCounter;
+            $idsPlaceholderName = 'entity_ids_' . $parameterCounter;
             $parameterCounter++;
 
-            $entityCondition = 'item.entity = :' . $parameterName . ' AND ' .
-                $queryBuilder->expr()->in('item.recordId', $entityIds);
+            $entityCondition = 'item.entity = :' . $entityPlaceholderName . ' AND ' .
+                $queryBuilder->expr()->in('item.recordId', ':' . $idsPlaceholderName);
             $queryBuilder->orWhere($entityCondition)
-                ->setParameter($parameterName, $class);
+                ->setParameter($entityPlaceholderName, $class)
+                ->setParameter($idsPlaceholderName, $entityIds);
         }
 
         /** @var Item[] $items */
