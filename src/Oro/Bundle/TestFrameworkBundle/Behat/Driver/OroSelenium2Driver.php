@@ -221,56 +221,103 @@ JS;
     /**
      * Wait PAGE load
      * @param int $time Time should be in milliseconds
+     * @return bool
      */
     public function waitPageToLoad($time = 60000)
     {
-        $this->wait(
-            $time,
-            '"complete" == document["readyState"] '.
-            '&& document.title !=="Loading..." '
-        );
+        $jsCheck = <<<JS
+        (function () {
+            if (document["readyState"] !== "complete") {
+                return false;
+            }
+            
+            if (document.title === "Loading...") {
+                return false;
+            }
+        
+            if (typeof(jQuery) == "undefined" || jQuery == null) {
+                return false;
+            }
+            
+            if (jQuery(document.body).hasClass('loading')) {
+                return false;
+            }
+
+            if (0 !== jQuery("div.loader-mask.shown").length) {
+                return false;
+            }
+            
+            return true;
+        })();
+JS;
+
+        $result = $this->wait($time, $jsCheck);
+
+        if (!$result) {
+            self::fail(sprintf('Wait for page init more than %d seconds', $time / 1000));
+        }
+
+        return $result;
     }
 
     /**
      * Wait AJAX request
      * @param int $time Time should be in milliseconds
-     * @param int $attempts
      * @return bool
      */
-    public function waitForAjax($time = 120000, $attempts = 5)
+    public function waitForAjax($time = 120000)
     {
-        $this->waitPageToLoad($time);
-        $attemptsNumber = $attempts;
-        $start = microtime(true);
-        $end = $start + $time / 1000.0;
-
         $jsAppActiveCheck = <<<JS
         (function () {
+            if (document["readyState"] !== "complete") {
+                return false;
+            }
+            
+            if (document.title === "Loading...") {
+                return false;
+            }
+        
             if (typeof(jQuery) == "undefined" || jQuery == null) {
                 return false;
             }
+            
+            if (jQuery.active) {
+                return false;
+            }
+            
+            if (jQuery(document.body).hasClass('loading')) {
+                return false;
+            }
 
-            var isAppActive = 0 !== jQuery("div.loader-mask.shown").length;
+            if (0 !== jQuery("div.loader-mask.shown").length) {
+                return false;
+            }
+            
             try {
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');
                 }
-                isAppActive = isAppActive || window.mediatorCachedForSelenium.execute('isInAction');
+                
+                var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
+                if (typeof(isInAction) !== "boolean") {
+                    return false;
+                }
+                
+                if (isInAction) {
+                    return false;
+                }
             } catch (e) {
                 return false;
             }
 
-            return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
+            return true;
         })();
 JS;
 
-        $result = false;
-        while (microtime(true) < $end && $attemptsNumber > 0) {
-            if ($result = $this->wait($time, $jsAppActiveCheck)) {
-                $attemptsNumber--;
-            } else {
-                $attemptsNumber = $attempts;
-            }
+        $result = $this->wait($time, $jsAppActiveCheck);
+
+        if (!$result) {
+            self::fail(sprintf('Wait for ajax more than %d seconds', $time / 1000));
         }
 
         return $result;

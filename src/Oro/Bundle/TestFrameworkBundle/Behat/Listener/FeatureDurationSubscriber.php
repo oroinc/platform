@@ -48,8 +48,8 @@ class FeatureDurationSubscriber implements EventSubscriberInterface
     {
         return [
             BeforeFeatureTested::BEFORE  => ['setStartTime', 1000],
-            AfterFeatureTested::AFTER  => ['measureFeatureDurationTime', 1000],
-            AfterExerciseCompleted::AFTER => ['createReport', 1000],
+            AfterFeatureTested::AFTER  => ['measureFeatureDurationTime', -1000],
+            AfterExerciseCompleted::AFTER => ['createReport', -1000],
         ];
     }
 
