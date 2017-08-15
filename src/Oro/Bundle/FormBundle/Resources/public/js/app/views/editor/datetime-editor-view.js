@@ -7,7 +7,7 @@ define(function(require) {
      *
      * ### Column configuration samples:
      * ``` yml
-     * datagrid:
+     * datagrids:
      *   {grid-uid}:
      *     inline_editing:
      *       enable: true
@@ -20,11 +20,11 @@ define(function(require) {
      *       {column-name-2}:
      *         inline_editing:
      *           editor:
-     *             view: oroform/js/app/views/editor/date-editor-view
+     *             view: oroform/js/app/views/editor/datetime-editor-view
      *             view_options:
      *               css_class_name: '<class-name>'
      *               datePickerOptions:
-     *                 # See http://goo.gl/pddxZU
+     *                 # See http://api.jqueryui.com/datepicker/
      *                 altFormat: 'yy-mm-dd'
      *                 changeMonth: true
      *                 changeYear: true
@@ -34,6 +34,11 @@ define(function(require) {
      *                 # See https://github.com/jonthornton/jquery-timepicker#options
      *           validation_rules:
      *             NotBlank: ~
+     *           save_api_accessor:
+     *               route: '<route>'
+     *               query_parameter_names:
+     *                  - '<parameter1>'
+     *                  - '<parameter2>'
      * ```
      *
      * ### Options in yml:
@@ -42,10 +47,11 @@ define(function(require) {
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
-     * inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
+     * inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://api.jqueryui.com/datepicker/)
      * inline_editing.editor.view_options.timeInputAttrs   | Optional. Attributes for the time HTML input element
-     * inline_editing.editor.view_options.timePickerOptions| Optional. See [documentation here](https://goo.gl/MP6Unb)
-     * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
+     * inline_editing.editor.view_options.timePickerOptions| Optional. See [documentation here](https://github.com/jonthornton/jquery-timepicker#options)
+     * inline_editing.validation_rules | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+     * inline_editing.save_api_accessor                    | Optional. Sets accessor module, route, parameters etc.
      *
      * ### Constructor parameters
      *
@@ -53,11 +59,12 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
+     * @param {Object} options.validationRules - Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
      * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
-     * @param {Object} options.datePickerOptions - See [documentation here](http://goo.gl/pddxZU)
+     * @param {Object} options.datePickerOptions - See [documentation here](http://api.jqueryui.com/datepicker/)
      * @param {Object} options.timeInputAttrs - Attributes for time HTML input element
-     * @param {Object} options.timePickerOptions - See [documentation here](https://goo.gl/MP6Unb)
+     * @param {Object} options.timePickerOptions - See [documentation here](https://github.com/jonthornton/jquery-timepicker#options)
+     * @param {string} options.value - initial value of edited field
      *
      * @augments [DateEditorView](./date-editor-view.md)
      * @exports DatetimeEditorView

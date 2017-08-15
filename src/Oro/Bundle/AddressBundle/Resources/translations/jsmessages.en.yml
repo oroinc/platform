@@ -1,4 +1,3 @@
-'map.unknown.location': 'Sorry, location is unavailable'
 'Remove': 'Remove'
 'Primary': 'Primary'
 'Create Address': 'Create Address'
@@ -6,3 +5,8 @@
 'Add Address': 'Add Address'
 'Address saved': 'Address saved'
 'Empty Address Book':  'Address book is empty'
+
+map:
+    unknown:
+        location: 'The address is not recognized. Please check  the provided address information.'
+        unavailable: 'The map cannot be displayed. Please try again later or contact your administrator.'

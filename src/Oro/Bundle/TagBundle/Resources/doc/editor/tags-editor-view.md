@@ -18,21 +18,21 @@ datagrids:
           editor:
             # view: orotag/js/app/views/editor/tags-editor-view
             view_options:
-                permissions:
-                    oro_tag_create: true
+              permissions:
+                oro_tag_create: true
           save_api_accessor:
-              # usual save api configuration
-              route: 'oro_api_post_taggable'
-              http_method: 'POST'
-              default_route_parameters:
-                  entity: <entity-url-safe-class-name>
-              route_parameters_rename_map:
-                  id: entityId
+            # usual save api configuration
+            route: 'oro_api_post_taggable'
+            http_method: 'POST'
+            default_route_parameters:
+              entity: <entity-url-safe-class-name>
+            route_parameters_rename_map:
+              id: entityId
           autocomplete_api_accessor:
-              # usual configuration for tags view
-              class: 'oroui/js/tools/search-api-accessor'
-              search_handler_name: 'tags'
-              label_field_name: 'name'
+            # usual configuration for tags view
+            class: 'oroui/js/tools/search-api-accessor'
+            search_handler_name: 'tags'
+            label_field_name: 'name'
           validation_rules:
             NotBlank: true
 ```
@@ -41,9 +41,12 @@ datagrids:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
-inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
-inline_editing.editor.permissions      | Permissions
-inline_editing.editor.permissions.oro_tag_create | Allows user to create new tag
+inline_editing.validation_rules | Optional. Validation rules. See [documentation](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once)
+inline_editing.editor.view_options.permissions      | Permissions
+inline_editing.editor.view_options.permissions.oro_tag_create | Allows user to create new tag
+inline_editing.autocomplete_api_accessor            | Required. Specifies available choices
+inline_editing.autocomplete_api_accessor.class | One of the [list of search APIs](../reference/search-apis.md)
+inline_editing.save_api_accessor                    | Optional. Sets accessor module, route, parameters etc.
 
 ### Constructor parameters
 
@@ -55,5 +58,6 @@ inline_editing.editor.permissions.oro_tag_create | Allows user to create new tag
 | options.model | <code>Object</code> | Current row model |
 | options.fieldName | <code>string</code> | Field name to edit in model |
 | options.permissions | <code>string</code> | Permissions object |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../reference/search-apis.md) |
 
