@@ -57,14 +57,17 @@ class ConfigFileValidator
             }
         } else {
             $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
-            /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId = $entityAttachmentConfig->getId();
-            if ($fieldConfigId->getFieldType() === 'file') {
-                $configValue = 'upload_file_mime_types';
-            } else {
-                $configValue = 'upload_image_mime_types';
+            $mimeTypes = $this->getMimeArray($entityAttachmentConfig->get('mimetypes'));
+            if (!$mimeTypes) {
+                /** @var FieldConfigId $fieldConfigId */
+                $fieldConfigId = $entityAttachmentConfig->getId();
+                if ($fieldConfigId->getFieldType() === 'file') {
+                    $configValue = 'upload_file_mime_types';
+                } else {
+                    $configValue = 'upload_image_mime_types';
+                }
+                $mimeTypes = $this->getMimeArray($this->config->get('oro_attachment.' . $configValue));
             }
-            $mimeTypes = $this->getMimeArray($this->config->get('oro_attachment.' . $configValue));
         }
 
         $fileSize = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;

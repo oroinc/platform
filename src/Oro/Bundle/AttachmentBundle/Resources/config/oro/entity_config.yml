@@ -122,3 +122,15 @@ entity_config:
                             subblock:       properties
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_height.tooltip
+
+                # the list of all allowed MIME types for attachments
+                mimetypes:
+                    form:
+                        type:               oro_entity_extend_association_property_textarea
+                        options:
+                            block:          general
+                            subblock:       properties
+                            required:       false
+                            label:          oro.attachment.mimetypes
+                            association_class: 'OroAttachmentBundle:Attachment'
+                            tooltip:        oro.attachment.mimetypes.tooltip
