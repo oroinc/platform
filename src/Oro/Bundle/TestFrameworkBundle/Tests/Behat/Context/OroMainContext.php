@@ -125,21 +125,24 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
+        if (!$this->getMink()->isSessionStarted()) {
+            return;
+        }
+
         $session = $this->getMink()->getSession();
 
         /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-
+        $driver = $session->getDriver();
         $url = $session->getCurrentUrl();
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
-        }
-
-        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
+            return;
+        } elseif (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+            // Don't wait when we need assert the flash message, because it can disappear until ajax in process
             return;
         }
 
@@ -165,6 +168,8 @@ class OroMainContext extends MinkContext implements
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
             return;
         }
 
@@ -1413,8 +1418,13 @@ class OroMainContext extends MinkContext implements
         ));
 
         $childElement = $parentElement->getElement($childElementName);
-        self::assertTrue($childElement->isIsset() && $childElement->isVisible(), sprintf(
+        self::assertTrue($childElement->isIsset(), sprintf(
             'Element "%s" not found inside element "%s"',
+            $childElementName,
+            $parentElementName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" found inside element "%s", but it\'s not visible',
             $childElementName,
             $parentElementName
         ));

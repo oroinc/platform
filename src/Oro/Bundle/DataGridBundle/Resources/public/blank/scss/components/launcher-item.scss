@@ -61,6 +61,12 @@
                     line-height: strip-units($launcher-item-icon-size / 10);
                 }
             }
+
+            &:first-child {
+                .fa-map-o {
+                    padding-left: $launcher-item-icon-map-first-padding-left;
+                }
+            }
         }
     }
 

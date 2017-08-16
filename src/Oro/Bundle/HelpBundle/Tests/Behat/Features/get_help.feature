@@ -1,7 +1,5 @@
 @ticket-BAP-11242
 @automatically-ticket-tagged
-@skip
-# todo: OPI-134
 Feature: Get help link
   I order to find help
   As crm user
