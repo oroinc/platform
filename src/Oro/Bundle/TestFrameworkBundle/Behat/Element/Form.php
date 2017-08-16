@@ -162,6 +162,10 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
 
+            if ($field->hasClass('select2-input')) {
+                return $this->elementFactory->wrapElement('Select2Entities', $field);
+            }
+
             if ('select' === $field->getTagName()) {
                 return $this->elementFactory->wrapElement('Select', $field);
             }
