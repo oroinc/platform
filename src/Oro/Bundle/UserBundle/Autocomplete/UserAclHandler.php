@@ -346,7 +346,6 @@ class UserAclHandler implements SearchHandlerInterface
             $queryBuilder->join('user.businessUnits', 'bu')
                 ->andWhere($queryBuilder->expr()->in('bu.id', ':resultBuIds'))
                 ->setParameter('resultBuIds', $resultBuIds);
-
         }
 
         return $queryBuilder->getQuery();
