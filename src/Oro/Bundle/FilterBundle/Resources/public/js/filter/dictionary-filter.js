@@ -242,7 +242,7 @@ define(function(require) {
             var select2element = this.$el.find(this.elementSelector);
             var values = this.getDataForSelect2();
 
-            if (select2Config.data.results.length > 100) {
+            if (select2Config.ajax.results.length > 100) {
                 select2Config.minimumInputLength = 2;
             }
             select2element.removeClass('hide');
