@@ -633,6 +633,12 @@ define(function(require) {
             this.viewMode = mode;
             persistentStorage.setItem(FiltersManager.STORAGE_KEY, mode);
             this.trigger('changeViewMode', mode);
+        },
+
+        getOpenFilters: function() {
+            return _.filter(this.filters, function(filter) {
+                return filter.$el.hasClass(filter.buttonActiveClass) === true;
+            });
         }
     });
 

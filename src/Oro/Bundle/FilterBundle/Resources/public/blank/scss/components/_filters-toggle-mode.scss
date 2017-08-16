@@ -68,6 +68,7 @@
 
     .reset-filter-button {
         width: $filter-toggle-mode-reset-filter-button-width;
+        margin-bottom: $filter-toggle-mode-reset-filter-button-offset-bottom;
 
         border-color: $filter-toggle-mode-reset-filter-button-border-color;
     }
