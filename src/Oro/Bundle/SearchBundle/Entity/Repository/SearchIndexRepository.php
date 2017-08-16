@@ -141,15 +141,13 @@ class SearchIndexRepository extends EntityRepository
         $parameterCounter = 0;
 
         foreach ($identifiers as $class => $entityIds) {
-            $entityPlaceholderName = 'class_' . $parameterCounter;
-            $idsPlaceholderName = 'entity_ids_' . $parameterCounter;
+            $parameterName = 'class_' . $parameterCounter;
             $parameterCounter++;
 
-            $entityCondition = 'item.entity = :' . $entityPlaceholderName . ' AND ' .
-                $queryBuilder->expr()->in('item.recordId', ':' . $idsPlaceholderName);
+            $entityCondition = 'item.entity = :' . $parameterName . ' AND ' .
+                $queryBuilder->expr()->in('item.recordId', $entityIds);
             $queryBuilder->orWhere($entityCondition)
-                ->setParameter($entityPlaceholderName, $class)
-                ->setParameter($idsPlaceholderName, $entityIds);
+                ->setParameter($parameterName, $class);
         }
 
         /** @var Item[] $items */
