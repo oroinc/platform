@@ -1,7 +1,5 @@
 @ticket-BAP-10957
 @automatically-ticket-tagged
-@skip
-# todo: OPI-136
 Feature: User email activity
   In order to have ability send email to user
   As OroCRM sales rep
