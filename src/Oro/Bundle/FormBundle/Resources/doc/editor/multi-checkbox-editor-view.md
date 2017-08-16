@@ -20,6 +20,11 @@ datagrids:
               css_class_name: '<class-name>'
           validation_rules:
             NotBlank: true
+          save_api_accessor:
+              route: '<route>'
+              query_parameter_names:
+                 - '<parameter1>'
+                 - '<parameter2>'
 ```
 
 ### Options in yml:
@@ -27,7 +32,8 @@ datagrids:
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
+inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+inline_editing.save_api_accessor                    | Optional. Sets accessor module, route, parameters etc.
 
 ### Constructor parameters
 
@@ -37,12 +43,11 @@ inline_editing.editor.validation_rules | Optional. Validation rules. See [docume
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
-| options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
-| options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder translation key for an empty element |
 | options.placeholder_raw | <code>string</code> | Raw placeholder value. It overrides placeholder translation key |
 | options.maximumSelectionLength | <code>string</code> | Maximum selection length |
-| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once) |
+| options.value | <code>string</code> | initial value of edited field |
 
 <a name="module_MultiCheckboxEditorView#multiselect"></a>
 ### multiCheckboxEditorView.multiselect

@@ -23,8 +23,12 @@ class ProcessorBag implements ProcessorBagInterface
      * @var array|null
      * after the bag is initialized this property is set to NULL,
      * this switches the bag in "frozen" state and further modification of it is prohibited
+     * please note that applicable checkers can be added at any moment, even if the bag is frozen
      */
     protected $initialData = [];
+
+    /** @var array */
+    protected $additionalApplicableCheckers = [];
 
     /**
      * @var array
@@ -97,9 +101,8 @@ class ProcessorBag implements ProcessorBagInterface
      */
     public function addApplicableChecker(ApplicableCheckerInterface $checker, $priority = 0)
     {
-        $this->assertNotFrozen();
-
-        $this->initialData['checkers'][$priority][] = $checker;
+        $this->additionalApplicableCheckers[$priority][] = $checker;
+        $this->processorApplicableChecker = null;
     }
 
     /**
@@ -108,6 +111,7 @@ class ProcessorBag implements ProcessorBagInterface
     public function getProcessors(ContextInterface $context)
     {
         $this->ensureInitialized();
+        $this->ensureProcessorApplicableCheckerInitialized();
 
         $action = $context->getAction();
 
@@ -169,9 +173,17 @@ class ProcessorBag implements ProcessorBagInterface
     {
         if (null !== $this->initialData) {
             $this->initializeProcessors();
-            $this->initializeProcessorApplicableChecker();
-
             $this->initialData = null;
+        }
+    }
+
+    /**
+     * Makes sure that the processor applicable checker is initialized
+     */
+    protected function ensureProcessorApplicableCheckerInitialized()
+    {
+        if (null === $this->processorApplicableChecker) {
+            $this->initializeProcessorApplicableChecker();
         }
     }
 
@@ -255,8 +267,8 @@ class ProcessorBag implements ProcessorBagInterface
     protected function initializeProcessorApplicableChecker()
     {
         $this->processorApplicableChecker = $this->applicableCheckerFactory->createApplicableChecker();
-        if (!empty($this->initialData['checkers'])) {
-            $checkers = $this->sortByPriorityAndFlatten($this->initialData['checkers']);
+        if (!empty($this->additionalApplicableCheckers)) {
+            $checkers = $this->sortByPriorityAndFlatten($this->additionalApplicableCheckers);
             foreach ($checkers as $checker) {
                 $this->processorApplicableChecker->addChecker($checker);
             }

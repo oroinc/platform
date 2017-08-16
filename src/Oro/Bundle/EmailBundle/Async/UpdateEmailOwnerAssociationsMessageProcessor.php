@@ -49,10 +49,7 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['ownerClass'], $data['ownerIds']) || ! is_array($data['ownerIds'])) {
-            $this->logger->critical(sprintf(
-                '[UpdateEmailOwnerAssociationsMessageProcessor] Got invalid message: "%s"',
-                $message->getBody()
-            ), ['message' => $message]);
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
@@ -83,10 +80,10 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
                     );
                 }
 
-                $this->logger->info(sprintf(
-                    '[UpdateEmailOwnerAssociationsMessageProcessor] Sent "%s" messages',
-                    count($data['ownerIds'])
-                ), ['data' => $data]);
+                $this->logger->info(
+                    sprintf('Sent "%s" messages', count($data['ownerIds'])),
+                    ['data' => $data]
+                );
 
                 return true;
             }

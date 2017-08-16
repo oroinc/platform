@@ -144,6 +144,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Find and assert that field value is empty
+     *
+     * @When /^(?P<fieldName>[\w\s]*) field is empty$/
+     */
+    public function fieldIsEmpty($fieldName)
+    {
+        return $this->fieldShouldHaveValue($fieldName, "");
+    }
+
+    /**
      * This is available for collection fields
      * See Emails and Phones in Contact create page
      * Example: And set "charlie@gmail.com" as primary email
@@ -336,29 +346,29 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * This step is used for system configuration field
      * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And check Use Default for "Position" field
+     * Example: And check "Use default" for "Position" field
      *
-     * @Given check Use Default for :label field
+     * @Given check :checkbox for :label field
      */
-    public function checkUseDefaultForField($label)
+    public function checkUseDefaultForField($label, $checkbox)
     {
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
-        $form->checkUseDefaultCheckbox($label);
+        $form->checkCheckboxByLabel($label, $checkbox);
     }
 
     /**
      * This step used for system configuration field
      * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use Default for "Position" field
+     * Example: And uncheck "Use default" for "Position" field
      *
-     * @Given uncheck Use Default for :label field
+     * @Given uncheck :checkbox for :label field
      */
-    public function uncheckUseDefaultForField($label)
+    public function uncheckUseDefaultForField($label, $checkbox)
     {
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label);
+        $form->uncheckCheckboxByLabel($label, $checkbox);
     }
 
     /**

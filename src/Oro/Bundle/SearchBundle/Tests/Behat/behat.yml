@@ -20,7 +20,7 @@ oro_behat_extension:
           Query: 'search'
 
     Theme Form:
-      selector: 'div#container'
+      selector: 'form[name="theme"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:

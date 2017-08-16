@@ -36,7 +36,7 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Menu Form:
-      selector: 'div#container'
+      selector: 'form[name="menu_update"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:

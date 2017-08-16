@@ -28,6 +28,10 @@ class Configuration implements ConfigurationInterface
                 'value' => null,
                 'type'  => 'text',
             ],
+            'google_api_key' => [
+                'value' => null,
+                'type'  => 'text',
+            ]
         ]);
 
         return $treeBuilder;

@@ -56,7 +56,7 @@ UPGRADE FROM 1.8 to 1.9
 Before
 
 ```
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         source:
@@ -67,7 +67,7 @@ datagrid:
 Now
 
 ```
-datagrid:
+datagrids:
     acme-demo-grid:
         acl_resource: 'acme_demo_entity_view'
         ... # some configuration
@@ -78,7 +78,7 @@ datagrid:
 Before
 
 ```
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         options:
@@ -88,7 +88,7 @@ datagrid:
 Now
 
 ```
-datagrid:
+datagrids:
     acme-demo-grid:
         ... # some configuration
         source:

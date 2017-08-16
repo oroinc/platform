@@ -80,6 +80,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'web_root' => '%kernel.root_dir%/../web',
                     'build_path' => 'js/app.min.js',
                     'building_timeout' => 60,
+                    'build_logger' => false,
                     'build' => array(
                         'optimize' => 'uglify2',
                         'paths' => array(),
@@ -96,6 +97,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'js_engine' => 'node',
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
+                    'build_logger' => false,
                     'build' => array(
                         'optimize' => 'none',
                         'generateSourceMaps' => false,
@@ -114,6 +116,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'web_root' => '%kernel.root_dir%/../web',
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
+                    'build_logger' => false,
                     'build' => array(
                         'optimize' => 'none',
                         'generateSourceMaps' => false,

@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-10860
 @automatically-ticket-tagged
 Feature: Change menu view
@@ -15,7 +16,7 @@ Scenario: Try navigate on top menu
 Scenario: Change menu view
   Given I go to System/Configuration
   And follow "Display settings"
-  And uncheck Use Default for "Position" field
+  And uncheck "Use default" for "Position" field
   And select "Left" from "Position"
   When I save setting
   Then menu must be on left side
