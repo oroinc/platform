@@ -42,8 +42,7 @@ define([
             return;
         }
         if (this.deferredRender) {
-            this.deferredRender.reject(this);
-            delete this.deferredRender;
+            this._rejectDeferredRender();
         }
         this.disposePageComponents();
         this.trigger('dispose', this);

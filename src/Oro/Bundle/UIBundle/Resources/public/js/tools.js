@@ -333,15 +333,17 @@ define(function(require) {
          */
         getElementXPath: function(element) {
             var paths = [];
+            var tagName = element.nodeName.toLowerCase();
             if (element && element.id) {
-                return '//*[@id="' + element.id + '"]';
+                return '//' + tagName + '[@id="' + element.id + '"]';
             } else {
                 // Use nodeName (instead of localName) so namespace prefix is included (if any).
                 for (; element && element.nodeType === 1; element = element.parentNode)  {
                     var index = 0;
+                    tagName = element.nodeName.toLowerCase();
                     // EXTRA TEST FOR ELEMENT.ID
                     if (element && element.id) {
-                        paths.splice(0, 0, '/*[@id="' + element.id + '"]');
+                        paths.splice(0, 0, '/' + tagName + '[@id="' + element.id + '"]');
                         break;
                     }
 
@@ -355,9 +357,9 @@ define(function(require) {
                         }
                     }
 
-                    var tagName = element.nodeName.toLowerCase();
-                    var pathIndex = (index ? '[' + (index + 1) + ']' : '');
-                    paths.splice(0, 0, tagName + pathIndex);
+                    var pathIndex = '[' + (index + 1) + ']';
+                    var classAttr = element.className ? '[@class="' + element.className + '"]' : '';
+                    paths.splice(0, 0, tagName + pathIndex + classAttr);
                 }
 
                 return paths.length ? '/' + paths.join('/') : null;
