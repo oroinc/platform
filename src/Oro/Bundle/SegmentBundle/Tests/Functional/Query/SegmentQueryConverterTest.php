@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\Query;
 
 use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
+use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -16,7 +17,9 @@ class SegmentQueryConverterTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadSegmentData::class]);
-        $this->segmentQueryConverter = $this->getContainer()->get('oro_segment.query_converter.segment');
+        /** @var SegmentQueryConverterFactory $segmentQueryConverterFactory */
+        $segmentQueryConverterFactory = $this->getContainer()->get('oro_segment.query.segment_query_converter_factory');
+        $this->segmentQueryConverter = $segmentQueryConverterFactory->createInstance();
     }
 
     public function testConvert()

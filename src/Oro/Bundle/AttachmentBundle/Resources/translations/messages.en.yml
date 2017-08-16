@@ -16,7 +16,7 @@ oro:
 
         enabled:              Enable attachments
         maxsize:              Max allowed file size, Mb
-        mimetypes:            Allowed mime types
+        mimetypes:            Allowed MIME types
         mimetypes.tooltip:    'The format of MIME types must follow the examples: application/pdf, image/*'
 
         max_size.tooltip:     Max allowed file size to upload in MB.
@@ -50,7 +50,7 @@ oro:
                 description:         The size of a file in bytes.
             mime_type:
                 label:               Mime type
-                description:         A media type and subtype of the file. Allowed mime types are "image/*", "application/pdf", "application/zip", "application/x-gzip", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation".
+                description:         A media type and subtype of the file. Allowed MIME types are "image/*", "application/pdf", "application/zip", "application/x-gzip", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation".
             content:
                 lebel:               Content
                 description:         The content of the file as a string.
@@ -60,10 +60,10 @@ oro:
             thumb_width.label:   Thumbnail width
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings
-            mime_types.label:    Mime types
-            upload_file_mime_types.label:  File mime types
+            mime_types.label:    MIME types
+            upload_file_mime_types.label:  File MIME types
             upload_file_mime_types.tooltip: List of MIME file types that are permitted for upload.
-            upload_image_mime_types.label: Image mime types
+            upload_image_mime_types.label: Image MIME types
             upload_image_mime_types.tooltip: List of MIME image types that are permitted for upload.
 
         action:

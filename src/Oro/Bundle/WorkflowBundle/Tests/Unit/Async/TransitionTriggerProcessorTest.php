@@ -88,9 +88,8 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         $this->setUpObjectManager($trigger);
         $this->setUpLogger(
             true,
-            '[TransitionTriggerProcessor] Transition not allowed',
+            'Transition not allowed',
             [
-                'message_body' => $message->getBody(),
                 'trigger' => $trigger
             ],
             'warning'
@@ -116,9 +115,8 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         $this->setUpObjectManager($trigger);
         $this->setUpLogger(
             true,
-            '[TransitionTriggerProcessor] Queue message could not be processed.',
+            'Queue message could not be processed.',
             [
-                'message_body' => $message->getBody(),
                 'exception' => $expectedException
             ]
         );

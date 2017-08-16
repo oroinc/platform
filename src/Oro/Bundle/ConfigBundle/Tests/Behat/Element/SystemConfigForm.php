@@ -18,7 +18,7 @@ class SystemConfigForm extends Form
             $value = self::normalizeValue($value);
 
             if ($this->isUseDefaultCheckboxExists($label)) {
-                $this->uncheckUseDefaultCheckbox($label);
+                $this->uncheckCheckboxByLabel($label, 'Use default');
             }
 
             $input = $this->getSettingControlByLabel($label);
@@ -29,20 +29,22 @@ class SystemConfigForm extends Form
 
     /**
      * @param string $label
+     * @param string $checkbox
      * @throws ElementNotFoundException
      */
-    public function checkUseDefaultCheckbox($label)
+    public function checkCheckboxByLabel($label, $checkbox)
     {
-        $this->getSettingControlByLabel($label, 'Use default')->check();
+        $this->getSettingControlByLabel($label, $checkbox)->check();
     }
 
     /**
      * @param string $label
+     * @param string $checkbox
      * @throws ElementNotFoundException
      */
-    public function uncheckUseDefaultCheckbox($label)
+    public function uncheckCheckboxByLabel($label, $checkbox)
     {
-        $this->getSettingControlByLabel($label, 'Use default')->uncheck();
+        $this->getSettingControlByLabel($label, $checkbox)->uncheck();
     }
 
     /**

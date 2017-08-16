@@ -1,4 +1,3 @@
-# features/user.feature
 Feature: User
   In order to create users
   As a OroCRM Admin user

@@ -49,10 +49,7 @@ class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface,
         $data = JSON::decode($message->getBody());
 
         if (! isset($data['emailIds'], $data['targetClass'], $data['targetId']) || ! is_array($data['emailIds'])) {
-            $this->logger->critical(
-                sprintf('[AddEmailAssociationsMessageProcessor] Got invalid message: "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
@@ -91,10 +88,10 @@ class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface,
                     );
                 }
 
-                $this->logger->info(sprintf(
-                    '[AddEmailAssociationsMessageProcessor] Sent "%s" messages',
-                    count($data['emailIds'])
-                ), ['data' => $data]);
+                $this->logger->info(
+                    sprintf('Sent "%s" messages', count($data['emailIds'])),
+                    ['data' => $data]
+                );
 
                 return true;
             }

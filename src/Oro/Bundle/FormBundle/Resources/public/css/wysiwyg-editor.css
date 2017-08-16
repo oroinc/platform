@@ -1,11 +1,15 @@
+html {
+    height: 100%;
+}
 body {
     font-size: 13px;
     line-height: 20px;
     font-family: Helvetica, Arial, sans-serif;
     color: #444;
-    min-height: 100px;
+    min-height: calc(100% - 16px);
+    margin: 8px;
 }
-body:not([contenteditable]) {
+body[contenteditable="false"] {
     cursor: not-allowed;
     background-color: #eee;
 }

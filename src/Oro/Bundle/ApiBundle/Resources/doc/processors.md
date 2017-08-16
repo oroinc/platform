@@ -196,6 +196,21 @@ There are several types of errors that may occur during the process of a request
 - **Security errors**. This type of error will occur if an access is denied to a requested, updating or deleting entity.
 - **Unexpected errors**. These errors will occur if some unpredictable problem happens. E.g. no access to a database or a file system, requested entity does not exist, updating entity is blocked, etc.
 
+Please note that to validate input data for [create](./actions.md#create-action) and [update](./actions.md#update-action) actions the best solution is to use validation constraints. In most cases it allows to not write any PHP code and configure required validation rules in `Resources/config/oro/api.yml`. The detailed information how to add own validation constraints can be found in [Forms and Validators Configuration](./forms.md) document. The following example shows how to add a validation constraint via `Resources/config/oro/api.yml`:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            fields:
+                primaryEmail:
+                    form_options:
+                        constraints:
+                            # add Symfony\Component\Validator\Constraints\Email validation constraint
+                            - Email: ~
+```
+
+
 If an error occurs in a processor, the main execution flow is interrupted and the control is passed to a special group of processors, that is named **normalize_result**. This is true for all types of errors. But there are some exceptions for this rule for the errors that occur in any processor of the **normalize_result** group. The execution flow is interrupted only if any of these processors raises an exception. However, these processors can safely add new errors into the [Context](./actions.md#context-class) and the execution of the next processors will not be interrupted. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
 
 An error is represented by [Error](../../Model/Error.php) class. Also there is [ErrorSource](../../Model/ErrorSource.php) class that can be used to specify a source of an error, e.g. the name of URI parameter or the path to a property in request data. These classes have the following methods:

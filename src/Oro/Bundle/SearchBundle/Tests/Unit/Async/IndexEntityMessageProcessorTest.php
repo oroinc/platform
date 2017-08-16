@@ -50,10 +50,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('error')
             ->with(
-                'Message is invalid. Class was not found.',
-                [
-                    'message' => $message
-                ]
+                'Message is invalid. Class was not found.'
             )
         ;
 
@@ -81,8 +78,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('error')
             ->with(
-                'Message is invalid. Id was not found.',
-                ['message' => $message]
+                'Message is invalid. Id was not found.'
             )
         ;
 

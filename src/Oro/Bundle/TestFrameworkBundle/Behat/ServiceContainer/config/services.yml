@@ -4,6 +4,11 @@ services:
         arguments:
             - '@definition.finder'
 
+    oro_test.listener.feature_duration_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureDurationSubscriber'
+        arguments:
+            - '%kernel.log_dir%'
+
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
 
@@ -112,7 +117,17 @@ services:
             - [setKernel, ['@symfony2_extension.kernel']]
 
     oro_behat_extension.specification.specification_divider:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationCountDivider
+
+    oro_behat_extension.specification.suite_configuration_divider:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\SuiteConfigurationDivider
+        arguments:
+            - '@oro_behat_extension.specification.statistic.filesystem_statistic_repository'
+
+    oro_behat_extension.specification.statistic.filesystem_statistic_repository:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Specification\Statistic\FilesystemStatisticRepository
+        arguments:
+            - '%kernel.root_dir%'
 
     oro_behat_extension.suite.suite_configuration_registry:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry
@@ -120,6 +135,7 @@ services:
             - '@symfony2_extension.kernel'
             - '@specifications.finder'
             - '@oro_behat_extension.specification.specification_divider'
+            - '@oro_behat_extension.specification.suite_configuration_divider'
         calls:
             - [setSuiteConfigurations, ['%suite.configurations%']]
 

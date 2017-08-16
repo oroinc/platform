@@ -307,7 +307,7 @@ For any activity entity grid you are able to include a column that includes all 
 To do so see the following example of tasks configuration in *datagrid.yml*:
 
 ``` yml
-datagrid:
+datagrids:
     tasks-grid:
         # extension configuration
         options:
@@ -320,7 +320,7 @@ This will create a column named `contexts` and will try to automatically detect 
 
 If you wish to configure the column, you are able to do it if you add a section with the name specified in the `column_name` option:
 ``` yml
-datagrid:
+datagrids:
     tasks-grid:
         # column configuration
         columns:

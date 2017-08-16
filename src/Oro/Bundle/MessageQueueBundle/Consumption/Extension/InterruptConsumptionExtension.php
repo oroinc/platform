@@ -32,7 +32,7 @@ class InterruptConsumptionExtension extends AbstractExtension
     {
         if (! file_exists($this->filePath)) {
             $context->getLogger()->info(
-                '[InterruptConsumptionExtension] Execution interrupted: the cache was cleared.',
+                'Execution interrupted: the cache was cleared.',
                 ['context' => $context]
             );
 
@@ -46,7 +46,7 @@ class InterruptConsumptionExtension extends AbstractExtension
 
         if (filemtime($this->filePath) > $this->timestamp) {
             $context->getLogger()->info(
-                '[InterruptConsumptionExtension] Execution interrupted: the cache was invalidated.',
+                'Execution interrupted: the cache was invalidated.',
                 ['context' => $context]
             );
 
