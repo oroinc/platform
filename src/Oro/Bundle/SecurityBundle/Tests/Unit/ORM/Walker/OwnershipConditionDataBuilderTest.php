@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 use Doctrine\ORM\Query\AST\PathExpression;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -564,5 +565,31 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 [null, null, PathExpression::TYPE_STATE_FIELD, null, null, false]
             ),
         );
+    }
+
+    public function testGetUserInCaseOfDifferentUsersInToken()
+    {
+        $user1 = new User(1);
+        $user2 = new User(2);
+
+        $token1 = new UsernamePasswordToken($user1, null, 'main', []);
+        $token2 = new UsernamePasswordToken($user2, null, 'main', []);
+
+        // during first call - return user1 token
+        $this->securityContext->expects($this->at(0))
+            ->method('getToken')
+            ->willReturn($token1);
+
+        // during second call - return user2 token
+        $this->securityContext->expects($this->at(1))
+            ->method('getToken')
+            ->willReturn($token2);
+
+        $user = $this->builder->getUser();
+        $this->assertSame($user1, $user);
+
+        // at the second call should be the second user in token
+        $user = $this->builder->getUser();
+        $this->assertSame($user2, $user);
     }
 }
