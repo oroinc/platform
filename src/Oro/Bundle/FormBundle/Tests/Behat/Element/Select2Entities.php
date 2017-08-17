@@ -53,17 +53,26 @@ class Select2Entities extends Element implements ClearableInterface
      */
     public function getSearchResults()
     {
+        $this->getPage()->waitFor(5, function (NodeElement $element) {
+            return null === $element->find('css', 'ul.select2-results li.select2-searching');
+        });
+
         $resultHolder = $this->getPage()->findVisible('css', 'div.select2-drop-active ul.select2-result-sub');
 
         if (!$resultHolder) {
             $resultHolder = $this->getPage()->findVisible('css', 'div.select2-drop-active ul.select2-results');
         }
 
-        if ($resultHolder) {
-            return $resultHolder->findAll('css', 'li');
+        if (!$resultHolder) {
+            return [];
         }
 
-        return [];
+        // Wait for show one result or go further
+        $resultHolder->waitFor(5, function (NodeElement $element) {
+            return 1 === count($element->findAll('css', 'li'));
+        });
+
+        return $resultHolder->findAll('css', 'li');
     }
 
     /**
@@ -73,9 +82,6 @@ class Select2Entities extends Element implements ClearableInterface
     public function type($value)
     {
         $this->getDriver()->typeIntoInput($this->getXpath(), $value);
-        $this->getPage()->waitFor(5, function (NodeElement $element) {
-            return null === $element->find('css', 'ul.select2-results li.select2-searching');
-        });
     }
 
     /**
@@ -83,11 +89,32 @@ class Select2Entities extends Element implements ClearableInterface
      */
     public function focus()
     {
-        parent::focus();
+        $mask = $this->getPage()->find('css', '#select2-drop-mask');
+        if ($mask && $mask->isVisible()) {
+            $mask->click();
+        }
 
-        $this->waitFor(5, function (NodeElement $element) {
-            return $element->hasClass('select2-focused') && !$element->hasClass('select2-active');
+        if (!empty($this->getSearchResults())) {
+            parent::click();
+        }
+
+        if (!$this->isActive()) {
+            parent::click();
+        }
+
+        $this->waitFor(5, function (Select2Entities $element) {
+            return $element->isActive();
         });
+    }
+
+    /**
+     * Check if input is active and ready for input
+     */
+    public function isActive()
+    {
+        return $this->hasClass('select2-focused')
+            && !$this->hasClass('select2-active')
+            && $this->getParent()->getParent()->getParent()->hasClass('select2-container-active');
     }
 
     /**
@@ -99,11 +126,19 @@ class Select2Entities extends Element implements ClearableInterface
         $closeLinks = $this->getParent()->getParent()
             ->findAll('css', 'a.select2-search-choice-close');
 
+        if (!$closeLinks) {
+            return;
+        }
+
         /** @var NodeElement $closeLink */
         foreach ($closeLinks as $closeLink) {
             // Click with javascript because element is not visible, only pseudo class ::before
             // https://symfony.com/doc/current/components/css_selector.html#limitations-of-the-cssselector-component
             $driver->executeJsOnXpath($closeLink->getXpath(), '{{ELEMENT}}.click()');
         }
+
+        $this->waitFor(5, function () use ($closeLink) {
+            return !$closeLink->isValid();
+        });
     }
 }
