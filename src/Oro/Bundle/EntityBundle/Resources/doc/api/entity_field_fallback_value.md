@@ -22,30 +22,12 @@ Get a list of entities of EntityFieldFallbackValue type
 
 ### arrayValue
 
-#### common
-
 The array value of the entity field.
-
-#### create, get, get_list, update
-
-{@inheritdoc}
 
 ### fallback
 
-#### common
-
 The value of the fallback, possible value is 'system'.
-
-#### create, get, get_list, update
-
-{@inheritdoc}
 
 ### scalarValue
 
-#### common
-
 The scalar value for the entity field.
-
-#### create, get, get_list, update
-
-{@inheritdoc}
