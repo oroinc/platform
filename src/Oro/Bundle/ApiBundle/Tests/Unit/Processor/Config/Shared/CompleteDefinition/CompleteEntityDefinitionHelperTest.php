@@ -941,6 +941,137 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association1' => [
+                    'target_class' => 'Test\Association1Target',
+                    'target_type'  => 'to-one'
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForAssociationWithTargetClassAndTargetTypeAndDataType()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association1' => [
+                    'data_type'    => 'some_custom_association',
+                    'target_class' => 'Test\Association1Target',
+                    'target_type'  => 'to-one'
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'data_type'    => 'some_custom_association',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type'  => 'to-one',
+                    ],
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForIdentifierFieldsOnly()
     {
         $config = $this->createConfigObject([

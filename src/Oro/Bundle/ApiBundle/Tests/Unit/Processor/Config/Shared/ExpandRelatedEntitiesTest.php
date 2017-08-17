@@ -342,11 +342,6 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ],
             $this->context->getResult()
         );
-//        $this->assertTrue($entityDefinition->getField('account')->hasTargetEntity());
-//        $this->assertTrue(
-//            $entityDefinition->getField('customerAssociation')->getTargetEntity()
-//                ->getField('account')->hasTargetEntity()
-//        );
     }
 
     public function testProcessWhenThirdLevelEntityShouldBeExpanded()
@@ -402,6 +397,108 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                         'target_class'     => 'Test\Association1Target',
                         'target_type'      => 'to-one'
                     ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
+    {
+        $config = [
+            'fields' => [
+                'association1' => [
+                    'target_class' => 'Test\Association1Target',
+                    'target_type'  => 'to-one'
+                ]
+            ]
+        ];
+
+        $this->context->setExtras([new ExpandRelatedEntitiesConfigExtra(['association1'])]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('hasAssociation')
+            ->willReturn(false);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Association1Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $this->context->getPropagableExtras()
+            )
+            ->willReturn($this->createRelationConfigObject(['exclusion_policy' => 'all']));
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'association1' => [
+                        'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association1Target',
+                        'target_type'      => 'to-one'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForAssociationWithTargetClassAndTargetTypeAndDataType()
+    {
+        $config = [
+            'fields' => [
+                'association1' => [
+                    'data_type'    => 'some_custom_association',
+                    'target_class' => 'Test\Association1Target',
+                    'target_type'  => 'to-one'
+                ]
+            ]
+        ];
+
+        $this->context->setExtras([new ExpandRelatedEntitiesConfigExtra(['association1'])]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('hasAssociation')
+            ->willReturn(false);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'association1' => [
+                        'data_type'    => 'some_custom_association',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type'  => 'to-one'
+                    ]
                 ]
             ],
             $this->context->getResult()
