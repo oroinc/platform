@@ -1,6 +1,7 @@
 {% block _page_footer_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-footer'
+        '~class': ' page-footer',
+        'data-page-footer': ''
     }) %}
 
     <footer {{ block('block_attributes') }}>

@@ -166,6 +166,10 @@
         }
     }
 
+    &.in-sticky {
+        margin: $filter-box-dropdown-mode-in-sticky-offset;
+    }
+
     @if ($apply-filters-toggle-mode-design) {
         &.toggle-mode {
             padding-bottom: $offset-y-m;

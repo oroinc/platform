@@ -66,10 +66,6 @@
         min-width: $filter-dropdown-mode-fields-row-min-width;
     }
 
-    &.in-sticky {
-        margin: $filter-box-dropdown-mode-in-sticky-offset;
-    }
-
     .filter-items {
         display: flex;
         flex-wrap: wrap;
@@ -115,7 +111,7 @@
     .ui-multiselect {
         float: right;
         margin: $filter-dropdown-mode-ui-multiselect-offset;
-        //TODO: Bug in jquery-ui-multiselect-widget
+        //Bug in jquery-ui-multiselect-widget
         width: auto !important;
     }
 
