@@ -31,6 +31,7 @@ class OroActionContext extends OroFeatureContext implements OroPageObjectAware, 
 
     /**
      * @Given /^(?:|I )should see available page actions:$/
+     *
      * @param TableNode $table
      */
     public function iShouldSeeAvailablePageActions(TableNode $table)
@@ -44,6 +45,7 @@ class OroActionContext extends OroFeatureContext implements OroPageObjectAware, 
 
     /**
      * @Given /^(?:|I )should not see following page actions:$/
+     *
      * @param TableNode $table
      */
     public function iShouldNotSeeFollowingPageActions(TableNode $table)
