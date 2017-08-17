@@ -228,7 +228,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 if ($cellValue instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
-                self::assertEquals($value, $cellValue, sprintf('Unexpected value at %d row in grid', $rowNumber));
+                self::assertEquals(
+                    $value,
+                    $cellValue,
+                    sprintf('Unexpected value at %d row "%s" column in grid', $rowNumber, $columnTitle)
+                );
             }
         }
     }
