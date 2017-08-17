@@ -1,4 +1,3 @@
-@skip
 @regression
 # @TODO split this feature and move to the regular test suite, or create small features in addition there
 Feature: Sales Flow
@@ -148,7 +147,7 @@ Feature: Sales Flow
     And I download "Lead" Data Template file
     And I fill template with data:
     |Lead name |First name|Last name|Status Id|Company name|Emails 1 Email    |
-    |ImportLead|FirstIN   |LastIN   |New      |TetsICompany|ImporLead@test.com|
+    |ImportLead|FirstIN   |LastIN   |new      |TetsICompany|ImporLead@test.com|
     And I import file
     And I reload the page
     And click view "ImporLead@test.com" in grid
@@ -166,6 +165,6 @@ Feature: Sales Flow
     And click on "View selector"
     And click "Board"
     And drag and drop "ImportLead" on "Closed Lost"
-    Then should see "Record has been succesfully updated" flash message
+    Then should see "Record has been successfully updated" flash message
     And go to Sales/ Opportunities
     And there is no records in grid
