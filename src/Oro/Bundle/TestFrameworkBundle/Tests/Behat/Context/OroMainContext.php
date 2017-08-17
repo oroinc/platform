@@ -1418,8 +1418,13 @@ class OroMainContext extends MinkContext implements
         ));
 
         $childElement = $parentElement->getElement($childElementName);
-        self::assertTrue($childElement->isIsset() && $childElement->isVisible(), sprintf(
+        self::assertTrue($childElement->isIsset(), sprintf(
             'Element "%s" not found inside element "%s"',
+            $childElementName,
+            $parentElementName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" found inside element "%s", but it\'s not visible',
             $childElementName,
             $parentElementName
         ));
