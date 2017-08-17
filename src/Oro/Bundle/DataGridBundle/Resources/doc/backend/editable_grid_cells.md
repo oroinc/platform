@@ -38,13 +38,16 @@ datagrids:
                         - IDENTITY(customerProductVisibility.product) = :product_id
             bind_parameters:
                 - product_id
+        inline_editing:
+            enable: true # this grid will allow to edit some cells
         columns:
             name:
                 label: acme.customer.name.label
             visibility:
                 label: acme.customer.product_visibility.label
                 frontend_type: select
-                editable: true # this cell will be editable
+                inline_editing:
+                    enable: true # this cell wil be editable
                 expanded: true # this cell will be rendered as radio buttons
                 choices: @oro_entity_extend.enum_value_provider->getEnumChoicesByCode('cust_prod_visibility')
         options:
@@ -58,7 +61,7 @@ datagrids:
 ```
 Common options:
 
-Parameter ``editable`` for columns mark cell as editable.
+Section ``inline_editing`` with option ``enable`` for columns makes cell editable.
 Option ``cellSelection`` add behavior of editable cell in grid on frontend.
 
 Event listener ``\Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener`` applied to all grids with "cellSelection" option.

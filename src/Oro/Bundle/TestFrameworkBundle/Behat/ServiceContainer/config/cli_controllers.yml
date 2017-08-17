@@ -48,6 +48,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteSetsController
         arguments:
             - '@oro_behat_extension.suite.suite_configuration_registry'
+            - '@oro_behat_extension.specification.statistic.filesystem_statistic_repository'
         tags:
             - { name: cli.controller, priority: 550 }
 
@@ -55,6 +56,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
         arguments:
             - '@oro_test.listener.step_duration_measure_subscriber'
+            - '@oro_test.listener.feature_duration_subscriber'
             - '@event_dispatcher'
         tags:
             - { name: 'cli.controller' }

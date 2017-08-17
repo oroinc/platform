@@ -9,7 +9,7 @@ oro_behat_extension:
           Password: '_password'
 
     User Form:
-      selector: 'div#container'
+      selector: 'form[name="oro_user_user_form"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:

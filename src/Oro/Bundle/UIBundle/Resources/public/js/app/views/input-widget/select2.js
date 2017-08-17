@@ -16,7 +16,7 @@ define(function(require) {
             containerCssClass: 'oro-select2',
             dropdownCssClass: 'oro-select2__dropdown',
             placeholder: __('Please select'),
-            dropdownAutoWidth: true,
+            dropdownAutoWidth: !tools.isMobile(),
             minimumInputLength: 0,
             minimumResultsForSearch: 7,
             adaptContainerCssClass: function(className) {

@@ -59,7 +59,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Message is invalid. Class was not found.', ['entity' => []])
+            ->with('Message is invalid. Class was not found.')
         ;
 
         $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
@@ -85,7 +85,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Message is invalid. Id was not found.', ['entity' => ['class' => 'class-name']])
+            ->with('Message is invalid. Id was not found.')
         ;
 
         $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);

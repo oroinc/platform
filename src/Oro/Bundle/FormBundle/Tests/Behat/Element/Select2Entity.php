@@ -76,7 +76,7 @@ class Select2Entity extends Element implements ClearableInterface
         );
 
         self::assertCount(1, $inputs);
-        array_shift($inputs)->setValue($value);
+        $this->getDriver()->typeIntoInput(array_shift($inputs)->getXpath(), $value);
     }
 
     /**

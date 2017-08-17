@@ -56,7 +56,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
             ->expects($this->once())
             ->method('debug')
             ->with(
-                '[RejectMessageOnExceptionDbalExtension] Execution was interrupted and message was rejected. {id}',
+                'Execution was interrupted and message was rejected. {id}',
                 ['id' => '123']
             )
         ;
