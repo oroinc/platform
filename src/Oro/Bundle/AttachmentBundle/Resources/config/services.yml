@@ -31,6 +31,8 @@ parameters:
 
     liip_imagine.meta_data.reader.class:                         Imagine\Image\Metadata\DefaultMetadataReader
 
+    oro_attachment.liip_imagine.unsupported_mime_types:          ['image/svg+xml']
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
@@ -47,17 +49,30 @@ services:
           - '@knp_gaufrette.filesystem_map'
         lazy: true
 
-    oro_attachment.image_factory:
-        class: Oro\Bundle\AttachmentBundle\Tools\ImageFactory
+    oro_attachment.liip_imagine.binary.factory.guess_mime_type:
+        class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory'
         arguments:
-          - '@liip_imagine.filter.manager'
           - '@liip_imagine.binary.mime_type_guesser'
           - '@liip_imagine.extension_guesser'
+
+    oro_attachment.liip_imagine.binary.filter:
+        class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\Basic\BasicImagineBinaryFilter'
+        arguments:
+          - '@liip_imagine.filter.manager'
+
+    oro_attachment.liip_imagine.binary.filter.unsupported_binaries.skip_by_mime_type:
+       class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\UnsupportedBinaries\SkipUnsupportedBinariesByMimeTypeFilterDecorator'
+       decorates: oro_attachment.liip_imagine.binary.filter
+       decoration_priority: 10
+       arguments:
+          - '@oro_attachment.liip_imagine.binary.filter.unsupported_binaries.skip_by_mime_type.inner'
+          - '%oro_attachment.liip_imagine.unsupported_mime_types%'
 
     oro_attachment.thumbnail_factory:
         class: Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory
         arguments:
-          - '@oro_attachment.image_factory'
+          - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
+          - '@oro_attachment.liip_imagine.binary.filter'
           - '@liip_imagine.filter.configuration'
 
     oro_attachment.association_helper:
@@ -220,7 +235,8 @@ services:
         class: 'Oro\Bundle\AttachmentBundle\Resizer\ImageResizer'
         arguments:
             - '@oro_attachment.file_manager'
-            - '@oro_attachment.image_factory'
+            - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
+            - '@oro_attachment.liip_imagine.binary.filter'
         calls:
             - [setLogger, ['@logger']]
 

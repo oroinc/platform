@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
@@ -26,6 +27,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInte
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
+use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoSuchElement;
 
 /**
@@ -58,6 +60,12 @@ class OroMainContext extends MinkContext implements
      */
     protected $messageQueueIsolator;
 
+    /** @var Stopwatch */
+    private $stopwatch;
+
+    /** @var bool */
+    private $debug = false;
+
     /**
      * @BeforeScenario
      */
@@ -74,45 +82,98 @@ class OroMainContext extends MinkContext implements
         $this->messageQueueIsolator = $messageQueueIsolator;
     }
 
+    /** @return Stopwatch */
+    private function getStopwatch()
+    {
+        if (!$this->stopwatch) {
+            $this->stopwatch = new Stopwatch();
+        }
+
+        return $this->stopwatch;
+    }
+
+    /**
+     * @BeforeStep
+     * @param BeforeStepScope $scope
+     */
+    public function beforeStepProfile(BeforeStepScope $scope)
+    {
+        if (!$this->debug) {
+            return;
+        }
+
+        $this->getStopwatch()->start($scope->getStep()->getText());
+    }
+
+    /**
+     * @AfterStep
+     * @param AfterStepScope $scope
+     */
+    public function afterStepProfile(AfterStepScope $scope)
+    {
+        if (!$this->debug) {
+            return;
+        }
+
+        $eventResult = $this->getStopwatch()->stop($scope->getStep()->getText());
+        fwrite(STDOUT, str_pad(sprintf('%s ms', $eventResult->getDuration()), 10));
+    }
+
     /**
      * @BeforeStep
      * @param BeforeStepScope $scope
      */
     public function beforeStep(BeforeStepScope $scope)
     {
+        if (!$this->getMink()->isSessionStarted()) {
+            return;
+        }
+
         $session = $this->getMink()->getSession();
 
         /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-
+        $driver = $session->getDriver();
         $url = $session->getCurrentUrl();
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
-            $driver->waitPageToLoad();
-
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
-        }
-
-        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
+            return;
+        } elseif (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+            // Don't wait when we need assert the flash message, because it can disappear until ajax in process
             return;
         }
 
-        $start = microtime(true);
-        $result = $driver->waitForAjax();
-        $timeElapsedSecs = microtime(true) - $start;
+        $driver->waitPageToLoad();
+    }
 
-        if (!$result) {
-            fwrite(
-                STDOUT,
-                sprintf(
-                    "Wait for ajax %d seconds, and it assume that ajax was NOT passed\n",
-                    $timeElapsedSecs
-                )
-            );
+    /**
+     * @AfterStep
+     * @param AfterStepScope $scope
+     */
+    public function afterStep(AfterStepScope $scope)
+    {
+        if (!$this->getMink()->isSessionStarted()) {
+            return;
         }
+
+        $session = $this->getMink()->getSession();
+
+        /** @var OroSelenium2Driver $driver */
+        $driver = $session->getDriver();
+        $url = $session->getCurrentUrl();
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            return;
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
+            return;
+        }
+
+        $driver->waitForAjax();
 
         // Check for unforeseen 500 errors
         $error = $this->elementFactory->findElementContains(
@@ -804,6 +865,36 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I should see "Address Select" with options:
+     *            | Value     |
+     *            | Address 1 |
+     * Example: Then I should see "User Address Select" with options:
+     *            | Value                | Type   |
+     *            | Organization Address | Group  |
+     *            | Address 1            | Option |
+     *            | Address 2            | Option |
+     *            | User Address         | Group  |
+     *            | User Address 1       | Option |
+     *
+     * @When /^(?:|I )should see "(?P<select>[^"]+)" with options:$/
+     */
+    public function shouldSeeSelectWithOptions($select, TableNode $options)
+    {
+        $field = $this->createElement($select);
+        $this->assertTrue($field->isValid(), sprintf('Select "%s" not found on page', $select));
+
+        foreach ($options as $option) {
+            if (isset($option['Type']) && $option['Type'] === 'Group') {
+                $opt = $field->find('named', ['optgroup', $option['Value']]);
+                $this->assertNotNull($opt, sprintf('Optgroup with value|text "%s" not found', $option['Value']));
+            } else {
+                $opt = $field->find('named', ['option', $option['Value']]);
+                $this->assertNotNull($opt, sprintf('Options with value|text "%s" not found', $option['Value']));
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function fillField($field, $value)
@@ -1327,8 +1418,13 @@ class OroMainContext extends MinkContext implements
         ));
 
         $childElement = $parentElement->getElement($childElementName);
-        self::assertTrue($childElement->isIsset() && $childElement->isVisible(), sprintf(
+        self::assertTrue($childElement->isIsset(), sprintf(
             'Element "%s" not found inside element "%s"',
+            $childElementName,
+            $parentElementName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" found inside element "%s", but it\'s not visible',
             $childElementName,
             $parentElementName
         ));

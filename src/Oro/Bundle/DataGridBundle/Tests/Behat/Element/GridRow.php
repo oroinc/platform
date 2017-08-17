@@ -96,7 +96,7 @@ class GridRow extends TableRow
      */
     public function setCellValueAndSave($header, $value)
     {
-        $cell = $this->setCellValue($header, $value);
+        $this->setCellValue($header, $value);
 
         $saveButton = $this->spin(function (GridRow $gridRow) {
             return $gridRow->find('css', 'button[title="Save changes"]');
