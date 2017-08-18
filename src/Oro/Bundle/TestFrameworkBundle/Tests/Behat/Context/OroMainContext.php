@@ -240,6 +240,62 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then /^(?:|I )should see only following flash messages:$/
+     *
+     * @param TableNode $table
+     */
+    public function iShouldSeeOnlyFollowingFlashMessages(TableNode $table)
+    {
+        $this->iShouldSeeFollowingFlashMessages($table, true);
+    }
+
+    /**
+     * @Then /^(?:|I )should see following flash messages:$/
+     *
+     * @param TableNode $table
+     * @param bool $strict
+     */
+    public function iShouldSeeFollowingFlashMessages(TableNode $table, $strict = false)
+    {
+        $expectedMessages = array_map(
+            function ($item) {
+                return $item[0];
+            },
+            $table->getRows()
+        );
+
+        $actualMessages = [];
+
+        $elements = $this->findAllElements('Flash Message');
+        foreach ($elements as $element) {
+            if (!$element->isValid() || !$element->isVisible()) {
+                continue;
+            }
+
+            $actualMessage = $element->getText();
+
+            foreach ($expectedMessages as $message) {
+                if (false !== stripos($actualMessage, $message)) {
+                    $actualMessage = $message;
+                    break;
+                }
+            }
+
+            $actualMessages[] = $actualMessage;
+        }
+
+        $this->assertEquals(
+            $expectedMessages,
+            array_intersect($expectedMessages, $actualMessages),
+            "All messages: \n\t" . implode("\n\t", $actualMessages)
+        );
+
+        if ($strict) {
+            $this->assertEquals($expectedMessages, $actualMessages);
+        }
+    }
+
+    /**
      * @Then /^(?:|I )should see (Schema updated) flash message$/
      */
     public function iShouldSeeUpdateSchema()
@@ -1153,11 +1209,7 @@ class OroMainContext extends MinkContext implements
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
 
-        $field = $this->getSession()->getPage()->findField($select);
-
-        if (null === $field) {
-            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $select);
-        }
+        $field = $this->elementFactory->createElement($select);
 
         $selectOptionXpath = '//option[contains(.,"%s")]';
         $selectOption = $field->find(
@@ -1165,7 +1217,7 @@ class OroMainContext extends MinkContext implements
             sprintf($selectOptionXpath, $option)
         );
 
-        if (null === $field) {
+        if (null === $selectOption) {
             throw new ElementNotFoundException(
                 $driver,
                 'select option',
