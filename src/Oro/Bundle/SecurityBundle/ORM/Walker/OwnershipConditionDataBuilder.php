@@ -46,7 +46,11 @@ class OwnershipConditionDataBuilder
     /** @var AclGroupProviderInterface */
     protected $aclGroupProvider;
 
-    /** @var null|mixed */
+    /**
+     * @deprecated Please use getUser method to get current user.
+     *
+     * @var null|mixed
+     */
     protected $user = null;
 
     /**
@@ -447,14 +451,11 @@ class OwnershipConditionDataBuilder
      */
     public function getUser()
     {
-        if ($this->user) {
-            return $this->user;
-        }
-
         $token = $this->getSecurityContext()->getToken();
         if (!$token) {
             return null;
         }
+
         $user = $token->getUser();
         if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
             return null;
@@ -462,6 +463,6 @@ class OwnershipConditionDataBuilder
 
         $this->user = $user;
 
-        return $this->user;
+        return $user;
     }
 }
