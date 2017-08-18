@@ -51,9 +51,7 @@ class CsvFileReader extends AbstractReader
      */
     public function read($context = null)
     {
-        if ($this->getFile()->eof()) {
-            $this->getFile()->rewind();
-
+        if ($this->isEof()) {
             return null;
         }
 
@@ -64,9 +62,7 @@ class CsvFileReader extends AbstractReader
             }
             $context->incrementReadOffset();
             if (null === $data || [null] === $data) {
-                if ($this->getFile()->eof()) {
-                    $this->getFile()->rewind();
-
+                if ($this->isEof()) {
                     return null;
                 }
 
@@ -93,6 +89,21 @@ class CsvFileReader extends AbstractReader
         }
 
         return $data;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isEof()
+    {
+        if ($this->getFile()->eof()) {
+            $this->getFile()->rewind();
+            $this->header = null;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

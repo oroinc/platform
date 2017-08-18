@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\File;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FileSystemOperator
 {
@@ -72,7 +73,7 @@ class FileSystemOperator
         $temporaryDirectory = $this->getTemporaryDirectory($readOnly);
         $fullFileName = $temporaryDirectory . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($fullFileName) || !is_file($fullFileName) || !is_readable($fullFileName)) {
-            throw new \LogicException(sprintf('Can\'t read file %s', $fileName));
+            throw new NotFoundHttpException(sprintf('Can\'t read file %s', $fileName));
         }
 
         return new \SplFileObject($fullFileName);

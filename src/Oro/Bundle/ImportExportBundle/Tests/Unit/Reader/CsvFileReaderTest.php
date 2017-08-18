@@ -28,6 +28,38 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider readSeveralEntitiesProvider
+     *
+     * @param array $options
+     * @param array $expected
+     */
+    public function testEnsureThatHeaderIsCleared(array $options, array $expected)
+    {
+        $context = $this->getContextWithOptionsMock($options);
+        $stepExecution = $this->getMockStepExecution($context);
+        $this->reader->setStepExecution($stepExecution);
+        $this->reader->initializeByContext($context);
+
+        $stepExecution->expects($this->never())
+            ->method('addReaderWarning');
+        $data = [];
+
+        $reflection = new \ReflectionClass($this->reader);
+        $property = $reflection->getProperty('header');
+        $property->setAccessible(true);
+
+        //ensure that header is cleared before read
+        $this->assertNull($property->getValue($this->reader));
+
+        while (($dataRow = $this->reader->read($stepExecution)) !== null) {
+            $data[] = $dataRow;
+        }
+        
+        $this->assertNull($property->getValue($this->reader)); //ensured that previous data was cleared
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
      * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Configuration of CSV reader must contain "filePath".
      */
@@ -72,6 +104,35 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($options['escape'], 'escape', $this->reader);
         $this->assertAttributeEquals($options['firstLineIsHeader'], 'firstLineIsHeader', $this->reader);
         $this->assertAttributeEquals($options['header'], 'header', $this->reader);
+    }
+
+    /** @return array */
+    public function readSeveralEntitiesProvider()
+    {
+        return [
+            [
+
+                'option' => ['filePath' => __DIR__ . '/fixtures/import_correct.csv'],
+                'expected' => [
+                    [
+                        'field_one' => '1',
+                        'field_two' => '2',
+                        'field_three' => '3',
+                    ],
+                    [
+                        'field_one' => 'test1',
+                        'field_two' => 'test2',
+                        'field_three' => 'test3',
+                    ],
+                    [],
+                    [
+                        'field_one' => 'after_new1',
+                        'field_two' => 'after_new2',
+                        'field_three' => 'after_new3',
+                    ],
+                ],
+            ]
+        ];
     }
 
     /**
@@ -167,7 +228,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Akeneo\Bundle\BatchBundle\Item\InvalidItemException
+     * @expectedException \Akeneo\Bundle\BatchBundle\Item\InvalidItemException
      * @expectedExceptionMessage Expecting to get 3 columns, actually got 2
      */
     public function testReadError()

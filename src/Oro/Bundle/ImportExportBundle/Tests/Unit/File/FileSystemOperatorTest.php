@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
 
 class FileSystemOperatorTest extends \PHPUnit_Framework_TestCase
@@ -54,13 +56,13 @@ class FileSystemOperatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Can't read file unknown.csv
-     */
     public function testGetTemporaryFileException()
     {
         $fs = new FileSystemOperator($this->cacheDir, $this->existingDir);
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage("Can't read file unknown.csv");
+
         $fs->getTemporaryFile('unknown.csv');
     }
 
