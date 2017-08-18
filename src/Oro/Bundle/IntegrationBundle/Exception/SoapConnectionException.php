@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Exception;
 
+use Oro\Bundle\IntegrationBundle\Utils\SecureErrorMessageHelper;
+
 class SoapConnectionException extends TransportException
 {
     /**
@@ -33,6 +35,8 @@ class SoapConnectionException extends TransportException
         $message .= str_pad('[response]', 20, ' ', STR_PAD_RIGHT) . $response . PHP_EOL;
         $message .= str_pad('[code]', 20, ' ', STR_PAD_RIGHT) . $code . PHP_EOL;
         $message .= PHP_EOL;
+
+        $message = SecureErrorMessageHelper::sanitizeSecureInfo($message);
 
         $newException = new static($message, $exceptionCode, $exception);
         if ($exception instanceof \SoapFault) {
