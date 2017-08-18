@@ -389,6 +389,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And I click delete Sign a contract with Charlie in grid
      *
      * @Given /^(?:|I )click (?P<action>((?!on)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click "(?P<action>((?!on)\w)*)" on row "(?P<content>[^"]*)" in grid$/
      */
     public function clickActionInRow($content, $action)
     {
@@ -406,6 +407,15 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $this->getGrid()->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
         $this->getSession()->getDriver()->waitForAjax();
+    }
+
+    /**
+     * @When /^(?:|I )click "(?P<button>(.+))" in confirmation dialogue$/
+     */
+    public function clickInConfirmationDialogue($button)
+    {
+        $modal = $this->elementFactory->createElement('Modal');
+        $modal->clickLink($button);
     }
 
     /**

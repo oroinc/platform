@@ -75,6 +75,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then /^(?:|I )should see (Schema updated) flash message$/
+     */
+    public function iShouldSeeUpdateSchema()
+    {
+        $this->iShouldSeeFlashMessage('Schema updated');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function assertPageContainsText($text)
