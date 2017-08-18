@@ -1209,11 +1209,7 @@ class OroMainContext extends MinkContext implements
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
 
-        $field = $this->getSession()->getPage()->findField($select);
-
-        if (null === $field) {
-            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $select);
-        }
+        $field = $this->elementFactory->createElement($select);
 
         $selectOptionXpath = '//option[contains(.,"%s")]';
         $selectOption = $field->find(
@@ -1221,7 +1217,7 @@ class OroMainContext extends MinkContext implements
             sprintf($selectOptionXpath, $option)
         );
 
-        if (null === $field) {
+        if (null === $selectOption) {
             throw new ElementNotFoundException(
                 $driver,
                 'select option',
