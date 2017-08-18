@@ -114,7 +114,7 @@ class OroMainContext extends MinkContext implements
             fwrite(
                 STDOUT,
                 sprintf(
-                    'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                    "Wait for ajax %d seconds, and it assume that ajax was NOT passed\n",
                     $timeElapsedSecs
                 )
             );

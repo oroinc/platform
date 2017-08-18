@@ -145,6 +145,11 @@ class Item implements TestFrameworkEntityInterface
         return $this->$name;
     }
 
+    public function __isset($name)
+    {
+        return isset($this->$name);
+    }
+
     public function __toString()
     {
         return (string) $this->stringValue;

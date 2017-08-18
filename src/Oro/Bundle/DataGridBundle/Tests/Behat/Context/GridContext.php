@@ -916,6 +916,15 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )click "(?P<button>(.+))" in confirmation dialogue$/
+     */
+    public function clickInConfirmationDialogue($button)
+    {
+        $modal = $this->elementFactory->createElement('Modal');
+        $modal->clickLink($button);
+    }
+
+    /**
      * @When /^(?:|I )confirm deletion$/
      */
     public function confirmDeletion()
