@@ -242,9 +242,6 @@ define(function(require) {
             var select2element = this.$el.find(this.elementSelector);
             var values = this.getDataForSelect2();
 
-            if (select2Config.ajax.results.length > 100) {
-                select2Config.minimumInputLength = 2;
-            }
             select2element.removeClass('hide');
             select2element.attr('multiple', 'multiple');
             select2element.inputWidget('create', 'select2', {initializeOptions: select2Config});
@@ -298,6 +295,10 @@ define(function(require) {
                 config.data = {
                     results: this.select2ConfigData
                 };
+
+                if (config.data.results.length > 100) {
+                    config.minimumInputLength = 2;
+                }
             }
 
             if (this.templateTheme === '') {
