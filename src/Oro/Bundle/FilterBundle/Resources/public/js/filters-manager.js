@@ -635,9 +635,9 @@ define(function(require) {
             this.trigger('changeViewMode', mode);
         },
 
-        getOpenFilters: function() {
+        getChangedFilters: function() {
             return _.filter(this.filters, function(filter) {
-                return filter.$el.hasClass(filter.buttonActiveClass) === true;
+                return filter.enabled && !_.isEqual(filter.value, filter._readDOMValue());
             });
         }
     });
