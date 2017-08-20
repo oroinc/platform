@@ -10,6 +10,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
     var __ = require('orotranslation/js/translator');
+    var errorHandler = require('oroui/js/error');
     require('jquery.form');
 
     /**
@@ -734,9 +735,10 @@ define(function(require) {
             if (this.deferredRender) {
                 this.deferredRender
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(_.bind(function() {
+                    .fail(_.bind(function(error) {
                         if (!this.disposing && !this.disposed) {
-                            throw new Error('Widget rendering failed');
+                            errorHandler.showErrorInConsole(error || new Error('Widget rendering failed'));
+                            this._triggerContentLoadEvents();
                         }
                     }, this));
             } else {

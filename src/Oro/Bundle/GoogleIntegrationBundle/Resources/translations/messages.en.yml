@@ -11,4 +11,4 @@ oro:
                     client_id:
                         label: Client Id
                     client_secret.label: Client secret
-                    google_api_key.label: Google Api Key
+                    google_api_key.label: Google API Key
