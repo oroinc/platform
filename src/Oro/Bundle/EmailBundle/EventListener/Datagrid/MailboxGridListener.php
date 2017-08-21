@@ -89,9 +89,8 @@ class MailboxGridListener implements FeatureToggleableInterface
         }
 
         if (!empty($organizations)) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->in('m.organization', $organizations)
-            );
+            $queryBuilder->andWhere($queryBuilder->expr()->in('m.organization', ':organizations'))
+                ->setParameter('organizations', $organizations);
         } else {
             $queryBuilder->andWhere('m.organization IS NULL');
         }

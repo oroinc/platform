@@ -113,7 +113,7 @@ class TagRepository extends EntityRepository
             ->setParameter('entityId', $entityId);
 
         if (!empty($tags)) {
-            $builder->andWhere($builder->expr()->in('t.tag', $tags));
+            $builder->andWhere($builder->expr()->in('t.tag', ':tags'))->setParameter('tags', $tags);
         }
 
         if (null !== $owner) {
