@@ -47,7 +47,8 @@ class OrganizationUsersHandler extends UserSearchHandler
         $entityIds = explode(',', $query);
 
         $queryBuilder = $this->getBasicQueryBuilder();
-        $queryBuilder->andWhere($queryBuilder->expr()->in('u.id', $entityIds));
+        $queryBuilder->andWhere($queryBuilder->expr()->in('u.id', ':entityIds'))
+            ->setParameter('entityIds', $entityIds);
 
         return $queryBuilder->getQuery()->getResult();
     }

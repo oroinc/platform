@@ -210,7 +210,7 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
         $queryBuilder->expects($this->exactly($callCount * 2))
             ->method('orWhere')
             ->will($this->returnSelf());
-        $queryBuilder->expects($this->exactly($callCount))
+        $queryBuilder->expects($this->atLeastOnce())
             ->method('setParameter')
             ->will($this->returnSelf());
 
