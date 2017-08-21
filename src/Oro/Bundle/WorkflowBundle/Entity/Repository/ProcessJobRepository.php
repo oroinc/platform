@@ -14,11 +14,13 @@ class ProcessJobRepository extends EntityRepository
      */
     public function deleteByHashes(array $hashes)
     {
+        $queryBuilder = $this->createQueryBuilder('job');
+        $queryBuilder->delete('OroWorkflowBundle:ProcessJob', 'job')
+            ->where($queryBuilder->expr()->in('job.entityHash', ':hashChunk'));
+
         $hashChunks = array_chunk($hashes, self::DELETE_HASH_BATCH);
         foreach ($hashChunks as $hashChunk) {
-            $queryBuilder = $this->createQueryBuilder('job')
-                ->delete('OroWorkflowBundle:ProcessJob', 'job');
-            $queryBuilder->where($queryBuilder->expr()->in('job.entityHash', $hashChunk))
+            $queryBuilder->setParameter('hashChunk', $hashChunk)
                 ->getQuery()
                 ->execute();
         }
@@ -33,10 +35,7 @@ class ProcessJobRepository extends EntityRepository
         if (empty($ids)) {
             return array();
         } else {
-            $queryBuilder = $this->createQueryBuilder('job');
-            return $queryBuilder->where($queryBuilder->expr()->in('job.id', $ids))
-                ->getQuery()
-                ->getResult();
+            return $this->findBy(['id' => $ids]);
         }
     }
 }
