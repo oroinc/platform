@@ -9,11 +9,12 @@ $filter-toggle-mode-criteria-selector-border-bottom: 1px solid get-color('additi
 $filter-toggle-mode-criteria-selector-color: get-color('additional', 'dark') !default;
 $filter-toggle-mode-criteria-selector-icon-top-pos: 18px !default;
 $filter-toggle-mode-criteria-selector-icon-right-pos: 15px !default;
-$filter-toggle-mode-criteria-hint-item-offset-bottom: $offset-y-m !default;
+$filter-toggle-mode-criteria-hint-item-offset: 0 $offset-y-m $offset-y-m 0 !default;
 $filter-toggle-mode-criteria-hint-item-offset-inner: 6px 25px 7px 6px !default;
 $filter-toggle-mode-criteria-hint-item-border-radius: 5px !default;
 
-$filter-toggle-mode-reset-filter-right-pos: 7px !default;
+$filter-toggle-mode-reset-filter-top-pos: 6px !default;
+$filter-toggle-mode-reset-filter-right-pos: 2px !default;
 
 $filter-toggle-mode-reset-filter-button-width: 100% !default;
 $filter-toggle-mode-reset-filter-button-offset-bottom: $offset-y-m !default;

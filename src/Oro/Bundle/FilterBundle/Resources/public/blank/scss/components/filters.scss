@@ -46,6 +46,7 @@
 
 .filter-box {
     position: relative;
+
     @include clearfix();
 
     .filter-container {
@@ -172,7 +173,7 @@
 
     @if ($apply-filters-toggle-mode-design) {
         &.toggle-mode {
-            padding-bottom: $offset-y-m;
+            padding: $offset-y-m 0;
         }
     }
 }
