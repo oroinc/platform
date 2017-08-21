@@ -23,7 +23,6 @@ class OroSoapExtensionTest extends ExtensionTestCase
 
         $expectedDefinitions = [
             'oro_soap.client.factory',
-            'oro_soap.client.settings.factory',
             'oro_soap.client',
         ];
 

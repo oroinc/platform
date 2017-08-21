@@ -110,10 +110,6 @@ services:
         class: 'Oro\Bundle\SoapBundle\Client\Factory\NativeSoapClientFactory'
         public: false
 
-    oro_soap.client.settings.factory:
-        class: 'Oro\Bundle\SoapBundle\Client\Settings\Factory\SoapClientSettingsFactory'
-        public: false
-
     oro_soap.client:
         class: 'Oro\Bundle\SoapBundle\Client\SoapClient'
         public: false
