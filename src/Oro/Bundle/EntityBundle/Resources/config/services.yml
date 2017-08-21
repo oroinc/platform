@@ -333,6 +333,7 @@ services:
         public: false
         arguments:
             - '@doctrine'
+            - '@oro_entity_config.provider.extend'
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
 

@@ -849,6 +849,78 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'already normalized child to-one association'                => [
+                'config'       => [
+                    'fields' => [
+                        'id'       => null,
+                        'category' => [
+                            'fields' => [
+                                'id'    => null,
+                                'title' => [
+                                    'property_path' => 'title.id',
+                                    'fields'        => [
+                                        'id' => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'       => 1,
+                        'category' => [
+                            'id'    => 2,
+                            'title' => 3
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'       => 1,
+                        'category' => [
+                            'id'    => 2,
+                            'title' => 3
+                        ]
+                    ]
+                ]
+            ],
+            'already normalized child to-many association'               => [
+                'config'       => [
+                    'fields' => [
+                        'id'       => null,
+                        'category' => [
+                            'fields' => [
+                                'id'     => null,
+                                'titles' => [
+                                    'property_path' => 'titles.id',
+                                    'fields'        => [
+                                        'id' => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'       => 1,
+                        'category' => [
+                            'id'     => 2,
+                            'titles' => [3]
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'       => 1,
+                        'category' => [
+                            'id'     => 2,
+                            'titles' => [3]
+                        ]
+                    ]
+                ]
+            ],
         ];
     }
 }

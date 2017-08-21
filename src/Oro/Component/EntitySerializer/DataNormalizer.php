@@ -123,7 +123,7 @@ class DataNormalizer
     {
         $propertyPathLength = count($propertyPath);
         foreach ($row[$field] as &$subRow) {
-            if ($propertyPathLength > 1 || array_key_exists($propertyPath[0], $subRow)) {
+            if ($propertyPathLength > 1 || (is_array($subRow) && array_key_exists($propertyPath[0], $subRow))) {
                 $subRow = $this->extractValueByPropertyPath($subRow, $propertyPath);
             }
         }
