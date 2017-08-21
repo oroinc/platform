@@ -1412,6 +1412,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then /^(?:|I )should see "(?P<title>[\w\s]*)" button$/
+     */
+    public function iShouldSeeButton($title)
+    {
+        $button = $this->getPage()->findButton($title);
+
+        if ($button) {
+            return;
+        }
+
+        $link = $this->getPage()->findLink($title);
+
+        if ($link && $link->hasClass('btn')) {
+            return;
+        }
+
+        self::fail(sprintf('Could not find button with "%s" title', $title));
+    }
+
+    /**
      * Use this action only for debugging
      *
      * This method should be used only for debug
