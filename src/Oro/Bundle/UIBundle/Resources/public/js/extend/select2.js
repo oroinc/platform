@@ -204,7 +204,10 @@ define(function(require) {
             positionDropdown.apply(this, arguments);
             var dialogIsBelow = $container.hasClass('select2-dropdown-open') &&
                 !$container.hasClass('select2-drop-above');
-            $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
+            if ($container.parent().hasClass(select2DropBelowClassName) !== dialogIsBelow) {
+                $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
+                this.opts.element.trigger('select2:dialogReposition');
+            }
         };
 
         prototype.close = function() {
