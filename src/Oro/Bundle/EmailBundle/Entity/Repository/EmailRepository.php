@@ -23,14 +23,7 @@ class EmailRepository extends EntityRepository
      */
     public function findEmailsByIds($ids)
     {
-        $queryBuilder = $this->createQueryBuilder('e');
-        $criteria     = new Criteria();
-        $criteria->where(Criteria::expr()->in('id', $ids));
-        $criteria->orderBy(['sentAt' => Criteria::DESC]);
-        $queryBuilder->addCriteria($criteria);
-        $result = $queryBuilder->getQuery()->getResult();
-
-        return $result;
+        return $this->findBy(['id' => $ids], ['sentAt' => Criteria::DESC]);
     }
 
     /**
@@ -42,11 +35,7 @@ class EmailRepository extends EntityRepository
      */
     public function findEmailByMessageId($messageId)
     {
-        return $this->createQueryBuilder('e')
-            ->where('e.messageId = :messageId')
-            ->setParameter('messageId', $messageId)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->findOneBy(['messageId' => $messageId]);
     }
 
     /**
