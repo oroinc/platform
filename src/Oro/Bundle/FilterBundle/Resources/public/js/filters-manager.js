@@ -138,6 +138,7 @@ define(function(require) {
 
             var filterListeners = {
                 'update': this._onFilterUpdated,
+                'change': this._onFilterChanged,
                 'disable': this._onFilterDisabled,
                 'showCriteria': this._onFilterShowCriteria
             };
@@ -202,6 +203,16 @@ define(function(require) {
             this.trigger('updateFilter', filter);
 
             this._publishCountSelectedFilters();
+        },
+
+        /**
+         * Triggers when filter DOM Value is changed
+         *
+         * @param {oro.filter.AbstractFilter} filter
+         * @protected
+         */
+        _onFilterChanged: function() {
+            this._publishCountChangedFilters();
         },
 
         /**
@@ -410,7 +421,7 @@ define(function(require) {
          */
         renderCriteria: function() {
             _.each(this.filters, function(filter) {
-                if (filter.enabled && _.isFunction(filter._renderCriteria) && !filter.isRendered()) {
+                if (filter.enabled && _.isFunction(filter._renderCriteria) && !filter._criteriaRenderd) {
                     filter._renderCriteria();
                 }
             }, this);
@@ -430,12 +441,37 @@ define(function(require) {
         },
 
         /**
+         * @param {Number} [count]
+         * @private
+         */
+        _publishCountChangedFilters: function(count) {
+            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateChangedFilters();
+
+            mediator.trigger(
+                'filterManager:changedFilters:count:' + this.collection.options.gridName,
+                countFilters
+            );
+        },
+
+        /**
          * @returns {Number} count of selected filters
          * @private
          */
         _calculateSelectedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
                 var num = (filter.enabled && !_.isEqual(filter.emptyValue, filter.value)) ? 1 : 0;
+
+                return memo + num;
+            }, 0);
+        },
+
+        /**
+         * @returns {Number} count of selected filters
+         * @private
+         */
+        _calculateChangedFilters: function() {
+            return _.reduce(this.filters, function(memo, filter) {
+                var num = (filter.enabled && !_.isEqual(filter.value, filter._readDOMValue())) ? 1 : 0;
 
                 return memo + num;
             }, 0);
