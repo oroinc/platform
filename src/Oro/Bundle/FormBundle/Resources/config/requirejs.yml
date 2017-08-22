@@ -37,6 +37,7 @@ config:
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
         'oroform/js/optional-validation-groups-handler': 'bundles/oroform/js/optional-validation-groups-handler.js'
         'oroform/js/app/views/form-validate-view': 'bundles/oroform/js/app/views/form-validate-view.js'
+        'oroform/js/validate-topmost-label-mixin': 'bundles/oroform/js/validate-topmost-label-mixin.js'
 
         #inline editing
         'oroform/js/tools/frontend-type-map': 'bundles/oroform/js/tools/frontend-type-map.js'

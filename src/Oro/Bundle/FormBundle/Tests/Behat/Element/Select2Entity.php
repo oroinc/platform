@@ -10,6 +10,11 @@ use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
 class Select2Entity extends Element implements ClearableInterface
 {
     /**
+     * @var int Count of attempts for getting the correct field suggestions
+     */
+    protected $attempts;
+
+    /**
      * {@inheritdoc}
      */
     public function setValue($value)
@@ -26,6 +31,7 @@ class Select2Entity extends Element implements ClearableInterface
             if (1 === count($results)) {
                 array_shift($results)->click();
                 $this->getDriver()->waitForAjax();
+
                 return;
             }
 
@@ -92,21 +98,50 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function getSuggestions()
     {
+        $this->attempts = 0;
+        $resultSet = $this->getResultSet();
+
+        $results = $this->spin(function (Select2Entity $element) use ($resultSet) {
+            /** @var NodeElement[] $results */
+            $results = $resultSet->findAll('css', 'li');
+            if (3 == $element->attempts) {
+                return $results;
+            }
+
+            try {
+                foreach ($results as $result) {
+                    $result->isVisible();
+                }
+            } catch (\Exception $e) {
+                $element->attempts = 0;
+            }
+
+            $element->attempts++;
+
+            return [];
+        }, 5);
+
+        return $results;
+    }
+
+    /**
+     * @return NodeElement
+     */
+    public function getResultSet()
+    {
         $this->open();
-        $this->getDriver()->waitForAjax();
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
-        $this->getDriver()->waitForAjax();
 
         /** @var NodeElement $resultSet */
         foreach ($this->getPage()->findAll('css', '.select2-results') as $resultSet) {
             if ($resultSet->isVisible()) {
-                return $resultSet->findAll('css', 'li');
+                return $resultSet;
             }
         }
 
-        return [];
+        self::fail('No select 2 entity results found on page');
     }
 
     /**

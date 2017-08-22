@@ -220,7 +220,7 @@
             {% set dateValidation = dateValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
         {% endif %}
 
-        {% set dateValidation = dateValidation|json_encode %}
+        {% set dateValidation = dateValidation|json_encode(constant('JSON_FORCE_OBJECT')) %}
     {% endif %}
 
     {% set options = {
@@ -275,7 +275,7 @@
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
             class: 'input-small datepicker-input ' ~ attrClass,
-            'data-validation': dateValidation|json_encode
+            'data-validation': dateValidation|json_encode(constant('JSON_FORCE_OBJECT'))
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -289,7 +289,7 @@
             id: 'time_selector_' ~ id,
             name: 'time_selector_' ~ id,
             class: 'input-small timepicker-input ' ~ attrClass,
-            'data-validation': timeValidation|json_encode
+            'data-validation': timeValidation|json_encode(constant('JSON_FORCE_OBJECT'))
         },
         timePickerOptions: {
         }
