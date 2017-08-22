@@ -51,14 +51,19 @@
     }
 
     .filter-criteria-hint-item {
-        display: block;
-        margin-bottom: $filter-toggle-mode-criteria-hint-item-offset-bottom;
+        display: inline-block;
+
+        margin: $filter-toggle-mode-criteria-hint-item-offset;
         padding: $filter-toggle-mode-criteria-hint-item-offset-inner;
+
         border-radius: $filter-toggle-mode-criteria-hint-item-border-radius;
+
+        vertical-align: top;
     }
 
     .reset-filter {
         position: absolute;
+        top: $filter-toggle-mode-reset-filter-top-pos;
         right: $filter-toggle-mode-reset-filter-right-pos;
     }
 
