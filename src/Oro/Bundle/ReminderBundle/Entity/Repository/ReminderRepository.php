@@ -94,9 +94,7 @@ class ReminderRepository extends EntityRepository
      */
     public function findReminders(array $reminderIds)
     {
-        $qb = $this->createQueryBuilder('reminder');
-
-        return $qb->where($qb->expr()->in('reminder.id', $reminderIds))->getQuery()->execute();
+        return $this->findBy(['id' => $reminderIds]);
     }
 
     /**

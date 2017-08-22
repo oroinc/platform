@@ -1209,11 +1209,7 @@ class OroMainContext extends MinkContext implements
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
 
-        $field = $this->getSession()->getPage()->findField($select);
-
-        if (null === $field) {
-            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $select);
-        }
+        $field = $this->elementFactory->createElement($select);
 
         $selectOptionXpath = '//option[contains(.,"%s")]';
         $selectOption = $field->find(
@@ -1221,7 +1217,7 @@ class OroMainContext extends MinkContext implements
             sprintf($selectOptionXpath, $option)
         );
 
-        if (null === $field) {
+        if (null === $selectOption) {
             throw new ElementNotFoundException(
                 $driver,
                 'select option',
@@ -1413,6 +1409,26 @@ class OroMainContext extends MinkContext implements
         $field->keyDown(13);
         $field->keyUp(13);
         $this->waitForAjax();
+    }
+
+    /**
+     * @Then /^(?:|I )should see "(?P<title>[\w\s]*)" button$/
+     */
+    public function iShouldSeeButton($title)
+    {
+        $button = $this->getPage()->findButton($title);
+
+        if ($button) {
+            return;
+        }
+
+        $link = $this->getPage()->findLink($title);
+
+        if ($link && $link->hasClass('btn')) {
+            return;
+        }
+
+        self::fail(sprintf('Could not find button with "%s" title', $title));
     }
 
     /**

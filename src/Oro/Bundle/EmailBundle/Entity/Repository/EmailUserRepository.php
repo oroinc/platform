@@ -65,7 +65,7 @@ class EmailUserRepository extends EntityRepository
             ->setParameter('active', true);
 
         if ($folderTypes) {
-            $qb->andWhere($qb->expr()->in('f.type', $folderTypes));
+            $qb->andWhere($qb->expr()->in('f.type', ':folderTypes'))->setParameter('folderTypes', $folderTypes);
         }
 
         if ($isSeen !== null) {
@@ -229,7 +229,8 @@ class EmailUserRepository extends EntityRepository
         $queryBuilder->join('e.thread', 't');
         $this->applyOwnerFilter($queryBuilder, $user);
         $this->applyHeadFilter($queryBuilder, false);
-        $queryBuilder->andWhere($queryBuilder->expr()->in('t.id', $threadIds));
+        $queryBuilder->andWhere($queryBuilder->expr()->in('t.id', ':threadIds'))
+            ->setParameter('threadIds', $threadIds);
 
         return $queryBuilder;
     }
@@ -350,7 +351,8 @@ class EmailUserRepository extends EntityRepository
     protected function applyIdFilter(QueryBuilder $queryBuilder, $ids)
     {
         if ($ids) {
-            $queryBuilder->andWhere($queryBuilder->expr()->in('eu.id', $ids));
+            $queryBuilder->andWhere($queryBuilder->expr()->in('eu.id', ':includeIds'))
+                ->setParameter('includeIds', $ids);
         }
 
         return $this;
@@ -365,7 +367,8 @@ class EmailUserRepository extends EntityRepository
     protected function applyExcludeIdFilter(QueryBuilder $queryBuilder, $ids)
     {
         if ($ids) {
-            $queryBuilder->andWhere($queryBuilder->expr()->notIn('eu.id', $ids));
+            $queryBuilder->andWhere($queryBuilder->expr()->notIn('eu.id', ':excludeIds'))
+                ->setParameter('excludeIds', $ids);
         }
 
         return $this;

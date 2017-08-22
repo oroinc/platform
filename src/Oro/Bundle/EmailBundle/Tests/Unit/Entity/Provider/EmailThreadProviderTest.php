@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
 class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
@@ -46,6 +49,11 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
+        $expressionBuilder = $this->createMock(Expr::class);
+        $expressionBuilder->expects($this->atLeastOnce())->method('in');
+        $queryBuilder->expects($this->atLeastOnce())->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->expects($this->atLeastOnce())->method('where')->will($this->returnSelf());
+        $queryBuilder->expects($this->atLeastOnce())->method('setParameter')->will($this->returnSelf());
         $repository->expects($this->once())
             ->method('createQueryBuilder')
             ->with('e')
@@ -70,9 +78,12 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $expressionBuilder = $this->createMock(Expr::class);
+        $expressionBuilder->expects($this->atLeastOnce())->method('in');
+        $queryBuilder->expects($this->atLeastOnce())->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->expects($this->atLeastOnce())->method('where')->will($this->returnSelf());
+        $queryBuilder->expects($this->atLeastOnce())->method('setParameter')->will($this->returnSelf());
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
             ->setMethods(['getResult'])
@@ -114,9 +125,12 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $expressionBuilder = $this->createMock(Expr::class);
+        $expressionBuilder->expects($this->atLeastOnce())->method('in');
+        $queryBuilder->expects($this->atLeastOnce())->method('expr')->willReturn($expressionBuilder);
+        $queryBuilder->expects($this->atLeastOnce())->method('where')->will($this->returnSelf());
+        $queryBuilder->expects($this->atLeastOnce())->method('setParameter')->will($this->returnSelf());
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
             ->setMethods(['getResult'])
