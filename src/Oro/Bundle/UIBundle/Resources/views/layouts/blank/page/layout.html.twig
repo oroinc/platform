@@ -20,7 +20,9 @@
     }) %}
 
     <body {{ block('block_attributes') }}>
-        {{ block_widget(block) }}
+        <div id="container" data-layout="separate">
+            {{ block_widget(block) }}
+        </div>
     </body>
 {% endblock %}
 
