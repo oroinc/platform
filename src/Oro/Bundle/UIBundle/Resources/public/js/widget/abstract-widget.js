@@ -770,7 +770,7 @@ define(function(require) {
             this.show();
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
-            this.getLayoutElement().attr('data-layout', 'separate')
+            this.getLayoutElement().attr('data-layout', 'separate');
             this.initLayout()
                 .done(_.bind(this._afterLayoutInit, this));
         },
