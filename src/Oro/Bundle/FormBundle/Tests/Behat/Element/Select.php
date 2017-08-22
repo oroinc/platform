@@ -11,6 +11,16 @@ class Select extends Element
      */
     public function setValue($value)
     {
-        $this->selectOption($value);
+        if (is_array($value)) {
+            if (!$this->hasAttribute('multiple')) {
+                self::fail('Only multiple select can be selected by several values');
+            }
+
+            foreach ($value as $option) {
+                $this->selectOption($option, true);
+            }
+        } else {
+            $this->selectOption($value);
+        }
     }
 }
