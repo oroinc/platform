@@ -41,7 +41,8 @@ class PermissionRepository extends EntityRepository
             ->setParameter('class', $class);
 
         if ($ids) {
-            $queryBuilder->andWhere($queryBuilder->expr()->in('p.id', $ids));
+            $queryBuilder->andWhere($queryBuilder->expr()->in('p.id', ':permissionsIds'))
+                ->setParameter('permissionsIds', $ids);
         }
 
         return $queryBuilder->getQuery()->getResult();
