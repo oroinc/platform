@@ -115,3 +115,7 @@ services:
         public: false
         arguments:
             - '@oro_soap.client.factory'
+
+    oro_soap.client.factory.settings:
+        class: 'Oro\Bundle\SoapBundle\Client\Settings\Factory\SoapClientSettingsFactory'
+        public: false
