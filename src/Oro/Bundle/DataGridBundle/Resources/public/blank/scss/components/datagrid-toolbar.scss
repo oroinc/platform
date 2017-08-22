@@ -131,6 +131,15 @@
 }
 
 @include breakpoint('mobile') {
+    .datagrid-tool {
+        margin-left: 0;
+        margin-right: 1px;
+
+        &:not(:first-child) {
+            margin-left: 1px;
+        }
+    }
+
     .datagrid-toolbar {
         justify-content: space-between;
 
