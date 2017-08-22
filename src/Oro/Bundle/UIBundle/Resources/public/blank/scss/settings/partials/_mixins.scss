@@ -412,12 +412,14 @@
     }
 
     @else if $state == 'visited' {
+        &--visited,
         &:visited {
             @content;
         }
     }
 
     @else if $state == 'focus' {
+        &--focus,
         &:focus {
             @content;
         }

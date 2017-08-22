@@ -143,6 +143,21 @@
         min-width: $filter-dropdown-menu-calendar-max-width;
     }
 
+    .select2-container {
+        @include base-ui-element(
+            $use-base-style: true,
+            $padding: $offset-y-s
+        );
+
+        display: block;
+
+        background: transparent;
+    }
+
+    .select2-container-active {
+        @extend .input--focus;
+    }
+
     @if ($apply-filters-dropdown-mode-design) {
         &.dropdown-mode {
             margin: $filter-box-dropdown-mode-offset;
