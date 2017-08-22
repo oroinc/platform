@@ -549,4 +549,79 @@ class ScrollDataTest extends \PHPUnit_Framework_TestCase
         $this->scrollData->setData($blocks);
         $this->assertEquals([0, 'namedSubblock'], $this->scrollData->getSubblockIds(5));
     }
+
+    public function testChangeBlockWhenNoBlockExists()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Block with id "someId" has not been found');
+
+        $blocks = [
+            ScrollData::DATA_BLOCKS => [
+            ]
+        ];
+
+        $this->scrollData->setData($blocks);
+        $this->scrollData->changeBlock('someId');
+    }
+
+    public function testChangeBlock()
+    {
+        $blocks = [
+            ScrollData::DATA_BLOCKS => [
+                0 => [
+                    ScrollData::TITLE => 'test title',
+                    ScrollData::PRIORITY => 25,
+                    ScrollData::BLOCK_CLASS => 'active',
+                    ScrollData::USE_SUB_BLOCK_DIVIDER => false,
+                ],
+            ]
+        ];
+
+        $this->scrollData->setData($blocks);
+        $this->scrollData->changeBlock(0, 'New title', 7, 'inactive', true);
+
+        $expectedBlocks = [
+            ScrollData::DATA_BLOCKS => [
+                0 => [
+                    ScrollData::TITLE => 'New title',
+                    ScrollData::PRIORITY => 7,
+                    ScrollData::BLOCK_CLASS => 'inactive',
+                    ScrollData::USE_SUB_BLOCK_DIVIDER => true,
+                ],
+            ]
+        ];
+
+        $this->assertEquals($expectedBlocks, $this->scrollData->getData());
+    }
+
+    public function testHasBlockWhenNoBlock()
+    {
+        $blocks = [
+            ScrollData::DATA_BLOCKS => [
+            ]
+        ];
+
+        $this->scrollData->setData($blocks);
+
+        $this->assertFalse($this->scrollData->hasBlock(0));
+    }
+
+    public function testHasBlock()
+    {
+        $blocks = [
+            ScrollData::DATA_BLOCKS => [
+                0 => [
+                    ScrollData::TITLE => 'Title',
+                ],
+                'named' => [
+                    ScrollData::TITLE => 'Named',
+                ]
+            ]
+        ];
+
+        $this->scrollData->setData($blocks);
+
+        $this->assertTrue($this->scrollData->hasBlock(0));
+        $this->assertTrue($this->scrollData->hasBlock('named'));
+    }
 }
