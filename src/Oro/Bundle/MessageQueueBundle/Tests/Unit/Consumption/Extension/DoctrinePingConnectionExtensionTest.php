@@ -72,19 +72,19 @@ class DoctrinePingConnectionExtensionTest extends \PHPUnit_Framework_TestCase
         $context->getLogger()
             ->expects($this->at(0))
             ->method('debug')
-            ->with('[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.')
+            ->with('Connection "test" is not active, trying to reconnect.')
         ;
         $context->getLogger()
             ->expects($this->at(1))
             ->method('debug')
-            ->with('[DoctrinePingConnectionExtension] Connection is active now.')
+            ->with('Connection "test" is active now.')
         ;
 
         $registry = $this->createRegistryMock();
         $registry
             ->expects($this->once())
             ->method('getConnections')
-            ->will($this->returnValue([$connection]))
+            ->will($this->returnValue(['test' => $connection]))
         ;
 
         $extension = new DoctrinePingConnectionExtension($registry);

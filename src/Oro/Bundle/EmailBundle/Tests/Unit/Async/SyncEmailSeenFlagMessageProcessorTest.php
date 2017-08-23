@@ -32,7 +32,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[SyncEmailSeenFlagMessageProcessor] Got invalid message: "{"seen":true}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new SyncEmailSeenFlagMessageProcessor(
@@ -57,7 +57,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[SyncEmailSeenFlagMessageProcessor] Got invalid message: "{"id":123}"')
+            ->with('Got invalid message')
         ;
 
         $processor = new SyncEmailSeenFlagMessageProcessor(
@@ -82,7 +82,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('[SyncEmailSeenFlagMessageProcessor] UserEmail was not found. id: "123"')
+            ->with('UserEmail was not found. id: "123"')
         ;
 
         $repository = $this->createEmailUserRepositoryMock();

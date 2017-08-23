@@ -4,9 +4,9 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Proxy;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Symfony\Bundle\FrameworkBundle\Client;
 
 trait SendChangedEntitiesToMessageQueueExtensionTrait

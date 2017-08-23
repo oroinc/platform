@@ -35,6 +35,9 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($owner, $emailUser->getOwner());
         $this->assertEquals($receivedAt, $emailUser->getReceivedAt());
         $this->assertNull($emailUser->getCreatedAt());
+
+        $emailUser->setOrganization(null);
+        $this->assertNull($emailUser->getOrganization());
     }
 
     public function testBeforeSave()

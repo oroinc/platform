@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
@@ -13,18 +12,20 @@ use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
 class DynamicSegmentQueryBuilder implements QueryBuilderInterface
 {
     /** @var ServiceLink */
-    protected $segmentQueryConverterLink;
+    protected $segmentQueryConverterFactoryLink;
 
     /** @var ManagerRegistry */
     protected $doctrine;
 
     /**
-     * @param ServiceLink     $segmentQueryConverterLink
+     * @param ServiceLink     $segmentQueryConverterFactoryLink
      * @param ManagerRegistry $doctrine
      */
-    public function __construct(ServiceLink $segmentQueryConverterLink, ManagerRegistry $doctrine)
-    {
-        $this->segmentQueryConverterLink = $segmentQueryConverterLink;
+    public function __construct(
+        ServiceLink $segmentQueryConverterFactoryLink,
+        ManagerRegistry $doctrine
+    ) {
+        $this->segmentQueryConverterFactoryLink = $segmentQueryConverterFactoryLink;
         $this->doctrine = $doctrine;
     }
 
@@ -43,13 +44,21 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
      */
     public function getQueryBuilder(Segment $segment)
     {
-        /** @var EntityManager $em */
         $em = $this->doctrine->getManagerForClass($segment->getEntity());
-
-        /** @var SegmentQueryConverter $segmentQueryConverter */
-        $segmentQueryConverter = $this->segmentQueryConverterLink->getService();
-        $qb = $segmentQueryConverter->convert(new RestrictionSegmentProxy($segment, $em));
+        $converter = $this->getConverter();
+        $qb = $converter->convert(new RestrictionSegmentProxy($segment, $em));
 
         return $qb;
+    }
+
+    /**
+     * @return SegmentQueryConverter
+     */
+    protected function getConverter()
+    {
+        /** @var SegmentQueryConverterFactory $factory */
+        $factory = $this->segmentQueryConverterFactoryLink->getService();
+
+        return  $factory->createInstance();
     }
 }

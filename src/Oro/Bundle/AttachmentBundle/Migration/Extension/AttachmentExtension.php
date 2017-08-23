@@ -55,13 +55,14 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
     }
 
     /**
-     * @param Schema $schema
-     * @param string $sourceTable      Target entity table name
-     * @param string $sourceColumnName A column name is used to show related entity
-     * @param array  $options          Additional options for relation
-     * @param int    $maxFileSize      Max allowed file size in megabytes
-     * @param int    $thumbWidth       Thumbnail width in pixels
-     * @param int    $thumbHeight      Thumbnail height in pixels
+     * @param Schema   $schema
+     * @param string   $sourceTable      Target entity table name
+     * @param string   $sourceColumnName A column name is used to show related entity
+     * @param array    $options          Additional options for relation
+     * @param int      $maxFileSize      Max allowed file size in megabytes
+     * @param int      $thumbWidth       Thumbnail width in pixels
+     * @param int      $thumbHeight      Thumbnail height in pixels
+     * @param array    $mimeTypes        The list of allowed MIME types
      */
     public function addImageRelation(
         Schema $schema,
@@ -70,13 +71,15 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
         $options = [],
         $maxFileSize = 1,
         $thumbWidth = 32,
-        $thumbHeight = 32
+        $thumbHeight = 32,
+        array $mimeTypes = []
     ) {
         $entityTable = $schema->getTable($sourceTable);
 
         $options['attachment']['maxsize'] = $maxFileSize;
         $options['attachment']['width']   = $thumbWidth;
         $options['attachment']['height']  = $thumbHeight;
+        $options['attachment']['mimetypes']  = implode("\n", $mimeTypes);
 
         $this->extendExtension->addManyToOneRelation(
             $schema,

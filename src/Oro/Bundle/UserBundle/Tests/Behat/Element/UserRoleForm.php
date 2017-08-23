@@ -85,7 +85,7 @@ class UserRoleForm extends Form
      */
     protected function getEntityRow($entity)
     {
-        $entityTrs = $this->findAll('css', 'div[id^=grid-role-permission-grid] table.grid tbody tr');
+        $entityTrs = $this->findAll('css', 'div[id*=permission-grid].inner-permissions-grid table.grid tbody tr');
         self::assertNotCount(0, $entityTrs, 'Can\'t find table with permissions on the page');
 
         /** @var NodeElement $entityTr */

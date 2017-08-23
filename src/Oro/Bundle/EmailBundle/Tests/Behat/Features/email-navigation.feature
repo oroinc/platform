@@ -14,7 +14,7 @@ Feature: Email Navigation Items
     And fill "Email Form" with:
       | Body    | Body 1            |
       | Subject | Subject 1         |
-      | To      | ["Samantha Parker" <samantha@example.com>] |
+      | To      | John Doe          |
     And I click "Send"
 
   Scenario: Pin and Add to favorites Email pages

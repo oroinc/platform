@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Session;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
@@ -117,17 +118,9 @@ class ImportExportContext extends OroFeatureContext implements
             'import_template_'
         );
 
-        $cookies = $this->getSession()->getDriver()->getWebDriverSession()->getCookie()[0];
-        $cookie = new Cookie();
-        $cookie->setName($cookies['name']);
-        $cookie->setValue($cookies['value']);
-        $cookie->setDomain($cookies['domain']);
-
-        $jar = new ArrayCookieJar();
-        $jar->add($cookie);
-
+        $cookieJar = $this->getCookieJar($this->getSession());
         $client = new Client($this->getSession()->getCurrentUrl());
-        $client->addSubscriber(new CookiePlugin($jar));
+        $client->addSubscriber(new CookiePlugin($cookieJar));
         $request = $client->get($url, null, ['save_to' => $this->template]);
         $response = $request->send();
 
@@ -426,5 +419,21 @@ class ImportExportContext extends OroFeatureContext implements
     public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
     {
         $this->messageQueueIsolator = $messageQueueIsolator;
+    }
+
+    /**
+     * @param Session $session
+     *
+     * @return ArrayCookieJar
+     */
+    private function getCookieJar(Session $session)
+    {
+        $cookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookieJar = new ArrayCookieJar();
+        foreach ($cookies as $cookie) {
+            $cookieJar->add(new Cookie($cookie));
+        }
+
+        return $cookieJar;
     }
 }

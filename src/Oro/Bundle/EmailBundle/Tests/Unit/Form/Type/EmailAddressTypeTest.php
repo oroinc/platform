@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 
 class EmailAddressTypeTest extends TypeTestCase
@@ -48,7 +50,8 @@ class EmailAddressTypeTest extends TypeTestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -58,7 +61,7 @@ class EmailAddressTypeTest extends TypeTestCase
             );
 
         $type = new EmailAddressType(array());
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 
     public function testGetName()
