@@ -303,7 +303,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>[\d]+)$/
+     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>(?:|zero|one|two|\d+))$/
      * @Given /^there (?:|are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number, $gridName = null)
@@ -1242,6 +1242,23 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iShouldSeeFollowingRecordsInGrid(TableNode $table, $gridName = null)
     {
+        $errorMessage = <<<TEXT
+            ---
+            You can't use more then one column in this method
+            It just assert thet given strings are in the grig
+            Example: Then I should see following records in grid:
+                       | Alice1  |
+                       | Alice10 |
+            
+            Guess, you can use another method...
+            
+            And I should see following grid:
+                | First name | Last name | Primary Email     | Enabled | Status |
+                | John       | Doe       | admin@example.com | Enabled | Active |
+                
+TEXT;
+
+        self::assertCount(1, $table->getRow(0), $errorMessage);
         foreach ($table->getRows() as list($value)) {
             $this->iShouldSeeRecordInGrid($value, $gridName);
         }

@@ -124,11 +124,11 @@ class FallbackEntityNameProvider implements EntityNameProviderInterface
         $getterName = 'get' . Inflector::classify($fieldName);
 
         if (method_exists($entity, $getterName)) {
-            return $entity->$getterName();
+            return $entity->{$getterName}();
         }
 
-        if (property_exists($entity, $fieldName)) {
-            return $entity->$fieldName;
+        if (isset($entity->{$fieldName})) {
+            return $entity->{$fieldName};
         }
 
         return null;

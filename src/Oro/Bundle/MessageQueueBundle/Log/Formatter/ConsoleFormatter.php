@@ -4,6 +4,8 @@ namespace Oro\Bundle\MessageQueueBundle\Log\Formatter;
 
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter as BaseConsoleFormatter;
 
+use Oro\Component\MessageQueue\Client\Config;
+
 /**
  * Formats message queue consumer related log records for the console output
  * by coloring them depending on log level.
@@ -34,6 +36,7 @@ class ConsoleFormatter extends BaseConsoleFormatter
             $this->dataMap = [
                 'processor' => ['extra', 'processor'],
                 'extension' => ['extra', 'extension'],
+                'topic'     => ['extra', 'message_properties', Config::PARAMETER_TOPIC_NAME],
                 'message'   => ['extra', 'message_body'],
             ];
         }
