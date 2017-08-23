@@ -24,10 +24,7 @@ define(['underscore', 'asap'], function(_, asap) {
         },
 
         isDesktop: function() {
-            var elem = document.getElementsByTagName('body')[0];
-            return elem && (' ' + elem.className + ' ')
-                    .replace(/[\t\r\n\f]/g, ' ')
-                    .indexOf(' desktop-version ') !== -1;
+            return !this.isMobile();
         },
 
         trim: function(text) {
