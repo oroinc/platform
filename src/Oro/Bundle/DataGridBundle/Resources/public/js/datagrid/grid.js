@@ -942,6 +942,12 @@ define(function(require) {
             this.listenTo(mediator, 'datagrid:changeColumnParam:' + this.name, function(columnName, option, value) {
                 this.changeColumnParam(columnName, option, value);
             });
+
+            this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function () {
+                if (!this.refreshAction) {
+                    this._onDatagridRefresh();
+                }
+            });
         },
 
         /**
@@ -1168,6 +1174,12 @@ define(function(require) {
             }
 
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
+        },
+
+        _onDatagridRefresh: function() {
+            this.setAdditionalParameter('refresh', true);
+            this.collection.fetch({reset: true});
+            this.removeAdditionalParameter('refresh');
         },
 
         /**
