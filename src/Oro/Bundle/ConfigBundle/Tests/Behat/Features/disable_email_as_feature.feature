@@ -23,6 +23,8 @@ Feature: Disable Email system functionality
 
   Scenario: Administrator disables Emails
     When I go to System/Configuration
+    And I click "System configuration"
+    And I click "General setup"
     And click "Email Configuration"
     And I fill "System Config Form" with:
       | Enable User Emails | false |

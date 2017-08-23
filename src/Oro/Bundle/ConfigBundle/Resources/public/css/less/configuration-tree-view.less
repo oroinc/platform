@@ -1,0 +1,45 @@
+.system-configuration-container {
+  .content-with-sidebar--controls {
+    height: 37px;
+  }
+
+  .jstree-search-component {
+    margin-right: 50px;
+  }
+
+  .jstree-wrapper {
+    > div {
+      position: relative;
+    }
+
+    &__title {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    &__label {
+      display: none;
+    }
+  }
+
+  .jstree-actions {
+    &__handle {
+      height: 30px;
+    }
+  }
+
+  .jstree {
+    i {
+      &.jstree-icon {
+        display: none;
+      }
+      &.jstree-icon.jstree-ocl {
+        display: inline-block;
+      }
+      &[class^="fa-"], &[class*=" fa-"] {
+        display: inline-block;
+      }
+    }
+  }
+}

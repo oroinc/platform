@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
-use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
 
-class UserConfigurationFormProvider extends SystemConfigurationFormProvider
+class UserConfigurationFormProvider extends AbstractProvider
 {
     const USER_TREE_NAME  = 'user_configuration';
 
@@ -19,6 +19,14 @@ class UserConfigurationFormProvider extends SystemConfigurationFormProvider
     public function getTree()
     {
         return $this->getTreeData(self::USER_TREE_NAME, self::CORRECT_FIELDS_NESTING_LEVEL);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getJsTree()
+    {
+        return $this->getJsTreeData(self::USER_TREE_NAME, self::CORRECT_MENU_NESTING_LEVEL);
     }
 
     /**

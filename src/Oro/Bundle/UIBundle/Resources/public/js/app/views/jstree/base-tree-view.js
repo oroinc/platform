@@ -22,6 +22,25 @@ define(function(require) {
     BaseTreeView = BaseView.extend({
         autoRender: true,
 
+        optionNames: BaseView.prototype.optionNames.concat([
+            'onSelectRoute', 'onSelectRouteParameters', 'onRootSelectRoute'
+        ]),
+
+        /**
+         * @property {String}
+         */
+        onSelectRoute: '',
+
+        /**
+         * @property {Object}
+         */
+        onSelectRouteParameters: {},
+
+        /**
+         * @property {String}
+         */
+        onRootSelectRoute: '',
+
         events: {
             'input [data-name="search"]': 'onSearch',
             'change [data-action-type="checkAll"]': 'onCheckAllClick'
