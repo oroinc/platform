@@ -23,9 +23,7 @@ parameters:
 
     oro_security.acl.group_provider.chain.class:               Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
 
-    oro_security.owner.tree.class:                             Oro\Bundle\SecurityBundle\Owner\OwnerTree
     oro_security.owner.decision_maker.class:                   Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker
-    oro_security.owner.decision_maker.abstract.class:          Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker
 
     oro_security.type.oro_acl_access_level_selector.class:     Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType
     oro_security.type.oro_acl_label.class:                     Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType
@@ -83,21 +81,55 @@ parameters:
 
 services:
     oro_security.security_facade:
+        deprecated: The "%service_id%" service is deprecated since 2.3.
         class: %oro_security.security_facade.class%
         arguments:
-            - '@security.context'
-            - '@oro_security.acl.annotation_provider'
-            - '@oro_security.acl.object_identity_factory'
-            - '@oro_entity.orm.entity_class_resolver'
+            - '@security.authorization_checker'
+            - '@oro_security.request_authorization_checker'
+            - '@oro_security.class_authorization_checker'
+            - '@security.token_storage'
+
+    oro_security.request_authorization_checker:
+        class: Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_security.entity_class_resolver.link'
+            - '@oro_security.acl.annotation_provider.link'
+
+    oro_security.class_authorization_checker:
+        class: Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_security.acl.object_identity_factory.link'
+            - '@oro_security.acl.annotation_provider.link'
             - '@logger'
         tags:
             - { name: monolog.logger, channel: security }
 
+    oro_security.token_accessor:
+        class: Oro\Bundle\SecurityBundle\Authentication\TokenAccessor
+        arguments:
+            - '@security.token_storage'
+
+    oro_security.acl.object_identity_factory.link:
+        tags:
+            - { name: oro_service_link, service: oro_security.acl.object_identity_factory }
+
+    oro_security.acl.annotation_provider.link:
+        tags:
+            - { name: oro_service_link, service: oro_security.acl.annotation_provider }
+
+    oro_security.entity_class_resolver.link:
+        tags:
+            - { name: oro_service_link, service: oro_entity.orm.entity_class_resolver }
+
     security.context.link:
+        deprecated: The "%service_id%" service is deprecated since 2.3.
         tags:
             - { name: oro_service_link,  service: security.context }
 
     oro_security.security_facade.link:
+        deprecated: The "%service_id%" service is deprecated since 2.3.
         tags:
             - { name: oro_service_link,  service: oro_security.security_facade }
 
@@ -273,25 +305,15 @@ services:
     oro_security.acl.group_provider.chain:
         class: %oro_security.acl.group_provider.chain.class%
 
-    oro_security.owner.tree:
-        public: false
-        class: %oro_security.owner.tree.class%
-
-    oro_security.owner.decision_maker.abstract:
-        class: %oro_security.owner.decision_maker.abstract.class%
-        abstract: true
-        calls:
-            - [ setContainer, [ '@service_container' ] ]
-
     oro_security.owner.decision_maker:
         public: false
-        parent: oro_security.owner.decision_maker.abstract
         class: %oro_security.owner.decision_maker.class%
         arguments:
-            - '@oro_security.ownership_tree_provider'
+            - '@oro_security.ownership_tree_provider.chain'
             - '@oro_security.acl.object_id_accessor'
             - '@oro_security.owner.entity_owner_accessor'
-            - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_security.owner.metadata_provider.chain'
+            - '@oro_security.token_accessor'
         tags:
            - { name: oro_security.owner.ownership_decision_maker }
 
@@ -459,7 +481,7 @@ services:
     oro_security.listener.controller:
         class: %oro_security.listener.controller.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.class_authorization_checker'
             - '@logger'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -1 }
@@ -488,14 +510,16 @@ services:
         class: %oro_security.search.acl_helper.class%
         arguments:
             - '@oro_search.provider.search_mapping'
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
             - '@oro_security.orm.ownership_sql_walker_builder'
+            - '@oro_security.owner.metadata_provider.chain'
 
     oro_security.orm.ownership_sql_walker_builder:
         public: false
         class: %oro_security.orm.ownership_sql_walker_builder.class%
         arguments:
-            - '@oro_entity_config.link.security_context'
+            - '@security.authorization_checker'
+            - '@security.token_storage'
             - '@oro_security.acl.object_id_accessor'
             - '@oro_security.entity_security_metadata_provider'
             - '@oro_security.owner.metadata_provider.chain'
@@ -531,11 +555,6 @@ services:
         tags:
             - { name: oro_entity.database_checker }
 
-    # deprecated 1.8:2.1 use @oro_security.ownership_tree_provider.chain instead
-    oro_security.link.ownership_tree_provider:
-        tags:
-            - { name: oro_service_link,  service: oro_security.ownership_tree_provider }
-
     oro_security.ownership_tree_provider.cache:
         public: false
         parent: oro.cache.abstract
@@ -561,9 +580,8 @@ services:
     oro_security.ownership_tree_subscriber:
         class: %oro_security.ownership_tree_subscriber.class%
         arguments:
-            - '@oro_security.link.ownership_tree_provider'
+            - '@oro_security.ownership_tree_provider.chain'
         calls:
-            - ['setContainer', ['@service_container']]
             - ['addSupportedClass', [%oro_user.entity.class%, [owner, organization], [businessUnits, organizations]]]
             - ['addSupportedClass', [%oro_organization.business_unit.entity.class%, [owner, organization], [users]]]
             - ['addSupportedClass', [%oro_organization.organization.entity.class%]]
@@ -579,7 +597,7 @@ services:
     oro_security.authentication.listener.basic:
         class: %oro-security.authentication.listener.basic.class%
         arguments:
-            - '@security.context'
+            - '@security.token_storage'
             - '@security.authentication.manager'
             - null
             - null
@@ -622,7 +640,7 @@ services:
     oro_security.listener.api_listener:
           class: %oro_security.listener.api_listener.class%
           arguments:
-              - '@oro_security.security_facade'
+              - '@oro_security.request_authorization_checker'
               - '@oro_security.acl_helper'
           calls:
               - [setRequest, ["@?request="]]
@@ -656,7 +674,6 @@ services:
           class: %oro_security.listener.search_listener.class%
           arguments:
               - '@oro_security.owner.ownership_metadata_provider'
-              - '@oro_security.security_facade'
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
               - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: collectEntityMapEvent, priority: -100 }
@@ -708,7 +725,8 @@ services:
     oro_security.layout.data_provider.acl:
         class: Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@doctrine'
         tags:
             - { name: layout.data_provider, alias: acl }
@@ -716,16 +734,22 @@ services:
     oro_security.layout.data_provider.current_user:
         class: Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.token_accessor'
         tags:
             - { name: layout.data_provider, alias: current_user }
+
+    oro_security.form.field_acl_helper:
+        class: Oro\Bundle\SecurityBundle\Form\FieldAclHelper
+        public: false
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity.doctrine_helper'
 
     oro_security.form.extension.aclprotected_fields_type:
         class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
         arguments:
-            - '@oro_security.security_facade'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.provider.security'
+            - '@oro_security.form.field_acl_helper'
             - '@logger'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
@@ -772,7 +796,7 @@ services:
         decorates: 'sensio_framework_extra.converter.doctrine.orm'
         parent: 'sensio_framework_extra.converter.doctrine.orm'
         arguments:
-            - '@oro_security.security_facade'
+            - '@oro_security.request_authorization_checker'
 
     oro_security.acl.cache.doctrine_decorator:
         class: Oro\Bundle\SecurityBundle\Acl\Cache\AclCache
@@ -806,3 +830,16 @@ services:
         class: Oro\Bundle\SecurityBundle\Authentication\TokenSerializer
         arguments:
             - '@doctrine'
+
+    oro_security.generator.random_token:
+        class: 'Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator'
+        arguments:
+            - '@oro_security.encoder.mcrypt'
+
+    oro_security.form.data_transformer.factory.crypted_data:
+        class: 'Oro\Bundle\SecurityBundle\Form\DataTransformer\Factory\CryptedDataTransformerFactory'
+        arguments:
+            - '@oro_security.encoder.mcrypt'
+            - '@logger'
+        lazy: true
+        public: false

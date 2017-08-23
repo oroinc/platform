@@ -5,15 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class FixtureLoader implements SuiteAwareInterface
+class FixtureLoader
 {
     /**
      * @var AliceLoader
@@ -39,7 +37,6 @@ class FixtureLoader implements SuiteAwareInterface
      * @var EntitySupplement
      */
     protected $entitySupplement;
-
 
     /**
      * @param KernelInterface $kernel
@@ -192,27 +189,21 @@ class FixtureLoader implements SuiteAwareInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setSuite(Suite $suite)
-    {
-        $this->suite = $suite;
-    }
-
-    /**
      * @param string $filename
      * @return string Real path to file with fuxtures
      * @throws \InvalidArgumentException
      */
     public function findFile($filename)
     {
-        $suitePaths = $this->suite->getSetting('paths');
-
-        if (false !== strpos($filename, ':')) {
-            list($bundleName, $filename) = explode(':', $filename);
-            $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
-            $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
+        if (false === strpos($filename, ':')) {
+            throw new \InvalidArgumentException(
+                'Please define a bundle name for fixtures e.g. "BundleName:fixture.yml"'
+            );
         }
+
+        list($bundleName, $filename) = explode(':', $filename);
+        $bundlePath = $this->kernel->getBundle('!'.$bundleName)->getPath();
+        $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
 
         if (!$file = $this->findFileInPath($filename, $suitePaths)) {
             throw new \InvalidArgumentException(sprintf(
@@ -264,5 +255,14 @@ class FixtureLoader implements SuiteAwareInterface
                 $entityReference => $values
             ]
         ];
+    }
+
+    /**
+     * @param $name
+     * @param $instance
+     */
+    public function addReference($name, $instance)
+    {
+        $this->aliceLoader->getReferenceRepository()->set($name, $instance);
     }
 }

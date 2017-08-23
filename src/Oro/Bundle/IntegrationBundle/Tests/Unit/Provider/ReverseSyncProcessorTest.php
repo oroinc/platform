@@ -65,7 +65,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getConnectorType')
             ->will($this->returnValue($realConnector));
 
-        $processor = $this->getReverseSyncProcessor(['processExport']);
+        $processor = $this->getReverseSyncProcessor(['processExport', 'addConnectorStatusAndFlush']);
         $processor->process($this->integration, $connectors, $params);
     }
 
@@ -84,7 +84,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processorRegistry->expects($this->once())
             ->method('getProcessorAliasesByEntity')
             ->with(ProcessorRegistry::TYPE_EXPORT)
-            ->will($this->returnValue(array($expectedAlias)));
+            ->will($this->returnValue([$expectedAlias]));
 
         $realConnector = new TestConnector();
 
@@ -107,16 +107,16 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
                 'tstJobName',
                 [
                     'export' => [
-                        'entityName'    => 'testEntity',
-                        'channel'       => 'testChannel',
-                        'processorAlias'=> $expectedAlias,
-                        'testParameter' => 'testValue'
+                        'entityName'     => 'testEntity',
+                        'channel'        => 'testChannel',
+                        'processorAlias' => $expectedAlias,
+                        'testParameter'  => 'testValue'
                     ]
                 ]
             )
             ->will($this->returnValue($jobResult));
 
-        $processor = $this->getReverseSyncProcessor();
+        $processor = $this->getReverseSyncProcessor(['addConnectorStatusAndFlush']);
         $processor->process($this->integration, $connector, ['testParameter' => 'testValue']);
     }
 
@@ -129,9 +129,12 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getReverseSyncProcessor($mockedMethods = null)
     {
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+
         return $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor')
             ->setMethods($mockedMethods)
             ->setConstructorArgs([
+                $registry,
                 $this->processorRegistry,
                 $this->jobExecutor,
                 $this->registry,

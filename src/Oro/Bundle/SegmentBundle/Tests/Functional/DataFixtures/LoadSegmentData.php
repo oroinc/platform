@@ -3,23 +3,21 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 
-class LoadSegmentData extends AbstractFixture
+class LoadSegmentData extends AbstractLoadSegmentData
 {
     const SEGMENT_DYNAMIC = 'segment_dynamic';
     const SEGMENT_DYNAMIC_WITH_FILTER = 'segment_dynamic_with_filter';
     const SEGMENT_STATIC = 'segment_static';
     const SEGMENT_STATIC_WITH_FILTER_AND_SORTING = 'segment_static_with_filter_and_sorting';
+    const SEGMENT_STATIC_WITH_SEGMENT_FILTER = 'segment_static_with_segment_filter';
 
     /** @var array */
-    private static $segments = [
+    protected static $segments = [
         self::SEGMENT_DYNAMIC => [
             'name' => 'Dynamic Segment',
             'description' => 'Dynamic Segment Description',
@@ -58,7 +56,7 @@ class LoadSegmentData extends AbstractFixture
                             'filter' => 'string',
                             'data' => [
                                 'value' => 'Some not existing name',
-                                'type' => 1,
+                                'type' => TextFilterType::TYPE_CONTAINS,
                             ]
                         ]
                     ]
@@ -110,6 +108,35 @@ class LoadSegmentData extends AbstractFixture
                 ]
             ]
         ],
+        self::SEGMENT_STATIC_WITH_SEGMENT_FILTER => [
+            'name' => 'Static Segment with Segment Filter applied',
+            'description' => 'Static Segment Description',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_STATIC,
+            'definition' => [
+                'columns' => [
+                    [
+                        'func' => null,
+                        'label' => 'Label',
+                        'name' => 'name',
+                        'sorting' => 'DESC'
+                    ]
+                ],
+                'filters' =>[
+                    [
+                        'columnName' => 'id',
+                        'criteria' => 'condition-segment',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'value' => null, //Will be set to static segment id
+                                'type' => null,
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
     ];
 
     /**
@@ -117,26 +144,29 @@ class LoadSegmentData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-        $owner = $organization->getBusinessUnits()->first();
+        parent::load($manager);
 
-        foreach (self::$segments as $segmentReference => $data) {
-            $segmentType = $manager->getRepository(SegmentType::class)->find($data['type']);
+        $this->applySegmentFilterToDefinition($manager);
+    }
 
-            $entity = new Segment();
-            $entity->setName($data['name']);
-            $entity->setDescription($data['description']);
-            $entity->setEntity($data['entity']);
-            $entity->setOwner($owner);
-            $entity->setType($segmentType);
-            $entity->setOrganization($organization);
-            $entity->setDefinition(json_encode($data['definition']));
+    /**
+     * {@inheritdoc}
+     */
+    protected function getSegmentsData(): array
+    {
+        return self::$segments;
+    }
 
-            $this->setReference($segmentReference, $entity);
-
-            $manager->persist($entity);
-        }
-
+    /**
+     * @param ObjectManager $manager
+     */
+    private function applySegmentFilterToDefinition(ObjectManager $manager)
+    {
+        $staticSegment = $this->getReference(self::SEGMENT_STATIC);
+        $staticSegmentWithSegmentFilter = $this->getReference(self::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        $definition = self::$segments[self::SEGMENT_STATIC_WITH_SEGMENT_FILTER]['definition'];
+        $definition['filters'][0]['criterion']['data']['value'] = $staticSegment->getId();
+        $staticSegmentWithSegmentFilter->setDefinition(json_encode($definition));
         $manager->flush();
     }
 }

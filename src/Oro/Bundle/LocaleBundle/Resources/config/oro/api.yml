@@ -1,0 +1,12 @@
+api:
+    entities:
+        Oro\Bundle\LocaleBundle\Entity\Localization:
+            actions:
+                create: false
+                update: false
+                delete_list: false
+                delete: false
+        Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+            actions:
+                delete_list: false
+                delete: false

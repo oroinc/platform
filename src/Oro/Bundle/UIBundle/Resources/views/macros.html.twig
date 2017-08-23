@@ -98,7 +98,7 @@
         data - row data
 #}
 {% macro renderAttribute(title, data) %}
-    <div class="control-group">
+    <div class="control-group attribute-row">
         <label class="control-label">{{ title }}</label>
         <div class="controls">
             {{ data|raw }}
@@ -127,7 +127,7 @@
         fieldName - the name of field on wich Field ACL should be checked
 #}
 {% macro renderHtmlProperty(title, data, entity = null, fieldName = null) %}
-    {% if entity is defined and fieldName is defined and not resource_granted('VIEW', entity, fieldName) %}
+    {% if entity is defined and fieldName is defined and not is_granted('VIEW', entity, fieldName) %}
     {% else %}
         {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
     {% endif %}
@@ -141,25 +141,23 @@
         entity - the entitty instance on wich Field ACL should be checked
         fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName) %}
-    {% if resource_granted('VIEW', entity, fieldName) %}
+{% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
+    {% if is_granted('VIEW', entity, fieldName) %}
         {% set collapseView = {
-                component: 'oroui/js/app/components/jquery-widget-component',
-                widgetModule: 'oroui/js/widget/collapse-widget',
                 storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
                 uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
-                toggleClassesOnly: true,
+                animationSpeed: 0,
+                closeClass: 'overflows',
+                checkOverflow: true,
                 open: false
             } %}
-        <div class="collapse-block"
-             data-page-component-module="oroui/js/app/components/viewport-component"
-             data-page-component-options="{{ collapseView|json_encode }}">
+        <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
             {{ _self.renderAttribute(title,
                 '<div class="control-label" data-collapse-container>' ~
                     data|default('oro.ui.empty'|trans) ~
                 '</div>' ~
-                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ 'Show more'|trans ~ '</a>' ~
-                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ 'Show less'|trans ~ '</a>'
+                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ moreText|trans ~ '</a>' ~
+                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ lessText|trans ~ '</a>'
             ) }}
         </div>
     {% endif %}
@@ -927,10 +925,10 @@
         contentAttributes - additional attributes for block content
         useSubBlockDivider - indicates if 'row-fluid-divider' css class should be added to a row when there are more than one subblocks
 #}
-{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider) %}
+{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider, headerLinkContent = '') %}
     {% set cols = subblocks|length %}
     <div class="responsive-section">
-        <h4 class="scrollspy-title">{{ title }}</h4>
+        <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
             {% if isForm is defined and isForm == true %}
@@ -1007,10 +1005,10 @@
         {% endif %}
         <div data-spy="scroll" data-target="#{{ dataTarget }}" data-offset="1" class="scrollspy container-fluid scrollable-container{% if isForm %} form-container{% endif %}">
             {% for scrollBlock in dataBlocks %}
-                {{ _self.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true) }}
+                {{ _self.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true, scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null) }}
             {% endfor %}
             {% if data.hiddenData is defined or isForm %}
-                <div class="hide">
+                <div class="hide" data-skip-input-widgets>
                     {% if data.hiddenData is defined %}
                         {{ data.hiddenData|raw }}
                     {% endif %}
@@ -1076,7 +1074,7 @@
         {%- if entity %}
             {% set ownerType = oro_get_owner_type(entity) %}
             {%- if ownerType %}
-                {% if  resource_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
+                {% if  is_granted('VIEW', entity, oro_get_owner_field_name(entity)) %}
                     {% set owner = oro_get_entity_owner(entity) %}
                     {% if owner %}
                         {% if (ownerType == 'USER') %}
@@ -1096,7 +1094,7 @@
                                     )|trans
                                 }}:
                             {% endif %}
-                            {% if ownerPath is defined and resource_granted('VIEW', owner) %}
+                            {% if ownerPath is defined and is_granted('VIEW', owner) %}
                                 {{ _self.renderUrl(ownerPath, ownerName) }}
                             {% else %}
                                 {{ ownerName }}
@@ -1109,17 +1107,20 @@
     {% endspaceless %}
 {%- endmacro -%}
 
-{%- macro renderUrl(url, title, class) -%}
+{%- macro renderUrl(url, text, class, title) -%}
     {% spaceless %}
+        {% if text is empty %}
+            {% set text = url %}
+        {% endif %}
         {% if title is empty %}
-            {% set title = url %}
+            {% set title = text %}
         {% endif %}
         {% if class is empty %}
             {% set class = '' %}
         {% endif %}
         {% if url is not empty %}
             <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
-                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ title }}</a>
+                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ text }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -1192,7 +1193,7 @@
 
 {%- macro entityViewLink(entity, label, route, permission) -%}
     {% if entity %}
-        {% if route and resource_granted(permission|default('VIEW'), entity) %}
+        {% if route and is_granted(permission|default('VIEW'), entity) %}
             {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
         {% else %}
             {{ label|escape }}
@@ -1226,7 +1227,7 @@
         entityLabelIfNotGranted - Entity label that should be rendered in case if user have no access to see field value
 #}
 {%- macro renderEntityViewLabel(entity, fieldName, entityLabelIfNotGranted = null) -%}
-    {% if entity is not null and resource_granted('VIEW', entity, fieldName) %}
+    {% if entity is not null and is_granted('VIEW', entity, fieldName) %}
         {{ attribute(entity, fieldName) }}
     {% else %}
         {% if entityLabelIfNotGranted is not null %}
@@ -1241,12 +1242,7 @@
             view: 'oroui/js/app/views/jstree/base-tree-view'
         }
     } %}
-    <div class="jstree-wrapper collapse-view expanded"
-        data-page-component-module="oroui/js/app/components/jquery-widget-component"
-        data-page-component-options="{{ {
-            widgetModule: 'oroui/js/widget/collapse-widget'
-        }|json_encode() }}"
-        data-role="jstree-wrapper">
+    <div class="jstree-wrapper collapse-view expanded" data-role="jstree-wrapper">
         <div data-page-component-module="oroui/js/app/components/view-component"
              data-page-component-options="{{ defaultTreeData.treeOptions|merge(data.treeOptions)|json_encode }}">
             {% if data.label|default('') %}

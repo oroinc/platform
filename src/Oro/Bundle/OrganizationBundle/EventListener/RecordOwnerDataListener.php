@@ -4,32 +4,33 @@ namespace Oro\Bundle\OrganizationBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\DependencyInjection\ServiceLink;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class RecordOwnerDataListener
 {
-    /** @var ServiceLink */
-    protected $securityContextLink;
+    /** @var TokenAccessor*/
+    protected $tokenAccessor;
 
     /** @var ConfigProvider */
     protected $configProvider;
 
     /**
-     * @param ServiceLink    $securityContextLink
+     * @param TokenAccessor $tokenAccessor
      * @param ConfigProvider $configProvider
      */
-    public function __construct(ServiceLink $securityContextLink, ConfigProvider $configProvider)
+    public function __construct(TokenAccessor $tokenAccessor, ConfigProvider $configProvider)
     {
-        $this->securityContextLink = $securityContextLink;
-        $this->configProvider  = $configProvider;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -40,14 +41,11 @@ class RecordOwnerDataListener
      */
     public function prePersist(LifecycleEventArgs $args)
     {
-        $token = $this->getSecurityContext()->getToken();
-        if (!$token) {
+        if (!$this->tokenAccessor->hasUser()) {
             return;
         }
-        $user = $token->getUser();
-        if (!$user) {
-            return;
-        }
+
+        $token = $this->tokenAccessor->getToken();
         $entity    = $args->getEntity();
         $className = ClassUtils::getClass($entity);
         if ($this->configProvider->hasConfig($className)) {
@@ -85,15 +83,6 @@ class RecordOwnerDataListener
                 );
             }
         }
-    }
-
-
-    /**
-     * @return SecurityContextInterface
-     */
-    protected function getSecurityContext()
-    {
-        return $this->securityContextLink->getService();
     }
 
     /**

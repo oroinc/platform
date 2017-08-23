@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
@@ -20,7 +21,7 @@ use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailExtension extends \Twig_Extension
 {
@@ -78,11 +79,19 @@ class EmailExtension extends \Twig_Extension
     }
 
     /**
-     * @return SecurityFacade
+     * @return AuthorizationCheckerInterface
      */
-    protected function getSecurityFacade()
+    protected function getAuthorizationChecker()
     {
-        return $this->container->get('oro_security.security_facade');
+        return $this->container->get('security.authorization_checker');
+    }
+
+    /**
+     * @return TokenAccessorInterface
+     */
+    protected function getTokenAccessor()
+    {
+        return $this->container->get('oro_security.token_accessor');
     }
 
     /**
@@ -141,6 +150,7 @@ class EmailExtension extends \Twig_Extension
      *
      * @param EmailThread $thread
      * @return EmailRecipient[]
+     * @deprecated since 2.3. Use EmailGridResultHelper::addEmailRecipients instead
      */
     public function getEmailThreadRecipients($thread)
     {
@@ -224,14 +234,15 @@ class EmailExtension extends \Twig_Extension
      */
     public function getEmailClankEvent()
     {
-        $securityFacade = $this->getSecurityFacade();
-        if (!$securityFacade->hasLoggedUser()) {
+        $tokenAccessor = $this->getTokenAccessor();
+        $currentUser = $tokenAccessor->getUser();
+        if (null === $currentUser) {
             return '';
         }
 
         return WebSocketSendProcessor::getUserTopic(
-            $securityFacade->getLoggedUser(),
-            $securityFacade->getOrganization()
+            $currentUser,
+            $tokenAccessor->getOrganization()
         );
     }
 
@@ -242,13 +253,13 @@ class EmailExtension extends \Twig_Extension
      */
     public function getUnreadEmailsCount()
     {
-        $securityFacade = $this->getSecurityFacade();
-        if (!$securityFacade->hasLoggedUser() || !$securityFacade->isGranted('oro_email_email_user_view')) {
+        $tokenAccessor = $this->getTokenAccessor();
+        $currentUser = $tokenAccessor->getUser();
+        if (null === $currentUser || !$this->getAuthorizationChecker()->isGranted('oro_email_email_user_view')) {
             return [];
         }
 
-        $currentOrganization = $securityFacade->getOrganization();
-        $currentUser = $securityFacade->getLoggedUser();
+        $currentOrganization = $tokenAccessor->getOrganization();
         /** @var EmailRepository $repo */
         $repo = $this->getRepository('OroEmailBundle:Email');
         $result = $repo->getCountNewEmailsPerFolders($currentUser, $currentOrganization);

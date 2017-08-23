@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Search;
 
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 
 class AclHelperTest extends \PHPUnit_Framework_TestCase
@@ -13,11 +18,17 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mappingProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipConditionDataBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipDataBuilder;
+
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $ownershipMetadataProvider;
+
+    /** @var OwnershipMetadataInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $ownershipMetadata;
 
     /** @var array */
     protected $mappings = [
@@ -59,31 +70,38 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
-        $this->mappingProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Provider\SearchMappingProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mappingProvider = $this->createMock(SearchMappingProvider::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->ownershipDataBuilder = $this->createMock(OwnershipConditionDataBuilder::class);
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $this->ownershipMetadata = $this->createMock(OwnershipMetadataInterface::class);
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->ownershipMetadataProvider
+            ->expects($this->any())
+            ->method('getMetadata')
+            ->willReturn($this->ownershipMetadata);
 
-        $this->ownershipDataBuilder = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->aclHelper = new AclHelper($this->mappingProvider, $this->securityFacade, $this->ownershipDataBuilder);
+        $this->aclHelper = new AclHelper(
+            $this->mappingProvider,
+            $this->tokenAccessor,
+            $this->ownershipDataBuilder,
+            $this->ownershipMetadataProvider
+        );
     }
 
     /**
      * @dataProvider applyTestCases
      *
      * @param mixed  $from
+     * @param string $ownerColumnName
      * @param string $expectedQuery
      */
-    public function testApply($from, $expectedQuery)
+    public function testApply($from, $ownerColumnName, $expectedQuery)
     {
         $mappings = $this->mappings;
 
@@ -113,7 +131,7 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->securityFacade->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getOrganizationId')
             ->willReturn(1);
 
@@ -131,17 +149,23 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
+        $this->ownershipMetadata->expects($this->any())->method('getOwnerFieldName')->willReturn($ownerColumnName);
+
         $query = new Query();
         $query->from($from);
         $this->aclHelper->apply($query);
         $this->assertEquals($expectedQuery, $query->getStringQuery());
     }
 
+    /**
+     * @return array
+     */
     public function applyTestCases()
     {
         return [
             'select from *'             => [
                 '*',
+                'owner',
                 'from testProduct, testPrice, testOrderItem, testCategory, testOrder where '
                 . '((integer testProduct_owner >= 0 or integer testPrice_owner >= 0 or integer '
                 . 'testOrderItem_owner = 0 or integer testCategory_owner = 3 or integer testOrder_owner '
@@ -149,7 +173,8 @@ class AclHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'select with unknown alias' => [
                 ['testProduct', 'badAlias'],
-                'from testProduct where ((integer testProduct_owner >= 0) and integer organization in (1, 0))'
+                'owner2',
+                'from testProduct where ((integer testProduct_owner2 >= 0) and integer organization in (1, 0))'
             ]
         ];
     }

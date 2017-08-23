@@ -99,9 +99,9 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             'Oro\Bundle\OrderBundle\Entity\OrderShippingTracking',
             'Extend\Entity\EV_Quote_Customer_Status',
             'Extend\Entity\EV_Quote_Internal_Status',
-            'Oro\Bundle\ProductBundle\Entity\Product',
             'Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision',
             'Oro\Bundle\ProductBundle\Entity\ProductUnit',
+            'Oro\Bundle\ProductBundle\Entity\RelatedItem\RelatedProduct',
             'Extend\Entity\EV_Prod_Inventory_Status',
             'Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote',
             'Oro\Bundle\RFPBundle\Entity\RequestProductItem',
@@ -111,12 +111,20 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
             'Extend\Entity\EV_Rfp_Internal_Status',
             'Oro\Bundle\WarehouseBundle\Entity\Warehouse',
             'Oro\Bundle\WebsiteBundle\Entity\Website',
+            'Extend\Entity\EV_Variant_Field_Code',
+            'Oro\Bundle\ProductBundle\Entity\Brand',
+            'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily',
+            'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
+            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            'Oro\Bundle\TaxBundle\Entity\ProductTaxCode',
+            'Oro\Bundle\CatalogBundle\Entity\Category',
+            'Oro\Bundle\PricingBundle\Entity\PriceAttributePriceList',
         ];
 
         return
             in_array($entityClass, $temporarySkipEntities, true)
             || is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || ( // any entity from "Extend\Entity" namespace, except enums
+            || (// any entity from "Extend\Entity" namespace, except enums
                 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE)
                 && 0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
             );

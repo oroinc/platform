@@ -64,7 +64,8 @@ services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
+            - '@oro_security.token_accessor'
             - '@oro_entity_config.config_manager'
             - '@translator'
         tags:
@@ -332,6 +333,7 @@ services:
         public: false
         arguments:
             - '@doctrine'
+            - '@oro_entity_config.provider.extend'
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
 

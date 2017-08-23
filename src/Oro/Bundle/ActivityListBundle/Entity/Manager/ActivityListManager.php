@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
@@ -23,7 +24,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 
 /**
@@ -36,8 +36,8 @@ class ActivityListManager
      */
     const ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER = 3;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /** @var EntityNameResolver */
     protected $entityNameResolver;
@@ -67,7 +67,7 @@ class ActivityListManager
     protected $workflowHelper;
 
     /**
-     * @param SecurityFacade                   $securityFacade
+     * @param AuthorizationCheckerInterface    $authorizationChecker
      * @param EntityNameResolver               $entityNameResolver
      * @param ConfigManager                    $config
      * @param ActivityListChainProvider        $provider
@@ -81,7 +81,7 @@ class ActivityListManager
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        SecurityFacade $securityFacade,
+        AuthorizationCheckerInterface $authorizationChecker,
         EntityNameResolver $entityNameResolver,
         ConfigManager $config,
         ActivityListChainProvider $provider,
@@ -93,7 +93,7 @@ class ActivityListManager
         EventDispatcherInterface $eventDispatcher,
         WorkflowDataHelper $workflowHelper
     ) {
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
         $this->entityNameResolver = $entityNameResolver;
         $this->config = $config;
         $this->chainProvider = $provider;
@@ -132,7 +132,7 @@ class ActivityListManager
         if ($ids) {
             $qb->setParameters([]);
             $qb->resetDQLParts(['join', 'where']);
-            $qb->where($qb->expr()->in('activity.id', implode(',', $ids)));
+            $qb->where($qb->expr()->in('activity.id', ':activitiesIds'))->setParameter('activitiesIds', $ids);
             $qb->orderBy(
                 'activity.' . $this->config->get('oro_activity_list.sorting_field'),
                 $this->config->get('oro_activity_list.sorting_direction')
@@ -333,7 +333,7 @@ class ActivityListManager
         $owner     = $entity->getOwner();
         if ($owner) {
             $ownerName = $this->entityNameResolver->getName($owner);
-            if ($this->securityFacade->isGranted('VIEW', $owner)) {
+            if ($this->authorizationChecker->isGranted('VIEW', $owner)) {
                 $ownerId = $owner->getId();
             }
         }
@@ -343,7 +343,7 @@ class ActivityListManager
         $editor     = $entity->getEditor();
         if ($editor) {
             $editorName = $this->entityNameResolver->getName($editor);
-            if ($this->securityFacade->isGranted('VIEW', $editor)) {
+            if ($this->authorizationChecker->isGranted('VIEW', $editor)) {
                 $editorId = $editor->getId();
             }
         }
@@ -376,8 +376,8 @@ class ActivityListManager
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
             'updatedAt'            => $entity->getUpdatedAt()->format('c'),
-            'editable'             => $this->securityFacade->isGranted('EDIT', $activity),
-            'removable'            => $this->securityFacade->isGranted('DELETE', $activity),
+            'editable'             => $this->authorizationChecker->isGranted('EDIT', $activity),
+            'removable'            => $this->authorizationChecker->isGranted('DELETE', $activity),
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
             'workflowsData'        => $workflowsData,

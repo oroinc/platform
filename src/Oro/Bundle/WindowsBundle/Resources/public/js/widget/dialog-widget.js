@@ -75,7 +75,7 @@ define(function(require) {
             _.defaults(dialogOptions, {
                 title: options.title,
                 limitTo: '#container',
-                minWidth: 360,
+                minWidth: 320,
                 minHeight: 150
             });
             if (tools.isMobile()) {
@@ -418,6 +418,10 @@ define(function(require) {
          * Resets dialog position to default
          */
         resetDialogPosition: function() {
+            if (!this.widget) {
+                // widget is not initialized -- where's nothing to position yet
+                return;
+            }
             if (this.options.position) {
                 this.setPosition(_.extend(this.options.position, {
                     of: '#container',
@@ -461,10 +465,31 @@ define(function(require) {
             }
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
+
+            var initialDialogPosition = dialog.css('position');
+            var initialScrollTop = $(window).scrollTop();
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                $('html, body').scrollTop(0);
+                dialog.css({
+                    position: 'absolute'
+                });
+            }
+
             this.internalSetDialogPosition(position, leftShift, topShift);
             this.leftAndWidthAdjustments(dialog, containerEl);
             this.topAndHeightAdjustments(dialog, containerEl);
             this.widget.trigger('dialogreposition');
+
+            if (tools.isIOS() && initialDialogPosition === 'fixed') {
+                // Manipulating with position to fix stupid iOS bug,
+                // when orientation is changed
+                dialog.css({
+                    position: initialDialogPosition
+                });
+                $('html, body').scrollTop(initialScrollTop);
+            }
         },
 
         leftAndWidthAdjustments: function(dialog, containerEl) {
@@ -489,12 +514,20 @@ define(function(require) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
             } else {
-                dialog.css('width', this.options.dialogOptions.width);
+                if (!this.widgetIsResizable() && !this.options.dialogOptions.autoResize) {
+                    dialog.css('width', this.options.dialogOptions.width);
+                }
             }
         },
 
         topAndHeightAdjustments: function(dialog, containerEl) {
             // containerEl.offsetTop will only work if offsetParent is document.body
+
+            // Set auto height for dialog before calc
+            if (!this.widgetIsResizable()) {
+                dialog.css('height', 'auto');
+            }
+
             var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
             var height = parseFloat(dialog.css('height'));
             var minHeight = parseFloat(dialog.css('min-height'));
@@ -588,6 +621,9 @@ define(function(require) {
             this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
             });
+        },
+        widgetIsResizable: function() {
+            return this.options.dialogOptions.resizable;
         }
     });
 

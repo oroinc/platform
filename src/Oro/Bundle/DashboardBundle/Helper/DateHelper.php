@@ -173,32 +173,30 @@ class DateHelper
      * @param \DateTime    $end
      * @param QueryBuilder $qb
      * @param string       $entityField
-     * @param bool         $useCurrentTimeZone
      */
     public function addDatePartsSelect(
         \DateTime $start,
         \DateTime $end,
         QueryBuilder $qb,
-        $entityField,
-        $useCurrentTimeZone = true
+        $entityField
     ) {
         switch ($this->getFormatStrings($start, $end)['viewType']) {
             case 'year':
                 $qb->addSelect(sprintf(
                     '%s as yearCreated',
-                    $this->getEnforcedTimezoneFunction('YEAR', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('YEAR', $entityField)
                 ));
                 $qb->addGroupBy('yearCreated');
                 break;
             case 'month':
                 $qb->addSelect(sprintf(
                     '%s as yearCreated',
-                    $this->getEnforcedTimezoneFunction('YEAR', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('YEAR', $entityField)
                 ));
                 $qb->addSelect(
                     sprintf(
                         '%s as monthCreated',
-                        $this->getEnforcedTimezoneFunction('MONTH', $entityField, $useCurrentTimeZone)
+                        $this->getEnforcedTimezoneFunction('MONTH', $entityField)
                     )
                 );
                 $qb->addGroupBy('yearCreated');
@@ -207,11 +205,11 @@ class DateHelper
             case 'date':
                 $qb->addSelect(sprintf(
                     "%s as yearCreated",
-                    $this->getEnforcedTimezoneFunction('YEAR', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('YEAR', $entityField)
                 ));
                 $qb->addSelect(sprintf(
                     '%s as weekCreated',
-                    $this->getEnforcedTimezoneFunction('WEEK', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('WEEK', $entityField)
                 ));
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('weekCreated');
@@ -219,17 +217,17 @@ class DateHelper
             case 'day':
                 $qb->addSelect(sprintf(
                     "%s as yearCreated",
-                    $this->getEnforcedTimezoneFunction('YEAR', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('YEAR', $entityField)
                 ));
                 $qb->addSelect(
                     sprintf(
                         "%s as monthCreated",
-                        $this->getEnforcedTimezoneFunction('MONTH', $entityField, $useCurrentTimeZone)
+                        $this->getEnforcedTimezoneFunction('MONTH', $entityField)
                     )
                 );
                 $qb->addSelect(sprintf(
                     "%s as dayCreated",
-                    $this->getEnforcedTimezoneFunction('DAY', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('DAY', $entityField)
                 ));
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
@@ -238,11 +236,11 @@ class DateHelper
             case 'time':
                 $qb->addSelect(sprintf(
                     '%s as dateCreated',
-                    $this->getEnforcedTimezoneFunction('DATE', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('DATE', $entityField)
                 ));
                 $qb->addSelect(sprintf(
                     '%s as hourCreated',
-                    $this->getEnforcedTimezoneFunction('HOUR', $entityField, $useCurrentTimeZone)
+                    $this->getEnforcedTimezoneFunction('HOUR', $entityField)
                 ));
                 $qb->addGroupBy('dateCreated');
                 $qb->addGroupBy('hourCreated');
@@ -433,13 +431,12 @@ class DateHelper
      *
      * @param string $functionName
      * @param string $fieldName
-     * @param bool   $useCurrentTimeZone
      *
      * @return string
      */
-    protected function getEnforcedTimezoneFunction($functionName, $fieldName, $useCurrentTimeZone = true)
+    protected function getEnforcedTimezoneFunction($functionName, $fieldName)
     {
-        if ($useCurrentTimeZone && 'UTC' !== $this->localeSettings->getTimeZone()) {
+        if ('UTC' !== $this->localeSettings->getTimeZone()) {
             $fieldName = sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
         }
         $result = sprintf('%s(%s)', $functionName, $fieldName);

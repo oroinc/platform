@@ -115,6 +115,14 @@ class EmailNotification extends ExtendEmailNotification
     }
 
     /**
+     * @return bool
+     */
+    public function hasEntityName()
+    {
+        return !empty($this->entityName);
+    }
+
+    /**
      * Set event
      *
      * @param Event $event
@@ -168,7 +176,7 @@ class EmailNotification extends ExtendEmailNotification
      *
      * @return EmailNotification
      */
-    public function setRecipientList(RecipientList $recipientList)
+    public function setRecipientList(RecipientList $recipientList = null)
     {
         $this->recipientList = $recipientList;
 

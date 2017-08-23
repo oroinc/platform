@@ -9,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 class MainMenu extends Element
 {
     /** @var Element */
-    private $dropDown = null;
+    protected $dropDown = null;
 
     /**
      * @inheritdoc
@@ -44,8 +44,12 @@ class MainMenu extends Element
     public function hasLink($path)
     {
         try {
+            $items = explode('/', $path);
+            $linkLocator = trim(array_pop($items));
+
             $this->moveByMenuTree($path);
-            return true;
+
+            return null !== $this->findVisibleLink($linkLocator);
         } catch (\Exception $e) {
             return false;
         }
@@ -60,10 +64,7 @@ class MainMenu extends Element
             /** @var NodeElement $link */
             $link = $this->findVisibleLink($item);
             $link->mouseOver();
-            $this->dropDown = $this->elementFactory->wrapElement(
-                'MainMenuDropdown',
-                $link->getParent()->find('css', '.dropdown-menu')
-            );
+            $this->getDropDown($link);
         }
     }
 
@@ -89,5 +90,16 @@ class MainMenu extends Element
         self::assertNotNull($link, sprintf('Menu item "%s" not found', $title));
 
         return $link;
+    }
+
+    /**
+     * @param NodeElement $link
+     */
+    protected function getDropDown($link)
+    {
+        $this->dropDown = $this->elementFactory->wrapElement(
+            'MainMenuDropdown',
+            $link->getParent()->find('css', '.dropdown-menu')
+        );
     }
 }

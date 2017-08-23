@@ -20,7 +20,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     public function testExecute()
     {
         $typeNames = array_keys($this->factory->getTypes());
-        $result = $this->runCommand($this->getCommandName(), ['--no-ansi']);
+        $result = $this->runCommand($this->getCommandName());
         $this->assertContains('Short Description', $result);
         foreach ($typeNames as $name) {
             $this->assertContains($name, $result);
@@ -32,7 +32,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         $types = $this->factory->getTypes();
         $typeNames = array_keys($types);
         $name = array_shift($typeNames);
-        $result = $this->runCommand($this->getCommandName(), [$name, '--no-ansi']);
+        $result = $this->runCommand($this->getCommandName(), [$name]);
         $this->assertContains('Full Description', $result);
         $this->assertContains($name, $result);
         $this->assertContains(array_shift($types), $result);
@@ -41,9 +41,9 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     public function testExecuteWithNotExistsArgument()
     {
         $name = 'some_not_exists_name';
-        $result = $this->runCommand($this->getCommandName(), [$name, '--no-ansi']);
+        $result = $this->runCommand($this->getCommandName(), [$name]);
 
-        $this->assertEquals(sprintf('Type "%s" is not found', $name), trim($result));
+        $this->assertEquals(sprintf('Type "%s" is not found', $name), $result);
     }
 
     /**

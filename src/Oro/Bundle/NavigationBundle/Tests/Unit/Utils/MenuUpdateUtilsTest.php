@@ -112,6 +112,25 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedItem, $menu->getChild('item-2')->getChild('item-1-1-1-1'));
     }
+
+    public function testUpdateMenuItemWithOptions()
+    {
+        $menu = $this->getMenu();
+        $item = $menu->getChild('item-1');
+
+        $update = new MenuUpdateStub();
+        $update->setKey('new');
+        $update->setParentKey('item-1');
+        $update->setCustom(true);
+
+        /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
+        $localizationHelper = $this->createMock(LocalizationHelper::class);
+
+        $options = ['extras' => ['test' => 'test']];
+        MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper, $options);
+
+        $this->assertEquals(['test' => 'test'], $item->getChild('new')->getExtras());
+    }
     
     public function testFindMenuItem()
     {

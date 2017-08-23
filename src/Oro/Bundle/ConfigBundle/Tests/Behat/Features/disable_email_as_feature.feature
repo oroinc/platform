@@ -1,4 +1,5 @@
-@fixture-disable_emails_stuff.yml
+@regression
+@fixture-OroConfigBundle:disable_emails_stuff.yml
 Feature: Disable Email system functionality
   In order to lightweight the system
   As Administrator

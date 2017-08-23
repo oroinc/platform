@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Columns;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -14,8 +12,8 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 
 /**
@@ -32,11 +30,11 @@ class ColumnsExtension extends AbstractExtension
     const MINIFIED_COLUMNS_PARAM = 'c';
     const COLUMNS_PARAM          = '_columns';
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var AclHelper */
     protected $aclHelper;
@@ -48,21 +46,21 @@ class ColumnsExtension extends AbstractExtension
     protected $defaultGridView = false;
 
     /**
-     * @param Registry       $registry
-     * @param SecurityFacade $securityFacade
-     * @param AclHelper      $aclHelper
-     * @param ColumnsHelper  $columnsHelper
+     * @param ManagerRegistry        $registry
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param AclHelper              $aclHelper
+     * @param ColumnsHelper          $columnsHelper
      */
     public function __construct(
-        Registry $registry,
-        SecurityFacade $securityFacade,
+        ManagerRegistry $registry,
+        TokenAccessorInterface $tokenAccessor,
         AclHelper $aclHelper,
         ColumnsHelper $columnsHelper
     ) {
-        $this->registry       = $registry;
-        $this->securityFacade = $securityFacade;
-        $this->aclHelper      = $aclHelper;
-        $this->columnsHelper  = $columnsHelper;
+        $this->registry = $registry;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->aclHelper = $aclHelper;
+        $this->columnsHelper = $columnsHelper;
     }
 
     /**
@@ -96,8 +94,8 @@ class ColumnsExtension extends AbstractExtension
         /** Set default columns data to metadata */
         $this->setColumnsOrder($config, $data);
 
-        $currentUser = $this->getCurrentUser();
-        if (!$currentUser) {
+        $currentUser = $this->tokenAccessor->getUser();
+        if (null === $currentUser) {
             return;
         }
 
@@ -294,7 +292,8 @@ class ColumnsExtension extends AbstractExtension
     protected function getDefaultGridView($gridName)
     {
         if ($this->defaultGridView === false) {
-            if (!$currentUser = $this->getCurrentUser()) {
+            $currentUser = $this->tokenAccessor->getUser();
+            if (null === $currentUser) {
                 return null;
             }
 
@@ -404,19 +403,6 @@ class ColumnsExtension extends AbstractExtension
         }
 
         return $result;
-    }
-
-    /**
-     * @return UserInterface
-     */
-    protected function getCurrentUser()
-    {
-        $user = $this->securityFacade->getLoggedUser();
-        if ($user instanceof UserInterface) {
-            return $user;
-        }
-
-        return null;
     }
 
     /**

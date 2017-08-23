@@ -11,7 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Parameter;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 
@@ -24,22 +24,22 @@ class StaticSegmentManager
     protected $dynamicSegmentQB;
 
     /**
-     * @var OwnershipMetadataProvider
+     * @var OwnershipMetadataProviderInterface
      */
     protected $ownershipMetadataProvider;
 
     /**
-     * @param EntityManager              $em
-     * @param DynamicSegmentQueryBuilder $dynamicSegmentQB
-     * @param OwnershipMetadataProvider  $ownershipMetadataProvider
+     * @param EntityManager                       $em
+     * @param DynamicSegmentQueryBuilder          $dynamicSegmentQB
+     * @param OwnershipMetadataProviderInterface  $ownershipMetadataProvider
      */
     public function __construct(
         EntityManager $em,
         DynamicSegmentQueryBuilder $dynamicSegmentQB,
-        OwnershipMetadataProvider $ownershipMetadataProvider
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider
     ) {
-        $this->em                        = $em;
-        $this->dynamicSegmentQB          = $dynamicSegmentQB;
+        $this->em = $em;
+        $this->dynamicSegmentQB = $dynamicSegmentQB;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
@@ -106,8 +106,14 @@ class StaticSegmentManager
             $values = [];
             $types = [];
             foreach ($originalQuery->getParameters() as $parameter) {
-                $values[] = $parameter->getValue();
-                $types[]  = $parameter->getType() == Type::TARRAY ? Connection::PARAM_STR_ARRAY : $parameter->getType();
+                /* @var $parameter Parameter */
+                $value = $parameter->getValue();
+                $type  = $parameter->getType() == Type::TARRAY ? Connection::PARAM_STR_ARRAY : $parameter->getType();
+                if (\PDO::PARAM_STR === $type && $value instanceof Segment) {
+                    $value = $value->getId();
+                }
+                $values[] = $value;
+                $types[]  = $type;
             }
 
             $this->em->getConnection()->executeQuery($dbQuery, $values, $types);
@@ -191,7 +197,7 @@ class StaticSegmentManager
     {
         $organizationField = $this->ownershipMetadataProvider
             ->getMetadata($segment->getEntity())
-            ->getGlobalOwnerFieldName();
+            ->getOrganizationFieldName();
         if ($organizationField) {
             $qb->andWhere(
                 sprintf(

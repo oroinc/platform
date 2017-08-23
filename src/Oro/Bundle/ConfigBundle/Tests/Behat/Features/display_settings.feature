@@ -1,8 +1,8 @@
 @ticket-BAP-14053
 @automatically-ticket-tagged
-@fixture-cases.yml
-@fixture-custom_report.yml
-@fixture-activities.yml
+@fixture-OroConfigBundle:cases.yml
+@fixture-OroConfigBundle:custom_report.yml
+@fixture-OroConfigBundle:activities.yml
 Feature: Display settings manage
   In order to control system display behavior
   As Administrator
@@ -19,15 +19,20 @@ Feature: Display settings manage
     Then I should not see an "Recent Emails" element
 
   Scenario: Disable WYSIWYG editor
+    Given I go to System/Configuration
+    And click "Display settings"
+    And I fill "System Config Form" with:
+      | Enable WYSIWYG editor | true |
+    And save form
     When I go to Activities/Calendar Events
     And press "Create Calendar event"
     Then I should see an "WYSIWYG editor" element
-    When I go to System/Configuration
+    But I go to System/Configuration
     And click "Display settings"
     And I fill "System Config Form" with:
       | Enable WYSIWYG editor | false |
     And save form
-    And I go to Activities/Cases
+    When I go to Activities/Cases
     And press "Create Case"
     Then I should not see an "WYSIWYG editor" element
 

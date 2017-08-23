@@ -80,11 +80,11 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         $body = JSON::decode($message->getBody());
 
         if (! isset($body['jobId'], $body['jobName'], $body['exportType'], $body['outputFormat'], $body['email'])) {
-            $this->logger->critical('[PostExportMessageProcessor] Invalid message', ['message' => $body]);
+            $this->logger->critical('Invalid message');
         }
 
         if (! ($job = $this->jobStorage->findJobById($body['jobId']))) {
-            $this->logger->critical('[PostExportMessageProcessor] Job not found', ['message' => $body]);
+            $this->logger->critical('Job not found');
 
             return self::REJECT;
         }
@@ -110,7 +110,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
         $this->sendNotification($body['email'], $summary);
 
-        $this->logger->info('[PostExportMessageProcessor] Sent notification email.', ['message' => $body]);
+        $this->logger->info('Sent notification email.');
 
         return self::ACK;
     }

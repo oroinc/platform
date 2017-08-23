@@ -1,17 +1,30 @@
 oro_behat_extension:
+  suites:
+    OroEmailBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - OroNavigationBundle::FeatureContext
+        - OroEmailBundle::FeatureContext
+        - OroEmailBundle::EmailFeatureToggleContext
+        - OroFormBundle::FormContext
+        - OroUserBundle::FeatureContext
+      paths:
+        - '@OroEmailBundle/Tests/Behat/Features'
   elements:
-    EmailForm:
-      selector: "form[id^='oro_email_email']"
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
-
-    EmailFormView:
+    Email Form:
       selector: "form[id^='oro_email_email']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
-          To: "div[id^='s2id_oro_email_email'] > ul > li.select2-search-choice > div"
-          From: "div[id^='s2id_oro_email_email_from'] > a > span.select2-chosen"
-          Subject: "input[id^='oro_email_email_subject']"
+          ToField:
+            type: 'xpath'
+            locator: '//input[contains(@id, "oro_email_email_to")]'
+            element: Select2Choices
+          From:
+            type: 'named'
+            locator: ['field', 'From']
+            element: Select2Offscreen
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'
@@ -32,6 +45,9 @@ oro_behat_extension:
     ReadUnreadIcon:
       selector: 'i.fa-envelope'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    RemoveEmail:
+      selector: '.select2-search-choice-close'
 
   pages:
     User Emails:

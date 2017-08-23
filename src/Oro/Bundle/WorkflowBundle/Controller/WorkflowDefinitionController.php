@@ -85,7 +85,7 @@ class WorkflowDefinitionController extends Controller
      */
     public function updateAction(WorkflowDefinition $workflowDefinition)
     {
-        if ($workflowDefinition->isSystem()) {
+        if ($workflowDefinition->isSystem() || !$this->isEditable($workflowDefinition)) {
             throw new AccessDeniedException('System workflow definitions are not editable');
         }
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
@@ -138,28 +138,29 @@ class WorkflowDefinitionController extends Controller
             throw new AccessDeniedException();
         }
 
-        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
-        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $form = $this->createForm(WorkflowVariablesType::NAME, null, [
-            'workflow' => $workflow,
-        ]);
+        $form = $this->createForm(WorkflowVariablesType::NAME, null, ['workflow' => $workflow]);
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
-                $translator = $this->get('translator');
                 $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
-                $this->addFlash('success', $translator->trans('oro.workflow.variable.save.success_message'));
+
+                $this->addFlash(
+                    'success',
+                    $this->get('translator')->trans('oro.workflow.variable.save.success_message')
+                );
 
                 return $this->get('oro_ui.router')->redirect($workflowDefinition);
             }
         }
 
+        $translateLinksProvider = $this->getTranslationsDatagridLinksProvider();
+
         return [
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
-            'translateLinks' => $translateLinks,
+            'translateLinks' => $translateLinksProvider->getWorkflowTranslateLinks($workflowDefinition),
         ];
     }
 
@@ -185,7 +186,19 @@ class WorkflowDefinitionController extends Controller
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'translateLinks' => $translateLinks,
             'variables' => $workflow->getVariables(true),
+            'edit_allowed' => $this->isEditable($workflowDefinition)
         ];
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return bool
+     */
+    protected function isEditable(WorkflowDefinition $workflowDefinition)
+    {
+        $checker = $this->get('oro_workflow.configuration.checker');
+
+        return $checker->isClean($workflowDefinition->getConfiguration());
     }
 
     /**

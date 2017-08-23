@@ -21,6 +21,7 @@ services:
             - { name: oro_service_link, service: oro_entity_config.config_manager }
 
     oro_entity_config.link.security_context:
+        deprecated: The "%service_id%" service is deprecated since 2.3.
         tags:
             - { name: oro_service_link, service: security.context }
 
@@ -295,8 +296,8 @@ services:
         arguments:
             - '@translator'
 
-    oro_entity_config.attribute_group_rendrer_registry:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry'
+    oro_entity_config.attribute_render_registry:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry'
 
     oro_entity_config.form.extension.dynamic_attributes:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\DynamicAttributesExtension
@@ -324,7 +325,7 @@ services:
     oro_entity_config.datagrid.attribute_family_actions_configuration:
         class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
         arguments:
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - '@doctrine.orm.entity_manager'
 
     oro_entity_config.manager.attribute_family_manager:
@@ -365,6 +366,7 @@ services:
             - [addBlockType, ['image', 'attribute_image']]
             - [addBlockType, ['boolean', 'attribute_boolean']]
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
+            - [addBlockType, ['html_escaped', 'attribute_html_escaped']]
             - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localized_fallback']]
 
     oro_entity_config.layout.data_provider.attribute_config_provider:
@@ -416,6 +418,6 @@ services:
     oro_entity_config.event_listener.attribute_after_remove_field:
         class: Oro\Bundle\EntityConfigBundle\EventListener\AfterRemoveFieldListener
         arguments:
-          - '@oro_entity.doctrine_helper'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.field.after_remove, method: onAfterRemove }

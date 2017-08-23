@@ -8,6 +8,8 @@ abstract class AbstractCondition extends AbstractExpression
 {
     /**
      * {@inheritdoc}
+     *
+     * @return boolean
      */
     protected function doEvaluate($context)
     {

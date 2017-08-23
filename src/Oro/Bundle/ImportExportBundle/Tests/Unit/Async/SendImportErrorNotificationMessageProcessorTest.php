@@ -192,7 +192,6 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
 
     public function testShouldProcessAndReturnAckWithNotifyEmail()
     {
-
         $logger = $this->createLoggerInterfaceMock();
         $logger
             ->expects($this->once())

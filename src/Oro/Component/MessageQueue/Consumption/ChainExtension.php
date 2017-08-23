@@ -1,11 +1,10 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
-class ChainExtension extends AbstractExtension
+class ChainExtension implements ExtensionInterface
 {
-    /**
-     * @var ExtensionInterface[]
-     */
+    /** @var ExtensionInterface[] */
     private $extensions;
 
     /**
@@ -17,7 +16,7 @@ class ChainExtension extends AbstractExtension
     }
 
     /**
-     * @param Context $context
+     * {@inheritdoc}
      */
     public function onStart(Context $context)
     {
@@ -27,7 +26,7 @@ class ChainExtension extends AbstractExtension
     }
 
     /**
-     * @param Context $context
+     * {@inheritdoc}
      */
     public function onBeforeReceive(Context $context)
     {
@@ -37,7 +36,7 @@ class ChainExtension extends AbstractExtension
     }
 
     /**
-     * @param Context $context
+     * {@inheritdoc}
      */
     public function onPreReceived(Context $context)
     {
@@ -47,7 +46,7 @@ class ChainExtension extends AbstractExtension
     }
 
     /**
-     * @param Context $context
+     * {@inheritdoc}
      */
     public function onPostReceived(Context $context)
     {
@@ -57,7 +56,7 @@ class ChainExtension extends AbstractExtension
     }
 
     /**
-     * @param Context $context
+     * {@inheritdoc}
      */
     public function onIdle(Context $context)
     {
@@ -67,7 +66,7 @@ class ChainExtension extends AbstractExtension
     }
 
     /**
-     * @param Context $context
+     * {@inheritdoc}
      */
     public function onInterrupted(Context $context)
     {

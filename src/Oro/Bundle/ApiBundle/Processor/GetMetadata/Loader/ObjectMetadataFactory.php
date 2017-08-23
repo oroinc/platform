@@ -134,33 +134,51 @@ class ObjectMetadataFactory
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setCollapsed($field->isCollapsed());
 
+        $completed = false;
+
         $dataType = $field->getDataType();
         if (!$dataType) {
-            $this->setAssociationDataType($associationMetadata, $field);
-            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
-            $associationMetadata->addAcceptableTargetClassName($targetClass);
+            $dataType = $this->getAssociationDataType($field);
         } elseif (DataType::isExtendedAssociation($dataType)) {
-            list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
-            $this->setAssociationDataType($associationMetadata, $field);
-            $associationMetadata->setAssociationType($associationType);
-            $targets = $this->getExtendedAssociationTargets(
-                $this->getAssociationOwnerClass($entityClass, $config, $field),
-                $associationType,
-                $associationKind
-            );
-            if (empty($targets)) {
-                $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
-            } else {
-                $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
-            }
-            $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
-        } else {
+            $this->completeExtendedAssociationMetadata($associationMetadata, $entityClass, $config, $field);
+            $completed = true;
+        }
+
+        if (!$completed) {
             $associationMetadata->setDataType($dataType);
             $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
             $associationMetadata->addAcceptableTargetClassName($targetClass);
         }
 
         return $associationMetadata;
+    }
+
+    /**
+     * @param AssociationMetadata         $associationMetadata
+     * @param string                      $entityClass
+     * @param EntityDefinitionConfig      $config
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function completeExtendedAssociationMetadata(
+        AssociationMetadata $associationMetadata,
+        $entityClass,
+        EntityDefinitionConfig $config,
+        EntityDefinitionFieldConfig $field
+    ) {
+        list($associationType, $associationKind) = DataType::parseExtendedAssociation($field->getDataType());
+        $this->setAssociationDataType($associationMetadata, $field);
+        $associationMetadata->setAssociationType($associationType);
+        $targets = $this->getExtendedAssociationTargets(
+            $this->getAssociationOwnerClass($entityClass, $config, $field),
+            $associationType,
+            $associationKind
+        );
+        if (empty($targets)) {
+            $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
+        } else {
+            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
+        }
+        $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
     }
 
     /**
@@ -218,13 +236,13 @@ class ObjectMetadataFactory
     }
 
     /**
-     * @param AssociationMetadata         $associationMetadata
      * @param EntityDefinitionFieldConfig $field
+     *
+     * @return string|null
      */
-    protected function setAssociationDataType(
-        AssociationMetadata $associationMetadata,
-        EntityDefinitionFieldConfig $field
-    ) {
+    protected function getAssociationDataType(EntityDefinitionFieldConfig $field)
+    {
+        $associationDataType = null;
         $targetEntity = $field->getTargetEntity();
         if ($targetEntity) {
             $associationDataType = DataType::STRING;
@@ -235,6 +253,21 @@ class ObjectMetadataFactory
                     $associationDataType = $targetIdField->getDataType();
                 }
             }
+        }
+
+        return $associationDataType;
+    }
+
+    /**
+     * @param AssociationMetadata         $associationMetadata
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function setAssociationDataType(
+        AssociationMetadata $associationMetadata,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $associationDataType = $this->getAssociationDataType($field);
+        if ($associationDataType) {
             $associationMetadata->setDataType($associationDataType);
         }
     }

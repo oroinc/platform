@@ -44,6 +44,6 @@ class JobControllerTest extends WebTestCase
      */
     private function getEntityManager()
     {
-        return $this->getContainer()->get('doctrine.orm.message_queue_job_entity_manager');
+        return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
     }
 }

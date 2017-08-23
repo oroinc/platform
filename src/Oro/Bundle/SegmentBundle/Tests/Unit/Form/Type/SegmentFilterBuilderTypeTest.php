@@ -6,16 +6,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 {
@@ -49,6 +53,20 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         );
     }
 
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [],
+                []
+            ),
+            $this->getValidatorExtension(false),
+        ];
+    }
+
     public function testConfigureOptionsNonManageableEntityClass()
     {
         $entityClass = '\stdClass';
@@ -64,9 +82,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'segment_entity' => $entityClass
         ];
 
-        $resolver = new OptionsResolver();
-        $this->formType->configureOptions($resolver);
-        $resolver->resolve($options);
+        $this->factory->create($this->formType, null, $options);
     }
 
     /**
@@ -84,9 +100,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             ->willReturn($em);
         $this->expectException(InvalidOptionsException::class);
 
-        $resolver = new OptionsResolver();
-        $this->formType->configureOptions($resolver);
-        $resolver->resolve($options);
+        $this->factory->create($this->formType, null, $options);
     }
 
     /**
@@ -126,14 +140,18 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
      * @param array $options
      * @param array $expected
      */
-    public function testConfigureOptionsDefaultsAndAutoFill($options, $expected)
+    public function testConfigureOptionsDefaultsAndAutoFill(array $options, array $expected)
     {
         $this->assertNormalizersCalls('\stdClass');
 
-        $resolver = new OptionsResolver();
-        $this->formType->configureOptions($resolver);
+        $form = $this->factory->create($this->formType, null, $options);
 
-        $this->assertEquals($expected, $resolver->resolve($options));
+        $actualOptions = $form->getConfig()->getOptions();
+
+        $this->assertArraySubset($expected, $actualOptions);
+        $this->assertArrayHasKey('constraints', $actualOptions);
+        $this->assertNotEmpty($actualOptions['constraints']);
+        $this->assertContains(new NotBlankFilters(), $actualOptions['constraints'], '', false, false);
     }
 
     /**
@@ -153,7 +171,8 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                     'segment_columns' => ['id'],
                     'segment_name_template' => 'Auto generated segment %s',
                     'add_name_field' => false,
-                    'name_field_required' => false
+                    'name_field_required' => false,
+                    'attr' => ['data-role' => 'query-designer-container']
                 ]
             ],
             'name_field_required' => [
@@ -169,9 +188,22 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                     'segment_columns' => ['id'],
                     'segment_name_template' => 'Auto generated segment %s',
                     'add_name_field' => true,
-                    'name_field_required' => true
+                    'name_field_required' => true,
+                    'attr' => ['data-role' => 'query-designer-container']
                 ]
             ],
+            'add NotBlankFilters constraint if required option is true' => [
+                'options' => [
+                    'required' => true,
+                    'segment_entity' => '\stdClass',
+                    'constraints' => new Valid()
+                ],
+                'expected' => [
+                    'required' => true,
+                    'segment_entity' => '\stdClass',
+                    'constraints' => [new Valid(), new NotBlankFilters()]
+                ]
+            ]
         ];
     }
 
@@ -389,6 +421,66 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                 'generated segment name' => 'Segment custom name'
             ],
         ];
+    }
+
+    public function testSubmitExistingWhenNoNameField()
+    {
+        $entityClass = '\stdClass';
+        $options = [
+            'segment_entity' => $entityClass,
+            'segment_columns' => ['id'],
+            'add_name_field' => false
+        ];
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManagerForClass')
+            ->with($entityClass, false)
+            ->willReturn($em);
+
+        $existingName = 'Some name';
+        /** @var Segment $existingEntity */
+        $existingEntity = $this->getEntity(Segment::class, ['id' => 2, 'name' => $existingName]);
+
+        $form = $this->factory->create($this->formType, $existingEntity, $options);
+
+        $form->submit([]);
+        $this->assertEquals($existingName, $existingEntity->getName());
+    }
+
+    public function testEventListenersOptions()
+    {
+        $isCalled = false;
+        $entityClass = '\stdClass';
+        $options = [
+            'segment_entity' => $entityClass,
+            'segment_columns' => ['id'],
+            'add_name_field' => true,
+            'field_event_listeners' => [
+                'definition' => [
+                    FormEvents::PRE_SET_DATA => function (FormEvent $event) use (&$isCalled) {
+                        $isCalled = true;
+                    }
+                ]
+            ]
+        ];
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManagerForClass')
+            ->with($entityClass, false)
+            ->willReturn($em);
+
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityReference');
+        $this->tokenStorage->expects($this->never())
+            ->method('getToken');
+
+        $existingEntity = $this->getEntity(Segment::class, ['id' => 2]);
+
+        $this->factory->create($this->formType, $existingEntity, $options);
+
+        $this->assertTrue($isCalled);
     }
 
     /**

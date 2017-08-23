@@ -25,8 +25,9 @@ class DriverMock implements \Doctrine\DBAL\Driver
      * @override
      */
     // @codingStandardsIgnoreStart
-    protected function _constructPdoDsn(array $params) {
-    // @codingStandardsIgnoreEnd
+    protected function _constructPdoDsn(array $params)
+    {
+        // @codingStandardsIgnoreEnd
         return "";
     }
 

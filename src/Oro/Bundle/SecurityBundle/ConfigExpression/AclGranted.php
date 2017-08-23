@@ -5,13 +5,14 @@ namespace Oro\Bundle\SecurityBundle\ConfigExpression;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
-
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 /**
  * Checks whether an access to a resource is granted.
@@ -20,8 +21,11 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
 {
     use ContextAccessorAwareTrait;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -33,13 +37,18 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
     protected $object;
 
     /**
-     * @param SecurityFacade  $securityFacade
-     * @param ManagerRegistry $doctrine
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
+     * @param ManagerRegistry               $doctrine
      */
-    public function __construct(SecurityFacade $securityFacade, ManagerRegistry $doctrine)
-    {
-        $this->securityFacade = $securityFacade;
-        $this->doctrine       = $doctrine;
+    public function __construct(
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenAccessorInterface $tokenAccessor,
+        ManagerRegistry $doctrine
+    ) {
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -84,7 +93,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
      * @acl: ['contact_view']
      * @acl: ['EDIT', 'Acme\DemoBundle\Entity\Contact']
      *
-     * {@see Oro\Bundle\SecurityBundle\SecurityFacade::isGranted} for details.
+     * {@see Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker::isGranted} for details.
      */
     public function initialize(array $options)
     {
@@ -114,7 +123,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
      */
     protected function isConditionAllowed($context)
     {
-        if (!$this->securityFacade->hasLoggedUser()) {
+        if (!$this->tokenAccessor->getToken()) {
             return false;
         }
         $attributes = $this->resolveValue($context, $this->attributes);
@@ -131,6 +140,6 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
             }
         }
 
-        return $this->securityFacade->isGranted($attributes, $object);
+        return $this->authorizationChecker->isGranted($attributes, $object);
     }
 }

@@ -101,6 +101,8 @@ class XlsxFileReader extends AbstractFileReader
             $context->incrementReadOffset();
             $context->incrementReadCount();
             $this->rowIterator->next();
+        } else {
+            $this->header = null;
         }
 
         return $data;
@@ -134,6 +136,7 @@ class XlsxFileReader extends AbstractFileReader
             $filePath = $this->fileInfo->getPathname();
         }
 
+        $this->header = null;
         $excelObj = $this->phpExcel->createPHPExcelObject($filePath);
         $sheet = $excelObj->getActiveSheet();
         $this->rowIterator = $sheet->getRowIterator();

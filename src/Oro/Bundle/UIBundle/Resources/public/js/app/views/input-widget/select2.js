@@ -16,7 +16,7 @@ define(function(require) {
             containerCssClass: 'oro-select2',
             dropdownCssClass: 'oro-select2__dropdown',
             placeholder: __('Please select'),
-            dropdownAutoWidth: true,
+            dropdownAutoWidth: !tools.isMobile(),
             minimumInputLength: 0,
             minimumResultsForSearch: 7,
             adaptContainerCssClass: function(className) {
@@ -26,6 +26,10 @@ define(function(require) {
                 }
                 return className.indexOf(containerCssClass) === 0;
             }
+        },
+
+        events: {
+            'select2-opening': 'disableKeyboard'
         },
 
         widgetFunctionName: 'select2',
@@ -41,7 +45,6 @@ define(function(require) {
                 var data = this.$el.data(this.widgetFunctionName);
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
-                this.disableKeyboard();
             }
         },
 
@@ -113,7 +116,7 @@ define(function(require) {
             var optionsLength = select.find('option').length;
 
             if (tools.isMobile() && (isSearchHidden || optionsLength < minimumResultsForSearch)) {
-                selectContainer.find('input').hide();
+                selectContainer.find('.select2-search, .select2-focusser').hide();
             }
         }
     });

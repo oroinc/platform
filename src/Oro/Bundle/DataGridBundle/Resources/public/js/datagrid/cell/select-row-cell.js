@@ -1,26 +1,31 @@
-define([
-    'jquery',
-    'backbone',
-    'backgrid'
-], function($, Backbone, Backgrid) {
+define(function(require) {
     'use strict';
 
     var SelectRowCell;
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var Backgrid = require('backgrid');
+    var template = require('tpl!orodatagrid/templates/datagrid/select-row-cell.html');
 
     /**
      * Renders a checkbox for row selection.
      *
      * @export  oro/datagrid/cell/select-row-cell
      * @class   oro.datagrid.cell.SelectRowCell
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    SelectRowCell = Backbone.View.extend({
-
+    SelectRowCell = BaseView.extend({
         /** @property */
         className: 'select-row-cell renderable',
 
         /** @property */
         tagName: 'td',
+
+        /** @property */
+        template: template,
+
+        /** @property */
+        checkboxSelector: '[data-role="select-row-cell"]',
 
         /** @property */
         events: {
@@ -41,6 +46,8 @@ define([
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
+
+            this.template = this.getTemplateFunction();
 
             this.listenTo(this.model, 'backgrid:select', function(model, checked) {
                 this.$(':checkbox').prop('checked', checked).change();
@@ -65,7 +72,7 @@ define([
          * @param e
          */
         updateCheckbox: function(e) {
-            if (this.$checkbox[0] !== e.target) {
+            if (this.$checkbox.get(0) !== e.target && !$(e.target).closest('label').length) {
                 this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).change();
             }
             e.stopPropagation();
@@ -87,10 +94,10 @@ define([
             // work around with trigger event to get current state of model (selected or not)
             var state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
-            this.$checkbox = $('<input tabindex="-1" type="checkbox" ' +
-                (state.selected ? 'checked="checked"' : '') +
-                '/>');
-            this.$el.empty().append(this.$checkbox);
+            this.$el.html(this.template({
+                checked: state.selected
+            }));
+            this.$checkbox = this.$el.find(this.checkboxSelector);
             return this;
         }
     });

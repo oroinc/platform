@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Session;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
@@ -18,10 +19,15 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
-class ImportExportContext extends OroFeatureContext implements KernelAwareContext, OroPageObjectAware
+class ImportExportContext extends OroFeatureContext implements
+    KernelAwareContext,
+    OroPageObjectAware,
+    MessageQueueIsolatorAwareInterface
 {
     use KernelDictionary, PageObjectDictionary;
 
@@ -39,6 +45,11 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      * @var OroMainContext
      */
     private $oroMainContext;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    private $messageQueueIsolator;
 
     /**
      * @param EntityAliasResolver $aliasResolver
@@ -77,7 +88,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     public function iDownloadDataTemplateFile($entity)
     {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
-        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export_template', $entityClass);
 
         self::assertCount(1, $processors, sprintf(
             'Too many processors ("%s") for export "%s" entity',
@@ -102,19 +113,14 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
             'oro_importexport_export_template',
             ['processorAlias' => array_shift($processors)]
         ));
-        $this->template = tempnam(sys_get_temp_dir(), 'opportunity_template_');
+        $this->template = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_template_'
+        );
 
-        $cookies = $this->getSession()->getDriver()->getWebDriverSession()->getCookie()[0];
-        $cookie = new Cookie();
-        $cookie->setName($cookies['name']);
-        $cookie->setValue($cookies['value']);
-        $cookie->setDomain($cookies['domain']);
-
-        $jar = new ArrayCookieJar();
-        $jar->add($cookie);
-
+        $cookieJar = $this->getCookieJar($this->getSession());
         $client = new Client($this->getSession()->getCurrentUrl());
-        $client->addSubscriber(new CookiePlugin($jar));
+        $client->addSubscriber(new CookiePlugin($cookieJar));
         $request = $client->get($url, null, ['save_to' => $this->template]);
         $response = $request->send();
 
@@ -122,7 +128,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     }
 
     /**
-     * This method compares data from the downloaded file
+     * This method strictly compares data from the downloaded file
      *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
      *
@@ -131,34 +137,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      */
     public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities)
     {
-        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
-        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
-
-        self::assertCount(1, $processors, sprintf(
-            'Too many processors ("%s") for export "%s" entity',
-            implode(', ', $processors),
-            $entity
-        ));
-
-        $processorName = array_shift($processors);
-        $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
-        $filePath = FileManager::generateTmpFilePath(
-            FileManager::generateFileName($processorName, 'csv')
-        );
-
-        $jobResult = $jobExecutor->executeJob(
-            'export',
-            'entity_export_to_csv',
-            [
-                'export' => [
-                    'processorAlias' => $processorName,
-                    'entityName' => $entityClass,
-                    'filePath' => $filePath,
-                ]
-            ]
-        );
-
-        static::assertTrue($jobResult->isSuccessful());
+        $filePath = $this->performExport($entity);
 
         try {
             $handler = fopen($filePath, 'rb');
@@ -189,6 +168,49 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     }
 
     /**
+     * This method makes non-strict comparison of data from the downloaded file.
+     *
+     * Checks whether the listed columns (in any order) and corresponding data is present.
+     *
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains at least the following columns:$/
+     *
+     * @param string    $entity
+     * @param TableNode $expectedEntities
+     */
+    public function exportedFileContainsAtLeastFollowingColumns($entity, TableNode $expectedEntities)
+    {
+        $filePath = $this->performExport($entity);
+
+        try {
+            $exportedFile = new \SplFileObject($filePath, 'rb');
+            // Treat file as CSV, skip empty lines.
+            $exportedFile->setFlags(\SplFileObject::READ_CSV
+                | \SplFileObject::READ_AHEAD
+                | \SplFileObject::SKIP_EMPTY
+                | \SplFileObject::DROP_NEW_LINE);
+
+            $headers = $exportedFile->current();
+            $expectedHeaders = $expectedEntities->getRow(0);
+
+            foreach ($exportedFile as $line => $data) {
+                $entityDataFromCsv = array_combine($headers, array_values($data));
+                $expectedEntityData = array_combine($expectedHeaders, array_values($expectedEntities->getRow($line)));
+
+                // Ensure that at least expected data is present.
+                foreach ($expectedEntityData as $property => $value) {
+                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                }
+            }
+
+            static::assertCount($exportedFile->key(), $expectedEntities->getRows());
+        } finally {
+            // We have to release SplFileObject before trying to delete the underlying file.
+            $exportedFile = null;
+            unlink($filePath);
+        }
+    }
+
+    /**
      * @param string $entityName
      * @return string
      */
@@ -208,7 +230,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      *
      * @Then /^(?:|I )don't see (?P<column>([\w\s]+)) column$/
      */
-    public function iDonTSeeBbCustomerNameColumn($column)
+    public function iDonTSeeColumn($column)
     {
         $csv = array_map('str_getcsv', file($this->template));
         self::assertNotContains($column, $csv[0]);
@@ -221,7 +243,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      *
      * @Then /^(?:|I )see (?P<column>([\w\s]+)) column$/
      */
-    public function iSeeAccountColumn($column)
+    public function iSeeColumn($column)
     {
         $csv = array_map('str_getcsv', file($this->template));
         self::assertContains($column, $csv[0]);
@@ -238,7 +260,10 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
      */
     public function iFillTemplateWithData(TableNode $table)
     {
-        $this->importFile = tempnam(sys_get_temp_dir(), 'opportunity_import_data_');
+        $this->importFile = tempnam(
+            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            'import_data_'
+        );
         $fp = fopen($this->importFile, 'w');
         $csv = array_map('str_getcsv', file($this->template));
         $headers = array_shift($csv);
@@ -271,8 +296,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
 
         $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
-        // todo: CRM-7599 Replace sleep to appropriate logic
-        sleep(2);
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -348,5 +372,68 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
             $validationMessage,
             implode('", "', $existedErrors)
         ));
+    }
+
+    /**
+     * @param string $entity Entity class alias.
+     *
+     * @return string Filepath to exported file.
+     */
+    private function performExport($entity)
+    {
+        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
+        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+
+        self::assertCount(1, $processors, sprintf(
+            'Too many processors ("%s") for export "%s" entity',
+            implode(', ', $processors),
+            $entity
+        ));
+
+        $processorName = array_shift($processors);
+        $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
+        $filePath = FileManager::generateTmpFilePath(
+            FileManager::generateFileName($processorName, 'csv')
+        );
+
+        $jobResult = $jobExecutor->executeJob(
+            'export',
+            'entity_export_to_csv',
+            [
+                'export' => [
+                    'processorAlias' => $processorName,
+                    'entityName' => $entityClass,
+                    'filePath' => $filePath,
+                ]
+            ]
+        );
+
+        static::assertTrue($jobResult->isSuccessful());
+
+        return $filePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
+
+    /**
+     * @param Session $session
+     *
+     * @return ArrayCookieJar
+     */
+    private function getCookieJar(Session $session)
+    {
+        $cookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookieJar = new ArrayCookieJar();
+        foreach ($cookies as $cookie) {
+            $cookieJar->add(new Cookie($cookie));
+        }
+
+        return $cookieJar;
     }
 }

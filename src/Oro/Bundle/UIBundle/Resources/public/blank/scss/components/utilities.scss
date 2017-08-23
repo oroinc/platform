@@ -4,22 +4,19 @@
     display: none !important; // override inline styles
 }
 
-.disabled-overlay {
-    display: none;
-}
-
 .disabled {
-    position: relative;
-    .disabled-overlay {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
+    @include base-disabled-style();
 }
 
 .bold {
     font-weight: bold;
+}
+
+.no-scroll {
+    overflow: hidden;
+}
+
+.disable-touch-scrolling {
+    overflow: hidden;
+    visibility: hidden;
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType as SegmentTypeEntity;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -79,6 +80,8 @@ class SegmentFilterBuilderType extends AbstractType
         $resolver->setDefault('segment_name_template', 'Auto generated segment %s');
         $resolver->setDefault('add_name_field', false);
         $resolver->setDefault('name_field_required', false);
+        $resolver->setDefault('attr', ['data-role' => 'query-designer-container']);
+        $resolver->setDefault('field_event_listeners', null);
         $resolver->setRequired('segment_entity');
 
         $resolver->setAllowedTypes('segment_entity', 'string');
@@ -87,6 +90,7 @@ class SegmentFilterBuilderType extends AbstractType
         $resolver->setAllowedTypes('add_name_field', 'bool');
         $resolver->setAllowedTypes('name_field_required', 'bool');
         $resolver->setAllowedTypes('segment_columns', ['array', 'null']);
+        $resolver->setAllowedTypes('field_event_listeners', ['array', 'null']);
         $resolver->setAllowedValues(
             'segment_type',
             [SegmentTypeEntity::TYPE_DYNAMIC, SegmentTypeEntity::TYPE_STATIC]
@@ -115,6 +119,29 @@ class SegmentFilterBuilderType extends AbstractType
                 return $value;
             }
         );
+
+        $resolver->setNormalizer(
+            'constraints',
+            function (Options $options, $value) {
+                if ($options['required']) {
+                    $hasNotBlankFiltersConstraint = false;
+                    if ($value && !is_array($value)) {
+                        $value = [$value];
+                    }
+                    foreach ((array)$value as $constraint) {
+                        if ($constraint instanceof NotBlankFilters) {
+                            $hasNotBlankFiltersConstraint = true;
+                            break;
+                        }
+                    }
+                    if (!$hasNotBlankFiltersConstraint) {
+                        $value[] = new NotBlankFilters();
+                    }
+                }
+
+                return $value;
+            }
+        );
     }
 
     /**
@@ -124,6 +151,14 @@ class SegmentFilterBuilderType extends AbstractType
     {
         $builder->add('definition', HiddenType::class, ['required' => false]);
         $builder->add('entity', HiddenType::class, ['required' => false, 'data' => $options['segment_entity']]);
+
+        if ($options['field_event_listeners']) {
+            foreach ($options['field_event_listeners'] as $field => $listeners) {
+                foreach ($listeners as $event => $listener) {
+                    $builder->get($field)->addEventListener($event, $listener);
+                }
+            }
+        }
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
@@ -226,6 +261,9 @@ class SegmentFilterBuilderType extends AbstractType
         if (!$segmentName && !$config->getOption('name_field_required') && empty($segment->getName())) {
             $segmentName = sprintf($config->getOption('segment_name_template'), uniqid('#', false));
         }
-        $segment->setName($segmentName);
+
+        if ($segmentName) {
+            $segment->setName($segmentName);
+        }
     }
 }

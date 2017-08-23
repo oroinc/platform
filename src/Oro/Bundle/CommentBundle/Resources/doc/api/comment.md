@@ -1,4 +1,4 @@
-#Oro\Bundle\CommentBundle\Entity\Comment
+# Oro\Bundle\CommentBundle\Entity\Comment
 
 ## ACTIONS  
 
@@ -221,15 +221,15 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who is the owner of a specific comment.  
+Retrieve the record of the user who is the owner of a specific comment record.
 
 #### get_relationship
 
-Retrieve the ID of the user who is the owner of a specific comment.
+Retrieve the ID of the user who is the owner of a specific comment record.
 
 #### update_relationship
 
-Replace the owner of a specific comment.
+Replace the owner of a specific comment record.
 
 {@request:json_api}
 Example:
@@ -250,11 +250,11 @@ Example:
 
 #### get_subresource
 
-Get full information about a record that the comment was made on.
+Retrieve a record that the comment was made on.
 
 #### get_relationship
 
-Get a record that the comment was made on.
+Retrieve the ID of a record that the comment was made on.
 
 #### update_relationship
 

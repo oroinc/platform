@@ -3,6 +3,18 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -22,14 +34,10 @@ use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class EmailNotificationTypeTest extends FormIntegrationTestCase
 {
@@ -64,8 +72,24 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
             ->with('oro_email_emailtemplate_index')
             ->willReturn('test/url');
 
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects($this->any())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
+
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
+        $configManager = $this->createMock(ConfigManager::class);
+
         $this->formType = new EmailNotificationType(
             new BuildTemplateFormSubscriber($tokenStorage),
+            new AdditionalEmailsSubscriber($registry, $this->getTranslator(), $configManager),
             $this->configProvider,
             $router
         );

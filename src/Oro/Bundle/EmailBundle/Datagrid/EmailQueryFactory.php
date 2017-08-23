@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -18,7 +17,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class EmailQueryFactory
 {
@@ -28,14 +27,11 @@ class EmailQueryFactory
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var string */
-    protected $fromEmailExpression;
-
-    /** @var Registry */
+    /** @var MailboxManager */
     protected $mailboxManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var FormFactoryInterface */
     protected $formFactory;
@@ -47,7 +43,7 @@ class EmailQueryFactory
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
      * @param MailboxManager            $mailboxManager
-     * @param SecurityFacade            $securityFacade
+     * @param TokenAccessorInterface    $tokenAccessor
      * @param FormFactoryInterface      $formFactory
      * @param FilterUtility             $filterUtil
      */
@@ -55,29 +51,85 @@ class EmailQueryFactory
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EntityNameResolver $entityNameResolver,
         MailboxManager $mailboxManager,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         FormFactoryInterface $formFactory,
         FilterUtility $filterUtil
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
-        $this->entityNameResolver        = $entityNameResolver;
-        $this->mailboxManager            = $mailboxManager;
-        $this->securityFacade            = $securityFacade;
-        $this->formFactory               = $formFactory;
-        $this->filterUtil                = $filterUtil;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->mailboxManager = $mailboxManager;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->formFactory = $formFactory;
+        $this->filterUtil = $filterUtil;
     }
 
     /**
-     * @param QueryBuilder $qb                  Source query builder
-     * @param string       $emailFromTableAlias EmailAddress table alias of joined Email#fromEmailAddress association
+     * Adds "from" email address related columns to a query builder.
+     * The following columns are added:
+     * * fromEmailAddress - The text representation of email address
+     * * fromEmailAddressOwnerClass - The class name of email address owner
+     * * fromEmailAddressOwnerId - The id of email address owner
+     *
+     * @param QueryBuilder $qb                     The query builder to update
+     * @param string       $emailAddressTableAlias The alias of the email address table
      */
-    public function prepareQuery(QueryBuilder $qb, $emailFromTableAlias = 'a')
+    public function addFromEmailAddress(QueryBuilder $qb, $emailAddressTableAlias = 'a')
     {
-        $qb->addSelect($this->getFromEmailExpression($emailFromTableAlias));
-        foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
-            $fieldName = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
+        /**
+         * @todo Doctrine does not support NULL as a scalar expression
+         * see https://github.com/doctrine/doctrine2/issues/5801
+         * as result we have to use NULLIF(0, 0) and NULLIF('', '') instead of NULL
+         */
+        $providers = $this->emailOwnerProviderStorage->getProviders();
+        if (empty($providers)) {
+            $qb->addSelect('NULLIF(\'\', \'\') AS fromEmailAddressOwnerClass');
+            $qb->addSelect('NULLIF(0, 0) AS fromEmailAddressOwnerId');
+            $qb->addSelect(sprintf('%s.email AS fromEmailAddress', $emailAddressTableAlias));
+        } else {
+            $emailAddressExpression = '';
+            $ownerClassExpression = '';
+            $ownerIdExpression = '';
+            foreach ($providers as $provider) {
+                $ownerFieldName = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
+                $ownerClass = $provider->getEmailOwnerClass();
 
-            $qb->leftJoin(sprintf('%s.%s', $emailFromTableAlias, $fieldName), $fieldName);
+                $ownerClassExpression .= sprintf(
+                    'WHEN %s.%s IS NOT NULL THEN \'%s\' ',
+                    $emailAddressTableAlias,
+                    $ownerFieldName,
+                    $ownerClass
+                );
+                if ($ownerIdExpression) {
+                    $ownerIdExpression .= ', ';
+                }
+                $ownerIdExpression .= sprintf('IDENTITY(%s.%s) ', $emailAddressTableAlias, $ownerFieldName);
+                $emailAddressExpression .= sprintf(
+                    'WHEN %s.%s IS NOT NULL THEN %s ',
+                    $emailAddressTableAlias,
+                    $ownerFieldName,
+                    $this->entityNameResolver->getNameDQL($ownerClass, $ownerFieldName)
+                );
+
+                $qb->leftJoin(sprintf('%s.%s', $emailAddressTableAlias, $ownerFieldName), $ownerFieldName);
+            }
+
+            $ownerClassExpression = sprintf(
+                '(CASE %sELSE NULLIF(\'\', \'\') END) AS fromEmailAddressOwnerClass',
+                $ownerClassExpression
+            );
+            $ownerIdExpression = sprintf(
+                'COALESCE(%s) AS fromEmailAddressOwnerId',
+                $ownerIdExpression
+            );
+            $emailAddressExpression = sprintf(
+                'CONCAT(\'\', CASE WHEN %1$s.hasOwner = true THEN (%2$s) ELSE %1$s.email END) AS fromEmailAddress',
+                $emailAddressTableAlias,
+                sprintf('CASE %sELSE \'\' END', $emailAddressExpression)
+            );
+
+            $qb->addSelect($ownerClassExpression);
+            $qb->addSelect($ownerIdExpression);
+            $qb->addSelect($emailAddressExpression);
         }
     }
 
@@ -110,7 +162,7 @@ class EmailQueryFactory
             $qb->andWhere($uoCheck);
         }
 
-        $qb->setParameter('owner', $this->securityFacade->getLoggedUserId());
+        $qb->setParameter('owner', $this->tokenAccessor->getUserId());
     }
 
     /**
@@ -164,7 +216,7 @@ class EmailQueryFactory
         $threadedExpressions = null;
         $threadedExpressionsParameters = null;
         if ($datagrid && $filters) {
-            list (
+            list(
                 $threadedExpressions,
                 $threadedExpressionsParameters
             ) = $this->prepareSearchFilters($datagrid, $filters, 'mm');
@@ -179,7 +231,7 @@ class EmailQueryFactory
                 ->innerJoin('OroEmailBundle:Email', 'mm', 'WITH', 'uu.email = mm.id')
                 ->where($filterExpressions);
 
-            list (
+            list(
                 $notThreadedExpressions,
                 $notThreadedExpressionsParameters
             ) = $this->prepareSearchFilters($datagrid, $filters, 'e');
@@ -336,7 +388,7 @@ class EmailQueryFactory
      */
     protected function getOwningExpression($expr, $tableAlias)
     {
-        $user         = $this->securityFacade->getLoggedUser();
+        $user = $this->tokenAccessor->getUser();
         $organization = $this->getOrganization();
 
         if ($organization === null) {
@@ -366,7 +418,7 @@ class EmailQueryFactory
     protected function getAvailableMailboxIds()
     {
         return $this->mailboxManager->findAvailableMailboxIds(
-            $this->securityFacade->getLoggedUser(),
+            $this->tokenAccessor->getUser(),
             $this->getOrganization()
         );
     }
@@ -376,41 +428,6 @@ class EmailQueryFactory
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
-    }
-
-    /**
-     * @param string $emailFromTableAlias EmailAddress table alias of joined Email#fromEmailAddress association
-     *
-     * @return string
-     */
-    protected function getFromEmailExpression($emailFromTableAlias)
-    {
-        $providers = $this->emailOwnerProviderStorage->getProviders();
-        if (empty($providers)) {
-            return sprintf('%s.email', $emailFromTableAlias);
-        }
-
-        $expressionsByOwner = [];
-        foreach ($providers as $provider) {
-            $relationAlias                      = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
-            $expressionsByOwner[$relationAlias] = $this->entityNameResolver->getNameDQL(
-                $provider->getEmailOwnerClass(),
-                $relationAlias
-            );
-        }
-
-        $expression = '';
-        foreach ($expressionsByOwner as $alias => $expressionPart) {
-            $expression .= sprintf('WHEN %s.%s IS NOT NULL THEN %s ', $emailFromTableAlias, $alias, $expressionPart);
-        }
-        $expression = sprintf('CASE %sELSE \'\' END', $expression);
-
-        // if has owner then use expression to expose formatted name, use email otherwise
-        return sprintf(
-            'CONCAT(\'\', CASE WHEN %1$s.hasOwner = true THEN (%2$s) ELSE %1$s.email END) as fromEmailExpression',
-            $emailFromTableAlias,
-            $expression
-        );
+        return $this->tokenAccessor->getOrganization();
     }
 }

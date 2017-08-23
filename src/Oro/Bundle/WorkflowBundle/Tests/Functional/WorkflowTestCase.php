@@ -3,21 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 
 abstract class WorkflowTestCase extends WebTestCase
 {
-    /**
-     * @var \ReflectionProperty
-     */
-    private static $configDirPropertyReflection;
-
     /**
      * Loads workflow by command from workflow.yml file under specified directory.
      *
@@ -29,7 +22,7 @@ abstract class WorkflowTestCase extends WebTestCase
     {
         self::setConfigLoadDirectory($directory);
 
-        return self::runCommand(LoadWorkflowDefinitionsCommand::NAME, ['--no-ansi'], true, true);
+        return self::runCommand(LoadWorkflowDefinitionsCommand::NAME, [], true, true);
     }
 
     /**
@@ -37,25 +30,8 @@ abstract class WorkflowTestCase extends WebTestCase
      */
     private static function setConfigLoadDirectory($directory)
     {
-        self::getConfigDirPropertyReflection()->setValue(
-            self::getContainer()->get('oro_workflow.configuration.provider.workflow_config'),
-            $directory
-        );
-    }
-
-    /**
-     * @return \ReflectionProperty
-     */
-    private static function getConfigDirPropertyReflection()
-    {
-        $reflectionClass = new \ReflectionClass(WorkflowConfigurationProvider::class);
-
-        if (!self::$configDirPropertyReflection) {
-            self::$configDirPropertyReflection = $reflectionClass->getProperty('configDirectory');
-            self::$configDirPropertyReflection->setAccessible(true);
-        }
-
-        return self::$configDirPropertyReflection;
+        self::getContainer()->get('oro_workflow.configuration.workflow_config_finder.builder')
+            ->setSubDirectory($directory);
     }
 
     /**

@@ -2,7 +2,3 @@ layout:
     actions:
         - '@setBlockTheme':
             themes: 'OroDataGridBundle:layouts:base/default.html.twig'
-        - '@add':
-            blockType: block
-            id: datagrid_toolbar_items_counter_template
-            parentId: head

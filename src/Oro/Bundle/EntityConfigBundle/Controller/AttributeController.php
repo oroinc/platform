@@ -14,8 +14,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Event\BeforeEntityAttributeSaveEvent;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -66,16 +64,6 @@ class AttributeController extends Controller
         $formAction = $this->generateUrl('oro_attribute_save', ['alias' => $alias]);
 
         $options['attribute'] = ['is_attribute' => true];
-        $event = new BeforeEntityAttributeSaveEvent(
-            $alias,
-            $entityConfigModel,
-            $options
-        );
-        $this->get('event_dispatcher')->dispatch(
-            Events::BEFORE_SAVE_ATTRIBUTE,
-            $event
-        );
-        $options = $event->getOptions();
 
         $response = $this
             ->get('oro_entity_config.form.handler.create_update_config_field_handler')
@@ -209,7 +197,7 @@ class AttributeController extends Controller
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
         $this->ensureEntityConfigSupported($entityConfigModel);
-        list ($layoutActions) = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
+        list($layoutActions) = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
 
         $response = [
             'entity' => $entityConfigModel,

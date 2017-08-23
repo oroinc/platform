@@ -3,6 +3,8 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider\Filter;
 
 use Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 
 class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +15,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
     protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $tokenAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $aclHelper;
@@ -49,9 +51,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with('OroOrganizationBundle:BusinessUnit')
             ->willReturn($businessUnitRepository);
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->aclHelper      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -66,7 +66,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->choiceTreeBUProvider = new ChoiceTreeBusinessUnitProvider(
             $this->registry,
-            $this->securityFacade,
+            $this->tokenAccessor,
             $this->aclHelper,
             $this->treeProvider
         );
@@ -77,16 +77,13 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetList($userBUIds, $result)
     {
-        $treeOwner = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTree')
-            ->setMethods(['getUserSubordinateBusinessUnitIds'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ownerTree = $this->createMock(OwnerTreeInterface::class);
 
         $this->treeProvider->expects($this->once())
             ->method('getTree')
-            ->willReturn($treeOwner);
+            ->willReturn($ownerTree);
 
-        $treeOwner
+        $ownerTree
             ->expects($this->once())
             ->method('getUserSubordinateBusinessUnitIds')
             ->willReturn($userBUIds);
@@ -105,8 +102,6 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
         $this->qb->expects($this->any())
             ->method('setParameter');
 
-        $tokenStorage = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
         $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->setMethods(['getId', 'getOrganizations'])
             ->disableOriginalConstructor()
@@ -120,10 +115,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
         $user->expects($this->once())
             ->method('getOrganizations')
             ->willReturn([$organization]);
-        $this->securityFacade->expects($this->once())
-            ->method('getToken')
-            ->willReturn($tokenStorage);
-        $tokenStorage->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 

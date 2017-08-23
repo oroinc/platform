@@ -1,0 +1,8 @@
+<div class="ui-datevariables-div">
+    <b><%= title %></b>
+    <ul>
+        <% _.each(items, function (label, value) { %>
+        <li><a data-value="<%= value %>" href="#"><%= label %></a></li>
+        <% }); %>
+    </ul>
+</div>

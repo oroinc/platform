@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
@@ -25,22 +26,22 @@ class DatagridType extends AbstractContainerType
     /** @var ManagerInterface */
     protected $manager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
     /**
-     * @param NameStrategyInterface $nameStrategy
-     * @param ManagerInterface $manager
-     * @param SecurityFacade $securityFacade
+     * @param NameStrategyInterface         $nameStrategy
+     * @param ManagerInterface              $manager
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(
         NameStrategyInterface $nameStrategy,
         ManagerInterface $manager,
-        SecurityFacade $securityFacade
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->nameStrategy = $nameStrategy;
         $this->manager = $manager;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -165,7 +166,7 @@ class DatagridType extends AbstractContainerType
 
         if ($gridConfig) {
             $aclResource = $gridConfig->getAclResource();
-            if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
+            if ($aclResource && !$this->authorizationChecker->isGranted($aclResource)) {
                 return false;
             } else {
                 return true;

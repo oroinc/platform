@@ -33,8 +33,12 @@ To be sure that your REST API resources work properly you can cover them by [fun
 | assertResponseContains | Asserts the response content contains the the given data. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
 | assertResponseCount | Asserts the response contains the given number of data items. |
 | assertResponseNotEmpty | Asserts the response data are not empty. |
+| assertResponseValidationError | Asserts the response content contains the the given validation error. |
+| assertResponseValidationErrors | Asserts the response content contains the the given validation errors. |
 | dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file should be located in the `responses` directory near to PHP file contains the test. |
 | getResourceId | Extracts JSON.API resource identifier from the response. For details see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
+| getRequestData | Converts the given request to an array that can be sent to the server. The given request can be a path to a file contains the request data or an array with the request data. If the request is a file name, the file should be located in the `requests` directory near to PHP file contains the test. |
+| getResponseErrors | Extracts the list of errors from JSON.API response. For details see [JSON.API Specification](http://jsonapi.org/format/#errors). |
 
 Load Fixtures
 -------------

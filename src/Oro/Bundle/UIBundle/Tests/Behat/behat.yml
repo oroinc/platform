@@ -17,6 +17,10 @@ oro_behat_extension:
       selector: '#flash-messages div.alert'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Flash Message Close Button:
+      selector: '#flash-messages div.alert .notification-flash__close'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     ControlGroup:
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup
 
@@ -75,3 +79,6 @@ oro_behat_extension:
 
     Alert Error Message:
       selector: '.alert-error .message'
+
+    TypeaheadSuggestionsDropdown:
+      selector: '.typeahead.dropdown-menu'

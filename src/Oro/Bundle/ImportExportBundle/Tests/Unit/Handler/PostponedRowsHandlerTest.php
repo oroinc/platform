@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
-use Oro\Component\MessageQueue\Client\Message;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Job\ExtensionInterface;
+use Oro\Component\MessageQueue\Job\JobProcessor;
+use Oro\Component\MessageQueue\Job\JobRunner;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Component\MessageQueue\Job\JobProcessor;
-use Oro\Component\MessageQueue\Job\JobRunner;
 
 class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +69,8 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($rootJob);
         $this->currentJob->method('getId')
             ->willReturn(1);
-        $this->jobRunner = new JobRunner($this->jobProcessor, $this->currentJob);
+        $jobExtension = $this->createMock(ExtensionInterface::class);
+        $this->jobRunner = new JobRunner($this->jobProcessor, $jobExtension, $this->currentJob);
     }
 
     public function testItCreatesIncrementedJob()
@@ -99,7 +102,7 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->currentJob);
 
         $result = [];
-        $body = ['attempts' => 5];
+        $body = ['attempts' => PostponedRowsHandler::MAX_ATTEMPTS];
         $this->messageProducer->expects($this->never())->method('send');
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
@@ -110,7 +113,7 @@ class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('findOrCreateChildJob')
             ->willReturn($this->currentJob);
 
-        $body = ['attempts' => 5];
+        $body = ['attempts' => PostponedRowsHandler::MAX_ATTEMPTS];
         $result = [];
         $result['postponedRows'] = ['elem1', 'elem2'];
 

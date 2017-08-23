@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ReportBundle\Grid;
 
+use Doctrine\Common\Cache\Cache;
+
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -18,25 +20,36 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     protected $doctrine;
 
     /**
-     * @var DatagridConfiguration
-     */
-    private $configuration = null;
-
-    /**
      * @var ReportDatagridConfigurationBuilder
      */
     protected $builder;
 
     /**
+     * @var string
+     */
+    private $prefixCacheKey;
+
+    /**
+     * @var Cache
+     */
+    private $reportCacheManager;
+
+    /**
      * @param ReportDatagridConfigurationBuilder $builder
      * @param ManagerRegistry                    $doctrine
+     * @param Cache                              $reportCacheManager
+     * @param string                             $prefixCacheKey
      */
     public function __construct(
         ReportDatagridConfigurationBuilder $builder,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        Cache $reportCacheManager,
+        $prefixCacheKey
     ) {
         $this->builder  = $builder;
         $this->doctrine = $doctrine;
+        $this->reportCacheManager = $reportCacheManager;
+        $this->prefixCacheKey = $prefixCacheKey;
     }
 
     /**
@@ -52,18 +65,16 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
      */
     public function getConfiguration($gridName)
     {
-        if ($this->configuration === null) {
-            $id     = intval(substr($gridName, strlen(Report::GRID_PREFIX)));
-            $repo   = $this->doctrine->getRepository('OroReportBundle:Report');
-            $report = $repo->find($id);
+        $cacheKey = $this->getCacheKey($gridName);
 
-            $this->builder->setGridName($gridName);
-            $this->builder->setSource($report);
-
-            $this->configuration = $this->builder->getConfiguration();
+        if ($this->reportCacheManager->contains($cacheKey)) {
+            $config = $this->reportCacheManager->fetch($cacheKey);
+        } else {
+            $config = $this->prepareConfiguration($gridName);
+            $this->reportCacheManager->save($cacheKey, $config);
         }
 
-        return $this->configuration;
+        return $config;
     }
 
     /**
@@ -89,5 +100,36 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     public function getBuilder()
     {
         return $this->builder;
+    }
+
+    /**
+     * Builds configuration of report grid by grid name
+     *
+     * @param $gridName
+     *
+     * @return DatagridConfiguration
+     */
+    protected function prepareConfiguration($gridName)
+    {
+        $id     = intval(substr($gridName, strlen(Report::GRID_PREFIX)));
+        $repo   = $this->doctrine->getRepository('OroReportBundle:Report');
+        $report = $repo->find($id);
+
+        $this->builder->setGridName($gridName);
+        $this->builder->setSource($report);
+
+        return $this->builder->getConfiguration();
+    }
+
+    /**
+     * Return unique cache key for report by grid name
+     *
+     * @param $gridName
+     *
+     * @return string
+     */
+    private function getCacheKey($gridName)
+    {
+        return $this->prefixCacheKey.'.'.$gridName;
     }
 }

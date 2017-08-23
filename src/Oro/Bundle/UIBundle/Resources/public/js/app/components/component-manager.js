@@ -3,8 +3,9 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
-    'oroui/js/app/components/base/component'
-], function($, _, __, tools, BaseComponent) {
+    'oroui/js/app/components/base/component',
+    'oroui/js/component-shortcuts-manager'
+], function($, _, __, tools, BaseComponent, ComponentShortcutsManager) {
     'use strict';
 
     var console = window.console;
@@ -70,7 +71,9 @@ define([
                     return;
                 }
                 e.preventDefault();
-                this.init(this.initOptions);
+                this.init(this.initOptions).done(function() {
+                    $(e.target).trigger('content:initialized');
+                });
             }, this));
 
             // if the container catches content remove event -- disposes related components
@@ -96,21 +99,40 @@ define([
          */
         _collectElements: function() {
             var elements = [];
-            var el = this.$el[0];
+            var self = this;
 
-            this.$el.find('[data-page-component-module]').each(function() {
-                var $elem = $(this);
+            _.each(ComponentShortcutsManager.getAll(), function(shortcut, shortcutName) {
+                var dataKey = 'page-component-' + shortcutName;
+                var dataAttr = 'data-' + dataKey;
 
-                // find nearest marked container with separate layout
-                var $separateLayout = $elem.parents('[data-layout="separate"]:first');
+                this.$el.find('[' + dataAttr + ']').each(function() {
+                    var $elem = $(this);
+                    if (self._isInOwnLayout($elem)) {
+                        return;
+                    }
 
-                // collects container elements from current layout
-                if (!$separateLayout.length || !_.contains($separateLayout.parents(), el)) {
+                    var data = ComponentShortcutsManager.getComponentData(shortcut, $elem.data(dataKey));
+                    data.pageComponentOptions = $.extend(
+                        true,
+                        data.pageComponentOptions,
+                        $elem.data('pageComponentOptions')
+                    );
+                    $elem.removeAttr(dataAttr)
+                        .removeData(dataKey)
+                        .data(data);
+
                     elements.push($elem);
-                }
-            });
+                });
+            }, this);
 
             return elements;
+        },
+
+        _isInOwnLayout: function($element) {
+            // find nearest marked container with separate layout
+            var $separateLayout = $element.parents('[data-layout="separate"]:first');
+            // collects container elements from current layout
+            return $separateLayout.length && _.contains($separateLayout.parents(), this.$el[0]);
         },
 
         /**
@@ -280,7 +302,8 @@ define([
                 } else {
                     throw error;
                 }
-            } else {
+            } else if (error) {
+                // if there is unhandled error -- show user message
                 require('oroui/js/mediator')
                     .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
             }

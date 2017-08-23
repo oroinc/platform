@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Export;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -9,7 +11,6 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ExportExtension extends AbstractExtension
 {
@@ -18,19 +19,25 @@ class ExportExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /**
-     * Constructor
-     *
-     * @param TranslatorInterface $translator
-     * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface           $translator
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenStorageInterface         $tokenStorage
      */
-    public function __construct(TranslatorInterface $translator, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        TranslatorInterface $translator,
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage
+    ) {
         $this->translator = $translator;
-        $this->securityFacade = $securityFacade;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -93,7 +100,7 @@ class ExportExtension extends AbstractExtension
         // we have to be sure that token is not null because Marketing Lists uses Grid building to get
         // query builder, some functional also uses Grid building without security context set
         return
-            null !== $this->securityFacade->getToken()
-            && $this->securityFacade->isGranted('oro_datagrid_gridview_export');
+            null !== $this->tokenStorage->getToken()
+            && $this->authorizationChecker->isGranted('oro_datagrid_gridview_export');
     }
 }

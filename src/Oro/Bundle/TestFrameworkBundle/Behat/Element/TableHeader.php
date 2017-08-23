@@ -17,16 +17,42 @@ class TableHeader extends Element
         $crawler = new Crawler($this->getHtml());
 
         $i = 0;
+        $headers = [];
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            if (strtolower($th->textContent) === strtolower($headerText)) {
+            $currentHeader = $th->textContent;
+            if (strtolower($currentHeader) === strtolower($headerText)) {
                 return $i;
             }
 
             $i++;
+            $headers[] = $currentHeader;
         }
 
-        self::fail(sprintf('Can\'t find link with "%s" header', $headerText));
+        self::fail(sprintf(
+            'Can\'t find link with "%s" header, available headers: %s',
+            $headerText,
+            implode(', ', $headers)
+        ));
+    }
+
+    /**
+     * Checks if table header has such column name
+     *
+     * @param $columnName
+     * @return bool
+     */
+    public function hasColumn($columnName)
+    {
+        $crawler = new Crawler($this->getHtml());
+
+        /** @var \DOMElement $th */
+        foreach ($crawler->filter('th') as $th) {
+            if (strtolower($th->textContent) === strtolower($columnName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

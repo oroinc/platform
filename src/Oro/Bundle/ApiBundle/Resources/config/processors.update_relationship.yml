@@ -33,7 +33,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 10 }
@@ -43,8 +43,9 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - VIEW
+            - true
         tags:
             - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 5 }
 
@@ -56,7 +57,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
+            - '@security.authorization_checker'
             - EDIT
         tags:
             - { name: oro.api.processor, action: update_relationship, group: security_check, priority: -30 }

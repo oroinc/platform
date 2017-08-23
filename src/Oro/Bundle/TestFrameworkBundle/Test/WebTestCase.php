@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\BrowserKit\Cookie;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
@@ -26,6 +27,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 /**
  * Abstract class for functional and integration tests
@@ -247,10 +250,57 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function updateUserSecurityToken($email)
     {
-        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['email' => $email]);
-
+        $user = $this->getUser($email);
         $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
         $this->getContainer()->get('security.token_storage')->setToken($token);
+    }
+
+    /**
+     * @param string $email
+     * @param string $userClass
+     * @return object
+     */
+    private function getUser($email, $userClass = User::class)
+    {
+        return $this->getContainer()->get('doctrine')->getRepository($userClass)->findOneBy(['email' => $email]);
+    }
+    /**
+     * Authenticates users with applying firewall context and setting correct session
+     * https://symfony.com/doc/current/testing/http_authentication.html
+     * @param string $email
+     * @param string $credentials
+     * @param string $firewallContext
+     * @param string $userClass
+     */
+    protected function simulateAuthentication($email, $credentials, $firewallContext, $userClass = User::class)
+    {
+        $user = $this->getUser($email, $userClass);
+        if ($user === null) {
+            $this->client->setServerParameters([]);
+            $this->client->getCookieJar()->clear();
+            $this->client->getContainer()->get('session')->remove('_security_'.$firewallContext);
+            $this->getContainer()->get('security.token_storage')->setToken(null);
+
+            return;
+        }
+        $session = $this->client->getContainer()->get('session');
+
+        /** @var Organization $organization */
+        $organization = $user->getOrganization();
+        $token = new UsernamePasswordOrganizationToken(
+            $user,
+            $credentials,
+            $firewallContext,
+            $organization,
+            $user->getRoles()
+        );
+
+        $session->set('_security_'.$firewallContext, serialize($token));
+        $session->save();
+        $this->getContainer()->get('security.token_storage')->setToken($token);
+
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $this->client->getCookieJar()->set($cookie);
     }
 
     /**
@@ -459,6 +509,8 @@ abstract class WebTestCase extends BaseWebTestCase
         $application->setAutoExit(false);
         $application->setTerminalDimensions(120, 50);
 
+        $params['--no-ansi'] = true;
+
         $args = ['application', $name];
         foreach ($params as $k => $v) {
             if (is_bool($v)) {
@@ -526,7 +578,7 @@ abstract class WebTestCase extends BaseWebTestCase
             $loader->addFixture($fixture);
         }
 
-        $executor = new DataFixturesExecutor($this->getDataFixtureExtecurotEntityManager());
+        $executor = new DataFixturesExecutor($this->getDataFixturesExecutorEntityManager());
         $executor->execute($loader->getFixtures(), true);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
@@ -535,7 +587,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @return EntityManagerInterface
      */
-    protected function getDataFixtureExtecurotEntityManager()
+    protected function getDataFixturesExecutorEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
     }

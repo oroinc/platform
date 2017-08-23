@@ -1,7 +1,7 @@
 UPGRADE FROM 1.10.0 to 1.10.1
 =============================
 
-####EntityExtendBundle
+#### EntityExtendBundle
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
     - removed property `tableToClassMap` in favour of `tableToClassesMap`

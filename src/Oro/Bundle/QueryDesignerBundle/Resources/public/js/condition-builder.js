@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
-    'oroui/js/dropdown-select'], function($, _, __) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'jquery-ui',
+    'oroui/js/dropdown-select'], function($, _, __, mediator) {
     'use strict';
 
     /**
@@ -88,6 +88,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             opts.conditionsGroup.stop = $.proxy(this._onConditionsGroupDrop, this);
             opts.criteriaList.over = $.proxy(this.syncDropAreaOver, this);
             opts.criteriaList.out = $.proxy(this.syncDropAreaOver, this);
+
+            mediator.trigger('condition-builder:options:prepare', opts);
         },
 
         getValue: function() {
@@ -116,6 +118,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
 
         _initConditionBuilder: function() {
             var $root = this.element;
+            $(this.element).addClass('ui-widget-oroquerydesigner-condition-builder');
             var sortableConnectWith = this.options.sortable.connectWith;
             if (!$root.is(sortableConnectWith)) {
                 $root = $root.find(sortableConnectWith);

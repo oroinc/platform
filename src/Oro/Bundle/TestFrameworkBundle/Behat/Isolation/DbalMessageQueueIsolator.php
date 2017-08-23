@@ -3,87 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception\TableNotFoundException;
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\RuntimeException;
-use Symfony\Component\Process\Process;
 
-class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
-    IsolatorInterface,
-    MessageQueueIsolatorInterface
+class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
 {
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
-
-    /**
-     * @var Process
-     */
-    private $process;
-
-    /**
-     * @param KernelInterface $kernel
-     */
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-    }
-
-    /** {@inheritdoc} */
-    public function start(BeforeStartTestsEvent $event)
-    {
-    }
-
-    /** {@inheritdoc} */
-    public function beforeTest(BeforeIsolatedTestEvent $event)
-    {
-        $command = sprintf(
-            'php %s/console oro:message-queue:consume --env=%s',
-            realpath($this->kernel->getRootDir()),
-            $this->kernel->getEnvironment()
-        );
-        $this->process = new Process($command);
-        $this->process->start(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                echo 'MessageQueueConsumer ERR > '.$buffer;
-            }
-        });
-    }
-
-    /** {@inheritdoc} */
-    public function afterTest(AfterIsolatedTestEvent $event)
-    {
-        $this->waitWhileProcessingMessages();
-
-        if (self::WINDOWS_OS === $this->getOs()) {
-            $killCommand = sprintf('TASKKILL /PID %d /T /F', $this->process->getPid());
-        } else {
-            $killCommand = sprintf('pkill -f "%s/console oro:message-queue:consume"', $this->kernel->getRootDir());
-        }
-
-        // Process::stop() might not work as expected
-        // See https://github.com/symfony/symfony/issues/5030
-        $process = new Process($killCommand, $this->kernel->getRootDir());
-
-        try {
-            $process->run();
-        } catch (RuntimeException $e) {
-            //it's ok
-        }
-    }
-
-    /** {@inheritdoc} */
-    public function terminate(AfterFinishTestsEvent $event)
-    {
-    }
+    /** @var Filesystem */
+    private $fs;
 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
@@ -94,79 +23,94 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
     /**
      * {@inheritdoc}
      */
-    public function isOutdatedState()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function restoreState(RestoreStateEvent $event)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'Dbal Message Queue';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTag()
+    protected function cleanUp()
     {
-        return 'message-queue';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getApplicableOs()
-    {
-        return [
-            self::WINDOWS_OS,
-            self::LINUX_OS,
-            self::MAC_OS,
-        ];
-    }
-
-    /**
-     * @param int $timeLimit
-     */
-    public function waitWhileProcessingMessages($timeLimit = 60)
-    {
-        $time = $timeLimit;
+        $this->kernel->boot();
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
         /** @var Connection $connection */
-        $connection = $this->kernel->getContainer()->get('doctrine')->getManager()->getConnection();
+        $connection = $doctrine->getManager()->getConnection();
 
-        try {
-            $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
-        } catch (TableNotFoundException $e) {
-            // Schema is not initialized yet
-            return;
-        }
+        $connection->executeQuery('DELETE FROM oro_message_queue');
+        $connection->executeQuery('DELETE FROM oro_message_queue_job');
+        $connection->executeQuery('DELETE FROM oro_message_queue_job_unique');
 
+        $this->getFilesystem()
+            ->remove(rtrim($this->kernel->getContainer()->getParameter('oro_message_queue.dbal.pid_file_dir')));
+    }
 
-        while (0 !== $result) {
-            if ($time <= 0) {
-                throw new RuntimeException('Message Queue was not process messages during time limit');
+    /**
+     * {@inheritdoc}
+     */
+    public function waitWhileProcessingMessages($timeLimit = self::TIMEOUT)
+    {
+        while ($timeLimit > 0) {
+            $isRunning = $this->isOutdatedState();
+            if (!$isRunning) {
+                throw new RuntimeException('Message Queue is not running');
             }
 
-            $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
-            usleep(250000);
-            $time -= 0.25;
+            $isQueueEmpty = $this->isQueueEmpty();
+            if ($isQueueEmpty) {
+                return;
+            }
+
+            sleep(1);
+            $timeLimit -= 1;
         }
+
+        throw new RuntimeException('Message Queue was not process messages during time limit');
     }
 
     /**
-     * @inheritdoc
+     * @return bool
      */
-    public function getProcess()
+    private function isQueueEmpty()
     {
-        return $this->process;
+        $this->kernel->boot();
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
+        /** @var Connection $connection */
+        $connection = $doctrine->getManager()->getConnection();
+
+        return
+            !$this->hasRows($connection, 'SELECT * FROM oro_message_queue')
+            && !$this->hasRows(
+                $connection,
+                sprintf(
+                    "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s')",
+                    Job::STATUS_SUCCESS,
+                    Job::STATUS_FAILED
+                )
+            )
+            && !$this->hasRows($connection, 'SELECT * FROM oro_message_queue_job_unique');
+    }
+
+    /**
+     * @param Connection $connection
+     * @param string     $sqlQuery
+     *
+     * @return bool
+     */
+    private function hasRows(Connection $connection, $sqlQuery)
+    {
+        return 0 !== $connection->executeQuery($sqlQuery)->rowCount();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFilesystem()
+    {
+        if (!$this->fs) {
+            $this->fs = new Filesystem();
+        }
+
+        return $this->fs;
     }
 }

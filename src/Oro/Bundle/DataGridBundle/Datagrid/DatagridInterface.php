@@ -57,6 +57,13 @@ interface DatagridInterface
     public function getAcceptedDatasource();
 
     /**
+     * Apply accepted extensions to datasource object
+     *
+     * @return $this
+     */
+    public function acceptDatasource();
+
+    /**
      * Getter for acceptor object
      *
      * @return Acceptor

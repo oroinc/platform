@@ -1,26 +1,28 @@
 define([
     'jquery',
     'underscore',
+    'tpl!oroui/templates/message-item.html',
     'oroui/js/tools',
     'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',
     'oroui/js/mediator',
     'oroui/js/error',
     'bootstrap'
-], function($, _, tools, MultiUseResourceManager, SHA256, mediator, error) {
+], function($, _, template, tools, MultiUseResourceManager, SHA256, mediator, error) {
     'use strict';
 
     var defaults = {
         container: '',
         temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
-        template: $.noop,
+        template: template,
         insertMethod: 'appendTo',
         style: 'default'
     };
     var queue = [];
     var groupedMessages = {};
     var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
+    var noFlashTags = ['a'];
 
     var resolveContainer = function(options) {
         if ($(options.container).is(defaults.container) && $(defaults.temporaryContainer).length) {
@@ -42,13 +44,19 @@ define([
         if (opt.onClose) {
             $el.find('button.close').click(opt.onClose);
         }
+
+        if (opt.hideCloseButton) {
+            $el.find('[data-dismiss="alert"]').remove();
+        }
+
         var delay = opt.delay || (opt.flash && 5000);
         var actions = {
             close: function() {
                 var result = $el.alert('close');
                 mediator.trigger('layout:adjustHeight');
                 return result;
-            }
+            },
+            namespace: opt.namespace
         };
         if (opt.namespace) {
             $el.attr('data-messenger-namespace', opt.namespace);
@@ -66,9 +74,12 @@ define([
      */
     return {
             /**
-             * Shows notification message
+             * Shows notification message.
+             * By default, the message is displayed until an user close it.
+             * If you want to close the message you can specify 'flash' or 'delay' option.
+             * Also in this case you can use `notificationFlashMessage` method.
              *
-             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} type 'error'|'success'|'warning'
              * @param {string} message text of message
              * @param {Object=} options
              *
@@ -103,9 +114,11 @@ define([
             },
 
             /**
-             * Shows flash notification message
+             * Shows flash notification message.
+             * By default, the message is displayed for 5 seconds.
+             * To change this you can use `delay` option.
              *
-             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} type 'error'|'success'|'warning'
              * @param {string} message text of message
              * @param {Object=} options
              *
@@ -120,7 +133,7 @@ define([
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                var isFlash = notFlashTypes.indexOf(type) === -1;
+                var isFlash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
                 var namespace = (options || {}).namespace;
 
                 if (!namespace) {
@@ -157,9 +170,10 @@ define([
 
             setup: function(options) {
                 _.extend(defaults, options);
-
                 $(document).on('remove', defaults.temporaryContainer, this.removeTemporaryContainer);
+            },
 
+            flushStoredMessages: function() {
                 if (window.localStorage) {
                     queue = queue.concat(JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]'));
                     localStorage.removeItem('oroAfterReloadMessages');
@@ -213,6 +227,18 @@ define([
 
             removeTemporaryContainer: function() {
                 $(defaults.container).append($(this).children());
+            },
+
+            /**
+             * Check if given string contains no flash tags
+             *
+             * @param {string} string
+             * @return {boolean}
+             */
+            _containsNoFlashTags: function(string) {
+                return _.some(noFlashTags, function(tag) {
+                    return $('<div>').append(string).find(tag).length > 0;
+                });
             }
         };
 });

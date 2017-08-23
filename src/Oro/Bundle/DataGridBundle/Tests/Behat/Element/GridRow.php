@@ -96,7 +96,7 @@ class GridRow extends TableRow
      */
     public function setCellValueAndSave($header, $value)
     {
-        $cell = $this->setCellValue($header, $value);
+        $this->setCellValue($header, $value);
 
         $saveButton = $this->spin(function (GridRow $gridRow) {
             return $gridRow->find('css', 'button[title="Save changes"]');
@@ -129,10 +129,6 @@ class GridRow extends TableRow
         $cell = $this->getCell($header);
 
         $cell->mouseOver();
-
-        // This doesn't work properly with chromedriver as it doesn't generate a pair of mouseDown/mouseUp events
-        // for the double click and only generates one. So our logic for mouseUp event doesn't work.
-        // This works with PhantomJs fine.
         $cell->doubleClick();
 
         $this->getElement('OroForm')->fillField(

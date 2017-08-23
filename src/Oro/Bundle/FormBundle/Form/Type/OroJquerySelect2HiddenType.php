@@ -21,6 +21,8 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 
 class OroJquerySelect2HiddenType extends AbstractType
 {
+    const NAME = 'oro_jqueryselect2_hidden';
+
     /**
      * @var EntityManager
      */

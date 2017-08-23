@@ -1,20 +1,23 @@
 /*global google*/
-define([
-    'underscore',
-    'backbone',
-    'orotranslation/js/translator',
-    'orolocale/js/locale-settings'
-], function(_, Backbone, __, localeSettings) {
+define(function(require) {
     'use strict';
 
+    var GoogleMapsView;
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var __ = require('orotranslation/js/translator');
+    var localeSettings = require('orolocale/js/locale-settings');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var messenger = require('oroui/js/messenger');
     var $ = Backbone.$;
 
     /**
      * @export  oroaddress/js/mapservice/googlemaps
      * @class   oroaddress.mapservice.Googlemaps
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    return Backbone.View.extend({
+    GoogleMapsView = BaseView.extend({
         options: {
             mapOptions: {
                 zoom: 17,
@@ -29,14 +32,26 @@ define([
         },
 
         mapLocationCache: {},
+
         mapsLoadExecuted: false,
 
+        errorMessage: null,
+
+        geocoder: null,
+
+        mapRespondingTimeout: 2000,
+
+        loadingMask: null,
+
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
+            this.options = _.defaults(options || {},
+                _.pick(localeSettings.settings, ['apiKey']),
+                this.options
+            );
             this.$mapContainer = $('<div class="map-visual"/>')
                 .appendTo(this.$el);
-            this.$unknownAddress = $('<div class="map-unknown">' + __('map.unknown.location') + '</div>')
-                .appendTo(this.$el);
+
+            this.loadingMask = new LoadingMaskView({container: this.$el});
 
             if (options.address) {
                 this.updateMap(options.address.address, options.address.label);
@@ -64,6 +79,7 @@ define([
         _initMap: function(location) {
             var weatherLayer;
             var cloudLayer;
+            this.removeErrorMessage();
             this._initMapOptions();
             this.map = new google.maps.Map(
                 this.$mapContainer[0],
@@ -88,6 +104,14 @@ define([
                 cloudLayer = new google.maps.weather.CloudLayer();
                 cloudLayer.setMap(this.map);
             }
+
+            this.loadingMask.hide();
+        },
+
+        isEmptyFunction: function(func) {
+            return typeof func === 'function' &&
+                /^function[^{]*[{]\s*[}]\s*$/.test(
+                    Function.prototype.toString.call(func));
         },
 
         loadGoogleMaps: function() {
@@ -117,6 +141,11 @@ define([
         },
 
         updateMap: function(address, label) {
+            var timeoutId;
+
+            this.loadingMask.show();
+            this.removeErrorMessage();
+
             // Load google maps js
             if (!this.hasGoogleMaps()) {
                 if (this.mapsLoadExecuted) {
@@ -129,14 +158,17 @@ define([
                     'label': label
                 };
                 this.loadGoogleMaps();
-
                 return;
             }
 
             if (this.mapLocationCache.hasOwnProperty(address)) {
                 this.updateMapLocation(this.mapLocationCache[address], label);
             } else {
+                if (this.isEmptyFunction(this.getGeocoder().geocode)) {
+                    return this.checkRenderMap();
+                }
                 this.getGeocoder().geocode({'address': address}, _.bind(function(results, status) {
+                    clearTimeout(timeoutId);
                     if (status === google.maps.GeocoderStatus.OK) {
                         this.mapLocationCache[address] = results[0].geometry.location;
                         //Move location marker and map center to new coordinates
@@ -145,6 +177,8 @@ define([
                         this.mapLocationUnknown();
                     }
                 }, this));
+
+                timeoutId = _.delay(_.bind(this.checkRenderMap, this), this.mapRespondingTimeout);
             }
         },
 
@@ -155,18 +189,32 @@ define([
             }
         },
 
+        checkRenderMap: function() {
+            if (this.mapsLoadExecuted) {
+                return false;
+            }
+
+            if (this.$mapContainer.is(':empty')) {
+                this.addErrorMessage();
+                this.loadingMask.hide();
+                return true;
+            }
+
+            return false;
+        },
+
         hasGoogleMaps: function() {
             return !_.isUndefined(window.google) && google.hasOwnProperty('maps');
         },
 
         mapLocationUnknown: function() {
             this.$mapContainer.hide();
-            this.$unknownAddress.show();
+            this.addErrorMessage(__('map.unknown.location'));
+            this.loadingMask.hide();
         },
 
         mapLocationKnown: function() {
             this.$mapContainer.show();
-            this.$unknownAddress.hide();
         },
 
         updateMapLocation: function(location, label) {
@@ -177,14 +225,43 @@ define([
                 this.mapLocationMarker.setPosition(location);
                 this.mapLocationMarker.setTitle(label);
                 this.location = location;
+                this.trigger('mapRendered');
+            } else {
+                this.loadingMask.hide();
             }
         },
 
         getGeocoder: function() {
-            if (_.isUndefined(this.geocoder)) {
+            if (_.isUndefined(this.geocoder) || _.isNull(this.geocoder)) {
                 this.geocoder = new google.maps.Geocoder();
             }
             return this.geocoder;
+        },
+
+        addErrorMessage: function(message, type) {
+            this.removeErrorMessage();
+            this.errorMessage = messenger.notificationFlashMessage(
+                type || 'warning',
+                message || __('map.unknown.unavailable'),
+                {
+                    container: this.$el,
+                    hideCloseButton: true,
+                    insertMethod: 'prependTo'
+                }
+            );
+        },
+
+        removeErrorMessage: function() {
+            if (_.isNull(this.errorMessage)) {
+                return;
+            }
+            messenger.clear(this.errorMessage.namespace, {
+                container: this.$el
+            });
+
+            delete this.errorMessage;
         }
     });
+
+    return GoogleMapsView;
 });

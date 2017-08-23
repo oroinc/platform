@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Route;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -24,8 +24,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     /** @var SymfonyRouter|\PHPUnit_Framework_MockObject_MockObject */
     protected $symfonyRouter;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
     /** @var Router */
     protected $router;
@@ -41,8 +41,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
 
         $this->symfonyRouter = $this->createMock(SymfonyRouter::class);
-        $this->securityFacade = $this->createMock(SecurityFacade::class);
-        $this->router = new Router($requestStack, $this->symfonyRouter, $this->securityFacade);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->router = new Router($requestStack, $this->symfonyRouter, $this->authorizationChecker);
     }
 
     public function testSaveAndStayRedirectAfterSave()
@@ -57,7 +57,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             ->method('generate')
             ->will($this->returnValue($testUrl));
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $redirect = $this->router->redirectAfterSave(
@@ -85,7 +85,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $entity = new \stdClass();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('EDIT', $this->identicalTo($entity))
             ->will($this->returnValue(true));
@@ -129,7 +129,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $entity = new \stdClass();
 
-        $this->securityFacade->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('EDIT', $this->identicalTo($entity))
             ->will($this->returnValue(false));
@@ -161,7 +161,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             ->method('generate')
             ->will($this->returnValue($testUrl));
 
-        $this->securityFacade->expects($this->never())
+        $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $redirect = $this->router->redirectAfterSave(

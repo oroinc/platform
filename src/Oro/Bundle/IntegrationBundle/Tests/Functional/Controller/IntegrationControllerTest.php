@@ -74,7 +74,7 @@ class IntegrationControllerTest extends WebTestCase
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         /** @var User $user */
-        $user    = $this->getContainer()->get('security.context')->getToken()->getUser();
+        $user    = $this->getContainer()->get('security.token_storage')->getToken()->getUser();
         $newUser = clone $user;
         $newUser->setUsername('new username');
         $newUser->setEmail(mt_rand() . $user->getEmail());
@@ -177,8 +177,7 @@ class IntegrationControllerTest extends WebTestCase
 
         $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 400);
-
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertNotEmpty($result['message']);

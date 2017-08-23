@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
 
 class DumpWorkflowTranslationsCommandTest extends WebTestCase
@@ -21,16 +21,11 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
 
         $this->loadFixtures([LoadWorkflowTranslations::class]);
 
-        /* @var $provider WorkflowConfigurationProvider */
-        $provider = $this->getContainer()->get('oro_workflow.configuration.provider.workflow_config');
+        /* @var $provider WorkflowConfigFinderBuilder */
+        $builder = $this->getContainer()->get('oro_workflow.configuration.workflow_config_finder.builder');
+        $builder->setSubDirectory('/Tests/Functional/Command/DataFixtures/ValidDefinitions');
 
-        $reflectionClass = new \ReflectionClass(WorkflowConfigurationProvider::class);
-
-        $reflectionProperty = $reflectionClass->getProperty('configDirectory');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($provider, '/Tests/Functional/Command/DataFixtures/ValidDefinitions');
-
-        $this->runCommand('oro:workflow:definitions:load', ['--no-ansi']);
+        $this->runCommand('oro:workflow:definitions:load');
     }
 
     public function testExecute()

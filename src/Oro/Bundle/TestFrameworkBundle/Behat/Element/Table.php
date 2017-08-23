@@ -35,10 +35,7 @@ class Table extends Element
      */
     public function getRowByContent($content)
     {
-        /** @var TableRow $row */
-        $row = $this->findElementContains(static::TABLE_ROW_ELEMENT, $content);
-        self::assertTrue($row->isIsset(), sprintf(static::ERROR_NO_ROW_CONTENT, $content));
-        return $row;
+        return $this->getRowByContentElement($content, static::TABLE_ROW_ELEMENT);
     }
 
     public function assertNoRecords()
@@ -51,8 +48,51 @@ class Table extends Element
      */
     public function getRows()
     {
-        return array_map(function (NodeElement $element) {
-            return $this->elementFactory->wrapElement(static::TABLE_ROW_ELEMENT, $element);
-        }, $this->findAll('css', 'tbody tr'));
+        return $this->getRowElements(static::TABLE_ROW_ELEMENT);
+    }
+
+    /**
+     * @param string $elementName
+     * @return TableRow[]
+     */
+    public function getRowElements($elementName)
+    {
+        return array_map(function (NodeElement $element) use ($elementName) {
+            return $this->elementFactory->wrapElement($elementName, $element);
+        }, $this->findAll('xpath', 'child::tbody/child::tr'));
+    }
+
+    /**
+     * @param string $content Any content that can identify row
+     * @param string $elementName
+     * @return TableRow
+     */
+    public function getRowByContentElement($content, $elementName)
+    {
+        /** @var TableRow $row */
+        $row = $this->findElementContains($elementName, $content);
+        self::assertTrue($row->isIsset(), sprintf(static::ERROR_NO_ROW_CONTENT, $content));
+
+        return $row;
+    }
+
+    /**
+     * @return TableHeader
+     */
+    public function getHeader()
+    {
+        return $this->getHeaderElement(static::TABLE_HEADER_ELEMENT);
+    }
+
+    /**
+     * @param string $elementName
+     * @return TableHeader
+     */
+    public function getHeaderElement($elementName)
+    {
+        return $this->elementFactory->wrapElement(
+            $elementName,
+            $this->find('xpath', 'child::thead/child::tr')
+        );
     }
 }

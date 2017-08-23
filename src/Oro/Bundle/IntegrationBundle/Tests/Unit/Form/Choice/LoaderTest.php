@@ -50,7 +50,7 @@ class LoaderTest extends OrmTestCase
             ],
             'test type is allowed'     => [
                 ['test'],
-                'SELECT i FROM OroIntegrationBundle:Channel i WHERE i.type IN(\'test\') ORDER BY i.name ASC'
+                'SELECT i FROM OroIntegrationBundle:Channel i WHERE i.type IN(:allowedTypes) ORDER BY i.name ASC'
             ]
         ];
     }

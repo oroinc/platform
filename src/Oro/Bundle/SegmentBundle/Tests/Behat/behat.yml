@@ -1,0 +1,22 @@
+oro_behat_extension:
+  elements:
+    Segment Form:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      selector: "form[name='oro_segment_form']"
+      options:
+        mapping:
+          Name: oro_segment_form[name]
+          Entity: oro_segment_form[entity]
+          Segment Type: oro_segment_form[type]
+
+  suites:
+    OroSegmentBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
+        - OroQueryDesignerBundle::QueryDesignerContext
+        - OroFilterBundle::FilterContext
+        - OroFormBundle::FormContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroSegmentBundle/Tests/Behat/Features'

@@ -54,7 +54,15 @@
 {% endblock %}
 
 {% block attribute_text_widget %}
-    {{ value|nl2br }}
+    {% if value is not iterable %}
+        {{ value|nl2br }}
+    {% else %}
+        {{ value|join('\n')|nl2br }}
+    {% endif %}
+{% endblock %}
+
+{% block attribute_html_escaped_widget %}
+    {{ value|oro_html_tag_trim(['script','style', 'link']) }}
 {% endblock %}
 
 {% block attribute_boolean_widget %}

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
-use Behat\Testwork\Suite\Exception\SuiteNotFoundException;
 use Behat\Testwork\Suite\SuiteRegistry;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,32 +13,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SuiteController implements Controller
 {
     /**
+     * @var SuiteConfigurationRegistry
+     */
+    protected $suiteConfigRegistry;
+
+    /**
      * @var SuiteRegistry
      */
-    private $registry;
+    protected $behatSuiteRegistry;
 
     /**
-     * @var array
+     * @param SuiteConfigurationRegistry $suiteConfigRegistry
+     * @param SuiteRegistry $behatSuiteRegistry
      */
-    private $suiteConfigurations = [];
-
-    /**
-     * @var array
-     */
-    private $applicationSuites = [];
-
-    /**
-     * Initializes controller.
-     *
-     * @param SuiteRegistry $registry
-     * @param array $suiteConfigurations
-     * @param array $applicationSuites
-     */
-    public function __construct(SuiteRegistry $registry, array $suiteConfigurations, array $applicationSuites)
+    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry, SuiteRegistry $behatSuiteRegistry)
     {
-        $this->registry = $registry;
-        $this->suiteConfigurations = $suiteConfigurations;
-        $this->applicationSuites = $applicationSuites;
+        $this->suiteConfigRegistry = $suiteConfigRegistry;
+        $this->behatSuiteRegistry = $behatSuiteRegistry;
     }
 
     /**
@@ -54,66 +45,62 @@ class SuiteController implements Controller
                 'Only execute a specific suite.'
             )
             ->addOption(
-                '--applicable-suites',
-                null,
-                InputOption::VALUE_NONE,
-                'Run test suites that was configured with application_suites config option'
-            );
+                '--suite-set',
+                '-ss',
+                InputOption::VALUE_REQUIRED,
+                'Only execute a specific set of suites'
+            )
+        ;
     }
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        foreach ($this->getRequestedSuites($input) as $name => $config) {
-            $this->registry->registerSuiteConfiguration(
-                $name,
-                $config['type'],
-                $config['settings']
+        if ($suiteName = $input->getOption('suite')) {
+            $this->registerSuite($suiteName);
+        }
+
+        if ($suiteSet = $input->getOption('suite-set')) {
+            $this->registerSuiteSet($suiteSet);
+        }
+
+        if (!$suiteName && !$suiteSet) {
+            $this->registerAll();
+        }
+    }
+
+    private function registerSuite($suiteName)
+    {
+        $suiteConfig = $this->suiteConfigRegistry->getSuiteConfig($suiteName);
+        $this->behatSuiteRegistry->registerSuiteConfiguration(
+            $suiteConfig->getName(),
+            $suiteConfig->getType(),
+            $suiteConfig->getSettings()
+        );
+    }
+
+    private function registerSuiteSet($suiteSet)
+    {
+        foreach ($this->suiteConfigRegistry->getSet($suiteSet) as $suiteConfig) {
+            $this->behatSuiteRegistry->registerSuiteConfiguration(
+                $suiteConfig->getName(),
+                $suiteConfig->getType(),
+                $suiteConfig->getSettings()
             );
         }
     }
 
-    /**
-     * Get suites list according to parameters from console e.g. --suite, --applicable-suites
-     *
-     * @param InputInterface $input
-     * @return array
-     */
-    protected function getRequestedSuites(InputInterface $input)
+    private function registerAll()
     {
-        $onlyApplicable = $input->getOption('applicable-suites');
-        $exerciseSuiteName = $input->getOption('suite');
-
-        if (null !== $exerciseSuiteName) {
-            return $this->getSuitesByNames([$exerciseSuiteName]);
-        } elseif ($onlyApplicable) {
-            return $this->getSuitesByNames($this->applicationSuites);
-        } else {
-            return $this->suiteConfigurations;
+        foreach ($this->suiteConfigRegistry->getSuiteConfigurations() as $suiteConfig) {
+            $this->behatSuiteRegistry->registerSuiteConfiguration(
+                $suiteConfig->getName(),
+                $suiteConfig->getType(),
+                $suiteConfig->getSettings()
+            );
         }
-    }
-
-    /**
-     * @param array $suitesNames
-     * @return array
-     */
-    protected function getSuitesByNames(array $suitesNames)
-    {
-        $suites = [];
-
-        foreach ($suitesNames as $suitesName) {
-            if (!isset($this->suiteConfigurations[$suitesName])) {
-                throw new SuiteNotFoundException(sprintf(
-                    '`%s` suite is not found or has not been properly registered.',
-                    $suitesName
-                ), $suitesName);
-            }
-
-            $suites[$suitesName] = $this->suiteConfigurations[$suitesName];
-        }
-
-        return $suites;
     }
 }

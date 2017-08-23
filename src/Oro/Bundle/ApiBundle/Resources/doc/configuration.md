@@ -130,7 +130,7 @@ Example:
 api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
-            sorter:
+            sorters:
                 fields:
                     field1:
                         exclude: true
@@ -232,7 +232,6 @@ This section describes entity fields' configuration.
 * **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
 * **description** *string* A human-readable description of the field or a link to the [documentation resource](./documentation.md). Used in auto generated documentation only.
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
-* **data_transformer** The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name. If a data transformer is a static method of a class, the method should have the following signature: `function ($class, $property, $value, array $config, array $context) : mixed` and should return transformed value. If a data transformer is a service, it should implement either `Oro\Component\EntitySerializer\DataTransformerInterface` or `Symfony\Component\Form\DataTransformerInterface` interface.
 * **collapse** *boolean* Indicates whether the entity should be collapsed. It is applicable for associations only. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by [get_relation_config](./actions.md#get_relation_config-action) processors to get identifier of the related entity.
 * **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
@@ -241,6 +240,17 @@ This section describes entity fields' configuration.
 * **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 * **depends_on** *string[]* A list of fields on which this field depends on. Also `.` can be used to specify a path to an association field. This option can be helpful for computed fields. These fields will be loaded from the database even if they are excluded.
+
+Special data types:
+
+As described above, the **data_type** attribute can be used to specify a data type of a field, but it can be used to configure some special types of fields as well. The following table contains details of such types.
+
+| Data Type | Description |
+| --- | --- |
+| nestedObject | Used to configure nested objects. For details see [Configure nested object](./how_to.md#configure-nested-object). |
+| nestedAssociation | Used to configure nested associations. For details see [Configure nested association](./how_to.md#configure-nested-association). |
+| association:relationType\[:associationKind\] | Used to configure extended associations. For details see [Configure Extended Many-To-One Association](./how_to.md#configure-extended-many-to-one-association), [Configure Extended Many-To-Many Association](./how_to.md#configure-extended-many-to-many-association) and [Configure Extended Multiple Many-To-One Association](./how_to.md#configure-extended-multiple-many-to-one-association). |
+
 
 Examples:
 
@@ -262,16 +272,6 @@ api:
                 addressName:
                     property_path: address.name
 
-                # full syntax for data transformer
-                field2:
-                    data_transformer:
-                        - 'my.data.transformer.service.id'
-                        - ['Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer', 'transform']
-
-                # short syntax for data transformer
-                field3:
-                    data_transformer: 'my.data.transformer.service.id'
-
                 # full syntax for "collapse" property
                 field4:
                     collapse:         true
@@ -288,6 +288,9 @@ api:
                     form_type: text
                     form_options:
                         trim: false
+                        constraints:
+                            # add Symfony\Component\Validator\Constraints\NotBlank validation constraint
+                            - NotBlank: ~
 
                 # to-one association
                 field7:

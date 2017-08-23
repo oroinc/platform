@@ -98,7 +98,7 @@ oro:
             records_count.label: 'Number of records: %count%'
 
         form:
-            default_group_label: Default group
+            default_group_label: General
             name.label: Name
             type.label: Type
 
@@ -119,15 +119,25 @@ oro:
 
     entityconfig:
         attribute.entity:
-             attributefamily:
-                  entity_label: Product Family
-                  entity_plural_label: Product Families
-                  code.label: Code
-                  entity_class.label: AttributeFamily
-                  id.label: ID
-                  is_enabled.label: Is enabled
-                  attribute_groups.label: Group
-                  image.label: Image
-                  labels.label: Labels
-                  owner.label: Owner
-                  organization.label: Organization
+            attributefamily:
+                entity_label: Product Family
+                entity_plural_label: Product Families
+                code:
+                    label: Code
+                    description: The code of the attribute family
+                entity_class:
+                    label: AttributeFamily
+                    description: The entity class of the attribute family
+                id.label: ID
+                is_enabled:
+                    label: Is enabled
+                    description: A flag that says if the attribute family is available or not
+                attribute_groups.label: Group
+                image:
+                    label: Image
+                    description: The image of the attribute family
+                labels:
+                    label: Labels
+                    description: The labels of the attribute family
+                owner.label: Owner
+                organization.label: Organization

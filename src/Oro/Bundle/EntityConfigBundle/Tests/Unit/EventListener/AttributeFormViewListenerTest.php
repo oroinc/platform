@@ -11,8 +11,6 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\AttributeGroupStub;
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributeFormViewListener;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
-use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
-use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 
@@ -92,11 +90,9 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
         $entity = $this->getEntity(TestActivityTarget::class, [
             'attributeFamily' => $this->getEntity(AttributeFamily::class)
         ]);
-        $event = new BeforeFormRenderEvent($formView, [], $this->environment, $entity);
-        $this->listener->onFormRender($event);
 
         $this->environment
-            ->expects($this->exactly((int)!empty($templateHtml)))
+            ->expects($templateHtml ? $this->once() : $this->never())
             ->method('render')
             ->willReturn($templateHtml);
 
@@ -106,7 +102,7 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($groupsData);
 
         $scrollData = new ScrollData($scrollData);
-        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData, new \stdClass(), $formView);
+        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData, $entity, $formView);
         $this->listener->onEdit($listEvent);
 
         $this->assertEquals($expectedData, $listEvent->getScrollData()->getData());
@@ -144,8 +140,6 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
         $entity = $this->getEntity(TestActivityTarget::class, [
             'attributeFamily' => $this->getEntity(AttributeFamily::class)
         ]);
-        $event = new BeforeViewRenderEvent($this->environment, [], $entity);
-        $this->listener->onViewRender($event);
 
         $this->environment
             ->expects($this->exactly((int)!empty($templateHtml)))
@@ -158,7 +152,7 @@ class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($groupsData);
 
         $scrollData = new ScrollData($scrollData);
-        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData, new \stdClass());
+        $listEvent = new BeforeListRenderEvent($this->environment, $scrollData, $entity);
         $this->listener->onViewList($listEvent);
 
         $this->assertEquals($expectedData, $listEvent->getScrollData()->getData());

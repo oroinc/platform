@@ -10,7 +10,7 @@ The Oro Platform collects documentation for API resources from several sources:
 
 * The documentation can be written in a [configuration file](./configuration.md).
 * A [Markdown](https://daringfireball.net/projects/markdown/) document. The detailed information you can find bellow in this document.
-* System-wide descriptions of entities and fields.
+* System-wide descriptions of [configurable entities and fields](./../../../EntityConfigBundle/README.md).
 
 The most priority source is the configuration file. The documentation provided there overrides all other sources. But as it is YAML file it is not the best way to write a big multi-line texts there. The more appropriate place for the documentation is a separate [Markdown](https://daringfireball.net/projects/markdown/) file. To use such file you need to provide a link to it in the configuration file, e.g.:
 
@@ -157,7 +157,7 @@ An example:
 
 ### create
 
-Create a new AcmeEntity record.
+Create a new acme entity record.
 The created record is returned in the response.
 
 {@inheritdoc}
@@ -190,7 +190,7 @@ An example:
 
 ### create
 
-Create a new AcmeEntity record.
+Create a new acme entity record.
 The created record is returned in the response.
 
 {@inheritdoc}

@@ -20,7 +20,7 @@ class GridFilters extends Element
         $filterItem = null;
 
         if ($strict) {
-            $filterItems = $this->elementFactory->findAllElements($name);
+            $filterItems = $this->elementFactory->findAllElements($name, $this);
             foreach ($filterItems as $item) {
                 if ($item->getText() === $text) {
                     $filterItem = $item;
@@ -28,11 +28,13 @@ class GridFilters extends Element
                 }
             }
         } else {
-            $filterItem = $this->elementFactory->findElementContains($name, $text);
-            self::assertTrue($filterItem->isValid(), sprintf('Can\'t find filter with "%s" name', $text));
+            $filterItem = $this->elementFactory->findElementContains($name, $text, $this);
+            if (!$filterItem->isValid()) {
+                $filterItem = $this->elementFactory->findElementContainsByXPath($name, $text, true, $this);
+            }
         }
 
-        if (!$filterItem) {
+        if (null === $filterItem || !$filterItem->isValid()) {
             self::fail(sprintf('Can\'t find filter with "%s" name', $text));
         }
 

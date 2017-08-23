@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
-use DateTime;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -21,7 +19,7 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
         $owner = new User();
         $organization = new Organization();
         $folder = new EmailFolder();
-        $receivedAt = new DateTime('now');
+        $receivedAt = new \DateTime('now');
 
         $emailUser->setEmail($email);
         $emailUser->setOrganization($organization);
@@ -37,6 +35,9 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($owner, $emailUser->getOwner());
         $this->assertEquals($receivedAt, $emailUser->getReceivedAt());
         $this->assertNull($emailUser->getCreatedAt());
+
+        $emailUser->setOrganization(null);
+        $this->assertNull($emailUser->getOrganization());
     }
 
     public function testBeforeSave()
@@ -44,7 +45,7 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
         $emailUser = new EmailUser();
         $emailUser->beforeSave();
 
-        $this->assertInstanceOf('\DateTime', $emailUser->getCreatedAt());
+        $this->assertInstanceOf(\DateTime::class, $emailUser->getCreatedAt());
     }
 
     /**
@@ -105,7 +106,9 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
     public function incomingEmailUserProvider()
     {
         $user = new User();
+        $user->setId(1);
         $user2 = new User();
+        $user->setId(2);
 
         return [
             'inbox folder' => [

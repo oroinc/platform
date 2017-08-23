@@ -318,7 +318,7 @@ the names of [constants of NumberFormatter](#constants):
 
 Next filters are available in Twig templates:
 
-###oro_format_number
+### oro_format_number
 
 This filter formats a number to localized format according to passed number style and optional custom options:
 
@@ -340,7 +340,7 @@ This example outputs MINUS 10.0000,123 and shows what options could be passed to
 }) }}
 ```
 
-###oro_format_currency
+### oro_format_currency
 
 This filter formats currency number according to localized format.
 
@@ -365,7 +365,7 @@ This line outputs a string: (1 2345.78 €)
 }) }}
 ```
 
-###oro_format_decimal
+### oro_format_decimal
 
 This filter formats decimal number according localized format.
 
@@ -387,7 +387,7 @@ This snippet shows an example of using custom formatting options. It outputs a s
 }) }}
 ```
 
-###oro_format_percent
+### oro_format_percent
 
 This filter formats percent number according localized format.
 
@@ -409,7 +409,7 @@ This snippet shows an example of using custom formatting options. It outputs a s
 }) }}
 ```
 
-###oro_format_spellout
+### oro_format_spellout
 
 This filter formats a number in spellout style.
 
@@ -428,7 +428,7 @@ This line outputs a string: twelve
 {{ 1|oro_format_spellout({ locale: 'en_US' }) }}
 ```
 
-###oro_format_duration
+### oro_format_duration
 
 This filter formats a number in duration style.
 
@@ -450,7 +450,7 @@ This line outputs a string: 1 hour, 1 minute, 1 second
 }) }}
 ```
 
-###oro_format_ordinal
+### oro_format_ordinal
 
 This filter formats a number in ordinal style.
 

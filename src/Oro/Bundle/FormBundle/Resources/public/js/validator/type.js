@@ -1,7 +1,9 @@
-define(['underscore', 'orotranslation/js/translator'
-], function(_, __) {
+define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var numberFormatter = require('orolocale/js/formatter/number');
     var defaultParam = {
         message: 'This value should be of type {{ type }}.'
     };
@@ -17,6 +19,10 @@ define(['underscore', 'orotranslation/js/translator'
                 case 'integer':
                     var valueNumber = Number(value).toFixed();
                     result = String(valueNumber) === value;
+                    break;
+                case 'float':
+                case 'numeric':
+                    result = !isNaN(numberFormatter.unformatStrict(value));
                     break;
                 default:
                     result = true;

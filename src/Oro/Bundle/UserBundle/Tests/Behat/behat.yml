@@ -9,7 +9,7 @@ oro_behat_extension:
           Password: '_password'
 
     User Form:
-      selector: 'div#container'
+      selector: 'form[name="oro_user_user_form"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
@@ -43,7 +43,9 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UserRoleView:
-      selector: "[data-target='#user-role-view']"
+      selector:
+        type: 'xpath'
+        locator: '//div[contains(@data-page-component-name,"role-permission-grid")]/..'
       class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm
 
   pages:

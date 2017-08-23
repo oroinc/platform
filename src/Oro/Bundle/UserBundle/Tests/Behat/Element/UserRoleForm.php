@@ -25,7 +25,7 @@ class UserRoleForm extends Form
             $levelCaption = strip_tags($level->getHtml());
             $availableLevels[] = $levelCaption;
 
-            if (preg_match(sprintf('/%s/i', $accessLevel), $levelCaption)) {
+            if (preg_match(sprintf('/%s/i', preg_quote($accessLevel, '\\')), $levelCaption)) {
                 $level->mouseOver();
                 $level->click();
                 return;
@@ -43,11 +43,18 @@ class UserRoleForm extends Form
     /**
      * Checks capability permission checkbox
      *
-     * @param $name
+     * @param string $name
+     * @param bool $check
      */
-    public function setCheckBoxPermission($name)
+    public function setCheckBoxPermission($name, $check = true)
     {
-        $this->findLabel($name)->find('css', 'input')->check();
+        $element = $this->findLabel($name)->find('css', 'input');
+
+        if ($check) {
+            $element->check();
+        } else {
+            $element->uncheck();
+        }
     }
 
     /**
@@ -78,7 +85,7 @@ class UserRoleForm extends Form
      */
     protected function getEntityRow($entity)
     {
-        $entityTrs = $this->findAll('css', 'div[id^=grid-role-permission-grid] table.grid tbody tr');
+        $entityTrs = $this->findAll('css', 'div[id*=permission-grid].inner-permissions-grid table.grid tbody tr');
         self::assertNotCount(0, $entityTrs, 'Can\'t find table with permissions on the page');
 
         /** @var NodeElement $entityTr */

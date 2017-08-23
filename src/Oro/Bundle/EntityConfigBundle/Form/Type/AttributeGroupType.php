@@ -65,7 +65,7 @@ class AttributeGroupType extends AbstractType
             ]
         );
 
-        $builder->add( //This needed for new forms which will be dynamically added
+        $builder->add(//This needed for new forms which will be dynamically added
             'attributeRelations',
             AttributeMultiSelectType::NAME,
             [

@@ -39,6 +39,25 @@ oro_behat_extension:
       selector: '.select2-offscreen'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
 
+    Select2Entities:
+      selector: '.select2-input'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities
+
+    Textarea:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Textarea
+
     Simple Color Picker Field:
       selector: 'span.simplecolorpicker'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroSimpleColorPickerField
+
+    Select2Offscreen:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Offscreen
+
+    Select2Choices:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Choices
+
+    Select:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select
+
+    PrettyCheckbox:
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\PrettyCheckbox

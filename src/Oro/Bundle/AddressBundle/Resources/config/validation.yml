@@ -1,4 +1,7 @@
 Oro\Bundle\AddressBundle\Entity\AbstractAddress:
+    constraints:
+        - Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization: { groups: ['RequireName'] }
+
     properties:
         street:
             - Length:

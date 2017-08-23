@@ -1,7 +1,7 @@
 UPGRADE FROM 1.4 to 1.5
 =======================
 
-####General changes
+#### General changes
 - FOSRestBundle updated from 0.12.* to 1.5.0-RC2 [FOSRestBundle Upgrading](https://github.com/FriendsOfSymfony/FOSRestBundle/blob/master/UPGRADING.md)
   fos_rest section in config.yml must be updated prior to new version of bundle.
 
@@ -25,24 +25,24 @@ fos_rest:
         default_format: json
 ```
 
-####OroAddressBundle:
+#### OroAddressBundle:
 - `PhoneProvider` class has been added to help getting phone number(s) from object.
 
-####OroCalendarBundle:
+#### OroCalendarBundle:
 - Added calendar providers. Calendar Provider gives developers a way to add a different kind of items on a calendar. As example developer can use calendar provider to show emails as "Calendar Events" into Calendar.
 - Changed REST API for CalendarConnections. Before Developer send Calendar ID of logged user and Calendar ID that connected with calendar of logged user. In current version he should send "CalendarProperty" ID into PUT and DELETE REST methods.
 - Added "context menu" for calendar, based on menu from NavigationBundle. "Context menu" can be extend in any other bundle
 
-####OroConfigBundle:
+#### OroConfigBundle:
 - `oro_config_entity` twig function was removed (deprecated since **1.3**)
 
-####OroDataAuditBundle
+#### OroDataAuditBundle
 - REST `Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController` was refactored to be based on `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController`
 - REST data representation was changed for resource `audit`, keys `object_class` and `object_name` was deprecated in favor of new camel case keys name.
 - REST added possibility to paginate and filter collection for resource `audit`. Possible filtering by: `loggedAt`, `action`, `user`, `objectClass`.
 - SOAP `Oro\Bundle\DataAuditBundle\Controller\Api\Soap\AuditController` was refactored to be based on `Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController`.
 
-####OroEntityExtendBundle:
+#### OroEntityExtendBundle:
 - `Tools\ExtendConfigDumper` constant `ENTITY` has been deprecated
 - Naming of proxy classes for extended entities has been changed to fix naming conflicts
 - Adding of extended fields to form has been changed. From now `form.additional` is not available in TWIG template, because extended fields are added to main form and have  `extra_field` flag. The following statement can be used to loop through extended fields in TWIG template: `{% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}`.
@@ -53,23 +53,23 @@ fos_rest:
   This is useful when auto-generated strategy fails due to duplication of short class names in the hierarchy.
 - Removed not used anymore `is_inverse` config node from `extend` scope in **entity config**
 
-####OroEntityConfigBundle:
+#### OroEntityConfigBundle:
 - Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
   as well as already existing `routeName` and `routeView` properties
 
-####OroIntegrationBundle:
+#### OroIntegrationBundle:
 - `Oro\Bundle\IntegrationBundle\Entity\Channel#getEnabled` deprecated in favor of `isEnabled` of the same class
 
-####OroFormBundle:
+#### OroFormBundle:
 - Added `oro_simple_color_picker` Symfony2 form type based on `hidden` and using [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff and [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
 - Added `oro_simple_color_choice` Symfony2 form type based on `choice` and using [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added `oro_color_table` Symfony2 form type intended to edit any color in a list and using [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff and [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
 
-####OroNavigationBundle
+#### OroNavigationBundle
 - Added support of [System Aware Resolver](/src/Oro/Component/Config/Resources/doc/system_aware_resolver.md) in navigation.yml
 - Added possibility to hide **pin** and **add to favorites** buttons on pages that does not support this kind of functionality. 
 
-####OroSoapBundle
+#### OroSoapBundle
 - Refactored `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController` added possibility to filter input parameters using **filter objects** as well as closures
 - Added `Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface` that could be implemented in order to filter/transform input parameters for REST APIs
 - Added `Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter` - filter that transforms underscore separated class name into valid namespace class name with backslashes
@@ -85,7 +85,7 @@ fos_rest:
   `Oro\Bundle\SoapBundle\Request\Handler\IncludeHandlerInterface` and registered as service with tag `oro_soap.include_handler` with `alias` option that should correspond
   to requested info that it handles
 
-####OroUIBundle:
+#### OroUIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
 - Added context provider(`oro_ui.provider.widget_context`) that allows to customize application behavior based depends on current context.
@@ -116,10 +116,10 @@ fos_rest:
   It contains reference on instance `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
 - `show_pin_button_on_start_page` config node is node used anymore. Please use ability to hide navigation elements in `navigation.yml` 
 
-####OroSearchBundle:
+#### OroSearchBundle:
 - Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.
 
-####OroWorkflowBundle:
+#### OroWorkflowBundle:
 - Added `multiple` option for `entity` attribute to allow use many-to-many relations in workflows. Example of usage of Multi-Select type (in this example it is supposed that Opportunity entity has `Multi-Select` field named `interested_in` and `enum_code` of this type is `opportunity_interested_in`):
 
 ``` yaml
@@ -144,14 +144,14 @@ workflows:
                                 expanded: true
 ```
 
-####OroUserBundle:
+#### OroUserBundle:
  - Added user search handler that return users that was assigned to current organization and limit by search string excluding current user. 
  Autocomplite alias for this handler is `organization_users`. 
 
-####OroTrackingBundle:
+#### OroTrackingBundle:
  - Entities `TrackingWebsite` and `TrackingEvent` were made extendable
 
-####OroBatchBundle:
+#### OroBatchBundle:
  - Added possibility to disable debug logging for integration/import/export processes(were placed in `app/logs/batch/`) 
  on application level under `oro_batch.log_batch` node. Default value is `disabled`
  - Added cleanup job for DB tables of entities from `AkeneoBatchBundle`. It performs by cron every day in 1 am, and also 
@@ -159,5 +159,5 @@ workflows:
   option is configurable on application level under `oro_batch.cleanup_interval` node. For manual run it's possible to pass
   interval directly as command argument `[-i|--interval[="..."]]` 
 
-####OroDistributionBundle:
+#### OroDistributionBundle:
  - Added possibility to access precise bundle in case of bundle inheritance by adding "!" sign before bundle name.

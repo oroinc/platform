@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -27,6 +26,8 @@ class FeatureContext extends OroFeatureContext implements
 
     /**
      * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
@@ -64,7 +65,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function charlieUserInTheSystem()
     {
-        $this->fixtureLoader->loadFixtureFile('user.yml');
+        $this->fixtureLoader->loadFixtureFile('OroUserBundle:user.yml');
     }
 
     /**
@@ -92,7 +93,13 @@ class FeatureContext extends OroFeatureContext implements
     {
         $this->getMink()->setDefaultSessionName('second_session');
         $this->oroMainContext->loginAsUserWithPassword('charlie');
-        $this->waitForAjax();
+
+        $error = $this->spin(function (FeatureContext $context) {
+            return $context->getPage()->find('css', 'div.alert-error');
+        }, 5);
+
+        self::assertNotNull($error, 'Expect to find error on page, but it not found');
+        self::assertEquals('Account is locked.', $error->getText());
 
         $this->oroMainContext->assertPage('Login');
         $this->getSession('second_session')->stop();

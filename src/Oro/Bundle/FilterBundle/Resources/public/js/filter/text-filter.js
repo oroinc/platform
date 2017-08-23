@@ -1,14 +1,20 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './empty-filter',
-    'oroui/js/tools',
-    'oroui/js/mediator'
-], function($, _, __, EmptyFilter, tools, mediator) {
+define(function(require) {
     'use strict';
 
     var TextFilter;
+    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
+    var template = require('tpl!orofilter/templates/filter/text-filter.html');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var EmptyFilter = require('./empty-filter');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+
+    var config = require('module').config();
+    config = _.extend({
+        notAlignCriteria: tools.isMobile()
+    }, config);
 
     /**
      * Text grid filter.
@@ -25,8 +31,9 @@ define([
     TextFilter = EmptyFilter.extend({
         wrappable: true,
 
-        wrapperTemplate: '',
+        notAlignCriteria: config.notAlignCriteria,
 
+        wrapperTemplate: wrapperTemplate,
         wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
@@ -34,6 +41,7 @@ define([
          *
          * @property
          */
+        template: template,
         templateSelector: '#text-filter-template',
 
         /**
@@ -116,8 +124,7 @@ define([
                 return;
             }
 
-            if (!this._hasMinimumLength()) {
-                this._showMinLengthWarning();
+            if (!this._isValid()) {
                 return;
             }
 
@@ -132,8 +139,7 @@ define([
          */
         _onClickUpdateCriteria: function(e) {
 
-            if (!this._hasMinimumLength()) {
-                this._showMinLengthWarning();
+            if (!this._isValid()) {
                 e.stopImmediatePropagation();
                 return;
             }
@@ -143,21 +149,23 @@ define([
         },
 
         /**
-         * Handles min_length text filter option.
-         * 0 is default value which means any length is fine.
+         * Handles min_length and max_length text filter option.
          *
          * @returns {boolean}
          * @private
          */
-        _hasMinimumLength: function() {
-            if (typeof this.min_length === 'undefined') {
-                return true;
+        _isValid: function() {
+            if (typeof this.min_length !== 'undefined' && this._readDOMValue().value.length < this.min_length) {
+                this._showMinLengthWarning();
+                return false;
             }
 
-            var enoughCharacters =  this._readDOMValue().value.length >= this.min_length;
-            var noCharacters = this._readDOMValue().value.length === 0;
+            if (typeof this.max_length !== 'undefined' && this._readDOMValue().value.length > this.max_length) {
+                this._showMaxLengthWarning();
+                return false;
+            }
 
-            return this.min_length === 0 || enoughCharacters || noCharacters;
+            return true;
         },
 
         /**
@@ -168,6 +176,17 @@ define([
                 'showFlashMessage',
                 'warning',
                 __('oro.filter.warning.min_length', {min_length: this.min_length})
+            );
+        },
+
+        /**
+         * @private
+         */
+        _showMaxLengthWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('oro.filter.warning.max_length', {max_length: this.max_length})
             );
         },
 
@@ -216,7 +235,7 @@ define([
          */
         _applyValueAndHideCriteria: function() {
             this._hideCriteria();
-            if (this._hasMinimumLength()) {
+            if (this._isValid()) {
                 this.applyValue();
             }
         },
@@ -274,7 +293,7 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            if (tools.isMobile()) {
+            if (this.notAlignCriteria) {
                 // no need to align criteria on mobile version, it is aligned over CSS
                 return;
             }

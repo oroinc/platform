@@ -112,7 +112,7 @@ class Tag extends ExtendTag
     protected $updated;
 
     /**
-     * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="LAZY")
+     * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="EXTRA_LAZY")
      */
     protected $tagging;
 

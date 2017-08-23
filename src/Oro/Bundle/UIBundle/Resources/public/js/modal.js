@@ -1,16 +1,16 @@
-define([
-    'module',
-    'underscore',
-    'backbone',
-    'orotranslation/js/translator',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    'backbone-bootstrap-modal'
-], function(module, _, Backbone, __, mediator, tools) {
+define(function(require) {
     'use strict';
 
     var Modal;
+    var module = require('module');
+    var template = require('tpl!oroui/templates/modal-dialog.html');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var Backbone = require('backbone');
     var $ = Backbone.$;
+    require('backbone-bootstrap-modal');
 
     var config = module.config();
 
@@ -36,6 +36,8 @@ define([
      * @extends Backbone.BootstrapModal
      */
     Modal = Backbone.BootstrapModal.extend({
+        template: template,
+
         events: _.extend(Backbone.BootstrapModal.prototype.events, {
             'click [data-button-id]': 'onButtonClick'
         }),
@@ -51,6 +53,10 @@ define([
 
             if (options.templateSelector) {
                 options.template = _.template($(options.templateSelector).html());
+            } else if (typeof options.template === 'string') {
+                options.template = _.template(options.template);
+            } else if (!options.template) {
+                options.template = this.template;
             }
 
             if (options.handleClose) {

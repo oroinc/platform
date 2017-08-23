@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Driver\DriverInterface;
-use Behat\Mink\Element\ElementInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
 class InputValue implements ElementValueInterface

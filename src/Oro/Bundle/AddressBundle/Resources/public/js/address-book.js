@@ -7,7 +7,8 @@ define([
     'oro/dialog-widget',
     'oroaddress/js/mapservice/googlemaps',
     'oroaddress/js/address/view',
-    'oroaddress/js/address/collection'
+    'oroaddress/js/address/collection',
+    'oroui/js/delete-confirmation'
 ], function(
     $,
     _,
@@ -18,7 +19,8 @@ define([
     DialogWidget,
     Googlemaps,
     AddressView,
-    AddressCollection
+    AddressCollection,
+    deleteConfirmation
 ) {
     'use strict';
 
@@ -30,8 +32,6 @@ define([
     return BaseView.extend({
         isEmpty: false,
 
-        showMap: true,
-
         options: {
             'mapOptions': {
                 zoom: 12
@@ -40,11 +40,13 @@ define([
             'addressListUrl': null,
             'addressCreateUrl': null,
             'addressUpdateUrl': null,
+            'addressDeleteUrl': null,
             'mapView': Googlemaps,
             'addressMapOptions': {},
             'allowToRemovePrimary': false,
-            'confirmRemove': false,
-            'confirmRemoveComponent': null
+            'confirmRemove': true,
+            'confirmRemoveComponent': deleteConfirmation,
+            showMap: true
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
@@ -63,7 +65,7 @@ define([
 
             this._initMainContainers();
 
-            if (this.showMap) {
+            if (this.options.showMap) {
                 this.initializeMap();
             }
         },
@@ -195,7 +197,8 @@ define([
                     template: this.options.template,
                     allowToRemovePrimary: this.options.allowToRemovePrimary,
                     confirmRemove: this.options.confirmRemove,
-                    confirmRemoveComponent: this.options.confirmRemoveComponent
+                    confirmRemoveComponent: this.options.confirmRemoveComponent,
+                    addressDeleteUrl: this._getUrl('addressDeleteUrl', address)
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);

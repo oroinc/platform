@@ -46,12 +46,12 @@
             'route': 'oro_integration_index',
             'params': {'_enableContentProviders': 'mainMenu'}
         }) %}
-        {% if resource_granted('oro_integration_create') %}
+        {% if is_granted('oro_integration_create') %}
             {% set html = html ~ UI.saveAndNewButton({
                 'route': 'oro_integration_create'
             }) %}
         {% endif %}
-        {% if form.vars.value.id or resource_granted('oro_integration_update') %}
+        {% if form.vars.value.id or is_granted('oro_integration_update') %}
             {% set html = html ~ UI.saveAndStayButton({
                 'route': 'oro_integration_update',
                 'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
@@ -140,11 +140,21 @@
                     mediator.execute('showLoading');
 
                     $.ajax(url, {
-                        success: function (res) {
-                            messenger.notificationMessage('success', res.message);
+                        success: function (response) {
+                            messenger.notificationMessage(
+                                response.successful ? 'success' : 'warning',
+                                response.message
+                            );
                         },
-                        errorHandlerMessage: __('oro.integration.error'),
-                        dataType: 'json'
+                        error: function(response) {
+                            messenger.notificationMessage(
+                                'error',
+                                response.responseJSON && response.responseJSON.message
+                                    ? response.responseJSON.message
+                                    : __('oro.integration.error')
+                            );
+                        },
+                        errorHandlerMessage: false
                     }).always(function () {
                         mediator.execute('hideLoading');
                     });

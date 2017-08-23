@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -17,15 +19,14 @@ use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadata;
 
     /** @var EventDispatcherInterface */
@@ -35,14 +36,14 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     protected $aclHelper;
 
     /**
-     * @param ContextRegistry           $contextRegistry
-     * @param ManagerRegistry           $registry
-     * @param OwnershipMetadataProvider $ownershipMetadata
+     * @param ContextRegistry                    $contextRegistry
+     * @param ManagerRegistry                    $registry
+     * @param OwnershipMetadataProviderInterface $ownershipMetadata
      */
     public function __construct(
         ContextRegistry $contextRegistry,
         ManagerRegistry $registry,
-        OwnershipMetadataProvider $ownershipMetadata
+        OwnershipMetadataProviderInterface $ownershipMetadata
     ) {
         parent::__construct($contextRegistry);
 
@@ -131,7 +132,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         foreach ($identifierNames = $metadata->getIdentifierFieldNames() as $fieldName) {
             $qb->orderBy('o.' . $fieldName, 'ASC');
         }
-        if (! empty($ids)) {
+        if (!empty($ids)) {
             if (count($identifierNames) > 1) {
                 throw new \LogicException(sprintf(
                     'not supported entity (%s) with composite primary key.',
@@ -139,9 +140,16 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
                 ));
             }
             $identifierName = 'o.' . current($identifierNames);
-            $qb
-                ->andWhere($identifierName . ' IN (:ids)')
-                ->setParameter('ids', $ids);
+
+            if (count($ids) === 1) {
+                $qb
+                    ->andWhere($identifierName . ' = :id')
+                    ->setParameter('id', reset($ids));
+            } else {
+                $qb
+                    ->andWhere($identifierName . ' IN (:ids)')
+                    ->setParameter('ids', $ids);
+            }
         }
 
         $this->addOrganizationLimits($qb, $entityName, $organization);
@@ -208,7 +216,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, Organization $organization = null)
     {
         if ($organization) {
-            $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getGlobalOwnerFieldName();
+            $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getOrganizationFieldName();
             if ($organizationField) {
                 $queryBuilder->andWhere('o.' . $organizationField . ' = :organization')
                     ->setParameter('organization', $organization);

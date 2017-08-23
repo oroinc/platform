@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -91,6 +92,11 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @param null $route
+     *
+     * @return array
+     */
     public function getExpectedDefinition($route = null)
     {
         $definition = [
@@ -118,7 +124,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
+                        'value' => SqlWalker::class,
                     ]
                 ],
                 'acl_resource' => 'oro_segment_view',

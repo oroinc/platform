@@ -1,0 +1,10 @@
+oro_behat_extension:
+  elements:
+    Organization Form:
+      selector: 'form[name="oro_organization_form"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Status: 'oro_organization_form[enabled]'
+          Name: 'oro_organization_form[name]'
+          Description: 'oro_organization_form[description]'

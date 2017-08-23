@@ -21,7 +21,7 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Form\Model\EmailApi as EmailModel;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -33,8 +33,8 @@ class EmailApiHandler extends ApiFormHandler
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
+    /** @var TokenAccessorInterface */
+    protected $tokenAccessor;
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
@@ -53,7 +53,7 @@ class EmailApiHandler extends ApiFormHandler
      * @param Request                  $request
      * @param EntityManager            $entityManager
      * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param SecurityFacade           $securityFacade
+     * @param TokenAccessorInterface   $tokenAccessor
      * @param EventDispatcherInterface $eventDispatcher
      * @param DataTransformerInterface $emailImportanceTransformer
      * @param DataTransformerInterface $emailBodyTypeTransformer
@@ -63,18 +63,18 @@ class EmailApiHandler extends ApiFormHandler
         Request $request,
         EntityManager $entityManager,
         EmailEntityBuilder $emailEntityBuilder,
-        SecurityFacade $securityFacade,
+        TokenAccessorInterface $tokenAccessor,
         EventDispatcherInterface $eventDispatcher,
         DataTransformerInterface $emailImportanceTransformer,
         DataTransformerInterface $emailBodyTypeTransformer
     ) {
         parent::__construct($form, $request, $entityManager);
 
-        $this->emailEntityBuilder         = $emailEntityBuilder;
-        $this->securityFacade             = $securityFacade;
-        $this->eventDispatcher            = $eventDispatcher;
+        $this->emailEntityBuilder = $emailEntityBuilder;
+        $this->tokenAccessor = $tokenAccessor;
+        $this->eventDispatcher = $eventDispatcher;
         $this->emailImportanceTransformer = $emailImportanceTransformer;
-        $this->emailBodyTypeTransformer   = $emailBodyTypeTransformer;
+        $this->emailBodyTypeTransformer = $emailBodyTypeTransformer;
     }
 
     /**
@@ -272,9 +272,9 @@ class EmailApiHandler extends ApiFormHandler
     {
         if (!$this->emailOrigin) {
             /** @var User $originOwner */
-            $originOwner = $this->securityFacade->getLoggedUser();
-            $organization = $this->securityFacade->getOrganization();
-            $originName   = InternalEmailOrigin::BAP . '_User_' . $originOwner->getId();
+            $originOwner = $this->tokenAccessor->getUser();
+            $organization = $this->tokenAccessor->getOrganization();
+            $originName = InternalEmailOrigin::BAP . '_User_' . $originOwner->getId();
 
             $origins = $originOwner->getEmailOrigins()->filter(
                 function ($item) use ($originName, $organization) {

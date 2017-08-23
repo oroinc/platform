@@ -27,6 +27,7 @@ define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_
             timezone: 'UTC',
             timezone_offset: '+00:00',
             format_address_by_address_country: true,
+            apiKey: null,
             unit: {
                 'temperature': 'fahrenheit',
                 'wind_speed':  'miles_per_hour'

@@ -23,10 +23,7 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
             $body['originFileName']
         )
         ) {
-            $this->logger->critical(
-                sprintf('Got invalid message. body: %s', $body),
-                ['message' => $body]
-            );
+            $this->logger->critical('Got invalid message');
 
             return false;
         }
@@ -104,7 +101,7 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
             $error
         );
 
-        $this->logger->critical($errorMessage, ['message' => $body]);
+        $this->logger->critical($errorMessage);
 
         if (isset($body['notifyEmail'])) {
             $this->producer->send(NotifcationTopics::SEND_NOTIFICATION_EMAIL, [

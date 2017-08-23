@@ -1,5 +1,5 @@
 include:
-    - ../../../../../../../../../platform/src/Oro/Bundle/TranslationBundle/Tests/Behat/Features/Fixtures/LanguageFixture.yml
+    - '@OroTranslationBundle:LanguageFixture.yml'
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     title_localization1:
@@ -16,6 +16,9 @@ Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
 
     title_localization5:
         string: 'Localization 5'
+
+    title_german_localization:
+        string: 'German Localization'
 
 Oro\Bundle\LocaleBundle\Entity\Localization:
     localization1:
@@ -51,3 +54,9 @@ Oro\Bundle\LocaleBundle\Entity\Localization:
         formattingCode: 'en_CA'
         titles: ['@title_localization5']
         parentLocalization: '@localization2'
+
+    german_localization:
+        name: 'German Localization'
+        language: '@german_language'
+        formattingCode: 'de_DE'
+        titles: ['@title_german_localization']

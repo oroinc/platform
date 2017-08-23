@@ -19,7 +19,7 @@ define(function(require) {
                 var dateTimeString;
                 var dateTimeFormat = 'YYYY-MM-DD[T]HH:mm:ss';
                 if (this.hasOwnProperty('_tzm')) {
-                    dateTimeString = this.add(-this._tzm , 'minutes').clone().utc().format(dateTimeFormat);
+                    dateTimeString = this.add(this._tzm , 'minutes').clone().utc().format(dateTimeFormat);
                     delete this._tzm;
                 } else {
                     dateTimeString = this.format(dateTimeFormat);

@@ -22,7 +22,6 @@ services:
             - '@oro_ui.router'
             - '@oro_entity.doctrine_helper'
             - '@oro_form.form.handler.default'
-            - '@oro_form.registry.form_template_data_provider'
 
     oro_form.provider.html_tag_provider:
         class: %oro_form.provider.html_tag_provider.class%

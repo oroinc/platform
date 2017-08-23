@@ -70,3 +70,7 @@ services:
     oro_cache.action.transformer.datetime_to_cron_format:
         public: false
         class: 'Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer'
+
+    oro.cache.memory_cache_chain:
+        public: false
+        class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain

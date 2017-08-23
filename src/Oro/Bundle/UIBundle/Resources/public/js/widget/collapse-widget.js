@@ -7,14 +7,16 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         options: {
             trigger: '[data-collapse-trigger]',
             container: '[data-collapse-container]',
-            hideSibling: false,
-            storageKey: '',
-            open: true,
-            forcedState: null,
             uid: '',
+            group: '',
+            storageKey: '',
             openClass: 'expanded',
-            overflowClass: 'overflows',
-            toggleClassesOnly: false,
+            forcedState: null,
+            closeClass: '',
+            keepState: false,
+            open: true,
+            hideSibling: false,
+            checkOverflow: false,
             animationSpeed: 250
         },
 
@@ -29,9 +31,6 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 storedState = JSON.parse(localStorage.getItem(this.options.storageKey + this.options.uid));
             }
 
-            this.$trigger = this.$el.find(this.options.trigger);
-            this.$container = this.$el.find(this.options.container);
-
             if (_.isBoolean(this.options.forcedState)) {
                 this.options.open = this.options.forcedState;
             } else if (_.isBoolean(storedState)) {
@@ -40,65 +39,116 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
 
             this.$el.addClass('init');
 
+            this._setElements();
             this._initEvents();
-
-            this.$el.toggleClass(this.options.openClass, this.options.open);
-            this.$el.toggleClass(
-                this.options.overflowClass,
-                this.$container[0].scrollHeight > this.$container[0].clientHeight
-            );
-
-            if (this.options.toggleClassesOnly) {
-                return;
-            }
+            this._setState(this.options.open);
 
             if (this.options.open) {
-                this.$container.show();
                 mediator.trigger('scrollable-table:reload');
-            } else {
-                this.$container.hide();
             }
         },
 
         _destroy: function() {
-            this._off(this.$trigger, 'click');
-            this.$el.removeClass('init');
-            if (!this.options.toggleClassesOnly) {
-                this.$container.css('display', '');
+            if (!this.options.keepState) {
                 this._setState(true, true);
             }
+            this.$el.removeClass('init');
+            this._off(this.$trigger, 'click');
+            mediator.off(null, null, this);
             this._super();
+        },
+
+        _setElements: function() {
+            this.$trigger = this.$el.find(this.options.trigger);
+            this.$container = this.$el.find(this.options.container);
         },
 
         _initEvents: function() {
             this._on(this.$trigger, {
                 'click': this._toggle
             });
+
+            var group = this.options.group;
+            if (group) {
+                mediator.on('collapse-group-widgets:' + group + ':setState', this._setState, this);
+                mediator.on('collapse-group-widgets:' + group + ':collectStates', this._collectStates, this);
+            }
+        },
+
+        _isOverflow: function() {
+            return this.$container[0].scrollHeight > this.$container[0].clientHeight;
         },
 
         _setState: function(isOpen, isDestroy) {
-            var params = {
-                isOpen: isOpen,
-                $el: this.$el,
-                $trigger: this.$trigger,
-                $container: this.$container
-            };
+            this.options.open = isOpen;
 
-            this.$el.toggleClass(this.options.openClass, isOpen);
-            this.$el.toggleClass(
-                this.options.overflowClass,
-                this.$container[0].scrollHeight > this.$container[0].clientHeight
-            );
-
-            if (this.options.hideSibling) {
-                this._hideSiblings(isOpen && !isDestroy);
+            if (this.$container.is(':animated')) {
+                this.$container.finish();
             }
 
-            this.$trigger.trigger('collapse:toggle', params);
+            if (this.options.checkOverflow) {
+                this.$el.removeClass(this.options.openClass)
+                    .removeClass(this.options.closeClass);
+                if (!this._isOverflow()) {
+                    //do nothing
+                    return;
+                }
+            }
+
+            this._applyStateOnEl(isOpen);
+            this._applyStateOnContainer(isOpen);
+            this._applyStateOnSiblings(isOpen, isDestroy);
+            this._applyStateOnTrigger(isOpen);
+            this._applyStateOnGroup(isOpen);
+
             mediator.trigger('layout:adjustHeight');
 
             if (this.options.storageKey) {
                 localStorage.setItem(this.options.storageKey + this.options.uid, isOpen);
+            }
+        },
+
+        _applyStateOnEl: function(isOpen) {
+            this.$el.toggleClass(this.options.openClass, isOpen);
+            this.$el.toggleClass(this.options.closeClass, !isOpen);
+        },
+
+        _applyStateOnContainer: function(isOpen) {
+            if (this.options.animationSpeed) {
+                if (isOpen) {
+                    this.$container.slideDown(this.options.animationSpeed);
+                } else {
+                    this.$container.slideUp(this.options.animationSpeed);
+                }
+            }
+        },
+
+        _applyStateOnSiblings: function(isOpen, isDestroy) {
+            if (this.options.hideSibling) {
+                this._hideSiblings(isOpen && !isDestroy);
+            }
+        },
+
+        _applyStateOnTrigger: function(isOpen) {
+            this.$trigger.trigger('collapse:toggle', {
+                isOpen: isOpen,
+                $el: this.$el,
+                $trigger: this.$trigger,
+                $container: this.$container
+            });
+        },
+
+        _applyStateOnGroup: function(isOpen) {
+            if (this.options.group) {
+                mediator.trigger('collapse-group:' + this.options.group + ':setState', isOpen);
+            }
+        },
+
+        _collectStates: function(states) {
+            if (this.options.open) {
+                states.expanded++;
+            } else {
+                states.collapsed++;
             }
         },
 
@@ -109,19 +159,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 event.preventDefault();
             }
 
-            var self = this;
-            if (!this.options.toggleClassesOnly) {
-                if (!this.$container.is(':animated')) {
-                    this.$container.slideToggle(this.options.animationSpeed, function() {
-                        self._setState($(this).is(':visible'));
-                    });
-                }
-
-                return false;
-            }
-
-            this.options.open = !this.options.open;
-            self._setState(this.options.open);
+            this._setState(!this.options.open);
         },
 
         _hideSiblings: function(isOpen) {

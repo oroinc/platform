@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Resizer;
 
-use Liip\ImagineBundle\Model\Binary;
-
+use Liip\ImagineBundle\Binary\BinaryInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Resizer\ImageResizer;
-use Oro\Bundle\AttachmentBundle\Tools\ImageFactory;
+use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
+use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
 use Psr\Log\LoggerInterface;
 
 class ImageResizerTest extends \PHPUnit_Framework_TestCase
@@ -20,26 +20,34 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var ImageResizer
      */
-    protected $resizer;
+    private $resizer;
 
     /**
-     * @var FileManager
+     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $fileManager;
+    private $fileManager;
 
     /**
-     * @var ImageFactory
+     * @var ImagineBinaryByFileContentFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $imageFactory;
+    private $imagineBinaryFactory;
+
+    /**
+     * @var ImagineBinaryFilterInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $imagineBinaryFilter;
 
     public function setUp()
     {
-        $this->imageFactory = $this->prophesize(ImageFactory::class);
-        $this->fileManager = $this->prophesize(FileManager::class);
+        $this->imagineBinaryFactory
+            = $this->createMock(ImagineBinaryByFileContentFactoryInterface::class);
+        $this->imagineBinaryFilter = $this->createMock(ImagineBinaryFilterInterface::class);
+        $this->fileManager = $this->createMock(FileManager::class);
 
         $this->resizer = new ImageResizer(
-            $this->fileManager->reveal(),
-            $this->imageFactory->reveal()
+            $this->fileManager,
+            $this->imagineBinaryFactory,
+            $this->imagineBinaryFilter
         );
     }
 
@@ -47,37 +55,77 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     {
         $exception = new \Exception();
 
-        $logger = $this->prophesize(LoggerInterface::class);
+        $logger = $this->createLoggerMock();
         $logger
-            ->warning(
+            ->method('warning')
+            ->with(
                 'Image (id: 1, filename: image.jpg) not found. Skipped during resize.',
                 ['exception' => $exception]
-            )
-            ->shouldBeCalled();
-        $this->resizer->setLogger($logger->reveal());
+            );
+        $this->resizer->setLogger($logger);
 
-        $image = $this->prophesize(File::class);
-        $image->getId()->willReturn(1);
-        $image->getFilename()->willReturn('image.jpg');
+        $image = $this->createFileMock();
+        $image->method('getId')->willReturn(1);
+        $image->method('getFilename')->willReturn('image.jpg');
 
-        $this->fileManager->getContent($image)->willThrow($exception);
+        $this->fileManager
+            ->method('getContent')
+            ->with($image)
+            ->willThrowException($exception);
 
-        $this->assertFalse($this->resizer->resizeImage($image->reveal(), self::FILTER_NAME, false));
+        $this->assertFalse($this->resizer->resizeImage($image, self::FILTER_NAME));
     }
 
     public function testResizeImage()
     {
-        $filteredBinary = new Binary(self::CONTENT, self::MIME_TYPE, self::FORMAT);
+        $binary = $this->createBinaryMock();
+        $filteredBinary = $this->createBinaryMock();
 
-        $image = new File();
+        $image = $this->createFileMock();
         $image->setMimeType(self::MIME_TYPE);
 
-        $this->fileManager->getContent($image)->willReturn(self::CONTENT);
-        $this->imageFactory->createImage(self::CONTENT, self::FILTER_NAME)->willReturn($filteredBinary);
+        $this->fileManager
+            ->method('getContent')
+            ->with($image)
+            ->willReturn(self::CONTENT);
+
+        $this->imagineBinaryFactory
+            ->method('createImagineBinary')
+            ->with(self::CONTENT)
+            ->willReturn($binary);
+
+        $this->imagineBinaryFilter
+            ->method('applyFilter')
+            ->with($binary, self::FILTER_NAME)
+            ->willReturn($filteredBinary);
 
         $this->assertEquals(
             $filteredBinary,
             $this->resizer->resizeImage($image, self::FILTER_NAME)
         );
+    }
+
+    /**
+     * @return LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createLoggerMock()
+    {
+        return $this->createMock(LoggerInterface::class);
+    }
+
+    /**
+     * @return File|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createFileMock()
+    {
+        return $this->createMock(File::class);
+    }
+
+    /**
+     * @return BinaryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createBinaryMock()
+    {
+        return $this->createMock(BinaryInterface::class);
     }
 }

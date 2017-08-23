@@ -1,14 +1,44 @@
 // @theme: blank;
 
-// @return the value in a map associated with a given key;
+// @return the value in a nested map;
+// $map: (
+//     'main': (
+//         'foo': 'bar',
+//     )
+// );
+// Use: get-nested-map-value($map, 'main', 'foo') => bar;
+
+@function get-nested-map-value($map: null, $key: 'main', $value: 'main') {
+    @if (type-of($map) == 'map') {
+        @return map-get(map-get($map,  $key), $value);
+    }
+}
+
+// @return the value in a $color-palette map associated with a given key;
 // Use: color: get-color('primary', 'base') => color: #000;
 
 @function get-color($palette: 'primary', $key: 'main') {
-    $current-palette: map-get($color-palette,  $palette);
+    $colorKey: get-nested-map-value($color-palette, $palette, $key);
 
-    @return map-get($current-palette, $key);
+    @if ($colorKey) {
+        @return $colorKey;
+    } @else {
+        @warn 'Color not found:' $palette $key;
+    }
 }
 
+// @return the value in a $theme-fonts map associated with a given key;
+// Use: font-family: get-font-name('main') => font-family: 'Lato';
+
+@function get-font-name($key) {
+    $font: get-nested-map-value($theme-fonts, $key, 'family');
+
+    @if ($font) {
+        @return $font;
+    } @else {
+        @warn 'Front not found:' $key;
+    }
+}
 
 // @return: the value in a map associated with a given key
 // Use: z-index: z('base');
@@ -20,9 +50,10 @@
             'fixed': 100,
             'popup': 150,
             'hidden': -1
-    );
+    ) !default;
 
     $z-index: map-get($layers, $layer);
+
     @return $z-index;
 }
 

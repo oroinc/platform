@@ -31,11 +31,11 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsola
     public function start(BeforeStartTestsEvent $event)
     {
         $this->kernel->boot();
-        $event->writeln('<info>Process messages before make db dump</info>');
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
+        $this->messageQueueIsolator->startMessageQueue();
         $this->messageQueueIsolator->waitWhileProcessingMessages();
-        $this->messageQueueIsolator->afterTest(new AfterIsolatedTestEvent());
+        $this->messageQueueIsolator->stopMessageQueue();
         $this->kernel->shutdown();
+        $event->writeln('<info>Process messages before make db dump</info>');
     }
 
     /** {@inheritdoc} */

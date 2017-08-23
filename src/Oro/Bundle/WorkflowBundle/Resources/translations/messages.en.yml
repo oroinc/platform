@@ -33,7 +33,7 @@ Name: Name
 Final: Final
 Start: Start
 Inactive: Inactive
-Configuration: Steps & Transitions
+Configuration: Configuration
 Transitions: Transitions
 Add transition: Add transition
 Add transition to this step: Add transition to this step
@@ -102,6 +102,8 @@ oro:
         block:
             title:
                 process_info: Process Information
+                general_information: General Information
+                steps_and_transitions: Steps & Transitions
             view:
                 process:
                     trigger:
@@ -143,6 +145,13 @@ oro:
             process:
                 activated:   Process has been activated successfully
                 deactivated: Process has been deactivated successfully
+            workflow:
+                could_not_be_cloned: 'Workflow could not be cloned'
+                could_not_be_saved: 'Workflow could not be saved'
+
+        status:
+            system.label: 'System'
+            readonly.label: 'Read-only'
 
         processdefinition:
             entity_label:                 Process

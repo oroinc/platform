@@ -59,7 +59,7 @@ class BreadcrumbManager implements BreadcrumbManagerInterface
     public function getMenu($menu, array $pathName = [], array $options = [])
     {
         if (!$menu instanceof ItemInterface) {
-            $menu = $this->provider->get((string) $menu, array_merge($options, ['check_access' => false]));
+            $menu = $this->provider->get((string) $menu, array_merge($options, ['check_access_not_logged_in' => true]));
         }
         foreach ($pathName as $child) {
             $menu = $menu->getChild($child);

@@ -11,10 +11,9 @@ use Doctrine\ORM\Query;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class OwnerTreeProvider extends AbstractOwnerTreeProvider
@@ -25,21 +24,21 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /** @var TokenStorageInterface */
     private $tokenStorage;
 
-    /** @var OwnershipMetadataProvider */
+    /** @var OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
 
     /**
-     * @param ManagerRegistry           $doctrine
-     * @param DatabaseChecker           $databaseChecker
-     * @param CacheProvider             $cache
-     * @param MetadataProviderInterface $ownershipMetadataProvider
-     * @param TokenStorageInterface     $tokenStorage
+     * @param ManagerRegistry                    $doctrine
+     * @param DatabaseChecker                    $databaseChecker
+     * @param CacheProvider                      $cache
+     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
+     * @param TokenStorageInterface              $tokenStorage
      */
     public function __construct(
         ManagerRegistry $doctrine,
         DatabaseChecker $databaseChecker,
         CacheProvider $cache,
-        MetadataProviderInterface $ownershipMetadataProvider,
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         TokenStorageInterface $tokenStorage
     ) {
         parent::__construct($databaseChecker, $cache);
@@ -64,11 +63,11 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /**
      * {@inheritdoc}
      */
-    protected function fillTree(OwnerTreeInterface $tree)
+    protected function fillTree(OwnerTreeBuilderInterface $tree)
     {
         $ownershipMetadataProvider = $this->getOwnershipMetadataProvider();
-        $userClass = $ownershipMetadataProvider->getBasicLevelClass();
-        $businessUnitClass = $ownershipMetadataProvider->getLocalLevelClass();
+        $userClass = $ownershipMetadataProvider->getUserClass();
+        $businessUnitClass = $ownershipMetadataProvider->getBusinessUnitClass();
         $connection = $this->getManagerForClass($userClass)->getConnection();
 
         list($businessUnits, $columnMap) = $this->executeQuery(
@@ -87,8 +86,8 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
             $orgId = $this->getId($businessUnit, $columnMap['orgId']);
             if (null !== $orgId) {
                 $buId = $this->getId($businessUnit, $columnMap['id']);
-                $tree->addLocalEntity($buId, $orgId);
-                $tree->addDeepEntity($buId, $this->getId($businessUnit, $columnMap['parentId']));
+                $tree->addBusinessUnit($buId, $orgId);
+                $tree->addBusinessUnitRelation($buId, $this->getId($businessUnit, $columnMap['parentId']));
             }
         }
 
@@ -116,15 +115,13 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
             $owningBuId = $this->getId($user, $columnMap['owningBuId']);
             $buId = $this->getId($user, $columnMap['buId']);
             if ($userId !== $lastUserId && !isset($processedUsers[$userId])) {
-                $tree->addBasicEntity($userId, $owningBuId);
+                $tree->addUser($userId, $owningBuId);
                 $processedUsers[$userId] = true;
             }
             if ($orgId !== $lastOrgId || $userId !== $lastUserId) {
-                $tree->addGlobalEntity($userId, $orgId);
+                $tree->addUserOrganization($userId, $orgId);
             }
-            if (null !== $buId) {
-                $tree->addLocalEntityToBasic($userId, $buId, $orgId);
-            }
+            $tree->addUserBusinessUnit($userId, $orgId, $buId);
             $lastUserId = $userId;
             $lastOrgId = $orgId;
         }
@@ -151,10 +148,10 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      */
     protected function executeQuery(Connection $connection, Query $query)
     {
-        $parsedQuery = QueryUtils::parseQuery($query);
+        $parsedQuery = QueryUtil::parseQuery($query);
 
         return [
-            $connection->executeQuery(QueryUtils::getExecutableSql($query, $parsedQuery)),
+            $connection->executeQuery(QueryUtil::getExecutableSql($query, $parsedQuery)),
             array_flip($parsedQuery->getResultSetMapping()->scalarMappings)
         ];
     }
@@ -180,7 +177,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     }
 
     /**
-     * @return MetadataProviderInterface
+     * @return OwnershipMetadataProviderInterface
      */
     protected function getOwnershipMetadataProvider()
     {

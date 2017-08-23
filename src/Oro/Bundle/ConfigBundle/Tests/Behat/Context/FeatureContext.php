@@ -28,16 +28,17 @@ class FeatureContext extends OroFeatureContext implements
     use KernelDictionary, FixtureLoaderDictionary, PageObjectDictionary, AllowedColorsMapping;
 
     /**
-     * Click link on sidebar in configuration menu
+     * Follow link on sidebar in configuration menu
      *
-     * Example: Given I click "Inventory" on configuration sidebar
+     * Example: Given I follow "System configuration/General setup/Language settings" on configuration sidebar
      *
-     * @When /^(?:|I )click "(?P<link>(?:[^"]|\\")*)" on configuration sidebar$/
+     * @When /^(?:|I )follow "(?P<path>[^"]*)" on configuration sidebar$/
      */
-    public function clickLinkOnConfigurationSidebar($link)
+    public function followLinkOnConfigurationSidebar($path)
     {
-        $sidebarConfigMenu = $this->getPage()->find('css', 'div.system-configuration-container div.left-panel');
-        $sidebarConfigMenu->clickLink($link);
+        /** @var SidebarConfigMenu $sidebarConfigMenu */
+        $sidebarConfigMenu = $this->createElement('SidebarConfigMenu');
+        $sidebarConfigMenu->openNestedMenu($path);
     }
 
     /**

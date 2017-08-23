@@ -5,21 +5,18 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
-use Oro\Bundle\DataAuditBundle\Model\EntityReference;
-use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
+
+class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
     /** @var ManagerRegistry */
     private $doctrine;
-    
+
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
@@ -42,37 +39,20 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
     {
         $body = JSON::decode($message->getBody());
 
-        $loggedAt = \DateTime::createFromFormat('U', $body['timestamp']);
-        $transactionId = $body['transaction_id'];
-
-        $user = new EntityReference();
-        if (isset($body['user_id'])) {
-            $user = new EntityReference($body['user_class'], $body['user_id']);
-        }
-
-        $organization = new EntityReference();
-        if (isset($body['organization_id'])) {
-            $organization = new EntityReference(Organization::class, $body['organization_id']);
-        }
-
-        $impersonation = new EntityReference();
-        if (isset($body['impersonation_id'])) {
-            $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
-        }
-
-        $ownerDecription = isset($body['owner_description']) ? $body['owner_description'] : null;
+        $loggedAt = $this->getLoggedAt($body);
+        $transactionId = $this->getTransactionId($body);
+        $user = $this->getUserReference($body);
+        $organization = $this->getOrganizationReference($body);
+        $impersonation = $this->getImpersonationReference($body);
+        $ownerDescription = $this->getOwnerDescription($body);
 
         $map = [];
 
-        // one to one, one to many, many to many inverse side
-        $sourceEntitiesData = array_merge(
-            $body['entities_inserted'],
-            $body['entities_updated'],
-            $body['entities_deleted'],
-            $body['collections_updated']
-        );
+        $this->processBidirectionalAssociations($body['entities_inserted'], $map);
+        $this->processBidirectionalAssociations($body['entities_updated'], $map);
+        $this->processBidirectionalAssociations($body['entities_deleted'], $map);
+        $this->processBidirectionalAssociations($body['collections_updated'], $map);
 
-        $this->processManyToOneAndManyToManyAndOneToOneRelations($sourceEntitiesData, $map);
         $this->processEntityFromCollectionUpdated($body['entities_updated'], $map);
 
         $this->entityChangesToAuditEntryConverter->convert(
@@ -82,7 +62,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $user,
             $organization,
             $impersonation,
-            $ownerDecription
+            $ownerDescription
         );
 
         return self::ACK;
@@ -92,7 +72,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
      * @param array $sourceEntitiesData
      * @param array $map
      */
-    private function processManyToOneAndManyToManyAndOneToOneRelations(array $sourceEntitiesData, array &$map)
+    private function processBidirectionalAssociations(array $sourceEntitiesData, array &$map)
     {
         foreach ($sourceEntitiesData as $sourceEntityData) {
             $sourceEntityClass = $sourceEntityData['entity_class'];
@@ -115,7 +95,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                     $entityMeta->isCollectionValuedAssociation($fieldName)
                 ) {
                     // many to one
-                    $this->processManyToOneRelation(
+                    $this->processManyToOneAssociation(
                         $sourceChange,
                         $entityClass,
                         $fieldName,
@@ -127,7 +107,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                     $entityMeta->isCollectionValuedAssociation($fieldName)
                 ) {
                     // many to many
-                    $this->processManyToManyRelation(
+                    $this->processManyToManyAssociation(
                         $sourceChange,
                         $entityClass,
                         $fieldName,
@@ -139,7 +119,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
                     $entityMeta->isSingleValuedAssociation($fieldName)
                 ) {
                     // one to one
-                    $this->processOneToOneRelations(
+                    $this->processOneToOneAssociations(
                         $sourceChange,
                         $entityClass,
                         $fieldName,
@@ -162,7 +142,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
      * @param int $sourceEntityId
      * @param array $map
      */
-    private function processManyToOneRelation(
+    private function processManyToOneAssociation(
         $sourceChange,
         $entityClass,
         $fieldName,
@@ -207,7 +187,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
      * @param int $sourceEntityId
      * @param array $map
      */
-    private function processManyToManyRelation(
+    private function processManyToManyAssociation(
         $sourceChange,
         $entityClass,
         $fieldName,
@@ -217,7 +197,9 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
     ) {
         list($old, $new) = $sourceChange;
 
-        if (isset($new['inserted']) && is_array($new['inserted'])) {
+        unset($old);
+
+        if (is_array($new) && array_key_exists('inserted', $new) && is_array($new['inserted'])) {
             foreach ($new['inserted'] as $insertedEntityData) {
                 $entityId = $insertedEntityData['entity_id'];
 
@@ -232,7 +214,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             }
         }
 
-        if (isset($new['deleted']) && is_array($new['deleted'])) {
+        if (is_array($new) && array_key_exists('deleted', $new) && is_array($new['deleted'])) {
             foreach ($new['deleted'] as $deletedEntityData) {
                 $entityId = $deletedEntityData['entity_id'];
 
@@ -256,7 +238,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
      * @param int $sourceEntityId
      * @param array $map
      */
-    private function processOneToOneRelations(
+    private function processOneToOneAssociations(
         $sourceChange,
         $entityClass,
         $fieldName,
@@ -299,7 +281,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
      */
     private function processEntityFromCollectionUpdated(array $sourceEntitiesData, array &$map)
     {
-        // many to one. updated entity is part of a collection on inversed side of relation.
+        // many to one. updated entity is part of a collection on inversed side of association.
         foreach ($sourceEntitiesData as $sourceEntityData) {
             $sourceEntityClass = $sourceEntityData['entity_class'];
             $sourceEntityId = $sourceEntityData['entity_id'];

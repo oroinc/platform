@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var ChoiceTreeFilter;
+    var template = require('tpl!orofilter/templates/filter/choice-tree.html');
     var _ = require('underscore');
     var $ = require('jquery');
     var TextFilter = require('oro/filter/text-filter');
@@ -17,6 +18,7 @@ define(function(require) {
      * @extends oro.filter.TextFilter
      */
     ChoiceTreeFilter = TextFilter.extend({
+        template: template,
         templateSelector: '#choice-tree-template',
 
         select2component: null,

@@ -135,10 +135,8 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
         $writer = $this->writerChain->getWriter($format);
 
         if (!$writer instanceof FileStreamWriter) {
-            $reflect = new \ReflectionClass($this);
             $this->logger->warning(
-                sprintf('[%s] Not supported format: "%s", using default', $reflect->getShortName(), $format),
-                ['body' => $body]
+                sprintf('Not supported format: "%s", using default', $format)
             );
             $writer = $this->writerChain->getWriter('csv');
         }
@@ -178,7 +176,7 @@ abstract class PreImportMessageProcessorAbstract implements MessageProcessorInte
             return self::REJECT;
         }
 
-        $files = $this->getFiles($body);
+        $files = $this->getFiles($body, $message);
 
         if (!$files) {
             return self::REJECT;

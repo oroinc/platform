@@ -4,11 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
@@ -49,7 +52,12 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager = $this->createMock(EmailNotificationManager::class);
 
-        $this->handler = new WorkflowNotificationHandler($this->manager, $this->em, $this->configProvider);
+        $this->handler = new WorkflowNotificationHandler(
+            $this->manager,
+            $this->em,
+            $this->configProvider,
+            new PropertyAccessor()
+        );
     }
 
     /**
@@ -66,17 +74,30 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
                     $this->entity,
                     $notification,
                     $this->em,
-                    $this->configProvider
+                    $this->configProvider,
+                    new PropertyAccessor()
                 );
             },
             $expected
         );
 
+        $record = $this->getTransitionRecord();
+        $user = new User();
+
         $this->manager->expects($expected ? $this->once() : $this->never())
             ->method('process')
-            ->with($this->entity, $expected);
+            ->with(
+                $this->entity,
+                $expected,
+                null,
+                [
+                    'transitionRecord' => $record,
+                    'transitionUser' => $user
+                ]
+            );
 
-        $this->event->expects($this->once())->method('getTransitionRecord')->willReturn($this->getTransitionRecord());
+        $this->event->expects($this->once())->method('getTransitionRecord')->willReturn($record);
+        $this->event->expects($this->any())->method('getTransitionUser')->willReturn($user);
         $this->event->expects($this->once())->method('stopPropagation');
 
         $this->handler->handle($this->event, $notifications);

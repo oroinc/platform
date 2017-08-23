@@ -69,8 +69,11 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 
     /**
      * @dataProvider setDefaultOptionsProvider
+     *
+     * @param array $options
+     * @param array $expectedOptions
      */
-    public function testSetDefaultOptions($multiple, $expanded, $expectedEmptyValue, $expectedEmptyData)
+    public function testSetDefaultOptions($multiple, array $options, array $expectedOptions)
     {
         $resolver = $this->getOptionsResolver();
 
@@ -79,16 +82,11 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
             $resolver,
             'test_enum',
             $multiple,
-            $expanded
+            $options['expanded'],
+            $options
         );
 
-        $this->assertEquals(
-            [
-                'empty_value' => $expectedEmptyValue,
-                'empty_data' => $expectedEmptyData
-            ],
-            $resolvedOptions
-        );
+        $this->assertEquals($expectedOptions, $resolvedOptions);
     }
 
     /**
@@ -118,13 +116,64 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         ]);
     }
 
+    /**
+     * @return array
+     */
     public function setDefaultOptionsProvider()
     {
         return [
-            [false, false, 'oro.form.choose_value', null],
-            [false, true, null, null],
-            [true, false, null, null],
-            [true, true, null, null]
+            'not multiple, not expanded' => [
+                'multiple' => false,
+                'options' => ['expanded' => false],
+                'expectedOptions' => [
+                    'empty_value' => 'oro.form.choose_value',
+                    'empty_data' => null,
+                ]
+            ],
+            'not multiple, not expanded, not null "empty_value"' => [
+                'multiple' => false,
+                'options' => ['expanded' => false, 'empty_value' => false],
+                'expectedOptions' => [
+                    'empty_value' => false,
+                    'empty_data' => null,
+                ]
+            ],
+            'not multiple, expanded' => [
+                'multiple' => true,
+                'options' => ['expanded' => false],
+                'expectedOptions' => [
+                    'empty_value' => null,
+                    'empty_data' => null,
+                ]
+            ],
+            'multiple, not expanded' => [
+                'multiple' => false,
+                'options' => ['expanded' => true],
+                'expectedOptions' => [
+                    'empty_value' => null,
+                    'empty_data' => null,
+                ]
+            ],
+            'multiple, expanded' => [
+                'multiple' => true,
+                'options' => ['expanded' => true],
+                'expectedOptions' => [
+                    'empty_value' => null,
+                    'empty_data' => null,
+                ]
+            ],
+            'multiple, expanded, other options' => [
+                'multiple' => true,
+                'options' => [
+                    'expanded' => true,
+                    'empty_value' => 'test',
+                    'empty_data' => '123',
+                ],
+                'expectedOptions' => [
+                    'empty_value' => 'test',
+                    'empty_data' => '123',
+                ]
+            ],
         ];
     }
 }

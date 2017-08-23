@@ -2,104 +2,118 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli;
 
-use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
-use Behat\Testwork\Suite\Suite;
+use Behat\Testwork\Suite\Generator\SuiteGenerator;
 use Behat\Testwork\Suite\SuiteRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfiguration;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SuiteConfigurationRegistry;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use Symfony\Component\Console\Command\Command;
 
 class SuiteControllerTest extends \PHPUnit_Framework_TestCase
 {
     private $suites = [
-        'One',
-        'Two',
-        'Three',
-        'Four',
-        'Five',
-        'Six',
+        'AcmeDemo1',
+        'AcmeDemo2',
+        'AcmeDemo3',
     ];
 
-    /**
-     * @dataProvider applicableSuitesProvider
-     * @param array $applicableSuites
-     */
-    public function testApplicableSuites(array $applicableSuites)
+    private $suiteSets = [
+        'First' => ['AcmeDemo1', 'AcmeDemo2'],
+        'Second' => ['AcmeDemo3'],
+    ];
+
+
+    public function testConfigure()
     {
         $suiteRegistry = new SuiteRegistry();
-        $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
-        $controller = new SuiteController(
-            $suiteRegistry,
-            $this->createFakeConfigurations($this->suites),
-            $applicableSuites
-        );
+        $controller = new SuiteController($this->getSuiteConfigurationRegistryMock(), $suiteRegistry);
+        $command = new Command('test');
 
-        $input = new InputStub('', [], ['applicable-suites' => true]);
-        $controller->execute($input, new OutputStub());
+        $controller->configure($command);
 
-        self::assertEquals($applicableSuites, $this->getRegisteredSuiteNames($suiteRegistry));
+        $this->assertTrue($command->getDefinition()->hasOption('suite'));
+        $this->assertTrue($command->getDefinition()->getOption('suite')->isValueRequired());
+        $this->assertTrue($command->getDefinition()->getOption('suite-set')->isValueRequired());
+        $this->assertTrue($command->getDefinition()->getOption('suite-set')->isValueRequired());
     }
 
     /**
-     * @expectedException \Behat\Testwork\Suite\Exception\SuiteNotFoundException
-     * @expectedExceptionMessage `Unregistered` suite is not found or has not been properly registered.
+     * @dataProvider executeData
+     * @param string $suite
+     * @param string $suiteSet
+     * @param array $expectedRegisteredSuites
      */
-    public function testSuiteNotFountException()
+    public function testExecute($suite, $suiteSet, array $expectedRegisteredSuites)
     {
-        $suiteRegistry = new SuiteRegistry();
-        $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());
-        $controller = new SuiteController(
-            $suiteRegistry,
-            $this->createFakeConfigurations($this->suites),
-            ['One', 'Two', 'Unregistered']
-        );
+        $generator = $this->getMockBuilder(SuiteGenerator::class)->getMock();
+        $generator->method('supportsTypeAndSettings')->willReturn(true);
+        $generator->method('generateSuite')->willReturnArgument(0);
 
-        $input = new InputStub('', [], ['applicable-suites' => true]);
-        $controller->execute($input, new OutputStub());
+        $suiteRegistry = new SuiteRegistry();
+        $suiteRegistry->registerSuiteGenerator($generator);
+
+        $controller = new SuiteController($this->getSuiteConfigurationRegistryMock(), $suiteRegistry);
+        $options = [
+            'suite' => $suite,
+            'suite-set' => $suiteSet,
+        ];
+        $controller->execute(new InputStub('', [], $options), new OutputStub());
+
+        $this->assertSame($expectedRegisteredSuites, $suiteRegistry->getSuites());
     }
 
-    /**
-     * @return array
-     */
-    public function applicableSuitesProvider()
+    public function executeData()
     {
         return [
-            [[
-                'Three',
-                'Four',
-                'Five',
-            ]],
-            [[
-                'Two',
-                'Three',
-                'Five',
-                'Six',
-            ]],
+            'Register Suite' => [
+                'suite' => 'AcmeDemo1',
+                'set' => null,
+                'expectedSuites' => ['AcmeDemo1'],
+            ],
+            'Register First Set' => [
+                'suite' => null,
+                'set' => 'First',
+                'expectedSuites' => $this->suiteSets['First'],
+            ],
+            'Register Second Set' => [
+                'suite' => null,
+                'set' => 'Second',
+                'expectedSuites' => $this->suiteSets['Second'],
+            ],
+            'Register All Suites' => [
+                'suite' => null,
+                'set' => null,
+                'expectedSuites' => $this->suites,
+            ],
         ];
     }
 
     /**
-     * @param array $availableSuites in format ['SuiteNameOne', 'SuiteNameTwo']
-     * @return array in format ['SuiteNameOne' => ['type' => null, 'settings' => []]]
+     * @return SuiteConfigurationRegistry
      */
-    private function createFakeConfigurations(array $availableSuites)
+    private function getSuiteConfigurationRegistryMock()
     {
-        return array_map(function () {
-            return [
-                'type' => null,
-                'settings' => [],
-            ];
-        }, array_flip($availableSuites));
-    }
+        $suiteConfigRegistry = $this
+            ->getMockBuilder(SuiteConfigurationRegistry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    /**
-     * @param SuiteRegistry $suiteRegistry
-     * @return array of suites names
-     */
-    private function getRegisteredSuiteNames(SuiteRegistry $suiteRegistry)
-    {
-        return array_map(function (Suite $suite) {
-            return $suite->getName();
-        }, $suiteRegistry->getSuites());
+        $suiteConfigRegistry->method('getSuiteConfig')->willReturnCallback(function ($suiteName) {
+            return new SuiteConfiguration($suiteName);
+        });
+
+        $suiteConfigRegistry->method('getSet')->willReturnCallback(function ($set) {
+            return array_map(function ($suite) {
+                return new SuiteConfiguration($suite);
+            }, $this->suiteSets[$set]);
+        });
+
+        $suiteConfigRegistry->method('getSuiteConfigurations')->willReturn(array_map(function ($suite) {
+            return new SuiteConfiguration($suite);
+        }, $this->suites));
+
+        return $suiteConfigRegistry;
     }
 }

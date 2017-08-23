@@ -167,8 +167,8 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param string $name Element name
-     * @param string $text Text that contains in element node
-     * @param Element $context
+     * @param string $text Text that is contained in element node
+     * @param Element|null $context The parent element
      *
      * @return Element
      */
@@ -183,23 +183,64 @@ class OroElementFactory implements SuiteAwareInterface
             ));
         }
 
-        $elementClass = $this->configuration[$configName]['class'];
-        $elementSelector = $this->selectorManipulator->addContainsSuffix(
-            $this->configuration[$configName]['selector'],
-            $text
-        );
+        $selector = $this->configuration[$configName]['selector'];
+        $selectorType = is_array($selector) ? $selector['type'] : 'css';
 
-        if ($context) {
-            $elementSelector = $this->prepend($elementSelector, $context);
+        switch ($selectorType) {
+            case 'css':
+                return $this->findElementContainsByCss($name, $text, $context);
+                break;
+            case 'xpath':
+                return $this->findElementContainsByXPath($name, $text, $context);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf(
+                    'Selector type "%s" is not supported',
+                    $selectorType
+                ));
         }
+    }
 
-        $element = new $elementClass($this->mink->getSession(), $this, $elementSelector);
+    /**
+     * @param string $name Element name
+     * @param string $text Text that is contained in element node
+     * @param Element|null $context The parent element
+     *
+     * @return Element
+     */
+    public function findElementContainsByCss($name, $text, Element $context = null)
+    {
+        return $this->findElement(
+            $name,
+            function ($selector) use ($text) {
+                return $this->selectorManipulator->addContainsSuffix($selector, $text);
+            },
+            $context
+        );
+    }
 
-        $this
-            ->injectSuite($element)
-            ->injectOptions($element, $this->configuration[$configName]);
-
-        return $element;
+    /**
+     * @param string $name Element name
+     * @param string $text Text that is directly contained in element node
+     *                     (or it's children nodes if $useChildren argument is true)
+     * @param bool $useChildren Whether to use children nodes to search string
+     * @param Element|null $context The parent element
+     *
+     * @return Element
+     */
+    public function findElementContainsByXPath($name, $text, $useChildren = true, Element $context = null)
+    {
+        return $this->findElement(
+            $name,
+            function ($selector) use ($text, $useChildren) {
+                return $this->selectorManipulator->getContainsXPathSelector(
+                    $this->selectorManipulator->getSelectorAsXpath($this->selectorsHandler, $selector),
+                    $text,
+                    $useChildren
+                );
+            },
+            $context
+        );
     }
 
     /**
@@ -247,6 +288,39 @@ class OroElementFactory implements SuiteAwareInterface
     public function setSuite(Suite $suite)
     {
         $this->suite = $suite;
+    }
+
+    /**
+     * @param string $name Element name
+     * @param callable $selectorCallback Function that should be used to build selector
+     *                                   function ($selector) : string|array
+     * @param Element|null $context The parent element
+     *
+     * @return Element
+     */
+    protected function findElement($name, $selectorCallback, Element $context = null)
+    {
+        $configName = $this->guessElement($name);
+
+        if (!$configName) {
+            throw new \InvalidArgumentException(
+                sprintf('Could not find element with "%s" name', $name)
+            );
+        }
+
+        $selector = $selectorCallback($this->configuration[$configName]['selector']);
+        if ($context) {
+            $selector = $this->prepend($selector, $context);
+        }
+
+        $elementClass = $this->configuration[$configName]['class'];
+        $element = new $elementClass($this->mink->getSession(), $this, $selector);
+
+        $this
+            ->injectSuite($element)
+            ->injectOptions($element, $this->configuration[$configName]);
+
+        return $element;
     }
 
     /**

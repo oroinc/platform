@@ -547,15 +547,10 @@ class PropertyAccessor implements PropertyAccessorInterface
             $camelized = $this->camelize($property);
             $singulars = (array)StringUtil::singularify($camelized);
 
-            if (is_array($value) || $value instanceof \Traversable) {
-                $methods = $this->findAdderAndRemover($reflClass, $singulars);
+            $isCollection = $this->checkValueIsCollection($object, $property, $value, $reflClass, $singulars);
 
-                // Use addXxx() and removeXxx() to write the collection
-                if (null !== $methods) {
-                    $this->writeCollection($object, $property, $value, $methods[0], $methods[1]);
-
-                    return;
-                }
+            if (true === $isCollection) {
+                return;
             }
 
             $setter           = 'set' . $camelized;
@@ -612,6 +607,51 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
+     * Checks if value is a collection and sets the value for the attribute
+     *
+     * @param array|object      $object   The object or array to write to
+     * @param mixed             $property The property or index to write
+     * @param mixed             $value    The value to write
+     * @param \ReflectionClass  $reflClass
+     * @param array             $singulars
+     * @return bool
+     */
+    protected function checkValueIsCollection($object, $property, $value, $reflClass, $singulars)
+    {
+        $shouldRemoveItems = true;
+
+        try {
+            $objectValue = $this->getValue($object, $property);
+        } catch (Exception\NoSuchPropertyException $ex) {
+            //property was not set so we cannot get a value that wasn't set already
+            $objectValue = null;
+        }
+        //if the value we want to add is not an array and we try to add it to a collection,
+        // then we don't want to overwrite the old values, instead add the new value to the collection
+        if ((!is_array($value) && !$value instanceof \Traversable)
+            && ($objectValue instanceof \ArrayAccess || is_array($objectValue))
+        ) {
+            //we try to add a value to a collection and we don't want to remove old items
+            $value = [$value];
+            $shouldRemoveItems = false;
+        }
+
+
+        if (is_array($value) || $value instanceof \Traversable) {
+            $methods = $this->findAdderAndRemover($reflClass, $singulars);
+
+            // Use addXxx() and removeXxx() to write the collection
+            if (null !== $methods) {
+                $this->writeCollection($object, $property, $value, $methods[0], $methods[1], $shouldRemoveItems);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Adjusts a collection-valued property by calling add*() and remove*() methods.
      *
      * @param object             $object       The object to write to
@@ -619,9 +659,16 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param array|\Traversable $collection   The collection to write
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
+     * @param boolean            $shouldRemoveItems Flag that tells if we want to remove existing items
      */
-    protected function writeCollection($object, $property, $collection, $addMethod, $removeMethod)
-    {
+    protected function writeCollection(
+        $object,
+        $property,
+        $collection,
+        $addMethod,
+        $removeMethod,
+        $shouldRemoveItems = true
+    ) {
         // At this point the add and remove methods have been found
         // Use iterator_to_array() instead of clone in order to prevent side effects
         // see https://github.com/symfony/symfony/issues/4670
@@ -630,7 +677,8 @@ class PropertyAccessor implements PropertyAccessorInterface
         $propertyValue = $this->readValue($object, $property, false);
         $previousValue = $propertyValue[self::VALUE];
 
-        if (is_array($previousValue) || $previousValue instanceof \Traversable) {
+        if (is_array($previousValue)
+            || $previousValue instanceof \Traversable) {
             foreach ($previousValue as $previousItem) {
                 foreach ($collection as $key => $item) {
                     if ($item === $previousItem) {
@@ -642,8 +690,10 @@ class PropertyAccessor implements PropertyAccessorInterface
                     }
                 }
 
-                // Item not found, add to remove list
-                $itemToRemove[] = $previousItem;
+                if (true === $shouldRemoveItems) {
+                    // Item not found, add to remove list
+                    $itemToRemove[] = $previousItem;
+                }
             }
         }
 

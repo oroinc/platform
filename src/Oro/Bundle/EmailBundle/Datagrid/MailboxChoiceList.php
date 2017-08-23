@@ -2,35 +2,35 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class MailboxChoiceList
 {
-    /** @var Registry */
-    private $doctrine;
-
-    /** @var SecurityFacade */
-    private $securityFacade;
+    /** @var TokenAccessorInterface */
+    private $tokenAccessor;
 
     /** @var MailboxManager */
     private $mailboxManager;
 
+    /** @var MailboxNameHelper */
+    private $mailboxNameHelper;
+
     /**
-     * @param Registry       $doctrine
-     * @param SecurityFacade $securityFacade
-     * @param MailboxManager $mailboxManager
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param MailboxManager         $mailboxManager
+     * @param MailboxNameHelper      $mailboxNameHelper
      */
-    public function __construct(Registry $doctrine, SecurityFacade $securityFacade, MailboxManager $mailboxManager)
-    {
-        $this->doctrine = $doctrine;
-        $this->securityFacade = $securityFacade;
+    public function __construct(
+        TokenAccessorInterface $tokenAccessor,
+        MailboxManager $mailboxManager,
+        MailboxNameHelper $mailboxNameHelper
+    ) {
+        $this->tokenAccessor = $tokenAccessor;
         $this->mailboxManager = $mailboxManager;
+        $this->mailboxNameHelper = $mailboxNameHelper;
     }
 
     /**
@@ -42,24 +42,29 @@ class MailboxChoiceList
     {
         /** @var Mailbox[] $systemMailboxes */
         $systemMailboxes = $this->mailboxManager->findAvailableMailboxes(
-            $this->securityFacade->getLoggedUser(),
+            $this->tokenAccessor->getUser(),
             $this->getOrganization()
         );
         $origins = $this->mailboxManager->findAvailableOrigins(
-            $this->securityFacade->getLoggedUser(),
+            $this->tokenAccessor->getUser(),
             $this->getOrganization()
         );
 
         $choiceList = [];
-        foreach ($origins as $origin) {
-            $mailbox = $origin->getMailboxName();
-            if (count($origin->getFolders()) > 0) {
-                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailbox);
+        foreach ($systemMailboxes as $mailbox) {
+            $origin = $mailbox->getOrigin();
+            if (null !== $origin) {
+                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailbox->getLabel());
             }
         }
-        foreach ($systemMailboxes as $mailbox) {
-            if ($mailbox->getOrigin() !== null) {
-                $choiceList[$mailbox->getOrigin()->getId()] = str_replace('@', '\@', $mailbox->getLabel());
+        foreach ($origins as $origin) {
+            if (!isset($choiceList[$origin->getId()]) && count($origin->getFolders()) > 0) {
+                $mailboxName = $this->mailboxNameHelper->getMailboxName(
+                    get_class($origin),
+                    $origin->getMailboxName(),
+                    null
+                );
+                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailboxName);
             }
         }
 
@@ -71,6 +76,6 @@ class MailboxChoiceList
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
+        return $this->tokenAccessor->getOrganization();
     }
 }

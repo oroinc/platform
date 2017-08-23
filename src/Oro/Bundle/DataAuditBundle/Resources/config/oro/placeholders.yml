@@ -16,11 +16,11 @@ placeholders:
             applicable:
                 - "@oro_dataaudit.placeholder.filter->isEntityAuditable($entity$, $audit_show_change_history$)"
                 - "@oro_user.placeholder.filter->isUserApplicable()"
-            acl: oro_dataaudit_history
+            acl: oro_dataaudit_view
         template_audit_condition_type_select:
             template: OroDataAuditBundle:js:audit-condition-type-select.html.twig
         data_audit_condition:
-            acl: oro_dataaudit_history
+            acl: oro_dataaudit_view
             applicable:
                 - "@oro_dataaudit.segment_widget.context_checker->isApplicableInContext($params$)"
             template: OroDataAuditBundle:Segment:data_audit_condition.html.twig

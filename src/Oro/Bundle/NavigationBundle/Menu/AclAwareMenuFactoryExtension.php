@@ -8,14 +8,14 @@ use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
 
 use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
     /**#@+
@@ -28,42 +28,46 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     const ACL_POLICY_KEY = 'acl_policy';
     /**#@-*/
 
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
+    /** @var RouterInterface */
     private $router;
 
-    /**
-     * @var ServiceLink
-     */
-    private $securityFacadeLink;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
-    /**
-     * @var \Doctrine\Common\Cache\CacheProvider
-     */
+    /** @var ClassAuthorizationChecker */
+    private $classAuthorizationChecker;
+
+    /** @var TokenAccessorInterface */
+    private $tokenAccessor;
+
+    /** @var CacheProvider */
     private $cache;
 
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $aclCache = [];
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $hideAllForNotLoggedInUsers = true;
 
     /**
-     * @param RouterInterface $router
-     * @param ServiceLink     $securityFacadeLink
+     * @param RouterInterface               $router
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param ClassAuthorizationChecker     $classAuthorizationChecker
+     * @param TokenAccessorInterface        $tokenAccessor
      */
-    public function __construct(RouterInterface $router, ServiceLink $securityFacadeLink)
-    {
+    public function __construct(
+        RouterInterface $router,
+        AuthorizationCheckerInterface $authorizationChecker,
+        ClassAuthorizationChecker $classAuthorizationChecker,
+        TokenAccessorInterface $tokenAccessor
+    ) {
         $this->router = $router;
-        $this->securityFacadeLink = $securityFacadeLink;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->classAuthorizationChecker = $classAuthorizationChecker;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -135,32 +139,31 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function processAcl(array &$newOptions, $options)
     {
-        $isAllowed                      = self::DEFAULT_ACL_POLICY;
+        $isAllowed  = self::DEFAULT_ACL_POLICY;
         $newOptions['extras']['isAllowed'] = $isAllowed;
         $options['extras']['isAllowed'] = $isAllowed;
-        $securityFacade = $this->securityFacadeLink->getService();
 
-        if (isset($options['check_access']) && $options['check_access'] === false) {
+        if ($this->getOptionValue($options, ['check_access']) === false) {
             return;
         }
 
-        if ($this->hideAllForNotLoggedInUsers && !$securityFacade->hasLoggedUser()) {
-            if (!empty($options['extras']['show_non_authorized'])) {
+        $checkAccessNotLoggedIn = $this->getOptionValue($options, ['check_access_not_logged_in']);
+        if (!$checkAccessNotLoggedIn && $this->hideAllForNotLoggedInUsers && !$this->tokenAccessor->hasUser()) {
+            if ($this->getOptionValue($options, ['extras', 'show_non_authorized'])) {
                 return;
             }
 
             $isAllowed = false;
-        } elseif ($securityFacade->getToken() !== null) { // don't check access if it's CLI
-            if (array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
-                $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
-            }
+        } elseif (null !== $this->tokenAccessor->getToken()) { // don't check access if it's CLI
+            $isAllowed = $this->getOptionValue($options, ['extras', self::ACL_POLICY_KEY], $isAllowed);
 
-            if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
-                if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
-                    $isAllowed = $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]];
+            if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options['extras'])) {
+                $aclResourceId = $options['extras'][self::ACL_RESOURCE_ID_KEY];
+                if (array_key_exists($aclResourceId, $this->aclCache)) {
+                    $isAllowed = $this->aclCache[$aclResourceId];
                 } else {
-                    $isAllowed = $securityFacade->isGranted($options[self::ACL_RESOURCE_ID_KEY]);
-                    $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]] = $isAllowed;
+                    $isAllowed = $this->authorizationChecker->isGranted($aclResourceId);
+                    $this->aclCache[$aclResourceId] = $isAllowed;
                 }
             } else {
                 $routeInfo = $this->getRouteInfo($options);
@@ -168,7 +171,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
                     if (array_key_exists($routeInfo['key'], $this->aclCache)) {
                         $isAllowed = $this->aclCache[$routeInfo['key']];
                     } else {
-                        $isAllowed = $securityFacade->isClassMethodGranted(
+                        $isAllowed = $this->classAuthorizationChecker->isClassMethodGranted(
                             $routeInfo['controller'],
                             $routeInfo['action']
                         );
@@ -190,10 +193,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function processRoute(array &$newOptions, $options)
     {
-        $params = [];
-        if (isset($options['routeParameters'])) {
-            $params = $options['routeParameters'];
-        }
+        $params = $this->getOptionValue($options, ['routeParameters'], []);
         $cacheKey   = null;
         $hasInCache = false;
         $uri        = null;
@@ -322,41 +322,23 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function alreadyDenied(array $options)
     {
-        return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
-        ($options['extras']['isAllowed'] === false);
+        return $this->getOptionValue($options, ['extras', 'isAllowed']) === false;
     }
 
     /**
      * @param array $options
-     * @return string
+     * @param array $keys
+     * @param mixed $default
+     *
+     * @return mixed
      */
-    private function getGlobalCacheKey(array $options)
+    private function getOptionValue(array $options, array $keys, $default = null)
     {
-        $securityFacade = $this->securityFacadeLink->getService();
+        $key = array_shift($keys);
+        if (!array_key_exists($key, $options)) {
+            return $default;
+        }
 
-        $data = [
-            $this->hideAllForNotLoggedInUsers,
-            $securityFacade->hasLoggedUser(),
-            $this->getOptionIfExist('route', $options),
-            $this->getOptionIfExist('routeParameters', $options),
-            $this->getOptionIfExist('uri', $options),
-            $this->getOptionIfExist('check_access', $options) === false,
-            $securityFacade->getToken() !== null,
-            $this->getOptionIfExist('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras']),
-            $this->getOptionIfExist('extras', $options) && !empty($options['extras']['show_non_authorized']),
-            $this->getOptionIfExist(self::ACL_RESOURCE_ID_KEY, $options),
-        ];
-
-        return $this->getCacheKey('global', serialize($data));
-    }
-
-    /**
-     * @param string $key
-     * @param array  $options
-     * @return mixed|null
-     */
-    private function getOptionIfExist($key, array $options)
-    {
-        return array_key_exists($key, $options) ? $options[$key] : null;
+        return $keys ? $this->getOptionValue($options[$key], $keys, $default) : $options[$key];
     }
 }

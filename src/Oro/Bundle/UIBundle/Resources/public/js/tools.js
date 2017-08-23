@@ -1,15 +1,15 @@
-define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = {};
+    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
 
     /**
      * @export oroui/js/tools
      * @name   oroui.tools
      */
-    var tools = {};
-    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
-
-    _.extend(tools, Chaplin.utils);
-
     _.extend(tools, {
         /** @type {boolean} */
         debug: false,
@@ -321,7 +321,49 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          */
         isTargetBlankEvent: function(event) {
             var mouseMiddleButton = 2;
-            return this.modifierKeyPressed(event) || event.which === mouseMiddleButton;
+            return event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ||
+                event.which === mouseMiddleButton;
+        },
+
+        /**
+         * Gets an XPath for an element which describes its hierarchical location.
+         *
+         * @param {HTMLElement} element
+         * @returns {string|null}
+         */
+        getElementXPath: function(element) {
+            var paths = [];
+            var tagName = element.nodeName.toLowerCase();
+            if (element && element.id) {
+                return '//' + tagName + '[@id="' + element.id + '"]';
+            } else {
+                // Use nodeName (instead of localName) so namespace prefix is included (if any).
+                for (; element && element.nodeType === 1; element = element.parentNode)  {
+                    var index = 0;
+                    tagName = element.nodeName.toLowerCase();
+                    // EXTRA TEST FOR ELEMENT.ID
+                    if (element && element.id) {
+                        paths.splice(0, 0, '/' + tagName + '[@id="' + element.id + '"]');
+                        break;
+                    }
+
+                    for (var sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
+                        // Ignore document type declaration.
+                        if (sibling.nodeType === Node.DOCUMENT_TYPE_NODE) {
+                            continue;
+                        }
+                        if (sibling.nodeName === element.nodeName) {
+                            ++index;
+                        }
+                    }
+
+                    var pathIndex = '[' + (index + 1) + ']';
+                    var classAttr = element.className ? '[@class="' + element.className + '"]' : '';
+                    paths.splice(0, 0, tagName + pathIndex + classAttr);
+                }
+
+                return paths.length ? '/' + paths.join('/') : null;
+            }
         }
     });
 

@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
@@ -23,16 +24,16 @@ class DatagridTypeTest extends BlockTypeTestCase
     /** @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject  */
     protected $manager;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $authorizationChecker;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->nameStrategy = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface');
-        $this->manager = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface');
-        $this->securityFacade = $this->createMock('Oro\Bundle\SecurityBundle\SecurityFacade');
+        $this->nameStrategy = $this->createMock(NameStrategyInterface::class);
+        $this->manager = $this->createMock(ManagerInterface::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
     }
 
     public function testBuildView()
@@ -43,7 +44,7 @@ class DatagridTypeTest extends BlockTypeTestCase
             ->will($this->returnValue('test-grid-test-scope'));
 
         $view = $this->getBlockView(
-            new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade),
+            new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker),
             [
                 'grid_name'              => 'test-grid',
                 'grid_scope'             => 'test-scope',
@@ -67,7 +68,7 @@ class DatagridTypeTest extends BlockTypeTestCase
             ->method('buildGridFullName');
 
         $view = $this->getBlockView(
-            new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade),
+            new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker),
             [
                 'grid_name'       => 'test-grid',
                 'grid_parameters' => ['foo' => 'bar'],
@@ -87,7 +88,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     public function testBuildViewWithParamsOverwrite()
     {
         $view = $this->getBlockView(
-            new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade),
+            new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker),
             [
                 'grid_name'       => 'test-grid',
                 'grid_parameters' => ['enableFullScreenLayout' => false]
@@ -103,7 +104,7 @@ class DatagridTypeTest extends BlockTypeTestCase
      */
     public function testBuildViewThrowsExceptionIfGridNameIsNotSpecified()
     {
-        $this->getBlockView(new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade));
+        $this->getBlockView(new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker));
     }
 
     /**
@@ -124,8 +125,7 @@ class DatagridTypeTest extends BlockTypeTestCase
             ->with('columns')
             ->will($this->returnValue(['column_1' => true]));
 
-        $this->securityFacade
-            ->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('acl_resource')
             ->will($this->returnValue(true));
@@ -215,7 +215,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                 ]
             );
 
-        $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
+        $type = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
         $options = $this->resolveOptions($type, [
             'grid_name' => 'test-grid',
             'split_to_cells' => true,
@@ -230,7 +230,7 @@ class DatagridTypeTest extends BlockTypeTestCase
 
     public function testFinishView()
     {
-        $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
+        $type = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
 
         $childView = $this->createMock(BlockView::class);
         $childView->vars = [
@@ -264,7 +264,7 @@ class DatagridTypeTest extends BlockTypeTestCase
 
     public function testGetName()
     {
-        $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
+        $type = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
 
         $this->assertSame(DatagridType::NAME, $type->getName());
     }
@@ -276,7 +276,7 @@ class DatagridTypeTest extends BlockTypeTestCase
      */
     public function testSetDefaultOptions(array $options, array $expectedOptions)
     {
-        $datagridType = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
+        $datagridType = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
         $resolver = new OptionsResolver();
         $datagridType->configureOptions($resolver);
 

@@ -58,7 +58,7 @@ abstract class AbstractAssociationType extends AbstractConfigType
             && $this->typeHelper->isDictionary($className)
             && !$this->typeHelper->isSupportActivityEnabled($className)
         ) {
-                return true;
+            return true;
         }
 
         return parent::isReadOnly($options);

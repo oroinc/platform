@@ -3,9 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Persistence\ObjectRepository;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -16,26 +15,16 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 {
     const NAME = 'oro:workflow:definitions:load';
 
-    /** @var WorkflowConfigurationProvider */
-    protected $provider;
-
-    /** @var \ReflectionProperty */
-    protected $reflectionProperty;
+    /** @var WorkflowConfigFinderBuilder */
+    protected $configFinderBuilder;
 
     protected function setUp()
     {
         $this->initClient();
 
-        $this->provider = $this->getContainer()->get('oro_workflow.configuration.provider.workflow_config');
-
-        $reflectionClass = new \ReflectionClass(WorkflowConfigurationProvider::class);
-
-        $this->reflectionProperty = $reflectionClass->getProperty('configDirectory');
-        $this->reflectionProperty->setAccessible(true);
-        $this->reflectionProperty->setValue(
-            $this->provider,
-            '/Tests/Functional/Command/DataFixtures/WithTransitionTriggers'
-        );
+        $this->configFinderBuilder = self::getContainer()
+            ->get('oro_workflow.configuration.workflow_config_finder.builder');
+        $this->configFinderBuilder->setSubDirectory('/Tests/Functional/Command/DataFixtures/WithTransitionTriggers');
     }
 
     /**
@@ -84,10 +73,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             $this->assertTransitionCronTriggerLoaded($triggers, $cronTrigger['cron']);
         }
 
-        $this->reflectionProperty->setValue(
-            $this->provider,
-            '/Tests/Functional/Command/DataFixtures/WithoutTransitionTriggers'
-        );
+        $this->configFinderBuilder->setSubDirectory('/Tests/Functional/Command/DataFixtures/WithoutTransitionTriggers');
 
         $this->assertCommandExecuted($expectedMessages);
 
@@ -131,10 +117,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      */
     public function testExecuteErrors(array $expectedMessages, $configDirectory)
     {
-        $this->reflectionProperty->setValue(
-            $this->provider,
-            $configDirectory
-        );
+        $this->configFinderBuilder->setSubDirectory($configDirectory);
 
         $this->assertCommandExecuted($expectedMessages);
     }
@@ -170,9 +153,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      */
     protected function assertCommandExecuted(array $messages)
     {
-        $result = $this->runCommand(self::NAME, ['--no-ansi']);
-
-        $result = str_replace(["\r\n", "\t", "\n", '  '], "", $result);
+        $result = $this->runCommand(self::NAME);
 
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {

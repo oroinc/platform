@@ -577,4 +577,12 @@ class Reminder extends ExtendReminder
     {
         return (string)$this->subject;
     }
+
+    /**
+     * @ORM\PostLoad()
+     */
+    public function postLoad()
+    {
+        $this->syncStartAtAndInterval();
+    }
 }
