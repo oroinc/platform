@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
-use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
@@ -22,9 +21,49 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
  */
 class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 {
-    const ALL   = 'all';
-    const ANY   = 'any';
+    /**
+     * Granting strategy ALL.
+     *
+     * The ACE will be considered applicable when all the turned-on bits in the
+     * required mask are also turned-on in the ACE mask.
+     */
+    const ALL = 'all';
+
+    /**
+     * Granting strategy ANY.
+     *
+     * The ACE will be considered applicable when any of the turned-on bits in
+     * the required mask is also turned-on the in the ACE mask.
+     */
+    const ANY = 'any';
+
+    /**
+     * Granting strategy EQUAL.
+     *
+     * The ACE will be considered applicable when the bitmasks are equal.
+     */
     const EQUAL = 'equal';
+
+    /**
+     * Granting strategy PERMISSION.
+     *
+     * The ACE will be considered applicable when the ACE mask contains a permission
+     * encoded in the required mask and when all the turned-on bits of this permission
+     * in the required mask are also turned-on in the ACE mask.
+     * This strategy is similar to the ALL strategy, but the difference is that
+     * in this strategy a permission without any turned-on bits is considered as
+     * to be ignored, unlike the ALL strategy where such permission is considered as
+     * forbidding. In other words this strategy does not allow to encode NONE access level
+     * in the ACE mask. Also the other big difference is that this strategy works only
+     * with ACE mask and the AclExtensionInterface::decideIsGranting method is not called at all,
+     * it means that ownership of a domain object is not matter.
+     * Usually this strategy is used in case if ACE mask can contain only limited set
+     * of permissions from all possible set of permissions that can be encoded by
+     * this type of mask. E.g. if a mask allows to encode VIEW, CREATE and EDIT permissions,
+     * but ACE mask can contains only VIEW and EDIT permissions and never contains CREATE permission.
+     * The typical use case of this strategy is to share a record with another SID.
+     */
+    const PERMISSION = 'perm';
 
     /** @var AuditLoggerInterface */
     protected $auditLogger;
@@ -127,7 +166,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             $entityMetadata = $securityMetadataProvider->getMetadata($type);
             $entityFieldsMetadata = $entityMetadata->getFields();
             if (isset($entityFieldsMetadata[$field])) {
-                $field = $entityFieldsMetadata[$field]->getAlias() ? : $field;
+                $fieldAlias = $entityFieldsMetadata[$field]->getAlias();
+                if ($fieldAlias) {
+                    $field = $fieldAlias;
+                }
             }
         }
 
@@ -220,9 +262,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                         continue;
                     }
 
-                    if ($this->isAceApplicable($requiredMask, $ace, $extension)) {
+                    $isAceApplicable = $this->isAceApplicable($requiredMask, $ace, $extension);
+                    if ($isAceApplicable) {
                         $isGranting = $ace->isGranting();
-                        if ($sid instanceof RoleSecurityIdentity) {
+                        if (self::PERMISSION !== $ace->getStrategy()) {
                             // give an additional chance for the appropriate ACL extension to decide
                             // whether an access to a domain object is granted or not
                             $decisionResult = $extension->decideIsGranting($requiredMask, $object, $securityToken);
@@ -248,9 +291,12 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                             $triggeredAce = $ace;
                             $triggeredMask = $requiredMask;
                         }
-                    } elseif ($this->containsExtraPermissions($requiredMask, $ace, $extension)) {
-                        $triggeredAce = $ace;
-                        $triggeredMask = $requiredMask;
+                    } elseif (null !== $isAceApplicable) {
+                        $permissionGroupMask = $this->getPermissionGroupMask($requiredMask, $extension);
+                        if (null !== $permissionGroupMask && 0 === ($permissionGroupMask & $ace->getMask())) {
+                            $triggeredAce = $ace;
+                            $triggeredMask = $requiredMask;
+                        }
                     }
                 }
             }
@@ -276,34 +322,28 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     /**
      * Determines whether the ACE is applicable to the given permission/security identity combination.
      *
-     * Strategy ALL:
-     *     The ACE will be considered applicable when all the turned-on bits in the
-     *     required mask are also turned-on in the ACE mask.
-     *
-     * Strategy ANY:
-     *     The ACE will be considered applicable when any of the turned-on bits in
-     *     the required mask is also turned-on the in the ACE mask.
-     *
-     * Strategy EQUAL:
-     *     The ACE will be considered applicable when the bitmasks are equal.
-     *
      * @param integer               $requiredMask
      * @param EntryInterface        $ace
      * @param AclExtensionInterface $extension
      *
-     * @return bool
+     * @return bool|null The ACE applicable result
+     *                   or NULL if the ACE mask is not comparable with the required mask
+     *
      * @throws \RuntimeException if the ACE strategy is not supported
      */
     protected function isAceApplicable($requiredMask, EntryInterface $ace, AclExtensionInterface $extension)
     {
-        $requiredMask = $extension->removeServiceBits($requiredMask);
-        $aceMask = $extension->removeServiceBits($ace->getMask());
+        $aceMask = $ace->getMask();
         $strategy = $ace->getStrategy();
         switch ($strategy) {
             case self::ALL:
                 return $requiredMask === ($aceMask & $requiredMask);
+            case self::PERMISSION:
+                return $this->hasRequiredPermission($requiredMask, $aceMask, $extension)
+                    ? $requiredMask === ($aceMask & $requiredMask)
+                    : null;
             case self::ANY:
-                return 0 !== ($aceMask & $requiredMask);
+                return 0 !== ($extension->removeServiceBits($aceMask) & $extension->removeServiceBits($requiredMask));
             case self::EQUAL:
                 return $requiredMask === $aceMask;
             default:
@@ -312,25 +352,46 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * Checks whether the required mask has at least one permission that does not exist in the given ACE mask
+     * Checks whether the ACE contains a permission encoded in the required mask.
      *
      * @param int                   $requiredMask
-     * @param EntryInterface        $ace
+     * @param int                   $aceMask
      * @param AclExtensionInterface $extension
      *
-     * @return bool
+     * @return bool|null
      */
-    protected function containsExtraPermissions($requiredMask, EntryInterface $ace, AclExtensionInterface $extension)
+    protected function hasRequiredPermission($requiredMask, $aceMask, AclExtensionInterface $extension)
     {
-        $aceMask = $ace->getMask();
+        $requiredPermissionMask = $this->getPermissionGroupMask($requiredMask, $extension);
 
-        return
-            $requiredMask !== $aceMask
-            && 0 !== $extension->removeServiceBits($requiredMask)
-            && !empty(array_diff(
-                $extension->getPermissions($requiredMask, true),
-                $extension->getPermissions($aceMask, true)
-            ));
+        return null !== $requiredPermissionMask && 0 !== ($aceMask & $requiredPermissionMask);
+    }
+
+    /**
+     * Determines a permission for the given mask and
+     * returns a mask with turned-on bits for all possible access levels allowed for this permission.
+     *
+     * @param int                   $mask
+     * @param AclExtensionInterface $extension
+     *
+     * @return int|null The mask or NULL if it is not possible to determine the permission
+     *                  or this permission does not support access levels (e.g. EXECUTE permission
+     *                  for a capability (see ActionAclExtension) has only 2 state, allowed or denied)
+     */
+    protected function getPermissionGroupMask($mask, AclExtensionInterface $extension)
+    {
+        $permissionGroupMask = null;
+        $permissions = $extension->getPermissions($mask, true);
+        foreach ($permissions as $permission) {
+            $maskBuilder = $extension->getMaskBuilder($permission);
+            $permissionGroup = 'GROUP_' . $permission;
+            if ($maskBuilder->hasMask($permissionGroup)) {
+                $permissionGroupMask = $maskBuilder->getMask($permissionGroup);
+                break;
+            }
+        }
+
+        return $permissionGroupMask;
     }
 
     /**
