@@ -417,17 +417,6 @@ define(function(require) {
         },
 
         /**
-         * Render criteria
-         */
-        renderCriteria: function() {
-            _.each(this.filters, function(filter) {
-                if (filter.enabled && _.isFunction(filter._renderCriteria) && !filter._criteriaRenderd) {
-                    filter._renderCriteria();
-                }
-            }, this);
-        },
-
-        /**
          * @param {Number} [count]
          * @private
          */

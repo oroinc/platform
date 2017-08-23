@@ -89,8 +89,10 @@
         display: $filter-trigger-wrapper-display;
         vertical-align: middle;
 
-        .dropdown-toggle {
-            color: $filter-trigger-wrapper-dropdown-toggle-color;
+        @if ($apply-filters-toggle-mode-design) {
+            .dropdown-toggle {
+                color: $filter-trigger-wrapper-dropdown-toggle-color;
+            }
         }
 
         .active {
@@ -174,6 +176,7 @@
 
     @if ($apply-filters-toggle-mode-design) {
         &.toggle-mode {
+            display: none;
             padding: $offset-y-m 0;
         }
     }
