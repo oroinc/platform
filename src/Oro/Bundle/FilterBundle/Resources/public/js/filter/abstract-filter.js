@@ -318,6 +318,15 @@ define([
         },
 
         /**
+         * Triggers when filter value is changed
+         *
+         * @protected
+         */
+        _onValueChanged: function() {
+            this.trigger('change');
+        },
+
+        /**
          * Triggers update event
          *
          * @param {*} newValue

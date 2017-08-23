@@ -138,6 +138,7 @@ define(function(require) {
 
             var filterListeners = {
                 'update': this._onFilterUpdated,
+                'change': this._onFilterChanged,
                 'disable': this._onFilterDisabled,
                 'showCriteria': this._onFilterShowCriteria
             };
@@ -202,6 +203,16 @@ define(function(require) {
             this.trigger('updateFilter', filter);
 
             this._publishCountSelectedFilters();
+        },
+
+        /**
+         * Triggers when filter DOM Value is changed
+         *
+         * @param {oro.filter.AbstractFilter} filter
+         * @protected
+         */
+        _onFilterChanged: function() {
+            this._publishCountChangedFilters();
         },
 
         /**
@@ -419,12 +430,37 @@ define(function(require) {
         },
 
         /**
+         * @param {Number} [count]
+         * @private
+         */
+        _publishCountChangedFilters: function(count) {
+            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateChangedFilters();
+
+            mediator.trigger(
+                'filterManager:changedFilters:count:' + this.collection.options.gridName,
+                countFilters
+            );
+        },
+
+        /**
          * @returns {Number} count of selected filters
          * @private
          */
         _calculateSelectedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
                 var num = (filter.enabled && !_.isEqual(filter.emptyValue, filter.value)) ? 1 : 0;
+
+                return memo + num;
+            }, 0);
+        },
+
+        /**
+         * @returns {Number} count of selected filters
+         * @private
+         */
+        _calculateChangedFilters: function() {
+            return _.reduce(this.filters, function(memo, filter) {
+                var num = (filter.enabled && !_.isEqual(filter.value, filter._readDOMValue())) ? 1 : 0;
 
                 return memo + num;
             }, 0);
@@ -635,9 +671,9 @@ define(function(require) {
             this.trigger('changeViewMode', mode);
         },
 
-        getOpenFilters: function() {
+        getChangedFilters: function() {
             return _.filter(this.filters, function(filter) {
-                return filter.$el.hasClass(filter.buttonActiveClass) === true;
+                return filter.enabled && !_.isEqual(filter.value, filter._readDOMValue());
             });
         }
     });
