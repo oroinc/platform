@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumIdChoiceType;
 
-class EnumChoiceWithTransformerTypeTest extends TypeTestCase
+class EnumIdChoiceTypeTest extends TypeTestCase
 {
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrine;
