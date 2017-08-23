@@ -481,7 +481,7 @@ define(function(require) {
                 $container.hide();
             }
 
-            this._publishCountSelectedFilters(0);
+            this._publishCountSelectedFilters();
         },
 
         /**
