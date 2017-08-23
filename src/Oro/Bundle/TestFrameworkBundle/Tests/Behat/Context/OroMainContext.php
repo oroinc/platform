@@ -957,6 +957,7 @@ class OroMainContext extends MinkContext implements
     {
         $field = $this->fixStepArgument($field);
         $value = $this->fixStepArgument($value);
+        $value = $this->createOroForm()->normalizeValue($value);
 
         if ($this->elementFactory->hasElement($field)) {
             $this->elementFactory->createElement($field)->setValue($value);
@@ -974,7 +975,7 @@ class OroMainContext extends MinkContext implements
     {
         $isVisible = $this->spin(function (OroMainContext $context) use ($element) {
             return $context->createElement($element)->isVisible();
-        });
+        }, 3);
 
         self::assertTrue(
             $isVisible,
@@ -988,15 +989,18 @@ class OroMainContext extends MinkContext implements
     public function assertElementNotOnPage($element)
     {
         $elementOnPage = $this->createElement($element);
+        $result = $this->spin(function (OroMainContext $context) use ($elementOnPage, $element) {
+            try {
+                return !$elementOnPage->isVisible();
+            } catch (NoSuchElement $e) {
+                return true;
+            }
+        }, 3);
 
-        try {
-            self::assertFalse(
-                $elementOnPage->isVisible(),
-                sprintf('Element "%s" is present when it should not', $element)
-            );
-        } catch (NoSuchElement $e) {
-            return;
-        }
+        self::assertTrue(
+            $result,
+            sprintf('Element "%s" is present when it should not', $element)
+        );
     }
 
     /**
