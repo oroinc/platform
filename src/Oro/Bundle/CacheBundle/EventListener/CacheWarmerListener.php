@@ -6,21 +6,18 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
+/**
+ * Check are config resources is fresh and warm up the cache if needed
+ */
 class CacheWarmerListener
 {
     /** @var \SplObjectStorage */
     protected $cacheMap;
 
-    /** @var bool */
-    protected $kernelDebug;
-
-    /**
-     * @param bool $kernelDebug
-     */
-    public function __construct($kernelDebug = false)
+    public function __construct()
     {
-        $this->kernelDebug = $kernelDebug;
         $this->cacheMap = new \SplObjectStorage();
     }
 
@@ -36,14 +33,26 @@ class CacheWarmerListener
     }
 
     /**
-     * Check cache metadata and warm up cache if needed
+     * @param GetResponseEvent $event
      */
-    public function onKernelRequest()
+    public function onKernelRequest(GetResponseEvent $event)
     {
-        if (false === $this->kernelDebug) {
-            return;
+        //only for master request to avoid multiple calls
+        if ($event->isMasterRequest()) {
+            $this->validateCache();
         }
+    }
 
+    public function onConsoleCommand()
+    {
+        $this->validateCache();
+    }
+
+    /**
+     * Executes event on kernel request and console command
+     */
+    protected function validateCache()
+    {
         $dumpers = new \SplObjectStorage();
 
         /** @var ConfigCacheWarmerInterface $configProvider */
