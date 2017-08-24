@@ -67,7 +67,7 @@ class MailboxController extends Controller
 
         list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
 
-        $tree = $provider->getTree();
+        $jsTree = $provider->getJsTree();
 
         $handler = $this->get('oro_email.form.handler.mailbox');
 
@@ -91,7 +91,7 @@ class MailboxController extends Controller
         }
 
         return [
-            'data'           => $tree,
+            'data'           => $jsTree,
             'form'           => $handler->getForm()->createView(),
             'activeGroup'    => $activeGroup,
             'activeSubGroup' => $activeSubGroup,

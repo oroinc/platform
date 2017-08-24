@@ -1,9 +1,13 @@
-system_configuration:
+user_configuration:
     fields:
         some_field:
             data_type: string
             type: text
             options: []
+
+        some_another_field:
+            data_type: string
+            type: choice
 
     groups:
         first_group:
@@ -16,13 +20,13 @@ system_configuration:
             title: 'Third group'
 
     tree:
-        system_configuration:
+        user_configuration:
             first_group:
                 children:
-                    second_group:
+                    NOT_EXITED_GROUP:
                         children:
-                            third_group:
+                            second_group:
                                 priority: 254
                                 children:
-                                    # ERROR THAT FIELD PLACED INCORRECTLY
-                                    - some_field
+                                    third_group:
+                                        children: []
