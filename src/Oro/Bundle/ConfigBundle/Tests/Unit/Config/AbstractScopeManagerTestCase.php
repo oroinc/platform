@@ -13,6 +13,7 @@ use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
+use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 abstract class AbstractScopeManagerTestCase extends \PHPUnit_Framework_TestCase
@@ -117,7 +118,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit_Framework_TestCase
         );
         $this->assertEmpty($this->manager->getChanges($scopeId));
     }
-    
+
     /**
      * Test saving settings
      */
@@ -167,6 +168,45 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($this->getScopedEntityName(), $this->manager->getScopedEntityName());
     }
+
+    public function testGetScopeIdFromEntity()
+    {
+        $entity = $this->getScopedEntity();
+        $entityId = $this->getEntityId($entity);
+        $this->assertEquals($entityId, $this->manager->getScopeIdFromEntity($entity));
+    }
+
+    public function testGetScopeIdFromUnsupportedEntity()
+    {
+        $entity = new \stdClass();
+        $this->assertEquals($this->manager->getScopeId(), $this->manager->getScopeIdFromEntity($entity));
+    }
+
+    public function testSetScopeIdFromEntity()
+    {
+        $entity = $this->getScopedEntity();
+        $entityId = $this->getEntityId($entity);
+        $newScopeId = $entityId ?: $this->manager->getScopeId();
+        $this->dispatcher->expects($this->exactly($newScopeId ? 1 : 0))
+            ->method('dispatch')
+            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+
+        $this->manager->setScopeIdFromEntity($entity);
+        $this->assertEquals($newScopeId, $this->manager->getScopeId());
+    }
+
+    public function testSetScopeIdFromUnsupportedEntity()
+    {
+        $entity = new \stdClass();
+        $oldScopeId = $this->manager->getScopeId();
+        $this->dispatcher->expects($this->exactly(0))
+            ->method('dispatch')
+            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+
+        $this->manager->setScopeIdFromEntity($entity);
+        $this->assertEquals($oldScopeId, $this->manager->getScopeId());
+    }
+
 
     /**
      * @param Config $config
@@ -222,6 +262,23 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit_Framework_TestCase
         }
 
         return $cachedConfig;
+    }
+
+    /**
+     * @return object|null
+     */
+    protected function getScopedEntity()
+    {
+        return null;
+    }
+
+    /**
+     * @param object $entity
+     * @return mixed
+     */
+    protected function getEntityId($entity)
+    {
+        return $entity && method_exists($entity, 'getId') ? $entity->getId() : null;
     }
 
     /**

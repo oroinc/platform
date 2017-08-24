@@ -13,3 +13,4 @@ and form types for their rendering.
 - [Translation Strategies](./Resources/doc/reference/translation_strategies.md)
 - [Translation Context Resolver](./Resources/doc/reference/context_resolver.md)
 - [Migrations](./Resources/doc/reference/migrations.md)
+- [The Dependency Injection Tags](./Resources/doc/reference/dependency_injection_tags.md)

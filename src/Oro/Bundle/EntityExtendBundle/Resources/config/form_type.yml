@@ -216,6 +216,13 @@ services:
         tags:
             - { name: form.type, alias: oro_enum_choice }
 
+    oro_entity_extend.type.enum_choice_with_transformer:
+        class: Oro\Bundle\EntityExtendBundle\Form\Type\EnumIdChoiceType
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: form.type, alias: oro_enum_id_choice }
+
     oro_entity_extend.type.enum_select:
         class: %oro_entity_extend.type.enum_select.class%
         arguments:
