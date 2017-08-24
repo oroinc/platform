@@ -20,7 +20,7 @@ class CacheWarmerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::SERVICE_ID)) {
+        if (!$container->hasDefinition(self::SERVICE_ID) || !$container->getParameter('kernel.debug')) {
             return;
         }
 
@@ -56,15 +56,8 @@ class CacheWarmerPass implements CompilerPassInterface
     protected function assertInstanceOf(Definition $definition, ContainerBuilder $container, $class)
     {
         $className = $definition->getClass();
-
-        if (!class_exists($className)) {
-            $parameterBag = $container->getParameterBag();
-
-            if ($parameterBag->has($className)) {
-                $className = $parameterBag->get($className);
-            } else {
-                $className = $parameterBag->resolveValue($className);
-            }
+        if (0 === strpos($className, '%')) {
+            $className = $container->getParameterBag()->resolveValue($className);
         }
 
         if (!class_exists($className)) {
@@ -87,11 +80,10 @@ class CacheWarmerPass implements CompilerPassInterface
     protected function assertDumper(ContainerBuilder $container, $dumper)
     {
         if (!$container->hasDefinition($dumper)) {
-            throw new \InvalidArgumentException('The declared cache metadata dumper "%s" not exist', $dumper);
+            throw new \InvalidArgumentException(sprintf('The declared cache metadata dumper "%s" not exist', $dumper));
         }
 
         $definition = $container->getDefinition($dumper);
         $this->assertInstanceOf($definition, $container, ConfigMetadataDumperInterface::class);
-        $definition->setShared(false)->setPublic(false);
     }
 }

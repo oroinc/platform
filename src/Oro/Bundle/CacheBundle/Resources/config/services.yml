@@ -5,13 +5,6 @@ services:
     oro_cache.oro_data_cache_manager:
         class: %oro_cache.oro_data_cache_manager.class%
 
-    oro_cache.config_cache_warmer.listener:
-        class: 'Oro\Bundle\CacheBundle\EventListener\CacheWarmerListener'
-        arguments:
-            - '%kernel.debug%'
-        tags:
-          - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
-
     oro_cache.provider.validation:
         public: false
         parent: oro.cache.abstract
@@ -74,3 +67,8 @@ services:
     oro.cache.memory_cache_chain:
         public: false
         class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
+
+    oro.cache.configuration_loader:
+        class: Oro\Bundle\CacheBundle\Loader\ConfigurationLoader
+        calls:
+            - [ setParameterBag, ['@=service("kernel").getContainer().getParameterBag()']]
