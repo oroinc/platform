@@ -10,6 +10,7 @@ use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestDump
 use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestDumper2;
 use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestWarmer1;
 use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestWarmer2;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class CacheWarmerPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,7 +54,7 @@ class CacheWarmerPassTest extends \PHPUnit_Framework_TestCase
         $service = $this->createMock(Definition::class);
         $service->expects(true === $isValid ? $this->once() : $this->never())->method('addMethodCall');
 
-        $container = new ContainerBuilder();
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
         $container->setDefinition('dumper1', $definition1);
         $container->setDefinition('test_def', $definition2);
         $container->setDefinition(CacheWarmerPass::SERVICE_ID, $service);

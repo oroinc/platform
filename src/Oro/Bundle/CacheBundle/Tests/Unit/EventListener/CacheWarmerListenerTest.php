@@ -16,7 +16,7 @@ class CacheWarmerListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->listener = new CacheWarmerListener(true);
+        $this->listener = new CacheWarmerListener();
     }
 
     /**
@@ -32,13 +32,13 @@ class CacheWarmerListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $cacheMap
      */
-    public function testOnKernelRequest(array $cacheMap)
+    public function testOnConsoleCommand(array $cacheMap)
     {
         foreach ($cacheMap as $item) {
             $this->listener->addConfigCacheProvider($item['configCacheWarmer'], $item['configMetadataDumper']);
         }
 
-        $this->listener->onKernelRequest();
+        $this->listener->onConsoleCommand();
     }
 
     /**
@@ -81,17 +81,6 @@ class CacheWarmerListenerTest extends \PHPUnit_Framework_TestCase
                 ['configCacheWarmer' => $this->createWarmer(true), 'configMetadataDumper' => $dumper2]
             ]
         ];
-    }
-
-    public function testWhenIsDebugFalse()
-    {
-        $listener = new CacheWarmerListener(false);
-        $listener->addConfigCacheProvider(
-            $this->createWarmer(false),
-            $this->createDumper(false)
-        );
-
-        $listener->onKernelRequest();
     }
 
     /**

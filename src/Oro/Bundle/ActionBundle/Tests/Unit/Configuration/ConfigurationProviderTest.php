@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
@@ -129,6 +130,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             self::ROOT_NODE_OPERATION
         );
 
+        $configurationProvider->setConfigurationLoader(new ConfigurationLoader());
         $configurationProvider->warmUpResourceCache($temporaryContainer);
 
         $resources = $temporaryContainer->getResources();
