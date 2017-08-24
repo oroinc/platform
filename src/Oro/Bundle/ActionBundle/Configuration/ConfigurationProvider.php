@@ -5,12 +5,21 @@ namespace Oro\Bundle\ActionBundle\Configuration;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\Merger\ConfigurationMerger;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class ConfigurationProvider implements ConfigurationProviderInterface
+class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCacheWarmerInterface
 {
+    const CONFIG_FILE_PATH = 'Resources/config/oro/actions.yml';
+
     /** @var ConfigurationDefinitionInterface */
     protected $configurationDefinition;
 
@@ -31,6 +40,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
     /** @var string */
     protected $rootNode;
+
+    /** @var ConfigurationLoader */
+    protected $configurationLoader;
 
     /**
      * @param ConfigurationDefinitionInterface $configurationDefinition
@@ -56,12 +68,35 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         $this->rootNode = $rootNode;
     }
 
+    /**
+     * @param ConfigurationLoader $configurationLoader
+     */
+    public function setConfigurationLoader(ConfigurationLoader $configurationLoader)
+    {
+        $this->configurationLoader = $configurationLoader;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function warmUpCache()
     {
         $this->clearCache();
         $this->cache->save($this->rootNode, $this->resolveConfiguration());
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUpResourceCache(ContainerBuilder $containerBuilder)
+    {
+        $this->clearCache();
+        $this->cache->save($this->rootNode, $this->resolveConfiguration(null, $containerBuilder));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function clearCache()
     {
         $this->cache->delete($this->rootNode);
@@ -91,13 +126,26 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
     /**
      * @param Collection $errors
+     * @param ContainerBuilder $containerBuilder
      * @return array
      * @throws InvalidConfigurationException
      */
-    protected function resolveConfiguration(Collection $errors = null)
+    protected function resolveConfiguration(Collection $errors = null, ContainerBuilder $containerBuilder = null)
     {
+        $rawConfiguration = [];
+        if (null !== $this->configurationLoader) {
+            $rawConfiguration = $this->configurationLoader->loadConfiguration(
+                self::CONFIG_FILE_PATH,
+                'oro_action',
+                $this->rootNode,
+                $containerBuilder
+            );
+        }
+
+        $rawConfiguration = array_merge($this->rawConfiguration, $rawConfiguration);
+
         $merger = new ConfigurationMerger($this->kernelBundles);
-        $configs = $merger->mergeConfiguration($this->rawConfiguration);
+        $configs = $merger->mergeConfiguration($rawConfiguration);
         $data = [];
 
         try {

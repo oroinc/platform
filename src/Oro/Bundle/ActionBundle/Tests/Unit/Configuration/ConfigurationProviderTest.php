@@ -4,17 +4,22 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration;
 use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
+use Oro\Component\Config\CumulativeResourceManager;
 
 class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
     const ROOT_NODE_NAME = 'test_root_node';
+    const ROOT_NODE_OPERATION = 'operations';
 
     const BUNDLE1 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1';
-    const BUNDLE2 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle2';
-    const BUNDLE3 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle3';
+    const BUNDLE2 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2';
+    const BUNDLE3 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationListConfiguration */
     protected $definitionConfiguration;
@@ -87,6 +92,49 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $configurationProvider->warmUpCache();
+    }
+
+    public function testWarmUpResourceCache()
+    {
+        $bundles = [
+            'TestBundle1' => self::BUNDLE1,
+            'TestBundle2' => self::BUNDLE2,
+        ];
+
+        $temporaryContainer = new ContainerBuilder();
+        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
+
+        $this->definitionConfiguration->expects($this->once())
+            ->method('processConfiguration')
+            ->willReturnCallback(function ($config) {
+                return $config;
+            });
+
+        $this->cacheProvider->expects($this->once())
+            ->method('save')
+            ->with(
+                self::ROOT_NODE_OPERATION,
+                [
+                    'test_operation1' => ['label' => 'Test Operation 1'],
+                    'test_operation2' => ['label' => 'Test Operation 2'],
+                    'test_operation4' => ['label' => 'Test Operation 4']
+                ]
+            );
+
+        $configurationProvider = new ConfigurationProvider(
+            $this->definitionConfiguration,
+            $this->definitionConfigurationValidator,
+            $this->cacheProvider,
+            [],
+            $bundles,
+            self::ROOT_NODE_OPERATION
+        );
+
+        $configurationProvider->setConfigurationLoader(new ConfigurationLoader());
+        $configurationProvider->warmUpResourceCache($temporaryContainer);
+
+        $resources = $temporaryContainer->getResources();
+        $this->assertCount(1, $resources);
     }
 
     public function testClearCache()

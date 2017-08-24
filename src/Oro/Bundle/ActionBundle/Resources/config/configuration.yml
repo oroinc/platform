@@ -33,6 +33,10 @@ services:
             - []
             - %kernel.bundles%
             - 'operations'
+        calls:
+            - [setConfigurationLoader, ['@oro.cache.configuration_loader']]
+        tags:
+            - { name: oro.config_cache_warmer.provider, dumper: 'oro_action.config.dumper' }
 
     oro_action.configuration.provider.action_groups:
         class: %oro_action.configuration.provider.class%
@@ -43,6 +47,10 @@ services:
             - []
             - %kernel.bundles%
             - 'action_groups'
+        calls:
+            - [setConfigurationLoader, ['@oro.cache.configuration_loader']]
+        tags:
+            - { name: oro.config_cache_warmer.provider, dumper: 'oro_action.config.dumper' }
 
     oro_action.configuration_pass.replace_property_path:
         class: 'Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath'
