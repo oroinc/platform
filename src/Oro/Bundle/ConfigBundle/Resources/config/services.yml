@@ -143,3 +143,11 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'doctrine_metadata_config' ] ]
+
+    oro_config.condition.is_system_config_equal:
+        class: Oro\Bundle\ConfigBundle\Condition\IsSystemConfigEqual
+        arguments:
+            - '@oro_config.manager'
+        tags:
+            - { name: oro_workflow.condition, alias: 'is_system_config_equal' }
+            - { name: oro_action.condition, alias: 'is_system_config_equal' }
