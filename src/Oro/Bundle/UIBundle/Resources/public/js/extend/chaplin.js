@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools',
-    'chaplin'
-], function($, _, tools, Chaplin) {
+    'chaplin',
+    'backbone'
+], function($, _, tools, Chaplin, Backbone) {
     'use strict';
 
     var original = {};
@@ -48,6 +49,54 @@ define([
         this.disposePageComponents();
         this.trigger('dispose', this);
         original.viewDispose.call(this);
+    };
+
+    Chaplin.View.prototype.delegate = function(eventName, second, third) {
+        var bound;
+        var event;
+        var events;
+        var handler;
+        var list;
+        var selector;
+
+        if (Backbone.utils) {
+            return Backbone.utils.delegate(this, eventName, second, third);
+        }
+        if (typeof eventName !== 'string') {
+            throw new TypeError('View#delegate: first argument must be a string');
+        }
+        if (arguments.length === 2) {
+            handler = second;
+        } else if (arguments.length === 3) {
+            selector = second;
+            if (typeof selector !== 'string') {
+                throw new TypeError('View#delegate: ' + 'second argument must be a string');
+            }
+            handler = third;
+        } else {
+            throw new TypeError('View#delegate: ' + 'only two or three arguments are allowed');
+        }
+        if (typeof handler !== 'function') {
+            throw new TypeError('View#delegate: ' + 'handler argument must be function');
+        }
+        list = (function() {
+            var _i;
+            var _len;
+            var _ref;
+            var _results;
+
+            _ref = eventName.split(' ');
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                event = _ref[_i];
+                _results.push('' + event + '.delegateEvents' + this.cid);
+            }
+            return _results;
+        }).call(this);
+        events = list.join(' ');
+        bound = _.bind(handler, this);
+        this.$el.on(events, selector || null, bound);
+        return bound;
     };
 
     /**
