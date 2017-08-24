@@ -192,6 +192,8 @@ class Form extends Element
             return new \DateTime($value);
         }
 
+        $value = self::checkAdditionalFunctions($value);
+
         return $value;
     }
 
@@ -221,5 +223,31 @@ class Form extends Element
         } while ($field === null && $i < $deep);
 
         return $field;
+    }
+
+    /**
+     * Parse for string commands and execute they
+     * Example: "<DateTime:August 24 11:00 AM>" would be parsed to DateTime object with provided data
+     *          "Daily every 5 days, end by <Date:next month>" <> value will be replaced as well
+     *
+     * @param $value
+     * @return \DateTime|mixed
+     */
+    protected static function checkAdditionalFunctions($value)
+    {
+        $matches = [];
+        preg_match('/<(?P<function>[\w]+):(?P<value>.+)>/', $value, $matches);
+
+        if (!empty($matches['function']) && !empty($matches['value'])) {
+            if ('DateTime' === $matches['function']) {
+                $value = new \DateTime($matches['value']);
+            }
+            if ('Date' === $matches['function']) {
+                $parsed =  new \DateTime($matches['value']);
+                $value = str_replace($matches[0], $parsed->format('M j, Y'), $value);
+            }
+        }
+
+        return $value;
     }
 }
