@@ -66,6 +66,12 @@ MessageQueueBundle
 - Service `oro_message_queue.client.consume_messages_command` was removed
 - Service `oro_message_queue.command.consume_messages` was removed
 
+SecurityBundle
+--------------
+- Class `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy`
+    - added new granting strategy named `PERMISSION`, for details see `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy::PERMISSION`
+    - removed method `containsExtraPermissions`
+
 SegmentBundle
 -------------
 - Services `oro_segment.query_converter.segment` and `oro_segment.query_converter.segment.link` were removed.
