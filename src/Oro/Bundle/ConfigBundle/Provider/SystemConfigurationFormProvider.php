@@ -11,7 +11,7 @@ class SystemConfigurationFormProvider extends AbstractProvider
      */
     public function getTree()
     {
-         return $this->getTreeData(self::TREE_NAME, self::CORRECT_FIELDS_NESTING_LEVEL);
+        return $this->getTreeData(self::TREE_NAME, self::CORRECT_FIELDS_NESTING_LEVEL);
     }
 
     /**
