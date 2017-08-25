@@ -174,7 +174,7 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
                 }
             }
         }
-        if (!empty($definition['response'])) {
+        if (!$association && !empty($definition['response'])) {
             foreach ($definition['response'] as $name => $item) {
                 if (empty($item['description'])
                     && 'data_channel' !== $name // @todo: remove this after CRM-8214 fix
