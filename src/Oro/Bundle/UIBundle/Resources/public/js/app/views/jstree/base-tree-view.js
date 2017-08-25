@@ -23,7 +23,8 @@ define(function(require) {
         autoRender: true,
 
         optionNames: BaseView.prototype.optionNames.concat([
-            'onSelectRoute', 'onSelectRouteParameters', 'onRootSelectRoute'
+            'onSelectRoute', 'onSelectRouteParameters', 'onRootSelectRoute',
+            'autoSelectFoundNode'
         ]),
 
         /**
@@ -41,7 +42,10 @@ define(function(require) {
          */
         onRootSelectRoute: '',
 
+        autoSelectFoundNode: false,
+
         events: {
+            'keypress [data-name="search"]': 'disableSubmit',
             'input [data-name="search"]': 'onSearch',
             'change [data-action-type="checkAll"]': 'onCheckAllClick'
         },
@@ -51,7 +55,8 @@ define(function(require) {
             'before_open.jstree':  'onBeforeOpen',
             'after_close.jstree':  'onAfterClose',
             'select_node.jstree': 'onSelect',
-            'search.jstree': 'searchResultsFilter'
+            'search.jstree': 'searchResultsFilter',
+            'open_node.jstree': 'onOpen'
         },
 
         /**
@@ -184,8 +189,17 @@ define(function(require) {
             return config;
         },
 
+        disableSubmit: function(e) {
+            if (e.keyCode === 13) {
+                //enter in search field
+                e.preventDefault();
+                return false;
+            }
+        },
+
         onSearch: function(event) {
             var value = $(event.target).val();
+            value = _.trim(value).replace(/\s+/g, ' ');
             if (this.jsTreeInstance.allNodesHidden) {
                 this.jsTreeInstance.show_all();
                 this.jsTreeInstance.allNodesHidden = false;
@@ -193,6 +207,10 @@ define(function(require) {
             this.jsTreeInstance.searchValue = value;
             this.jsTreeInstance.settings.autohideNeighbors = tools.isMobile() && _.isEmpty(value);
             this.jsTreeInstance.search(value);
+        },
+
+        onOpen: function(event, data) {
+            this.underlineFilter(data);
         },
 
         /**
@@ -203,7 +221,10 @@ define(function(require) {
          */
         searchResultsFilter: function(event, data) {
             if (data.res.length) {
-                this.underlineFilter.apply(this, arguments);
+                this.underlineFilter(data);
+                if (this.autoSelectFoundNode && data.res.length === 1) {
+                    this.$el.find('a.jstree-search').click();
+                }
             } else {
                 this.showSearchResultMessage(_.__('oro.ui.jstree.search.search_no_found'));
             }
@@ -212,14 +233,13 @@ define(function(require) {
         /**
          * Underline matches substrings
          *
-         * @param {Object} event
          * @param {Object} data
          */
-        underlineFilter: _.debounce(function(event, data) {
-            var pattern = new RegExp(data.instance.searchValue, 'gi');
-            if (!data.nodes) {
+        underlineFilter: _.debounce(function(data) {
+            if (!data || !data.instance) {
                 return;
             }
+            var pattern = new RegExp(data.instance.searchValue, 'gi');
             $('.jstree-search', this.$el).each(function(index, item) {
                 var $item = $(item);
                 var sourceText = $item.text().replace(pattern, '<span class="matched-keyword">$&</span>');
@@ -301,7 +321,7 @@ define(function(require) {
                     }
                 }, this));
             }
-            this.underlineFilter.apply(this, arguments);
+            this.underlineFilter.apply(data);
         },
 
         onAfterOpen: function(event, data) {

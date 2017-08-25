@@ -3,7 +3,7 @@ define(function(require) {
 
     var ConfigurationTreeView;
     var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
+    var $ = require('jquery');
     var routing = require('routing');
     var BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
 
@@ -22,13 +22,16 @@ define(function(require) {
                 return this._toggleParentNode(selected);
             }
 
-            var route = this.onSelectRoute;
             var parent = _.last(_.without(selected.node.parents, '#'));
             var routeParams = _.extend({}, this.onSelectRouteParameters, {
                 activeGroup: parent + '/' + selected.node.id
             });
 
-            mediator.execute('redirectTo', {url: routing.generate(route, routeParams)});
+            var url = routing.generate(this.onSelectRoute, routeParams);
+            //simulate click on real link to check page state
+            var $link = $('<a>').attr('href', url);
+            this.$tree.before($link);
+            $link.click().remove();
         },
 
         _toggleParentNode: function(selected) {
