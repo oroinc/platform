@@ -943,7 +943,7 @@ define(function(require) {
                 this.changeColumnParam(columnName, option, value);
             });
 
-            this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function () {
+            this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function() {
                 if (!this.refreshAction) {
                     this._onDatagridRefresh();
                 }
