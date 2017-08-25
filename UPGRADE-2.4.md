@@ -23,6 +23,7 @@ MessageQueue component
 ActionBundle
 ------------
 - Class `Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass` was removed.
+- Changed constructor arguments in `Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider`. Added `Oro\Bundle\CacheBundle\Loader\ConfigurationLoader $configurationLoader` before previous arguments.
 
 ApiBundle
 ---------

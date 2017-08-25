@@ -17,6 +17,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
 {
     const CONFIG_FILE_PATH = 'Resources/config/oro/actions.yml';
 
+    /** @var ConfigurationLoader */
+    protected $configurationLoader;
+
     /** @var ConfigurationDefinitionInterface */
     protected $configurationDefinition;
 
@@ -38,10 +41,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
     /** @var string */
     protected $rootNode;
 
-    /** @var ConfigurationLoader */
-    protected $configurationLoader;
-
     /**
+     * @param ConfigurationLoader $configurationLoader
      * @param ConfigurationDefinitionInterface $configurationDefinition
      * @param ConfigurationValidatorInterface $validator
      * @param CacheProvider $cache
@@ -50,6 +51,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
      * @param string $rootNode
      */
     public function __construct(
+        ConfigurationLoader $configurationLoader,
         ConfigurationDefinitionInterface $configurationDefinition,
         ConfigurationValidatorInterface $validator,
         CacheProvider $cache,
@@ -57,20 +59,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
         array $kernelBundles,
         $rootNode
     ) {
+        $this->configurationLoader = $configurationLoader;
         $this->configurationDefinition = $configurationDefinition;
         $this->validator = $validator;
         $this->cache = $cache;
         $this->rawConfiguration = $rawConfiguration;
         $this->kernelBundles = array_values($kernelBundles);
         $this->rootNode = $rootNode;
-    }
-
-    /**
-     * @param ConfigurationLoader $configurationLoader
-     */
-    public function setConfigurationLoader(ConfigurationLoader $configurationLoader)
-    {
-        $this->configurationLoader = $configurationLoader;
     }
 
     /**
@@ -129,16 +124,12 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
      */
     protected function resolveConfiguration(Collection $errors = null, ContainerBuilder $containerBuilder = null)
     {
-        $rawConfiguration = [];
-        if (null !== $this->configurationLoader) {
-            $rawConfiguration = $this->configurationLoader->loadConfiguration(
-                self::CONFIG_FILE_PATH,
-                'oro_action',
-                $this->rootNode,
-                $containerBuilder
-            );
-        }
-
+        $rawConfiguration = $this->configurationLoader->loadConfiguration(
+            self::CONFIG_FILE_PATH,
+            'oro_action',
+            $this->rootNode,
+            $containerBuilder
+        );
         $rawConfiguration = array_merge($this->rawConfiguration, $rawConfiguration);
 
         $merger = new ConfigurationMerger($this->kernelBundles);

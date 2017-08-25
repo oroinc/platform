@@ -1,0 +1,3 @@
+skipped_config:
+    test_data:
+        test_key: test value

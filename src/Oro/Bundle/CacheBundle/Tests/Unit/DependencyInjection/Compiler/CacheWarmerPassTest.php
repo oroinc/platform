@@ -26,14 +26,6 @@ class CacheWarmerPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->compilerPass);
-    }
-
-    /**
      * @dataProvider classesDataProvider
      *
      * @param string $dumperClass

@@ -20,14 +20,6 @@ class CacheWarmerListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->listener);
-    }
-
-    /**
      * @dataProvider cacheMapProvider
      *
      * @param array $cacheMap

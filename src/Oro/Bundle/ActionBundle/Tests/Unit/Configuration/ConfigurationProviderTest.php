@@ -33,25 +33,9 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->definitionConfiguration = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->definitionConfigurationValidator = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['contains', 'fetch', 'save', 'delete'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->definitionConfiguration, $this->definitionConfigurationValidator, $this->cacheProvider);
+        $this->definitionConfiguration = $this->createMock(OperationListConfiguration::class);
+        $this->definitionConfigurationValidator = $this->createMock(OperationConfigurationValidator::class);
+        $this->cacheProvider = $this->createMock(CacheProvider::class);
     }
 
     public function testGetActionConfigurationWithCache()
@@ -68,6 +52,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($config);
 
         $configurationProvider = new ConfigurationProvider(
+            new ConfigurationLoader(),
             $this->definitionConfiguration,
             $this->definitionConfigurationValidator,
             $this->cacheProvider,
@@ -84,6 +69,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertConfigurationCacheBuilt();
 
         $configurationProvider = new ConfigurationProvider(
+            new ConfigurationLoader(),
             $this->definitionConfiguration,
             $this->definitionConfigurationValidator,
             $this->cacheProvider,
@@ -107,9 +93,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->definitionConfiguration->expects($this->once())
             ->method('processConfiguration')
-            ->willReturnCallback(function ($config) {
-                return $config;
-            });
+            ->willReturnArgument(0);
 
         $this->cacheProvider->expects($this->once())
             ->method('save')
@@ -123,6 +107,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             );
 
         $configurationProvider = new ConfigurationProvider(
+            new ConfigurationLoader(),
             $this->definitionConfiguration,
             $this->definitionConfigurationValidator,
             $this->cacheProvider,
@@ -131,7 +116,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             self::ROOT_NODE_OPERATION
         );
 
-        $configurationProvider->setConfigurationLoader(new ConfigurationLoader());
         $configurationProvider->warmUpResourceCache($temporaryContainer);
 
         $resources = $temporaryContainer->getResources();
@@ -141,6 +125,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testClearCache()
     {
         $configurationProvider = new ConfigurationProvider(
+            new ConfigurationLoader(),
             $this->definitionConfiguration,
             $this->definitionConfigurationValidator,
             $this->cacheProvider,
@@ -174,11 +159,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                 return $config;
             });
 
-        //$this->definitionConfigurationValidator->expects($this->once())
-        //    ->method('validate')
-        //    ->with($config);
+        $this->definitionConfigurationValidator->expects($this->once())
+            ->method('validate')
+            ->with($config);
 
         $configurationProvider = new ConfigurationProvider(
+            new ConfigurationLoader(),
             $this->definitionConfiguration,
             $this->definitionConfigurationValidator,
             $this->cacheProvider,
@@ -206,6 +192,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertConfigurationCacheBuilt();
 
         $configurationProvider = new ConfigurationProvider(
+            new ConfigurationLoader(),
             $this->definitionConfiguration,
             $this->definitionConfigurationValidator,
             $this->cacheProvider,
@@ -315,6 +302,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                 return $configs;
             });
 
-        //$this->definitionConfigurationValidator->expects($this->once())->method('validate');
+        $this->definitionConfigurationValidator->expects($this->once())->method('validate');
     }
 }

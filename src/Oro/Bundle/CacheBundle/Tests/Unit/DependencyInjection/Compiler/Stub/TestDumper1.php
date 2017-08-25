@@ -8,7 +8,6 @@ use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 
 class TestDumper1 implements ConfigMetadataDumperInterface
 {
-
     /**
      * {@inheritdoc}
      */
