@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Formatter;
 
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
+use Oro\Component\MessageQueue\Client\Config;
 
 class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,14 +15,17 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'level_name' => 'DEBUG',
             'context'    => [],
             'extra'      => [
-                'processor'    => 'TestProcessor',
-                'message_body' => 'message body'
+                'processor'          => 'TestProcessor',
+                'message_body'       => 'message body',
+                'message_properties' => [
+                    Config::PARAMETER_TOPIC_NAME => 'test topic'
+                ]
             ]
         ];
         $formatter = new ConsoleFormatter();
 
         self::assertEquals(
-            'DEBUG: test message {"processor":"TestProcessor","message":"message body"} ' . "\n",
+            'DEBUG: test message {"processor":"TestProcessor","topic":"test topic","message":"message body"} ' . "\n",
             $formatter->format($record)
         );
     }

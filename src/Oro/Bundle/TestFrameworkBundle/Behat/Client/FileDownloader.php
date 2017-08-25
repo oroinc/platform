@@ -8,7 +8,6 @@ use Guzzle\Http\Client;
 use Guzzle\Plugin\Cookie\Cookie;
 use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
 use Guzzle\Plugin\Cookie\CookiePlugin;
-
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 
 /**
@@ -27,23 +26,30 @@ class FileDownloader
      */
     public function download($url, $filePath, Session $session)
     {
-        $cookies = $session->getDriver()->getWebDriverSession()->getCookie()[0];
-
-        $cookie = new Cookie();
-        $cookie->setName($cookies['name']);
-        $cookie->setValue($cookies['value']);
-        $cookie->setDomain($cookies['domain']);
-
-        $jar = new ArrayCookieJar();
-        $jar->add($cookie);
-
+        $cookieJar = $this->getCookieJar($session);
         $client = new Client($session->getCurrentUrl());
-        $client->addSubscriber(new CookiePlugin($jar));
+        $client->addSubscriber(new CookiePlugin($cookieJar));
         $request = $client->get($url, null, ['save_to' => $filePath]);
         $response = $request->send();
 
         self::assertEquals(200, $response->getStatusCode());
 
         return true;
+    }
+
+    /**
+     * @param Session $session
+     *
+     * @return ArrayCookieJar
+     */
+    private function getCookieJar(Session $session)
+    {
+        $cookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookieJar = new ArrayCookieJar();
+        foreach ($cookies as $cookie) {
+            $cookieJar->add(new Cookie($cookie));
+        }
+
+        return $cookieJar;
     }
 }

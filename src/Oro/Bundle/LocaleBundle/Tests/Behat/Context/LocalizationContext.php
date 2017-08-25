@@ -33,6 +33,8 @@ class LocalizationContext extends OroFeatureContext implements KernelAwareContex
             }, $localizations)
         );
 
+        $this->getContainer()->get('oro_translation.js_dumper')->dumpTranslations();
+
         $configManager->flush();
     }
 }

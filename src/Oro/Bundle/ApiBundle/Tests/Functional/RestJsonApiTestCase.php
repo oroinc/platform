@@ -438,7 +438,29 @@ class RestJsonApiTestCase extends ApiTestCase
     /**
      * Asserts the response content contains the the given data.
      *
-     * @param array|string $expectedContent The file name or full file path to yml template file or array
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     *
+     * @return array
+     */
+    protected function loadResponseData($expectedContent)
+    {
+        if (is_string($expectedContent)) {
+            if ($this->isRelativePath($expectedContent)) {
+                $expectedContent = $this->getTestResourcePath('responses', $expectedContent);
+            }
+            $file = $this->getContainer()->get('file_locator')->locate($expectedContent);
+            self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $expectedContent));
+
+            $expectedContent = Yaml::parse(file_get_contents($file));
+        }
+
+        return self::processTemplateData($expectedContent);
+    }
+
+    /**
+     * Asserts the response content contains the the given data.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
      * @param object|null  $entity          If not null, object will set as entity reference
      */
@@ -449,16 +471,7 @@ class RestJsonApiTestCase extends ApiTestCase
         }
 
         $content = json_decode($response->getContent(), true);
-
-        if (is_string($expectedContent)) {
-            if ($this->isRelativePath($expectedContent)) {
-                $expectedContent = $this->getTestResourcePath('responses', $expectedContent);
-            }
-            $file = $this->getContainer()->get('file_locator')->locate($expectedContent);
-            self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $expectedContent));
-
-            $expectedContent = Yaml::parse(file_get_contents($file));
-        }
+        $expectedContent = $this->loadResponseData($expectedContent);
 
         self::assertArrayContains(
             self::processTemplateData($expectedContent),
@@ -487,6 +500,47 @@ class RestJsonApiTestCase extends ApiTestCase
     {
         $content = json_decode($response->getContent(), true);
         self::assertNotEmpty($content['data']);
+    }
+
+    /**
+     * Asserts the response content contains the the given validation error.
+     *
+     * @param array    $expectedError
+     * @param Response $response
+     */
+    protected function assertResponseValidationError($expectedError, Response $response)
+    {
+        $this->assertResponseValidationErrors([$expectedError], $response);
+    }
+
+    /**
+     * Asserts the response content contains the the given validation errors.
+     *
+     * @param array    $expectedErrors
+     * @param Response $response
+     */
+    protected function assertResponseValidationErrors($expectedErrors, Response $response)
+    {
+        static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+
+        $content = json_decode($response->getContent(), true);
+        try {
+            $this->assertResponseContains(['errors' => $expectedErrors], $response);
+            self::assertCount(
+                count($expectedErrors),
+                $content['errors'],
+                'Unexpected number of validation errors'
+            );
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(
+                sprintf(
+                    "%s\nResponse:\n%s",
+                    $e->getMessage(),
+                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                ),
+                $e->getComparisonFailure()
+            );
+        }
     }
 
     /**

@@ -168,8 +168,8 @@ OroWorkflowBundle provides REST API that allows activation and deactivation of p
 
 Activation URL attributes:
 * **route:** ``oro_api_process_activate``
-* **parameter:** workflowDefinition - name of the appropriate process definition
+* **parameter:** processDefinition - name of the appropriate process definition
 
 Deactivation URL attributes:
 * **route:** ``oro_api_process_deactivate``
-* **parameter:** workflowDefinition - name of the appropriate process definition
+* **parameter:** processDefinition - name of the appropriate process definition

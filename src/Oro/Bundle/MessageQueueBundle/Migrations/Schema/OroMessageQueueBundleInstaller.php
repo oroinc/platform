@@ -19,7 +19,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -74,6 +74,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $table->addColumn('created_at', 'datetime');
         $table->addColumn('started_at', 'datetime', ['notnull' => false]);
         $table->addColumn('stopped_at', 'datetime', ['notnull' => false]);
+        $table->addIndex(['owner_id'], "owner_id_idx");
         $table->setPrimaryKey(['id']);
         $table->addColumn('data', 'json_array', [
             'notnull' => false,

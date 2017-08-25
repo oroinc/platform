@@ -66,15 +66,11 @@ MessageQueueBundle
 - Service `oro_message_queue.client.consume_messages_command` was removed
 - Service `oro_message_queue.command.consume_messages` was removed
 
-SyncBundle
-----------
-- Class `Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator`
-    - removed property `generatedTags`
-    - removed method `getCacheIdentifier`
-
-UIBundle
---------
-- `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
+SecurityBundle
+--------------
+- Class `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy`
+    - added new granting strategy named `PERMISSION`, for details see `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy::PERMISSION`
+    - removed method `containsExtraPermissions`
 
 SegmentBundle
 -------------
@@ -101,3 +97,17 @@ SegmentBundle
      ```
 - Class `Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder` was changed to use `oro_segment.query.segment_query_converter_factory.link` instead of `oro_segment.query_converter.segment.link`.
     - public method `setSegmentQueryConverterFactoryLink(ServiceLink $segmentQueryConverterFactoryLink)` was removed.
+
+SyncBundle
+----------
+- Class `Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator`
+    - removed property `generatedTags`
+    - removed method `getCacheIdentifier`
+
+UIBundle
+--------
+- `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
+
+UserBundle
+----------
+-  Removed the use of js-application build `js/oro.min.js` from login page. Use `head_script` twig placeholder to include custom script on login page.

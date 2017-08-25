@@ -101,7 +101,7 @@ class WorkflowDefinitionProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $isFresh
      *
-     * @dataProvider
+     * @dataProvider refreshWorkflowDefinitionDataProvider
      */
     public function testRefreshWorkflowDefinition($isFresh = true)
     {

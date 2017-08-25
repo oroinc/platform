@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -17,17 +18,18 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
 
         $this->loadFixtures([
             LoadOrganization::class,
+            LoadBusinessUnit::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/filters.yml'
         ]);
     }
 
     /**
-     * @param string      $entityClass          The FQCN of an entity
-     * @param integer     $expectedStatusCode   expected status code of a response
-     * @param array       $params               request parameters
-     * @param array       $expects              response expectation
-     * @param string|null $idsReplacementMethod method to be used for ids correction
-     * @param string      $identifier           attribute name value to reach referenced object
+     * @param string       $entityClass          The FQCN of an entity
+     * @param integer      $expectedStatusCode   expected status code of a response
+     * @param array        $params               request parameters
+     * @param array|string $expects              response expectation
+     * @param string|null  $idsReplacementMethod method to be used for ids correction
+     * @param string       $identifier           attribute name value to reach referenced object
      *
      * @dataProvider getParamsAndExpectation
      */
@@ -47,12 +49,13 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
             $params
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, $expectedStatusCode, $entityType, 'get list');
+        self::assertApiResponseStatusCodeEquals($response, $expectedStatusCode, $entityType, 'get list');
 
+        $expects = $this->loadResponseData($expects);
         if ($idsReplacementMethod && $identifier) {
             $expects = $this->{$idsReplacementMethod}($expects, $identifier);
         }
-        $this->assertEquals($expects, json_decode($response->getContent(), true));
+        $this->assertResponseContains($expects, $response);
     }
 
     /**
@@ -74,7 +77,7 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ]
                 ],
-                'expects'    => $this->loadExpectation('output_1.yml')
+                'expects'    => 'output_1.yml'
             ],
             'filter by field of 2nd level related entity (user.owner)'                                     => [
                 'className'  => 'Oro\Bundle\UserBundle\Entity\User',
@@ -87,7 +90,7 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ]
                 ],
-                'expects'    => $this->loadExpectation('output_1.yml')
+                'expects'    => 'output_1.yml'
             ],
             'filter by field of 3rd level related entity (user.owner.organization)'                        => [
                 'className'    => 'Oro\Bundle\UserBundle\Entity\User',
@@ -103,7 +106,7 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                         'size' => 3
                     ]
                 ],
-                'expects'      => $this->loadExpectation('output_filters_3.yml'),
+                'expects'      => 'output_filters_3.yml',
                 'replacements' => 'replaceUserIdsInExpectation',
                 'identifier'   => 'username'
             ],
@@ -155,7 +158,7 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
                         'size' => 3
                     ]
                 ],
-                'expects'      => $this->loadExpectation('output_filters_1.yml'),
+                'expects'      => 'output_filters_1.yml',
                 'replacements' => 'replaceTestEmployeeIdsInExpectation',
                 'identifier'   => 'name'
             ],

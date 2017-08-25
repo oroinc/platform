@@ -74,13 +74,12 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnSettingsSaveBefore()
     {
-        $settingsKey = $this->getConfigKey();
         $owner = $this->getEntity(User::class, ['id' => 1]);
-        $event = $this->getEvent([$settingsKey => ['value' => $owner]]);
+        $event = $this->getEvent(['value' => $owner]);
 
         $this->listener->onSettingsSaveBefore($event);
 
-        $this->assertEquals([$settingsKey => ['value' => 1]], $event->getSettings());
+        $this->assertEquals(['value' => 1], $event->getSettings());
     }
 
     /**
