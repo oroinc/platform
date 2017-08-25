@@ -224,6 +224,7 @@ define(function(require) {
                 this.underlineFilter(data);
                 if (this.autoSelectFoundNode && data.res.length === 1) {
                     this.$el.find('a.jstree-search').click();
+                    this.$el.find('[data-name="search"]').focus();
                 }
             } else {
                 this.showSearchResultMessage(_.__('oro.ui.jstree.search.search_no_found'));
