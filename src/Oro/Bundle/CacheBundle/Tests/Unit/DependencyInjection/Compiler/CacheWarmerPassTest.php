@@ -4,13 +4,13 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheWarmerPass;
 use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestDumper1;
 use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestDumper2;
 use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestWarmer1;
 use Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TestWarmer2;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class CacheWarmerPassTest extends \PHPUnit_Framework_TestCase
 {

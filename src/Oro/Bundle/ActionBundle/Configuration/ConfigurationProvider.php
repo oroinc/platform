@@ -5,16 +5,13 @@ namespace Oro\Bundle\ActionBundle\Configuration;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Component\Config\Merger\ConfigurationMerger;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Bundle\CacheBundle\Loader\ConfigurationLoader;
 use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
+use Oro\Component\Config\Merger\ConfigurationMerger;
 
 class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCacheWarmerInterface
 {
