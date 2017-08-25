@@ -24,6 +24,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportExportContext extends OroFeatureContext implements
     KernelAwareContext,
     OroPageObjectAware,
@@ -176,10 +179,14 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @param string    $entity
      * @param TableNode $expectedEntities
+     * @param string    $processorName
      */
-    public function exportedFileContainsAtLeastFollowingColumns($entity, TableNode $expectedEntities)
-    {
-        $filePath = $this->performExport($entity);
+    public function exportedFileContainsAtLeastFollowingColumns(
+        $entity,
+        TableNode $expectedEntities,
+        $processorName = null
+    ) {
+        $filePath = $this->performExport($entity, $processorName);
 
         try {
             $exportedFile = new \SplFileObject($filePath, 'rb');
@@ -376,21 +383,24 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * @param string $entity Entity class alias.
+     * @param string $processorName export processor name.
      *
      * @return string Filepath to exported file.
      */
-    private function performExport($entity)
+    private function performExport($entity, $processorName = null)
     {
         $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
-        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
 
-        self::assertCount(1, $processors, sprintf(
-            'Too many processors ("%s") for export "%s" entity',
-            implode(', ', $processors),
-            $entity
-        ));
+        if (!$processorName) {
+            $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+            self::assertCount(1, $processors, sprintf(
+                'Too many processors ("%s") for export "%s" entity',
+                implode(', ', $processors),
+                $entity
+            ));
+            $processorName = array_shift($processors);
+        }
 
-        $processorName = array_shift($processors);
         $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
         $filePath = FileManager::generateTmpFilePath(
             FileManager::generateFileName($processorName, 'csv')
