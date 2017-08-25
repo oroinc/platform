@@ -448,7 +448,10 @@ define(function(require) {
          */
         _calculateSelectedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
-                var num = (filter.enabled && !_.isEqual(filter.emptyValue, filter.value)) ? 1 : 0;
+                var num = (filter.enabled &&
+                           !filter.isEmptyValue() &&
+                           !_.isEqual(filter.emptyValue, filter.value)
+                          ) ? 1 : 0;
 
                 return memo + num;
             }, 0);
