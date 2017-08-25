@@ -126,7 +126,8 @@ class EmailGridResultHelper
         $qb
             ->select('eu.id, f.type')
             ->innerJoin('eu.folders', 'f')
-            ->where($qb->expr()->in('eu.id', $emailUserIds));
+            ->where($qb->expr()->in('eu.id', ':emailUserIds'))
+            ->setParameter('emailUserIds', $emailUserIds);
         $rows = $qb->getQuery()->getArrayResult();
 
         $result = [];
@@ -157,7 +158,8 @@ class EmailGridResultHelper
         $qb
             ->select('o, m')
             ->leftJoin('o.mailbox', 'm')
-            ->where($qb->expr()->in('o.id', $originIds));
+            ->where($qb->expr()->in('o.id', ':originIds'))
+            ->setParameter('originIds', $originIds);
         /** @var EmailOrigin[] $origins */
         $origins = $qb->getQuery()->getResult();
 
@@ -216,7 +218,8 @@ class EmailGridResultHelper
         $qb
             ->select('r, ea')
             ->innerJoin('r.emailAddress', 'ea')
-            ->where($qb->expr()->in('IDENTITY(r.email)', $emailIds));
+            ->where($qb->expr()->in('IDENTITY(r.email)', ':emailIds'))
+            ->setParameter('emailIds', $emailIds);
         $this->bindEmailAddressOwners($qb, 'ea');
         /** @var EmailRecipient[] $recipients */
         $recipients = $qb->getQuery()->getResult();
@@ -245,7 +248,8 @@ class EmailGridResultHelper
             ->select('r, ea, IDENTITY(e.thread) AS threadId')
             ->innerJoin('r.email', 'e')
             ->innerJoin('r.emailAddress', 'ea')
-            ->where($qb->expr()->in('IDENTITY(e.thread)', $threadIds));
+            ->where($qb->expr()->in('IDENTITY(e.thread)', ':threadIds'))
+            ->setParameter('threadIds', $threadIds);
         $this->bindEmailAddressOwners($qb, 'ea');
         /** @var array $rows */
         $rows = $qb->getQuery()->getResult();
@@ -301,7 +305,8 @@ class EmailGridResultHelper
         $qb = $this->createQueryBuilder(EmailAddress::class, 'ea');
         $qb
             ->select('ea')
-            ->where($qb->expr()->in('ea.id', $emailAddressIds));
+            ->where($qb->expr()->in('ea.id', ':emailAddressIds'))
+            ->setParameter('emailAddressIds', $emailAddressIds);
         $this->bindEmailAddressOwners($qb, 'ea');
         /** @var EmailAddress[] $emailAddresses */
         $emailAddresses = $qb->getQuery()->getResult();

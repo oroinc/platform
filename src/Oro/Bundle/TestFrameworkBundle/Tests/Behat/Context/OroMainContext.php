@@ -125,21 +125,24 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
+        if (!$this->getMink()->isSessionStarted()) {
+            return;
+        }
+
         $session = $this->getMink()->getSession();
 
         /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-
+        $driver = $session->getDriver();
         $url = $session->getCurrentUrl();
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
-        }
-
-        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
+            return;
+        } elseif (preg_match(self::SKIP_WAIT_PATTERN, $scope->getStep()->getText())) {
+            // Don't wait when we need assert the flash message, because it can disappear until ajax in process
             return;
         }
 
@@ -165,6 +168,8 @@ class OroMainContext extends MinkContext implements
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        } elseif (0 !== strpos($url, $this->getMinkParameter('base_url'))) {
             return;
         }
 
@@ -231,6 +236,62 @@ class OroMainContext extends MinkContext implements
             //No worries, flash message can disappeared till time next call
         } catch (\Exception $e) {
             //No worries, flash message can disappeared till time next call
+        }
+    }
+
+    /**
+     * @Then /^(?:|I )should see only following flash messages:$/
+     *
+     * @param TableNode $table
+     */
+    public function iShouldSeeOnlyFollowingFlashMessages(TableNode $table)
+    {
+        $this->iShouldSeeFollowingFlashMessages($table, true);
+    }
+
+    /**
+     * @Then /^(?:|I )should see following flash messages:$/
+     *
+     * @param TableNode $table
+     * @param bool $strict
+     */
+    public function iShouldSeeFollowingFlashMessages(TableNode $table, $strict = false)
+    {
+        $expectedMessages = array_map(
+            function ($item) {
+                return $item[0];
+            },
+            $table->getRows()
+        );
+
+        $actualMessages = [];
+
+        $elements = $this->findAllElements('Flash Message');
+        foreach ($elements as $element) {
+            if (!$element->isValid() || !$element->isVisible()) {
+                continue;
+            }
+
+            $actualMessage = $element->getText();
+
+            foreach ($expectedMessages as $message) {
+                if (false !== stripos($actualMessage, $message)) {
+                    $actualMessage = $message;
+                    break;
+                }
+            }
+
+            $actualMessages[] = $actualMessage;
+        }
+
+        $this->assertEquals(
+            $expectedMessages,
+            array_intersect($expectedMessages, $actualMessages),
+            "All messages: \n\t" . implode("\n\t", $actualMessages)
+        );
+
+        if ($strict) {
+            $this->assertEquals($expectedMessages, $actualMessages);
         }
     }
 
@@ -896,6 +957,7 @@ class OroMainContext extends MinkContext implements
     {
         $field = $this->fixStepArgument($field);
         $value = $this->fixStepArgument($value);
+        $value = $this->createOroForm()->normalizeValue($value);
 
         if ($this->elementFactory->hasElement($field)) {
             $this->elementFactory->createElement($field)->setValue($value);
@@ -913,7 +975,7 @@ class OroMainContext extends MinkContext implements
     {
         $isVisible = $this->spin(function (OroMainContext $context) use ($element) {
             return $context->createElement($element)->isVisible();
-        });
+        }, 3);
 
         self::assertTrue(
             $isVisible,
@@ -927,15 +989,18 @@ class OroMainContext extends MinkContext implements
     public function assertElementNotOnPage($element)
     {
         $elementOnPage = $this->createElement($element);
+        $result = $this->spin(function (OroMainContext $context) use ($elementOnPage, $element) {
+            try {
+                return !$elementOnPage->isVisible();
+            } catch (NoSuchElement $e) {
+                return true;
+            }
+        }, 3);
 
-        try {
-            self::assertFalse(
-                $elementOnPage->isVisible(),
-                sprintf('Element "%s" is present when it should not', $element)
-            );
-        } catch (NoSuchElement $e) {
-            return;
-        }
+        self::assertTrue(
+            $result,
+            sprintf('Element "%s" is present when it should not', $element)
+        );
     }
 
     /**
@@ -1148,11 +1213,7 @@ class OroMainContext extends MinkContext implements
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
 
-        $field = $this->getSession()->getPage()->findField($select);
-
-        if (null === $field) {
-            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $select);
-        }
+        $field = $this->elementFactory->createElement($select);
 
         $selectOptionXpath = '//option[contains(.,"%s")]';
         $selectOption = $field->find(
@@ -1160,7 +1221,7 @@ class OroMainContext extends MinkContext implements
             sprintf($selectOptionXpath, $option)
         );
 
-        if (null === $field) {
+        if (null === $selectOption) {
             throw new ElementNotFoundException(
                 $driver,
                 'select option',
@@ -1355,6 +1416,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then /^(?:|I )should see "(?P<title>[\w\s]*)" button$/
+     */
+    public function iShouldSeeButton($title)
+    {
+        $button = $this->getPage()->findButton($title);
+
+        if ($button) {
+            return;
+        }
+
+        $link = $this->getPage()->findLink($title);
+
+        if ($link && $link->hasClass('btn')) {
+            return;
+        }
+
+        self::fail(sprintf('Could not find button with "%s" title', $title));
+    }
+
+    /**
      * Use this action only for debugging
      *
      * This method should be used only for debug
@@ -1413,8 +1494,13 @@ class OroMainContext extends MinkContext implements
         ));
 
         $childElement = $parentElement->getElement($childElementName);
-        self::assertTrue($childElement->isIsset() && $childElement->isVisible(), sprintf(
+        self::assertTrue($childElement->isIsset(), sprintf(
             'Element "%s" not found inside element "%s"',
+            $childElementName,
+            $parentElementName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" found inside element "%s", but it\'s not visible',
             $childElementName,
             $parentElementName
         ));

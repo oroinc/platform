@@ -302,7 +302,8 @@ define([
                 } else {
                     throw error;
                 }
-            } else {
+            } else if (error) {
+                // if there is unhandled error -- show user message
                 require('oroui/js/mediator')
                     .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
             }

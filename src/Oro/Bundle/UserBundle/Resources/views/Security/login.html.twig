@@ -5,7 +5,6 @@
 {% endblock %}
 {% block content %}
 <div class="container">
-
     <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
         <div class="title-box">
             {% if oro_theme_logo() %}
@@ -17,14 +16,6 @@
             <h2 class="title">{{ 'Login'|trans }}</h2>
         </div>
         <fieldset>
-            <script type="text/javascript">
-                require(['jquery'], function ($) {
-                    var $form = $('#login-form');
-                    $form.on('submit', function () {
-                        $form.find('button').attr('disabled', 'disabled');
-                    });
-                });
-            </script>
             {% if error %}
                 <div class="alert alert-error">
                     <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -59,5 +50,13 @@
         <input type="hidden" name="_target_path" value="" />
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
     </form>
+    <script type="text/javascript">
+        document.getElementById('login-form').addEventListener('submit', function (event) {
+            var buttons = event.target.getElementsByTagName('button');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].setAttribute('disabled', 'disabled');
+            }
+        });
+    </script>
 </div>
 {% endblock content %}

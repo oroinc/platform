@@ -18,12 +18,16 @@ define(function(require) {
         },
 
         render: function() {
-            this.$el.validate(this.validationOptions || {});
+            this.validator = this.$el.validate(this.validationOptions || {});
             return this;
         },
 
         dispose: function() {
             delete this.validationOptions;
+            if (this.validator) {
+                this.validator.destroy();
+                delete this.validator;
+            }
             FormValidateView.__super__.dispose.call(this);
         }
     });

@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
+use Gaufrette\Exception\FileNotFound;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
@@ -256,7 +259,11 @@ class ExportHandler extends AbstractHandler
      */
     public function handleDownloadExportResult($fileName)
     {
-        $content = $this->fileManager->getContent($fileName);
+        try {
+            $content = $this->fileManager->getContent($fileName);
+        } catch (FileNotFound $exception) {
+            throw new NotFoundHttpException();
+        }
         $headers     = [];
         $contentType = $this->getFileContentType($fileName);
         if ($contentType !== null) {

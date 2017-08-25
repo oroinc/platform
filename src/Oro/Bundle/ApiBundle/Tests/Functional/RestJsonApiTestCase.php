@@ -490,6 +490,47 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
+     * Asserts the response content contains the the given validation error.
+     *
+     * @param array    $expectedError
+     * @param Response $response
+     */
+    protected function assertResponseValidationError($expectedError, Response $response)
+    {
+        $this->assertResponseValidationErrors([$expectedError], $response);
+    }
+
+    /**
+     * Asserts the response content contains the the given validation errors.
+     *
+     * @param array    $expectedErrors
+     * @param Response $response
+     */
+    protected function assertResponseValidationErrors($expectedErrors, Response $response)
+    {
+        static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+
+        $content = json_decode($response->getContent(), true);
+        try {
+            $this->assertResponseContains(['errors' => $expectedErrors], $response);
+            self::assertCount(
+                count($expectedErrors),
+                $content['errors'],
+                'Unexpected number of validation errors'
+            );
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(
+                sprintf(
+                    "%s\nResponse:\n%s",
+                    $e->getMessage(),
+                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                ),
+                $e->getComparisonFailure()
+            );
+        }
+    }
+
+    /**
      * @param string   $fileName The file name or full path to the output file
      * @param Response $response
      */
