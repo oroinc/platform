@@ -27,10 +27,6 @@ class OroActionBundleTest extends \PHPUnit_Framework_TestCase
                 'type' => PassConfig::TYPE_AFTER_REMOVING
             ],
             [
-                'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass',
-                'type' => PassConfig::TYPE_AFTER_REMOVING
-            ],
-            [
                 'class' => 'Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\MassActionProviderPass',
                 'type' => PassConfig::TYPE_AFTER_REMOVING
             ],
