@@ -37,9 +37,8 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
             return;
         }
 
-        foreach ($this->resolvers as $item) {
-            /** @var RouteOptionsResolverInterface $resolver */
-            list($resolver, $resolverView) = $item;
+        /** @var RouteOptionsResolverInterface $resolver */
+        foreach ($this->resolvers as list($resolver, $resolverView)) {
             if (null === $resolverView || $resolverView === $view) {
                 $resolver->resolve($route, $routes);
             }
