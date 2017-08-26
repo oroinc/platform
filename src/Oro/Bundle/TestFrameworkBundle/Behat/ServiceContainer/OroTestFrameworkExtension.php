@@ -66,6 +66,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processBundleBehatConfigurations($container);
         $this->processBundleAutoload($container);
         $this->injectMessageQueueIsolator($container);
+        $this->processReferenceRepositoryInitializers($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
         $this->processClassResolvers($container);
@@ -342,6 +343,39 @@ class OroTestFrameworkExtension implements TestworkExtension
             }
 
             $baseConfig[$key] = $value;
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function processReferenceRepositoryInitializers(ContainerBuilder $container)
+    {
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $doctrineIsolator = $container->getDefinition('oro_behat_extension.isolation.doctrine_isolator');
+
+        /** @var BundleInterface $bundle */
+        foreach ($kernel->getBundles() as $bundle) {
+            $namespace = sprintf('%s\Tests\Behat\ReferenceRepositoryInitializer', $bundle->getNamespace());
+
+            if (!class_exists($namespace)) {
+                continue;
+            }
+
+            try {
+                $initializer = new $namespace;
+            } catch (\Throwable $e) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Error while creating "%s" initializer. Initializer should not have any dependencies',
+                        $namespace
+                    ),
+                    0,
+                    $e
+                );
+            }
+
+            $doctrineIsolator->addMethodCall('addInitializer', [$initializer]);
         }
     }
 

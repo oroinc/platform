@@ -75,7 +75,6 @@ services:
     arguments:
       - '@symfony2_extension.kernel'
       - '@oro_test.context.fixture_loader'
-      - '@oro_test.reference_repository_initializer'
       - '@oro_test.alice_loader'
     tags:
       - { name: 'oro_behat.isolator', priority: 300 }

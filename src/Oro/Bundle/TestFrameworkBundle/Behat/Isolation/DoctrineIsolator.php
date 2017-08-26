@@ -33,6 +33,11 @@ class DoctrineIsolator implements IsolatorInterface
     protected $referenceRepositoryInitializer;
 
     /**
+     * @var ReferenceRepositoryInitializerInterface[]
+     */
+    protected $initializers = [];
+
+    /**
      * @var OroAliceLoader
      */
     protected $aliceLoader;
@@ -40,19 +45,24 @@ class DoctrineIsolator implements IsolatorInterface
     /**
      * @param KernelInterface $kernel
      * @param FixtureLoader $fixtureLoader
-     * @param ReferenceRepositoryInitializer $referenceRepositoryInitializer
      * @param OroAliceLoader $aliceLoader
      */
     public function __construct(
         KernelInterface $kernel,
         FixtureLoader $fixtureLoader,
-        ReferenceRepositoryInitializer $referenceRepositoryInitializer,
         OroAliceLoader $aliceLoader
     ) {
         $this->kernel = $kernel;
         $this->fixtureLoader = $fixtureLoader;
-        $this->referenceRepositoryInitializer = $referenceRepositoryInitializer;
         $this->aliceLoader = $aliceLoader;
+    }
+
+    /**
+     * @param ReferenceRepositoryInitializerInterface $initializer
+     */
+    public function addInitializer(ReferenceRepositoryInitializerInterface $initializer)
+    {
+        $this->initializers[] = $initializer;
     }
 
     /** {@inheritdoc} */
@@ -65,8 +75,14 @@ class DoctrineIsolator implements IsolatorInterface
     {
         $event->writeln('<info>Load fixtures</info>');
 
-        $this->aliceLoader->setDoctrine($this->kernel->getContainer()->get('doctrine'));
-        $this->referenceRepositoryInitializer->init();
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
+        $this->aliceLoader->setDoctrine($doctrine);
+        $referenceRepository = $this->aliceLoader->getReferenceRepository();
+        $referenceRepository->clear();
+
+        foreach ($this->initializers as $initializer) {
+            $initializer::init($doctrine, $referenceRepository);
+        }
 
         $this->loadFixtures($event);
     }
