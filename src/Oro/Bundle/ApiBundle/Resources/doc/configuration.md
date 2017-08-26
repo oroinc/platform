@@ -32,7 +32,7 @@ api:
 
 If an auto-generated alias for your entity looks bad for you, you can change it in `Resources/config/oro/entity.yml`. More details you can find in [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
-Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. If you use API sandbox run `oro:api:doc:cache:clear` CLI command to apply the changes for it. Also please see other [debug commands](./debug_commands.md) that may be helpful.
+Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. If you use API sandbox run `oro:api:doc:cache:clear` CLI command to apply the changes for it. Also please see other [CLI commands](./commands.md) that may be helpful.
 
 
 Configuration structure
