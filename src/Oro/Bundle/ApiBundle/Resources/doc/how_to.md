@@ -377,7 +377,7 @@ By default, all REST API resources are handled by the following controllers:
  - [RestApiSubresourceController](../../Controller/RestApiSubresourceController.php) - handles [get_subresource](./actions.md#get_subresource-action) action.
  - [RestApiRelationshipController](../../Controller/RestApiRelationshipController.php) - handles [get_relationship](./actions.md#get_relationship-action), [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action) and [delete_relationship](./actions.md#delete_relationship-action) actions.
 
-If by some reasons your REST API resource cannot be implemented to handle by one of these controllers you can register own controller. Please note that this way is not recommended and should be used only in a very special cases because a lot of logic should be implemented from the scratch, including:
+If by some reasons your REST API resource cannot be implemented to be handled by one of these controllers you can register own controller. Please note that this way is not recommended and should be used only in a very special cases, because a lot of logic should be implemented from the scratch, including:
 
  - extracting and validation of input data
  - building and formatting output document
