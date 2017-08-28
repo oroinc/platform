@@ -10,12 +10,10 @@ $filter-dropdown-mode-items-hint-inner-offset: 7px 130px 2px 10px !default;
 $filter-trigger-wrapper-display: inline-block !default;
 $filter-trigger-wrapper-dropdown-toggle-color: get-color('primary', 'dark') !default;
 
-$filter-date-range-offset: $offset-y-m 0 !default;
+$filter-date-range-offset: null !default;
 
 $filter-separator-width: 22px !default;
 $filter-separator-text-align: center !default;
-
-$filter-select-oro-wrapper-offset-inner-top: 13px !default;
 
 $filter-reset-color: get-color('additional', 'ultra') !default;
 $filter-reset-hover-color: darken(get-color('additional', 'ultra'), 10%) !default;

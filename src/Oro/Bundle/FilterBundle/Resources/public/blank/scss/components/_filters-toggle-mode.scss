@@ -81,11 +81,13 @@
 
     .datepicker-input {
         max-width: $filter-toggle-mode-datepicker-input-max-width;
+        min-width: 0;
         width: $filter-toggle-mode-datepicker-input-width;
     }
 
     .timepicker-input {
         max-width: $filter-toggle-mode-timepicker-input-max-width;
+        min-width: 0;
         width: $filter-toggle-mode-timepicker-input-width;
         margin-left: $filter-toggle-mode-timepicker-input-offset-left;
     }
@@ -140,6 +142,64 @@
             }
 
             font: $filter-manager-toggle-mode-trigger-font;
+        }
+    }
+
+    .choice-filter {
+        display: flex;
+    }
+
+    .filter-select-oro-wrapper,
+    .value-field-frame,
+    .filter-date-range {
+        width: 50%;
+        flex-basis: 50%;
+    }
+
+    .filter-select-oro-wrapper {
+        padding-right: $offset-x-m;
+    }
+
+    .value-field-frame {
+        padding-left: $offset-x-m;
+    }
+}
+
+@include breakpoint('mobile-landscape') {
+    .toggle-mode {
+        .filter-select-oro-wrapper {
+            width: 30%;
+            flex-basis: 30%;
+        }
+
+        .value-field-frame,
+        .filter-date-range {
+            width: 70%;
+            flex-basis: 70%;
+        }
+    }
+}
+
+@include breakpoint('mobile') {
+    .toggle-mode {
+        .choice-filter {
+            flex-direction: column;
+        }
+
+        .filter-select-oro-wrapper,
+        .value-field-frame,
+        .filter-date-range {
+            width: 100%;
+            flex-basis: 100%;
+        }
+
+        .filter-select-oro-wrapper {
+            padding-right: 0;
+            margin-bottom: $offset-y
+        }
+
+        .value-field-frame {
+            padding-left: 0;
         }
     }
 }

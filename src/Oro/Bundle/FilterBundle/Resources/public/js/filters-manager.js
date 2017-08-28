@@ -676,7 +676,11 @@ define(function(require) {
 
         getChangedFilters: function() {
             return _.filter(this.filters, function(filter) {
-                return filter.enabled && !_.isEqual(filter.value, filter._readDOMValue());
+                return (
+                    filter.enabled &&
+                   !_.isUndefined(filter._readDOMValue().value) &&
+                   !_.isEqual(filter.value, filter._readDOMValue())
+                );
             });
         }
     });
