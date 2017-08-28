@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
+use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ImportExportBundle\Event\Events;
@@ -106,18 +107,32 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     /**
      * @param array $header
      * @param array $data
+     * @throws LogicException
+     */
+    protected function validateColumns(array $header, array $data)
+    {
+        $dataDiff = array_diff(array_keys($data), $header);
+        // if data contains keys that are not in header, refresh header and check again
+        if ($dataDiff) {
+            $header = $this->getRefreshedBackendHeader();
+            $dataDiff = array_diff(array_keys($data), $header);
+            if ($dataDiff) {
+                throw new LogicException(
+                    sprintf('Backend header doesn\'t contain fields: %s', implode(', ', $dataDiff))
+                );
+            }
+        }
+    }
+
+    /**
+     * @param array $header
+     * @param array $data
      * @return array
      * @throws LogicException
      */
     protected function fillEmptyColumns(array $header, array $data)
     {
-        $dataDiff = array_diff(array_keys($data), $header);
-        // if data contains keys that are not in header
-        if ($dataDiff) {
-            throw new LogicException(
-                sprintf('Backend header doesn\'t contain fields: %s', implode(', ', $dataDiff))
-            );
-        }
+        $this->validateColumns($header, $data);
 
         $result = array();
         foreach ($header as $headerKey) {
@@ -155,6 +170,15 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
                 return true;
             }
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getRefreshedBackendHeader()
+    {
+        $this->backendHeader = null;
+        return $this->receiveBackendHeader();
     }
 
     /**
@@ -294,22 +318,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     protected function filterEmptyArrays(array $data)
     {
-        $hasValue = false;
-
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $value = $this->filterEmptyArrays($value);
-                $data[$key] = $value;
-            }
-
-            if (array() === $value) {
-                unset($data[$key]);
-            } elseif (null !== $value) {
-                $hasValue = true;
-            }
-        }
-
-        return $hasValue ? $data : array();
+        return ArrayUtil::filterEmptyArrays($data);
     }
 
     /**
