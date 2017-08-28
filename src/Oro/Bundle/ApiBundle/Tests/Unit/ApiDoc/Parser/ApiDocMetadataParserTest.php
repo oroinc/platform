@@ -9,10 +9,11 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
     /** @var ApiDocMetadataParser */
@@ -20,123 +21,414 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
+
         $this->parser = new ApiDocMetadataParser($this->valueNormalizer);
     }
 
-    /**
-     * @dataProvider  supportsDataProvider
-     *
-     * @param array $inputData
-     * @param bool  $result
-     */
-    public function testSupports($inputData, $result)
+    public function testSupportsWithoutMetadata()
     {
-        $this->assertEquals($result, $this->parser->supports($inputData));
-    }
-
-    public function supportsDataProvider()
-    {
-        $metadata = new EntityMetadata();
-        $config = $this->getMockBuilder('Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requestType = new RequestType([]);
-        $apiMetadata = new ApiDocMetadata('test', $metadata, $config, $requestType);
-        return [
-            [[], false],
-            [['class' => 'testClass', 'options' => ['metadata' => $apiMetadata]], false],
-            [['class' => ApiDocMetadata::class], false],
-            [['class' => ApiDocMetadata::class, 'options' => []], false],
-            [['class' => ApiDocMetadata::class, 'options' => ['metadata' => new \stdClass()]], false],
-            [['class' => ApiDocMetadata::class, 'options' => ['metadata' => $apiMetadata]], true],
+        $item = [
+            'class'   => 'Test\Class',
+            'options' => []
         ];
+
+        $this->assertFalse($this->parser->supports($item));
     }
 
-    public function testParse()
+    public function testSupportsWithMetadata()
     {
+        $item = [
+            'class'   => ApiDocMetadata::class,
+            'options' => [
+                'metadata' => new ApiDocMetadata(
+                    'test',
+                    $this->createMock(EntityMetadata::class),
+                    $this->createMock(EntityDefinitionConfig::class),
+                    new RequestType([])
+                )
+            ]
+        ];
+
+        $this->assertTrue($this->parser->supports($item));
+    }
+
+    public function testSupportsWithUnknownMetadata()
+    {
+        $item = [
+            'class'   => 'Test\Class',
+            'options' => [
+                'metadata' => new \stdClass()
+            ]
+        ];
+
+        $this->assertFalse($this->parser->supports($item));
+    }
+
+    public function testSupportsWithMetadataButWithInvalidClassName()
+    {
+        $item = [
+            'class'   => 'Test\Class',
+            'options' => [
+                'metadata' => new ApiDocMetadata(
+                    'test',
+                    $this->createMock(EntityMetadata::class),
+                    $this->createMock(EntityDefinitionConfig::class),
+                    new RequestType([])
+                )
+            ]
+        ];
+
+        $this->assertFalse($this->parser->supports($item));
+    }
+
+    public function testParseIdentifierFieldWithGeneratorForCreateAction()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->setHasIdentifierGenerator(true);
+        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('id')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'id' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Field Description',
+                    'readonly'    => true
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseIdentifierFieldWithoutGeneratorForCreateAction()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('id')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'id' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Field Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseIdentifierFieldForNotCreateAction()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $metadata->setHasIdentifierGenerator(true);
+        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('id')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('update', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'id' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Field Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseNullableField()
+    {
+        $requestType = new RequestType([]);
+
         $metadata = new EntityMetadata();
         $metadata->setIdentifierFieldNames(['id']);
 
-        $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
-        $metadata->addField(new FieldMetadata('firstName'))->setDataType('string');
-        $metadata->addField(new FieldMetadata('lastName'))->setDataType('string');
+        $field = $metadata->addField(new FieldMetadata('field1'));
+        $field->setDataType('string');
+        $field->setIsNullable(true);
 
-        $contactsAssociation = new AssociationMetadata('contacts');
-        $contactsAssociation->setTargetClassName('ContactClass');
-        $contactsAssociation->setIsCollection(true);
-        $metadata->addAssociation($contactsAssociation);
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDescription('Field Description');
 
-        $accountAssociation = new AssociationMetadata('defaultAccount');
-        $accountAssociation->setTargetClassName('AccountClass');
-        $accountAssociation->setIsCollection(false);
-        $metadata->addAssociation($accountAssociation);
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
 
+        $this->assertEquals(
+            [
+                'field1' => [
+                    'required'    => false,
+                    'dataType'    => 'string',
+                    'description' => 'Field Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseNotNullableField()
+    {
         $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $field = $metadata->addField(new FieldMetadata('field1'));
+        $field->setDataType('string');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'field1' => [
+                    'required'    => true,
+                    'dataType'    => 'string',
+                    'description' => 'Field Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseNullableAssociation()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+        $association->setIsNullable(true);
 
         $this->valueNormalizer->expects($this->any())
             ->method('normalizeValue')
-            ->willReturnMap([
-                ['ContactClass', 'entityType', $requestType, false, 'contacts'],
-                ['AccountClass', 'entityType', $requestType, false, 'accounts'],
-            ]);
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
-        $config->addField('id')->setDescription('Id Field');
-        $config->addField('firstName')->setDescription('firstName Field');
-        $config->addField('lastName')->setDescription('lastName Field');
-        $config->addField('contacts')->setDescription('contacts Field');
-        $config->addField('defaultAccount')->setDescription('defaultAccount Field');
+        $config->addField('association1')->setDescription('Association Description');
 
-        $result = $this->parser->parse(
-            ['options' => ['metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)]]
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'association1' => [
+                    'required'    => false,
+                    'dataType'    => 'integer',
+                    'description' => 'Association Description',
+                    'actualType'  => null,
+                    'subType'     => 'targets'
+                ]
+            ],
+            $result
         );
+    }
 
-        $expectedResult = [
-            'id' => [
-                'required' => true,
-                'dataType' => 'integer',
-                'description' => 'Id Field',
-                'readonly' => true,
-                'isRelation' => false,
-                'isCollection' => false
-            ],
-            'firstName' => [
-                'required' => true,
-                'dataType' => 'string',
-                'description' => 'firstName Field',
-                'readonly' => false,
-                'isRelation' => false,
-                'isCollection' => false
-            ],
-            'lastName' => [
-                'required' => true,
-                'dataType' => 'string',
-                'description' => 'lastName Field',
-                'readonly' => false,
-                'isRelation' => false,
-                'isCollection' => false
-            ],
-            'contacts' => [
-                'required' => true,
-                'dataType' => 'array of contacts',
-                'description' => 'contacts Field',
-                'readonly' => false,
-                'isRelation' => true,
-                'isCollection' => true
-            ],
-            'defaultAccount' => [
-                'required' => true,
-                'dataType' => 'accounts',
-                'description' => 'defaultAccount Field',
-                'readonly' => false,
-                'isRelation' => true,
-                'isCollection' => false
-            ],
-        ];
+    public function testParseNotNullableAssociation()
+    {
+        $requestType = new RequestType([]);
 
-        $this->assertEquals($result, $expectedResult);
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->willReturn('targets');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'association1' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Association Description',
+                    'actualType'  => null,
+                    'subType'     => 'targets'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseCollectionAssociation()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+        $association->setIsCollection(true);
+
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->willReturn('targets');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'association1' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Association Description',
+                    'actualType'  => 'collection',
+                    'subType'     => 'targets'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseAssociationAsField()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('object');
+        $association->setTargetClassName('Test\TargetClass');
+
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->willReturn('targets');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'association1' => [
+                    'required'    => true,
+                    'dataType'    => 'object',
+                    'description' => 'Association Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseAssociationIsPartOfIdentifierWithGenerator()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id', 'association1']);
+        $metadata->setHasIdentifierGenerator(true);
+
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->willReturn('targets');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        $this->assertEquals(
+            [
+                'association1' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Association Description',
+                    'readonly'    => true,
+                    'actualType'  => null,
+                    'subType'     => 'targets'
+                ]
+            ],
+            $result
+        );
     }
 }

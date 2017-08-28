@@ -31,7 +31,7 @@ services:
     oro_locale.settings:
         class: %oro_locale.settings.class%
         arguments:
-            - '@oro_config.user'
+            - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
         calls:
             - [addNameFormats, [%oro_locale.format.name%]]
