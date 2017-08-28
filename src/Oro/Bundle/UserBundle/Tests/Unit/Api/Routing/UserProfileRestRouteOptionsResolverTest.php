@@ -6,7 +6,6 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -18,9 +17,6 @@ use Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver;
 class UserProfileRestRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $docViewDetector;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $valueNormalizer;
 
     /** @var UserProfileRestRouteOptionsResolver */
@@ -28,15 +24,9 @@ class UserProfileRestRouteOptionsResolverTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-        $this->docViewDetector = $this->getMockBuilder(RestDocViewDetector::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->valueNormalizer = $this->getMockBuilder(ValueNormalizer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->userProfileRestRouteOptionsResolver = new UserProfileRestRouteOptionsResolver(
-            $this->docViewDetector,
             $this->valueNormalizer
         );
     }
@@ -91,13 +81,9 @@ class UserProfileRestRouteOptionsResolverTest extends \PHPUnit_Framework_TestCas
         $routes->add(UserProfileRestRouteOptionsResolver::GET_ROUTE_NAME, $route);
         $accessor = new RouteCollectionAccessor($routes);
 
-        $requestType = new RequestType([RequestType::REST]);
-        $this->docViewDetector->expects(self::once())
-            ->method('getRequestType')
-            ->willReturn($requestType);
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with(UserProfile::class, DataType::ENTITY_TYPE, self::identicalTo($requestType))
+            ->with(UserProfile::class, DataType::ENTITY_TYPE, new RequestType([RequestType::REST]))
             ->willThrowException(new \Exception('some error'));
 
         $this->userProfileRestRouteOptionsResolver->resolve($route, $accessor);
@@ -115,13 +101,9 @@ class UserProfileRestRouteOptionsResolverTest extends \PHPUnit_Framework_TestCas
         $accessor = new RouteCollectionAccessor($routes);
 
         $entityType = 'userprofile';
-        $requestType = new RequestType([RequestType::REST]);
-        $this->docViewDetector->expects(self::once())
-            ->method('getRequestType')
-            ->willReturn($requestType);
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with(UserProfile::class, DataType::ENTITY_TYPE, self::identicalTo($requestType))
+            ->with(UserProfile::class, DataType::ENTITY_TYPE, new RequestType([RequestType::REST]))
             ->willReturn($entityType);
 
         $this->userProfileRestRouteOptionsResolver->resolve($route, $accessor);
