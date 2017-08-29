@@ -62,6 +62,7 @@ define(function(require) {
          * Selector for select input element
          *
          * @property
+         * @property
          */
         inputSelector: 'select',
 
@@ -107,6 +108,11 @@ define(function(require) {
          * @property {Boolean}
          */
         contextSearch: true,
+
+        /**
+         * @property {Boolean}
+         */
+        closeAfterChose: true,
 
         /**
          * @property {Boolean}
@@ -256,9 +262,9 @@ define(function(require) {
                         this.selectDropdownOpened = true;
                         this.selectWidget.updateDropdownPosition();
                     }, this),
-                    beforeclose: function() {
-                        return false;
-                    },
+                    beforeclose: _.bind(function() {
+                        return this.closeAfterChose;
+                    }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         setTimeout(_.bind(function() {
@@ -362,7 +368,6 @@ define(function(require) {
             if (!this.selectDropdownOpened) {
                 setTimeout(_.bind(function() {
                     this.selectWidget.multiselect('open');
-                    this.selectDropdownOpened = false;
                 }, this), 50);
             } else {
                 setTimeout(_.bind(function() {
