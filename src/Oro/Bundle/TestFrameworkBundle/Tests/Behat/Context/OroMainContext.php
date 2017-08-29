@@ -1232,4 +1232,36 @@ class OroMainContext extends MinkContext implements
         $driver->waitPageToLoad();
         $driver->switchToWindow();
     }
+
+    /**
+     * Assert link existing on current page
+     *
+     * @Then /^I should see following buttons:$/
+     */
+    public function iShouldSeeFollowingButtons(TableNode $table)
+    {
+        foreach ($table->getRows() as $item) {
+            $item = reset($item);
+            self::assertNotNull(
+                $this->getPage()->findLink($item),
+                "Button with name $item not found (link selector, actually)"
+            );
+        }
+    }
+
+    /**
+     * Assert that links are not present on current page
+     *
+     * @Then /^I should not see following buttons:$/
+     */
+    public function iShouldNotSeeFollowingButtons(TableNode $table)
+    {
+        foreach ($table->getRows() as $item) {
+            $item = reset($item);
+            self::assertNull(
+                $this->getPage()->findLink($item),
+                "Button with name $item still present on page (link selector, actually)"
+            );
+        }
+    }
 }
