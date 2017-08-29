@@ -1,4 +1,4 @@
-system_configuration:
+user_configuration:
     fields:
         some_field:
             data_type: string
@@ -16,7 +16,7 @@ system_configuration:
             title: 'Third group'
 
     tree:
-        system_configuration:
+        user_configuration:
             first_group:
                 children:
                     second_group:
