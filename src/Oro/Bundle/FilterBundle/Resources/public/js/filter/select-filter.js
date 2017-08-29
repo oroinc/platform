@@ -62,7 +62,6 @@ define(function(require) {
          * Selector for select input element
          *
          * @property
-         * @property
          */
         inputSelector: 'select',
 
