@@ -9,6 +9,9 @@ oro_behat_extension:
           Title: 'oro_localization[titles][values][default]'
           Language: 'oro_localization[language]'
           Formatting: 'oro_localization[formattingCode]'
+          Parent Localization:
+            type: 'xpath'
+            locator: '//div[contains(@id,"s2id_oro_localization_parentLocalization-uid")]//input'
 
     Localization Create Form:
       selector: 'form[name="oro_localization"]'

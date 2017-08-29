@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
+namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener;
 
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
@@ -14,7 +14,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\SkipIsolatorsTrait;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;

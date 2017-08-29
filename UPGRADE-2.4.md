@@ -20,14 +20,27 @@ MessageQueue component
     - changed the constructor signature: added parameter `ExtensionInterface $jobExtension`
 - Class `Oro\Component\MessageQueue\Util\VarExport` was removed
 
+ActionBundle
+------------
+- Class `Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass` was removed.
+- Changed constructor arguments in `Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider`. Added `Oro\Bundle\CacheBundle\Loader\ConfigurationLoader $configurationLoader` before previous arguments.
+
 ApiBundle
 ---------
 - The `data_transformer` option for fields was removed from `Resources/config/oro/api.yml`. This option is required very very rarely and it is quite confusing for developers because its name is crossed with data transformers used in Symfony Forms, but the purpose of this option was very different and it was used to transform a field value from one data type to another during loading data. If you used this option for some of your API resources, please replace it with a processor for [customize_loaded_data](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md#customize_loaded_data-action) action.
+- Class `Oro\Bundle\ApiBundle\Request\ApiActions`
+    - removed methods `isInputAction`, `isOutputAction` and `getActionOutputFormatActionType`. They were moved to `Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler`
+    - removed method `isIdentifierNeededForAction`. This code was moved to `Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser`
+- Class `Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter` was renamed to `Oro\Bundle\ApiBundle\ApiDoc\NewHtmlFormatter`
 
 BatchBundle
 -----------
 - Class `Oro\Bundle\BatchBundle\Job\DoctrineJobRepository`
     - changed the constructor signature: parameter `EntityManager $entityManager` was replaced with `ManagerRegistry $doctrine`
+
+CacheBundle
+-----------
+- Added tag `oro.config_cache_warmer.provider` to be able to register custom warmer configuration provider for `Oro\Bundle\CacheBundle\EventListener\CacheWarmerListener`. It must implement `Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface`.
 
 DashboardBundle
 --------
@@ -65,6 +78,12 @@ MessageQueueBundle
 - The entity manager `message_queue_job` was removed. The default entity manager is used instead
 - Service `oro_message_queue.client.consume_messages_command` was removed
 - Service `oro_message_queue.command.consume_messages` was removed
+
+SecurityBundle
+--------------
+- Class `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy`
+    - added new granting strategy named `PERMISSION`, for details see `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy::PERMISSION`
+    - removed method `containsExtraPermissions`
 
 SegmentBundle
 -------------
@@ -105,3 +124,7 @@ UIBundle
 UserBundle
 ----------
 -  Removed the use of js-application build `js/oro.min.js` from login page. Use `head_script` twig placeholder to include custom script on login page.
+- Class `Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver`
+    - changed the constructor signature: parameter `RestDocViewDetector $docViewDetector` was removed
+- Class `Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver`
+    - changed the constructor signature: parameter `RestDocViewDetector $docViewDetector` was removed

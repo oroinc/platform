@@ -34,7 +34,23 @@ class TestEntitiesMigration implements Migration
         $table = $schema->createTable('test_api_department');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['business_unit_owner_id']);
+        $table->addIndex(['organization_id']);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_business_unit'),
+            ['business_unit_owner_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
     }
 
     /**
@@ -53,14 +69,30 @@ class TestEntitiesMigration implements Migration
         $table->addColumn('department_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('type', 'string', ['length' => 255]);
+        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('position', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['department_id'], 'IDX_C91820CFAE80F5DF', []);
+        $table->addIndex(['business_unit_owner_id']);
+        $table->addIndex(['organization_id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('test_api_department'),
             ['department_id'],
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_business_unit'),
+            ['business_unit_owner_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
     }
 

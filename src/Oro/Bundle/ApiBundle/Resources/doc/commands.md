@@ -1,5 +1,5 @@
-Debug Commands
-==============
+CLI Commands
+============
 
 oro:api:cache:clear
 -------------------

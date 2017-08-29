@@ -204,7 +204,7 @@ class RestDocHandler implements HandlerInterface
         EntityDefinitionConfig $config,
         EntityMetadata $metadata
     ) {
-        if (ApiActions::isInputAction($action)) {
+        if ($this->isActionWithInput($action)) {
             $this->setDirectionValue($annotation, 'input', $this->getDirectionValue($action, $config, $metadata));
         }
     }
@@ -225,10 +225,10 @@ class RestDocHandler implements HandlerInterface
         EntityMetadata $metadata,
         $associationName = null
     ) {
-        if (ApiActions::isOutputAction($action)) {
+        if ($this->isActionWithOutput($action)) {
             // check if output format should be taken from another action type. In this case
             // entity metadata and config will be taken for the action, those format should be used
-            $substituteAction = ApiActions::getActionOutputFormatActionType($action);
+            $substituteAction = $this->getOutputAction($action);
             if ($action !== $substituteAction) {
                 $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
                 $config = $substituteContext->getConfig();
@@ -290,5 +290,54 @@ class RestDocHandler implements HandlerInterface
                 }
             }
         }
+    }
+
+
+    /**
+     * Returns true in case if the given action receives resource data.
+     *
+     * @param string $action
+     *
+     * @return bool
+     */
+    protected function isActionWithInput($action)
+    {
+        return in_array(
+            $action,
+            [ApiActions::CREATE, ApiActions::UPDATE, ApiActions::UPDATE_RELATIONSHIP, ApiActions::ADD_RELATIONSHIP],
+            true
+        );
+    }
+
+    /**
+     * Returns true in case if the given action returns resource data.
+     *
+     * @param string $action
+     *
+     * @return bool
+     */
+    protected function isActionWithOutput($action)
+    {
+        return !in_array(
+            $action,
+            [ApiActions::DELETE, ApiActions::DELETE_LIST, ApiActions::DELETE_RELATIONSHIP],
+            true
+        );
+    }
+
+    /**
+     * Returns action name that should be used to format output data.
+     *
+     * @param string $action
+     *
+     * @return string
+     */
+    protected function getOutputAction($action)
+    {
+        if (in_array($action, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
+            return ApiActions::GET;
+        }
+
+        return $action;
     }
 }

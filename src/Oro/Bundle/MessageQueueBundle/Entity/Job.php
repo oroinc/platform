@@ -3,12 +3,16 @@ namespace Oro\Bundle\MessageQueueBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 use Oro\Component\MessageQueue\Job\Job as BaseJob;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="oro_message_queue_job")
+ * @ORM\Table(
+ *     name="oro_message_queue_job",
+ *     indexes={@Index(name="owner_id_idx", columns={"owner_id"})}
+ * )
  */
 class Job extends BaseJob
 {
