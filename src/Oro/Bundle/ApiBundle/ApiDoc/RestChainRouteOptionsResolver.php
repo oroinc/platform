@@ -33,7 +33,7 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
         }
 
         $view = $this->docViewDetector->getView();
-        if (empty($view)) {
+        if (!$view) {
             return;
         }
 

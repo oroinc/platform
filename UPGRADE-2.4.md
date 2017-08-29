@@ -124,3 +124,7 @@ UIBundle
 UserBundle
 ----------
 -  Removed the use of js-application build `js/oro.min.js` from login page. Use `head_script` twig placeholder to include custom script on login page.
+- Class `Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver`
+    - changed the constructor signature: parameter `RestDocViewDetector $docViewDetector` was removed
+- Class `Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver`
+    - changed the constructor signature: parameter `RestDocViewDetector $docViewDetector` was removed

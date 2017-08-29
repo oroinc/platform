@@ -16,7 +16,7 @@ A processor is the main element where a business logic of Data API is implemente
 
 Please see [actions](./actions.md) section for more details about where and how processors are used.
 
-Also you can use the [oro:api:debug](./debug_commands.md#oroapidebug) command to see all actions and processors.
+Also you can use the [oro:api:debug](./commands.md#oroapidebug) command to see all actions and processors.
 
 Creating a processor
 --------------------
