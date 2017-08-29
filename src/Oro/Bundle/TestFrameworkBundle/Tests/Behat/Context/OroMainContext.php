@@ -66,12 +66,31 @@ class OroMainContext extends MinkContext implements
     /** @var bool */
     private $debug = false;
 
+    /** @var bool */
+    private $skipWait = false;
+
     /**
      * @BeforeScenario
      */
     public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
+     * @BeforeScenario @skipWait
+     */
+    public function applySkipWait()
+    {
+        $this->skipWait = true;
+    }
+
+    /**
+     * @AfterScenario @skipWait
+     */
+    public function cancelSkipWait()
+    {
+        $this->skipWait = false;
     }
 
     /**
@@ -125,7 +144,7 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
-        if (!$this->getMink()->isSessionStarted()) {
+        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
             return;
         }
 
@@ -155,7 +174,7 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
-        if (!$this->getMink()->isSessionStarted()) {
+        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
             return;
         }
 

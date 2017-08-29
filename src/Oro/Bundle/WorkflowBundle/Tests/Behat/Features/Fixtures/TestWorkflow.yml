@@ -17,6 +17,12 @@ Oro\Bundle\TranslationBundle\Entity\TranslationKey:
     first_workflow_variable3_label_key:
         key: oro.workflow.test_workflow.variable.other_user_variable2.label
         domain: workflows
+    first_workflow_variable_bool_label_key:
+        key: oro.workflow.test_workflow.variable.test_bool_variable.label
+        domain: workflows
+    first_workflow_variable_array_label_key:
+        key: oro.workflow.test_workflow.variable.test_array_variable.label
+        domain: workflows
     first_workflow_attribute_label_key:
         key: oro.workflow.test_workflow.attribute.other_user_attribute.label
         domain: workflows
@@ -65,6 +71,16 @@ Oro\Bundle\TranslationBundle\Entity\Translation:
     first_workflow_variable3_label:
         translationKey: '@first_workflow_variable3_label_key'
         value: 'guest'
+        language: '@en_language'
+        scope: 1
+    first_workflow_variable_bool_label:
+        translationKey: '@first_workflow_variable_bool_label_key'
+        value: 'Test Bool Var'
+        language: '@en_language'
+        scope: 1
+    first_workflow_variable_array_label:
+        translationKey: '@first_workflow_variable_array_label_key'
+        value: 'Test Array Var'
         language: '@en_language'
         scope: 1
     first_workflow_attribute_label:
@@ -141,8 +157,16 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
                 variables:
                     test_variable:
                         type: float
-                        value: 100
+                        value: 99
                         label: 'oro.workflow.test_workflow.variable.test_variable.label'
+                    test_bool_variable:
+                        type: bool
+                        value: true
+                        label: 'oro.workflow.test_workflow.variable.test_bool_variable.label'
+                    test_array_variable:
+                        type: array
+                        value: ['value1', 'value2']
+                        label: 'oro.workflow.test_workflow.variable.test_array_variable.label'
                     other_user_variable1:
                         type: entity
                         value: null
