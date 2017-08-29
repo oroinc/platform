@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\Security;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class ContextListener
 {
@@ -41,7 +42,11 @@ class ContextListener
                     $this->getOrganizationManager()->getOrganizationById($token->getOrganizationContext()->getId())
                 );
 
-                if (!$token->getUser()->getOrganizations(true)->contains($token->getOrganizationContext())) {
+                $user = $token->getUser();
+                $organizationAccessDenied = $token->getUser() instanceof AbstractUser
+                    && !$user->getOrganizations(true)->contains($token->getOrganizationContext());
+
+                if ($organizationAccessDenied) {
                     $exception = new OrganizationAccessDeniedException();
                     $exception->setOrganizationName($token->getOrganizationContext()->getName());
                     $exception->setToken($token);
