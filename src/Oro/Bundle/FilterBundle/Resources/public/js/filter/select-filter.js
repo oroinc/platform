@@ -233,6 +233,8 @@ define(function(require) {
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
+                    showCheckAll: false,
+                    showUncheckAll: false,
                     noneSelectedText: this.placeholder,
                     selectedText: _.bind(function(numChecked, numTotal, checkedItems) {
                         return this._getSelectedText(checkedItems);
@@ -255,6 +257,9 @@ define(function(require) {
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
                         this.selectWidget.updateDropdownPosition();
+                    }, this),
+                    refresh: _.bind(function() {
+                        this.selectWidget.onRefresh();
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
