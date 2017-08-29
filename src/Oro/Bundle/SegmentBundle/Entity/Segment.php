@@ -278,7 +278,7 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     }
 
     /**
-     * Get this segment definition in YAML format
+     * Get this segment definition in JSON format
      *
      * @return string
      */
@@ -288,7 +288,7 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     }
 
     /**
-     * Set this segment definition in YAML format
+     * Set this segment definition in JSON format
      *
      * @param string $definition
      * @return Segment
