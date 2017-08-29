@@ -1,6 +1,8 @@
 OroSearchBundle
 ===============
 
+*Note:* This article is published in the Oro documentation library.
+
 Search bundle creates search index for entities and allows to perform search using this index.
 
  - [Configuration](Resources/doc/configuration.md)
