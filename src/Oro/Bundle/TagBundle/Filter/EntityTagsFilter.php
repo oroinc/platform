@@ -10,6 +10,10 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\Type\EntityTagsFilterType;
 
+/**
+ * @deprecated and will be removed in v2.4. Use TagsDictionaryFilter instead
+ * @see TagsDictionaryFilter
+ */
 class EntityTagsFilter extends AbstractTagsFilter
 {
     /** @var TranslatorInterface  */
