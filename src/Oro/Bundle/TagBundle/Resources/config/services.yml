@@ -124,12 +124,19 @@ services:
 
     oro_tag.filter.tags:
         class: Oro\Bundle\TagBundle\Filter\EntityTagsFilter
+        deprecated: The "%service_id%" service is deprecated since 2.0.20, will be removed in 2.4
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@translator'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tag }
+
+    oro_tag.filter.tags_choice_tree:
+        class: Oro\Bundle\TagBundle\Filter\TagsDictionaryFilter
+        parent: 'oro_filter.dictionary_filter'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: tag_dictionary }
 
     oro_tag.grid.tags_extension:
         class: Oro\Bundle\TagBundle\Grid\TagsExtension

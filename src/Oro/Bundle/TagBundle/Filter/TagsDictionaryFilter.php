@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\TagBundle\Filter;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\Expr\Func;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 
 /**
- * @deprecated and will be removed in v2.4. Use TagsDictionaryFilter instead
- * @see TagsDictionaryFilter
+ * This class implements logic for tags filter, based on dictionary filter.
  */
-abstract class AbstractTagsFilter extends AbstractFilter
+class TagsDictionaryFilter extends DictionaryFilter
 {
     /**
      * {@inheritdoc}
@@ -26,11 +24,11 @@ abstract class AbstractTagsFilter extends AbstractFilter
 
     /**
      * {@inheritdoc}
+     * @param OrmFilterDatasourceAdapter $ds
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $this->checkDataSourceAdapter($ds);
-        /** @var OrmFilterDatasourceAdapter $ds */
 
         $className = $this->getEntityClassName();
         $entityClassParam = 'tags_filter_entity_class_' . $this->clearEntityClassName($className);
@@ -46,9 +44,9 @@ abstract class AbstractTagsFilter extends AbstractFilter
      * Builds filtering expression by tags ids and entity class name
      *
      * @param OrmFilterDatasourceAdapter $ds
-     * @param array                      $data
-     * @param string                     $entityClassParam
-     * @param string                     $comparisonType
+     * @param array $data
+     * @param string $entityClassParam
+     * @param string $comparisonType
      *
      * @return bool|Func
      */
@@ -88,15 +86,18 @@ abstract class AbstractTagsFilter extends AbstractFilter
         return $expr;
     }
 
+
     /**
      * @param FilterDatasourceAdapterInterface $ds
+     * @throws \LogicException
      */
     protected function checkDataSourceAdapter(FilterDatasourceAdapterInterface $ds)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
             throw new \LogicException(
                 sprintf(
-                    '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
+                    '"%s" expected but "%s" given.',
+                    OrmFilterDatasourceAdapter::class,
                     get_class($ds)
                 )
             );
@@ -114,10 +115,6 @@ abstract class AbstractTagsFilter extends AbstractFilter
             return false;
         }
         $value = $data['value'];
-
-        if ($value instanceof Collection) {
-            $value = $value->getValues();
-        }
 
         if (!is_array($value)) {
             return false;
@@ -146,5 +143,8 @@ abstract class AbstractTagsFilter extends AbstractFilter
      *
      * @return string
      */
-    abstract protected function getEntityClassName();
+    protected function getEntityClassName()
+    {
+        return $this->params['entity_class'];
+    }
 }

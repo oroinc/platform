@@ -44,8 +44,9 @@ define([
             var status = 0;
             if (_.isObject(xhr)) {
                 status = xhr.status;
-                if ('responseJSON' in xhr && 'code' in xhr.responseJSON) {
-                    status = xhr.responseJSON.code;
+                var responseCode = _.result(xhr.responseJSON, 'code');
+                if (!_.isUndefined(responseCode)) {
+                    status = responseCode;
                 }
             }
             return status === testStatus;
