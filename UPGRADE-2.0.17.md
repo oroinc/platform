@@ -4,7 +4,12 @@ UPGRADE FROM 2.0.16 to 2.0.17
 Table of Contents
 -----------------
 
+- [ElasticSearchBundle](#elasticsearchbundle)
 - [ReportBundle](#reportbundle)
+
+ElasticSearchBundle
+-------------------
+- Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
 
 ReportBundle
 ------------
@@ -64,3 +69,4 @@ To set values for $prefixCacheKey and $reportCacheManager in ReportDatagridConfi
      ```
 
 - Class Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener was added. It cleans cache of report grid on postUpdate event of Report entity.
+
