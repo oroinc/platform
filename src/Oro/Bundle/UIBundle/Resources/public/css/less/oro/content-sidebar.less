@@ -38,7 +38,8 @@
 
         i {
             font-size: 8px;
-            line-height: 20px;
+            line-height: 8px;
+            margin: 7px 3px 7px 0;
         }
     }
 
@@ -64,6 +65,14 @@
 
         &.content-sidebar-minimized {
             margin-left: @sidebarMinimizedWidth;
+        }
+
+        .placeholder {
+            background-color: #f1f1f1;
+
+            .content {
+                padding: 15px 15px 0;
+            }
         }
 
         .responsive-section {

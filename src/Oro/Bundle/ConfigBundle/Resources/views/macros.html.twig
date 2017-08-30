@@ -83,50 +83,52 @@
     } %}
 
     {% set data = oro_form_process(data, form) %}
-    <div class="scrollable-container">
-        <div class="system-configuration-content content form-container" id="configuration-options-block">
-            <div class="pull-right">
-                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
-            </div>
-            {% if data.formErrors is defined and data.formErrors | length %}
-                <div class="customer-info-actions container-fluid well-small alert-wrap">
-                    <div class="alert alert-error">
-                        <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
-                        {{ data.formErrors|raw }}
-                    </div>
+    <div class="placeholder">
+        <div class="scrollable-container">
+            <div class="system-configuration-content content form-container" id="configuration-options-block">
+                <div class="pull-right">
+                    <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
                 </div>
-            {% endif %}
-
-            {% for scrollBlock in data.dataBlocks %}
-            {% set accordionId = 'system-configuration-collapse' ~ loop.index %}
-            <div class="accordion">
-                <div class="accordion-group">
-                    <div class="accordion-heading">
-                        {% if loop.first %}
-                        <div class="pull-right">
-                            {{ _self.renderCollapseExpandActions('#configuration-options-block') }}
+                {% if data.formErrors is defined and data.formErrors | length %}
+                    <div class="customer-info-actions container-fluid well-small alert-wrap">
+                        <div class="alert alert-error">
+                            <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                            {{ data.formErrors|raw }}
                         </div>
-                        {% endif %}
-                        <a href="#{{ accordionId }}" data-toggle="collapse" class="accordion-toggle">
-                            {{ scrollBlock.title|trans }}
-                        </a>
                     </div>
-                    <div class="accordion-body in collapse" id="{{ accordionId }}" >
-                        <div class="accordion-inner">
-                            {% if scrollBlock.description is defined and scrollBlock.description != '' %}
-                                <p>{{ scrollBlock.description|trans }}</p>
+                {% endif %}
+
+                {% for scrollBlock in data.dataBlocks %}
+                {% set accordionId = 'system-configuration-collapse' ~ loop.index %}
+                <div class="accordion">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            {% if loop.first %}
+                            <div class="pull-right">
+                                {{ _self.renderCollapseExpandActions('#configuration-options-block') }}
+                            </div>
                             {% endif %}
+                            <a href="#{{ accordionId }}" data-toggle="collapse" class="accordion-toggle">
+                                {{ scrollBlock.title|trans }}
+                            </a>
+                        </div>
+                        <div class="accordion-body in collapse" id="{{ accordionId }}" >
+                            <div class="accordion-inner">
+                                {% if scrollBlock.description is defined and scrollBlock.description != '' %}
+                                    <p>{{ scrollBlock.description|trans }}</p>
+                                {% endif %}
 
-                            {% for subblock in scrollBlock.subblocks %}
-                                {{ _self.renderFieldset(subblock) }}
-                            {% endfor %}
+                                {% for subblock in scrollBlock.subblocks %}
+                                    {{ _self.renderFieldset(subblock) }}
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-            <div class="hide">
-                {{ data.hiddenData|raw }}
+                {% endfor %}
+                <div class="hide">
+                    {{ data.hiddenData|raw }}
+                </div>
             </div>
         </div>
     </div>
