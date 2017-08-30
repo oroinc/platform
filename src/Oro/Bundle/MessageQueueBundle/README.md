@@ -1,5 +1,7 @@
 # OroMessageQueue Bundle
 
+*Note:* This article is published in the Oro documentation library.
+
 ## Table of Contents
 
  - [Overview](#overview)

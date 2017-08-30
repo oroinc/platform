@@ -1,6 +1,8 @@
 OroCacheBundle
 ===============
 
+*Note:* This article is published in the Oro documentation library.
+
 The `OroCacheBundle` is responsible for operations with various kinds of caches.
 
 Table of Contents

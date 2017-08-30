@@ -1,4 +1,14 @@
 oro_behat_extension:
+  suites:
+    OroWorkflowBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroFormBundle::FormContext
+        - OroDataGridBundle::GridContext
+        - OroWorkflowBundle::FeatureContext
+      paths:
+        - '@OroWorkflowBundle/Tests/Behat/Features'
+
   elements:
     Workflow Page Title:
       selector: 'div.top-row h1, h1.page-title span.page-title__text'

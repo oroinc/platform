@@ -66,6 +66,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processBundleBehatConfigurations($container);
         $this->processBundleAutoload($container);
         $this->injectMessageQueueIsolator($container);
+        $this->processReferenceRepositoryInitializers($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
         $this->processClassResolvers($container);
@@ -115,9 +116,6 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
                 ->end()
-                ->scalarNode('reference_initializer_class')
-                    ->defaultValue('Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer')
-                ->end()
                 ->arrayNode('artifacts')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -144,7 +142,6 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
-        $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
             ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
@@ -343,6 +340,39 @@ class OroTestFrameworkExtension implements TestworkExtension
             }
 
             $baseConfig[$key] = $value;
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function processReferenceRepositoryInitializers(ContainerBuilder $container)
+    {
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $doctrineIsolator = $container->getDefinition('oro_behat_extension.isolation.doctrine_isolator');
+
+        /** @var BundleInterface $bundle */
+        foreach ($kernel->getBundles() as $bundle) {
+            $namespace = sprintf('%s\Tests\Behat\ReferenceRepositoryInitializer', $bundle->getNamespace());
+
+            if (!class_exists($namespace)) {
+                continue;
+            }
+
+            try {
+                $initializer = new $namespace;
+            } catch (\Throwable $e) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Error while creating "%s" initializer. Initializer should not have any dependencies',
+                        $namespace
+                    ),
+                    0,
+                    $e
+                );
+            }
+
+            $doctrineIsolator->addMethodCall('addInitializer', [$initializer]);
         }
     }
 

@@ -15,6 +15,8 @@ class OroMessageQueueJobOwnerIdIndex implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_message_queue_job');
-        $table->addIndex(['owner_id'], "owner_id_idx");
+        if (!$table->hasIndex("owner_id_idx")) {
+            $table->addIndex(['owner_id'], "owner_id_idx");
+        }
     }
 }

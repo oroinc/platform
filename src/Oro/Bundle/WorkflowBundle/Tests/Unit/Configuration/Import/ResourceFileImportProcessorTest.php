@@ -37,7 +37,7 @@ class ResourceFileImportProcessorTest extends \PHPUnit_Framework_TestCase
 
         $importFileStateAssert = function (\SplFileInfo $fileInfo) {
             $this->assertInstanceOf(\SplFileInfo::class, $fileInfo);
-            $this->assertSame('//relative path', $fileInfo->getPathname());
+            $this->assertSame(sprintf('/%srelative path', DIRECTORY_SEPARATOR), $fileInfo->getPathname());
 
             return true;
         };
@@ -59,9 +59,9 @@ class ResourceFileImportProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->contentFile->expects($this->once())->method('getPath')->willReturn('/');
 
-        $importFileStateAssert = function ($importFile) {
+        $importFileStateAssert = function (\SplFileInfo $importFile) {
             $this->assertInstanceOf(\SplFileInfo::class, $importFile);
-            $this->assertSame('//relative path', $importFile->getPathname());
+            $this->assertSame(sprintf('/%srelative path', DIRECTORY_SEPARATOR), $importFile->getPathname());
             return true;
         };
 
