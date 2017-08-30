@@ -13,6 +13,7 @@ Table of Contents
 - [CronBundle](#cronbundle)
 - [DataAuditBundle](#dataauditbundle)
 - [DistributionBundle](#distributionbundle)
+- [ElasticSearchBundle](#elasticsearchbundle)
 - [EmailBundle](#emailbundle)
 - [FormBundle](#formbundle)
 - [ImapBundle](#imapbundle)
@@ -194,6 +195,9 @@ DistributionBundle
   > - `updateAction()`<sup>[[?]](https://github.com/orocrm/platform/tree/2.1.0/src/Oro/Bundle/DistributionBundle/Controller/PackageController.php#L167 "Oro\Bundle\DistributionBundle\Controller\PackageController")</sup>
   > - `updateAction(Request $request)`<sup>[[?]](https://github.com/orocrm/platform/tree/2.2.0/src/Oro/Bundle/DistributionBundle/Controller/PackageController.php#L179 "Oro\Bundle\DistributionBundle\Controller\PackageController")</sup>
 
+ElasticSearchBundle
+-------------------
+* Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
 
 EmailBundle
 -----------
