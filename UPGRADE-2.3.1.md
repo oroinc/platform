@@ -1,6 +1,10 @@
 UPGRADE FROM 2.3 to 2.3.1
 =========================
 
+ElasticSearchBundle
+-------------------
+- Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
+
 SegmentBundle
 -------------
 - Class Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory was created. It was registered as the service `oro_segment.query.segment_query_converter_factory`.
