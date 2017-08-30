@@ -68,6 +68,9 @@ datagrids:
            hints:
                - { name: HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, value: false }
 ```
+ElasticSearchBundle
+-------------------
+- Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
 
 FormBundle
 ----------
