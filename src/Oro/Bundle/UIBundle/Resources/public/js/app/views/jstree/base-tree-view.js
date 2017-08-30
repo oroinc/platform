@@ -47,7 +47,8 @@ define(function(require) {
         events: {
             'keypress [data-name="search"]': 'disableSubmit',
             'input [data-name="search"]': 'onSearch',
-            'change [data-action-type="checkAll"]': 'onCheckAllClick'
+            'change [data-action-type="checkAll"]': 'onCheckAllClick',
+            'click [data-name="clear-search"]': 'clearSearch'
         },
 
         treeEvents: {
@@ -63,6 +64,16 @@ define(function(require) {
          * @property {Object}
          */
         $tree: null,
+
+        /**
+         * @property {Object}
+         */
+        $searchField: null,
+
+        /**
+         * @property {Object}
+         */
+        $clearSearchButton: null,
 
         /**
          * @property {Object}
@@ -105,6 +116,8 @@ define(function(require) {
             }
 
             this.$tree = this.$el.find('[data-role="jstree-container"]');
+            this.$searchField = this.$el.find('[data-name="search"]');
+            this.$clearSearchButton = this.$el.find('[data-name="clear-search"]');
             this.$tree.data('treeView', this);
             this.onSearch = _.debounce(this.onSearch, this.searchTimeout);
 
@@ -170,7 +183,7 @@ define(function(require) {
                 this.$el.find('[data-role="jstree-checkall"]').show();
             }
 
-            if (this.$el.find('[data-name="search"]').length) {
+            if (this.$searchField.length) {
                 config.plugins.push('search');
                 config.search = {
                     close_opened_onclear: true,
@@ -199,6 +212,7 @@ define(function(require) {
 
         onSearch: function(event) {
             var value = $(event.target).val();
+            this.toggleClearSearchButton();
             value = _.trim(value).replace(/\s+/g, ' ');
             if (this.jsTreeInstance.allNodesHidden) {
                 this.jsTreeInstance.show_all();
@@ -214,6 +228,21 @@ define(function(require) {
         },
 
         /**
+         * Show/Hide clear search field button
+         */
+        toggleClearSearchButton: function() {
+            this.$clearSearchButton.toggleClass('hide', this.$searchField.val() === '');
+        },
+
+        /**
+         * Clear search field value
+         */
+        clearSearch: function() {
+            this.$searchField.val('');
+            this.$searchField.trigger('input');
+        },
+
+        /**
          * Search results filter
          *
          * @param {Object} event
@@ -224,7 +253,7 @@ define(function(require) {
                 this.underlineFilter(data);
                 if (this.autoSelectFoundNode && data.res.length === 1) {
                     this.$el.find('a.jstree-search').click();
-                    this.$el.find('[data-name="search"]').focus();
+                    this.$searchField.focus();
                 }
             } else {
                 this.showSearchResultMessage(_.__('oro.ui.jstree.search.search_no_found'));
@@ -414,6 +443,8 @@ define(function(require) {
             this.$tree.parent().off();
 
             delete this.$tree;
+            delete this.$searchField;
+            delete this.$clearSearchButton;
             delete this.jsTreeInstance;
             delete this.jsTreeConfig;
 

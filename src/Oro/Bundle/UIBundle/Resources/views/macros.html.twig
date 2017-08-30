@@ -1281,6 +1281,9 @@
                 {% if not data.disableSearch|default(false) and data.treeOptions.data|default([]) %}
                 <div class="jstree-search-component">
                     <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
+                    <span data-name="clear-search" class="jstree-search-component__clear hide">
+                        <i class="fa fa-close"></i>
+                    </span>
                 </div>
                 {% endif %}
                 <div data-role="jstree-container"></div>
