@@ -8,6 +8,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType as BaseFilterType;
 
+/**
+ * @deprecated This class is deprecated due new implementation of dictionary filter of tags.
+ * Will be removed in v2.4
+ */
 class EntityTagsFilterType extends AbstractType
 {
     const NAME = 'oro_type_tag_filter';

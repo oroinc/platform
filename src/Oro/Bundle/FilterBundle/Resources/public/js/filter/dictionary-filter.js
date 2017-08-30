@@ -481,11 +481,6 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var data = this.$(this.elementSelector).inputWidget('data');
-            if (!data || !data.length) {
-                data = this.previousData.length ? this.previousData : this.initialData;
-            }
-
             if (this.valueIsLoaded(value.value)) {
                 var self = this;
 
@@ -494,7 +489,7 @@ define(function(require) {
                     _.chain(value.value)
                         .map(function(id) {
                             var item =  _.find(self.selectedData, function(item) {
-                                return item.id === id;
+                                return item.id.toString() === id.toString();
                             });
 
                             return item ? item.text : item;

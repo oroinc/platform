@@ -11,6 +11,7 @@ use Oro\Bundle\QueryDesignerBundle\Grid\QueryDesignerQueryConfiguration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider;
 
 class TagsReportExtension extends AbstractTagsExtension
@@ -142,15 +143,15 @@ class TagsReportExtension extends AbstractTagsExtension
         $label   = isset($columns[$idAlias]['label']) ? $columns[$idAlias]['label'] : 'oro.tag.tags_label';
 
         return [
-            'type'      => 'tag',
+            'type' => 'tag_dictionary',
             'data_name' => $idAlias,
-            'label'     => $label,
-            'enabled'   => true,
-            'options'   => [
-                'field_options' => [
-                    'entity_class' => $entityClass,
-                ]
-            ]
+            'class' => Tag::class,
+            'null_value' => ':empty:',
+            'populate_default' => true,
+            'default_value' => 'Any',
+            'label' => $label,
+            'enabled' => true,
+            'entity_class' => $entityClass
         ];
     }
 

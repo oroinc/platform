@@ -57,6 +57,7 @@ services:
 
     oro_tag.form.type.entity_tags_selector:
         class: %oro_tag.form.type.entity_tags_selector.class%
+        deprecated: The "%service_id%" service is deprecated since 2.0.20, will be removed in 2.4
         arguments:
             - '@oro_security.acl_helper'
             - '@doctrine'
@@ -65,6 +66,7 @@ services:
 
     oro_tag.form.type.entity_tags_filter:
         class: %oro_tag.form.type.entity_tags_filter.class%
+        deprecated: The "%service_id%" service is deprecated since 2.0.20, will be removed in 2.4
         tags:
             - { name: form.type, alias: oro_type_tag_filter }
 

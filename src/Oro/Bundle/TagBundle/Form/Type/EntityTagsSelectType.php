@@ -10,6 +10,10 @@ use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * @deprecated This class is deprecated due new implementation of dictionary filter of tags.
+ * Will be removed in v2.4
+ */
 class EntityTagsSelectType extends AbstractType
 {
     /** @var AclHelper */

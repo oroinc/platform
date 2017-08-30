@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagsExtension extends AbstractTagsExtension
@@ -187,15 +188,15 @@ class TagsExtension extends AbstractTagsExtension
         $className = $this->getEntity($config);
 
         return [
-            'type'      => 'tag',
+            'type' => 'tag_dictionary',
             'data_name' => sprintf('%s.%s', $config->getOrmQuery()->getRootAlias(), 'id'),
-            'label'     => 'oro.tag.entity_plural_label',
-            'enabled'   => $this->taggableHelper->isEnableGridFilter($className),
-            'options'   => [
-                'field_options' => [
-                    'entity_class' => $className,
-                ]
-            ]
+            'class' => Tag::class,
+            'null_value' => ':empty:',
+            'populate_default' => true,
+            'default_value' => 'Any',
+            'label' => 'oro.tag.entity_plural_label',
+            'enabled' => $this->taggableHelper->isEnableGridFilter($className),
+            'entity_class' => $className
         ];
     }
 
