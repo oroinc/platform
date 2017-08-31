@@ -734,6 +734,16 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotContainsText($element, $text)
+    {
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+        self::assertNotContains($text, $elementObject->getText());
+    }
+
+    /**
      * Click on button in modal window
      * Example: Given I click "Edit" in modal window
      * Example: When I click "Save and Close" in modal window
