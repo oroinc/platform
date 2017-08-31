@@ -12,6 +12,8 @@ Feature: Display settings manage
     Given I login as administrator
     And I should see an "Recent Emails" element
     When I go to System/Configuration
+    And I click "System configuration"
+    And I click "General setup"
     And I click "Display settings"
     And I fill "System Config Form" with:
       | Show recent emails | false |
@@ -20,7 +22,7 @@ Feature: Display settings manage
 
   Scenario: Disable WYSIWYG editor
     Given I go to System/Configuration
-    And click "Display settings"
+    And I click "Display settings"
     And I fill "System Config Form" with:
       | Enable WYSIWYG editor | true |
     And save form
@@ -28,7 +30,7 @@ Feature: Display settings manage
     And press "Create Calendar event"
     Then I should see an "WYSIWYG editor" element
     But I go to System/Configuration
-    And click "Display settings"
+    And I click "Display settings"
     And I fill "System Config Form" with:
       | Enable WYSIWYG editor | false |
     And save form
@@ -75,7 +77,7 @@ Feature: Display settings manage
 
   Scenario: Change record pagination limit
     When I go to System/Configuration
-    And click "Display settings"
+    And I click "Display settings"
     And I fill "System Config Form" with:
       | Record Pagination | on |
     And I save form
@@ -129,7 +131,7 @@ Feature: Display settings manage
   Scenario: Change sidebar settings
     Given right sidebar is visible
     When I go to System/Configuration
-    And click "Display settings"
+    And I click "Display settings"
     And I fill "System Config Form" with:
       | Enable left sidebar  | Yes |
       | Enable right sidebar | No  |
@@ -174,7 +176,7 @@ Feature: Display settings manage
     When I go to Reports & Segments/Calendar Events/Test Report
     Then I should not see "Show SQL Query"
     When I go to System/Configuration
-    And click "Display settings"
+    And I click "Display settings"
     And fill "System Config Form" with:
       | Display SQL in Reports and Segments | true |
     And save form
