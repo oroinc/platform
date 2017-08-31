@@ -167,6 +167,26 @@ class ScrollData
 
     /**
      * @param int|string $blockId
+     * @param string|null $title
+     * @return int
+     */
+    public function addSubBlockAsFirst($blockId, $title = null)
+    {
+        $this->assertBlockDefined($blockId);
+
+        $subBlock = [self::DATA => []];
+
+        if (null !== $title) {
+            $subBlock[self::TITLE] = $title;
+        }
+
+        array_unshift($this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS], $subBlock);
+
+        return 0;
+    }
+
+    /**
+     * @param int|string $blockId
      * @param int $subBlockID
      * @param string $html
      * @param string|null $fieldName
