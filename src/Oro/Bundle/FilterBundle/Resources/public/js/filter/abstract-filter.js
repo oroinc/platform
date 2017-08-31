@@ -471,6 +471,16 @@ define([
         },
 
         /**
+         * Return true if DOM Value of filter is changed
+         *
+         * @returns {boolean}
+         * @protected
+         */
+        _isDOMValueChanged: function() {
+            throw new Error('Method _isDOMValueChanged is abstract and must be implemented');
+        },
+
+        /**
          * Set filter button class
          *
          * @param {Object} element

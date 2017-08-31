@@ -433,6 +433,18 @@ define(function(require) {
             this.choices = _.map(choices, function(option, i) {
                 return _.isString(option) ? {value: i, label: option} : option;
             });
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _isDOMValueChanged: function() {
+            var thisDOMValue = this._readDOMValue();
+            return (
+                !_.isUndefined(thisDOMValue.value) &&
+                !_.isNull(thisDOMValue.value) &&
+                !_.isEqual(this.value, thisDOMValue)
+            );
         }
     });
 

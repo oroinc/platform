@@ -678,8 +678,7 @@ define(function(require) {
             return _.filter(this.filters, function(filter) {
                 return (
                     filter.enabled &&
-                    !_.isUndefined(filter._readDOMValue().value) &&
-                    !_.isEqual(filter.value, filter._readDOMValue())
+                    filter._isDOMValueChanged()
                 );
             });
         }

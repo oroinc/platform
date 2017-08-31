@@ -684,6 +684,18 @@ define(function(require) {
             } else {
                 this.$('.field-condition-date-popover').addClass('hide');
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _isDOMValueChanged: function() {
+            var thisDOMValue = this._readDOMValue();
+            return (
+                !_.isUndefined(thisDOMValue.value) &&
+                !_.isUndefined(thisDOMValue.type) &&
+                !_.isEqual(this.value, thisDOMValue)
+            );
         }
     });
 
