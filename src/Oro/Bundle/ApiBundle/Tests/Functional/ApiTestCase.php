@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Yaml\Parser;
 
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -24,13 +23,6 @@ abstract class ApiTestCase extends WebTestCase
 
     /** @var ValueNormalizer */
     protected $valueNormalizer;
-
-    /**
-     * Local cache for expectations
-     *
-     * @var array
-     */
-    private $expectations = [];
 
     /**
      * {@inheritdoc}
@@ -193,25 +185,6 @@ abstract class ApiTestCase extends WebTestCase
 
         return $this->getContainer()->get('oro_api.rest.entity_id_transformer')
             ->transform($entityId);
-    }
-    /**
-     * @param string $filename
-     *
-     * @return array
-     */
-    protected function loadExpectation($filename)
-    {
-        if (!isset($this->expectations[$filename])) {
-            $expectedContent = file_get_contents(
-                __DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $filename
-            );
-
-            $ymlParser = new Parser();
-
-            $this->expectations[$filename] = $ymlParser->parse($expectedContent);
-        }
-
-        return $this->expectations[$filename];
     }
 
     /**

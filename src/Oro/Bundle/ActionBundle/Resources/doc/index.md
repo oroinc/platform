@@ -5,6 +5,7 @@ Table of Contents
 -----------------
  - [ActionBundle Glossary](#actionbundle-glossary)
  - [Console commands](#console-commands)
+ - [The Dependency Injection Tags](./dependency_injection_tags.md)
 
   On top of common [Action Component](/src/Oro/Component/Action/Resources/doc/actions.md) and Oro Platform in general, 
 **ActionBundle** provide a way to bring more complex solutions in ORO based projects with reusable parties of

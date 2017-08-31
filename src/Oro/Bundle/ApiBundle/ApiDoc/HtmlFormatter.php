@@ -7,6 +7,9 @@ use Symfony\Component\Templating\EngineInterface;
 
 use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
 
+/**
+ * Base HTML formatter that can be used for all types of REST API views.
+ */
 class HtmlFormatter extends AbstractFormatter
 {
     /** @var FileLocatorInterface */
@@ -181,7 +184,7 @@ class HtmlFormatter extends AbstractFormatter
     {
         return $this->engine->render('NelmioApiDocBundle::resource.html.twig', array_merge(
             [
-                'data'           => $this->reformatData($data),
+                'data'           => $data,
                 'displayContent' => true,
             ],
             $this->getGlobalVars()
@@ -195,40 +198,10 @@ class HtmlFormatter extends AbstractFormatter
     {
         return $this->engine->render('NelmioApiDocBundle::resources.html.twig', array_merge(
             [
-                'resources' => $this->reformatDocData($collection),
+                'resources' => $collection,
             ],
             $this->getGlobalVars()
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function compressNestedParameters(array $data, $parentName = null, $ignoreNestedReadOnly = false)
-    {
-        $newParams = array();
-        foreach ($data as $name => $info) {
-            $newName = $this->getNewName($name, $info, $parentName);
-
-            $newParams[$newName] = array(
-                'dataType'     => $info['dataType'],
-                'readonly'     => $info['readonly'],
-                'required'     => $info['required'],
-                'description'  => $info['description'],
-
-                'isRelation'     => $info['isRelation'],
-                'isCollection'   => $info['isCollection']
-            );
-
-            if (isset($info['children']) && (!$info['readonly'] || !$ignoreNestedReadOnly)) {
-                $children = $this->compressNestedParameters($info['children'], $newName, $ignoreNestedReadOnly);
-                foreach ($children as $nestedItemName => $nestedItemData) {
-                    $newParams[$nestedItemName] = $nestedItemData;
-                }
-            }
-        }
-
-        return $newParams;
     }
 
     /**
@@ -286,57 +259,5 @@ class HtmlFormatter extends AbstractFormatter
     protected function getFileContent($path)
     {
         return file_get_contents($this->fileLocator->locate($path));
-    }
-
-    /**
-     * Reformats input and output data for collected array of resources.
-     *
-     * @param array $collection
-     *
-     * @return array
-     */
-    protected function reformatDocData(array $collection)
-    {
-        foreach ($collection as $resourceBlockName => $resourceGroupBlock) {
-            foreach ($resourceGroupBlock as $resourceUrl => $resourceBlock) {
-                foreach ($resourceBlock as $resourceId => $resource) {
-                    $collection[$resourceBlockName][$resourceUrl][$resourceId] = $this->reformatData($resource);
-                }
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
-     * Reformats input and output data for collected resource.
-     *
-     * @param array $data
-     *
-     * @return array
-     */
-    protected function reformatData(array $data)
-    {
-        // reformat parameters (input data)
-        if (array_key_exists('parameters', $data)) {
-            $data['documentation'] .= $this->engine
-                ->render(
-                    'OroApiBundle:ApiDoc:input.html.twig',
-                    ['data' => $data['parameters']]
-                );
-            unset($data['parameters']);
-        }
-
-        // reformat output
-        if (array_key_exists('response', $data)) {
-            $data['documentation'] .= $this->engine
-                ->render(
-                    'OroApiBundle:ApiDoc:response.html.twig',
-                    ['data' => $data['response']]
-                );
-            $data['parsedResponseMap'] = [];
-        }
-
-        return $data;
     }
 }

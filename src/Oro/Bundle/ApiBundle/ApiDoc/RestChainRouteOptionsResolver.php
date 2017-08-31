@@ -33,13 +33,12 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
         }
 
         $view = $this->docViewDetector->getView();
-        if (empty($view)) {
+        if (!$view) {
             return;
         }
 
-        foreach ($this->resolvers as $item) {
-            /** @var RouteOptionsResolverInterface $resolver */
-            list($resolver, $resolverView) = $item;
+        /** @var RouteOptionsResolverInterface $resolver */
+        foreach ($this->resolvers as list($resolver, $resolverView)) {
             if (null === $resolverView || $resolverView === $view) {
                 $resolver->resolve($route, $routes);
             }

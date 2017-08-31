@@ -76,7 +76,7 @@ services:
         class: Oro\Bundle\CurrencyBundle\Model\LocaleSettings
         decorates: oro_locale.settings
         arguments:
-            - '@oro_config.user'
+            - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
             - '@oro_currency.provider.view_type'
         calls:

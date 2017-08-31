@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
+use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
@@ -26,8 +28,12 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
         $workflowManagerRegistry->expects($this->any())->method('getManager')->willReturn($this->workflowManager);
 
+        $workflowVariableFormatter = $this->createMock(WorkflowVariableFormatter::class);
+        $workflowVariableFormatter->expects($this->any())->method('formatWorkflowVariableValue')->willReturn('test');
+
         $container = self::getContainerBuilder()
             ->add('oro_workflow.registry.workflow_manager', $workflowManagerRegistry)
+            ->add('oro_workflow.formatter.workflow_variable', $workflowVariableFormatter)
             ->getContainer($this);
 
         $this->extension = new WorkflowExtension($container);
@@ -50,5 +56,11 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $entity = new StubEntity();
         $this->workflowManager->expects($this->once())->method('hasWorkflowItemsByEntity')->with($entity);
         $this->callTwigFunction($this->extension, 'has_workflow_items', [$entity]);
+    }
+
+    public function testFormatWorkflowVariableValue()
+    {
+        $entity = $this->createMock(Variable::class);
+        $this->callTwigFilter($this->extension, 'oro_format_workflow_variable_value', [$entity]);
     }
 }
