@@ -10,4 +10,3 @@ config:
         'orotag/js/app/views/editor/tags-editor-view': 'bundles/orotag/js/app/views/editor/tags-editor-view.js'
         'orotag/js/app/views/viewer/tags-view': 'bundles/orotag/js/app/views/viewer/tags-view.js'
         'oro/filter/tags-report-filter': 'bundles/orotag/js/filter/tags-report-filter.js'
-
