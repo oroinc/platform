@@ -18,6 +18,9 @@ use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class AbstractProvider implements ProviderInterface
 {
     const CORRECT_FIELDS_NESTING_LEVEL = 5;
