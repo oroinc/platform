@@ -181,7 +181,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $bundleSuite = $suiteGenerator->generateSuite($bundle->getName(), []);
+            $bundleSuite = $suiteGenerator->generateSuite('!' . $bundle->getName(), []);
 
             if (!$this->hasValidPaths($bundleSuite)) {
                 continue;
