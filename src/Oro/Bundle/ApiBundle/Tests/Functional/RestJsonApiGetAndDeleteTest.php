@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
+
 class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
 {
     /**
@@ -13,6 +15,10 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
     public function testRestRequests($entityClass, $excludedActions)
     {
         if (in_array('get_list', $excludedActions, true)) {
+            return;
+        }
+
+        if (in_array($entityClass, SkippedEntitiesProvider::getForGetListAction(), true)) {
             return;
         }
 

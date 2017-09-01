@@ -32,11 +32,8 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
 
     public function testInitializeScopeId()
     {
-        $user = new User();
-        $user->setId(123);
-
         $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())->method('getUser')->willReturn($user);
+        $token->expects($this->once())->method('getUser')->willReturn($this->getScopedEntity());
 
         $this->securityContext->expects($this->once())->method('getToken')->willReturn($token);
 
@@ -83,20 +80,6 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
         $this->assertEquals(456, $this->manager->getScopeId());
     }
 
-    public function testSetScopeIdFromEntity()
-    {
-        $user = new User();
-        $user->setId(123);
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
-
-        $this->manager->setScopeIdFromEntity($user);
-
-        $this->assertEquals(123, $this->manager->getScopeId());
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -113,5 +96,15 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     protected function getScopedEntityName()
     {
         return 'user';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return User
+     */
+    protected function getScopedEntity()
+    {
+        return $this->getEntity(User::class, ['id' => 123]);
     }
 }

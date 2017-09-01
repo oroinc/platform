@@ -19,22 +19,27 @@ system_configuration:
     groups:
         first_group:
             title: 'First group'
+            icon: 'fa-file'
 
         second_group:
             title: 'Second group'
+            icon: 'fa-file'
 
         third_group:
             title: 'Third group'
+            icon: 'fa-file'
 
         fourth_group:
             title: 'Fourth group'
+            icon: 'fa-file'
 
         another_branch_first:
             title: 'Another branch first group'
+            icon: 'fa-file'
 
         another_branch_second:
             title: 'Another branch second group'
-
+            icon: 'fa-file'
 
     tree:
         system_configuration:

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -82,6 +83,10 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
     public function testUpdateRequests($entityClass, $excludedActions)
     {
         if (in_array(ApiActions::UPDATE, $excludedActions, true)) {
+            return;
+        }
+
+        if (in_array($entityClass, SkippedEntitiesProvider::getForUpdateAction(), true)) {
             return;
         }
 

@@ -6,11 +6,11 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+use Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider as ApiDocViews;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class ApiDocConfigurationCompilerPass implements CompilerPassInterface
 {
-    const API_DOC_PATH_PARAMETER_NAME               = 'oro_api.api_doc.path';
     const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
     const EXPECTED_API_DOC_EXTRACTOR_CLASS          = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
     const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS  = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
@@ -22,7 +22,10 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
     const REQUEST_TYPE_PROVIDER_TAG                 = 'oro_api.request_type_provider';
     const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
     const EXPECTED_API_DOC_HTML_FORMATTER_CLASS     = 'Nelmio\ApiDocBundle\Formatter\HtmlFormatter';
-    const NEW_API_DOC_HTML_FORMATTER_CLASS          = 'Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter';
+    const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
+    const NEW_API_DOC_HTML_FORMATTER_SERVICE        = 'oro_api.api_doc.formatter.html_formatter';
+    const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
+    const DEFAULT_API_DOC_HTML_FORMATTER_CLASS      = 'Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter';
     const FILE_LOCATOR_SERVICE                      = 'file_locator';
 
     /**
@@ -34,35 +37,8 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // extractor
-        $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
-        $apiDocExtractorDef->setClass(
-            $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass())
-        );
-        $apiDocExtractorDef->addMethodCall(
-            'setRestDocViewDetector',
-            [new Reference(self::REST_DOC_VIEW_DETECTOR_SERVICE)]
-        );
-        $apiDocExtractorDef->addMethodCall(
-            'setRouteOptionsResolver',
-            [new Reference(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)]
-        );
-        // HTML formatter
-        if ($container->hasDefinition(self::API_DOC_HTML_FORMATTER_SERVICE)) {
-            $apiDocHtmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
-            if (self::EXPECTED_API_DOC_HTML_FORMATTER_CLASS === $apiDocHtmlFormatterDef->getClass()) {
-                $apiDocHtmlFormatterDef->setClass(self::NEW_API_DOC_HTML_FORMATTER_CLASS);
-                $apiDocHtmlFormatterDef->addMethodCall(
-                    'setFileLocator',
-                    [new Reference(self::FILE_LOCATOR_SERVICE)]
-                );
-                $apiDocHtmlFormatterDef->addMethodCall(
-                    'setDocumentationPath',
-                    [$container->getParameter(self::API_DOC_PATH_PARAMETER_NAME)]
-                );
-            }
-        }
-
+        $this->configureApiDocExtractor($container);
+        $this->configureHtmlFormatter($container);
         $this->registerRoutingOptionsResolvers($container);
         $this->registerRequestTypeProviders($container);
     }
@@ -79,8 +55,16 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
             return false;
         }
         $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
-        $newApiDocExtractorClass = $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass());
-        if (!$newApiDocExtractorClass) {
+        if (!$this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass())) {
+            return false;
+        }
+
+        // HTML formatter
+        if (!$container->hasDefinition(self::API_DOC_HTML_FORMATTER_SERVICE)) {
+            return false;
+        }
+        $htmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
+        if (self::EXPECTED_API_DOC_HTML_FORMATTER_CLASS !== $htmlFormatterDef->getClass()) {
             return false;
         }
 
@@ -89,6 +73,61 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function configureApiDocExtractor(ContainerBuilder $container)
+    {
+        $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
+        $apiDocExtractorDef->setClass(
+            $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass())
+        );
+        $apiDocExtractorDef->addMethodCall(
+            'setRestDocViewDetector',
+            [new Reference(self::REST_DOC_VIEW_DETECTOR_SERVICE)]
+        );
+        $apiDocExtractorDef->addMethodCall(
+            'setRouteOptionsResolver',
+            [new Reference(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)]
+        );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function configureHtmlFormatter(ContainerBuilder $container)
+    {
+        // rename default HTML formatter service
+        $defaultHtmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
+        $container->removeDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
+        $container->setDefinition(self::RENAMED_API_DOC_HTML_FORMATTER_SERVICE, $defaultHtmlFormatterDef);
+        $isPublicService = $defaultHtmlFormatterDef->isPublic();
+        $defaultHtmlFormatterDef->setPublic(false);
+        $defaultHtmlFormatterDef->setClass(self::DEFAULT_API_DOC_HTML_FORMATTER_CLASS);
+        $defaultHtmlFormatterDef->addMethodCall(
+            'setFileLocator',
+            [new Reference(self::FILE_LOCATOR_SERVICE)]
+        );
+
+        // configure composite HTML formatter and set it as default one
+        $compositeHtmlFormatterDef = $container->getDefinition(self::COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE);
+        $container->removeDefinition(self::COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE);
+        $container->setDefinition(self::API_DOC_HTML_FORMATTER_SERVICE, $compositeHtmlFormatterDef);
+        $compositeHtmlFormatterDef->setPublic($isPublicService);
+        $compositeHtmlFormatterDef->addMethodCall(
+            'addFormatter',
+            ['', new Reference(self::RENAMED_API_DOC_HTML_FORMATTER_SERVICE)]
+        );
+        $compositeHtmlFormatterDef->addMethodCall(
+            'addFormatter',
+            [ApiDocViews::PLAIN_VIEW, new Reference(self::NEW_API_DOC_HTML_FORMATTER_SERVICE)]
+        );
+        $compositeHtmlFormatterDef->addMethodCall(
+            'addFormatter',
+            [ApiDocViews::JSON_API_VIEW, new Reference(self::NEW_API_DOC_HTML_FORMATTER_SERVICE)]
+        );
     }
 
     /**

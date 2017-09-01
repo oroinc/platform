@@ -59,6 +59,7 @@
          data-page-component-module="oroproduct/js/app/datagrid/backend-datagrid-component"
          data-page-component-name="{{ options.gridName }}"
          data-page-component-options="{{ options|json_encode }}"
+         data-server-render
          data-layout="separate"
             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
     >

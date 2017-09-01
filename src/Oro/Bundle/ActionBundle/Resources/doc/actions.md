@@ -1,5 +1,5 @@
 Actions
-=========
+=======
 
 Table of Contents
 -----------------
@@ -7,6 +7,7 @@ Table of Contents
  - [Format Name](#format-name)
  - [Create Date](#create-date)
  - [Resolve Destination Page](#resolve-destination-page)
+ - [Duplicate](#duplicate)
 
 Run Action Group `@run_action_group`
 ------------------------------------
@@ -149,3 +150,36 @@ Resolve Destination Page
 Allowed values for parameter `destination`:
  - for index page (`routeName`) value can be `name`
  - for view page (`routeView`) value can be `view`
+
+Duplicate
+---------
+**Class:** Oro\Bundle\ActionBundle\Action\DuplicateEntity
+
+**Alias:** dupliсate, duplicate_entity
+
+**Description:** Duplicate entity object
+
+**Options:**
+- entity - (optional) property path of original entity (by default will be used `getEntity()` method from context)
+- target - (optional) property path of original entity, alias for `entity`
+- settings - (optional) list of filters and matchers to be applied
+- attribute - target property path where result of action will be saved
+
+**Filters and Matchers:**
+Available filters: `setNull`, `keep`, `collection`, `emptyCollection`, `replaceValue`and `shallowCopy`.
+Available matchers: `property`, `propertyName` and `propertyType`.
+For more information see [DeepCopy](https://packagist.org/packages/myclabs/deep-copy) documentation.
+
+**Configuration Example**
+```
+- @duplicate:
+    target: $.entity
+    attribute: $.entityCopy
+    settings:
+      - [[setNull], [propertyName, [id]]]
+      - [[collection], [propertyName, [items]]]
+      - [[replaceValue, $.currentUser], [propertyName, [user]]]
+      - [[keep], [propertyName, [owner]]]
+      - [[shallowCopy], [propertyType, ['\DateTime']]]
+      - [[keep], [propertyType, ['%oro_user.entity.user%']]]
+```

@@ -16,7 +16,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(User::class);
         $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
-        $this->assertEquals($expects, json_decode($response->getContent(), true));
+        $this->assertResponseContains($expects, $response);
     }
 
     /**
@@ -31,7 +31,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ],
                 ],
-                'expects' => $this->loadExpectation('output_1.yml')
+                'expects' => 'output_1.yml'
             ],
             'Wrong field names should be skipped' => [
                 'params'  => [
@@ -40,7 +40,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,wrongFieldName'
                     ],
                 ],
-                'expects' => $this->loadExpectation('output_1.yml')
+                'expects' => 'output_1.yml'
             ],
             'Includes should not be added due they are missed in root entity fields' => [
                 'params'  => [
@@ -49,7 +49,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ],
                 ],
-                'expects' => $this->loadExpectation('output_1.yml')
+                'expects' => 'output_1.yml'
             ],
             'Included owner and filter it\'s fields (all except createdAt, updatedAt) ' => [
                 'params'  => [
@@ -59,7 +59,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'businessunits' => 'name,phone,website,email,fax,organization,owner,users'
                     ],
                 ],
-                'expects' => $this->loadExpectation('output_2.yml')
+                'expects' => 'output_2.yml'
             ],
             'Owner and Roles not included, so we cannot filter their fields, only relations will be returned' => [
                 'params'  => [
@@ -71,7 +71,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'userroles' => 'name'
                     ],
                 ],
-                'expects' => $this->loadExpectation('output_3.yml')
+                'expects' => 'output_3.yml'
             ],
             'Wrong separator' => [
                 'params'  => [
@@ -79,7 +79,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'users' => 'phone, title, username,email,firstName,middleName.lastName,enabled'
                     ],
                 ],
-                'expects' => $this->loadExpectation('output_4.yml')
+                'expects' => 'output_4.yml'
             ],
             'Include of third level entity' => [
                 'params'  => [
@@ -90,7 +90,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
                         'organizations' => 'enabled'
                     ],
                 ],
-                'expects' => $this->loadExpectation('output_5.yml')
+                'expects' => 'output_5.yml'
             ],
         ];
     }

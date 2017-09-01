@@ -34,16 +34,6 @@ define(function(require) {
         /**
          * @property {String}
          */
-        onSelectRoute: '',
-
-        /**
-         * @property {String}
-         */
-        onRootSelectRoute: '',
-
-        /**
-         * @property {String}
-         */
         onMoveRoute: '',
 
         /**
@@ -63,9 +53,7 @@ define(function(require) {
 
             this.updateAllowed = options.updateAllowed;
             this.reloadWidget = options.reloadWidget;
-            this.onSelectRoute = options.onSelectRoute;
             this.onMoveRoute = options.onMoveRoute;
-            this.onRootSelectRoute = options.onRootSelectRoute;
         },
 
         /**
