@@ -31,6 +31,10 @@ class KernelStub implements KernelInterface
      */
     public function getBundle($name, $first = true)
     {
+        if (substr($name, 0, 1) == '!') {
+            $name = substr($name, 1);
+        }
+
         return $this->bundleMap[$name];
     }
 
