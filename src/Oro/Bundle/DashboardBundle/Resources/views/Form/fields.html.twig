@@ -1,109 +1,38 @@
 {% block oro_type_widget_datetime_range_widget %}
-    <div class="datetime-range-filter filter-criteria datetime-range-filter-{{ form.vars.name }}">
-        <!-- datetime range filter placeholder -->
-        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="value"/>
-    </div>
-    <script type="text/javascript">
-        require(
-            ['jquery', 'underscore', 'oro/filter/datetime-filter', 'oroui/js/tools', 'orodashboard/js/widget/datetime-range'],
-            function ($, _, DateTimeFilter, tools, WidgetConfigDateTimeRangeFilter) {
-                $(function () {
-                    {% set encodeBitmask = constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_APOS') %}
-                    var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(encodeBitmask)|raw }}');
-                    var DatetimeFilterWithMeta = WidgetConfigDateTimeRangeFilter.extend(metadata);
-                    var dateRangeFilter = new DatetimeFilterWithMeta();
+    {% set valueType = (form.vars.value.type != '') ? form.vars.value.type : 1 %}
 
-                    var valueConfig = {start: '', end: ''};
-                    {% if form.vars.value.value != null %}
-                        valueConfig = JSON.parse('{{ form.vars.value.value|json_encode|raw }}');
-                    {% endif %}
+    {% import 'OroDashboardBundle::macros.html.twig' as UI %}
 
-                    valueConfig.startEndPrefix = '{{ form.vars.full_name }}';
-
-                    var value = {
-                        part: 'value',
-                        type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
-                        value: valueConfig
-                    };
-                    dateRangeFilter.updateValue(value);
-                    dateRangeFilter.render();
-
-                    $('.datetime-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
-                    $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
-                    $('div.widget-configuration').closest('.ui-widget-content').trigger('dialogresize');
-                });
-            }
-        );
-    </script>
+    {{ UI.renderDateWidgeView(form, valueType, 'datetime', 'orodashboard/js/app/views/widget-datetime-range-view') }}
 {% endblock %}
 
 {% block oro_type_widget_date_range_widget %}
-    <div class="date-range-filter filter-criteria date-range-filter-{{ form.vars.name }}">
-        <!-- datetime range filter placeholder -->
-        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="value"/>
-    </div>
-    <script type="text/javascript">
-        require(
-            ['jquery', 'underscore', 'orodashboard/js/widget/date-range'],
-            function ($, _, WidgetConfigDateRangeFilter) {
-                $(function () {
-                    {% set encodeBitmask = constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_APOS') %}
-                    var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(encodeBitmask)|raw }}');
-                    var DatetimeFilterWithMeta = WidgetConfigDateRangeFilter.extend(metadata);
-                    var dateRangeFilter = new DatetimeFilterWithMeta({
-                        $form: $('[name="' + '{{ form.vars.full_name }}[part]"]').closest('form')
-                    });
+    {% set monthType = constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_THIS_MONTH') %}
+    {% set valueType = (form.vars.value.type != '') ? form.vars.value.type : (form.vars.datetime_range_metadata.valueTypes ? monthType : 1) %}
 
-                    var valueConfig = {start: '', end: ''};
-                    {% if form.vars.value.value != null %}
-                        valueConfig = JSON.parse('{{ form.vars.value.value|json_encode|raw }}');
-                    {% endif %}
+    {% import 'OroDashboardBundle::macros.html.twig' as UI %}
 
-                    valueConfig.startEndPrefix = '{{ form.vars.full_name }}';
-
-                    var value = {
-                        part: 'value',
-                        type: {{ (form.vars.value.type != '')
-                            ? form.vars.value.type
-                            : (form.vars.datetime_range_metadata.valueTypes ? constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_THIS_MONTH') : 1) }},
-                        value: valueConfig
-                    };
-                    dateRangeFilter.updateValue(value);
-                    dateRangeFilter.render();
-
-                    $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el).trigger('content:changed');
-                    $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
-                    $('div.widget-configuration').closest('.ui-widget-content').trigger('dialogresize');
-                });
-            }
-        )
-    </script>
+    {{ UI.renderDateWidgeView(form, valueType, 'date', 'orodashboard/js/app/views/widget-date-range-view') }}
 {% endblock oro_type_widget_date_range_widget %}
 
 {% block oro_type_widget_title_widget %}
-    <div class="widget-title-widget">
-        {{ form_widget(form.title) }}
+    <div class="widget-title-container">
+        <div class="widget-title-widget">
+            {{ form_widget(form.title) }}
+        </div>
+        {{ form_row(form.useDefault, { 'attr': {'data-role': 'changeUseDefault'} }) }}
     </div>
-    {{ form_row(form.useDefault) }}
-    <script type="text/javascript">
-        require(['jquery'], function ($) {
-            $(function () {
-                var title     = $('input#{{ form.title.vars.id }}');
-                var isDefault = $('input#{{ form.useDefault.vars.id }}');
 
-                if (isDefault.prop('checked') == true) {
-                    $(title).prop('readonly', 'readonly');
-                }
-                $(isDefault).change(function() {
-                    if ($(this).is(':checked')) {
-                        $(title).prop('readonly', true);
-                    } else {
-                        $(title).prop('readonly', false );
-                    }
-                });
-            });
-        })
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        view: {
+            _sourceElement: '.widget-title-container',
+            view: 'oroform/js/app/views/default-field-value-view',
+            fieldSelector: 'input#' ~ form.title.vars.id,
+            prepareTinymce: false
+        }
+    }) }}></div>
 {% endblock oro_type_widget_title_widget %}
 
 {% block oro_type_widget_items_row %}
@@ -143,9 +72,10 @@
 
 {% block oro_type_widget_items_javascript %}
     {% set options = {
+        view: 'orodashboard/js/items/view',
+        _sourceElement: '#' ~ form.vars.id ~ 'Row',
         itemsData: form.children.items.vars.value,
         baseName: form.children.items.vars.full_name,
-        el: '#' ~ form.vars.id ~ 'Row'
     } %}
     {% if form.vars.attr is not empty and form.vars.attr.placeholder is defined %}
         {% set options = options|merge({
@@ -153,46 +83,35 @@
         }) %}
     {% endif %}
 
-    <script>
-        require([
-            'orodashboard/js/items/view'
-        ], function (ItemsView) {
-            'use strict';
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-            new ItemsView({{ options|json_encode|raw }});
-        });
-    </script>
+    <div {{ UI.renderPageComponentAttributes({
+        view: options
+    }) }}></div>
 {% endblock %}
 
 {% block oro_type_widget_date_widget %}
-    <div class="widget-date-widget">
-        {{ form_widget(form.useDate) }}
-    </div>
-    {% if form.date is defined %}
-        <div class="widget-date-input-widget">
-            {{ form_widget(form.date) }}
+    <div class="widget-date-compare">
+        <div class="widget-date-widget">
+            {{ form_widget(form.useDate, { 'attr': {'data-role': 'updateDatapicker'} }) }}
         </div>
-        <script type="text/javascript">
-            require(['jquery'], function ($) {
-                $(function () {
-                    var useDate = $('input#{{ form.useDate.vars.id }}');
+        {% if form.date is defined %}
+            <div class="widget-date-input-widget">
+                {{ form_widget(form.date) }}
+            </div>
 
-                    if (useDate.prop('checked') !== true) {
-                        $('input#{{ form.date.vars.id }}').attr('readonly', 'readonly');
-                    }
+            {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-                    $(useDate).change(function() {
-                        var date    = $('input#date_selector_{{ form.date.vars.id }}');
-                        if ($(this).is(':checked')) {
-                            $(date).datepicker('enable');
-                        } else {
-                            $(date).datepicker('disable');
-                        }
-                    });
-                });
-            })
-        </script>
-    {% endif %}
+            <div {{ UI.renderPageComponentAttributes({
+                view: {
+                    _sourceElement: '.widget-date-compare',
+                    view: 'orodashboard/js/app/views/widget-date-compare-view',
+                    useDateSelector: 'input#' ~ form.useDate.vars.id,
+                    dateSelector: 'input#' ~ form.date.vars.id,
+                }
+            }) }}></div>
+        {% endif %}
+    </div>
 {% endblock oro_type_widget_date_widget %}
 
 {% block oro_dashboard_query_filter_row %}

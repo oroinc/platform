@@ -13,7 +13,7 @@
     {% if form.use_parent_scope_value is defined %}
         <div class="horizontal parent-scope-checkbox">
             <div class="oro-clearfix">
-                {{ form_row(form.use_parent_scope_value) }}
+                {{ form_row(form.use_parent_scope_value,  { 'attr': {'data-role': 'changeUseDefault'} }) }}
             </div>
         </div>
     {% endif %}
