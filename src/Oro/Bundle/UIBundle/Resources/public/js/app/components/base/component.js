@@ -18,12 +18,33 @@ define([
     BaseComponent = function(options) {
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
+        _.extend(this, options[BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME]);
         this.initialize(options);
         this.delegateListeners();
     };
 
     // defines static methods
     _.extend(BaseComponent, {
+        /**
+         * The component may have a dependency on other components of the same componentManager (siblingComponents)
+         * Dependencies can be declared in the components's prototype as `requiredSiblingComponents` property
+         *      requiredSiblingComponents: {
+         *          builder: 'condition-builder',
+         *          grid: 'account-grid'
+         *      },
+         * With the object where:
+         *  - keys are properties where related components instances will be assigned
+         *  - values are names of components in the componentManager
+         *
+         * Names can be changed over components options
+         *      new MyComponent({
+         *          requiredSiblingComponents: {
+         *              grid: 'my-account-grid'
+         *          }
+         *      });
+         */
+        REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME: 'requiredSiblingComponents',
+
         /**
          * Takes from Backbone standard extend method
          * to provide inheritance for Components
