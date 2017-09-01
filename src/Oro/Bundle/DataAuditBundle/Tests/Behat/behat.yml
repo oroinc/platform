@@ -3,13 +3,8 @@ oro_behat_extension:
     OroDataAuditBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - Oro\Bundle\FormBundle\Tests\Behat\Context\FeatureContext
-        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
-        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - OroFormBundle::FormContext
         - OroDataGridBundle::GridContext
-        - OroApplicationBundle::CommerceMainContext
-        - OroShoppingListBundle::ShoppingListContext
-        - OroSaleBundle::FeatureContext
         - OroSecurityBundle::ACLContext
       paths:
         - '@OroDataAuditBundle/Tests/Behat/Features'
