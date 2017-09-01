@@ -195,7 +195,7 @@ class SuiteConfigurationRegistry
         $suiteConfig->setSettings($settings);
 
         try {
-            $this->kernel->getBundle($name);
+            $this->kernel->getBundle('!' . $name);
             $suiteConfig
                 ->setType(self::SUITE_TYPE_SYMFONY)
                 ->setSetting('bundle', $name)
