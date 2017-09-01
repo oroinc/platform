@@ -34,7 +34,7 @@ final class OroBehatClassResolver implements ClassResolver
     public function resolveClass($contextClassShortcut)
     {
         list($bundleName, $contextClass) = explode('::', $contextClassShortcut);
-        $fqdn = $this->kernel->getBundle($bundleName)->getNamespace().'\Tests\Behat\Context\\'.$contextClass;
+        $fqdn = $this->kernel->getBundle('!' . $bundleName)->getNamespace().'\Tests\Behat\Context\\'.$contextClass;
 
         if (!class_exists($fqdn)) {
             throw new \RuntimeException(
