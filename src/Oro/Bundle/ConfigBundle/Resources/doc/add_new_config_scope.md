@@ -86,9 +86,9 @@ After this, developer should add new form provider for test scope:
    
     namespace Acme\Bundle\SomeBundle\Provider;
     
-    use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+    use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
     
-    class TestConfigurationFormProvider extends SystemConfigurationFormProvider
+    class TestConfigurationFormProvider extends AbstractProvider
     {
         const TEST_TREE_NAME  = 'test_configuration';
     
@@ -98,6 +98,14 @@ After this, developer should add new form provider for test scope:
         public function getTree()
         {
             return $this->getTreeData(self::TEST_TREE_NAME, self::CORRECT_FIELDS_NESTING_LEVEL);
+        }
+        
+        /**
+         * {@inheritdoc}
+         */
+        public function getJsTree()
+        {
+            return $this->getJsTreeData(self::TEST_TREE_NAME, self::CORRECT_MENU_NESTING_LEVEL);
         }
     }
 
@@ -109,11 +117,7 @@ register it as a service with `oro_config.configuration_provider` tag:
 
       acme_test.provider.form_provider.test:
           class: %acme_test.provider.form_provider.test.class%
-          arguments:
-              - []
-              - @form.factory
-          tags:
-              -  { name: oro_config.configuration_provider }
+          parent: 'oro_config.provider.abstract_provider'
           lazy: true
 ```
 
@@ -136,7 +140,7 @@ add new action to manipulate data:
 
         list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
 
-        $tree = $provider->getTree();
+        $tree = $provider->getJsTree();
         $form = false;
 
         if ($activeSubGroup !== null) {

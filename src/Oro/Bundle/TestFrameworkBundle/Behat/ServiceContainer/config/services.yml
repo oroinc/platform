@@ -98,12 +98,6 @@ services:
         class: Nelmio\Alice\Instances\Collection
         factory: ['@oro_test.alice_loader', getReferenceRepository]
 
-    oro_test.reference_repository_initializer:
-        class: '%oro_test.reference_initializer_class%'
-        arguments:
-            - '@symfony2_extension.kernel'
-            - '@oro_test.reference_repository'
-
     oro_behat_extension.fixtures.doctrine_entity_populator:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\DoctrineEntityPopulator
         arguments:

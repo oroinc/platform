@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\TagBundle\Filter;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\Expr\Func;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\TagBundle\Form\Type\Filter\TagsReportFilterType;
 
-abstract class AbstractTagsFilter extends AbstractFilter
+/**
+ * This class implements logic for tags filter, based on choice-tree filter.
+ */
+class TagsDictionaryFilter extends DictionaryFilter
 {
     /**
      * {@inheritdoc}
@@ -22,11 +25,11 @@ abstract class AbstractTagsFilter extends AbstractFilter
 
     /**
      * {@inheritdoc}
+     * @param OrmFilterDatasourceAdapter $ds
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $this->checkDataSourceAdapter($ds);
-        /** @var OrmFilterDatasourceAdapter $ds */
 
         $className = $this->getEntityClassName();
         $entityClassParam = 'tags_filter_entity_class_' . $this->clearEntityClassName($className);
@@ -111,10 +114,6 @@ abstract class AbstractTagsFilter extends AbstractFilter
         }
         $value = $data['value'];
 
-        if ($value instanceof Collection) {
-            $value = $value->getValues();
-        }
-
         if (!is_array($value)) {
             return false;
         }
@@ -138,9 +137,10 @@ abstract class AbstractTagsFilter extends AbstractFilter
     }
 
     /**
-     * Returns the class name of an entity for which filtering will be applied.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    abstract protected function getEntityClassName();
+    protected function getEntityClassName()
+    {
+        return $this->params['entity_class'];
+    }
 }

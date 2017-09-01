@@ -66,12 +66,31 @@ class OroMainContext extends MinkContext implements
     /** @var bool */
     private $debug = false;
 
+    /** @var bool */
+    private $skipWait = false;
+
     /**
      * @BeforeScenario
      */
     public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
+     * @BeforeScenario @skipWait
+     */
+    public function applySkipWait()
+    {
+        $this->skipWait = true;
+    }
+
+    /**
+     * @AfterScenario @skipWait
+     */
+    public function cancelSkipWait()
+    {
+        $this->skipWait = false;
     }
 
     /**
@@ -125,7 +144,7 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
-        if (!$this->getMink()->isSessionStarted()) {
+        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
             return;
         }
 
@@ -155,7 +174,7 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
-        if (!$this->getMink()->isSessionStarted()) {
+        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
             return;
         }
 
@@ -712,6 +731,16 @@ class OroMainContext extends MinkContext implements
         $elementObject = $this->createElement($element);
         self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
         self::assertContains($text, $elementObject->getText());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotContainsText($element, $text)
+    {
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+        self::assertNotContains($text, $elementObject->getText());
     }
 
     /**
@@ -1527,5 +1556,37 @@ class OroMainContext extends MinkContext implements
             $childElementName,
             $parentElementName
         ));
+    }
+
+    /**
+     * Assert link existing on current page
+     *
+     * @Then /^I should see following buttons:$/
+     */
+    public function iShouldSeeFollowingButtons(TableNode $table)
+    {
+        foreach ($table->getRows() as $item) {
+            $item = reset($item);
+            self::assertNotNull(
+                $this->getPage()->findLink($item),
+                "Button with name $item not found (link selector, actually)"
+            );
+        }
+    }
+
+    /**
+     * Assert that links are not present on current page
+     *
+     * @Then /^I should not see following buttons:$/
+     */
+    public function iShouldNotSeeFollowingButtons(TableNode $table)
+    {
+        foreach ($table->getRows() as $item) {
+            $item = reset($item);
+            self::assertNull(
+                $this->getPage()->findLink($item),
+                "Button with name $item still present on page (link selector, actually)"
+            );
+        }
     }
 }

@@ -9,3 +9,14 @@ oro_behat_extension:
 
     Use Organization:
       selector: 'language_settings[oro_locale___language][use_parent_scope_value]'
+
+  suites:
+    OroTranslationBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroTranslationBundle::FeatureContext
+        - OroFormBundle::FormContext
+        - OroConfigBundle::FeatureContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroTranslationBundle/Tests/Behat/Features'

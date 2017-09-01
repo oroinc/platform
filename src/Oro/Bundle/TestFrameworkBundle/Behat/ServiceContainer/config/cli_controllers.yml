@@ -1,10 +1,19 @@
 services:
+    cli.controller.available_references:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableReferencesController
+        arguments:
+            - '@oro_test.alice_loader'
+            - '@oro_behat_extension.isolation.doctrine_isolator'
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: cli.controller, priority: 700 }
+
     cli.controller.suite_configuration_filter:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteConfigurationFilterController
         arguments:
             - '@oro_behat_extension.suite.suite_configuration_registry'
         tags:
-            - { name: cli.controller, priority: 600 }
+            - { name: cli.controller, priority: 650 }
 
     cli.controller.suite_divider:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteDividerController

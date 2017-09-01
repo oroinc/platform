@@ -68,6 +68,15 @@ datagrids:
            hints:
                - { name: HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, value: false }
 ```
+ElasticSearchBundle
+-------------------
+- Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
+
+ImportExportBundle
+--------------
+- Class `Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter` does not initialize backend headers
+    during import anymore. Method `getHeaderConversionRules` previously called `initialize` method to load both conversion
+    rules and backend headers, but now it calls only `initializeRules`
 
 FormBundle
 ----------

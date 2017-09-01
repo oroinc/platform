@@ -6,6 +6,8 @@ Feature: User system settings manage
   Scenario: Change user create password restrictions settings
     Given I login as administrator
     And I go to System/Configuration
+    And I click "System configuration"
+    And I click "General setup"
     And I click "User Settings"
     When I fill "System Config Form" with:
       | Minimal password length      | 10   |

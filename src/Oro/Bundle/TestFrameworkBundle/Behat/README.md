@@ -613,7 +613,12 @@ include:
 
 You can use references to the entities in both inline and alice fixtures.
 [See Alice documentation about References](https://github.com/nelmio/alice/blob/2.x/doc/relations-handling.md#handling-relations).
-You can use default references that were created by ```ReferenceRepositoryInitializer``` before the tests run:
+```{Bundle}\Tests\Behat\ReferenceRepositoryInitializer``` used for create references for objects that already exist in database.
+It is prohibited to modify or add new entities within Initializer.
+It should implement ```ReferenceRepositoryInitializerInterface``` and should not have dependencies.
+For show all references use ```bin/behat --available-references``` command.
+
+The most common used references:
 
 - ```@admin``` - Admin user
 - ```@adminRole``` - Administrator role
