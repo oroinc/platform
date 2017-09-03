@@ -1,0 +1,8 @@
+services:
+  oro_behat_extension.health_checker.fixtures_checker:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\FixturesChecker
+    arguments:
+      - '@oro_test.context.fixture_loader'
+      - '@oro_behat_extension.fixtures.yml_parser'
+    tags:
+      - { name: 'behat_health_checker' }

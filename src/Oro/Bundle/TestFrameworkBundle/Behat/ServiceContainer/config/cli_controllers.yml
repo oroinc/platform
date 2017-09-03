@@ -78,6 +78,14 @@ services:
         tags:
             - { name: 'cli.controller', priority: 500 }
 
+    cli.controller.health_check_controller:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\HealthCheckController
+        arguments:
+            - '@event_dispatcher'
+            - '@tester.result.interpreter'
+        tags:
+            - { name: 'cli.controller', priority: 110 }
+
     cli.controller.input_output_controller:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
         arguments:
