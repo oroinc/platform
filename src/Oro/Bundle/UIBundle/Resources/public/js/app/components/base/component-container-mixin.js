@@ -3,6 +3,7 @@ define(function(require) {
 
     var componentContainerMixin;
     var ComponentManager = require('oroui/js/app/components/component-manager');
+    var $ = require('jquery');
 
     componentContainerMixin = {
         /**
@@ -65,10 +66,21 @@ define(function(require) {
         },
 
         /**
+         * @returns {boolean}
+         */
+        hasOwnLayout: function() {
+            return this.getLayoutElement().is('[data-layout="separate"]');
+        },
+
+        /**
          * Initializes all linked page components
          * @param {Object|null} options
          */
         initPageComponents: function(options) {
+            if (!this.hasOwnLayout()) {
+                var error = new Error('PageComponents can not be initialized for the element without own layout');
+                return $.Deferred().reject(error);
+            }
             return this._getComponentManager().init(options);
         },
 

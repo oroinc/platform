@@ -45,6 +45,10 @@
 
     &[type="date"] {
         min-height: $input-date-height;
+
+        &::-webkit-inner-spin-button {
+            display: none;
+        }
     }
 
     &--short {

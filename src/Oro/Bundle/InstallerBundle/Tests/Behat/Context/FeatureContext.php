@@ -107,4 +107,46 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Or
     {
         return $this->getContainer()->getParameter($name);
     }
+
+    /**
+     * @Then I should be on the :number step
+     */
+    public function iShouldBeOnTheStep($number)
+    {
+        $activeStepElement = $this->getPage()->find('css', 'div.progress-bar li.active strong');
+        self::assertNotNull($activeStepElement, 'Can\'t find active step on the page');
+        self::assertEquals($number, $activeStepElement->getText());
+    }
+
+    /**
+     * @When I press Launch application button
+     */
+    public function iPressLaunchApplicationButton()
+    {
+        $button = $this->getPage()->find('css', 'div.button-set a.primary');
+        self::assertNotNull($button, 'Primary button is not found on the page');
+
+        $button->click();
+    }
+
+    /**
+     * @Then I should be on the admin login page
+     */
+    public function iShouldBeOnTheAdminLoginPage()
+    {
+        $windowNames = $this->getSession()->getWindowNames();
+        $this->getSession()->switchToWindow($windowNames[1]);
+        $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
+        $route = $this->getContainer()->get('router')->match($urlPath);
+
+        self::assertEquals(
+            'oro_user_security_login',
+            $route['_route'],
+            sprintf(
+                'Expected that current url "%s" will match "oro_user_security_login", but it matched to "%s"',
+                $urlPath,
+                $route['_route']
+            )
+        );
+    }
 }
