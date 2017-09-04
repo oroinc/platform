@@ -76,3 +76,19 @@ oro_behat_extension:
     User Edit:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserEdit
       route: 'oro_user_edit'
+
+  suites:
+    OroUserBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
+        - OroUserBundle::FeatureContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroConfigBundle::FeatureContext
+        - OroSecurityBundle::ACLContext
+        - OroSecurityBundle::PermissionContext
+        - OroActivityListBundle::ActivityContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroUserBundle/Tests/Behat/Features'

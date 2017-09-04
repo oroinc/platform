@@ -1,0 +1,28 @@
+user_configuration:
+    fields:
+        some_field:
+            data_type: string
+            type: text
+            options: []
+
+    groups:
+        first_group:
+            title: 'First group'
+
+        second_group:
+            title: 'Second group'
+
+        third_group:
+            title: 'Third group'
+
+    tree:
+        user_configuration:
+            first_group:
+                children:
+                    second_group:
+                        children:
+                            third_group:
+                                priority: 254
+                                children:
+                                    # ERROR THAT FIELD PLACED INCORRECTLY
+                                    - some_field

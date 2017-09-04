@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -46,7 +47,7 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
             ['data' => ['type' => $entityType, 'attributes' => ['notExistingField' => null]]]
         );
-        $this->assertApiResponseStatusCodeEquals($response, [400, 403, 405], $entityType, 'post');
+        self::assertApiResponseStatusCodeEquals($response, [400, 403, 405], $entityType, 'post');
 
         // Make sure Entity can be created without setting Owner or Organization
         // Owner and or Organization will be set from context for configurable entities
@@ -57,12 +58,12 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
                 $classMetadata = $this->metadataProvider->getMetadata($entityClass);
                 foreach ($content['errors'] as $error) {
                     if (isset($error['source']['pointer'])) {
-                        $this->assertNotEquals(
+                        self::assertNotEquals(
                             '/data/relationships/' . $classMetadata->getOwnerFieldName() . '/data',
                             $error['source']['pointer'],
                             "Entity {$entityClass} should not have '{$error['title']}' constraint for 'Owner'"
                         );
-                        $this->assertNotEquals(
+                        self::assertNotEquals(
                             '/data/relationships/' . $classMetadata->getOrganizationFieldName() . '/data',
                             $error['source']['pointer'],
                             "Entity {$entityClass} should not have '{$error['title']}' constraint for 'Organization'"
@@ -85,6 +86,10 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
             return;
         }
 
+        if (in_array($entityClass, SkippedEntitiesProvider::getForUpdateAction(), true)) {
+            return;
+        }
+
         $entityType = $this->getEntityType($entityClass);
 
         $response = $this->request(
@@ -92,6 +97,6 @@ class RestJsonApiFormValidationTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => '1']),
             ['data' => ['type' => $entityType, 'id' => '1', 'attributes' => ['notExistingField' => null]]]
         );
-        $this->assertApiResponseStatusCodeEquals($response, [400, 403, 405], $entityType, 'post');
+        self::assertApiResponseStatusCodeEquals($response, [400, 403, 405], $entityType, 'post');
     }
 }
