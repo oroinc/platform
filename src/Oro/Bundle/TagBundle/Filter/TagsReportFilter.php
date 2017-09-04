@@ -4,7 +4,7 @@ namespace Oro\Bundle\TagBundle\Filter;
 
 use Oro\Bundle\TagBundle\Form\Type\Filter\TagsReportFilterType;
 
-class TagsReportFilter extends AbstractTagsFilter
+class TagsReportFilter extends TagsDictionaryFilter
 {
     /**
      * {@inheritdoc}

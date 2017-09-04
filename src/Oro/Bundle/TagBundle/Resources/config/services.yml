@@ -121,14 +121,17 @@ services:
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 150 }
 
-    oro_tag.filter.tags:
-        class: Oro\Bundle\TagBundle\Filter\EntityTagsFilter
-        arguments:
-            - '@form.factory'
-            - '@oro_filter.filter_utility'
-            - '@translator'
+    oro_tag.filter.tags_choice_tree:
+        class: Oro\Bundle\TagBundle\Filter\TagsDictionaryFilter
+        parent: 'oro_filter.dictionary_filter'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tag }
+
+    oro_tag.filter.tags_report:
+        class: Oro\Bundle\TagBundle\Filter\TagsReportFilter
+        parent: 'oro_filter.dictionary_filter'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: tags-report }
 
     oro_tag.grid.tags_extension:
         class: Oro\Bundle\TagBundle\Grid\TagsExtension
@@ -225,16 +228,6 @@ services:
         class: Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: tags, format_type: excel }
-
-    oro_tag.filter.tags_report:
-        class: Oro\Bundle\TagBundle\Filter\TagsReportFilter
-        arguments:
-            - '@form.factory'
-            - '@oro_filter.filter_utility'
-            - '@doctrine'
-            - '@oro_security.acl_helper'
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: tags-report }
 
     oro_tag.workflow.action.copy_tagging.class:
         class: %oro_tag.workflow.action.copy_tagging.class%
