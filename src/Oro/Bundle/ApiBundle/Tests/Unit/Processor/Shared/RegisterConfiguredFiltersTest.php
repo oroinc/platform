@@ -179,6 +179,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterConfig = new FilterFieldConfig();
         $filterConfig->setDataType('string');
         $filterConfig->setPropertyPath('category');
+        $filterConfig->setOperators([ComparisonFilter::GT]);
         $filtersConfig->addField('filter', $filterConfig);
 
         $this->filterFactory->expects($this->once())

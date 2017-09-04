@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -23,10 +25,10 @@ class FormProcessorTestCase extends \PHPUnit_Framework_TestCase
     /** @var FormContext|SingleItemContext */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var MetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
 
     protected function setUp()

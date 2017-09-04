@@ -30,6 +30,7 @@ define(function(require) {
             ignoreHead: false
         },
         attributes: {
+            'data-layout': 'separate',
             'class': 'list-item'
         },
         events: {
@@ -168,19 +169,21 @@ define(function(require) {
             this.$(this.options.infoBlock)
                 .trigger('content:remove') // to dispose only components related to infoBlock
                 .html(this.model.get('contentHTML'));
-            this.initLayout().done(_.bind(function() {
-                // if the activity has an EmailTreadView -- handle comment count change in own way
-                var emailTreadView = this.getEmailThreadView();
-                if (emailTreadView) {
-                    this.listenTo(emailTreadView, 'commentCountChanged', function(diff) {
-                        this.model.set('commentCount', this.model.get('commentCount') + diff);
-                    });
-                }
-                var loadingView = this.subview('loading');
-                if (loadingView) {
-                    loadingView.hide();
-                }
-            }, this));
+            this.initLayout().done(this._handleLayoutInit.bind(this));
+        },
+
+        _handleLayoutInit: function() {
+            // if the activity has an EmailTreadView -- handle comment count change in own way
+            var emailTreadView = this.getEmailThreadView();
+            if (emailTreadView) {
+                this.listenTo(emailTreadView, 'commentCountChanged', function(diff) {
+                    this.model.set('commentCount', this.model.get('commentCount') + diff);
+                });
+            }
+            var loadingView = this.subview('loading');
+            if (loadingView) {
+                loadingView.hide();
+            }
         },
 
         _onCommentCountChange: function() {

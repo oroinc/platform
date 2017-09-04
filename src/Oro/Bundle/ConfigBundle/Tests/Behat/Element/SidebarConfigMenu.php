@@ -9,20 +9,27 @@ class SidebarConfigMenu extends Element
 {
     public function openNestedMenu($path)
     {
-        $collapseAllLink = $this->find('css', 'a[data-action="accordion:collapse-all"]');
+        $configMenuDropdownButton = $this->find('css', 'button[title="Mass Actions"]');
+        self::assertNotNull($configMenuDropdownButton, 'Config menu dropdown button not found');
+        $configMenuDropdownButton->click();
+
+        $configMenuDropdown = $configMenuDropdownButton->getParent()->find('css', 'ul[data-role="jstree-actions"]');
+        self::assertNotNull($configMenuDropdown, 'Config menu dropdown not found');
+
+        $collapseAllLink = $configMenuDropdown->find('css', 'a[title="Collapse all"]');
         self::assertNotNull($collapseAllLink, 'Collapse All link not found');
         $collapseAllLink->click();
 
         // wait for links will collapsed
         $this->spin(function (SidebarConfigMenu $element) {
-            $linksCount = count($element->findAll('css', 'a[data-toggle="collapse"]'));
-            $collapsedLinksCount = count($element->findAll('css', 'a.collapsed'));
+            $linksCount = count($element->findAll('css', 'li.jstree-node'));
+            $collapsedLinksCount = count($element->findAll('css', 'li.jstree-closed'));
 
             return $linksCount === $collapsedLinksCount;
         });
 
         $items = explode('/', $path);
-        $context = $this->find('css', 'ul.system-configuration-accordion');
+        $context = $this->find('css', 'ul.jstree-container-ul');
         self::assertNotNull($context, 'System configuration not found');
         $lastLink = array_pop($items);
 
@@ -32,13 +39,15 @@ class SidebarConfigMenu extends Element
 
             $link->click();
 
-            $accordionBody = $link->getParent()->getParent()->find('css', 'div.accordion-body');
+            $accordionBody = $link->getParent()->find('css', 'ul.jstree-children');
 
-            $isUnrolled = $this->spin(function () use ($accordionBody) {
-                return false !== strpos($accordionBody->getAttribute('style'), 'height: auto');
+            $isExpanded = $this->spin(function () use ($accordionBody) {
+                return $accordionBody !== null
+                    && $accordionBody->isVisible()
+                    && $accordionBody->getAttribute('style') === '';
             }, 5);
 
-            self::assertTrue($isUnrolled, sprintf('Menu "%s" is still collapsed', $item));
+            self::assertTrue($isExpanded, sprintf('Menu "%s" is still collapsed', $item));
             $context = $accordionBody;
         }
 
@@ -46,10 +55,12 @@ class SidebarConfigMenu extends Element
     }
 
     /**
-     * @return \Behat\Mink\Element\NodeElement[]
+     * @return NodeElement[]
      */
     public function getIntegrations()
     {
-        return $this->findAll('css', '#config_tab_group_integrations li a');
+        $this->openNestedMenu('System configuration/Integrations');
+
+        return $this->findAll('css', '#integrations ul[role="group"] li[role="treeitem"] a');
     }
 }
