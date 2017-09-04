@@ -59,18 +59,24 @@
     {% set content = _self.renderTabContent(data.form, data.content) %}
     <div class="system-configuration-container">
         {% embed "OroUIBundle::content_sidebar.html.twig" %}
+            {% block header %}
+                <div id="system-configuration-jstree-inline-actions"></div>
+            {% endblock header %}
             {% block sidebar %}
-                {% set treeOptions = {
-                    'data' : data.configTree,
-                    'nodeId': data.activeSubTabName,
-                    'onSelectRoute': data.routeName,
-                    'onSelectRouteParameters': data.routeParameters,
-                    'autoSelectFoundNode': true,
-                    'view': 'oroconfig/js/app/views/configuration-tree-view'
-                } %}
                 {{ UI.renderJsTree({
-                    'label': 'oro.config.menu.system_configuration.label'|trans,
-                    'treeOptions': treeOptions
+                    'label': null,
+                    'treeOptions': {
+                        'data' : data.configTree,
+                        'nodeId': data.activeSubTabName,
+                        'onSelectRoute': data.routeName,
+                        'onSelectRouteParameters': data.routeParameters,
+                        'autoSelectFoundNode': true,
+                        'view': 'oroconfig/js/app/views/configuration-tree-view'
+                    },
+                    'actionsOptions': {
+                        inlineActionsCount: 2,
+                        inlineActionsElement: '#system-configuration-jstree-inline-actions'
+                    }
                 }) }}
             {% endblock sidebar %}
 

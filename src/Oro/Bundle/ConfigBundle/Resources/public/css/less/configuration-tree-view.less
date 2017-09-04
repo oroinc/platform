@@ -1,31 +1,4 @@
 .system-configuration-container {
-
-  .jstree-search-component {
-    margin-right: 50px;
-  }
-
-  .jstree-wrapper {
-    > div {
-      position: relative;
-    }
-
-    &__title {
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-
-    &__label {
-      display: none;
-    }
-  }
-
-  .jstree-actions {
-    &__handle {
-      height: 30px;
-    }
-  }
-
   .jstree {
     i {
       &.jstree-icon {
@@ -36,6 +9,16 @@
       }
       &[class^="fa-"], &[class*=" fa-"] {
         display: inline-block;
+      }
+    }
+  }
+  .jstree-actions {
+    &__menu {
+      &--inline {
+        float: left;
+
+        font-size: 11px;
+        line-height: 11px;
       }
     }
   }

@@ -1,3 +1,4 @@
+@sidebarHeaderHeight: 31px;
 @sidebarHorizontalPadding: 10px;
 @sidebarWidth: 313px;
 @sidebarMinimizedWidth: 33px;
@@ -18,28 +19,35 @@
         }
     }
 
-    &--sidebar-content {
+    &--sidebar-content,
+    &--header-content {
         .content-sidebar-minimized & {
             display: none;
         }
     }
 
-    &--controls {
+    &--header {
+        height: @sidebarHeaderHeight;
         border-bottom: 1px solid @sidebarBorderColor;
-        text-align: right;
         padding: 5px @sidebarHorizontalPadding 4px;
-
-        margin-left: -10px;
         margin-bottom: @sidebarHorizontalPadding;
     }
 
+    &--controls {
+        float: right;
+        text-align: right;
+    }
+
     &--control {
+        height: 20px;
+        width: 20px;
+        display: inline-block;
         cursor: pointer;
 
         i {
             font-size: 8px;
-            line-height: 8px;
-            margin: 7px 3px 7px 0;
+            margin: 6px 0 0 0;
+            display: block;
         }
     }
 
