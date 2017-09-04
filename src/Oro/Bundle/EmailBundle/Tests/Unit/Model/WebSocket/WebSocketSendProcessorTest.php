@@ -5,9 +5,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\WebSocket;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -97,5 +100,44 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send');
 
         $this->processor->send([]);
+    }
+
+    /**
+     * @dataProvider getUserTopicDataProvider
+     *
+     * @param User|string $user
+     * @param Organization $organization
+     * @param string $expected
+     */
+    public function testGetUserTopic($user, $organization, $expected)
+    {
+        $this->assertEquals($expected, WebSocketSendProcessor::getUserTopic($user, $organization));
+    }
+
+    /**
+     * @return array
+     */
+    public function getUserTopicDataProvider()
+    {
+        $user = $this->getEntity(User::class, ['id' => 123]);
+        $organization = $this->getEntity(Organization::class, ['id' => 321]);
+
+        return [
+            'user is object' => [
+                'user' => $user,
+                'organization' => $organization,
+                'expected' => 'oro/email_event/user_123_org_321',
+            ],
+            'user is string' => [
+                'user' => 'TEST',
+                'organization' => $organization,
+                'expected' => 'oro/email_event/user_TEST_org_321',
+            ],
+            'no organization' => [
+                'user' => 'TEST',
+                'organization' => null,
+                'expected' => 'oro/email_event/user_TEST_org_',
+            ],
+        ];
     }
 }

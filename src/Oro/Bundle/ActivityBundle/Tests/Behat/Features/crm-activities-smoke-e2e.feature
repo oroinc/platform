@@ -363,6 +363,6 @@ Feature: Activities
       |Recurrence   |Daily every 1 day, end after 1 occurrence|
     And go to Activities/ Calendar Events
     And should see following grid:
-      | Title                   | Calendar | Start                  | End                    | Recurrent | Recurrence                               | Invitation status |
-      | All day no repeat Event | John Doe | Jan 24, 2017, 12:00 AM | Feb 26, 2020, 12:00 AM | No        | N/A                                      | Not responded     |
-      | Stand-Up                | John Doe | Aug 16, 2017, 12:00 AM | Aug 16, 2017, 12:00 AM | Yes       |Daily every 1 day, end after 1 occurrence | Not responded     |
+      | Title                   | Calendar | Recurrent | Recurrence                               | Invitation status |
+      | All day no repeat Event | John Doe | No        | N/A                                      | Not responded     |
+      | Stand-Up                | John Doe | Yes       |Daily every 1 day, end after 1 occurrence | Not responded     |

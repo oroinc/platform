@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
+
 class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
 {
     /**
@@ -16,6 +18,10 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
             return;
         }
 
+        if (in_array($entityClass, SkippedEntitiesProvider::getForGetListAction(), true)) {
+            return;
+        }
+
         $entityType = $this->getEntityType($entityClass);
 
         // test "get list" request
@@ -23,9 +29,9 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
             'GET',
             $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'limit' => 1])
         );
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
 
-        $id = $this->getGetEntityId($entityClass, $this->jsonToArray($response->getContent()));
+        $id = $this->getGetEntityId($entityClass, self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
             if (!in_array('get', $excludedActions, true)) {
@@ -60,7 +66,7 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
         );
         if ($response->getStatusCode() === 200) {
             $id = [];
-            $content = $this->jsonToArray($response->getContent());
+            $content = self::jsonToArray($response->getContent());
             if (!empty($content)) {
                 $idField = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass)[0];
                 foreach ($content as $item) {
@@ -80,7 +86,7 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
                         'GET',
                         $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id[0]])
                     );
-                    $this->assertApiResponseStatusCodeEquals($response, 404, $entityType, 'get');
+                    self::assertApiResponseStatusCodeEquals($response, 404, $entityType, 'get');
                 }
             }
         }
@@ -103,7 +109,7 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
                 'GET',
                 $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id])
             );
-            $this->assertApiResponseStatusCodeEquals($response, 404, $entityType, 'get');
+            self::assertApiResponseStatusCodeEquals($response, 404, $entityType, 'get');
         }
     }
 
@@ -118,7 +124,7 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
             'GET',
             $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id])
         );
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get');
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get');
     }
 
     /**

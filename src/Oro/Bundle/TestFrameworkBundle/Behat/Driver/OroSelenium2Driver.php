@@ -153,9 +153,9 @@ JS;
             if (document.title === "Loading...") {
                 return false;
             }
-        
-            if (typeof(jQuery) == "undefined" || jQuery == null) {
-                return false;
+            
+            if (typeof(jQuery) == "undefined" || jQuery == null) {		
+                return false;		
             }
             
             if (jQuery(document.body).hasClass('loading')) {
