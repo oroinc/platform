@@ -25,11 +25,6 @@ oro_behat_extension:
     Fallback Status:
       selector: '.fallback-status [class^="fa-folder"]'
 
-  pages:
-    Localization Config:
-      class: Oro\Bundle\LocaleBundle\Tests\Behat\Page\LocalizationConfig
-      route: 'oro_config_configuration_system'
-
   suites:
       OroLocaleBundle:
         contexts:

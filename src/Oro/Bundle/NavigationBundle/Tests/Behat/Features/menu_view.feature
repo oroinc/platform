@@ -15,7 +15,7 @@ Scenario: Try navigate on top menu
 
 Scenario: Change menu view
   Given I go to System/Configuration
-  And follow "Display settings"
+  And I follow "System configuration/General setup/Display settings" on configuration sidebar
   And uncheck "Use default" for "Position" field
   And select "Left" from "Position"
   When I save setting
