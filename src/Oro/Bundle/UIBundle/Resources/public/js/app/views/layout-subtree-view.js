@@ -22,7 +22,6 @@ define(function(require) {
             this.options = $.extend(true, {}, this.options, options);
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);
             LayoutSubtreeManager.addView(this);
-            this.initLayout();
         },
 
         dispose: function() {
@@ -38,8 +37,6 @@ define(function(require) {
                 .trigger('content:remove')
                 .html($(content).children())
                 .trigger('content:changed');
-
-            this.initLayout();
         },
 
         beforeContentLoading: function() {

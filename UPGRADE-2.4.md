@@ -129,6 +129,9 @@ SyncBundle
 UIBundle
 --------
 - `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
+- `'oroui/js/app/components/base/component-container-mixin'` Each view on which we want to call `'initLayout()'` method 
+(to intialize all components within) have to be marked as separated layout by adding `'data-layout="separate"'` 
+attribute. Otherwise `'Error'` will be thrown.
 
 UserBundle
 ----------

@@ -190,7 +190,7 @@ define(function(require) {
          * @param {Object} options
          */
         insertDataGrid: function(options) {
-            this.$el = $('<div>');
+            this.$el = $('<div data-layout="separate">');
             this.$componentEl.append(this.$el);
         },
 

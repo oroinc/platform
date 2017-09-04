@@ -20,7 +20,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
             contentContainer: '.row-fluid',
             contentClasses: [],
             templateParams: {},
-            template: _.template('<div class="box-type1">' +
+            template: _.template('<div class="box-type1" data-layout="separate">' +
                 '<div class="title"<% if (_.isNull(title)) { %>style="display: none;"<% } %>>' +
                     '<div class="pull-right widget-actions-container"></div>' +
                     '<span class="widget-title"><%- title %></span>' +
