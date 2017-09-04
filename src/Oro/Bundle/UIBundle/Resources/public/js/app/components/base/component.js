@@ -49,7 +49,32 @@ define([
          * Takes from Backbone standard extend method
          * to provide inheritance for Components
          */
-        extend: Backbone.Model.extend
+        extend: Backbone.Model.extend,
+
+        /**
+         * Collects dependency definition from component's prototype chain
+         *
+         * @param {Function} Component constructor of a component
+         * @return {Object.<string, string>} where key is internal name for component's instance,
+         *                                  value is component's name in componentManager
+         * @static
+         */
+        getRequiredSiblingComponentNames: function(Component) {
+            var PROP = BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME;
+            var dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
+            dependencies.push(_.result(Component.prototype, PROP));
+            dependencies = _.extend.apply(null, [{}].concat(dependencies));
+
+            // remove dependencies without componentName
+            // (the name was falsified in descendant component definition, means is doesn't require it anymore)
+            _.each(dependencies, function(componentName, dependencyName) {
+                if (!componentName) {
+                    delete dependencies[dependencyName];
+                }
+            });
+
+            return dependencies;
+        }
     });
 
     // lends methods from Backbone and Chaplin
@@ -99,11 +124,13 @@ define([
             this.unsubscribeAllEvents();
             this.stopListening();
             this.off();
+            var siblingComponents = _.keys(BaseComponent.getRequiredSiblingComponentNames(this.constructor));
+
             // dispose and remove all own properties
             _.each(this, function(item, name) {
-                if (componentOptions.indexOf(name) !== -1) {
+                if (componentOptions.indexOf(name) !== -1 && siblingComponents.indexOf(name) !== -1) {
                     /**
-                     * Do not dispose auto-assigned props, that were passed over options.
+                     * Do not dispose auto-assigned props, that were passed over options or sibling components.
                      * Just delete a reference.
                      * Parent view or component have to take care of them, to dispose them properly.
                      */

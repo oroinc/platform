@@ -327,21 +327,11 @@ define(function(require) {
          *                                  value is component's name in componentManager
          */
         _getRequiredSiblingComponentNames: function(Component, options) {
-            var PROP = BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME;
-            var dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
-            dependencies.push(_.result(Component.prototype, PROP));
-            dependencies = _.extend.apply(null, [{}].concat(dependencies));
-
-            // remove dependencies without componentName
-            // (the name was falsified in descendant component definition, means is doesn't require it anymore)
-            _.each(dependencies, function(componentName, dependencyName) {
-                if (!componentName) {
-                    delete dependencies[dependencyName];
-                }
-            });
+            var dependencies = BaseComponent.getRequiredSiblingComponentNames(Component);
 
             // options can only change componentName of existing dependency, can not make it falsy
-            _.each(_.result(options, PROP), function(componentName, dependencyName) {
+            var updateFromOptions = _.result(options, BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME);
+            _.each(updateFromOptions, function(componentName, dependencyName) {
                 if (componentName && dependencies[dependencyName]) {
                     dependencies[dependencyName] = componentName;
                 }
