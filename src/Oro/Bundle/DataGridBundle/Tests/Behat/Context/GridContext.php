@@ -1502,10 +1502,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
             if ($gridToolbarActions->isVisible()) {
                 $gridToolbarActions->getActionByTitle('Filters')->click();
-            } else {
-                $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-                self::assertNotNull($filterState);
+            }
 
+            $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
+            if ($filterState->isValid()) {
                 $filterState->click();
             }
         }
