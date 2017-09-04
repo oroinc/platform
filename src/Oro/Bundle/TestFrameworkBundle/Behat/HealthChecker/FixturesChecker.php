@@ -48,7 +48,11 @@ class FixturesChecker implements HealthCheckerInterface
                 $file = $this->fixtureLoader->findFile($fixtureFile);
                 $this->parser->parse($file);
             } catch (\Exception $e) {
-                $this->addError($e->getMessage());
+                $message = 'Error while find and parse "'.$fixtureFile.'" fixture'.PHP_EOL;
+                $message .= '   Suite: '.$event->getSuite()->getName().PHP_EOL;
+                $message .= '   Feature: '.$event->getFeature()->getFile().PHP_EOL;
+                $message .= '   '.$e->getMessage();
+                $this->addError($message);
             }
         }
     }
