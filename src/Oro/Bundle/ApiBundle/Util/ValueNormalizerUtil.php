@@ -21,6 +21,7 @@ class ValueNormalizerUtil
      */
     public static function humanizeClassName($className, $classSuffix = null)
     {
+        // get short class name
         $delimiter = strrpos($className, '\\');
         if (false !== $delimiter) {
             $className = substr($className, $delimiter + 1);
@@ -29,11 +30,13 @@ class ValueNormalizerUtil
         if ($classSuffix && substr($className, -strlen($classSuffix)) === $classSuffix) {
             $classSuffix = null;
         }
-
+        // divide class name into words
         $result = strtolower(preg_replace('/(?<=\\w)([A-Z\\\\])/', ' $1', $className));
         if ($classSuffix) {
             $result .= ' ' . strtolower($classSuffix);
         }
+        // remove redundant "_" characters and fix abbreviations
+        $result = preg_replace('/(?<!\w{2}) (?!\w{2})/', '', str_replace('_ ', ' ', $result));
 
         return $result;
     }

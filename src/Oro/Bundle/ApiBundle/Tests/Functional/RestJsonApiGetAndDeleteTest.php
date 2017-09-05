@@ -29,9 +29,9 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
             'GET',
             $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1])
         );
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
 
-        $id = $this->getGetEntityId($this->jsonToArray($response->getContent()));
+        $id = $this->getGetEntityId(self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
             if (!in_array('get', $excludedActions, true)) {
@@ -64,7 +64,7 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
         );
         if ($response->getStatusCode() === 200) {
             $id = [];
-            $content = $this->jsonToArray($response->getContent());
+            $content = self::jsonToArray($response->getContent());
             if (!empty($content['data'])) {
                 foreach ($content['data'] as $item) {
                     $id[] = $item['id'];
@@ -78,9 +78,9 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
                 );
                 if ($response->getStatusCode() !== 204) {
                     // process delete errors
-                    $data = $this->jsonToArray($response->getContent());
-                    $this->assertEquals(403, $response->getStatusCode());
-                    $this->assertEquals($data['errors'][0]['title'], 'forbidden exception');
+                    $data = self::jsonToArray($response->getContent());
+                    self::assertEquals(403, $response->getStatusCode());
+                    self::assertEquals($data['errors'][0]['title'], 'forbidden exception');
                 } elseif (!in_array('get', $excludedActions, true)) {
                     // check if entity was really deleted
                     $this->checkGetRequest($entityType, $id[0], 404);
@@ -102,9 +102,9 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
         );
         if ($response->getStatusCode() !== 204) {
             // process delete errors
-            $data = $this->jsonToArray($response->getContent());
-            $this->assertEquals(403, $response->getStatusCode());
-            $this->assertEquals($data['errors'][0]['title'], 'forbidden exception');
+            $data = self::jsonToArray($response->getContent());
+            self::assertEquals(403, $response->getStatusCode());
+            self::assertEquals($data['errors'][0]['title'], 'forbidden exception');
         } elseif (!in_array('get', $excludedActions, true)) {
             // check if entity was really deleted
             $this->checkGetRequest($entityType, $id, 404);
@@ -122,7 +122,7 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
             'GET',
             $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id])
         );
-        $this->assertApiResponseStatusCodeEquals($response, $expectedStatus, $entityType, 'get');
+        self::assertApiResponseStatusCodeEquals($response, $expectedStatus, $entityType, 'get');
     }
 
     /**

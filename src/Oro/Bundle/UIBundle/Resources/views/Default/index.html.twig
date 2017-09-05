@@ -64,7 +64,7 @@
                             <ul class="nav pull-right user-menu">
                                 {{ block('user_menu') }}
                             </ul>
-                            <div class="nav top-search shortcuts">
+                            <div class="nav top-search shortcuts" data-layout="separate">
                                 {{ block('navbar') }}
                             </div>
                             {% placeholder pin_tabs_list %}
@@ -124,7 +124,7 @@
                         {% placeholder breadcrumb_pin_after %}
                     </div>
                     {% endblock before_content %}
-                    <div id="container"{% if isDesktopVersion() %} class="scrollable-container"{% endif %}>
+                    <div id="container"{% if isDesktopVersion() %} class="scrollable-container"{% endif %} data-layout="separate">
                         {% block page_container %}
                             {% placeholder content_before %}
                             {% block content %}
