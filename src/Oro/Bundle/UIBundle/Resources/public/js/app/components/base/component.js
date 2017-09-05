@@ -128,7 +128,7 @@ define([
 
             // dispose and remove all own properties
             _.each(this, function(item, name) {
-                if (componentOptions.indexOf(name) !== -1 && siblingComponents.indexOf(name) !== -1) {
+                if (componentOptions.indexOf(name) !== -1 || siblingComponents.indexOf(name) !== -1) {
                     /**
                      * Do not dispose auto-assigned props, that were passed over options or sibling components.
                      * Just delete a reference.
