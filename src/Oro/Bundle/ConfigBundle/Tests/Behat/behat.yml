@@ -5,7 +5,7 @@ oro_behat_extension:
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm
 
     SidebarConfigMenu:
-      selector: 'div.system-configuration-container div.left-panel'
+      selector: 'div.system-configuration-container div[data-role="sidebar"]'
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu
 
     ColorsConfigBlock:
@@ -19,6 +19,9 @@ oro_behat_extension:
 
     Entity pagination:
       selector: '#entity-pagination'
+
+    Configuration Sidebar Content:
+      selector: '.jstree'
 
   suites:
     OroConfigBundle:

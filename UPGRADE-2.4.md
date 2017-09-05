@@ -72,6 +72,12 @@ ElasticSearchBundle
 -------------------
 - Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
 
+ImportExportBundle
+--------------
+- Class `Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter` does not initialize backend headers
+    during import anymore. Method `getHeaderConversionRules` previously called `initialize` method to load both conversion
+    rules and backend headers, but now it calls only `initializeRules`
+
 FormBundle
 ----------
 - Removed usage of `'tinymce/jquery.tinymce'` extension. Use `'tinymce/tinymce'` directly instead
@@ -123,6 +129,9 @@ SyncBundle
 UIBundle
 --------
 - `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
+- `'oroui/js/app/components/base/component-container-mixin'` Each view on which we want to call `'initLayout()'` method 
+(to intialize all components within) have to be marked as separated layout by adding `'data-layout="separate"'` 
+attribute. Otherwise `'Error'` will be thrown.
 
 UserBundle
 ----------

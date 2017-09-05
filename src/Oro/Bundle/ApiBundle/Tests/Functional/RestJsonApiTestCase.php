@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
@@ -471,14 +472,39 @@ class RestJsonApiTestCase extends ApiTestCase
         }
 
         $content = json_decode($response->getContent(), true);
-        $expectedContent = $this->loadResponseData($expectedContent);
+        $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
-        self::assertArrayContains(
-            self::processTemplateData($expectedContent),
-            $content
-        );
+        self::assertArrayContains($expectedContent, $content);
+
+        // test the primary data collection count and order
+        if (!empty($expectedContent[JsonApiDoc::DATA])) {
+            $expectedData = $expectedContent[JsonApiDoc::DATA];
+            if (is_array($expectedData) && isset($expectedData[0][JsonApiDoc::TYPE])) {
+                $expectedItems = $this->getResponseDataItems($expectedData);
+                $actualItems = $this->getResponseDataItems($content[JsonApiDoc::DATA]);
+                self::assertSame(
+                    $expectedItems,
+                    $actualItems,
+                    'Failed asserting the primary data collection items count and order.'
+                );
+            }
+        }
     }
 
+    /**
+     * @param array $data
+     *
+     * @return array [['type' => entity type, 'id' => entity id], ...]
+     */
+    private function getResponseDataItems(array $data)
+    {
+        $result = [];
+        foreach ($data as $item) {
+            $result[] = ['type' => $item[JsonApiDoc::TYPE], 'id' => $item[JsonApiDoc::ID]];
+        }
+
+        return $result;
+    }
     /**
      * Asserts the response contains the given number of data items.
      *

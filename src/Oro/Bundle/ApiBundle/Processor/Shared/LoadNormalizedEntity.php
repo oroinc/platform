@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Loads whole entity by its identifier using "get" action.
@@ -17,6 +18,8 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
  */
 class LoadNormalizedEntity implements ProcessorInterface
 {
+    const NORMALIZED_ENTITY_LOADED_PARAM = 'normalized_entity_loaded';
+
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
@@ -40,6 +43,10 @@ class LoadNormalizedEntity implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
+        if (true === $context->get(self::NORMALIZED_ENTITY_LOADED_PARAM)) {
+            return;
+        }
+
         /** @var SingleItemContext $context */
 
         $entityId = $context->getId();
@@ -49,14 +56,29 @@ class LoadNormalizedEntity implements ProcessorInterface
         }
 
         $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
+        $getContext = $this->createGetContext($context, $getProcessor);
 
+        $getProcessor->process($getContext);
+        $this->processGetResult($getContext, $context);
+
+        $context->set(self::NORMALIZED_ENTITY_LOADED_PARAM, true);
+    }
+
+    /**
+     * @param SingleItemContext        $context
+     * @param ActionProcessorInterface $processor
+     *
+     * @return GetContext
+     */
+    protected function createGetContext(SingleItemContext $context, ActionProcessorInterface $processor)
+    {
         /** @var GetContext $getContext */
-        $getContext = $getProcessor->createContext();
+        $getContext = $processor->createContext();
         $getContext->setVersion($context->getVersion());
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
         $getContext->setClassName($context->getClassName());
-        $getContext->setId($entityId);
+        $getContext->setId($context->getId());
         if ($this->reuseExistingEntity && $context->hasResult()) {
             $getContext->setResult($context->getResult());
         }
@@ -64,9 +86,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
         $getContext->setSoftErrorsHandling(true);
 
-        $getProcessor->process($getContext);
-
-        $this->processGetResult($getContext, $context);
+        return $getContext;
     }
 
     /**

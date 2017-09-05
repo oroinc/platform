@@ -7,6 +7,8 @@ define(function(require) {
     var componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
     var tools = require('oroui/js/tools');
 
+    var console = window.console;
+
     var OriginalBackboneView = Backbone.View;
     Backbone.View = function(original) {
         this.subviews = [];
@@ -109,7 +111,6 @@ define(function(require) {
             this.$el.remove();
         } else {
             this.undelegateEvents();
-            this.$el.removeData();
         }
 
         properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
@@ -133,16 +134,21 @@ define(function(require) {
     Backbone.View.prototype.getLayoutElement = function() {
         return this.$el;
     };
-    Backbone.View.prototype.initLayout = function(options) {
-        // initializes layout
+    Backbone.View.prototype.initControls = function() {
         Backbone.mediator.execute('layout:init', this.getLayoutElement());
+    };
+    Backbone.View.prototype.initLayout = function(options) {
+        // initializes controls in layout
+        this.initControls();
         // initializes page components
         var initPromise = this.initPageComponents(options);
         if (!this.deferredRender) {
             this._deferredRender();
             initPromise.always(_.bind(this._resolveDeferredRender, this));
         }
-        return initPromise;
+        return initPromise.fail(function(e) {
+            console.error(e);
+        });
     };
     /**
      * Create flag of deferred render
