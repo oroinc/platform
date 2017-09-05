@@ -45,8 +45,8 @@ define(function(require) {
         autoSelectFoundNode: false,
 
         events: {
-            'keypress [data-name="search"]': 'disableSubmit',
-            'input [data-name="search"]': 'onSearch',
+            'keypress [data-name="search"]': 'onSearchKeypress',
+            'input [data-name="search"]': 'onSearchDelay',
             'change [data-action-type="checkAll"]': 'onCheckAllClick',
             'click [data-name="clear-search"]': 'clearSearch'
         },
@@ -115,11 +115,11 @@ define(function(require) {
                 return;
             }
 
-            this.$tree = this.$el.find('[data-role="jstree-container"]');
-            this.$searchField = this.$el.find('[data-name="search"]');
-            this.$clearSearchButton = this.$el.find('[data-name="clear-search"]');
+            this.$tree = this.$('[data-role="jstree-container"]');
+            this.$searchField = this.$('[data-name="search"]');
+            this.$clearSearchButton = this.$('[data-name="clear-search"]');
             this.$tree.data('treeView', this);
-            this.onSearch = _.debounce(this.onSearch, this.searchTimeout);
+            this.onSearchDelay = _.debounce(this.onSearch, this.searchTimeout);
 
             var config = {
                 'core': {
@@ -180,7 +180,7 @@ define(function(require) {
                     three_state: false
                 };
 
-                this.$el.find('[data-role="jstree-checkall"]').show();
+                this.$('[data-role="jstree-checkall"]').show();
             }
 
             if (this.$searchField.length) {
@@ -202,12 +202,38 @@ define(function(require) {
             return config;
         },
 
-        disableSubmit: function(e) {
+        isNodeHasHandler: function(node) {
+            return true;
+        },
+
+        isElementHasHandler: function($el) {
+            var node = this.jsTreeInstance.get_node($el);
+            return node ? this.isNodeHasHandler(node) : false;
+        },
+
+        onSearchKeypress: function(e) {
             if (e.keyCode === 13) {
                 //enter in search field
-                e.preventDefault();
-                return false;
+                return this.onSearchEnter(e);
             }
+        },
+
+        onSearchEnter: function(e) {
+            if (this.autoSelectFoundNode) {
+                this.onSearch(e);
+                var $results = this.$('a.jstree-search');
+                if ($results.length === 1 && this.isElementHasHandler($results)) {
+                    $results.click();
+                }
+            }
+
+            e.preventDefault();
+            this.$searchField.focus();
+            return false;
+        },
+
+        onSearchDelay: function(e) {
+            return this.onSearch(e);
         },
 
         onSearch: function(event) {
@@ -249,14 +275,60 @@ define(function(require) {
          * @param {Object} data
          */
         searchResultsFilter: function(event, data) {
+            if (!data || !data.instance) {
+                return;
+            }
+
             if (data.res.length) {
                 this.underlineFilter(data);
-                if (this.autoSelectFoundNode && data.res.length === 1) {
-                    this.$el.find('a.jstree-search').click();
-                    this.$searchField.focus();
-                }
+                this.addChildToSearchResults(data.res);
             } else {
                 this.showSearchResultMessage(_.__('oro.ui.jstree.search.search_no_found'));
+            }
+        },
+
+        /**
+         * Show child of found nodes without handler
+         *
+         * @param {Array} nodes
+         */
+        addChildToSearchResults: function(nodes) {
+            if (this.jsTreeInstance.settings.search.show_only_matches_children) {
+                return;
+            }
+
+            var additionalNodes = [];
+            var nodesWithAdditional = [];
+
+            _.each(this.$('li.jstree-node:visible'), function(item) {
+                var $item = $(item);
+                var node = this.jsTreeInstance.get_node(item.id);
+                if (!node.children_d.length || this.isNodeHasHandler(node)) {
+                    return;
+                }
+
+                var $child = $item.children('.jstree-children');
+                if ($child.is(':visible')) {
+                    return;
+                }
+
+                additionalNodes = additionalNodes.concat(node.children_d);
+                nodesWithAdditional.push(node.id);
+            }, this);
+
+            if (!additionalNodes.length) {
+                return;
+            }
+
+            nodes = _.uniq(nodes);
+            additionalNodes = _.uniq(additionalNodes);
+            additionalNodes = nodes.slice().concat(additionalNodes);
+            this.jsTreeInstance.show_node(additionalNodes);
+
+            if (nodes.length > 1) {
+                this.jsTreeInstance.close_node(nodesWithAdditional, 0);
+            } else {
+                this.jsTreeInstance.open_node(nodesWithAdditional, 0);
             }
         },
 
@@ -266,15 +338,12 @@ define(function(require) {
          * @param {Object} data
          */
         underlineFilter: _.debounce(function(data) {
-            if (!data || !data.instance) {
-                return;
-            }
             var pattern = new RegExp(data.instance.searchValue, 'gi');
-            $('.jstree-search', this.$el).each(function(index, item) {
-                var $item = $(item);
+            this.$('a.jstree-search').each(function() {
+                var $item = $(this);
                 var sourceText = $item.text().replace(pattern, '<span class="matched-keyword">$&</span>');
-                $item.contents().filter(function(index, node) {
-                    return node.nodeName === '#text' || node.className === 'matched-keyword';
+                $item.contents().filter(function() {
+                    return this.nodeName === '#text' || this.className === 'matched-keyword';
                 }).remove();
 
                 $item.append(sourceText);
