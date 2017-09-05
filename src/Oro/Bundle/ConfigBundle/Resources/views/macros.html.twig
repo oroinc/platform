@@ -58,7 +58,9 @@
 
     {% set content = _self.renderTabContent(data.form, data.content) %}
     <div class="system-configuration-container">
-        {% embed "OroUIBundle::content_sidebar.html.twig" %}
+        {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
+            scrollbar: '[data-role="jstree-container"]'
+        }} %}
             {% block header %}
                 <div id="system-configuration-jstree-inline-actions"></div>
             {% endblock header %}

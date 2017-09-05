@@ -1,25 +1,62 @@
 .system-configuration-container {
-  .jstree {
-    i {
-      &.jstree-icon {
-        display: none;
-      }
-      &.jstree-icon.jstree-ocl {
-        display: inline-block;
-      }
-      &[class^="fa-"], &[class*=" fa-"] {
-        display: inline-block;
+  .content-with-sidebar {
+    &--sidebar {
+      .jstree-container {
+        overflow: auto;
       }
     }
   }
-  .jstree-actions {
-    &__menu {
-      &--inline {
-        float: left;
 
-        font-size: 11px;
-        line-height: 11px;
+  .jstree {
+    &-node {
+      position: static;
+      margin-left: 20px;
+
+      &[aria-level="1"] {
+        > .jstree-anchor {
+          text-transform: uppercase;
+          font-weight: bold;
+          font-size: 12px;
+        }
       }
+    }
+
+    &-anchor {
+      overflow: visible;
+      padding: 0 8px 8px 2px;
+    }
+
+    &-actions {
+      &__menu {
+        &--inline {
+          float: left;
+
+          font-size: 11px;
+          line-height: 11px;
+        }
+      }
+    }
+
+    &-icon:empty {
+      width: 20px;
+      margin-right: 1px;
+    }
+
+    &-ocl {
+      display: inline-block;
+    }
+
+    &-leaf {
+      .jstree-ocl {
+        display: none;
+      }
+    }
+
+    [class^="fa-"], [class*=" fa-"] {
+      display: inline-block;
+      text-align: left;
+      font-size: 13px;
+      margin: 0 -2px 0 2px;
     }
   }
 }

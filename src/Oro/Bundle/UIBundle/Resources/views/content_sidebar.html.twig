@@ -2,8 +2,7 @@
     view: 'oroui/js/app/views/content-sidebar-view'
 }) %}
 {% set class="content-with-sidebar--" %}
-<div data-page-component-module="oroui/js/app/components/view-component"
-     data-page-component-options="{{ options|json_encode }}"
+<div data-page-component-view="{{ options|json_encode }}"
      class="{{ class }}container">
     <div data-role="sidebar" class="{{ class }}sidebar">
         <div class="{{ class }}header">
