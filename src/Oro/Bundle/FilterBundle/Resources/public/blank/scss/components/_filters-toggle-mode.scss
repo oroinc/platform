@@ -183,6 +183,7 @@
 
 @include breakpoint('mobile') {
     .toggle-mode {
+        .data-filter-choice,
         .choice-filter {
             flex-direction: column;
         }
