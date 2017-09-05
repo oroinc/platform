@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
+use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -19,6 +20,9 @@ class CountQueryBuilderOptimizer
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+
+    /** @var RelationHelper */
+    protected $relationHelper;
 
     /** @var QueryOptimizationContext */
     protected $context;
@@ -42,6 +46,14 @@ class CountQueryBuilderOptimizer
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param RelationHelper $relationHelper
+     */
+    public function setRelationHelper(RelationHelper $relationHelper)
+    {
+        $this->relationHelper = $relationHelper;
     }
 
     /**
@@ -414,11 +426,16 @@ class CountQueryBuilderOptimizer
     {
         $associations = $this->context->getClassMetadata($entityClass)
             ->getAssociationsByTargetClass($targetEntityClass);
-        if (!array_key_exists($associationName, $associations)) {
-            return 0;
+
+        if (array_key_exists($associationName, $associations)) {
+            return $associations[$associationName]['type'];
         }
 
-        return $associations[$associationName]['type'];
+        if ($this->relationHelper && $this->relationHelper->hasVirtualRelations($entityClass)) {
+            return $this->relationHelper->getMetadataTypeForVirtualJoin($entityClass, $targetEntityClass);
+        }
+
+        return 0;
     }
 
     /**

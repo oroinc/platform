@@ -56,6 +56,10 @@ define([
                 this.$el.append(data.scripts);
             }
 
+            if (data) {
+                this.initLayout();
+            }
+
             return this;
         },
 
