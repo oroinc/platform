@@ -9,6 +9,7 @@ services:
         class: %oro_batch.orm.query_builder.count_query_optimizer.class%
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
+            - [setRelationHelper, ['@oro_entity.helper.relation_helper']]
 
     oro_batch.job.repository:
         class: %oro_batch.job.repository.class%
