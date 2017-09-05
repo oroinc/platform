@@ -34,9 +34,6 @@ layout:
                 body:
                     blockType: body
                 wrapper:
-                      options:
-                          attr:
-                              id: 'container'
                       blockType: container
                 page_container:
                     blockType: container

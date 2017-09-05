@@ -45,6 +45,10 @@ define(function(require) {
         /** @property {String} */
         tagName: 'div',
 
+        attributes: {
+            'data-layout': 'separate'
+        },
+
         /** @property {int} */
         requestsCount: 0,
 

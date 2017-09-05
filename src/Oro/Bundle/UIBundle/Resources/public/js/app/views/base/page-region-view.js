@@ -67,12 +67,6 @@ define([
                 PageRegionView.__super__.render.call(this);
             }
 
-            // starts deferred initialization
-            this._deferredRender();
-            // initialize components in view's markup
-            this.initLayout()
-                .done(_.bind(this._resolveDeferredRender, this));
-
             return this;
         },
 
