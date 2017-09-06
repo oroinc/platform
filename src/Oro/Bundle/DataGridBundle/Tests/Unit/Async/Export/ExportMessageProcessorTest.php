@@ -34,23 +34,19 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                '[DataGridExportMessageProcessor] Got invalid message: '
-                .'"{"securityToken":"token","parameters":{"gridName":"grid_name"},"format":"csv"}"',
+                'Got invalid message',
                 ['securityToken' => 'token', 'parameters' => ['gridName' => 'grid_name'], 'format' => 'csv'],
             ],
             [
-                '[DataGridExportMessageProcessor] Got invalid message: '
-                    .'"{"jobId":1,"parameters":{"gridName":"grid_name"},"format":"csv"}"',
+                'Got invalid message',
                 ['jobId' => 1, 'parameters' => ['gridName' => 'grid_name'], 'format' => 'csv'],
             ],
             [
-                '[DataGridExportMessageProcessor] Got invalid message: '
-                .'"{"jobId":1,"securityToken":"token","format":"csv"}"',
+                'Got invalid message',
                 ['jobId' => 1, 'securityToken' => 'token', 'format' => 'csv'],
             ],
             [
-                '[DataGridExportMessageProcessor] Got invalid message: '
-                    .'"{"jobId":1,"securityToken":"token","parameters":{"gridName":"grid_name"}}"',
+                'Got invalid message',
                 ['jobId' => 1, 'securityToken' => 'token', 'parameters' => ['gridName' => 'grid_name']],
             ],
         ];
@@ -93,7 +89,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with($this->equalTo('[DataGridExportMessageProcessor] Invalid format: "invalid_format"'))
+            ->with($this->equalTo('Invalid format: "invalid_format"'))
         ;
 
         $writerChain = $this->createWriterChainMock();
@@ -132,7 +128,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with($this->equalTo('[DataGridExportMessageProcessor] Cannot set security token'))
+            ->with($this->equalTo('Cannot set security token'))
         ;
 
         $fileStreamWriter = $this->createFileStreamWriterMock();

@@ -103,6 +103,7 @@ define(function(require) {
         };
 
         var allowedCustomOptions = [
+            'grouping_used',
             'min_fraction_digits',
             'max_fraction_digits'
         ];

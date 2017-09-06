@@ -23,6 +23,12 @@ define(function(require) {
      */
     SelectFilter = AbstractFilter.extend({
         /**
+         * @property
+         */
+
+        MultiselectDecorator: MultiselectDecorator,
+
+        /**
          * Filter selector template
          *
          * @property
@@ -230,10 +236,12 @@ define(function(require) {
          */
         _initializeSelectWidget: function() {
             var $dropdownContainer = this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer;
-            this.selectWidget = new MultiselectDecorator({
+            this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
                     noneSelectedText: this.placeholder,
+                    showCheckAll: false,
+                    showUncheckAll: false,
                     selectedText: _.bind(function(numChecked, numTotal, checkedItems) {
                         return this._getSelectedText(checkedItems);
                     }, this),
@@ -255,6 +263,9 @@ define(function(require) {
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
                         this.selectWidget.updateDropdownPosition();
+                    }, this),
+                    refresh: _.bind(function() {
+                        this.selectWidget.onRefresh();
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
