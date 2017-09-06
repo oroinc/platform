@@ -48,13 +48,13 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Or
                 $time = 1000;
                 break;
             case 'Installation':
-                $time = 180;
+                $time = 280;
                 break;
             default:
                 throw new RuntimeException('Unknown initialization');
         }
 
-        $this->spin(function (FeatureContext $context) {
+        $result = $this->spin(function (FeatureContext $context) {
             if (null !== $context->getPage()->find('css', '.icon-no')) {
                 throw new RuntimeException('Error was happen during initialization');
             }
@@ -62,6 +62,8 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Or
                 null === $context->getPage()->find('css', '.icon-wait')
                 && !$context->getPage()->findLink('Next')->hasClass('disabled');
         }, $time);
+
+        self::assertNotNull($result, sprintf('"%s" step does not fit in %s seconds', $initialization, $time));
     }
 
     /**
