@@ -570,66 +570,6 @@
                 }
             }
         }
-
-        .ui-multiselect-checkboxes  {
-            margin: 10px 0 0;
-
-            input[type="checkbox"] {
-                margin: 0 8px 5px 0;
-            }
-
-            input[type="radio"] {
-                position: static !important;
-
-                vertical-align: middle;
-                margin: 3px 8px 2px 0;
-
-                text-indent: 0;
-            }
-
-            li {
-                label {
-                    padding: 3px 0;
-
-                    cursor: pointer;
-
-                    span {
-                        padding-top: 1px;
-
-                        display: block;
-                        overflow: hidden;
-
-                        font-weight: 400;
-                        white-space: normal;
-                    }
-
-                    input {
-                        float: left;
-                    }
-
-                    &.ui-state-hover {
-                        background: transparent;
-                    }
-                }
-            }
-        }
-
-        &.ui-multiselect-single {
-            .ui-multiselect-checkboxes  {
-                li {
-                    label {
-                        padding: 3px 0;
-
-                        cursor: pointer;
-
-                        &.ui-state-hover {
-                            background: transparent;
-                            color: inherit;
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
