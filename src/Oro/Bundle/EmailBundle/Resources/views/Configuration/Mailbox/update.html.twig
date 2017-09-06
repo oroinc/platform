@@ -76,7 +76,7 @@
     {% set buttons = buttons ~ UI.dropdownSaveButton({'html': html}) %}
 
     {% set options = {
-        el: '#' ~ form.vars.id,
+        view: 'oroconfig/js/form/config-form'
     } %}
 
     <form
@@ -86,8 +86,7 @@
         action="{{ formAction }}"
         method="post"
         data-collect="true"
-        data-page-component-module="oroconfig/js/form/config-form"
-        data-page-component-options="{{ options|json_encode }}"
+        data-page-component-view="{{ options|json_encode }}"
     >
         {{ emailUI.renderMailboxConfigTitleAndButtons(pageTitle, buttons) }}
 
