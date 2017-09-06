@@ -23,7 +23,11 @@ define(function(require) {
             'click [data-role=check-connection-btn]': 'requestAPI',
             'change .critical-field :input': 'clear'
         },
+        attributes: {
+            'data-layout': 'separate'
+        },
         initialize: function(options) {
+            this._setAttributes(this.attributes);
             _.extend(this, _.pick(options, ['entity', 'entityId', 'organization', 'formPrefix']));
             this.model.on('change', this.render, this);
         },
