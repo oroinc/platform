@@ -19,9 +19,5 @@
     .page-sidebar {
         width: $page-sidebar-tablet-s-width;
         padding: $page-sidebar-tablet-s-inner-offset;
-
-        > *:last-child {
-            margin: $page-sidebar-inner-last-block-tablet-s-offset;
-        }
     }
 }
