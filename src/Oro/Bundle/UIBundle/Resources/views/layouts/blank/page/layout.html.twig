@@ -65,12 +65,14 @@
 {% endblock %}
 
 {% block _page_main_header_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-main__header'
-    }) %}
-    <div{{ block('block_attributes') }}>
-        {{ block_widget(block) }}
-    </div>
+    {% if block.count > 0 %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' page-main__header'
+        }) %}
+        <div{{ block('block_attributes') }}>
+            {{ block_widget(block) }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 
