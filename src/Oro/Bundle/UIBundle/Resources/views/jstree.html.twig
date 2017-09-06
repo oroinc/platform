@@ -1,17 +1,19 @@
-{% set defaultTreeData = {
+{% set data = data|merge({
     treeOptions: {
         view: 'oroui/js/app/views/jstree/base-tree-view'
-    }
-} %}
-{% set class="content-with-sidebar--" %}
+    }|merge(data.treeOptions|default({})),
+    actionsOptions: {
+        view: 'oroui/js/app/views/jstree/action-manager-view',
+        actions: actions|default({})
+    }|merge(data.actionsOptions|default({}))
+}) %}
 
 <div class="jstree-wrapper collapse-view expanded" data-role="jstree-wrapper">
-    <div data-page-component-module="oroui/js/app/components/view-component"
-         data-page-component-options="{{ defaultTreeData.treeOptions|merge(data.treeOptions)|json_encode }}">
-        {% if data.label|default('') %}
-            <div class="jstree-wrapper__title">
-                {% block header %}
-                    {% block label %}
+    <div data-page-component-view="{{ data.treeOptions|json_encode }}">
+        <div class="jstree-wrapper__title">
+            {% block header %}
+                {% block label %}
+                    {% if data.label|default('') %}
                         <span class="jstree-wrapper__label">
                             <label class="custom-checkbox jstree-wrapper__checkbox"
                                    data-role="jstree-checkall">
@@ -26,26 +28,15 @@
                                 {{ data.label }}
                             </span>
                         </span>
-                    {% endblock label %}
-                    {% block actions %}
-                        <div class="jstree-actions dropdown btn-group"
-                            data-page-component-module="oroui/js/app/components/view-component"
-                            data-page-component-options="{{ {
-                                'view': 'oroui/js/app/views/jstree/action-manager-view',
-                                'actions': actions|default({})
-                            }|json_encode}}">
-                            <button type="button" class="jstree-actions__handle btn btn-default btn-small dropdown-toggle"
-                                    data-toggle="dropdown" title="Mass Actions">
-                                <i class="fa-ellipsis-h"></i>
-                                <i class="caret"></i>
-                            </button>
-                            <ul class="jstree-actions__menu dropdown-menu dropdown-menu__action-column" data-role="jstree-actions">
-                            </ul>
-                        </div>
-                    {% endblock actions %}
-                {% endblock header %}
-            </div>
-        {% endif %}
+                    {% endif %}
+                {% endblock label %}
+                {% block actions %}
+                    <div class="jstree-actions dropdown btn-group"
+                        data-page-component-view="{{ data.actionsOptions|json_encode }}">
+                    </div>
+                {% endblock actions %}
+            {% endblock header %}
+        </div>
         <div data-collapse-container>
             {% block content %}
                 {% block search %}
@@ -59,7 +50,7 @@
                     {% endif %}
                 {% endblock search %}
                 {% block tree %}
-                    <div data-role="jstree-container"></div>
+                    <div data-role="jstree-container" class="jstree-container"></div>
                 {% endblock tree %}
             {% endblock content %}
         </div>
