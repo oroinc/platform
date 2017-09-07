@@ -24,6 +24,10 @@ class FixturesChecker implements HealthCheckerInterface
      */
     protected $errors = [];
 
+    /**
+     * @param FixtureLoader $fixtureLoader
+     * @param OroYamlParser $parser
+     */
     public function __construct(FixtureLoader $fixtureLoader, OroYamlParser $parser)
     {
         $this->fixtureLoader = $fixtureLoader;
@@ -40,6 +44,9 @@ class FixturesChecker implements HealthCheckerInterface
         ];
     }
 
+    /**
+     * @param BeforeFeatureTested $event
+     */
     public function checkFixtures(BeforeFeatureTested $event)
     {
         $fixtureFiles = DoctrineIsolator::getFixtureFiles($event->getFeature()->getTags());
@@ -57,19 +64,24 @@ class FixturesChecker implements HealthCheckerInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isFailure()
     {
         return !empty($this->errors);
     }
 
+    /**
+     * @param string $message
+     */
     private function addError($message)
     {
         $this->errors[] = $message;
     }
 
     /**
-     * Return array of strings error messages
-     * @return array
+     * {@inheritdoc}
      */
     public function getErrors()
     {

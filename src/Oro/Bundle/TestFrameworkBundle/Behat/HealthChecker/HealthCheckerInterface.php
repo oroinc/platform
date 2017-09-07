@@ -13,7 +13,7 @@ interface HealthCheckerInterface extends EventSubscriberInterface
 
     /**
      * Return array of strings error messages
-     * @return array
+     * @return string[]
      */
     public function getErrors();
 }

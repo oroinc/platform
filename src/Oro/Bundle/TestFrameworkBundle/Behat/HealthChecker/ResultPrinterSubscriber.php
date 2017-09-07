@@ -46,11 +46,13 @@ class ResultPrinterSubscriber implements EventSubscriberInterface
     public function printMessages()
     {
         foreach ($this->healthCheckers as $healthChecker) {
-            if ($healthChecker->isFailure()) {
-                foreach ($healthChecker->getErrors() as $error) {
-                    $this->startPrintingErrors();
-                    $this->output->writeln(sprintf('<error> - %s</error>', $error));
-                }
+            if (empty($healthChecker->getErrors())) {
+                continue;
+            }
+
+            foreach ($healthChecker->getErrors() as $error) {
+                $this->startPrintingErrors();
+                $this->output->writeln(sprintf('<error> - %s</error>', $error));
             }
         }
     }
