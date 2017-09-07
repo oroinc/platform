@@ -112,7 +112,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
             $type = $this->entityClassResolver->getEntityClass($type);
         }
 
-        return $this->entityClassResolver->isEntity($type);
+        return $this->entityMetadataProvider->isProtectedEntity($type);
     }
 
     /**
