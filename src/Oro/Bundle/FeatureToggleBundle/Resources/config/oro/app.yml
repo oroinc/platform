@@ -1,0 +1,3 @@
+oro_message_queue:
+    persistent_services:
+        - 'oro_featuretoggle.configuration.provider'
