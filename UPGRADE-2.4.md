@@ -98,6 +98,8 @@ MessageQueueBundle
 - The entity manager `message_queue_job` was removed. The default entity manager is used instead
 - Service `oro_message_queue.client.consume_messages_command` was removed
 - Service `oro_message_queue.command.consume_messages` was removed
+- The extension `Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension` was removed. This 
+job is handled by `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension` extension.
 
 SecurityBundle
 --------------
