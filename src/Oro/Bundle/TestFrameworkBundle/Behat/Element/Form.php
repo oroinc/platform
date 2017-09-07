@@ -154,6 +154,13 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('DateTimePicker', $field->getParent()->getParent());
             }
 
+            if ($field->hasClass('custom-checkbox__input')) {
+                return $this->elementFactory->wrapElement(
+                    'PrettyCheckbox',
+                    $field->getParent()->find('css', '.custom-checkbox__icon')
+                );
+            }
+
             if ($field->hasAttribute('type') && 'checkbox' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('Checkbox', $field);
             }
