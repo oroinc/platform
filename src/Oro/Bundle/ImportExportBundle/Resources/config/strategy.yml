@@ -36,6 +36,7 @@ services:
             - '@translator'
             - '@oro_importexport.strategy.new_entities_helper'
             - '@oro_entity.doctrine_helper'
+            - '@oro_security.owner.checker'
 
     oro_importexport.strategy.new_entities_helper:
         class: Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper

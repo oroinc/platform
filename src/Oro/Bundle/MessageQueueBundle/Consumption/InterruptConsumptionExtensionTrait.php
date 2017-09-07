@@ -23,9 +23,7 @@ trait InterruptConsumptionExtensionTrait
             $directory = dirname($filePath);
 
             if (! @mkdir($directory, 0777, true) && ! is_dir($directory)) {
-                throw new LogicException(
-                    sprintf('[InterruptConsumptionExtension] Cannot create directory %s', $directory)
-                );
+                throw new LogicException(sprintf('Cannot create directory "%s"', $directory));
             }
 
             touch($filePath);

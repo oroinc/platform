@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
@@ -48,6 +49,21 @@ class OroEntityManager extends EntityManager
         }
 
         return new OroEntityManager($conn, $config, $conn->getEventManager());
+    }
+
+    /**
+     * Sets the Metadata factory service instead of create the factory in the manager constructor.
+     *
+     * @param ClassMetadataFactory $metadataFactory
+     */
+    public function setMetadataFactory(ClassMetadataFactory $metadataFactory)
+    {
+        $metadataFactory->setEntityManager($this);
+        $metadataFactory->setCacheDriver($this->getConfiguration()->getMetadataCacheImpl());
+
+        $reflProperty = new \ReflectionProperty(EntityManager::class, 'metadataFactory');
+        $reflProperty->setAccessible(true);
+        $reflProperty->setValue($this, $metadataFactory);
     }
 
     /**

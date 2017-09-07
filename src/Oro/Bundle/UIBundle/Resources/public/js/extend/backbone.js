@@ -111,7 +111,6 @@ define(function(require) {
             this.$el.remove();
         } else {
             this.undelegateEvents();
-            this.$el.removeData();
         }
 
         properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
