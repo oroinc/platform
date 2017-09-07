@@ -31,6 +31,9 @@ use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 abstract class AbstractProviderTest extends FormIntegrationTestCase
 {
     const CONFIG_NAME = 'system_configuration';
@@ -432,28 +435,41 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                 'text' => 'Third group',
                 'icon' => 'fa-file',
                 'parent' => 'second_group',
-                'priority' => 254
+                'priority' => 254,
+                'search_by' => [
+                    'Third group',
+                    'Fourth group',
+                    'title some field',
+                    'tooltip some field',
+                    'title some other field',
+                ]
             ],
             [
                 'id' => 'another_branch_first',
                 'text' => 'Another branch first group',
                 'icon' => 'fa-file',
                 'parent' => 'second_group',
-                'priority' => 0
+                'priority' => 0,
+                'search_by' => [
+                    'Another branch first group',
+                    'Another branch second group',
+                ]
             ],
             [
                 'id' => 'second_group',
                 'text' => 'Second group',
                 'icon' => 'fa-file',
                 'parent' => 'first_group',
-                'priority' => 0
+                'priority' => 0,
+                'search_by' => ['Second group']
             ],
             [
                 'id' => 'first_group',
                 'text' => 'First group',
                 'icon' => 'fa-file',
                 'parent' => '#',
-                'priority' => 0
+                'priority' => 0,
+                'search_by' => ['First group']
             ],
         ];
 

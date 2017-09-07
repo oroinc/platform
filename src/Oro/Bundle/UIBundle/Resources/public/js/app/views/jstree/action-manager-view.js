@@ -84,7 +84,7 @@ define(function(require) {
             return this;
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             return _.extend({}, this.options, {
                 subviewsCount: this.subviews.length
             });
