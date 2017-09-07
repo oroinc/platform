@@ -463,7 +463,14 @@ define(function(require) {
          */
         _calculateChangedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
-                var num = (filter.enabled && !_.isEqual(filter.value, filter._readDOMValue())) ? 1 : 0;
+                var domVal = filter._readDOMValue();
+
+                var num = (filter.enabled &&
+                   !_.isEqual(filter.value, domVal) &&
+                   !_.isEqual(filter.emptyValue, domVal) &&
+                   !_.isUndefined(domVal.type) &&
+                   !_.isEmpty(domVal.value)
+                ) ? 1 : 0;
 
                 return memo + num;
             }, 0);

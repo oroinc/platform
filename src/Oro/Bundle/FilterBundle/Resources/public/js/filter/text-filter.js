@@ -175,6 +175,7 @@ define(function(require) {
         _isDOMValueChanged: function() {
             var thisDOMValue = this._readDOMValue();
             return (
+                !_.isEmpty(thisDOMValue.value) &&
                 !_.isUndefined(thisDOMValue.value) &&
                 !_.isNull(thisDOMValue.value) &&
                 !_.isEqual(this.value, thisDOMValue)
