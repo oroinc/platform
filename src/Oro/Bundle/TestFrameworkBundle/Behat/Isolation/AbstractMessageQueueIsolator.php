@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Process;
+
+use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\Process;
 
 abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator implements
     IsolatorInterface,
@@ -26,6 +29,12 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var CacheState */
+    protected $cacheState;
+
+    /** @var \DateTime */
+    protected $lastCacheStateChangeDate;
+
     /**
      * @param KernelInterface $kernel
      */
@@ -33,26 +42,35 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
     {
         $this->kernel = $kernel;
         $this->logger = $this->kernel->getContainer()->get('logger');
+
+        $this->cacheState = $this->kernel->getContainer()->get('oro_message_queue.consumption.cache_state');
+        $this->lastCacheStateChangeDate = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
+        $event->writeln('<info>Run message queue</info>');
         $this->startMessageQueue();
         $this->waitWhileProcessingMessages();
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function start(BeforeStartTestsEvent $event)
     {
-        $this->startMessageQueue();
-        $event->writeln('<info>Run message queue</info>');
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function terminate(AfterFinishTestsEvent $event)
     {
         try {
+            $event->writeln('<info>Process message queue</info>');
             $this->startMessageQueue();
             $this->waitWhileProcessingMessages();
         } catch (\Exception $e) {
@@ -63,20 +81,54 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         }
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         try {
+            $event->writeln('<info>Process message queue</info>');
             $this->startMessageQueue();
             $this->waitWhileProcessingMessages();
         } catch (\Exception $e) {
             throw $e;
         } finally {
-            $event->writeln('<info>Process message queue</info>');
+            $event->writeln('<info>Stop message queue</info>');
             $this->stopMessageQueue();
         }
     }
 
+    /**
+     * Checks state of MQ processors.
+     * If no MQ processors is running, checks state of caches and if cache was changed - restarts MQ processors.
+     *
+     * @return bool
+     */
+    public function ensureMessageQueueIsRunning()
+    {
+        $isRunning = $this->isOutdatedState();
+        if (!$isRunning) {
+            $cacheChangeDate = $this->cacheState->getChangeDate();
+
+            if (null === $cacheChangeDate) {
+                $this->startMessageQueue();
+                $isRunning = true;
+            }
+
+            if ($cacheChangeDate > $this->lastCacheStateChangeDate) {
+                $this->lastCacheStateChangeDate = $cacheChangeDate;
+
+                $this->startMessageQueue();
+                $isRunning = true;
+            }
+        }
+
+        return $isRunning;
+    }
+
+    /**
+     * {@inheritdoc]
+     */
     public function startMessageQueue()
     {
         // start processes if they are not initialized
@@ -126,13 +178,16 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function stopMessageQueue()
     {
         if (self::WINDOWS_OS === $this->getOs()) {
             $killCommand = sprintf('TASKKILL /IM %s/console /T /F', realpath($this->kernel->getRootDir()));
         } else {
             $killCommand = sprintf(
-                "pkill -9 -f '%s/[c]onsole oro:message-queue:consume'",
+                "pkill -15 -f '%s/[c]onsole oro:message-queue:consume'",
                 realpath($this->kernel->getRootDir())
             );
         }
@@ -173,12 +228,13 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
      */
     public function isOutdatedState()
     {
-        $isRunning = false;
         foreach ($this->processes as $process) {
-            $isRunning = $isRunning || ($process->getStatus() && $process->isRunning());
+            if ($process->getStatus() && $process->isRunning()) {
+                return true;
+            }
         }
 
-        return $isRunning;
+        return false;
     }
 
     /**
@@ -187,10 +243,12 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
     public function restoreState(RestoreStateEvent $event)
     {
         try {
+            $event->writeln('<info>Process message queue</info>');
             $this->waitWhileProcessingMessages();
         } catch (\Exception $e) {
             throw $e;
         } finally {
+            $event->writeln('<info>Stop message queue</info>');
             $this->stopMessageQueue();
         }
     }

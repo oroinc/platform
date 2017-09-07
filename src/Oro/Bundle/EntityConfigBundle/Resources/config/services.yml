@@ -421,3 +421,10 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.field.after_remove, method: onAfterRemove }
+
+    oro_entity_config.event_listener.cache_state:
+        class:  Oro\Bundle\EntityConfigBundle\EventListener\CacheStateChangeListener
+        arguments:
+            - '@oro_message_queue.consumption.cache_state'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onPostFlushConfig }

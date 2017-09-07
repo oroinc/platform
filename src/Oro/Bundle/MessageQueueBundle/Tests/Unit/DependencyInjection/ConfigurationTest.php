@@ -95,7 +95,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'transport' => [
                 'null' => [],
-            ]
+            ],
+            'persistent_services' => [],
+            'persistent_processors' => []
         ], $config);
     }
 
@@ -121,7 +123,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'default' => ['alias' => 'foo'],
                 'null' => [],
                 'foo' => ['foo_param' => 'aParam'],
-            ]
+            ],
+            'persistent_services' => [],
+            'persistent_processors' => []
         ], $config);
     }
 
@@ -153,8 +157,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'pid_file_dir' => $pidDir,
                     'polling_interval' => 1000,
                     'consumer_process_pattern' => ':consume'
-                ],
-            ]
+                ]
+            ],
+            'persistent_services' => [],
+            'persistent_processors' => []
         ], $config);
     }
 
@@ -182,6 +188,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'traceable_producer' => false,
                 'redelivered_delay_time' => 10
             ],
+            'persistent_services' => [],
+            'persistent_processors' => []
         ], $config);
     }
 
