@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -38,24 +40,23 @@ class ConsoleContextListener
     {
         $command = $event->getCommand();
         $input = $event->getInput();
-        $definition = $command->getDefinition();
 
-        $definition->addOption(
+        $options = [
             new InputOption(
                 self::OPTION_USER,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'ID, username or email of the user that should be used as current user'
-            )
-        );
-        $definition->addOption(
+            ),
             new InputOption(
                 self::OPTION_ORGANIZATION,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'ID or name of the organization that should be used as current organization'
             )
-        );
+        ];
+
+        $this->addOptionsToCommand($command, $input, $options);
 
         $user = $input->getParameterOption('--' . self::OPTION_USER);
         $organization = $input->getParameterOption('--' . self::OPTION_ORGANIZATION);
@@ -65,25 +66,46 @@ class ConsoleContextListener
         }
 
         $tokenStorage = $this->getSecurityTokenStorage();
-        $token = $tokenStorage->getToken();
-        if (null === $token) {
-            $token = new ConsoleToken();
-            $tokenStorage->setToken($token);
-        }
+        $token = $this->createToken($user);
+        $tokenStorage->setToken($token);
 
-        $this->setUser($user, $token);
-
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token && $token instanceof OrganizationContextTokenInterface) {
             $this->setOrganization($organization, $token);
         }
     }
 
     /**
-     * @param mixed $user
-     * @param TokenInterface $token
-     * @throws \InvalidArgumentException
+     * @param Command             $command
+     * @param InputInterface      $input
+     * @param array|InputOption[] $options
      */
-    protected function setUser($user, TokenInterface $token)
+    protected function addOptionsToCommand(Command $command, InputInterface $input, array $options)
+    {
+        $inputDefinition = $command->getApplication()->getDefinition();
+        $commandDefinition = $command->getDefinition();
+
+        foreach ($options as $option) {
+            /**
+             * Starting from Symfony 2.8 event 'ConsoleCommandEvent' fires after all definitions were merged.
+             */
+            $inputDefinition->addOption($option);
+            $commandDefinition->addOption($option);
+        }
+
+        /**
+         * Added only for compatibility with Symfony below 2.8
+         */
+        $command->mergeApplicationDefinition();
+        $input->bind($command->getDefinition());
+    }
+
+    /**
+     * @param mixed $user
+     * @throws \InvalidArgumentException
+     *
+     * @return TokenInterface
+     */
+    protected function createToken($user)
     {
         if (!$user) {
             return;
@@ -97,7 +119,10 @@ class ConsoleContextListener
         }
 
         if ($userEntity) {
+            $token = new ConsoleToken($userEntity->getRoles());
             $token->setUser($userEntity);
+
+            return $token;
         } else {
             throw new \InvalidArgumentException(
                 sprintf('Can\'t find user with identifier %s', $user)

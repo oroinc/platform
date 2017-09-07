@@ -300,13 +300,6 @@ services:
         tags:
             - { name: oro_service_link,  service: oro_security.acl.manager }
 
-    oro_email.listener.role_subscriber:
-        class: %oro_email.listener.role_subscriber.class%
-        arguments:
-            - '@oro_email.acl.manager.link'
-        tags:
-            - { name: doctrine.event_subscriber }
-
     oro_email.listener.auto_response_listener:
         class: %oro_email.listener.auto_response_listener.class%
         public: false

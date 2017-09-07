@@ -1086,6 +1086,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iRestartMessageConsumer()
     {
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $this->messageQueueIsolator->stopMessageQueue();
         $this->messageQueueIsolator->startMessageQueue();
     }
@@ -1289,9 +1290,6 @@ class OroMainContext extends MinkContext implements
             $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
         } catch (\Exception $e) {
             throw $e;
-        } finally {
-            $this->messageQueueIsolator->stopMessageQueue();
-            $this->messageQueueIsolator->startMessageQueue();
         }
     }
 

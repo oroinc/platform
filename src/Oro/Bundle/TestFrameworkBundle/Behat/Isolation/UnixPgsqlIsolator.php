@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 
 final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
@@ -125,18 +126,7 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     public function isOutdatedState()
     {
-        if (!$this->dbTemp) {
-            return false;
-        }
-
-        try {
-            $this->makeDump();
-            $this->dropTempDb();
-
-            return false;
-        } catch (ProcessFailedException $e) {
-            return true;
-        }
+        return (bool) $this->dbTemp;
     }
 
     /** {@inheritdoc} */
@@ -242,8 +232,9 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     private function killConnections()
     {
         $process = sprintf(
-            'PGPASSWORD="%s" psql -h %s --port=%s -U %s template1 -t -c "'.
-            'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname in (\'%s\', \'%s\')"',
+            'PGPASSWORD="%s" psql -h %s --port=%s -U %s -t -c "'.
+            'SELECT pg_terminate_backend(pid) FROM pg_stat_activity '.
+            'WHERE datname in (\'%s\', \'%s\') AND pid <> pg_backend_pid()"',
             $this->dbPass,
             $this->dbHost,
             $this->dbPort,
