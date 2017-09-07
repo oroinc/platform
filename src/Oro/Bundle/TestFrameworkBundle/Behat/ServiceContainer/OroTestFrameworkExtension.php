@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
+use WebDriver\ServiceFactory;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
