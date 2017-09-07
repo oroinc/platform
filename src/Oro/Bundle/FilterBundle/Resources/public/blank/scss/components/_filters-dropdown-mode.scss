@@ -51,9 +51,9 @@
         .value-field-frame {
             width: $filter-dropdown-mode-criteria-value-field-frame-width;
             // Break inline styles
-            margin-left: initial !important;
+            margin-left: 0 !important;
             // Break inline styles
-            padding-right: initial !important;
+            padding-right: 0 !important;
         }
     }
 
