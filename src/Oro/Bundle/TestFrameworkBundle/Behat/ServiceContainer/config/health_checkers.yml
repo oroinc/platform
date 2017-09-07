@@ -4,5 +4,18 @@ services:
     arguments:
       - '@oro_test.context.fixture_loader'
       - '@oro_behat_extension.fixtures.yml_parser'
+      - '@oro_behat_extension.isolation.doctrine_isolator'
     tags:
       - { name: 'behat_health_checker' }
+
+  oro_behat_extension.health_checker.result_printer_subscriber:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultPrinterSubscriber
+    arguments:
+      - '@cli.output'
+    tags:
+      - { name: 'health_checker_aware' }
+
+  oro_behat_extension.health_checker.result_interpretation:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultInterpretation
+    tags:
+      - { name: 'health_checker_aware' }

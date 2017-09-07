@@ -36,6 +36,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     const ISOLATOR_TAG = 'oro_behat.isolator';
     const SUITE_AWARE_TAG = 'suite_aware';
     const HEALTH_CHECKER_TAG = 'behat_health_checker';
+    const HEALTH_CHECKER_AWARE_TAG = 'health_checker_aware';
     const CONFIG_PATH = '/Tests/Behat/behat.yml';
     const MESSAGE_QUEUE_ISOLATOR_AWARE_TAG = 'message_queue_isolator_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
@@ -226,9 +227,13 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     private function processHealthCheckers(ContainerBuilder $container)
     {
-        $healthController = $container->getDefinition('cli.controller.health_check_controller');
-        foreach ($container->findTaggedServiceIds(self::HEALTH_CHECKER_TAG) as $id => $attributes) {
-            $healthController->addMethodCall('addHealthChecker', [new Reference($id)]);
+        $healthCheckerIds = array_keys($container->findTaggedServiceIds(self::HEALTH_CHECKER_TAG));
+
+        foreach ($container->findTaggedServiceIds(self::HEALTH_CHECKER_AWARE_TAG) as $id => $attributes) {
+            $service = $container->getDefinition($id);
+            foreach ($healthCheckerIds as $healthCheckerId) {
+                $service->addMethodCall('addHealthChecker', [new Reference($healthCheckerId)]);
+            }
         }
     }
 

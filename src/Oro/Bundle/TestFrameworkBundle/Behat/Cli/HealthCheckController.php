@@ -4,6 +4,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
 use Behat\Testwork\Tester\Result\ResultInterpreter;
+use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\HealthCheckerAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\HealthCheckerAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\HealthCheckerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultInterpretation;
 use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultPrinterSubscriber;
@@ -13,12 +15,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class HealthCheckController implements Controller
+class HealthCheckController implements Controller, HealthCheckerAwareInterface
 {
-    /**
-     * @var HealthCheckerInterface[]
-     */
-    protected $healthCheckers = [];
+    use HealthCheckerAwareTrait;
 
     /**
      * @var EventDispatcherInterface
@@ -31,21 +30,29 @@ class HealthCheckController implements Controller
     protected $resultInterpreter;
 
     /**
+     * @var ResultPrinterSubscriber
+     */
+    protected $resultPrinterSubscriber;
+
+    /**
+     * @var ResultInterpretation
+     */
+    protected $resultInterpretation;
+
+    /**
      * @param EventDispatcherInterface $dispatcher
      * @param ResultInterpreter $resultInterpreter
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ResultInterpreter $resultInterpreter)
-    {
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        ResultInterpreter $resultInterpreter,
+        ResultPrinterSubscriber $resultPrinterSubscriber,
+        ResultInterpretation $resultInterpretation
+    ) {
         $this->dispatcher = $dispatcher;
         $this->resultInterpreter = $resultInterpreter;
-    }
-
-    /**
-     * @param HealthCheckerInterface $healthChecker
-     */
-    public function addHealthChecker(HealthCheckerInterface $healthChecker)
-    {
-        $this->healthCheckers[] = $healthChecker;
+        $this->resultPrinterSubscriber = $resultPrinterSubscriber;
+        $this->resultInterpretation = $resultInterpretation;
     }
 
     /**
@@ -77,7 +84,7 @@ class HealthCheckController implements Controller
             $this->dispatcher->addSubscriber($healthChecker);
         }
 
-        $this->dispatcher->addSubscriber(new ResultPrinterSubscriber($this->healthCheckers, $output));
-        $this->resultInterpreter->registerResultInterpretation(new ResultInterpretation($this->healthCheckers));
+        $this->dispatcher->addSubscriber($this->resultPrinterSubscriber);
+        $this->resultInterpreter->registerResultInterpretation($this->resultInterpretation);
     }
 }

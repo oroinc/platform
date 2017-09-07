@@ -83,8 +83,11 @@ services:
         arguments:
             - '@event_dispatcher'
             - '@tester.result.interpreter'
+            - '@oro_behat_extension.health_checker.result_printer_subscriber'
+            - '@oro_behat_extension.health_checker.result_interpretation'
         tags:
             - { name: 'cli.controller', priority: 110 }
+            - { name: 'health_checker_aware' }
 
     cli.controller.input_output_controller:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController

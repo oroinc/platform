@@ -5,20 +5,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker;
 use Behat\Testwork\Tester\Result\Interpretation\ResultInterpretation as ResultInterpretationInterface;
 use Behat\Testwork\Tester\Result\TestResult;
 
-class ResultInterpretation implements ResultInterpretationInterface
+class ResultInterpretation implements ResultInterpretationInterface, HealthCheckerAwareInterface
 {
-    /**
-     * @var HealthCheckerInterface[]
-     */
-    protected $healthCheckers = [];
-
-    /**
-     * @param HealthCheckerInterface[] $healthCheckers
-     */
-    public function __construct(array $healthCheckers)
-    {
-        $this->healthCheckers = $healthCheckers;
-    }
+    use HealthCheckerAwareTrait;
 
     /**
      * {@inheritdoc}

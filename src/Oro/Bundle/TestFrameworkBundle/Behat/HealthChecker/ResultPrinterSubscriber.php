@@ -6,12 +6,9 @@ use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ResultPrinterSubscriber implements EventSubscriberInterface
+class ResultPrinterSubscriber implements EventSubscriberInterface, HealthCheckerAwareInterface
 {
-    /**
-     * @var HealthCheckerInterface[]
-     */
-    protected $healthCheckers = [];
+    use HealthCheckerAwareTrait;
 
     /**
      * @var OutputInterface
@@ -19,17 +16,10 @@ class ResultPrinterSubscriber implements EventSubscriberInterface
     protected $output;
 
     /**
-     * @var bool
-     */
-    private $isPrinted = false;
-
-    /**
-     * @param HealthCheckerInterface[] $healthCheckers
      * @param OutputInterface $output
      */
-    public function __construct(array $healthCheckers, OutputInterface $output)
+    public function __construct(OutputInterface $output)
     {
-        $this->healthCheckers = $healthCheckers;
         $this->output = $output;
     }
 
@@ -45,13 +35,17 @@ class ResultPrinterSubscriber implements EventSubscriberInterface
 
     public function printMessages()
     {
-        foreach ($this->healthCheckers as $healthChecker) {
-            if (!$healthChecker->isFailure()) {
-                continue;
-            }
+        $failedCheckers = array_filter($this->healthCheckers, function (HealthCheckerInterface $healthChecker) {
+            return $healthChecker->isFailure();
+        });
 
+        if (empty($failedCheckers)) {
+            return;
+        }
+
+        $this->startPrintingErrors();
+        foreach ($failedCheckers as $healthChecker) {
             foreach ($healthChecker->getErrors() as $error) {
-                $this->startPrintingErrors();
                 $this->output->writeln(sprintf('<error> - %s</error>', $error));
             }
         }
@@ -59,12 +53,7 @@ class ResultPrinterSubscriber implements EventSubscriberInterface
 
     private function startPrintingErrors()
     {
-        if ($this->isPrinted) {
-            return;
-        }
-
         $this->output->writeln('');
         $this->output->writeln('---- Errors while check:');
-        $this->isPrinted = true;
     }
 }
