@@ -72,11 +72,22 @@ ElasticSearchBundle
 -------------------
 - Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
 
+EmailBundle
+-----------
+
+- service `oro_email.listener.role_subscriber` and class `Oro\Bundle\EmailBundle\EventListener\RoleSubscriber` was removed. 
+Email entity is not ACL protected entity so it should not contain any permissions for it.
+- class `Oro\Bundle\EmailBundle\Migrations\Data\ORM\UpdateEmailEditAclRule` was removed. Email entity is not ACL 
+protected entity so it should not contain any permissions for it.
+
 ImportExportBundle
 --------------
 - Class `Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter` does not initialize backend headers
     during import anymore. Method `getHeaderConversionRules` previously called `initialize` method to load both conversion
     rules and backend headers, but now it calls only `initializeRules`
+- Was added new parameter to `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy` class constructor and 
+`oro_importexport.strategy.configurable_add_or_replace` service. New parameter id `oro_security.owner.checker` service that
+helps check the owner during import.
 
 FormBundle
 ----------

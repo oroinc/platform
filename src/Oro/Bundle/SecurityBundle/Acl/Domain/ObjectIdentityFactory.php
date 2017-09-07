@@ -5,8 +5,10 @@ namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclException;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclException;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
  * A factory class to create ACL ObjectIdentity objects
@@ -88,19 +90,33 @@ class ObjectIdentityFactory
      */
     public function get($val)
     {
-        try {
-            $result = $this->extensionSelector
-                ->select($val)
-                ->getObjectIdentity($val);
+        $result = null;
+        $extension = null;
 
-            if ($result === null) {
-                $objInfo = is_object($val)
-                    ? get_class($val)
-                    : (string)$val;
-                throw new \InvalidArgumentException(sprintf('Cannot create ObjectIdentity for: %s.', $objInfo));
+        try {
+            // ACL extension already have the 'type' property that specify the ACL extension.
+            if ($val instanceof Acl) {
+                $extension = $this->extensionSelector->selectByExtensionKey($val->getType());
+            } elseif (is_string($val) && ObjectIdentityHelper::isEncodedIdentityString($val)) {
+                $extension = $this->extensionSelector->selectByExtensionKey(
+                    ObjectIdentityHelper::getExtensionKeyFromIdentityString($val)
+                );
+            } else {
+                $extension = $this->extensionSelector->select($val);
+            }
+
+            if ($extension) {
+                $result = $extension->getObjectIdentity($val);
             }
         } catch (\InvalidArgumentException $ex) {
             throw new InvalidDomainObjectException($ex->getMessage(), 0, $ex);
+        }
+
+        if ($result === null) {
+            $objInfo = is_object($val)
+                ? get_class($val)
+                : (string)$val;
+            throw new InvalidDomainObjectException(sprintf('Cannot create ObjectIdentity for: %s.', $objInfo));
         }
 
         return $result;

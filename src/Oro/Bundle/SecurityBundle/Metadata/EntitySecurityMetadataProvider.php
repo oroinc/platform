@@ -196,7 +196,7 @@ class EntitySecurityMetadataProvider
     {
         $data = [];
 
-        $securityConfigs = $this->securityConfigProvider->getConfigs();
+        $securityConfigs = $this->securityConfigProvider->getConfigs(null, true);
 
         foreach ($securityConfigs as $securityConfig) {
             $className = $securityConfig->getId()->getClassName();
