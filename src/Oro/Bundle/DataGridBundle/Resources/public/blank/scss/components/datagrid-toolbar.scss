@@ -6,7 +6,7 @@
     align-content: stretch;
     justify-content: center;
 
-    margin: 10px -5px;
+    margin: 10px -$offset-x-s;
     padding: 0;
 
     &__side,
@@ -74,15 +74,13 @@
 }
 
 .datagrid-tool {
-    margin: 3px 5px;
+    margin: $offset-x-s;
 
     &:first-child {
-        // margin-left: 0;
         position: relative;
     }
 
     &:last-child {
-        // margin-right: 0;
         flex-grow: 0;
     }
 }
@@ -133,12 +131,12 @@
 
 @include breakpoint('tablet-small') {
     .datagrid-toolbar {
-        margin-left: -3px;
-        margin-right: -3px;
+        margin-left: -($offset-x-s/2);
+        margin-right: -($offset-x-s/2);
     }
 
     .datagrid-tool {
-        margin: 3px;
+        margin: $offset-y-s ($offset-x-s/2);
     }
 }
 
