@@ -4,6 +4,7 @@ define(function(require) {
     var ConfigurationTreeView;
     var _ = require('underscore');
     var $ = require('jquery');
+    var tools = require('oroui/js/tools');
     var routing = require('routing');
     var BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
 
@@ -20,6 +21,10 @@ define(function(require) {
                 activeGroup: parent + '/' + node.id
             });
 
+            var state = tools.unpackFromQueryString(location.search)[this.urlKey] || {};
+            if (_.isUndefined(routeParams[this.urlKey])) {
+                routeParams[this.urlKey] = state;
+            }
             var url = routing.generate(this.onSelectRoute, routeParams);
             //simulate click on real link to check page state
             var $link = $('<a>').attr('href', url);

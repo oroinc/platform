@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var Chaplin = require('chaplin');
 
@@ -47,6 +48,7 @@ define(function(require) {
         events: {
             'keypress [data-name="search"]': 'onSearchKeypress',
             'input [data-name="search"]': 'onSearchDelay',
+            'change [data-name="search"]': 'onSearchDelay',
             'change [data-action-type="checkAll"]': 'onCheckAllClick',
             'click [data-name="clear-search"]': 'clearSearch'
         },
@@ -69,6 +71,11 @@ define(function(require) {
          * @property {Object}
          */
         $searchField: null,
+
+        /**
+         * @property {String}
+         */
+        searchValue: null,
 
         /**
          * @property {Object}
@@ -104,6 +111,16 @@ define(function(require) {
          * @property {Number}
          */
         searchTimeout: 250,
+
+        /**
+         * @property {Object}
+         */
+        originalSearchEngine: {},
+
+        /**
+         * @property {String}
+         */
+        urlKey: '',
 
         /**
          * @param {Object} options
@@ -148,6 +165,7 @@ define(function(require) {
 
             this.$tree.jstree(this.jsTreeConfig);
             this.jsTreeInstance = $.jstree.reference(this.$tree);
+            this.urlKey = this.jsTreeInstance.settings.state.key;
 
             var treeEvents = Chaplin.utils.getAllPropertyVersions(this, 'treeEvents');
             treeEvents = _.extend.apply({}, treeEvents);
@@ -158,10 +176,18 @@ define(function(require) {
                 }
             }, this);
 
-            this.$tree.one('ready.jstree', _.bind(function() {
-                this.initialization = false;
-                this._resolveDeferredRender();
-            }, this));
+            this.$tree.one('ready.jstree', _.bind(this.onReady, this));
+        },
+
+        onReady: function() {
+            this.initialization = false;
+
+            var state = tools.unpackFromQueryString(location.search)[this.urlKey] || {};
+            if (this.$searchField.length && state.search) {
+                this.$searchField.val(state.search).change();
+            }
+
+            this._resolveDeferredRender();
         },
 
         /**
@@ -189,7 +215,8 @@ define(function(require) {
                     close_opened_onclear: true,
                     show_only_matches: true,
                     show_only_matches_children: false,
-                    case_sensitive: false
+                    case_sensitive: false,
+                    search_callback: _.bind(this.searchCallback, this)
                 };
             }
 
@@ -236,10 +263,45 @@ define(function(require) {
             return this.onSearch(e);
         },
 
+        _getOriginalSearchEngine: function(str) {
+            var callback = this.originalSearchEngine[str];
+            if (!callback) {
+                var settings = this.jsTreeInstance.settings.search;
+                callback = this.originalSearchEngine[str] = new $.vakata.search(str, true, {
+                    caseSensitive: settings.case_sensitive,
+                    fuzzy: settings.fuzzy
+                });
+            }
+
+            return callback;
+        },
+
+        searchCallback: function(str, node) {
+            var original = this._getOriginalSearchEngine(str);
+            if (original.search(node.text).isMatch) {
+                return true;
+            }
+
+            var searchBy = node.original.search_by || [];
+            for (var i = 0, length = searchBy.length; i < length; i++) {
+                if (original.search(searchBy[i]).isMatch) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
         onSearch: function(event) {
             var value = $(event.target).val();
-            this.toggleClearSearchButton();
             value = _.trim(value).replace(/\s+/g, ' ');
+            if (this.searchValue === value) {
+                return
+            }
+            this.searchValue = value;
+            this._toggleClearSearchButton(value);
+            this._changeUrlParam('search', value.length ? value : null);
+
             if (this.jsTreeInstance.allNodesHidden) {
                 this.jsTreeInstance.show_all();
                 this.jsTreeInstance.allNodesHidden = false;
@@ -256,8 +318,8 @@ define(function(require) {
         /**
          * Show/Hide clear search field button
          */
-        toggleClearSearchButton: function() {
-            this.$clearSearchButton.toggleClass('hide', this.$searchField.val() === '');
+        _toggleClearSearchButton: function(str) {
+            this.$clearSearchButton.toggleClass('hide', str === '');
         },
 
         /**
@@ -265,7 +327,7 @@ define(function(require) {
          */
         clearSearch: function() {
             this.$searchField.val('');
-            this.$searchField.trigger('input');
+            this.$searchField.change();
         },
 
         /**
@@ -503,6 +565,11 @@ define(function(require) {
             return node;
         },
 
+        _changeUrlParam: function(param, value) {
+            param = this.urlKey + '[' + param + ']';
+            mediator.execute('changeUrlParam', param, value);
+        },
+
         dispose: function() {
             if (this.disposed) {
                 return;
@@ -516,6 +583,7 @@ define(function(require) {
             delete this.$clearSearchButton;
             delete this.jsTreeInstance;
             delete this.jsTreeConfig;
+            delete this.originalSearchEngine;
 
             return BaseTreeView.__super__.dispose.call(this);
         }
