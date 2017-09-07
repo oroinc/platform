@@ -20,6 +20,11 @@ class FixturesChecker implements HealthCheckerInterface
     protected $parser;
 
     /**
+     * @var DoctrineIsolator
+     */
+    protected $doctrineIsolator;
+
+    /**
      * @var array
      */
     protected $errors = [];
@@ -27,11 +32,13 @@ class FixturesChecker implements HealthCheckerInterface
     /**
      * @param FixtureLoader $fixtureLoader
      * @param OroYamlParser $parser
+     * @param DoctrineIsolator $doctrineIsolator
      */
-    public function __construct(FixtureLoader $fixtureLoader, OroYamlParser $parser)
+    public function __construct(FixtureLoader $fixtureLoader, OroYamlParser $parser, DoctrineIsolator $doctrineIsolator)
     {
         $this->fixtureLoader = $fixtureLoader;
         $this->parser = $parser;
+        $this->doctrineIsolator = $doctrineIsolator;
     }
 
     /**
@@ -49,16 +56,22 @@ class FixturesChecker implements HealthCheckerInterface
      */
     public function checkFixtures(BeforeFeatureTested $event)
     {
-        $fixtureFiles = DoctrineIsolator::getFixtureFiles($event->getFeature()->getTags());
+        $fixtureFiles = $this->doctrineIsolator->getFixtureFiles($event->getFeature()->getTags());
         foreach ($fixtureFiles as $fixtureFile) {
             try {
                 $file = $this->fixtureLoader->findFile($fixtureFile);
                 $this->parser->parse($file);
             } catch (\Exception $e) {
-                $message = 'Error while find and parse "'.$fixtureFile.'" fixture'.PHP_EOL;
-                $message .= '   Suite: '.$event->getSuite()->getName().PHP_EOL;
-                $message .= '   Feature: '.$event->getFeature()->getFile().PHP_EOL;
-                $message .= '   '.$e->getMessage();
+                $message = sprintf(
+                    'Error while find and parse "%s" fixture'.PHP_EOL.
+                    '   Suite: %s'.PHP_EOL.
+                    '   Feature: %s'.PHP_EOL.
+                    '   %s',
+                    $fixtureFile,
+                    $event->getSuite()->getName(),
+                    $event->getFeature()->getFile(),
+                    $e->getMessage()
+                );
                 $this->addError($message);
             }
         }

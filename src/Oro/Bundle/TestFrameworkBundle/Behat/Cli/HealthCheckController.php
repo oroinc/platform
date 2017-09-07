@@ -54,7 +54,10 @@ class HealthCheckController implements Controller
     public function configure(SymfonyCommand $command)
     {
         $command
-            ->addOption('--check', null, InputOption::VALUE_NONE,
+            ->addOption(
+                '--check',
+                null,
+                InputOption::VALUE_NONE,
                 'Check behat tests without executing'
             );
     }

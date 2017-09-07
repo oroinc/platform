@@ -140,7 +140,7 @@ class DoctrineIsolator implements IsolatorInterface
      * @param array $tags
      * @return array
      */
-    public static function getFixtureFiles(array $tags)
+    public function getFixtureFiles(array $tags)
     {
         if (!$tags) {
             return [];
@@ -167,7 +167,7 @@ class DoctrineIsolator implements IsolatorInterface
      */
     private function loadFixtures(BeforeIsolatedTestEvent $event)
     {
-        $fixtureFiles = self::getFixtureFiles($event->getTags());
+        $fixtureFiles = $this->getFixtureFiles($event->getTags());
 
         foreach ($fixtureFiles as $fixtureFile) {
             try {

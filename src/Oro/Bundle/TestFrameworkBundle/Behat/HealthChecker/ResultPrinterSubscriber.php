@@ -46,7 +46,7 @@ class ResultPrinterSubscriber implements EventSubscriberInterface
     public function printMessages()
     {
         foreach ($this->healthCheckers as $healthChecker) {
-            if (empty($healthChecker->getErrors())) {
+            if (!$healthChecker->isFailure()) {
                 continue;
             }
 
