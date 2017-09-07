@@ -6,7 +6,7 @@
     align-content: stretch;
     justify-content: center;
 
-    margin: 10px -$offset-x-s;
+    margin: 10px -($offset-x-s);
     padding: 0;
 
     &__side,
