@@ -34,6 +34,7 @@
     @if ($use-base-style) {
         display: inline-block;
         padding: $padding;
+        max-width: 100%;
 
         font-size: $font-size;
         font-family: $font-family;
