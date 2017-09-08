@@ -64,7 +64,7 @@ Feature: Localization Crud
       | Edit   |
       | Delete |
     When I go to System/Configuration
-    And I follow "System configuration/General setup/Localization" on configuration sidebar
+    And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And I fill "System Config Form" with:
       | Enabled Localizations | Dutch |
       | Default Localization  | Dutch |
