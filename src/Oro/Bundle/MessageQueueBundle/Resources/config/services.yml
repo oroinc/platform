@@ -16,7 +16,8 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            # extension should be first to be able to reconnect to db
+            - { name: 'oro_message_queue.consumption.extension', priority: -250}
 
     oro_message_queue.consumption.docrine_clear_identity_map_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
@@ -24,21 +25,17 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            # extension should be one of the first to be able to "finish process old message" with old container state
+            - { name: 'oro_message_queue.consumption.extension', priority: -245 }
 
-    oro_message_queue.consumption.interrupt_consumption_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension'
+    oro_message_queue.consumption.container_reset_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
         public: false
         arguments:
-            - '%oro_message_queue.consumption.interrupt_filepath%'
+            - '@service_container'
         tags:
+            # extension have 0 priority to be sure that extensions with higher priority will be processed with clear container
             - { name: 'oro_message_queue.consumption.extension' }
-
-    oro_message_queue.consumption.queue_consumer:
-        class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
-        arguments:
-            - '@oro_message_queue.transport.connection'
-            - '@oro_message_queue.consumption.extensions'
 
     oro_message_queue.consumption.extension.maintance:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
@@ -51,6 +48,26 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.interrupt_consumption_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension'
+        public: false
+        arguments:
+            - '%oro_message_queue.consumption.interrupt_filepath%'
+            - '@oro_message_queue.consumption.cache_state'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.queue_consumer:
+        class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
+        arguments:
+            - '@oro_message_queue.transport.connection'
+            - '@oro_message_queue.consumption.extensions'
+
+    oro_message_queue.command.consume_messages:
+        class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
+        tags:
+            - { name: console.command }
+
     oro_message_queue.listener.update_schema:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
         arguments:
@@ -58,10 +75,15 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'oro.entity_extend.entity.schema.update', priority: -250, method: 'interruptConsumption' }
 
-    oro_message_queue.consumption.token_storage_clearer_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension'
+    oro_message_queue.consumption.cache_state:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\CacheState
+        arguments:
+            - '@oro_message_queue.consumption.cache_state_driver.dbal'
+
+    oro_message_queue.consumption.cache_state_driver.dbal:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\StateDriver\DbalStateDriver
         public: false
         arguments:
-            - '@security.token_storage'
-        tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            - 'cache'
+            - '@doctrine'
+            - '@logger'

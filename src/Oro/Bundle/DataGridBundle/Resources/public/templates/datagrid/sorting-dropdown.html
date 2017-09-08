@@ -1,7 +1,7 @@
 <% if (hasSortingOrderButton) { %>
 <div class="sorting-label"><%=_.__('oro.datagrid.toolbar_sorting.label') %>:</div>
 <% } %>
-<select class="oro-select2 input-widget">
+<select class="oro-select2 oro-select2--size-s input-widget">
     <option value="not-selected" <% if (currentDirection === null) { %>selected="selected"<% } %>>
         <%= _.__('oro.datagrid.sorters.not_selected') %>
     </option>

@@ -270,7 +270,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigs')
             ->willReturnMap(
                 [
-                    [null, false, $securityConfigs],
+                    [null, true, $securityConfigs],
                     [\stdClass::class, false, $fieldsConfig]
                 ]
             );

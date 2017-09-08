@@ -121,29 +121,20 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
         ], $body);
 
         if (! isset($body['jobId'], $body['securityToken'], $body['parameters']['gridName'], $body['format'])) {
-            $this->logger->critical(
-                sprintf('[DataGridExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message');
 
             return false;
         }
 
         $this->writer = $this->writerChain->getWriter($body['format']);
         if (! $this->writer instanceof FileStreamWriter) {
-            $this->logger->critical(
-                sprintf('[DataGridExportMessageProcessor] Invalid format: "%s"', $body['format']),
-                ['message' => $message]
-            );
+            $this->logger->critical(sprintf('Invalid format: "%s"', $body['format']));
 
             return false;
         }
 
         if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical(
-                sprintf('[DataGridExportMessageProcessor] Cannot set security token'),
-                ['message' => $message]
-            );
+            $this->logger->critical('Cannot set security token');
 
             return false;
         }

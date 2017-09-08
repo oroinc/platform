@@ -19,8 +19,6 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
@@ -29,8 +27,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
  */
 class ImportExportContext extends OroFeatureContext implements
     KernelAwareContext,
-    OroPageObjectAware,
-    MessageQueueIsolatorAwareInterface
+    OroPageObjectAware
 {
     use KernelDictionary, PageObjectDictionary;
 
@@ -48,11 +45,6 @@ class ImportExportContext extends OroFeatureContext implements
      * @var OroMainContext
      */
     private $oroMainContext;
-
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    private $messageQueueIsolator;
 
     /**
      * @param EntityAliasResolver $aliasResolver
@@ -303,7 +295,6 @@ class ImportExportContext extends OroFeatureContext implements
 
         $flashMessage = 'Import started successfully. You will receive email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -421,14 +412,6 @@ class ImportExportContext extends OroFeatureContext implements
         static::assertTrue($jobResult->isSuccessful());
 
         return $filePath;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
-    {
-        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 
     /**

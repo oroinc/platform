@@ -10,6 +10,7 @@ Table of Contents
  - [Abstract cache services](#abstract-cache-services)
  - [APC cache](#apc-cache)
  - [Warm up config cache](#warm-up-config-cache)
+ - [Caching of Symfony Validation rules](#caching-of-symfony-validation-rules)
 
 Abstract cache services
 -----------------------
