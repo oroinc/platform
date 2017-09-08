@@ -433,6 +433,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Open dashboard
+     *
+     * @Given I am on dashboard
+     * @And I am on dashboard
+     */
+    public function iAmOnDashboard()
+    {
+        $router = $this->getContainer()->get('router');
+        $this->visit($router->generate('oro_default'));
+    }
+
+    /**
      * Open dashboard login page and login as existing user
      * Demo user should have password the same as username, e.g. username: charlie, password: charlie
      * Example: Given I login as administrator
