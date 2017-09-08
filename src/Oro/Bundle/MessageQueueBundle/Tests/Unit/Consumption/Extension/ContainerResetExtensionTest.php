@@ -13,6 +13,40 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class ContainerResetExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    public function testSetPersistentServices()
+    {
+        $extension = new ContainerResetExtension(new Container());
+
+        self::assertAttributeSame([], 'persistentServices', $extension);
+
+        $extension->setPersistentServices(['service1']);
+        self::assertAttributeEquals(['service1'], 'persistentServices', $extension);
+
+        $extension->setPersistentServices(['service2']);
+        self::assertAttributeEquals(
+            ['service1', 'service2'],
+            'persistentServices',
+            $extension
+        );
+    }
+
+    public function testSetPersistentProcessors()
+    {
+        $extension = new ContainerResetExtension(new Container());
+
+        self::assertAttributeSame([], 'persistentProcessors', $extension);
+
+        $extension->setPersistentProcessors(['processor1']);
+        self::assertAttributeEquals(['processor1' => true], 'persistentProcessors', $extension);
+
+        $extension->setPersistentProcessors(['processor2']);
+        self::assertAttributeEquals(
+            ['processor1' => true, 'processor2' => true],
+            'persistentProcessors',
+            $extension
+        );
+    }
+
     public function testOnPreReceivedShouldNotResetPersistentServices()
     {
         $persistentService = new \stdClass();

@@ -50,22 +50,30 @@ class ContainerResetExtension extends AbstractExtension
 
     /**
      * Sets the services that should not be removed during the container reset.
+     * The given services are added in addition to already set services.
      *
      * @param string[] $persistentServices
      */
     public function setPersistentServices(array $persistentServices)
     {
-        $this->persistentServices = $persistentServices;
+        $this->persistentServices = array_merge(
+            $this->persistentServices,
+            $persistentServices
+        );
     }
 
     /**
      * Sets the processors that can work without the container reset.
+     * The given processors are added in addition to already set processors.
      *
      * @param string[] $persistentProcessors
      */
     public function setPersistentProcessors(array $persistentProcessors)
     {
-        $this->persistentProcessors = array_fill_keys($persistentProcessors, true);
+        $this->persistentProcessors = array_merge(
+            $this->persistentProcessors,
+            array_fill_keys($persistentProcessors, true)
+        );
     }
 
     /**
