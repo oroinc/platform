@@ -5,7 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Suite;
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\GenericSuite;
-use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationDivider;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SpecificationCountDivider;
+use Oro\Bundle\TestFrameworkBundle\Behat\Specification\SuiteConfigurationDivider;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -36,9 +37,14 @@ class SuiteConfigurationRegistry
     private $specificationFinder;
 
     /**
-     * @var SpecificationDivider
+     * @var SpecificationCountDivider
      */
     private $specificationDivider;
+
+    /**
+     * @var SuiteConfigurationDivider
+     */
+    private $suiteConfigurationDivider;
 
     /**
      * @var array SuiteConfiguration grouped by sets
@@ -48,11 +54,13 @@ class SuiteConfigurationRegistry
     public function __construct(
         KernelInterface $kernel,
         SpecificationFinder $specificationFinder,
-        SpecificationDivider $specificationDivider
+        SpecificationCountDivider $specificationDivider,
+        SuiteConfigurationDivider $suiteConfigurationDivider
     ) {
         $this->kernel = $kernel;
         $this->specificationFinder = $specificationFinder;
         $this->specificationDivider = $specificationDivider;
+        $this->suiteConfigurationDivider = $suiteConfigurationDivider;
     }
 
     /**
@@ -103,12 +111,25 @@ class SuiteConfigurationRegistry
      * @param int $divider
      * @return void
      */
-    public function genererateSets($divider)
+    public function generateSetsDividedByCount($divider)
     {
         $this->suiteSets = $this->specificationDivider->divide(
             self::PREFIX_SUITE_SET,
             $this->getSuiteConfigurations(),
             $divider
+        );
+    }
+
+    /**
+     * @param int $time
+     * @return void
+     */
+    public function generateSetsByMaxExecutionTime($time)
+    {
+        $this->suiteSets = $this->suiteConfigurationDivider->divide(
+            self::PREFIX_SUITE_SET,
+            $this->getSuiteConfigurations(),
+            $time
         );
     }
 

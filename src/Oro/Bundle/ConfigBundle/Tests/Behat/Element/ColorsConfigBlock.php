@@ -57,7 +57,7 @@ element.value = '{$encodedValues}';
 JS;
 
         $this->getDriver()->executeScript($script);
-        $this->getDriver()->waitForAjax(10);
+        $this->getDriver()->waitForAjax();
     }
 
     /**

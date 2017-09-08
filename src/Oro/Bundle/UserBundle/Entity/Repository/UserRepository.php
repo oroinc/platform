@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
@@ -130,12 +131,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
      */
     public function findUsersByUsernames(array $usernames)
     {
-        $queryBuilder = $this->createQueryBuilder('u')
-            ->select('u');
-        $queryBuilder->where($queryBuilder->expr()->in('u.username', $usernames))
-            ->orderBy('u.username');
-
-        return $queryBuilder->getQuery()->getResult();
+        return $this->findBy(['username' => $usernames], ['username' => Criteria::ASC]);
     }
 
     /**
@@ -145,12 +141,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
      */
     public function findUsersByIds(array $ids)
     {
-        $queryBuilder = $this->createQueryBuilder('u')
-            ->select('u');
-        $queryBuilder->where($queryBuilder->expr()->in('u.id', $ids))
-            ->orderBy('u.username');
-
-        return $queryBuilder->getQuery()->getResult();
+        return $this->findBy(['id' => $ids], ['username' => Criteria::ASC]);
     }
 
     /**
@@ -173,9 +164,10 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ->select('user')
             ->leftJoin('user.emails', 'email')
             ->where($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->in('LOWER(email.email)', $lowerCaseEmails),
-                $queryBuilder->expr()->in('LOWER(user.email)', $lowerCaseEmails)
-            ));
+                $queryBuilder->expr()->in('LOWER(email.email)', ':lowerCaseEmails'),
+                $queryBuilder->expr()->in('LOWER(user.email)', ':lowerCaseEmails')
+            ))
+            ->setParameter('lowerCaseEmails', $lowerCaseEmails);
 
         if ($organization) {
             $queryBuilder->innerJoin('user.organizations', 'organization')

@@ -14,6 +14,10 @@
     float: left;
     width: 60%;
     height: 420px;
+    .alert, .loader-overlay {
+      width: auto;
+      margin: 0 15px 0 10px;
+    }
   }
   .responsive-small & {
     .map-address-list, .map-visual-frame {
@@ -23,10 +27,18 @@
     .map-visual-frame, .map-visual {
       max-height: 50vh;
     }
+    .map-visual-frame {
+      .alert, .loader-overlay {
+        margin: 10px 0;
+      }
+    }
+    .map-visual {
+      margin: 10px 0;
+    }
   }
   .map-visual {
     height: 420px;
-    margin-left: 5px;
+    margin: 0 15px 0 10px;
     img {
       max-width:none;
     }

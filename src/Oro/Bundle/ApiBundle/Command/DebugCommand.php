@@ -32,6 +32,11 @@ class DebugCommand extends AbstractDebugCommand
                 InputArgument::OPTIONAL,
                 'Shows a list of processors for a specified action'
             )
+            ->addArgument(
+                'group',
+                InputArgument::OPTIONAL,
+                'Shows a list of processors for a specified action and from a specified group'
+            )
             ->addOption(
                 'attribute',
                 null,
@@ -41,6 +46,12 @@ class DebugCommand extends AbstractDebugCommand
                 . ' The name and value should be separated by the colon,'
                 . ' e.g.: <info>--attribute=collection:true</info> for scalar value'
                 . ' or <info>--attribute=extra:[definition,filters]</info> for array value'
+            )
+            ->addOption(
+                'processors',
+                null,
+                InputOption::VALUE_NONE,
+                'Shows a list of all processors which'
             );
         parent::configure();
     }
@@ -58,11 +69,21 @@ class DebugCommand extends AbstractDebugCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $action = $input->getArgument('action');
-        if (empty($action)) {
-            $this->dumpActions($output);
+        $showAllProcessors = $input->getOption('processors');
+        if ($showAllProcessors) {
+            $this->dumpAllProcessors($output, $this->getRequestType($input));
         } else {
-            $this->dumpProcessors($output, $action, $this->getRequestType($input), $input->getOption('attribute'));
+            $action = $input->getArgument('action');
+            if (empty($action)) {
+                $this->dumpActions($output);
+            } else {
+                $attributes = $input->getOption('attribute');
+                $group = $input->getArgument('group');
+                if ($group) {
+                    $attributes[] = sprintf('group:%s', $group);
+                }
+                $this->dumpProcessors($output, $action, $this->getRequestType($input), $attributes);
+            }
         }
     }
 
@@ -98,16 +119,33 @@ class DebugCommand extends AbstractDebugCommand
             ]);
             $i++;
         }
+        $allProcessorsIds = array_unique($allProcessorsIds);
+
+        $container = $this->getContainer();
+        $allProcessorsIdsRegisteredInContainer = [];
+        foreach ($allProcessorsIds as $processorId) {
+            if ($container->has($processorId)) {
+                $allProcessorsIdsRegisteredInContainer[] = $processorId;
+            }
+        }
 
         $table->render();
 
         $output->writeln(
-            sprintf('<info>Total number of processors:</info> %s', $totalNumberOfProcessors)
+            sprintf('<info>Total number of processors in the ProcessorBag:</info> %s', $totalNumberOfProcessors)
         );
         $output->writeln(
             sprintf(
-                '<info>Total number of processor services:</info> %s',
-                count(array_unique($allProcessorsIds))
+                '<info>Total number of processor instances'
+                . ' (the same processor can be re-used in several actions or groups):</info> %s',
+                count($allProcessorsIds)
+            )
+        );
+        $output->writeln(
+            sprintf(
+                '<info>Total number of processors in DIC'
+                . ' (only processors that depend on other services are added to DIC):</info> %s',
+                count($allProcessorsIdsRegisteredInContainer)
             )
         );
 
@@ -119,10 +157,66 @@ class DebugCommand extends AbstractDebugCommand
         $output->writeln('');
         $output->writeln(
             sprintf(
-                'To run show a list of processors for some action run <info>%s ACTION</info>',
+                'To show a list of processors for a specific action, run <info>%1$s ACTION</info>,'
+                . ' e.g. <info>%1$s get_list</info>',
                 $this->getName()
             )
         );
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param RequestType     $requestType
+     */
+    protected function dumpAllProcessors(OutputInterface $output, RequestType $requestType)
+    {
+        $output->writeln('The processors are displayed in alphabetical order.');
+
+        /** @var ProcessorBagInterface $processorBag */
+        $processorBag = $this->getContainer()->get('oro_api.processor_bag');
+
+        $table = new Table($output);
+        $table->setHeaders(['Processor', 'Actions', 'Is Service?']);
+
+        $context = new Context();
+        $context->set(ApiContext::REQUEST_TYPE, $requestType);
+
+        $applicableChecker = new ChainApplicableChecker();
+        $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
+
+        $processorsMap = [];
+        $container = $this->getContainer();
+        $actions = $processorBag->getActions();
+        foreach ($actions as $action) {
+            $context->setAction($action);
+            $processors = $processorBag->getProcessors($context);
+            $processors->setApplicableChecker($applicableChecker);
+            foreach ($processors as $processor) {
+                if ($processor instanceof TraceableProcessor) {
+                    $processor = $processor->getProcessor();
+                }
+                $className = get_class($processor);
+                if (!isset($processorsMap[$className])) {
+                    $processorsMap[$className] = [[], false];
+                }
+                if (!in_array($action, $processorsMap[$className][0], true)) {
+                    $processorsMap[$className][0][] = $action;
+                }
+                if ($container->has($processors->getProcessorId())) {
+                    $processorsMap[$className][1][] = true;
+                }
+            }
+        }
+        ksort($processorsMap);
+        foreach ($processorsMap as $className => list($actionNames, $isService)) {
+            $isServiceStr = 'No';
+            if ($isService) {
+                $isServiceStr = 'Yes';
+            }
+            $table->addRow([$className, implode("\n", $actionNames), $isServiceStr]);
+        }
+
+        $table->render();
     }
 
     /**

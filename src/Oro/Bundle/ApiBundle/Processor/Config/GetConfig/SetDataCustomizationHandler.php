@@ -98,11 +98,8 @@ class SetDataCustomizationHandler implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath($fieldName);
-            if ($metadata->hasAssociation($propertyPath)) {
-                $linkedMetadata = $this->doctrineHelper->getEntityMetadataForClass(
-                    $metadata->getAssociationTargetClass($propertyPath)
-                );
+            $linkedMetadata = $this->getLinkedMetadata($metadata, $fieldName, $field);
+            if (null !== $linkedMetadata) {
                 $this->setFieldCustomizationHandler(
                     $context,
                     $field,
@@ -112,6 +109,30 @@ class SetDataCustomizationHandler implements ProcessorInterface
                 );
             }
         }
+    }
+
+    /**
+     * @param ClassMetadata               $metadata
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     *
+     * @return ClassMetadata|null
+     */
+    protected function getLinkedMetadata(ClassMetadata $metadata, $fieldName, EntityDefinitionFieldConfig $field)
+    {
+        $propertyPath = $field->getPropertyPath($fieldName);
+        if ($metadata->hasAssociation($propertyPath)) {
+            return $this->doctrineHelper->getEntityMetadataForClass(
+                $metadata->getAssociationTargetClass($propertyPath)
+            );
+        }
+
+        $targetClass = $field->getTargetClass();
+        if ($targetClass && $this->doctrineHelper->isManageableEntityClass($targetClass)) {
+            return $this->doctrineHelper->getEntityMetadataForClass($targetClass);
+        }
+
+        return null;
     }
 
     /**

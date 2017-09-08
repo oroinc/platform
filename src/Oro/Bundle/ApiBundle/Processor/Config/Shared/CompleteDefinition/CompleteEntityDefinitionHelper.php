@@ -78,7 +78,13 @@ class CompleteEntityDefinitionHelper
                 $context->get(ExpandRelatedEntitiesConfigExtra::NAME)
             );
             $this->completeCustomAssociations($definition, $metadata, $version, $requestType);
-            $this->completeFields($definition, $metadata, $existingFields);
+            $this->completeUnidirectionalAssociations(
+                $definition,
+                $metadata,
+                $expandedEntities,
+                $version,
+                $requestType
+            );
             $this->completeAssociations(
                 $definition,
                 $metadata,
@@ -88,6 +94,7 @@ class CompleteEntityDefinitionHelper
                 $requestType
             );
             $this->completeDependentAssociations($definition, $metadata, $version, $requestType);
+            $this->completeFields($definition, $metadata, $existingFields);
         }
         // make sure that identifier field names are set
         $idFieldNames = $definition->getIdentifierFieldNames();
@@ -231,12 +238,63 @@ class CompleteEntityDefinitionHelper
             ) {
                 $field->setExcluded();
             }
-            $extras = [];
-            if (!empty($expandedEntities[$fieldName])) {
-                $extras[] = new ExpandRelatedEntitiesConfigExtra($expandedEntities[$fieldName]);
-            }
-            $this->completeAssociation($field, $mapping, $version, $requestType, $extras);
+            $this->completeAssociation(
+                $field,
+                $mapping,
+                $version,
+                $requestType,
+                $this->getAssociationConfigExtras($fieldName, $expandedEntities)
+            );
         }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ClassMetadata          $metadata
+     * @param array                  $expandedEntities [field name => [path, ...], ...]
+     * @param string                 $version
+     * @param RequestType            $requestType
+     */
+    protected function completeUnidirectionalAssociations(
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        array $expandedEntities,
+        $version,
+        RequestType $requestType
+    ) {
+        $associationNames = $metadata->getAssociationNames();
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $targetClass = $field->getTargetClass();
+            if ($targetClass && $field->hasTargetType() && !$field->hasDataType()) {
+                $propertyPath = $field->getPropertyPath($fieldName);
+                if (!in_array($propertyPath, $associationNames, true)) {
+                    $this->associationHelper->completeAssociation(
+                        $field,
+                        $targetClass,
+                        $version,
+                        $requestType,
+                        $this->getAssociationConfigExtras($fieldName, $expandedEntities)
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $fieldName
+     * @param array  $expandedEntities [field name => [path, ...], ...]
+     *
+     * @return array
+     */
+    protected function getAssociationConfigExtras($fieldName, array $expandedEntities)
+    {
+        $extras = [];
+        if (!empty($expandedEntities[$fieldName])) {
+            $extras[] = new ExpandRelatedEntitiesConfigExtra($expandedEntities[$fieldName]);
+        }
+
+        return $extras;
     }
 
     /**

@@ -159,8 +159,8 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
             $this->pidFileManager->removePidFile($consumerId);
         }
 
-        $context->getLogger()->alert(sprintf(
-            '[RedeliverOrphanMessagesDbalExtension] Orphans were found and redelivered. consumerIds: "%s"',
+        $context->getLogger()->critical(sprintf(
+            'Orphans were found and redelivered. consumerIds: "%s"',
             implode(', ', $orphanConsumerIds)
         ));
     }

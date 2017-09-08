@@ -53,18 +53,12 @@ class CommandRunnerProcessor implements MessageProcessorInterface, TopicSubscrib
         $body = JSON::decode($message->getBody());
 
         if (!isset($body['command'])) {
-            $this->logger->critical(
-                'Got invalid message: empty command',
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message: empty command');
 
             return self::REJECT;
         }
         if (!isset($body['jobId'])) {
-            $this->logger->critical(
-                'Got invalid message: empty jobId',
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message: empty jobId');
 
             return self::REJECT;
         }
@@ -73,10 +67,7 @@ class CommandRunnerProcessor implements MessageProcessorInterface, TopicSubscrib
             $commandArguments = $body['arguments'];
         }
         if (!is_array($commandArguments)) {
-            $this->logger->critical(
-                'Got invalid message: "arguments" must be of type array',
-                ['message' => $message]
-            );
+            $this->logger->critical('Got invalid message: "arguments" must be of type array');
 
             return self::REJECT;
         }
