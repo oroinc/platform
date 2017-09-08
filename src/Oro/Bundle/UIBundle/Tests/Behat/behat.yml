@@ -82,9 +82,3 @@ oro_behat_extension:
 
     TypeaheadSuggestionsDropdown:
       selector: '.typeahead.dropdown-menu'
-
-    JsTreeSearch:
-      selector: '.jstree-search-component__input'
-
-    ClearSearchValueButton:
-      selector: '.jstree-search-component__clear'
