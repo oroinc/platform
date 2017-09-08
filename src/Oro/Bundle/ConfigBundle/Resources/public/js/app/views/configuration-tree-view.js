@@ -21,9 +21,9 @@ define(function(require) {
                 activeGroup: parent + '/' + node.id
             });
 
-            var state = tools.unpackFromQueryString(location.search)[this.urlKey] || {};
-            if (_.isUndefined(routeParams[this.urlKey])) {
-                routeParams[this.urlKey] = state;
+            var state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
+            if (_.isUndefined(routeParams[this.viewGroup])) {
+                routeParams[this.viewGroup] = state;
             }
             var url = routing.generate(this.onSelectRoute, routeParams);
             //simulate click on real link to check page state

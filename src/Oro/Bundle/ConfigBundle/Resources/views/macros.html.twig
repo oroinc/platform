@@ -56,7 +56,24 @@
 {% macro renderConfigurationScrollData(data) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-    {% set content = _self.renderTabContent(data.form, data.content) %}
+    {% set content %}
+        <div data-page-component-view="{{ {
+            view: 'oroui/js/app/views/highlight-text-view',
+            highlightSelectors: [
+                'div.system-configuration-content-title',
+                'h5.user-fieldset span',
+                'div.control-label label',
+                'i.tooltip-icon'
+            ],
+            toggleSelectors: {
+                'div.control-group': 'div.control-group-wrapper',
+                'fieldset.form-horizontal': 'div.system-configuration-content-inner'
+            },
+            viewGroup: 'configuration'
+        }|json_encode }}">
+            {{ _self.renderTabContent(data.form, data.content) }}
+        </div>
+    {% endset %}
     <div class="system-configuration-container">
         {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
             scrollbar: '[data-role="jstree-container"]'
@@ -69,6 +86,7 @@
                     'label': null,
                     'treeOptions': {
                         'data' : data.configTree,
+                        'viewGroup': 'configuration',
                         'nodeId': data.activeSubTabName,
                         'onSelectRoute': data.routeName,
                         'onSelectRouteParameters': data.routeParameters,
@@ -188,8 +206,10 @@
             </div>
         {% endif %}
 
-        {% for dataBlock in block.data %}
-            {{ dataBlock|raw }}
-        {% endfor %}
+        <div class="control-group-wrapper">
+            {% for dataBlock in block.data %}
+                {{ dataBlock|raw }}
+            {% endfor %}
+        </div>
     </fieldset>
 {% endmacro %}
