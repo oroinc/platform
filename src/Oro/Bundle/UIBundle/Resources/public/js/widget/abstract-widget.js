@@ -719,9 +719,11 @@ define(function(require) {
             if (this.deferredRender) {
                 this.deferredRender
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(function() {
-                        throw new Error('Widget rendering failed');
-                    });
+                    .fail(_.bind(function() {
+                        if (!this.disposing && !this.disposed) {
+                            throw new Error('Widget rendering failed');
+                        }
+                    }, this));
             } else {
                 this._triggerContentLoadEvents();
             }
