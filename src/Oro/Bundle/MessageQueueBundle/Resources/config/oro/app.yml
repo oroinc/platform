@@ -9,6 +9,9 @@ doctrine:
 oro_message_queue:
     persistent_services:
         - 'kernel'
+        - 'oro_message_queue.client.message_processor_registry'
+        - 'oro_message_queue.client.delegate_message_processor'
+        - 'oro_message_queue.client.route_message_processor'
     persistent_processors:
         - 'oro_message_queue.client.route_message_processor'
         - 'oro_message_queue.job.calculate_root_job_status_processor'
