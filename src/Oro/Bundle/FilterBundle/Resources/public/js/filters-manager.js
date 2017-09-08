@@ -227,6 +227,7 @@ define(function(require) {
             this.trigger('afterDisableFilter', filter);
 
             this._publishCountSelectedFilters();
+            this._publishCountChangedFilters();
         },
 
         _onFilterShowCriteria: function(shownFilter) {
