@@ -16,10 +16,6 @@ define(function(require) {
             'click [data-role="sync"]': 'onSync'
         },
 
-        _showLoading: function() {
-
-        },
-
         onSync: function(e) {
             e.preventDefault();
 
