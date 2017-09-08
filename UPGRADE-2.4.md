@@ -72,6 +72,12 @@ ElasticSearchBundle
 -------------------
 - Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
 
+EntityExtendBundle
+------------------
+- Removed class `Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper`
+- Class `Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder`
+    - changed signature of method `buildManyToManyTargetSideRelation`: parameter `FieldConfigId $targetFieldId` was replaced with `array $relation`
+
 EmailBundle
 -----------
 
