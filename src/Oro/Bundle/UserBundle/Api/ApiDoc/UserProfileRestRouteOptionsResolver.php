@@ -6,9 +6,9 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\UserBundle\Api\Model\UserProfile;
@@ -18,19 +18,14 @@ use Oro\Bundle\UserBundle\Api\Model\UserProfile;
  */
 class UserProfileRestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
     /**
-     * @param RestDocViewDetector $docViewDetector
-     * @param ValueNormalizer     $valueNormalizer
+     * @param ValueNormalizer $valueNormalizer
      */
-    public function __construct(RestDocViewDetector $docViewDetector, ValueNormalizer $valueNormalizer)
+    public function __construct(ValueNormalizer $valueNormalizer)
     {
-        $this->docViewDetector = $docViewDetector;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -49,7 +44,7 @@ class UserProfileRestRouteOptionsResolver implements RouteOptionsResolverInterfa
         $userProfileEntityType = ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             UserProfile::class,
-            $this->docViewDetector->getRequestType(),
+            new RequestType([RequestType::REST]),
             false
         );
         if (!$userProfileEntityType) {

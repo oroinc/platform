@@ -31,15 +31,15 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'Got invalid message: "{"parameters":{"gridName":"name"},"format":"csv"}"',
+                'Got invalid message',
                 ['parameters' => ['gridName' => 'name'], 'format' => 'csv'],
             ],
             [
-                'Got invalid message: "{"securityToken":"token","format":"csv"}"',
+                'Got invalid message',
                 ['securityToken' => 'token', 'format' => 'csv'],
             ],
             [
-                'Got invalid message: "{"securityToken":"token","parameters":{"gridName":"name"}}"',
+                'Got invalid message',
                 ['securityToken' => 'token', 'parameters' => ['gridName' => 'name']],
             ],
         ];

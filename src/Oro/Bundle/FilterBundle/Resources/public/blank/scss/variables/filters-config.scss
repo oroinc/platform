@@ -1,0 +1,43 @@
+// @theme: blank;
+
+$filter-criteria-selector-icon-color: lighten(get-color('additional', 'dark'), 20%) !default;
+$filter-criteria-hint-max-width: 250px !default;
+$filter-criteria-hint-item-color: get-color('additional', 'ultra') !default;
+$filter-criteria-hint-item-bg: get-color('additional', 'middle') !default;
+
+$filter-dropdown-mode-items-hint-inner-offset: 7px 130px 2px 10px !default;
+
+$filter-trigger-wrapper-display: inline-block !default;
+$filter-trigger-wrapper-dropdown-toggle-color: get-color('primary', 'dark') !default;
+
+$filter-date-range-offset: null !default;
+
+$filter-separator-width: 22px !default;
+$filter-separator-text-align: center !default;
+
+$filter-reset-color: get-color('additional', 'ultra') !default;
+$filter-reset-hover-color: darken(get-color('additional', 'ultra'), 10%) !default;
+
+$filter-start-end-max-width: 95px !default;
+$filter-start-end-display: inline-block !default;
+
+$filter-action-row-offset-top: $offset-y !default;
+
+$filter-dropdown-menu-calendar-max-width: 270px !default;
+$filter-dropdown-item-active-weight: bold !default;
+
+$align-filter-dropdown-to-right-side: true !default;
+
+// Filters Dropdown Mode
+$apply-filters-dropdown-mode-design: true !default;
+$filter-box-dropdown-mode-offset: 10px 0 !default;
+$filter-box-dropdown-mode-in-sticky-offset: auto !default;
+$filter-box-dropdown-mode-inner-offset: 10px 0 0 !default;
+$filter-box-dropdown-mode-background: get-color('additional', 'base') !default;
+$filter-box-dropdown-mode-use-corner: true !default;
+$filter-box-dropdown-mode-corner-position-r: 15px !default;
+$filter-box-dropdown-mode-corner-position-b: 100% !default;
+$filter-box-dropdown-mode-corner-size: 8px !default;
+
+// Filters Toggle Mode
+$apply-filters-toggle-mode-design: true !default;

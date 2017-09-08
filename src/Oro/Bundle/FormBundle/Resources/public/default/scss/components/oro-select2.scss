@@ -240,3 +240,19 @@
         }
     }
 }
+
+@include breakpoint('mobile') {
+    .oro-select2 {
+        &__dropdown {
+            .select2-result-label {
+                white-space: normal;
+            }
+        }
+
+        &--size-s {
+            .select2-chosen {
+                padding-right: 8px !important;
+            }
+        }
+    }
+}

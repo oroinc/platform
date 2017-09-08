@@ -1,10 +1,8 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 
@@ -23,10 +21,7 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
             $body['originFileName']
         )
         ) {
-            $this->logger->critical(
-                sprintf('Got invalid message. body: %s', $body),
-                ['message' => $body]
-            );
+            $this->logger->critical('Got invalid message');
 
             return false;
         }
@@ -99,15 +94,15 @@ class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
     protected function sendErrorNotification(array $body, $error)
     {
         $errorMessage = sprintf(
-            '[PreCliImportMessageProcessor] An error occurred while reading file %s: "%s"',
+            'An error occurred while reading file %s: "%s"',
             $body['originFileName'],
             $error
         );
 
-        $this->logger->critical($errorMessage, ['message' => $body]);
+        $this->logger->critical($errorMessage);
 
         if (isset($body['notifyEmail'])) {
-            $this->producer->send(NotifcationTopics::SEND_NOTIFICATION_EMAIL, [
+            $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL, [
                 'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
                 'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
                 'toEmail' => $body['notifyEmail'],

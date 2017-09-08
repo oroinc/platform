@@ -318,6 +318,15 @@ define([
         },
 
         /**
+         * Triggers when filter value is changed
+         *
+         * @protected
+         */
+        _onValueChanged: function() {
+            this.trigger('change');
+        },
+
+        /**
          * Triggers update event
          *
          * @param {*} newValue
@@ -459,6 +468,16 @@ define([
         _readDOMValue: function() {
             throw new Error('Method _readDOMValue is abstract and must be implemented');
             //return { value: this._getInputValue(this.inputValueSelector) }
+        },
+
+        /**
+         * Return true if DOM Value of filter is changed
+         *
+         * @returns {boolean}
+         * @protected
+         */
+        _isDOMValueChanged: function() {
+            throw new Error('Method _isDOMValueChanged is abstract and must be implemented');
         },
 
         /**

@@ -1,10 +1,19 @@
 services:
+    cli.controller.available_references:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableReferencesController
+        arguments:
+            - '@oro_test.alice_loader'
+            - '@oro_behat_extension.isolation.doctrine_isolator'
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: cli.controller, priority: 700 }
+
     cli.controller.suite_configuration_filter:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteConfigurationFilterController
         arguments:
             - '@oro_behat_extension.suite.suite_configuration_registry'
         tags:
-            - { name: cli.controller, priority: 600 }
+            - { name: cli.controller, priority: 650 }
 
     cli.controller.suite_divider:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteDividerController
@@ -48,6 +57,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuiteSetsController
         arguments:
             - '@oro_behat_extension.suite.suite_configuration_registry'
+            - '@oro_behat_extension.specification.statistic.filesystem_statistic_repository'
         tags:
             - { name: cli.controller, priority: 550 }
 
@@ -55,6 +65,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
         arguments:
             - '@oro_test.listener.step_duration_measure_subscriber'
+            - '@oro_test.listener.feature_duration_subscriber'
             - '@event_dispatcher'
         tags:
             - { name: 'cli.controller' }
@@ -66,6 +77,17 @@ services:
             - '@event_dispatcher'
         tags:
             - { name: 'cli.controller', priority: 500 }
+
+    cli.controller.health_check_controller:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\HealthCheckController
+        arguments:
+            - '@event_dispatcher'
+            - '@tester.result.interpreter'
+            - '@oro_behat_extension.health_checker.result_printer_subscriber'
+            - '@oro_behat_extension.health_checker.result_interpretation'
+        tags:
+            - { name: 'cli.controller', priority: 110 }
+            - { name: 'health_checker_aware' }
 
     cli.controller.input_output_controller:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController

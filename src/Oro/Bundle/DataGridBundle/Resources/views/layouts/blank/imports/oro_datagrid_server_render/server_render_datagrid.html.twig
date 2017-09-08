@@ -37,8 +37,6 @@
 
     {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
 
-    {% set enableToggleFilters = false %}
-
     {% set options  = {
         el: '#' ~ gridId,
         gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
@@ -46,7 +44,7 @@
         metadata: datagridMetaData,
         data: datagridData,
         enableFilters: enableFilters,
-        enableToggleFilters: enableToggleFilters,
+        enableToggleFilters: renderParams.enableToggleFilters is defined ? renderParams.enableToggleFilters : false,
         filterContainerSelector: renderParams.filterContainerSelector is defined ? renderParams.filterContainerSelector : null,
         filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : null,
         enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
@@ -61,11 +59,13 @@
          data-page-component-module="oroproduct/js/app/datagrid/backend-datagrid-component"
          data-page-component-name="{{ options.gridName }}"
          data-page-component-options="{{ options|json_encode }}"
+         data-server-render
          data-layout="separate"
             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
     >
         <div class="oro-datagrid"
              data-skip-input-widgets
+             data-layout="separate"
         >
 
             {% if toolbarOptions.placement.top %}

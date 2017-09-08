@@ -1,6 +1,8 @@
 OroMessageQueue Component
 =========================
 
+*Note:* This article is published in the Oro documentation library.
+
 The component incorporates a message queue in your application via different transports.
 It contains several layers.
 
@@ -655,7 +657,7 @@ class FooMessageProcessor implements MessageProcessor
 <?php
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
-use Oro\Component\MessageQueue\Consumption\Extensions;
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 
@@ -666,7 +668,7 @@ $doctrineConnection = DriverManager::getConnection(
 
 $connection = new DbalConnection($doctrineConnection, 'oro_message_queue');
 
-$queueConsumer = new QueueConsumer($connection, new Extensions([]));
+$queueConsumer = new QueueConsumer($connection, new ChainExtension([]));
 $queueConsumer->bind('aQueue', new FooMessageProcessor());
 
 try {

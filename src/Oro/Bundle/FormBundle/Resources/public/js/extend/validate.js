@@ -1,14 +1,15 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    'oroui/js/tools/logger',
-    'oroform/js/optional-validation-groups-handler',
-    'oroui/js/error',
-    'jquery.validate'
-], function($, _, __, tools, logger, validationHandler, error) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var logger = require('oroui/js/tools/logger');
+    var validationHandler = require('oroform/js/optional-validation-groups-handler');
+    var validateTopmostLabelMixin = require('oroform/js/validate-topmost-label-mixin');
+    var error = require('oroui/js/error');
+    require('jquery.validate');
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -131,22 +132,6 @@ define([
         return rules;
     };
 
-    /**
-     * Removes error message from an element
-     *
-     * @param {Element|jQuery} element
-     */
-    $.validator.prototype.hideElementErrors = function(element) {
-        var $placement = getErrorPlacement(element);
-        if ($placement.is('.fields-row-error')) {
-            $placement.find('.' + this.settings.errorClass).remove();
-        } else {
-            $placement.next('.' + this.settings.errorClass).remove();
-        }
-        this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
-        return this;
-    };
-
     $.validator.prototype.check = _.wrap($.validator.prototype.check, function(check, element) {
         if (!element.name) {
             // add temporary elements names to support validation for frontend elements
@@ -171,26 +156,6 @@ define([
         return func.apply(this, _.rest(arguments)).add($additionalElements);
     });
 
-    /**
-     * Fetches descendant form elements which available for validation
-     *
-     * @param {Element|jQuery} element
-     * @returns {jQuery}
-     */
-    $.validator.prototype.elementsOf = function(element) {
-        var $element = $(element);
-        return $element.find('input, select, textarea')
-            .not(':submit, :reset, :image, [disabled]')
-            .not(this.settings.ignore)
-            .add($element.find(':input[data-validate-element]'));
-    };
-
-    // translates default messages
-    $.validator.prototype.defaultMessage = _.wrap($.validator.prototype.defaultMessage, function(func) {
-        var message = func.apply(this, _.rest(arguments));
-        return _.isString(message) ? __(message) : message;
-    });
-
     // saves name of validation rule which is violated
     $.validator.prototype.formatAndAdd = _.wrap($.validator.prototype.formatAndAdd, function(func, element, rule) {
         $(element).data('violated', rule.method);
@@ -198,7 +163,7 @@ define([
     });
 
     // updates place for message label before show message
-    $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(func, element, message) {
+    $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(originMethod, element, message) {
         if (!message) {
             return;
         }
@@ -208,18 +173,37 @@ define([
         if (message && label.length) {
             this.settings.errorPlacement(label, element);
         }
-        return func.call(this, element, message);
+        originMethod.call(this, element, message);
+        validateTopmostLabelMixin.showLabel.call(this, element, message, label);
     });
 
-    // fixes focus on select2 element
+    $.validator.prototype.destroy = _.wrap($.validator.prototype.destroy, function(originDestroy) {
+        validateTopmostLabelMixin.destroy.call(this);
+        originDestroy.call(this);
+    });
+
+    // fixes focus on select2 element and problem with focus on hidden inputs
     $.validator.prototype.focusInvalid = _.wrap($.validator.prototype.focusInvalid, function(func) {
+        if (!this.settings.focusInvalid) {
+            return func.apply(this, _.rest(arguments));
+        }
+
         var $elem = $(this.findLastActive() || (this.errorList.length && this.errorList[0].element) || []);
-        if (this.settings.focusInvalid && $elem.is('.select2[type=hidden]')) {
+        var $firstValidationError = $('.validation-failed').filter(':visible').first();
+
+        if ($elem.is('.select2[type=hidden]')) {
             $elem.parent().find('input.select2-focusser')
                 .focus()
                 .trigger('focusin');
+        } else if (!$elem.filter(':visible').length && $firstValidationError.length) {
+            var $scrollableContainer = $firstValidationError.closest('.scrollable-container');
+            var scrollTop = $firstValidationError.position().top + $scrollableContainer.scrollTop();
+
+            $scrollableContainer.animate({
+                scrollTop: scrollTop
+            }, scrollTop / 2);
         } else {
-            func.apply(this, _.rest(arguments));
+            return func.apply(this, _.rest(arguments));
         }
     });
 
@@ -228,14 +212,12 @@ define([
      */
     $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init) {
         validationHandler.initialize($(this.currentForm));
-        var validator = this;
-
+        validateTopmostLabelMixin.init.call(this);
         $(this.currentForm).on('content:changed', function(event) {
             validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
-        }).on('disabled', function(e) {
-            validator.hideElementErrors(e.target);
-        });
-
+        }).on('disabled', _.bind(function(e) {
+            this.hideElementErrors(e.target);
+        }, this));
         init.apply(this, _.rest(arguments));
         // defer used there since `elements` method expects form has validator object that is created here
         _.defer(_.bind(this.collectPristineValues, this));
@@ -246,90 +228,122 @@ define([
         this.collectPristineValues();
     });
 
-    /**
-     * Process server error response and shows messages on the form elements
-     *
-     * @param {Object} errors
-     */
-    $.validator.prototype.showBackendErrors = function(errors) {
-        var result = {};
+    _.extend($.validator.prototype, {
+        /**
+         * Process server error response and shows messages on the form elements
+         *
+         * @param {Object} errors
+         */
+        showBackendErrors: function(errors) {
+            var result = {};
+
+            /**
+             * Converts server error response:
+             * {
+             *   "children": {
+             *     "message": {"errors": ["This value should not be blank."]},
+             *     "attachment": {
+             *       "children": {
+             *         "file": {
+             *           "errors": ["The file is too large (1146138 bytes). Allowed maximum size is 1048576 bytes."]
+             *         }
+             *       }
+             *     }
+             *   }
+             * }
+             *
+             * to:
+             * {
+             *   "message": "This value should not be blank."
+             *   "attachment[file]": "The file is too large (1146138 bytes). Allowed maximum size is 1048576 bytes."
+             * }
+             *
+             * @param {Object} obj
+             * @param {string=} path
+             */
+            (function parseBackendErrors(obj, path) {
+                _.each(obj, function(item, name) {
+                    var _path;
+                    if (name === 'children') {
+                        // skip 'children' level
+                        parseBackendErrors(item, path);
+                    } else {
+                        _path = path ? (path + '[' + name + ']') : name;
+                        if (_.isEqual(_.keys(item), ['errors']) && _.isArray(item.errors)) {
+                            // only first error to show
+                            result[_path] = item.errors[0];
+                        } else if (_.isObject(item)) {
+                            parseBackendErrors(item, _path);
+                        }
+                    }
+                });
+            })(errors);
+
+            result = _.omit(result, function(message, name) {
+                return !this.findByName(name)[0];
+            }, this);
+
+            if (!_.isEmpty(result)) {
+                this.showErrors(result);
+            }
+        },
+
+        collectPristineValues: function() {
+            this.pristineValues = {};
+            this.elements().each(_.bind(function(index, element) {
+                if (!this.checkable(element)) {
+                    this.pristineValues[element.name] = element.value;
+                }
+            }, this));
+        },
+
+        isPristine: function(element) {
+            return this.pristineValues[element.name] === element.value;
+        },
 
         /**
-         * Converts server error response:
-         * {
-         *   "children": {
-         *     "message": {"errors": ["This value should not be blank."]},
-         *     "attachment": {
-         *       "children": {
-         *         "file": {
-         *           "errors": ["The file is too large (1146138 bytes). Allowed maximum size is 1048576 bytes."]
-         *         }
-         *       }
-         *     }
-         *   }
-         * }
-         *
-         * to:
-         * {
-         *   "message": "This value should not be blank."
-         *   "attachment[file]": "The file is too large (1146138 bytes). Allowed maximum size is 1048576 bytes."
-         * }
-         *
-         * @param {Object} obj
-         * @param {string=} path
+         * Resets form validation state
+         *  - clears errors and validation history
+         * (similar to validator.resetForm(), but does not change form elements' values)
          */
-        (function parseBackendErrors(obj, path) {
-            _.each(obj, function(item, name) {
-                var _path;
-                if (name === 'children') {
-                    // skip 'children' level
-                    parseBackendErrors(item, path);
-                } else {
-                    _path = path ? (path + '[' + name + ']') : name;
-                    if (_.isEqual(_.keys(item), ['errors']) && _.isArray(item.errors)) {
-                        // only first error to show
-                        result[_path] = item.errors[0];
-                    } else if (_.isObject(item)) {
-                        parseBackendErrors(item, _path);
-                    }
-                }
-            });
-        })(errors);
+        resetFormErrors: function() {
+            this.submitted = {};
+            this.lastElement = null;
+            this.prepareForm();
+            this.hideErrors();
+            this.elements().removeClass(this.settings.errorClass);
+        },
 
-        result = _.omit(result, function(message, name) {
-            return !this.findByName(name)[0];
-        }, this);
-
-        if (!_.isEmpty(result)) {
-            this.showErrors(result);
-        }
-    };
-
-    $.validator.prototype.collectPristineValues = function() {
-        this.pristineValues = {};
-        this.elements().each(_.bind(function(index, element) {
-            if (!this.checkable(element)) {
-                this.pristineValues[element.name] = element.value;
+        /**
+         * Removes error message from an element
+         *
+         * @param {Element|jQuery} element
+         */
+        hideElementErrors: function(element) {
+            var $placement = getErrorPlacement(element);
+            if ($placement.is('.fields-row-error')) {
+                $placement.find('.' + this.settings.errorClass).remove();
+            } else {
+                $placement.next('.' + this.settings.errorClass).remove();
             }
-        }, this));
-    };
+            this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
+            return this;
+        },
 
-    $.validator.prototype.isPristine = function(element) {
-        return this.pristineValues[element.name] === element.value;
-    };
-
-    /**
-     * Resets form validation state
-     *  - clears errors and validation history
-     * (similar to validator.resetForm(), but does not change form elements' values)
-     */
-    $.validator.prototype.resetFormErrors = function() {
-        this.submitted = {};
-        this.lastElement = null;
-        this.prepareForm();
-        this.hideErrors();
-        this.elements().removeClass(this.settings.errorClass);
-    };
+        /**
+         * Fetches descendant form elements which available for validation
+         *
+         * @param {Element|jQuery} element
+         * @returns {jQuery}
+         */
+        elementsOf: function(element) {
+            var $element = $(element);
+            return $element.find('input, select, textarea')
+                .not(':submit, :reset, :image, [disabled]')
+                .not(this.settings.ignore)
+                .add($element.find(':input[data-validate-element]'));
+        }
+    });
 
     /**
      * Loader for custom validation methods
@@ -505,6 +519,11 @@ define([
                 }
                 return message.call(this, param, element);
             });
+        } else if (_.isString(message)) {
+            var translated = __(message);
+            message = function() {
+                return translated;
+            };
         }
 
         return addMethod.call(this, name, method, message);

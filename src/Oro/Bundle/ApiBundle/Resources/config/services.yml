@@ -442,6 +442,51 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
 
+    oro_api.api_doc.formatter.html_formatter:
+        class: Oro\Bundle\ApiBundle\ApiDoc\NewHtmlFormatter
+        public: false
+        parent: nelmio_api_doc.formatter.abstract_formatter
+        calls:
+            - [setTemplatingEngine, ['@templating']]
+            - [setMotdTemplate, ['%nelmio_api_doc.motd.template%']]
+            - [setApiName, ['%nelmio_api_doc.api_name%']]
+            - [setEnableSandbox, ['%nelmio_api_doc.sandbox.enabled%']]
+            - [setEndpoint, ['%nelmio_api_doc.sandbox.endpoint%']]
+            - [setRequestFormatMethod, ['%nelmio_api_doc.sandbox.request_format.method%']]
+            - [setRequestFormats, ['%nelmio_api_doc.sandbox.request_format.formats%']]
+            - [setDefaultRequestFormat, ['%nelmio_api_doc.sandbox.request_format.default_format%']]
+            - [setAcceptType, ['%nelmio_api_doc.sandbox.accept_type%']]
+            - [setBodyFormats, ['%nelmio_api_doc.sandbox.body_format.formats%']]
+            - [setDefaultBodyFormat, ['%nelmio_api_doc.sandbox.body_format.default_format%']]
+            - [setAuthentication, ['%nelmio_api_doc.sandbox.authentication%']]
+            - [setDefaultSectionsOpened, ['%nelmio_api_doc.default_sections_opened%']]
+            - [setFileLocator, ['@file_locator']]
+            - [setDocumentationPath, ['%oro_api.api_doc.path%']]
+
+    oro_api.api_doc.formatter.html_formatter.composite:
+        class: Oro\Bundle\ApiBundle\ApiDoc\CompositeFormatter
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+
+    oro_api.api_doc.annotation_parser:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocAnnotationParser
+        tags:
+            - { name: nelmio_api_doc.extractor.parser }
+
+    oro_api.api_doc.metadata_parser:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser
+        arguments:
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: nelmio_api_doc.extractor.parser }
+
+    oro_api.api_doc.parser:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
+        public: false
+        arguments:
+            - '@file_locator'
+
     oro_api.rest.doc_view_detector:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
         public: false
@@ -513,18 +558,6 @@ services:
     oro_api.expanded_association_extractor:
         class: Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor
         public: false
-
-    oro_api.api_doc.metadata_parser:
-        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser
-        arguments:
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: nelmio_api_doc.extractor.parser }
-
-    oro_api.api_doc.parser:
-        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
-        arguments:
-            - '@file_locator'
 
     oro_api.request_expression_matcher:
         class: Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher

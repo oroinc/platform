@@ -27,7 +27,6 @@ define(function(require) {
 
         var numberFormats = localeSettings.getNumberFormats('decimal');
         this.decimalSeparator = numberFormats.decimal_separator_symbol;
-        this.orderSeparator = numberFormats.grouping_separator_symbol;
     };
 
     NumberFormatter.prototype = new AbstractFormatter();
@@ -48,7 +47,7 @@ define(function(require) {
         defaults: {
             decimals: 2,
             decimalSeparator: '.',
-            orderSeparator: ','
+            orderSeparator: ''
         },
 
         HUMANIZED_NUM_RE: /(\d)(?=(?:\d{3})+$)/g,

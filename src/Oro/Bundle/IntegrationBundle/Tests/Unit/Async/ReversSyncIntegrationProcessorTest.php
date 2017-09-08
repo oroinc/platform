@@ -70,7 +70,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Invalid message: integration_id and connector should not be empty: []')
+            ->with('Invalid message: integration_id and connector should not be empty')
         ;
         $processor = new ReversSyncIntegrationProcessor(
             $this->createDoctrineHelperStub(),
@@ -117,8 +117,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('critical')
             ->with(
-                'Invalid message: integration_id and connector should not be empty:'.
-                ' {"integration_id":"theIntegrationId"}'
+                'Invalid message: integration_id and connector should not be empty'
             )
         ;
         $processor = new ReversSyncIntegrationProcessor(
@@ -144,7 +143,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Integration should exist and be enabled: theIntegrationId')
+            ->with('Integration should exist and be enabled')
         ;
         $entityManagerMock = $this->createEntityManagerStub();
         $entityManagerMock
@@ -179,7 +178,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Integration should exist and be enabled: theIntegrationId')
+            ->with('Integration should exist and be enabled')
         ;
         $integration = new Integration();
         $integration->setEnabled(false);

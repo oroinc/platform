@@ -7,7 +7,7 @@ define(function(require) {
      *
      * ### Column configuration samples:
      * ``` yml
-     * datagrid:
+     * datagrids:
      *   {grid-uid}:
      *     inline_editing:
      *       enable: true
@@ -16,6 +16,10 @@ define(function(require) {
      *       # Sample 1. Mapped by number frontend type
      *       {column-name-1}:
      *         frontend_type: <multi-currency>
+     *         multicurrency_config:
+     *           original_field: '<original_field>'
+     *           value_field: '<value_field>'
+     *           currency_field: '<currency_field>'
      *       # Sample 2. Full configuration
      *       {column-name-2}:
      *         inline_editing:
@@ -26,6 +30,10 @@ define(function(require) {
      *               css_class_name: '<class-name>'
      *           validation_rules:
      *             NotBlank: ~
+     *         multicurrency_config:
+     *           original_field: '<original_field>'
+     *           value_field: '<value_field>'
+     *           currency_field: '<currency_field>'
      * ```
      *
      * ### Options in yml:
@@ -35,7 +43,11 @@ define(function(require) {
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
      * inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-     * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
+     * inline_editing.validation_rules | Optional. Validation rules. See [documentation](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once)
+     * multicurrency_config.original_field | Field that contains combined currency value, like EUR100.0000
+     * multicurrency_config.value_field | Field that contains amount of currency value
+     * multicurrency_config.currency_field | Field that contains code of currency (e.g. EUR)
+     *
      *
      * ### Constructor parameters
      *
@@ -45,9 +57,10 @@ define(function(require) {
      * @param {string} options.fieldName - Field name to edit in model
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
-     * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
+     * @param {Object} options.validationRules - Validation rules. See [documentation here](../../../../FormBundle/Resources/doc/reference/js_validation.md#conformity-server-side-validations-to-client-once)
+     * @param {Object} options.choices - Array of codes of available currencies
      *
-     * @augments [TextEditorView](./text-editor-view.md)
+     * @augments [TextEditorView](../../../../FormBundle/Resources/doc/editor/text-editor-view.md)
      * @exports MultiCurrencyEditorView
      */
     var MultiCurrencyEditorView;
@@ -61,6 +74,10 @@ define(function(require) {
     require('jquery.select2');
 
     MultiCurrencyEditorView = TextEditorView.extend(/** @exports MultiCurrencyEditorView.prototype */{
+        /**
+         * Option for select2 widget to show or hide search input for list of currencies
+         * @protected
+         */
         MINIMUM_RESULTS_FOR_SEARCH: 8,
 
         className: function() {
@@ -134,11 +151,21 @@ define(function(require) {
                 _this.onGenericArrowKeydown(e);
             });
         },
-
+        /**
+         * Convert string presetation of value to object with 'currency' and 'amount' fields
+         *
+         * @param {String} value in format 'currency_code+amount'
+         * @returns {Object}
+         */
         parseRawValue: function(raw) {
             return multiCurrencyFormatter.unformatMultiCurrency(raw);
         },
 
+        /**
+         * Collects values from DOM elements and converts them to string format like EUR100.0000
+         *
+         * @returns {String}
+         */
         getValue: function() {
             var $currency = this.$('input[name=currency]');
             var currency = $currency.data('select2') ? $currency.select2('val') : $currency.val();
@@ -156,6 +183,11 @@ define(function(require) {
             return rules;
         },
 
+        /**
+         * Prepares array of objects that presents select options in dropdown
+         *
+         * @returns {Array}
+         */
         getCurrencyData: function() {
             var useSymbol = configuration.get('currency-view-type') === 'symbol';
             var availableCurrencies = this.availableCurrencies;

@@ -1,5 +1,5 @@
-Forms Configuration
-===================
+Forms and Validators Configuration
+==================================
 
 Table of Contents
 -----------------
@@ -10,18 +10,42 @@ Table of Contents
 Overview
 --------
 
-The Symfony [Validation Component](http://symfony.com/doc/current/book/validation.html) and [Forms Component](http://symfony.com/doc/current/book/forms.html) are used to validate and transform input data to an entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+The Symfony [Validation Component](http://symfony.com/doc/current/book/validation.html) and [Forms Component](http://symfony.com/doc/current/book/forms.html) are used to validate and transform input data to an entity in [create](./actions.md#create-action), [update](./actions.md#update-action), [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action) and [delete_relationship](./actions.md#delete_relationship-action) actions.
 
 Validation
 ----------
 
-The validation rules are loaded from *Resources/config/validation.yml* and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applicable in Data API as well.
+The validation rules are loaded from `Resources/config/validation.yml` and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applicable in Data API as well.
 Also, by default, Data API uses two validation groups: **Default** and **api**. If you need to add validation constrains that should be applicable in Data API only you should add them in **api** validation group.
 
-In case if input data violates some validation constraints, these constraints will be automatically converted to validation errors which are used to build correct response of Data API. The conversion is performed by [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default the HTTP status code for validation errors is `400 Bad Request`. But, if needed, there are several ways to change it:
+In case if input data violates some validation constraints, these constraints will be automatically converted to [validation errors](./processors.md#error-handling) which are used to build correct response of Data API. The conversion is performed by [CollectFormErrors](../../Processor/Shared/CollectFormErrors.php) processor. By default the HTTP status code for validation errors is `400 Bad Request`. But, if needed, there are several ways to change it:
 
 - Implement [ConstraintWithStatusCodeInterface](../../Validator/Constraints/ConstraintWithStatusCodeInterface.php) in you constraint class.
 - Implement own constraint text extractor. The API bundle has the [default implementation of constraint text extractor](../../Request/ConstraintTextExtractor.php). To add new extractor just create a class implements [ConstraintTextExtractorInterface](../../Request/ConstraintTextExtractorInterface.php) and tag it with the `oro.api.constraint_text_extractor` in the dependency injection container. Also this service can be used to change an error code and type for a validation constraint.
+
+Here are several examples how to add validation constraints to API resources using `Resources/config/oro/api.yml` configuration file:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            fields:
+                primaryEmail:
+                    form_options:
+                        constraints:
+                            # add Symfony\Component\Validator\Constraints\Email validation constraint
+                            - Email: ~
+                userName:
+                    form_options:
+                        constraints:
+                            # add Symfony\Component\Validator\Constraints\Length validation constraint
+                            - Length:
+                                max: 50
+                            # add Acme\Bundle\AcmeBundle\Validator\Constraints\Alphanumeric validation constraint
+                            - Acme\Bundle\AcmeBundle\Validator\Constraints\Alphanumeric: ~
+
+```
+
 
 Forms
 -----
@@ -32,7 +56,7 @@ And as result all Data API form types, extensions and guessers should be registe
 - using application configuration file
 - tagging form elements by appropriate tag in the dependency injection container
 
-To register new form elements using application configuration file you can add *Resources/config/oro/app.yml* in any bundle or use *app/config/config.yml* of your application. The following example shows how it can be done:
+To register new form elements using application configuration file you can add `Resources/config/oro/app.yml` in any bundle or use *app/config/config.yml* of your application. The following example shows how it can be done:
 
 ```yaml
 api:

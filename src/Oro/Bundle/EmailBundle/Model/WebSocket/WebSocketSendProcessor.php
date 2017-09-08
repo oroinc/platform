@@ -31,11 +31,11 @@ class WebSocketSendProcessor
      * @param Organization $organization
      * @return string
      */
-    public static function getUserTopic($user, Organization $organization)
+    public static function getUserTopic($user, Organization $organization = null)
     {
         $userId = $user instanceof User ? $user->getId() : $user;
 
-        return sprintf(self::TOPIC, $userId, $organization->getId());
+        return sprintf(self::TOPIC, $userId, $organization ? $organization->getId() : '');
     }
 
     /**

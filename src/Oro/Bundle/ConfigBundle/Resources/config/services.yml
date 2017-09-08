@@ -75,16 +75,22 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_config.provider.system_configuration.form_provider:
-        class:                        %oro_config.provider.system_configuration.form_provider.class%
+    oro_config.provider.abstract_provider:
+        class: Oro\Bundle\ConfigBundle\Provider\AbstractProvider
+        abstract: true
         arguments:
             - '@oro_config.config_bag'
+            - '@translator'
             - '@form.factory'
             - '@security.authorization_checker'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
-            - { name: oro_config.configuration_provider }
+            -  { name: oro_config.configuration_provider }
+
+    oro_config.provider.system_configuration.form_provider:
+        class: %oro_config.provider.system_configuration.form_provider.class%
+        parent: 'oro_config.provider.abstract_provider'
         lazy: true
 
     oro_config.form.config_subscriber:
@@ -143,3 +149,11 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'doctrine_metadata_config' ] ]
+
+    oro_config.condition.is_system_config_equal:
+        class: Oro\Bundle\ConfigBundle\Condition\IsSystemConfigEqual
+        arguments:
+            - '@oro_config.manager'
+        tags:
+            - { name: oro_workflow.condition, alias: 'is_system_config_equal' }
+            - { name: oro_action.condition, alias: 'is_system_config_equal' }

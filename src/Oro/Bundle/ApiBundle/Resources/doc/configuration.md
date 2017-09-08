@@ -32,7 +32,7 @@ api:
 
 If an auto-generated alias for your entity looks bad for you, you can change it in `Resources/config/oro/entity.yml`. More details you can find in [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
-Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. If you use API sandbox run `oro:api:doc:cache:clear` CLI command to apply the changes for it. Also please see other [debug commands](./debug_commands.md) that may be helpful.
+Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. If you use API sandbox run `oro:api:doc:cache:clear` CLI command to apply the changes for it. Also please see other [CLI commands](./commands.md) that may be helpful.
 
 
 Configuration structure
@@ -232,7 +232,6 @@ This section describes entity fields' configuration.
 * **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
 * **description** *string* A human-readable description of the field or a link to the [documentation resource](./documentation.md). Used in auto generated documentation only.
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
-* **data_transformer** The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name. If a data transformer is a static method of a class, the method should have the following signature: `function ($class, $property, $value, array $config, array $context) : mixed` and should return transformed value. If a data transformer is a service, it should implement either `Oro\Component\EntitySerializer\DataTransformerInterface` or `Symfony\Component\Form\DataTransformerInterface` interface.
 * **collapse** *boolean* Indicates whether the entity should be collapsed. It is applicable for associations only. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by [get_relation_config](./actions.md#get_relation_config-action) processors to get identifier of the related entity.
 * **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
@@ -273,16 +272,6 @@ api:
                 addressName:
                     property_path: address.name
 
-                # full syntax for data transformer
-                field2:
-                    data_transformer:
-                        - 'my.data.transformer.service.id'
-                        - ['Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer', 'transform']
-
-                # short syntax for data transformer
-                field3:
-                    data_transformer: 'my.data.transformer.service.id'
-
                 # full syntax for "collapse" property
                 field4:
                     collapse:         true
@@ -299,6 +288,9 @@ api:
                     form_type: text
                     form_options:
                         trim: false
+                        constraints:
+                            # add Symfony\Component\Validator\Constraints\NotBlank validation constraint
+                            - NotBlank: ~
 
                 # to-one association
                 field7:

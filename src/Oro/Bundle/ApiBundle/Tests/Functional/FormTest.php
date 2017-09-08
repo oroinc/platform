@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Symfony\Component\Form\FormInterface;
+
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
@@ -9,8 +11,6 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-use Symfony\Component\Form\FormInterface;
 
 class FormTest extends WebTestCase
 {
@@ -35,11 +35,11 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => 'test']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertTrue($form->isValid(), 'isValid');
 
-        $this->assertSame(123, $object->getId());
-        $this->assertSame('test', $object->getTitle());
+        self::assertSame(123, $object->getId());
+        self::assertSame('test', $object->getTitle());
     }
 
     public function testApiForm()
@@ -51,11 +51,11 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => 'test']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertTrue($form->isValid(), 'isValid');
 
-        $this->assertSame(123, $object->getId());
-        $this->assertSame('test', $object->getTitle());
+        self::assertSame(123, $object->getId());
+        self::assertSame('test', $object->getTitle());
     }
 
     public function testDefaultFormValidation()
@@ -65,8 +65,8 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => '']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertFalse($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertFalse($form->isValid(), 'isValid');
     }
 
     public function testApiFormValidation()
@@ -78,8 +78,8 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => '']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertFalse($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertFalse($form->isValid(), 'isValid');
     }
 
     public function testValidationConstraintFromAllGroups()
@@ -91,8 +91,8 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => 'test', 'description' => '12']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertTrue($form->isValid(), 'isValid');
     }
 
     public function testValidationConstraintFromApiGroup()
@@ -104,8 +104,8 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => 'test', 'description' => '1234']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertFalse($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertFalse($form->isValid(), 'isValid');
     }
 
     public function testValidationConstraintFromUiGroup()
@@ -117,8 +117,8 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => 'test', 'description' => '1234']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertTrue($form->isValid(), 'isValid');
     }
 
     /**
@@ -143,11 +143,11 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['id' => 123, 'title' => 'test']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertTrue($form->isValid(), 'isValid');
 
-        $this->assertSame(123, $object->getId());
-        $this->assertSame('test', $object->getTitle());
+        self::assertSame(123, $object->getId());
+        self::assertSame('test', $object->getTitle());
     }
 
     public function testApiFormWithGuessedTypesAndPropertyPath()
@@ -166,11 +166,11 @@ class FormTest extends WebTestCase
         $form->setData($object);
 
         $form->submit(['code' => 123, 'title' => 'test']);
-        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
-        $this->assertTrue($form->isValid(), 'isValid');
+        self::assertTrue($form->isSubmitted(), 'isSubmitted');
+        self::assertTrue($form->isValid(), 'isValid');
 
-        $this->assertSame(123, $object->getId());
-        $this->assertSame('test', $object->getTitle());
+        self::assertSame(123, $object->getId());
+        self::assertSame('test', $object->getTitle());
     }
 
     protected function switchToDefaultFormExtension()
@@ -233,7 +233,9 @@ class FormTest extends WebTestCase
      */
     protected function getRootForm(array $options = [])
     {
-        $options['data_class'] = self::TEST_CLASS;
+        if (!isset($options['data_class'])) {
+            $options['data_class'] = self::TEST_CLASS;
+        }
         $options['extra_fields_message'] = FormHelper::EXTRA_FIELDS_MESSAGE;
         $form = $this->getContainer()->get('form.factory')->create($this->getType(), null, $options);
 

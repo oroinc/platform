@@ -119,6 +119,21 @@ define([
             if (this.deferredInit) {
                 this.deferredInit.resolve(this);
             }
+        },
+
+        /**
+         * Reject deferred initialization
+         *
+         * @protected
+         */
+        _rejectDeferredInit: function(error) {
+            if (this.deferredInit) {
+                if (error) {
+                    this.deferredInit.reject(error);
+                } else {
+                    this.deferredInit.reject();
+                }
+            }
         }
     });
 

@@ -89,16 +89,28 @@ class ImportCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException('Email is required for the validation!');
         }
 
+        $message = [
+            'fileName' => $fileName,
+            'originFileName' => $originFileName,
+            'notifyEmail' => $email,
+            'jobName' =>  $jobName,
+            'processorAlias' => $processorAlias,
+            'process' => $processor,
+        ];
+
+        $token = $this->getContainer()->get('security.token_storage')->getToken();
+        if ($token) {
+            $message = array_merge(
+                $message,
+                [
+                    'securityToken' => $this->getContainer()->get('oro_security.token_serializer')->serialize($token)
+                ]
+            );
+        }
+
         $this->getMessageProducer()->send(
             Topics::PRE_CLI_IMPORT,
-            [
-                'fileName' => $fileName,
-                'originFileName' => $originFileName,
-                'notifyEmail' => $email,
-                'jobName' =>  $jobName,
-                'processorAlias' => $processorAlias,
-                'process' => $processor,
-            ]
+            $message
         );
         
         if ($email) {

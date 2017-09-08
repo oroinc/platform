@@ -115,7 +115,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $possibleElementName = $this->fixStepArgument($fieldName);
         if ($this->elementFactory->hasElement($possibleElementName)) {
             $value = $this->createElement($possibleElementName)->getValue();
-            self::assertEquals($fieldValue, $value);
+            self::assertSame($fieldValue, $value);
 
             return;
         }
@@ -141,6 +141,16 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         self::fail(sprintf('Can\'t find field with "%s" label', $fieldName));
+    }
+
+    /**
+     * Find and assert that field value is empty
+     *
+     * @When /^(?P<fieldName>[\w\s]*) field is empty$/
+     */
+    public function fieldIsEmpty($fieldName)
+    {
+        return $this->fieldShouldHaveValue($fieldName, "");
     }
 
     /**
@@ -336,29 +346,29 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * This step is used for system configuration field
      * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And check Use Default for "Position" field
+     * Example: And check "Use default" for "Position" field
      *
-     * @Given check Use Default for :label field
+     * @Given check :checkbox for :label field
      */
-    public function checkUseDefaultForField($label)
+    public function checkUseDefaultForField($label, $checkbox)
     {
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
-        $form->checkUseDefaultCheckbox($label);
+        $form->checkCheckboxByLabel($label, $checkbox);
     }
 
     /**
      * This step used for system configuration field
      * Go to System/Configuration and see the fields with default checkboxes
-     * Example: And uncheck Use Default for "Position" field
+     * Example: And uncheck "Use default" for "Position" field
      *
-     * @Given uncheck Use Default for :label field
+     * @Given uncheck :checkbox for :label field
      */
-    public function uncheckUseDefaultForField($label)
+    public function uncheckUseDefaultForField($label, $checkbox)
     {
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
-        $form->uncheckUseDefaultCheckbox($label);
+        $form->uncheckCheckboxByLabel($label, $checkbox);
     }
 
     /**

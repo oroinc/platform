@@ -296,8 +296,8 @@ services:
         arguments:
             - '@translator'
 
-    oro_entity_config.attribute_group_rendrer_registry:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry'
+    oro_entity_config.attribute_render_registry:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry'
 
     oro_entity_config.form.extension.dynamic_attributes:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\DynamicAttributesExtension
@@ -421,3 +421,10 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.field.after_remove, method: onAfterRemove }
+
+    oro_entity_config.event_listener.cache_state:
+        class:  Oro\Bundle\EntityConfigBundle\EventListener\CacheStateChangeListener
+        arguments:
+            - '@oro_message_queue.consumption.cache_state'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onPostFlushConfig }

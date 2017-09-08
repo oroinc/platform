@@ -10,7 +10,9 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
+use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -31,6 +33,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var OwnerChecker */
+    protected $ownerChecker;
 
     /** @var array */
     protected $cachedEntities = [];
@@ -53,6 +58,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param TranslatorInterface          $translator
      * @param NewEntitiesHelper            $newEntitiesHelper
      * @param DoctrineHelper               $doctrineHelper
+     * @param OwnerChecker                 $ownerChecker
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -62,13 +68,15 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         ChainEntityClassNameProvider $chainEntityClassNameProvider,
         TranslatorInterface $translator,
         NewEntitiesHelper $newEntitiesHelper,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        OwnerChecker $ownerChecker
     ) {
         parent::__construct($eventDispatcher, $strategyHelper, $fieldHelper, $databaseHelper);
         $this->chainEntityClassNameProvider = $chainEntityClassNameProvider;
         $this->translator                   = $translator;
         $this->newEntitiesHelper            = $newEntitiesHelper;
         $this->doctrineHelper               = $doctrineHelper;
+        $this->ownerChecker = $ownerChecker;
     }
 
 
@@ -125,9 +133,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $searchContext);
         if ($existingEntity) {
-            if (!$this->isPermissionGrantedForEntity('EDIT', $existingEntity, $entityClass)) {
-                return null;
-            }
             $existingOid = spl_object_hash($existingEntity);
             if (isset($this->cachedEntities[$existingOid])) {
                 return $existingEntity;
@@ -167,7 +172,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             }
 
             $this->databaseHelper->resetIdentifier($entity);
-            if (!$this->strategyHelper->isGranted("CREATE", $entity)) {
+            if (!$this->strategyHelper->isGranted('CREATE', 'entity:' . ClassUtils::getClass($entity))) {
                 $error = $this->translator->trans(
                     'oro.importexport.import.errors.access_denied_entity',
                     ['%entity_name%' => $entityClass,]
@@ -210,11 +215,12 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $excludedFields[] = $identifierName;
         $fields           = $this->fieldHelper->getFields($entityName, true);
         $action = $existingEntity ? 'EDIT' : 'CREATE';
+        $checkEntity = $existingEntity ? $entity : new ObjectIdentity('entity', $entityName);
 
-        foreach ($fields as $key => $field) {
+        foreach ($fields as $field) {
             $fieldName = $field['name'];
             $importedValue = $this->getObjectValue($entity, $fieldName);
-            if (!$this->strategyHelper->isGranted($action, $entity, $fieldName) && $importedValue) {
+            if (!$this->strategyHelper->isGranted($action, $checkEntity, $fieldName) && $importedValue) {
                 $error = $this->translator->trans(
                     'oro.importexport.import.errors.access_denied_property_entity',
                     [
@@ -230,6 +236,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                     $this->fieldHelper->setObjectValue($entity, $fieldName, null);
                 }
             }
+        }
+
+        if (!$this->ownerChecker->isOwnerCanBeSet($entity)) {
+            $error = $this->translator->trans(
+                'oro.importexport.import.errors.wrong_owner'
+            );
+            $this->strategyHelper->addValidationErrors([$error], $this->context);
         }
     }
 
@@ -443,6 +456,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function combineIdentityValues($entity, $entityClass, array $searchContext)
     {
+        if (!$this->isSearchContextValid($searchContext)) {
+            return null;
+        }
+
         $identityValues = $searchContext;
         $identityValues += $this->fieldHelper->getIdentityValues($entity);
         $notEmptyValues     = [];
@@ -577,6 +594,34 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             $this->context->addError($error);
 
             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * We shouldn't allow to search related entity in cache of `newEntitiesHelper`
+     * if main entity is not in db and
+     * main entity has one of next relations to current entity: ONE_TO_ONE or ONE_TO_MANY
+     * because in another case we can face with issue of resetting inversed
+     *
+     * @param array $searchContext
+     *
+     * @return bool
+     */
+    protected function isSearchContextValid(array $searchContext)
+    {
+        foreach ($searchContext as $identityValue) {
+            if (null === $identityValue || '' === $identityValue) {
+                return false;
+            }
+
+            if (is_object($identityValue)) {
+                $identifier = $this->databaseHelper->getIdentifier($identityValue);
+                if ($identifier === null) {
+                    return false;
+                }
+            }
         }
 
         return true;

@@ -13,8 +13,6 @@ use Symfony\Component\Console\Command\Command;
 
 class SuiteControllerTest extends \PHPUnit_Framework_TestCase
 {
-    const SUITE_SET_DIVIDER = 1;
-
     private $suites = [
         'AcmeDemo1',
         'AcmeDemo2',

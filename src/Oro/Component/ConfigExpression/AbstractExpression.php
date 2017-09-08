@@ -117,7 +117,7 @@ abstract class AbstractExpression implements ExpressionInterface
      * @param mixed  $params
      * @param string $factoryAccessor
      *
-     * @return array
+     * @return string
      */
     protected function convertToPhpCode($params, $factoryAccessor)
     {

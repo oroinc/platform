@@ -1,6 +1,6 @@
-@skip
 @regression
 @fixture-OroActivityBundle:activities-smoke-e2e.yml
+# @TODO split this feature and move to the regular test suite, or create small features in addition there
 Feature: Activities
   In order to check Activity entity on admin panel
   As a Admin
@@ -22,11 +22,13 @@ Feature: Activities
     And save and close form
     Then should see "Task saved" flash message
     And go to Activities/ Tasks
-    And I should see following records in grid:
-      |Test1  |Aug 24, 2018, 12:00 AM|Open  |Normal  |John Doe   |
+    And I should see following grid:
+      | Subject | Due date               | Status | Priority | Assigned To |
+      | Test1   | Aug 24, 2018, 12:00 AM | Open   | Normal   | John Doe    |
     When click My Tasks in user menu
-    Then I should see following records in grid:
-      |Test1  |Aug 24, 2018, 12:00 AM|Open  |Normal  |John Doe   |
+    Then I should see following grid:
+      | Subject | Due date               | Status | Priority |
+      | Test1   | Aug 24, 2018, 12:00 AM | Open   | Normal   |
 
   Scenario: Add a Task for Another Record
     Given go to Sales/ Leads
@@ -69,8 +71,9 @@ Feature: Activities
       | Email  | hours         | 30              |
     And click "Create Task"
     Then should see "Task created successfully" flash message
-    And I should see following records in grid:
-      |SalesRep Task|Aug 24, 2018, 12:00 AM|Open  |Normal  |John Doe   |
+    And I should see following grid:
+      | Subject       | Due date               | Status | Priority |
+      | SalesRep Task | Aug 24, 2018, 12:00 AM | Open   | Normal   |
     And go to Activities/ Tasks
     And click view "SalesRep Task" in grid
     And should see "Assigned To: Charlie Sheen (Main)"
@@ -118,8 +121,9 @@ Feature: Activities
     And save and close form
     Then should see "Call saved" flash message
     And go to Activities/ Calls
-    And I should see following records in grid:
-      |Call to Someone  |0501468825|Oct 31, 2016, 8:00 AM|John Doe|
+    And I should see following grid:
+      | Subject          | Phone number | Call date & time      | Contexts |
+      | Call to Someone  | 0501468825   | Oct 31, 2016, 8:00 AM | John Doe |
 
   Scenario:Add a Task for Another Record
     Given go to Sales/ Leads
@@ -154,9 +158,10 @@ Feature: Activities
     And should see "Phone Number 0503504444"
     And should not see "Phone Number 0503505566"
     And go to Activities/ Calls
-    And I should see following records in grid:
-      |Call to Someone  |0501468825|Oct 31, 2016, 8:00 AM|John Doe        |
-      |Call for lead    |0503504444|Nov 21, 2016, 8:00 AM|OroInc, John Doe|
+    And I should see following grid:
+      | Subject          | Phone number | Call date & time      | Contexts         |
+      | Call for lead    | 0503504444   | Nov 21, 2016, 8:00 AM | OroInc, John Doe |
+      | Call to Someone  | 0501468825   | Oct 31, 2016, 8:00 AM | John Doe         |
 
   Scenario:View and Manage Calls on the view page of a record
     Given go to Activities/ Cases
@@ -187,17 +192,18 @@ Feature: Activities
     And should see "Case saved" flash message
     And go to System/ User Management/ Users
     And click view "Charlie Sheen" in grid
-    Then I should see following records in grid:
-      |1|Case subject|Open |High |
+    Then I should see following "User Cases Grid" grid:
+      | Case ID | Subject      | Status | Priority |
+      | 1       | Case subject | Open   | High     |
 
   Scenario:Create a contact request
     Given go to Activities/ Contact Requests
     And click "Create Contact Request"
     And fill form with:
-    |First name|Joshua         |
-    |Last name |Field          |
-    |Email     |test@test.com|
-    |Comment   |testComment    |
+      |First name|Joshua         |
+      |Last name |Field          |
+      |Email     |test@test.com  |
+      |Comment   |testComment    |
     And save and close form
     And should see "Contact request has been saved successfully" flash message
     And click "Log call"
@@ -216,15 +222,16 @@ Feature: Activities
     And click view "Call for contact request" in grid
     And should see "Context Joshua Field"
 
-  Scenario:Manage Contact Requests
+  Scenario: Manage Contact Requests
     Given go to Activities/ Contact Requests
     And click view "Joshua" in grid
     When click "Convert to Opportunity"
     And click "Submit"
     Then should see "Converted to Opportunity"
     And go to Sales/ Opportunities
-    And I should see following records in grid:
-      |Joshua Field  |Open|John Doe|
+    And I should see following grid:
+      | Opportunity name | Status | Owner    |
+      | Joshua Field     | Open   | John Doe |
     And go to Activities/ Contact Requests
     And click "Create Contact Request"
     And fill form with:
@@ -237,8 +244,9 @@ Feature: Activities
     And click "Submit"
     Then should see "Converted to Lead"
     And go to Sales/ Leads
-    And I should see following records in grid:
-      |Bob Cornelius|New|Bob|Cornelius|rest@test.com|John Doe|
+    And I should see following grid:
+      | Lead name     | Status | First name | Last name | Email         | Owner    |
+      | Bob Cornelius | New    | Bob        | Cornelius | rest@test.com | John Doe |
     And go to Activities/ Contact Requests
     And click "Create Contact Request"
     And fill form with:
@@ -255,9 +263,10 @@ Feature: Activities
     And click "Yes, Delete"
     Then I should see "Contact Request deleted" flash message
     And go to Activities/ Contact Requests
-    And I should see following records in grid:
-      |Bob   |Cornelius|rest@test.com|Converted to Lead       |
-      |Joshua|Field    |test@test.com|Converted to Opportunity|
+    And I should see following grid:
+      | First name | Last name | Email         | Step                     |
+      | Bob        | Cornelius | rest@test.com | Converted to Lead        |
+      | Joshua     | Field     | test@test.com | Converted to Opportunity |
 
   Scenario: Create a calendar event in the Calendar Events grid
     Given go to Activities/ Calendar Events
@@ -285,8 +294,9 @@ Feature: Activities
     Then I should see "The context has been added" flash message
     And should see "Context Magento"
     And go to Activities/ Calendar Events
-    And should see following records in grid:
-      |All day no repeat Event|John Doe|Jan 24, 2017, 12:00 AM|Feb 26, 2020, 12:00 AM|No|N/A|Not responded|
+    And should see following grid:
+      | Title                   | Calendar | Start                  | End                    | Recurrent | Recurrence | Invitation status |
+      | All day no repeat Event | John Doe | Jan 24, 2017, 12:00 AM | Feb 26, 2020, 12:00 AM | No        | N/A        | Not responded     |
 
   Scenario: Add an event for Another Record
     Given go to Sales/ Leads
@@ -352,5 +362,7 @@ Feature: Activities
       |Guests       |John Doe - Organizer                     |
       |Recurrence   |Daily every 1 day, end after 1 occurrence|
     And go to Activities/ Calendar Events
-    And should see following records in grid:
-      |Stand-Up|John Doe|Yes|Daily every 1 day, end after 1 occurrence|Not responded|
+    And should see following grid:
+      | Title                   | Calendar | Recurrent | Recurrence                               | Invitation status |
+      | All day no repeat Event | John Doe | No        | N/A                                      | Not responded     |
+      | Stand-Up                | John Doe | Yes       |Daily every 1 day, end after 1 occurrence | Not responded     |

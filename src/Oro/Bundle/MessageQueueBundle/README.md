@@ -1,10 +1,13 @@
 # OroMessageQueue Bundle
 
+*Note:* This article is published in the Oro documentation library.
+
 ## Table of Contents
 
  - [Overview](#overview)
  - [Usage](#usage)
  - [Cunsomer options](#cunsomer-options)
+ - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Supervisord](#supervisord)
  - [Internals](#internals)
    - [Structure](#structure)

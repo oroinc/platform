@@ -7,21 +7,60 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class SidebarConfigMenu extends Element
 {
-    public function clickLink($locator)
+    public function openNestedMenu($path)
     {
-        $this->find('css', 'a[data-action="accordion:expand-all"]')->click();
-        $link = $this->findLink($locator);
-        $link->waitFor(60, function (NodeElement $link) {
-            return $link->isVisible();
+        $configMenuDropdownButton = $this->find('css', 'button[title="Mass Actions"]');
+        self::assertNotNull($configMenuDropdownButton, 'Config menu dropdown button not found');
+        $configMenuDropdownButton->click();
+
+        $configMenuDropdown = $configMenuDropdownButton->getParent()->find('css', 'ul[data-role="jstree-actions"]');
+        self::assertNotNull($configMenuDropdown, 'Config menu dropdown not found');
+
+        $collapseAllLink = $configMenuDropdown->find('css', 'a[title="Collapse all"]');
+        self::assertNotNull($collapseAllLink, 'Collapse All link not found');
+        $collapseAllLink->click();
+
+        // wait for links will collapsed
+        $this->spin(function (SidebarConfigMenu $element) {
+            $linksCount = count($element->findAll('css', 'li.jstree-node'));
+            $collapsedLinksCount = count($element->findAll('css', 'li.jstree-closed'));
+
+            return $linksCount === $collapsedLinksCount;
         });
-        $link->click();
+
+        $items = explode('/', $path);
+        $context = $this->find('css', 'ul.jstree-container-ul');
+        self::assertNotNull($context, 'System configuration not found');
+        $lastLink = array_pop($items);
+
+        while ($item = trim(array_shift($items))) {
+            $link = $context->findLink($item);
+            self::assertNotNull($link, sprintf('Link "%s" was not found in configuration menu', $item));
+
+            $link->click();
+
+            $accordionBody = $link->getParent()->find('css', 'ul.jstree-children');
+
+            $isExpanded = $this->spin(function () use ($accordionBody) {
+                return $accordionBody !== null
+                    && $accordionBody->isVisible()
+                    && $accordionBody->getAttribute('style') === '';
+            }, 5);
+
+            self::assertTrue($isExpanded, sprintf('Menu "%s" is still collapsed', $item));
+            $context = $accordionBody;
+        }
+
+        $context->clickLink($lastLink);
     }
 
     /**
-     * @return \Behat\Mink\Element\NodeElement[]
+     * @return NodeElement[]
      */
     public function getIntegrations()
     {
-        return $this->findAll('css', '#config_tab_group_integrations li a');
+        $this->openNestedMenu('System configuration/Integrations');
+
+        return $this->findAll('css', '#integrations ul[role="group"] li[role="treeitem"] a');
     }
 }

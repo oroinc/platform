@@ -38,6 +38,18 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessWhenNormalizedEntityLoaded()
+    {
+        $this->context->set(LoadNormalizedEntity::NORMALIZED_ENTITY_LOADED_PARAM, true);
+
+        $this->processorBag
+            ->expects(static::never())
+            ->method('getProcessor')
+            ->with('get');
+
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWhenGetActionSuccess()
     {
         $getResult = ['key' => 'value'];
@@ -127,6 +139,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
             $expectedContext->getResponseHeaders()->set($key, $value);
         }
         $expectedContext->setResult($getResult);
+        $expectedContext->set(LoadNormalizedEntity::NORMALIZED_ENTITY_LOADED_PARAM, true);
 
         $this->assertEquals($expectedContext, $this->context);
     }

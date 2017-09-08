@@ -1,7 +1,7 @@
 {
     "name": "oro/platform",
     "description": "Business Application Platform (BAP)",
-    "homepage": "https://github.com/orocrm/platform.git",
+    "homepage": "https://github.com/oroinc/platform.git",
     "license": "MIT",
     "authors": [
         {
@@ -29,7 +29,7 @@
         "symfony/assetic-bundle": "2.8.1",
         "symfony/swiftmailer-bundle": "2.4.*",
         "symfony/monolog-bundle": "3.0.*",
-        "sensio/distribution-bundle": "4.0.*",
+        "sensio/distribution-bundle": "5.0.*",
         "sensio/framework-extra-bundle": "3.0.*",
         "incenteev/composer-parameter-handler": "2.1.2",
         "jms/serializer": "1.4.2",
@@ -137,6 +137,10 @@
         "oro": {
             "type": "composer",
             "url": "https://packagist.orocrm.com"
+        },
+        "asset-packagist": {
+            "type": "composer",
+            "url": "https://asset-packagist.orocrm.com"
         }
     },
     "minimum-stability": "dev",

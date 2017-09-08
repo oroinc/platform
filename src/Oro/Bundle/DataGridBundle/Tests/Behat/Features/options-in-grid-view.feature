@@ -1,3 +1,4 @@
+@regression
 @ticket-BAP-12348
 @automatically-ticket-tagged
 Feature: Options in Grid View

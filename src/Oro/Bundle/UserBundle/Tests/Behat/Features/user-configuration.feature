@@ -1,6 +1,6 @@
+@regression
 @ticket-BB-6429
 @automatically-ticket-tagged
-@skip
 Feature: User configuration
   In order to have ability to change configuration on user level
   As admin
@@ -10,7 +10,7 @@ Feature: User configuration
     Given I login as administrator
     And I go to System/User Management/Users
     And I click Configuration on admin in grid "Grid"
-    And I click "Display settings"
+    And I follow "System configuration/General setup/Display settings" on configuration sidebar
     And I fill "User Config Form" with:
       | Use parent scope for Position | false   |
       | Position                      | Left    |

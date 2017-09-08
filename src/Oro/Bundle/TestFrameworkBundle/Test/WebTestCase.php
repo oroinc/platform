@@ -264,35 +264,6 @@ abstract class WebTestCase extends BaseWebTestCase
     {
         return $this->getContainer()->get('doctrine')->getRepository($userClass)->findOneBy(['email' => $email]);
     }
-    /**
-     * Authenticates users with applying firewall context and setting correct session
-     * https://symfony.com/doc/current/testing/http_authentication.html
-     * @param string $email
-     * @param string $credentials
-     * @param string $firewallContext
-     * @param string $userClass
-     */
-    protected function simulateAuthentication($email, $credentials, $firewallContext, $userClass = User::class)
-    {
-        $user = $this->getUser($email, $userClass);
-        $session = $this->client->getContainer()->get('session');
-
-        /** @var Organization $organization */
-        $organization = $user->getOrganization();
-        $token = new UsernamePasswordOrganizationToken(
-            $user,
-            $credentials,
-            $firewallContext,
-            $organization,
-            $user->getRoles()
-        );
-
-        $session->set('_security_'.$firewallContext, serialize($token));
-        $session->save();
-
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $this->client->getCookieJar()->set($cookie);
-    }
 
     /**
      * Reset client and rollback transaction

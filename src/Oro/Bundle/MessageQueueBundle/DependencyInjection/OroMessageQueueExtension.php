@@ -54,12 +54,12 @@ class OroMessageQueueExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('log.yml');
         $loader->load('job.yml');
 
-        // @see BAP-12051
         // php pcntl extension available only for UNIX like systems
         if (extension_loaded('pcntl')) {
-            $loader->load('optional_services.yml');
+            $loader->load('signal_extension.yml');
         }
 
         foreach ($config['transport'] as $name => $transportConfig) {
@@ -97,6 +97,8 @@ class OroMessageQueueExtension extends Extension
             );
             $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
         }
+
+        $this->setPersistenceServicesAndProcessors($config, $container);
     }
 
     /**
@@ -111,5 +113,25 @@ class OroMessageQueueExtension extends Extension
         $container->addResource(new FileResource($rc->getFileName()));
 
         return new Configuration($this->factories);
+    }
+
+    /**
+     * Sets the services that should not be reset during container reset and
+     * Message Queue processors that can work without container reset to container reset extension.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $container
+     */
+    protected function setPersistenceServicesAndProcessors(array $config, ContainerBuilder $container)
+    {
+        $resetExtensionDefinition = $container
+            ->getDefinition('oro_message_queue.consumption.container_reset_extension');
+
+        if (!empty($config['persistent_services'])) {
+            $resetExtensionDefinition->addMethodCall('setPersistentServices', [$config['persistent_services']]);
+        }
+        if (!empty($config['persistent_processors'])) {
+            $resetExtensionDefinition->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
+        }
     }
 }

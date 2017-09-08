@@ -6,7 +6,7 @@ use DateTime;
 
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
+use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 
 class AuditFieldTest extends \PHPUnit_Framework_TestCase
 {

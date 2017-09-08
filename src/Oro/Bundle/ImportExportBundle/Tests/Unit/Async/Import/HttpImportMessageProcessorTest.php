@@ -53,7 +53,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[HttpImportMessageProcessor] Got invalid message. body: []');
+            ->with('Got invalid message');
 
         $processor = new HttpImportMessageProcessor(
             $this->createJobRunnerMock(),
@@ -69,7 +69,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = $this->createMessageMock();
         $message
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getBody')
             ->willReturn('[]');
 

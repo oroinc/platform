@@ -25,7 +25,6 @@ define(function(require) {
 
             $tree.on('open_all.jstree', afterOpenAll);
 
-            $tree.jstree('show_all');
             $tree.jstree('open_all');
         }
     });

@@ -1,12 +1,14 @@
 parameters:
     oro_message_queue.maintance.idle_time: 5
     oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
+
 services:
     oro_message_queue.consumption.extensions:
-        class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension'
         public: false
         arguments:
             - []
+            - '@oro_message_queue.log.consumer_state'
 
     oro_message_queue.consumption.docrine_ping_connection_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
@@ -14,13 +16,35 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            # extension should be first to be able to reconnect to db
+            - { name: 'oro_message_queue.consumption.extension', priority: -250}
 
     oro_message_queue.consumption.docrine_clear_identity_map_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
         public: false
         arguments:
             - '@doctrine'
+        tags:
+            # extension should be one of the first to be able to "finish process old message" with old container state
+            - { name: 'oro_message_queue.consumption.extension', priority: -245 }
+
+    oro_message_queue.consumption.container_reset_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            # extension have 0 priority to be sure that extensions with higher priority will be processed with clear container
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.extension.maintance:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
+        public: false
+        arguments:
+            - '@oro_platform.maintenance'
+            - '%oro_message_queue.maintance.idle_time%'
+        calls:
+            - ['setFilePathServerLockFromConfig', ['%kernel.root_dir%/config/oro_env.conf']]
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
@@ -29,6 +53,7 @@ services:
         public: false
         arguments:
             - '%oro_message_queue.consumption.interrupt_filepath%'
+            - '@oro_message_queue.consumption.cache_state'
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
@@ -43,17 +68,6 @@ services:
         tags:
             - { name: console.command }
 
-    oro_message_queue.consumption.extension.maintance:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
-        public: false
-        arguments:
-            - '@oro_platform.maintenance'
-            - '%oro_message_queue.maintance.idle_time%'
-        calls:
-            - ['setFilePathServerLockFromConfig', ['%kernel.root_dir%/config/oro_env.conf']]
-        tags:
-            - { name: 'oro_message_queue.consumption.extension' }
-
     oro_message_queue.listener.update_schema:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
         arguments:
@@ -61,10 +75,15 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'oro.entity_extend.entity.schema.update', priority: -250, method: 'interruptConsumption' }
 
-    oro_message_queue.consumption.token_storage_clearer_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension'
+    oro_message_queue.consumption.cache_state:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\CacheState
+        arguments:
+            - '@oro_message_queue.consumption.cache_state_driver.dbal'
+
+    oro_message_queue.consumption.cache_state_driver.dbal:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\StateDriver\DbalStateDriver
         public: false
         arguments:
-            - '@security.token_storage'
-        tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            - 'cache'
+            - '@doctrine'
+            - '@logger'

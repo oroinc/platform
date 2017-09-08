@@ -20,6 +20,13 @@ services:
         public: false
         arguments:
             - '@oro_message_queue.job.processor'
+            - '@oro_message_queue.job.extensions'
+
+    oro_message_queue.job.extensions:
+        class: 'Oro\Component\MessageQueue\Job\ChainExtension'
+        public: false
+        arguments:
+            - []
 
     oro_message_queue.job.root_job_status_calculator:
         class: 'Oro\Component\MessageQueue\Job\RootJobStatusCalculator'

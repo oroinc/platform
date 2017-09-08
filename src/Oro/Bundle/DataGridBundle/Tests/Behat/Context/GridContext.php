@@ -141,6 +141,29 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Start inline editing in grid without changing the value and assert inline editor value
+     *
+     * Example: When I start inline editing on "Test Warehouse" Quantity field I should see "10000000" value
+     *
+     * @param string|null $field
+     * @param string|null $value
+     * @param string|null $entityTitle
+     *
+     * @When /^(?:|I )start inline editing on "(?P<field>[^"]+)" field I should see "(?P<value>.*)" value$/
+     * @codingStandardsIgnoreStart
+     * @When /^(?:|I )start inline editing on "(?P<entityTitle>[^"]+)" "(?P<field>.+)" field I should see "(?P<value>.*)" value$/
+     * @codingStandardsIgnoreEnd
+     */
+    public function startInlineEditingAndAssertEditorValue($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+        $cell = $row->startInlineEditing($field);
+        $inlineEditor = $cell->findField('value');
+
+        self::assertEquals($inlineEditor->getValue(), $value);
+    }
+
+    /**
      * @param string|null $entityTitle
      * @param string|null $gridName
      * @return GridRow
@@ -228,7 +251,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 if ($cellValue instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
-                self::assertEquals($value, $cellValue, sprintf('Unexpected value at %d row in grid', $rowNumber));
+                self::assertEquals(
+                    $value,
+                    $cellValue,
+                    sprintf('Unexpected value at %d row "%s" column in grid', $rowNumber, $columnTitle)
+                );
             }
         }
     }
@@ -299,7 +326,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>[\d]+)$/
+     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>(?:|zero|one|two|\d+))$/
      * @Given /^there (?:|are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number, $gridName = null)
@@ -569,6 +596,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
      * @When /^(?:|when )(?:|I )sort "(?P<gridName>[\w\s]+)" by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again)$/
+     * @When /^(?:|I )sort grid by "(?P<field>.*)"(?:| again)$/
      */
     public function sortGridBy($field, $gridName = null)
     {
@@ -674,6 +702,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $actualValue = trim($columns[$columnNumber - 1]->text());
             // removing multiple spaces, newlines, tabs
             $actualValue = trim(preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue));
+
+            $html = trim($columns[$columnNumber - 1]->html());
+            // remove "Edit" suffix from value, if it comes from editable cell
+            if (preg_match('/<i[^>]+>Edit<\/i>$/iu', $html) === 1) {
+                $actualValue = substr($actualValue, 0, -4);
+            }
 
             self::assertEquals(
                 $value,
@@ -1232,6 +1266,23 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iShouldSeeFollowingRecordsInGrid(TableNode $table, $gridName = null)
     {
+        $errorMessage = <<<TEXT
+            ---
+            You can't use more then one column in this method
+            It just asserts that given strings are in the grid
+            Example: Then I should see following records in grid:
+                       | Alice1  |
+                       | Alice10 |
+            
+            Guess, you can use another method...
+            
+            And I should see following grid:
+                | First name | Last name | Primary Email     | Enabled | Status |
+                | John       | Doe       | admin@example.com | Enabled | Active |
+                
+TEXT;
+
+        self::assertCount(1, $table->getRow(0), $errorMessage);
         foreach ($table->getRows() as list($value)) {
             $this->iShouldSeeRecordInGrid($value, $gridName);
         }
@@ -1584,10 +1635,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
             if ($gridToolbarActions->isVisible()) {
                 $gridToolbarActions->getActionByTitle('Filters')->click();
-            } else {
-                $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-                self::assertNotNull($filterState);
+            }
 
+            $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
+            if ($filterState->isValid()) {
                 $filterState->click();
             }
         }
