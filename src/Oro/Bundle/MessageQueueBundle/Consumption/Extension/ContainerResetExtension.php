@@ -100,6 +100,8 @@ class ContainerResetExtension extends AbstractExtension
         }
 
         $this->container->reset();
+        // clear the memory and prevent segmentation fault that might sometimes occur in "unserialize" function
+        gc_collect_cycles();
 
         // restore the persistent services in the container
         foreach ($persistentServices as $serviceId => $serviceInstance) {
