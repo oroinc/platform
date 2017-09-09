@@ -1,5 +1,5 @@
 @regression
-@skip
+@fixture-OroProductBundle:product_frontend.yml
 Feature: Mobile menu
   In order to simplify navigation on smaller device screens and touch screen devices
   As a Customer
@@ -11,8 +11,8 @@ Feature: Mobile menu
     And I go to System/Configuration
     And I follow "Commerce/Design/Theme" on configuration sidebar
     And fill "Theme Form" with:
-      |ThemeUseDefault|false       |
-      |Theme          |Custom theme|
+      | ThemeUseDefault | false        |
+      | Theme           | Custom theme |
     And submit form
 
   Scenario: Check that search option places in fullscreen popup in custom theme
@@ -25,6 +25,7 @@ Feature: Mobile menu
     Then I should see an "Fullscreen Popup" element
     And I should see an "Search Form" element
     And fill "Search Form" with:
-      |Query|111A    |
+      | Query | SKU2    |
     And I click "Search Button"
-    Then I should see "111A"
+    And I should not see "SKU1"
+    Then I should see "SKU2"
