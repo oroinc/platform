@@ -61,7 +61,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(BuildDestinationMetaRegistryPass::class))
         ;
         $container
-            ->expects($this->at(5))
+            ->expects($this->once())
             ->method('getExtension')
             ->willReturn($extensionMock)
         ;
@@ -87,7 +87,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->createMock(ContainerBuilder::class);
         $container
-            ->expects($this->at(5))
+            ->expects($this->once())
             ->method('getExtension')
             ->with('oro_message_queue')
             ->willReturn($extensionMock)
@@ -109,7 +109,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->createMock(ContainerBuilder::class);
         $container
-            ->expects($this->at(5))
+            ->expects($this->once())
             ->method('getExtension')
             ->with('oro_message_queue')
             ->willReturn($extensionMock)

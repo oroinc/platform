@@ -42,7 +42,7 @@ oro_message_queue:
         - 'kernel'
 ```
 
-Please note that all persistent services must be declared as a public services.
+Please note that all persistent services must be declared as public services.
 
 Cache state
 -----------
