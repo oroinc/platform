@@ -31,13 +31,20 @@ class InterruptConsumptionExtension extends AbstractExtension
     /**
      * @param string $filePath
      */
-    public function __construct($filePath, CacheState $cacheState)
+    public function __construct($filePath)
     {
         $this->touch($filePath);
 
         $this->filePath = $filePath;
         $this->timestamp = filemtime($filePath);
         $this->startTime = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param CacheState $cacheState
+     */
+    public function setCacheState(CacheState $cacheState)
+    {
         $this->cacheState = $cacheState;
     }
 

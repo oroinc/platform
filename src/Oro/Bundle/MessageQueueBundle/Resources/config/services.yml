@@ -51,7 +51,8 @@ services:
         public: false
         arguments:
             - '%oro_message_queue.consumption.interrupt_filepath%'
-            - '@oro_message_queue.consumption.cache_state'
+        calls:
+            - ['setCacheState', ['@oro_message_queue.consumption.cache_state']]
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 

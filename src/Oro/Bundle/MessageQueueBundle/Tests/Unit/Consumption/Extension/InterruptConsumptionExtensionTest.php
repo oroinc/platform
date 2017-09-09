@@ -36,14 +36,14 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        new InterruptConsumptionExtension($this->filePath);
     }
 
     public function testShouldCreateFileIfItNotExist()
     {
         $this->assertFileNotExists($this->filePath);
 
-        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        new InterruptConsumptionExtension($this->filePath);
 
         $this->assertFileExists($this->filePath);
     }
@@ -53,7 +53,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         touch($this->filePath, time() - 1);
         $timestamp = filemtime($this->filePath);
 
-        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        new InterruptConsumptionExtension($this->filePath);
 
         clearstatcache(true, $this->filePath);
 
@@ -62,7 +62,8 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldInterruptConsumptionIfFileWasDeleted()
     {
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $extension = new InterruptConsumptionExtension($this->filePath);
+        $extension->setCacheState($this->cacheState);
 
         unlink($this->filePath);
 
@@ -91,7 +92,8 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldInterruptConsumptionIfFileMetadataIncreased()
     {
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $extension = new InterruptConsumptionExtension($this->filePath);
+        $extension->setCacheState($this->cacheState);
 
         touch($this->filePath, time() + 1);
 
@@ -120,7 +122,8 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldNotInterruptIfFileExistAndMetadataNotChanged()
     {
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $extension = new InterruptConsumptionExtension($this->filePath);
+        $extension->setCacheState($this->cacheState);
 
         $context = $this->createContextMock();
 
@@ -140,7 +143,8 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         // the case when consumer works for 30 days and after that the cache was changed
         $changeStateDate = new \DateTime('now+30days', new \DateTimeZone('UTC'));
 
-        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $extension = new InterruptConsumptionExtension($this->filePath);
+        $extension->setCacheState($this->cacheState);
         $context = $this->createContextMock();
 
         $logger = $this->createLoggerMock();
