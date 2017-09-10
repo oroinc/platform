@@ -1,5 +1,8 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
+
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
@@ -7,68 +10,71 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProce
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageToArrayConverterPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTransportExtensionsPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
-use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
-use Oro\Component\Testing\ClassExtensionTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 {
-    use ClassExtensionTrait;
+    /** @var OroMessageQueueBundle */
+    private $bundle;
 
-    public function testShouldExtendBundleClass()
+    protected function setUp()
     {
-        $this->assertClassExtends(Bundle::class, OroMessageQueueBundle::class);
-    }
-
-    public function testCouldBeConstructedWithoutAnyArguments()
-    {
-        new OroMessageQueueBundle();
+        $this->bundle = new OroMessageQueueBundle();
     }
 
     public function testShouldRegisterExpectedCompilerPasses()
     {
-        $extensionMock = $this->createMock(OroMessageQueueExtension::class);
-
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->at(0))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildExtensionsPass::class));
+            ->with($this->isInstanceOf(ConfigureDbalTransportExtensionsPass::class));
         $container->expects($this->at(1))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildRouteRegistryPass::class));
+            ->with($this->isInstanceOf(BuildExtensionsPass::class));
         $container->expects($this->at(2))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildMessageProcessorRegistryPass::class));
+            ->with($this->isInstanceOf(BuildRouteRegistryPass::class));
         $container->expects($this->at(3))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildTopicMetaSubscribersPass::class));
+            ->with($this->isInstanceOf(BuildMessageProcessorRegistryPass::class));
         $container->expects($this->at(4))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf(BuildDestinationMetaRegistryPass::class));
+            ->with($this->isInstanceOf(BuildTopicMetaSubscribersPass::class));
         $container->expects($this->at(5))
             ->method('addCompilerPass')
+            ->with($this->isInstanceOf(BuildDestinationMetaRegistryPass::class));
+        $container->expects($this->at(6))
+            ->method('addCompilerPass')
             ->with($this->isInstanceOf(BuildMessageToArrayConverterPass::class));
+        $container->expects($this->at(7))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(MakeLoggerServicesPersistentPass::class));
+        $container->expects($this->at(8))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(MakeAnnotationReaderServicesPersistentPass::class));
+
         $container->expects($this->once())
             ->method('getExtension')
-            ->willReturn($extensionMock);
+            ->willReturn($this->createMock(OroMessageQueueExtension::class));
 
         $bundle = new OroMessageQueueBundle();
         $bundle->build($container);
     }
 
-    public function testShouldRegisterDefaultAndNullTransportFactories()
+    public function testShouldRegisterExpectedTransportFactories()
     {
-        $extensionMock = $this->createMock(OroMessageQueueExtension::class);
+        $extension = $this->createMock(OroMessageQueueExtension::class);
 
-        $extensionMock->expects($this->at(0))
+        $extension->expects($this->at(0))
             ->method('addTransportFactory')
             ->with($this->isInstanceOf(DefaultTransportFactory::class));
-        $extensionMock->expects($this->at(1))
+        $extension->expects($this->at(1))
             ->method('addTransportFactory')
             ->with($this->isInstanceOf(NullTransportFactory::class));
 
@@ -76,25 +82,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())
             ->method('getExtension')
             ->with('oro_message_queue')
-            ->willReturn($extensionMock);
-
-        $bundle = new OroMessageQueueBundle();
-        $bundle->build($container);
-    }
-
-    public function testShouldRegisterDbalTransportFactory()
-    {
-        $extensionMock = $this->createMock(OroMessageQueueExtension::class);
-
-        $extensionMock->expects($this->at(2))
-            ->method('addTransportFactory')
-            ->with($this->isInstanceOf(DbalTransportFactory::class));
-
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->with('oro_message_queue')
-            ->willReturn($extensionMock);
+            ->willReturn($extension);
 
         $bundle = new OroMessageQueueBundle();
         $bundle->build($container);

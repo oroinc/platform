@@ -1,5 +1,5 @@
 parameters:
-    oro_message_queue.maintance.idle_time: 5
+    oro_message_queue.maintenance.idle_time: 5
     oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
 
 services:
@@ -10,39 +10,36 @@ services:
             - []
             - '@oro_message_queue.log.consumer_state'
 
-    oro_message_queue.consumption.docrine_ping_connection_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
-        public: false
-        arguments:
-            - '@doctrine'
-        tags:
-            # extension should be first to be able to reconnect to db
-            - { name: 'oro_message_queue.consumption.extension', priority: -250}
-
-    oro_message_queue.consumption.docrine_clear_identity_map_extension:
-        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
-        public: false
-        arguments:
-            - '@doctrine'
-        tags:
-            # extension should be one of the first to be able to "finish process old message" with old container state
-            - { name: 'oro_message_queue.consumption.extension', priority: -245 }
-
     oro_message_queue.consumption.container_reset_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
         public: false
         arguments:
             - '@service_container'
         tags:
-            # extension have 0 priority to be sure that extensions with higher priority will be processed with clear container
-            - { name: 'oro_message_queue.consumption.extension' }
+            - { name: 'oro_message_queue.consumption.extension', priority: 250, persistent: true }
 
-    oro_message_queue.consumption.extension.maintance:
+    oro_message_queue.consumption.docrine_ping_connection_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: 210, persistent: true }
+
+    oro_message_queue.consumption.docrine_clear_identity_map_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: 200, persistent: true }
+
+    oro_message_queue.consumption.maintenance_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
         public: false
         arguments:
             - '@oro_platform.maintenance'
-            - '%oro_message_queue.maintance.idle_time%'
+            - '%oro_message_queue.maintenance.idle_time%'
         calls:
             - ['setFilePathServerLockFromConfig', ['%kernel.root_dir%/config/oro_env.conf']]
         tags:

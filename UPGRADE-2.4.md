@@ -101,11 +101,27 @@ FormBundle
 
 MessageQueueBundle
 ------------------
+- Fixed handling of `priority` attribute of the tag `oro_message_queue.consumption.extension` to work in the same way
+as other Symfony's tagged services. From now the highest the priority number, the earlier the extension is executed.
 - The entity manager `message_queue_job` was removed. The default entity manager is used instead
 - Service `oro_message_queue.client.consume_messages_command` was removed
 - Service `oro_message_queue.command.consume_messages` was removed
 - The extension `Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension` was removed. This 
 job is handled by `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension` extension.
+- Parameter `oro_message_queue.maintance.idle_time` was renamed to `oro_message_queue.maintenance.idle_time`
+- Class `Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension`
+    - removed property `protected $registry`
+    - changed the constructor signature: parameter `RegistryInterface $registry` was replaces with `ContainerInterface $container`
+- Class `Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension`
+    - removed property `protected $registry`
+    - changed the constructor signature: parameter `RegistryInterface $registry` was replaces with `ContainerInterface $container`
+- Class `Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension`
+    - the visibility of property `$processors` was changed from `protected` to `private`
+    - the visibility of property `$container` was changed from `container` to `container`
+    - removed method `setContainer`
+    - changed the constructor signature: parameter `ContainerInterface $container` was added
+- Class `Oro\Component\MessageQueue\Consumption\Extension\SignalExtension`
+    - the visibility of method `interruptExecutionIfNeeded` was changed from `public` to `protected`
 
 SecurityBundle
 --------------

@@ -4,6 +4,8 @@ oro_message_queue:
         - 'oro_message_queue.client.message_processor_registry'
         - 'oro_message_queue.client.delegate_message_processor'
         - 'oro_message_queue.client.route_message_processor'
+        - 'oro_message_queue.client.config'
+        - 'oro_message_queue.client.created_queues'
         - 'oro_message_queue.log.consumer_state'
         - 'oro_message_queue.log.message_to_array_converter'
     persistent_processors:

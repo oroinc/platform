@@ -42,7 +42,26 @@ oro_message_queue:
         - 'kernel'
 ```
 
-Please note that all persistent services must be declared as public services.
+Please note that all persistent services must be declared as public services; otherwise, they will be ignored.
+
+Persistent consumption extensions
+---------------------------------
+
+By default all consumption extensions are recreated each time after resetting of the container. But this can be
+changed, for example by performance reasons or because some extensions may have an internal state that should
+keep unchanged even if the container is reset. To prevent recreation of an extension just mark it by
+`persistent` attribute of the tag `oro_message_queue.consumption.extension`. Here is an example:
+
+```yaml
+    acme.consumption.my_extension:
+        class: Acme\Bundle\AppBundle\Async\Consumption\Extension\MyExtension
+        public: false
+        tags:
+            - { name: oro_message_queue.consumption.extension, persistent: true }
+```
+
+Also if an extension is marked as persistent, but it is required to reset some internal state during resetting
+of the container, the extension can implement [ResettableExtensionInterface](../../Consumption/Extension/ResettableExtensionInterface.php).
 
 Cache state
 -----------
