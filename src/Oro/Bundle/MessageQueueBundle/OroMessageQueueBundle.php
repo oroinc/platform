@@ -7,6 +7,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPa
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTransportExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
@@ -24,6 +25,7 @@ class OroMessageQueueBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
+        $container->addCompilerPass(new ConfigureDbalTransportExtensionsPass());
         $container->addCompilerPass(new BuildExtensionsPass());
         $container->addCompilerPass(new BuildRouteRegistryPass());
         $container->addCompilerPass(new BuildMessageProcessorRegistryPass());

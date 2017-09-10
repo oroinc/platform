@@ -98,7 +98,7 @@ class QueueConsumer
 
         $extension = $this->extension ?: new ChainExtension([]);
         if ($runtimeExtension) {
-            $extension = new ChainExtension([$extension, $runtimeExtension]);
+            $extension = new ChainExtension([$runtimeExtension, $extension]);
         }
 
         $context = new Context($session);

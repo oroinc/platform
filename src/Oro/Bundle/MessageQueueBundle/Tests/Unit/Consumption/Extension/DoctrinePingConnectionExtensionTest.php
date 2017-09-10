@@ -1,122 +1,89 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
+use Psr\Log\LoggerInterface;
+
 use Doctrine\DBAL\Connection;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DoctrinePingConnectionExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCouldBeConstructedWithRequiredAttributes()
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverInterface */
+    private $doctrine;
+
+    /** @var CreateQueueExtension */
+    private $extension;
+
+    protected function setUp()
     {
-        new DoctrinePingConnectionExtension($this->createRegistryMock());
+        $this->doctrine = $this->createMock(RegistryInterface::class);
+
+        $this->extension = new DoctrinePingConnectionExtension($this->doctrine);
     }
 
     public function testShouldNotReconnectIfConnectionIsOK()
     {
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
             ->method('ping')
-            ->will($this->returnValue(true))
-        ;
-        $connection
-            ->expects($this->never())
-            ->method('close')
-        ;
-        $connection
-            ->expects($this->never())
-            ->method('connect')
-        ;
+            ->willReturn(true);
+        $connection->expects($this->never())
+            ->method('close');
+        $connection->expects($this->never())
+            ->method('connect');
 
-        $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->never())
-            ->method('debug')
-        ;
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('debug');
 
-        $registry = $this->createRegistryMock();
-        $registry
-            ->expects($this->once())
-            ->method('getConnections')
-            ->will($this->returnValue([$connection]))
-        ;
+        $this->doctrine->expects($this->once())
+            ->method('getConnectionNames')
+            ->willReturn(['connection-name' => 'connection_service_id']);
+        $this->doctrine->expects($this->once())
+            ->method('getConnection')
+            ->with('connection-name')
+            ->willReturn($connection);
 
-        $extension = new DoctrinePingConnectionExtension($registry);
-        $extension->onPreReceived($context);
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setLogger($logger);
+        $this->extension->onPreReceived($context);
     }
 
     public function testShouldDoesReconnectIfConnectionFailed()
     {
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
             ->method('ping')
-            ->will($this->returnValue(false))
-        ;
-        $connection
-            ->expects($this->once())
-            ->method('close')
-        ;
-        $connection
-            ->expects($this->once())
-            ->method('connect')
-        ;
+            ->willReturn(false);
+        $connection->expects($this->once())
+            ->method('close');
+        $connection->expects($this->once())
+            ->method('connect');
 
-        $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->at(0))
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->at(0))
             ->method('debug')
-            ->with('[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.')
-        ;
-        $context->getLogger()
-            ->expects($this->at(1))
+            ->with('[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.');
+        $logger->expects($this->at(1))
             ->method('debug')
-            ->with('[DoctrinePingConnectionExtension] Connection is active now.')
-        ;
+            ->with('[DoctrinePingConnectionExtension] Connection is active now.');
 
-        $registry = $this->createRegistryMock();
-        $registry
-            ->expects($this->once())
-            ->method('getConnections')
-            ->will($this->returnValue([$connection]))
-        ;
+        $this->doctrine->expects($this->once())
+            ->method('getConnectionNames')
+            ->willReturn(['connection-name' => 'connection_service_id']);
+        $this->doctrine->expects($this->once())
+            ->method('getConnection')
+            ->with('connection-name')
+            ->willReturn($connection);
 
-        $extension = new DoctrinePingConnectionExtension($registry);
-        $extension->onPreReceived($context);
-    }
-
-    /**
-     * @return Context
-     */
-    protected function createContext()
-    {
         $context = new Context($this->createMock(SessionInterface::class));
-        $context->setLogger($this->createMock(LoggerInterface::class));
-        $context->setMessageConsumer($this->createMock(MessageConsumerInterface::class));
-        $context->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
-
-        return $context;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RegistryInterface
-     */
-    protected function createRegistryMock()
-    {
-        return $this->createMock(RegistryInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
-     */
-    protected function createConnectionMock()
-    {
-        return $this->createMock(Connection::class);
+        $context->setLogger($logger);
+        $this->extension->onPreReceived($context);
     }
 }

@@ -42,6 +42,7 @@ class InterruptConsumptionExtension extends AbstractExtension
 
     /**
      * @param CacheState $cacheState
+     * @deprecated since 2.0
      */
     public function setCacheState(CacheState $cacheState)
     {

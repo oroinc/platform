@@ -62,6 +62,8 @@ services:
         public: false
         arguments:
             - '@oro_message_queue.client.driver'
+        calls:
+            - ['setQueueRegistry', ['@oro_message_queue.client.created_queues']]
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: 10 }
 
@@ -79,6 +81,9 @@ services:
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
+
+    oro_message_queue.client.created_queues:
+        class: 'Oro\Component\MessageQueue\Transport\QueueCollection'
 
     oro_message_queue.client.consume_messages_command:
         class: 'Oro\Component\MessageQueue\Client\ConsumeMessagesCommand'
