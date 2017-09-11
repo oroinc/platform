@@ -1,0 +1,2 @@
+include:
+    - '@OroProductBundle:product_frontend.yml'
