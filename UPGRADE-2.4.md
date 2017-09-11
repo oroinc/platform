@@ -85,6 +85,8 @@ EmailBundle
 Email entity is not ACL protected entity so it should not contain any permissions for it.
 - class `Oro\Bundle\EmailBundle\Migrations\Data\ORM\UpdateEmailEditAclRule` was removed. Email entity is not ACL 
 protected entity so it should not contain any permissions for it.
+- method `handleChangedAddresses` in class `Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager` does not persist
+new EmailAddresses anymore, but returns array of updated entities and entities to create
 
 ImportExportBundle
 --------------
@@ -94,10 +96,19 @@ ImportExportBundle
 - Was added new parameter to `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy` class constructor and 
 `oro_importexport.strategy.configurable_add_or_replace` service. New parameter id `oro_security.owner.checker` service that
 helps check the owner during import.
+- `Oro\Bundle\ImportExportBundle\Job\JobResult` have new `needRedelivery` flag
+- `Oro\Bundle\ImportExportBundle\Job\JobExecutor` in case of any of catched exception during Job processing is a type of
+`Doctrine\DBAL\Exception\UniqueConstraintViolationException` JobResult will have a `needRedelivery` flag set to true.
+- `Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor` is able to catch new 
+`Oro\Component\MessageQueue\Exception\JobRedeliveryException` and it this case is able to requeue a message to process
 
 FormBundle
 ----------
 - Removed usage of `'tinymce/jquery.tinymce'` extension. Use `'tinymce/tinymce'` directly instead
+
+MessageQueueComponent
+------------------
+- new `Oro\Component\MessageQueue\Exception\JobRedeliveryException` has been created
 
 MessageQueueBundle
 ------------------
