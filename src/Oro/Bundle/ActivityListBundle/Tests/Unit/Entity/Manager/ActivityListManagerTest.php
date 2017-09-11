@@ -22,6 +22,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,6 +65,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowDataHelper */
     protected $workflowHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagHelper;
+
     public function setUp()
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -78,6 +82,16 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->inheritanceHelper = $this->createMock(ActivityInheritanceTargetsHelper::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->workflowHelper = $this->createMock(WorkflowDataHelper::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $this->htmlTagHelper->expects($this->any())
+            ->method('purify')
+            ->will(
+                $this->returnCallback(
+                    function ($value) {
+                        return $value;
+                    }
+                )
+            );
 
         $this->activityListManager = new ActivityListManager(
             $this->authorizationChecker,
@@ -90,7 +104,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->aclHelper,
             $this->inheritanceHelper,
             $this->eventDispatcher,
-            $this->workflowHelper
+            $this->workflowHelper,
+            $this->htmlTagHelper
         );
     }
 
