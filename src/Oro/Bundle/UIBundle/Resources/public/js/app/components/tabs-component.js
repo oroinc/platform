@@ -84,18 +84,6 @@ define(function(require) {
                 'dropdownDefaultLabel',
                 this.getElement('dropdownToggleLabel').html()
             );
-            this.getElement('dropdown').on({
-                'shown.bs.dropdown': _.bind(function() {
-                    var dropdownMenu = this.getElement('dropdownMenu');
-                    if (dropdownMenu.offset().left < 0) {
-                        dropdownMenu.removeClass('pull-right');
-                    }
-                }, this),
-                'hide.bs.dropdown': _.bind(function() {
-                    var dropdownMenu = this.getElement('dropdownMenu');
-                    dropdownMenu.addClass('pull-right');
-                }, this)
-            });
             this.dropdownInitTabs();
 
             this.dropdownUpdate();
