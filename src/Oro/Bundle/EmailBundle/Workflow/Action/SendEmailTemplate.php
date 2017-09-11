@@ -111,8 +111,10 @@ class SendEmailTemplate extends AbstractSendEmail
         foreach ($this->options['to'] as $email) {
             if ($email) {
                 $address = $this->getEmailAddress($context, $email);
-                $this->validateAddress($address);
-                $to[] = $this->getEmailAddress($context, $address);
+                if ($address) {
+                    $this->validateAddress($address);
+                    $to[] = $this->getEmailAddress($context, $address);
+                }
             }
         }
         $emailModel->setTo($to);

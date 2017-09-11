@@ -631,7 +631,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                             'email' => 'test@test.com'
                         ],
                         'test@test.com',
-                        '"Test" <test@test.com>'
+                        '"Test" <test@test.com>',
+                        ' '
                     ],
                     'template' => 'test',
                     'entity' => new \stdClass(),
