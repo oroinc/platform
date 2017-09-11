@@ -1,109 +1,81 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\ConsumptionExtension;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Client\ConsumptionExtension\CreateQueueExtension;
 use Oro\Component\MessageQueue\Client\DriverInterface;
+use Oro\Component\MessageQueue\Transport\QueueCollection;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\Testing\ClassExtensionTrait;
-use Psr\Log\LoggerInterface;
 
 class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    use ClassExtensionTrait;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverInterface */
+    private $driver;
 
-    public function testShouldImplementExtensionInterface()
-    {
-        $this->assertClassImplements(ExtensionInterface::class, CreateQueueExtension::class);
-    }
+    /** @var CreateQueueExtension */
+    private $extension;
 
-    public function testCouldBeConstructedWithRequiredArguments()
+    protected function setUp()
     {
-        new CreateQueueExtension($this->createDriverMock());
+        $this->driver = $this->createMock(DriverInterface::class);
+
+        $this->extension = new CreateQueueExtension($this->driver, new QueueCollection());
     }
 
     public function testShouldCreateQueueUsingQueueNameFromContext()
     {
-        $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('debug')
-            ->with('Make sure the queue "theQueueName" exists on a broker side.')
-        ;
+            ->with('Make sure the queue "theQueueName" exists on a broker side.');
 
-        $context = new Context($this->createSessionMock());
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setQueueName('theQueueName');
-        $context->setLogger($loggerMock);
+        $context->setLogger($logger);
 
-        $driverMock = $this->createDriverMock();
-        $driverMock
-            ->expects($this->once())
+        $this->driver->expects($this->once())
             ->method('createQueue')
             ->with('theQueueName')
-        ;
+            ->willReturn($this->createMock(QueueInterface::class));
 
-        $extension = new CreateQueueExtension($driverMock);
-
-        $extension->onBeforeReceive($context);
+        $this->extension->onBeforeReceive($context);
     }
 
     public function testShouldCreateSameQueueOnlyOnce()
     {
-        $driverMock = $this->createDriverMock();
-        $driverMock
-            ->expects($this->at(0))
+        $this->driver->expects($this->at(0))
             ->method('createQueue')
             ->with('theQueueName1')
-        ;
-        $driverMock
-            ->expects($this->at(1))
+            ->willReturn($this->createMock(QueueInterface::class));
+        $this->driver->expects($this->at(1))
             ->method('createQueue')
             ->with('theQueueName2')
-        ;
+            ->willReturn($this->createMock(QueueInterface::class));
 
-        $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock
-            ->expects($this->at(0))
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->at(0))
             ->method('debug')
-            ->with('Make sure the queue "theQueueName1" exists on a broker side.')
-        ;
-        $loggerMock
-            ->expects($this->at(1))
+            ->with('Make sure the queue "theQueueName1" exists on a broker side.');
+        $logger->expects($this->at(1))
             ->method('debug')
-            ->with('Make sure the queue "theQueueName2" exists on a broker side.')
-        ;
+            ->with('Make sure the queue "theQueueName2" exists on a broker side.');
 
-        $extension = new CreateQueueExtension($driverMock);
-
-        $context = new Context($this->createSessionMock());
-        $context->setLogger($loggerMock);
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setLogger($logger);
         $context->setQueueName('theQueueName1');
 
-        $extension->onBeforeReceive($context);
-        $extension->onBeforeReceive($context);
+        $this->extension->onBeforeReceive($context);
+        $this->extension->onBeforeReceive($context);
 
-        $context = new Context($this->createSessionMock());
-        $context->setLogger($loggerMock);
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setLogger($logger);
         $context->setQueueName('theQueueName2');
 
-        $extension->onBeforeReceive($context);
-        $extension->onBeforeReceive($context);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
-     */
-    protected function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
-     */
-    protected function createDriverMock()
-    {
-        return $this->createMock(DriverInterface::class);
+        $this->extension->onBeforeReceive($context);
+        $this->extension->onBeforeReceive($context);
     }
 }

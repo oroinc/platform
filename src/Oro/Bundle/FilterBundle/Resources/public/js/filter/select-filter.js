@@ -117,6 +117,11 @@ define(function(require) {
         /**
          * @property {Boolean}
          */
+        closeAfterChose: true,
+
+        /**
+         * @property {Boolean}
+         */
         loadedMetadata: true,
 
         /**
@@ -267,6 +272,9 @@ define(function(require) {
                     refresh: _.bind(function() {
                         this.selectWidget.onRefresh();
                     }, this),
+                    beforeclose: _.bind(function() {
+                        return this.closeAfterChose;
+                    }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         setTimeout(_.bind(function() {
@@ -275,7 +283,7 @@ define(function(require) {
                             }
                         }, this), 100);
                     }, this),
-                    appendTo: this.dropdownContainer,
+                    appendTo: this._setDropdownContainer(),
                     refreshNotOpened: this.templateTheme !== ''
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
@@ -287,6 +295,14 @@ define(function(require) {
                     this._onClickFilterArea(e);
                 }
             }, this));
+        },
+
+        /**
+         * Set container for dropdown
+         * @return {jQuery}
+         */
+        _setDropdownContainer: function() {
+            return this.dropdownContainer;
         },
 
         /**
@@ -428,6 +444,18 @@ define(function(require) {
             this.choices = _.map(choices, function(option, i) {
                 return _.isString(option) ? {value: i, label: option} : option;
             });
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _isDOMValueChanged: function() {
+            var thisDOMValue = this._readDOMValue();
+            return (
+                !_.isUndefined(thisDOMValue.value) &&
+                !_.isNull(thisDOMValue.value) &&
+                !_.isEqual(this.value, thisDOMValue)
+            );
         }
     });
 

@@ -2,25 +2,38 @@
     view: 'oroui/js/app/views/content-sidebar-view'
 }) %}
 {% set class="content-with-sidebar--" %}
-<div data-page-component-module="oroui/js/app/components/view-component"
-     data-page-component-options="{{ options|json_encode }}"
+<div data-page-component-view="{{ options|json_encode }}"
      class="{{ class }}container">
     <div data-role="sidebar" class="{{ class }}sidebar">
-        <div class="{{ class }}controls">
-            <div data-role="sidebar-maximize" class="{{ class }}control {{ class }}maximize">
-                <i class="fa-forward "></i>
-            </div>
-            <div data-role="sidebar-minimize" class="{{ class }}control {{ class }}minimize">
-                <i class="fa-backward "></i>
-            </div>
+        <div class="{{ class }}header">
+            {% block header_wrapper %}
+                <div class="{{ class }}header-content">
+                    {% block header %}
+                    {% endblock header %}
+                </div>
+                {% block controls_wrapper %}
+                    <div class="{{ class }}controls">
+                        <div data-role="sidebar-maximize" class="{{ class }}control {{ class }}maximize">
+                            <i class="fa-forward "></i>
+                        </div>
+                        <div data-role="sidebar-minimize" class="{{ class }}control {{ class }}minimize">
+                            <i class="fa-backward "></i>
+                        </div>
+                    </div>
+                {% endblock controls_wrapper %}
+            {% endblock header_wrapper %}
         </div>
+        {% block sidebar_wrapper %}
         <div class="{{ class }}sidebar-content">
             {% block sidebar %}
             {% endblock sidebar %}
         </div>
+        {% endblock sidebar_wrapper %}
     </div>
+    {% block content_wrapper %}
     <div data-role="content" class="{{ class }}content">
         {% block content %}
         {% endblock content %}
     </div>
+    {% endblock content_wrapper %}
 </div>

@@ -433,6 +433,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Open dashboard
+     *
+     * @Given I am on dashboard
+     * @And I am on dashboard
+     */
+    public function iAmOnDashboard()
+    {
+        $router = $this->getContainer()->get('router');
+        $this->visit($router->generate('oro_default'));
+    }
+
+    /**
      * Open dashboard login page and login as existing user
      * Demo user should have password the same as username, e.g. username: charlie, password: charlie
      * Example: Given I login as administrator
@@ -1086,6 +1098,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iRestartMessageConsumer()
     {
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $this->messageQueueIsolator->stopMessageQueue();
         $this->messageQueueIsolator->startMessageQueue();
     }
@@ -1289,9 +1302,6 @@ class OroMainContext extends MinkContext implements
             $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
         } catch (\Exception $e) {
             throw $e;
-        } finally {
-            $this->messageQueueIsolator->stopMessageQueue();
-            $this->messageQueueIsolator->startMessageQueue();
         }
     }
 
@@ -1554,6 +1564,62 @@ class OroMainContext extends MinkContext implements
         self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
             'Element "%s" exists inside element "%s" when it should not',
             $childElementName,
+            $parentElementName
+        ));
+    }
+
+    /**
+     * Example: Then I should see "Map container" element with text "Address" inside "Default Addresses" element
+     *
+     * @Then I should see :childElementName element with text :text inside :parentElementName element
+     * @param string $parentElementName
+     * @param string $childElementName
+     * @param string $text
+     */
+    public function iShouldSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->findElementContains($childElementName, $text);
+        self::assertTrue($childElement->isIsset(), sprintf(
+            'Element "%s" with text "%s" not found inside element "%s"',
+            $childElementName,
+            $text,
+            $parentElementName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" with text "%s" found inside element "%s", but it\'s not visible',
+            $childElementName,
+            $text,
+            $parentElementName
+        ));
+    }
+
+    /**
+     * Example: Then I should not see "Map container" element with text "Address" inside "Default Addresses" element
+     *
+     * @Then I should not see :childElementName element with text :text inside :parentElementName element
+     * @param string $parentElementName
+     * @param string $childElementName
+     * @param string $text
+     */
+    public function iShouldNotSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->findElementContains($childElementName, $text);
+        self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
+            'Element "%s" with text "%s" exists inside element "%s" when it should not',
+            $childElementName,
+            $text,
             $parentElementName
         ));
     }

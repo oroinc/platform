@@ -27,4 +27,27 @@ class ConfigurationControllerTest extends AbstractConfigurationControllerTest
 
         return $this->getUrl('oro_user_config', $parameters);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameters()
+    {
+        return [
+            'main user configuration page' => [
+                'parameters' => [
+                    'activeGroup' => null,
+                    'activeSubGroup' => null,
+                ],
+                'expected' => ['Localization options', 'Primary Location']
+            ],
+            'user configuration sub page' => [
+                'parameters' => [
+                    'activeGroup' => 'platform',
+                    'activeSubGroup' => 'look_and_feel',
+                ],
+                'expected' => ['Sidebar settings']
+            ],
+        ];
+    }
 }

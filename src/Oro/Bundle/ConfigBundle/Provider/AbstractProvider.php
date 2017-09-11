@@ -250,17 +250,18 @@ abstract class AbstractProvider implements ProviderInterface
         $level++;
         foreach ($nodes as $name => $node) {
             if (is_array($node) && isset($node['children']) && $correctMenuLevel > $level) {
-                $children = $node['children'];
                 $groupedData = $this->buildJsTree(
-                    $children,
+                    $node['children'],
                     $correctMenuLevel,
                     $level,
                     $name,
                     $groupedData
                 );
-            }
 
-            $groupedData[] = $this->buildJsTreeItem($name, $parentName, $node);
+                $groupedData[] = $this->buildJsTreeItem($name, $parentName, $node);
+            } else {
+                $groupedData[] = $this->buildJsTreeItemWithSearchData($name, $parentName, $node);
+            }
         }
 
         return $groupedData;
@@ -285,8 +286,89 @@ abstract class AbstractProvider implements ProviderInterface
             'text' => $text,
             'icon' => $group['icon'] ?? null,
             'parent' => $parentName,
-            'priority' => $node['priority'] ?? 0
+            'priority' => $node['priority'] ?? 0,
+            'search_by' => [$text]
         ];
+    }
+
+    /**
+     * @param string $name
+     * @param string $parentName
+     * @param array $node
+     * @return array
+     */
+    private function buildJsTreeItemWithSearchData($name, $parentName, array $node)
+    {
+        $jsTreeData = $this->buildJsTreeItem($name, $parentName, $node);
+        $jsTreeData['search_by'] = $this->prepareSearchData($name, $node);
+
+        return $jsTreeData;
+    }
+
+    /**
+     * @param string $name
+     * @param string|array $node
+     * @return array
+     */
+    private function prepareSearchData($name, $node)
+    {
+        $itemSearchData = [];
+        if (is_array($node) && isset($node['children'])) {
+            $itemSearchData[] = $this->prepareGroupSearchData($name);
+            foreach ($node['children'] as $childName => $nodeData) {
+                $itemSearchData[] = $this->prepareSearchData($childName, $nodeData);
+            }
+        } else {
+            $itemSearchData[] = $this->prepareFieldSearchData($node);
+        }
+
+        if ($itemSearchData) {
+            $itemSearchData = array_merge(...$itemSearchData);
+        }
+
+        return $itemSearchData;
+    }
+
+    /**
+     * @param string $node
+     * @return array
+     */
+    private function prepareGroupSearchData($node)
+    {
+        $group = $this->configBag->getGroupsNode($node);
+        if ($group === false) {
+            throw new ItemNotFoundException(sprintf('Group "%s" is not defined.', $node));
+        }
+
+        $searchData = [];
+        if (isset($group['title'])) {
+            $searchData[] = $this->translator->trans($group['title']);
+        }
+
+        return $searchData;
+    }
+
+    /**
+     * @param string $node
+     * @return array
+     */
+    private function prepareFieldSearchData($node)
+    {
+        $fieldsRoot = $this->configBag->getFieldsRoot($node);
+        if ($fieldsRoot === false) {
+            throw new ItemNotFoundException(sprintf('Field "%s" is not defined.', $node));
+        }
+
+        $searchData = [];
+        if (isset($fieldsRoot['options']['label'])) {
+            $searchData[] = $this->translator->trans($fieldsRoot['options']['label']);
+        }
+
+        if (isset($fieldsRoot['options']['tooltip'])) {
+            $searchData[] = $this->translator->trans($fieldsRoot['options']['tooltip']);
+        }
+
+        return $searchData;
     }
 
     /**

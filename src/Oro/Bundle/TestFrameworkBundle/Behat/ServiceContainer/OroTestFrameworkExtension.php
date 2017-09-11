@@ -31,10 +31,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 use WebDriver\ServiceFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OroTestFrameworkExtension implements TestworkExtension
 {
     const ISOLATOR_TAG = 'oro_behat.isolator';
     const SUITE_AWARE_TAG = 'suite_aware';
+    const HEALTH_CHECKER_TAG = 'behat_health_checker';
+    const HEALTH_CHECKER_AWARE_TAG = 'health_checker_aware';
     const CONFIG_PATH = '/Tests/Behat/behat.yml';
     const MESSAGE_QUEUE_ISOLATOR_AWARE_TAG = 'message_queue_isolator_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
@@ -71,6 +76,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processSuiteAwareSubscriber($container);
         $this->processClassResolvers($container);
         $this->processArtifactHandlers($container);
+        $this->processHealthCheckers($container);
         $this->replaceSessionListener($container);
         $this->setWebDriverCurl($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
@@ -135,6 +141,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
+        $loader->load('health_checkers.yml');
         $loader->load('isolators.yml');
         $loader->load('artifacts.yml');
         $loader->load('cli_controllers.yml');
@@ -215,6 +222,21 @@ class OroTestFrameworkExtension implements TestworkExtension
             $container->getDefinition($id)->replaceArgument(0, $handlerConfigurations[$handlerClass::getConfigKey()]);
             $prettySubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
             $progressSubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function processHealthCheckers(ContainerBuilder $container)
+    {
+        $healthCheckerIds = array_keys($container->findTaggedServiceIds(self::HEALTH_CHECKER_TAG));
+
+        foreach ($container->findTaggedServiceIds(self::HEALTH_CHECKER_AWARE_TAG) as $id => $attributes) {
+            $service = $container->getDefinition($id);
+            foreach ($healthCheckerIds as $healthCheckerId) {
+                $service->addMethodCall('addHealthChecker', [new Reference($healthCheckerId)]);
+            }
         }
     }
 

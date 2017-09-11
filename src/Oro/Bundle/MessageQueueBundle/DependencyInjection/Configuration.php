@@ -48,7 +48,12 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('default_destination')->defaultValue('default')->cannotBeEmpty()->end()
                 ->integerNode('redelivered_delay_time')->min(1)->defaultValue(10)->cannotBeEmpty()->end()
             ->end()->end()
-        ;
+            ->arrayNode('persistent_services')
+                ->prototype('scalar')->end()
+            ->end()
+            ->arrayNode('persistent_processors')
+                ->prototype('scalar')->end()
+            ->end();
 
         return $tb;
     }

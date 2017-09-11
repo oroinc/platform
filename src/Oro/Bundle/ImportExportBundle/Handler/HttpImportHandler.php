@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 
 class HttpImportHandler extends AbstractImportHandler
 {
@@ -67,6 +68,10 @@ class HttpImportHandler extends AbstractImportHandler
         array $options = []
     ) {
         $jobResult = $this->executeJob($jobName, $processorAlias, $options);
+
+        if ($jobResult->needRedelivery()) {
+            throw JobRedeliveryException::create();
+        }
 
         $counts = $this->getValidationCounts($jobResult);
         $importInfo = '';

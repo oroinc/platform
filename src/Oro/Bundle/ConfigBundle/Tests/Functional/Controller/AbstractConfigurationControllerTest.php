@@ -19,10 +19,11 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
 
     /**
      * @param array $parameters
+     * @param array $expected
      *
      * @dataProvider getParameters
      */
-    public function testSystemActionDesktopVersion($parameters)
+    public function testSystemActionDesktopVersion($parameters, array $expected)
     {
         $crawler = $this->client->request('GET', $this->getRequestUrl($parameters));
         $result = $this->client->getResponse();
@@ -31,8 +32,10 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
             'System configuration is not available in mobile version. Please open the page on the desktop.',
             $crawler->html()
         );
-        $this->assertContains('System configuration', $crawler->html());
-        $this->assertContains('Localization', $crawler->html());
+
+        foreach ($expected as $value) {
+            $this->assertContains($value, $crawler->html());
+        }
     }
 
     /**
@@ -67,13 +70,15 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
                 'parameters' => [
                     'activeGroup' => null,
                     'activeSubGroup' => null,
-                ]
+                ],
+                'expected' => ['Application Settings', 'Application URL']
             ],
             'user configuration sub page' => [
                 'parameters' => [
                     'activeGroup' => 'platform',
                     'activeSubGroup' => 'localization',
-                ]
+                ],
+                'expected' => ['Localization options', 'Primary Location']
             ],
         ];
     }

@@ -40,16 +40,21 @@ services:
 
     oro_message_queue.client.message_processor_registry:
         class: 'Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry'
-        calls:
-            - ['setContainer', ['@service_container']]
+        arguments:
+            - []
+            - '@service_container'
 
     oro_message_queue.client.meta.topic_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry'
-        arguments: [[]]
+        arguments:
+            - []
 
     oro_message_queue.client.meta.destination_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
-        arguments: ['@oro_message_queue.client.config', [], 'default']
+        arguments:
+            - '@oro_message_queue.client.config'
+            - []
+            - 'default'
 
     oro_message_queue.client.delegate_message_processor:
         class: 'Oro\Component\MessageQueue\Client\DelegateMessageProcessor'
@@ -61,8 +66,9 @@ services:
         public: false
         arguments:
             - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.client.created_queues'
         tags:
-            - { name: 'oro_message_queue.consumption.extension', priority: 10 }
+            - { name: 'oro_message_queue.consumption.extension', priority: -10 }
 
     oro_message_queue.client.delay_redelivered_message_extension:
         class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\DelayRedeliveredMessageExtension'
@@ -78,6 +84,9 @@ services:
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
+
+    oro_message_queue.client.created_queues:
+        class: 'Oro\Component\MessageQueue\Transport\QueueCollection'
 
     oro_message_queue.client.meta.topics_command:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicsCommand'

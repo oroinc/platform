@@ -95,14 +95,14 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
-        $input->expects($this->at(0))
+        $input->expects($this->exactly(2))
             ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_USER)
-            ->will($this->returnValue($userId));
-        $input->expects($this->at(1))
-            ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
-            ->will($this->returnValue($organizationId));
+            ->willReturnMap(
+                [
+                    ['--' . ConsoleContextListener::OPTION_USER, false, $userId],
+                    ['--' . ConsoleContextListener::OPTION_ORGANIZATION, false, $organizationId],
+                ]
+            );
 
         $this->userRepository->expects($this->once())
             ->method('find')
@@ -140,14 +140,14 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
-        $input->expects($this->at(0))
+        $input->expects($this->exactly(2))
             ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_USER)
-            ->will($this->returnValue($username));
-        $input->expects($this->at(1))
-            ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
-            ->will($this->returnValue($organizationName));
+            ->willReturnMap(
+                [
+                    ['--' . ConsoleContextListener::OPTION_USER, false, $username],
+                    ['--' . ConsoleContextListener::OPTION_ORGANIZATION, false, $organizationName],
+                ]
+            );
 
         $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
@@ -179,7 +179,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
-        $input->expects($this->at(0))
+        $input->expects($this->at(1))
             ->method('getParameterOption')
             ->with('--' . ConsoleContextListener::OPTION_USER)
             ->will($this->returnValue($username));
@@ -200,13 +200,26 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
     {
         $organizationName = 'test_organization';
 
+        $username = 'test_user';
+        $user = new User();
+        $user->setUsername($username);
+
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
-        $input->expects($this->at(1))
+        $input->expects($this->exactly(2))
             ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
-            ->will($this->returnValue($organizationName));
+            ->willReturnMap(
+                [
+                    ['--' . ConsoleContextListener::OPTION_USER, false, $username],
+                    ['--' . ConsoleContextListener::OPTION_ORGANIZATION, false, $organizationName],
+                ]
+            );
+
+        $this->userManager->expects($this->once())
+            ->method('findUserByUsernameOrEmail')
+            ->with($username)
+            ->will($this->returnValue($user));
 
         $this->organizationRepository->expects($this->once())
             ->method('findOneBy')
@@ -226,13 +239,26 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $organization = new Organization();
         $organization->setName($organizationName);
 
+        $username = 'test_user';
+        $user = new User();
+        $user->setUsername($username);
+
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
-        $input->expects($this->at(1))
+        $input->expects($this->exactly(2))
             ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
-            ->will($this->returnValue($organizationName));
+            ->willReturnMap(
+                [
+                    ['--' . ConsoleContextListener::OPTION_USER, false, $username],
+                    ['--' . ConsoleContextListener::OPTION_ORGANIZATION, false, $organizationName],
+                ]
+            );
+
+        $this->userManager->expects($this->once())
+            ->method('findUserByUsernameOrEmail')
+            ->with($username)
+            ->will($this->returnValue($user));
 
         $this->organizationRepository->expects($this->once())
             ->method('findOneBy')
@@ -260,14 +286,14 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject $input */
         $input = $event->getInput();
-        $input->expects($this->at(0))
+        $input->expects($this->exactly(2))
             ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_USER)
-            ->will($this->returnValue($username));
-        $input->expects($this->at(1))
-            ->method('getParameterOption')
-            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
-            ->will($this->returnValue($organizationName));
+            ->willReturnMap(
+                [
+                    ['--' . ConsoleContextListener::OPTION_USER, false, $username],
+                    ['--' . ConsoleContextListener::OPTION_ORGANIZATION, false, $organizationName],
+                ]
+            );
 
         $this->userManager->expects($this->once())
             ->method('findUserByUsernameOrEmail')
@@ -289,9 +315,9 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|InputDefinition $definition */
         $definition = $this->getMockBuilder(InputDefinition::class)
             ->disableOriginalConstructor()
-            ->setMethods(['addOption', 'getParameterOption'])
+            ->setMethods(['addOption', 'getParameterOption', 'getOptions'])
             ->getMock();
-        $definition->expects($this->at(0))
+        $definition->expects($this->at(1))
             ->method('addOption')
             ->with($this->isInstanceOf(InputOption::class))
             ->will(
@@ -301,7 +327,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $definition->expects($this->at(1))
+        $definition->expects($this->at(3))
             ->method('addOption')
             ->with($this->isInstanceOf('Symfony\Component\Console\Input\InputOption'))
             ->will(
@@ -311,6 +337,9 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $definition->expects($this->any())
+            ->method('getOptions')
+            ->willReturn([]);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|Application $application */
         $application = $this->getMockBuilder(Application::class)
