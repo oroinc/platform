@@ -15,6 +15,21 @@ class Registry extends BaseRegistry
     /**
      * {@inheritdoc}
      */
+    protected function getService($name)
+    {
+        $manager = parent::getService($name);
+        if ($manager instanceof OroEntityManager) {
+            $manager->setDefaultQueryCacheLifetime(
+                $this->container->getParameter('oro_entity.default_query_cache_lifetime')
+            );
+        }
+
+        return $manager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function resetManager($name = null)
     {
         $this->managersMap    = [];
