@@ -1,5 +1,4 @@
 @regression
-@fixture-OroSearchBundle:searchInCustomTheme.yml
 Feature: Mobile menu
   In order to simplify navigation on smaller device screens and touch screen devices
   As a Customer
@@ -24,8 +23,3 @@ Feature: Mobile menu
     When I click "Main Menu Button"
     Then I should see an "Fullscreen Popup" element
     And I should see an "Search Form" element
-    And fill "Search Form" with:
-      | Query | SKU2    |
-    And I click "Search Button"
-    And I should not see "SKU1"
-    Then I should see "SKU2"
