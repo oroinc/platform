@@ -9,6 +9,7 @@ use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -98,12 +99,16 @@ class ImportMessageProcessor implements MessageProcessorInterface
             return self::REJECT;
         }
 
-        $result = $this->jobRunner->runDelayed(
-            $body['jobId'],
-            function (JobRunner $jobRunner, Job $job) use ($body) {
-                return $this->handleImport($body, $job, $jobRunner);
-            }
-        );
+        try {
+            $result = $this->jobRunner->runDelayed(
+                $body['jobId'],
+                function (JobRunner $jobRunner, Job $job) use ($body) {
+                    return $this->handleImport($body, $job, $jobRunner);
+                }
+            );
+        } catch (JobRedeliveryException $exception) {
+            return self::REQUEUE;
+        }
 
         $this->fileManager->deleteFile($body['fileName']);
 

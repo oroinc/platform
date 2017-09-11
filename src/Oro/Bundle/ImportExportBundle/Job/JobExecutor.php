@@ -10,7 +10,7 @@ use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 use Akeneo\Bundle\BatchBundle\Job\Job;
 
-use Doctrine\ORM\UnitOfWork;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -164,6 +164,8 @@ class JobExecutor
             $this->saveFailedJobExecution($jobExecution);
         }
 
+        $this->resetEntityManagerIfNecessary();
+
         $this->dispatchAfterJobExecutionEvent($jobExecution, $jobResult);
 
         return $jobResult;
@@ -179,6 +181,14 @@ class JobExecutor
     {
         $failureExceptions = $this->collectFailureExceptions($jobExecution);
 
+        foreach ($jobExecution->getAllFailureExceptions() as $failureException) {
+            // in most cases this occurs in a race condition issue when couple of consumers try to process data
+            // in which we have a UNIQUE constraint. workaround is to requeue a message with this job
+            if ($failureException['class'] === UniqueConstraintViolationException::class) {
+                $jobResult->setNeedRedelivery(true);
+                return false;
+            }
+        }
         $isSuccessful = $jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions;
         if ($isSuccessful) {
             $jobResult->setSuccessful(true);
@@ -455,5 +465,12 @@ class JobExecutor
         }
 
         return $this->contextAggregatorRegistry->getAggregator($aggregatorType);
+    }
+
+    private function resetEntityManagerIfNecessary()
+    {
+        if (!$this->entityManager->isOpen()) {
+            $this->entityManager = $this->managerRegistry->resetManager();
+        }
     }
 }
