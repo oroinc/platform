@@ -19,6 +19,11 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_entity');
 
         $rootNode->children()
+            ->integerNode('default_query_cache_lifetime')
+                ->info('Default doctrine`s query cache lifetime')
+                ->defaultNull()
+                ->min(1)
+            ->end()
             ->arrayNode('exclusions')
                 ->info('The list of entities and its fields to be excluded')
                 ->example([['entity' => 'Acme\Bundle\Entity\SomeEntity', 'field' => 'some_field']])
