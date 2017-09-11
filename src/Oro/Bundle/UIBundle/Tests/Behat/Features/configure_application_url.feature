@@ -23,5 +23,5 @@ Feature: Configure application URL
     Given I fill "Application Settings Form" with:
       | Application URL | http://dev-commerce.local/ |
     And I click "Save settings"
-  #todo: Unstable test, add related ticket here
+  #todo: Unstable test, should be fixed inn BAP-15443
 #    Then I should see "Configuration saved" flash message

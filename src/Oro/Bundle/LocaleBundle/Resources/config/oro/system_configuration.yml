@@ -3,6 +3,7 @@ system_configuration:
         localization:
             title: oro.locale.system_configuration.groups.localization.title
             icon:  'fa-flag'
+            page_reload: true
         language_settings:
             title: oro.locale.system_configuration.groups.language_settings.title
             icon:  'fa-font'
