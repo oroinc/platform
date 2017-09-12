@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\CronBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
+
 interface ScheduleIntervalsAwareInterface
 {
     /**
-     * @return ScheduleIntervalInterface[]
+     * @return Collection|ScheduleIntervalInterface[]
      */
     public function getSchedules();
 }
