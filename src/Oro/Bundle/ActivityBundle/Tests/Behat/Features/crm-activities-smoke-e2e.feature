@@ -50,7 +50,7 @@ Feature: Activities
     And click "Create Task"
     Then should see "Task created successfully" flash message
     And should see "Sprint Demo - test description"
-    And should see "Task assigned by John Doe, updated by"
+    And should see "Task assigned by John Doe"
     And go to Activities/ Tasks
     And click view "Sprint Demo" in grid
     And should see "Context OroInc"
