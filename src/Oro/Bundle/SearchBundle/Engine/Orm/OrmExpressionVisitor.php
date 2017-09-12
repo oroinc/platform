@@ -42,10 +42,8 @@ class OrmExpressionVisitor extends ExpressionVisitor
         $value = $comparison->getValue()->getValue();
         list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
 
-        $index = str_replace('.', '_', uniqid('', true));
-
+        list($joinAlias, $index)  = $this->driver->getJoinAttributes($field, $type, $this->qb->getAllAliases());
         $joinField = sprintf('search.%sFields', $type);
-        $joinAlias = $this->driver->getJoinAlias($type, $index);
         $this->qb->leftJoin($joinField, $joinAlias);
 
         $searchCondition = [
