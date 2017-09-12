@@ -17,7 +17,7 @@ class Select2Entity extends Element
 
         if (1 < count($results)) {
             foreach ($results as $result) {
-                if ($result->getText() == $value) {
+                if (trim($result->getText()) == $value) {
                     $result->click();
 
                     return;

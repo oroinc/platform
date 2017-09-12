@@ -88,6 +88,10 @@ define([
         }
 
         this.disposePageComponents();
+        if (this.deferredRender) {
+            this.deferredRender.reject(this);
+            delete this.deferredRender;
+        }
         this.trigger('dispose', this);
 
         _ref = _.toArray(this.subviews);

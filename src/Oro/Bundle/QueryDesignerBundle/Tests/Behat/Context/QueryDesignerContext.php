@@ -21,30 +21,37 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
     {
         foreach ($table->getRows() as $row) {
             list($column) = $row;
-            $this->addColumn($column);
+            $this->addColumns(explode('->', $column));
         }
     }
 
     /**
      * Method implements column functionality
      *
-     * @param string $column
+     * @param array $columns
      */
-    private function addColumn($column)
+    private function addColumns($columns)
     {
         $this->clickLinkInColumnDesigner('Choose a field');
-        $this->getPage()
-            ->find(
-                'xpath',
-                "//div[@id='select2-drop']/div/input"
-            )
-            ->setValue($column);
-        $this->getPage()
-            ->find(
-                'xpath',
-                "//div[@id='select2-drop']//div[contains(., '{$column}')]"
-            )
-            ->click();
+        foreach ($columns as $key => $column) {
+            $typeTitle = $key === count($columns) - 1 ? 'Fields' : 'Related entities';
+            $this->getPage()
+                ->find(
+                    'xpath',
+                    "//div[@id='select2-drop']/div/input"
+                )
+                ->setValue($column);
+            $this->getPage()
+                ->find(
+                    'xpath',
+                    sprintf(
+                        "//div[@id='select2-drop']//div[contains(.,'%s')]/..//div[contains(.,'%s')]",
+                        $typeTitle,
+                        $column
+                    )
+                )
+                ->click();
+        }
         $this->clickLinkInColumnDesigner('Add');
     }
 

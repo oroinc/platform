@@ -179,7 +179,7 @@ class ControllersTest extends WebTestCase
                 'format' => 'csv',
                 'batchSize' => 200,
                 'parameters' => [
-                    'gridName' => 'oro_segment_grid_3',
+                    'gridName' => 'oro_segment_grid_' . $id,
                     'gridParameters' => [
                         '_filter' => [
                             'c1' => [
