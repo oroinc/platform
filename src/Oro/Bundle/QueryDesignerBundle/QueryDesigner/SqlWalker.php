@@ -4,12 +4,16 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 
+use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
+
 /**
  * @TODO: This walker will be replaced according to logic #BAP-13404
  * Dynamicly applies limit to subquery which is "hooked" by SubQueryLimitHelper
  */
 class SqlWalker extends TranslationWalker
 {
+    use HookUnionTrait;
+
     const WALKER_HOOK_LIMIT_KEY = 'walker_hook_for_limit';
     const WALKER_HOOK_LIMIT_VALUE = 'walker_hook_limit_value';
     const WALKER_HOOK_LIMIT_ID = 'walker_hook_limit_id';
@@ -30,6 +34,6 @@ class SqlWalker extends TranslationWalker
             $sql = "SELECT customTableAlias.$identifierField FROM ($sql LIMIT $limitValue) customTableAlias";
         }
 
-        return $sql;
+        return $this->hookUnion($sql);
     }
 }

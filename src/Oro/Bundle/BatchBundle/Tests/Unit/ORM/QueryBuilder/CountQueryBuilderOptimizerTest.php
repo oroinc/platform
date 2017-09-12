@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\QueryBuilder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -13,12 +14,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
+use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\Tagging;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 
 class CountQueryBuilderOptimizerTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
     private $em;
+
+    /** @var RelationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $relationHelper;
 
     protected function setUp()
     {
@@ -34,6 +40,21 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                 'Test' => 'Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity'
             ]
         );
+
+        $this->relationHelper = $this->createMock(RelationHelper::class);
+        $this->relationHelper->expects($this->any())
+            ->method('hasVirtualRelations')
+            ->willReturn(true);
+
+        $this->relationHelper->expects($this->any())
+            ->method('getMetadataTypeForVirtualJoin')
+            ->willReturnCallback(function ($entityClass, $targetEntityClass) {
+                if ($targetEntityClass === Tagging::class) {
+                    return ClassMetadata::ONE_TO_MANY;
+                }
+
+                return 0;
+            });
     }
 
     /**
@@ -45,6 +66,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     public function testGetCountQueryBuilder($queryBuilder, $expectedDql)
     {
         $optimizer = new CountQueryBuilderOptimizer();
+        $optimizer->setRelationHelper($this->relationHelper);
         $countQb   = $optimizer->getCountQueryBuilder(call_user_func($queryBuilder, $this->em));
 
         $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $countQb);
@@ -443,11 +465,14 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                         ->select(['u.id'])
                         ->leftJoin('Test:Email', 'e', Join::WITH, 'u MEMBER OF e.users')
                         ->leftJoin('Test:Comment', 'c', Join::WITH, 'c.email = e')
-                        ->leftJoin('Test:Note', 'n', Join::WITH, 'c.note = n');
+                        ->leftJoin('Test:Note', 'n', Join::WITH, 'c.note = n')
+                        ->leftJoin('Test:Tagging', 't', Join::WITH, "t.recordId = u.id AND t.entityName = 'Test:User'")
+                        ->leftJoin('t.tag', 'tag');
                 },
                 'expectedDQL' => 'SELECT u.id FROM Test:User u '
                     . 'LEFT JOIN Test:Email e WITH u MEMBER OF e.users '
-                    . 'LEFT JOIN Test:Comment c WITH c.email = e'
+                    . 'LEFT JOIN Test:Comment c WITH c.email = e '
+                    . "LEFT JOIN Test:Tagging t WITH t.recordId = u.id AND t.entityName = 'Test:User'"
             ],
             'join_one_to_many_table' => [
                 'queryBuilder' => function ($em) {

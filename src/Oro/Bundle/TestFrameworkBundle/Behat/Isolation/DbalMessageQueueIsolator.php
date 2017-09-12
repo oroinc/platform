@@ -3,18 +3,22 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\DBAL\Connection;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
+
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\RuntimeException;
+
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
 class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
 {
     /** @var Filesystem */
     private $fs;
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicable(ContainerInterface $container)
     {
         return 'dbal' === $container->getParameter('message_queue_transport');
@@ -49,12 +53,12 @@ class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
      */
     public function waitWhileProcessingMessages($timeLimit = self::TIMEOUT)
     {
-        $isRunning = $this->isOutdatedState();
-        if (!$isRunning) {
-            throw new RuntimeException('Message Queue is not running');
-        }
-
         while ($timeLimit > 0) {
+            $isRunning = $this->ensureMessageQueueIsRunning();
+            if (!$isRunning) {
+                throw new RuntimeException('Message Queue is not running');
+            }
+
             $isQueueEmpty = $this->isQueueEmpty();
             if ($isQueueEmpty) {
                 return;

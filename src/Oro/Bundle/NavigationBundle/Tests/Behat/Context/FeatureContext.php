@@ -20,23 +20,9 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class FeatureContext extends OroFeatureContext implements
     OroPageObjectAware,
-    KernelAwareContext,
-    MessageQueueIsolatorAwareInterface
+    KernelAwareContext
 {
     use PageObjectDictionary, KernelDictionary;
-
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    protected $messageQueueIsolator;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
-    {
-        $this->messageQueueIsolator = $messageQueueIsolator;
-    }
 
     /**
      * Save system configuration. It just press 'Save settings' button
@@ -201,7 +187,6 @@ class FeatureContext extends OroFeatureContext implements
         $clicked = $menu->openAndClick($firstPage);
 
         $this->waitForAjax();
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         $actualPage = $this->getLastPersistedPage($em);
 
@@ -221,7 +206,6 @@ class FeatureContext extends OroFeatureContext implements
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
-            $this->messageQueueIsolator->waitWhileProcessingMessages();
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
             $actualTitle = $crawler->filter('head title')->first()->text();
 

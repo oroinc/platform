@@ -1,9 +1,14 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapper;
 
 class BuildExtensionsPass implements CompilerPassInterface
 {
@@ -12,24 +17,57 @@ class BuildExtensionsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $tags = $container->findTaggedServiceIds('oro_message_queue.consumption.extension');
+        $extensions = [];
 
-        $groupByPriority = [];
-        foreach ($tags as $serviceId => $tagAttributes) {
-            foreach ($tagAttributes as $tagAttribute) {
-                $priority = isset($tagAttribute['priority']) ? (int) $tagAttribute['priority'] : 0;
+        $taggedServices = $container->findTaggedServiceIds('oro_message_queue.consumption.extension');
+        foreach ($taggedServices as $serviceId => $tags) {
+            foreach ($tags as $attributes) {
+                $priority = 0;
+                if (isset($attributes['priority'])) {
+                    $priority = (int)$attributes['priority'];
+                }
+                $persistent = false;
+                if (isset($attributes['persistent'])) {
+                    $persistent = (bool)$attributes['persistent'];
+                }
 
-                $groupByPriority[$priority][] = new Reference($serviceId);
+                $extensions[$priority][] = [$serviceId, $persistent];
             }
         }
 
-        ksort($groupByPriority);
+        ksort($extensions);
 
         $flatExtensions = [];
-        foreach ($groupByPriority as $extension) {
+        foreach ($extensions as $extension) {
             $flatExtensions = array_merge($flatExtensions, $extension);
         }
 
-        $container->getDefinition('oro_message_queue.consumption.extensions')->replaceArgument(0, $flatExtensions);
+        $extensionReferences = [];
+        foreach ($flatExtensions as $extension) {
+            list($serviceId, $persistent) = $extension;
+            if (!$persistent) {
+                $service = $container->getDefinition($serviceId);
+                $serviceClass = $service->getClass();
+                if (0 === strpos($serviceClass, '%')) {
+                    $serviceClass = $container->getParameter(substr($serviceClass, 1, -1));
+                }
+                if (!is_a($serviceClass, ResettableExtensionInterface::class, true)) {
+                    $service->setPublic(true);
+
+                    $resettableWrapper = new Definition(
+                        ResettableExtensionWrapper::class,
+                        [new Reference('service_container'), $serviceId]
+                    );
+                    $resettableWrapper->setPublic(false);
+
+                    $serviceId .= '.resettable_wrapper';
+                    $container->setDefinition($serviceId, $resettableWrapper);
+                }
+            }
+            $extensionReferences[] = new Reference($serviceId);
+        }
+
+        $container->getDefinition('oro_message_queue.consumption.extensions')
+            ->replaceArgument(0, $extensionReferences);
     }
 }

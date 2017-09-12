@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
@@ -31,6 +32,9 @@ class OroEntityManager extends EntityManager
     /** @var array */
     protected $loggingHydrators;
 
+    /** @var int|null */
+    protected $defaultQueryCacheLifetime;
+
     public static function create($conn, Configuration $config, EventManager $eventManager = null)
     {
         if (!$config->getMetadataDriverImpl()) {
@@ -48,6 +52,21 @@ class OroEntityManager extends EntityManager
         }
 
         return new OroEntityManager($conn, $config, $conn->getEventManager());
+    }
+
+    /**
+     * Sets the Metadata factory service instead of create the factory in the manager constructor.
+     *
+     * @param ClassMetadataFactory $metadataFactory
+     */
+    public function setMetadataFactory(ClassMetadataFactory $metadataFactory)
+    {
+        $metadataFactory->setEntityManager($this);
+        $metadataFactory->setCacheDriver($this->getConfiguration()->getMetadataCacheImpl());
+
+        $reflProperty = new \ReflectionProperty(EntityManager::class, 'metadataFactory');
+        $reflProperty->setAccessible(true);
+        $reflProperty->setValue($this, $metadataFactory);
     }
 
     /**
@@ -187,6 +206,22 @@ class OroEntityManager extends EntityManager
         } else {
             parent::flush($entity);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createQuery($dql = '')
+    {
+        return parent::createQuery($dql)->setQueryCacheLifetime($this->defaultQueryCacheLifetime);
+    }
+
+    /**
+     * @param int|null
+     */
+    public function setDefaultQueryCacheLifetime($defaultQueryCacheLifetime)
+    {
+        $this->defaultQueryCacheLifetime = $defaultQueryCacheLifetime;
     }
 
     /**

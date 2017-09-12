@@ -5,18 +5,15 @@ namespace Oro\Component\MessageQueue\Client\ConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Client\DriverInterface;
+use Oro\Component\MessageQueue\Transport\QueueCollection;
 
 class CreateQueueExtension extends AbstractExtension
 {
-    /**
-     * @var DriverInterface
-     */
+    /** @var DriverInterface */
     private $driver;
 
-    /**
-     * @var bool[]
-     */
-    private $createdQueues = [];
+    /** @var QueueCollection */
+    private $createdQueues;
 
     /**
      * @param DriverInterface $driver
@@ -24,6 +21,16 @@ class CreateQueueExtension extends AbstractExtension
     public function __construct(DriverInterface $driver)
     {
         $this->driver = $driver;
+        $this->createdQueues = new QueueCollection();
+    }
+
+    /**
+     * @param QueueCollection $createdQueues
+     * @deprecated since 2.0
+     */
+    public function setQueueRegistry(QueueCollection $createdQueues)
+    {
+        $this->createdQueues = $createdQueues;
     }
 
     /**
@@ -31,17 +38,16 @@ class CreateQueueExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context)
     {
-        if (isset($this->createdQueues[$context->getQueueName()])) {
+        $queueName = $context->getQueueName();
+        if ($this->createdQueues->has($queueName)) {
             return;
         }
 
-        $this->createdQueues[$context->getQueueName()] = true;
-        
-        $this->driver->createQueue($context->getQueueName());
+        $this->createdQueues->set($queueName, $this->driver->createQueue($queueName));
 
         $context->getLogger()->debug(sprintf(
             '[CreateQueueExtension] Make sure the queue %s exists on a broker side.',
-            $context->getQueueName()
+            $queueName
         ));
     }
 }

@@ -97,6 +97,29 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         );
     }
 
+    public function testShouldSendSameMessageToProcessEntitiesInverseRelations()
+    {
+        $message = $this->createMessage([
+            'timestamp' => time(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [],
+            'entities_updated' => [],
+            'entities_deleted' => [],
+            'collections_updated' => [],
+        ]);
+        $expectedBody = json_decode($message->getBody(), true);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertMessageSent(
+            Topics::ENTITIES_INVERSED_RELATIONS_CHANGED,
+            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+        );
+    }
+
     public function testShouldCreateAuditForInsertedEntity()
     {
         $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
@@ -372,7 +395,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
     {
         $message = new NullMessage();
         $message->setBody(json_encode($body));
-        
+
         return $message;
     }
 

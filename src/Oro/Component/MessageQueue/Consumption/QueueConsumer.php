@@ -98,7 +98,7 @@ class QueueConsumer
 
         $extension = $this->extension ?: new ChainExtension([]);
         if ($runtimeExtension) {
-            $extension = new ChainExtension([$extension, $runtimeExtension]);
+            $extension = new ChainExtension([$runtimeExtension, $extension]);
         }
 
         $context = new Context($session);
@@ -168,14 +168,13 @@ class QueueConsumer
         }
         $logger->info('Pre receive Message');
         if ($message = $messageConsumer->receive(1)) {
+            $context->setMessage($message);
+            $extension->onPreReceived($context);
+
             $logger->info('Message received');
             $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
             $logger->debug('Properties: {properties}', ['properties' => new VarExport($message->getProperties())]);
             $logger->debug('Payload: {payload}', ['payload' => new VarExport($message->getBody())]);
-
-            $context->setMessage($message);
-
-            $extension->onPreReceived($context);
 
             if (!$context->getStatus()) {
                 $status = $messageProcessor->process($message, $session);
