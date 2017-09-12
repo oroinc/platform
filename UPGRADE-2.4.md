@@ -134,6 +134,10 @@ job is handled by `Oro\Bundle\MessageQueueBundle\Consumption\Extension\Container
 - Class `Oro\Component\MessageQueue\Consumption\Extension\SignalExtension`
     - the visibility of method `interruptExecutionIfNeeded` was changed from `public` to `protected`
 
+SearchBundle
+------------
+- Removed method `getUniqueId` from class `Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver`. Use method `getJoinAttributes` instead.
+
 SecurityBundle
 --------------
 - Class `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy`
