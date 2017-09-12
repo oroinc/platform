@@ -359,6 +359,30 @@ abstract class BaseDriver
     }
 
     /**
+     * Returns an unique (in terms of single query) alias & index, used for SQL aliases for joins
+     *
+     * @param string|array $fieldName
+     * @param string $type
+     * @param array $existingAliases
+     * @return array
+     */
+    public function getJoinAttributes($fieldName, $type, array $existingAliases)
+    {
+        if (is_array($fieldName)) {
+            $fieldName = implode('_', $fieldName);
+        }
+
+        $i = 0;
+        do {
+            $i++;
+            $index = $fieldName . '_' . $i;
+            $joinAlias = $this->getJoinAlias($type, $index);
+        } while (in_array($joinAlias, $existingAliases));
+
+        return [$joinAlias, $index, $i];
+    }
+
+    /**
      * Set from parameters from search query
      *
      * @param \Oro\Bundle\SearchBundle\Query\Query $query
