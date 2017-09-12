@@ -7,5 +7,4 @@ define(function(require) {
     require('./bootstrap/bootstrap-scrollspy');
     require('./bootstrap/bootstrap-tooltip');
     require('./bootstrap/bootstrap-typeahead');
-    require('./bootstrap/bootstrap-tab');
 });
