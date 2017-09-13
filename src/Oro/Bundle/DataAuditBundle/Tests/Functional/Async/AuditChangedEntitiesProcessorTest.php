@@ -380,7 +380,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
     {
         $message = new NullMessage();
         $message->setBody(json_encode($body));
-        
+
         return $message;
     }
 
