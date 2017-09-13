@@ -5,7 +5,11 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     WidgetDateCompareView = BaseView.extend({
-        optionNames: BaseView.prototype.optionNames.concat(['useDateSelector', 'dateSelector']),
+        autoRender: true,
+
+        optionNames: BaseView.prototype.optionNames.concat(['useDateSelector']),
+
+        datepickerSelector: '.datepicker-input',
 
         events: {
             'change [data-role="updateDatapicker"]': 'onChange'
@@ -13,14 +17,14 @@ define(function(require) {
 
         onChange: function(e) {
             var state = e.currentTarget.checked ? 'enable' : 'disable';
-            this.$('.datepicker-input').datepicker(state);
+            this.$(this.datepickerSelector).datepicker(state);
         },
 
         render: function() {
             var $compareToDate = this.$(this.useDateSelector);
 
             if ($compareToDate.prop('checked') === false) {
-                this.$(this.dateSelector).prop('readonly', true);
+                this.$(this.datepickerSelector).datepicker('disable');
             }
 
             WidgetDateCompareView.__super__.render.apply(this, arguments);
