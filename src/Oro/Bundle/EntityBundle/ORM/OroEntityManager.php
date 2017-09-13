@@ -31,6 +31,9 @@ class OroEntityManager extends EntityManager
     /** @var array */
     protected $loggingHydrators;
 
+    /** @var int|null */
+    protected $defaultQueryCacheLifetime;
+
     public static function create($conn, Configuration $config, EventManager $eventManager = null)
     {
         if (!$config->getMetadataDriverImpl()) {
@@ -187,6 +190,22 @@ class OroEntityManager extends EntityManager
         } else {
             parent::flush($entity);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createQuery($dql = '')
+    {
+        return parent::createQuery($dql)->setQueryCacheLifetime($this->defaultQueryCacheLifetime);
+    }
+
+    /**
+     * @param int|null
+     */
+    public function setDefaultQueryCacheLifetime($defaultQueryCacheLifetime)
+    {
+        $this->defaultQueryCacheLifetime = $defaultQueryCacheLifetime;
     }
 
     /**

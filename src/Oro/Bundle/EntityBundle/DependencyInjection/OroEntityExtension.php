@@ -34,6 +34,7 @@ class OroEntityExtension extends Extension
         $loader->load('fallbacks.yml');
         $loader->load('twig.yml');
 
+        $container->setParameter('oro_entity.default_query_cache_lifetime', $config['default_query_cache_lifetime']);
         $container->setParameter('oro_entity.exclusions', $config['exclusions']);
         $container->setParameter('oro_entity.virtual_fields', $config['virtual_fields']);
         $container->setParameter('oro_entity.virtual_relations', $config['virtual_relations']);
