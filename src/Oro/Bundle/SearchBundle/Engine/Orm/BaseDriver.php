@@ -38,6 +38,11 @@ abstract class BaseDriver
     protected $associationMappings;
 
     /**
+     * @var array
+     */
+    protected $queryParameterIndex;
+
+    /**
      * @param EntityManager $em
      * @param ClassMetadata $class
      * @throws \InvalidArgumentException
@@ -156,9 +161,12 @@ abstract class BaseDriver
     }
 
     /**
-     * Returns an unique ID hash, used for SQL aliases
+     * Returns an unique ID, used for SQL aliases
+     *
+     * @deprecated Will be removed in version 2.4. Use 'getJoinAttributes' instead
      *
      * @param string|array $prefix
+     *
      * @return string
      */
     public function getUniqueId($prefix = '')
@@ -167,7 +175,9 @@ abstract class BaseDriver
             $prefix = implode('_', $prefix);
         }
 
-        return str_replace('.', '_', uniqid($prefix, true));
+        $id = $this->getParameterIndex($prefix);
+
+        return str_replace('.', '_', $prefix.'_'.$id);
     }
 
     /**
@@ -180,6 +190,30 @@ abstract class BaseDriver
     public function getJoinField($type)
     {
         return sprintf('search.%sFields', $type);
+    }
+
+    /**
+     * Returns an unique (in terms of single query) alias & index, used for SQL aliases for joins
+     *
+     * @param string|array $fieldName
+     * @param string $type
+     * @param array $existingAliases
+     * @return array
+     */
+    public function getJoinAttributes($fieldName, $type, array $existingAliases)
+    {
+        if (is_array($fieldName)) {
+            $fieldName = implode('_', $fieldName);
+        }
+
+        $i = 0;
+        do {
+            $i++;
+            $index = $fieldName . '_' . $i;
+            $joinAlias = $this->getJoinAlias($type, $index);
+        } while (in_array($joinAlias, $existingAliases));
+
+        return [$joinAlias, $index, $i];
     }
 
     /**
@@ -393,9 +427,8 @@ abstract class BaseDriver
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
 
-            $uniqIndex = $this->getUniqueId($name);
             $joinField = $this->getJoinField($type);
-            $joinAlias = $this->getJoinAlias($type, $uniqIndex);
+            list($joinAlias, $uniqIndex) = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
 
             $param = sprintf('param%s', $uniqIndex);
             $withClause = sprintf('%s.field = :%s', $joinAlias, $param);
@@ -516,5 +549,21 @@ abstract class BaseDriver
                     sprintf('Unsupported operator "%s"', $condition)
                 );
         }
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return integer
+     */
+    protected function getParameterIndex($prefix)
+    {
+        if (isset($this->queryParameterIndex[$prefix])) {
+            $this->queryParameterIndex[$prefix]++;
+        } else {
+            $this->queryParameterIndex[$prefix] = 1;
+        }
+
+        return $this->queryParameterIndex[$prefix];
     }
 }
