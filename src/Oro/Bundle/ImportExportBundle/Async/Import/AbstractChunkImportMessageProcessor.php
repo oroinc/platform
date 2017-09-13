@@ -14,6 +14,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -110,20 +111,24 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
             return self::REJECT;
         }
 
-        $result = $this
-            ->jobRunner
-            ->runDelayed(
-                $body['jobId'],
-                function (JobRunner $jobRunner, Job $job) use ($body, $user) {
-                    $this->getCreateToken($user);
-                    $result = $this->processData($body);
-                    $this->saveJobResult($job, $result);
-                    $summary = $this->getSummaryMessage(array_merge(['filePath' => $body['filePath']], $result));
-                    $this->logger->info($summary);
+        try {
+            $result = $this
+                ->jobRunner
+                ->runDelayed(
+                    $body['jobId'],
+                    function (JobRunner $jobRunner, Job $job) use ($body, $user) {
+                        $this->getCreateToken($user);
+                        $result = $this->processData($body);
+                        $this->saveJobResult($job, $result);
+                        $summary = $this->getSummaryMessage(array_merge(['filePath' => $body['filePath']], $result));
+                        $this->logger->info($summary);
 
-                    return $result['success'];
-                }
-            );
+                        return $result['success'];
+                    }
+                );
+        } catch (JobRedeliveryException $exception) {
+            return self::REQUEUE;
+        }
 
         return $result ? self::ACK : self::REJECT;
     }

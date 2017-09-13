@@ -4,12 +4,13 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
-class CsvFileReader extends AbstractReader
+class CsvFileReader extends AbstractReader implements ClosableInterface
 {
     /**
      * @var \SplFileInfo
@@ -191,5 +192,14 @@ class CsvFileReader extends AbstractReader
     public function initializeByContext(ContextInterface $context)
     {
         $this->initializeFromContext($context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->file = null;
+        $this->header = null;
     }
 }

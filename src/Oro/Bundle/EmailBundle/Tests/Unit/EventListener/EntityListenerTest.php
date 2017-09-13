@@ -5,11 +5,13 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
@@ -49,6 +51,12 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface */
     private $producer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailAddressManager */
+    private $emailAddressManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    private $entityRepository;
+
     protected function setUp()
     {
         $this->emailOwnerManager    =
@@ -81,6 +89,17 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->emailAddressManager = $this->getMockBuilder(EmailAddressManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailAddressManager->expects($this->any())
+            ->method('getEmailAddressRepository')
+            ->willReturn($this->entityRepository);
+
         $this->listener = new EntityListener(
             $this->emailOwnerManager,
             new ServiceLink($this->emailActivityManager),
@@ -88,6 +107,8 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             $this->emailActivityUpdates,
             $this->producer
         );
+
+        $this->listener->setEmailAddressManager($this->emailAddressManager);
     }
 
     public function testOnFlush()
@@ -95,6 +116,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $emailOwner = new TestEmailOwner(123);
         $contactsArray = [new User(), new User(), new User()];
         $updatedEmailAddresses = [new EmailAddress(1), new EmailAddress(2)];
+        $createdEmailAddresses = [new EmailAddress(3)];
 
         $uow = $this->getMockBuilder('Oro\Component\TestUtils\ORM\Mocks\UnitOfWork')
             ->disableOriginalConstructor()
@@ -130,7 +152,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->emailOwnerManager->expects($this->once())
             ->method('handleChangedAddresses')
             ->with([])
-            ->will($this->returnValue($updatedEmailAddresses));
+            ->willReturn([$updatedEmailAddresses, $createdEmailAddresses]);
 
         $postFlushEventArgs = $this->createPostFlushEventArgsMock();
         $postFlushEventArgs->expects($this->any())
@@ -149,6 +171,10 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
                 'ownerClass' => TestEmailOwner::class,
                 'ownerIds' => [123],
             ]);
+
+        $this->entityRepository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturn(null);
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
@@ -191,7 +217,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
         $this->emailOwnerManager->expects($this->once())
             ->method('handleChangedAddresses')
-            ->will($this->returnValue([]));
+            ->willReturn([[],[]]);
         $this->emailActivityManager->expects($this->once())
             ->method('updateActivities')
             ->with($createdEmails);
@@ -247,6 +273,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $emailOwner = new TestEmailOwner(123);
         $contactsArray = [new User(), new User(), new User()];
         $updatedEmailAddresses = [new EmailAddress(1), new EmailAddress(2)];
+        $createdEmailAddresses = [new EmailAddress(3)];
 
         $uow = $this->getMockBuilder('Oro\Component\TestUtils\ORM\Mocks\UnitOfWork')
             ->disableOriginalConstructor()
@@ -282,7 +309,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->emailOwnerManager->expects($this->once())
             ->method('handleChangedAddresses')
             ->with([])
-            ->will($this->returnValue($updatedEmailAddresses));
+            ->willReturn([$updatedEmailAddresses, $createdEmailAddresses]);
 
         $postFlushEventArgs = $this->createPostFlushEventArgsMock();
         $postFlushEventArgs->expects($this->any())

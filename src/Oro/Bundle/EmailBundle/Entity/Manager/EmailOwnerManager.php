@@ -49,7 +49,7 @@ class EmailOwnerManager
     /**
      * @param array $emailAddressData Data retrieved by "createEmailAddressData"
      *
-     * @return EmailAddress[] Updated email addresses
+     * @return array Updated email addresses
      */
     public function handleChangedAddresses(array $emailAddressData)
     {
@@ -221,6 +221,7 @@ class EmailOwnerManager
     protected function updateEmailAddresses(array $emailOwnerChanges, array $emailOwnerDeletions)
     {
         $updatedEmailAddresses = [];
+        $createEmailAddresses = [];
         foreach ($emailOwnerChanges as $item) {
             $email = $item['email'];
             $newOwner = false === $item['owner'] ? null : $item['owner'];
@@ -229,8 +230,7 @@ class EmailOwnerManager
                 $emailAddress = $this->emailAddressManager->newEmailAddress()
                     ->setEmail($email)
                     ->setOwner($newOwner);
-                $this->emailAddressManager->getEntityManager()->persist($emailAddress);
-                $updatedEmailAddresses[] = $emailAddress;
+                $createEmailAddresses[] = $emailAddress;
             } elseif ($emailAddress->getOwner() !== $newOwner) {
                 $emailAddress->setOwner($newOwner);
                 $updatedEmailAddresses[] = $emailAddress;
@@ -251,7 +251,7 @@ class EmailOwnerManager
             }
         }
 
-        return $updatedEmailAddresses;
+        return [$updatedEmailAddresses, $createEmailAddresses];
     }
 
     /**

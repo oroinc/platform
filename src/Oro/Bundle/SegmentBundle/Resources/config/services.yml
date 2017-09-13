@@ -84,10 +84,8 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
-            - { name: doctrine.event_listener, event: preRemove }
-            - { name: doctrine.event_listener, event: postFlush }
-        calls:
-            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
+            - { name: doctrine.event_listener, event: preRemove, connection: default }
+            - { name: doctrine.event_listener, event: postFlush, connection: default }
 
     oro_segment.entity_name_provider:
         class: %oro_segment.entity_name_provider.class%

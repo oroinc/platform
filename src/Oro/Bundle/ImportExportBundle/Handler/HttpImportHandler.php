@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
+use Symfony\Component\HttpFoundation\File\File;
+
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Symfony\Component\HttpFoundation\File\File;
+
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 
 class HttpImportHandler extends AbstractImportHandler
 {
@@ -68,6 +71,11 @@ class HttpImportHandler extends AbstractImportHandler
         array $options = []
     ) {
         $jobResult = $this->executeJob($jobName, $processorAlias, $options);
+
+        if ($jobResult->needRedelivery()) {
+            throw JobRedeliveryException::create();
+        }
+
         $counts = $this->getValidationCounts($jobResult);
         $importInfo = '';
 

@@ -10,8 +10,10 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
@@ -42,6 +44,9 @@ class EntityListener implements OptionalListenerInterface
     /** @var Email[] */
     protected $updatedEmails = [];
 
+    /** @var EmailAddress[] */
+    protected $newEmailAddresses = [];
+
     /** @var EmailActivityUpdates */
     protected $emailActivityUpdates;
 
@@ -52,12 +57,16 @@ class EntityListener implements OptionalListenerInterface
      * @var bool
      */
     protected $enabled = true;
+    /**
+     * @var EmailAddressManager
+     */
+    private $emailAddressManager;
 
     /**
-     * @param EmailOwnerManager $emailOwnerManager
-     * @param ServiceLink $emailActivityManagerLink
-     * @param ServiceLink $emailThreadManagerLink
-     * @param EmailActivityUpdates $emailActivityUpdates
+     * @param EmailOwnerManager        $emailOwnerManager
+     * @param ServiceLink              $emailActivityManagerLink
+     * @param ServiceLink              $emailThreadManagerLink
+     * @param EmailActivityUpdates     $emailActivityUpdates
      * @param MessageProducerInterface $producer
      */
     public function __construct(
@@ -72,6 +81,14 @@ class EntityListener implements OptionalListenerInterface
         $this->emailThreadManagerLink   = $emailThreadManagerLink;
         $this->emailActivityUpdates     = $emailActivityUpdates;
         $this->producer = $producer;
+    }
+
+    /**
+     * @param EmailAddressManager $emailAddressManager
+     */
+    public function setEmailAddressManager(EmailAddressManager $emailAddressManager)
+    {
+        $this->emailAddressManager = $emailAddressManager;
     }
 
     /**
@@ -95,7 +112,7 @@ class EntityListener implements OptionalListenerInterface
         $uow = $em->getUnitOfWork();
 
         $emailAddressData = $this->emailOwnerManager->createEmailAddressData($uow);
-        $updatedEmailAddresses = $this->emailOwnerManager->handleChangedAddresses($emailAddressData);
+        list($updatedEmailAddresses, $created) = $this->emailOwnerManager->handleChangedAddresses($emailAddressData);
         foreach ($updatedEmailAddresses as $emailAddress) {
             $this->computeEntityChangeSet($em, $emailAddress);
         }
@@ -116,6 +133,7 @@ class EntityListener implements OptionalListenerInterface
         );
 
         $this->emailActivityUpdates->processUpdatedEmailAddresses($updatedEmailAddresses);
+        $this->newEmailAddresses = array_merge($this->newEmailAddresses, $created);
     }
 
     /**
@@ -142,6 +160,10 @@ class EntityListener implements OptionalListenerInterface
             $this->getEmailActivityManager()->updateActivities($this->activityManagerEmails);
             $this->activityManagerEmails = [];
             $em->flush();
+        }
+
+        if ($this->newEmailAddresses) {
+            $this->saveNewEmailAddresses($em);
         }
         $this->addAssociationWithEmailActivity($event);
 
@@ -238,5 +260,29 @@ class EntityListener implements OptionalListenerInterface
     protected function getEmailActivityManager()
     {
         return $this->emailActivityManagerLink->getService();
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    private function saveNewEmailAddresses(EntityManager $em)
+    {
+        $flush = false;
+
+        foreach ($this->newEmailAddresses as $newEmailAddress) {
+            $emailAddress = $this->emailAddressManager
+                ->getEmailAddressRepository()
+                ->findOneBy(['email' => $newEmailAddress->getEmail()]);
+            if ($emailAddress === null) {
+                $em->persist($newEmailAddress);
+                $flush = true;
+            }
+        }
+
+        $this->newEmailAddresses = [];
+
+        if ($flush) {
+            $em->flush();
+        }
     }
 }
