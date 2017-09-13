@@ -775,7 +775,7 @@ define(function(require) {
         _onJsonContentResponse: function(content) {
             if (_.has(content, 'flashMessage')) {
                 var message = content.flashMessage;
-                messenger.notificationFlashMessage(message.type, __(message.text));
+                messenger.notificationFlashMessage(message.type, message.text);
             }
 
             if (_.has(content, 'trigger')) {
