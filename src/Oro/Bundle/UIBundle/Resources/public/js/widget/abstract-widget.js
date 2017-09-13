@@ -11,6 +11,7 @@ define(function(require) {
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
     var __ = require('orotranslation/js/translator');
     var errorHandler = require('oroui/js/error');
+    var messenger = require('oroui/js/messenger');
     require('jquery.form');
 
     /**
@@ -729,6 +730,10 @@ define(function(require) {
          * @private
          */
         _onContentLoad: function(content) {
+            try {
+                return this._onJsonContentResponse($.parseJSON(content));
+            } catch (e) {} // if response is not JSON use default handler
+
             delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
@@ -743,6 +748,40 @@ define(function(require) {
                     }, this));
             } else {
                 this._triggerContentLoadEvents();
+            }
+        },
+
+        /**
+         * Handle returned json response
+         *
+         * @param {Object} content
+         * @private
+         */
+        _onJsonContentResponse: function(content) {
+            if (_.has(content, 'flashMessage')) {
+                var message = content.flashMessage;
+                messenger.notificationFlashMessage(message.type, message.text);
+            }
+
+            if (_.has(content, 'triggerSuccess') && content.triggerSuccess) {
+                mediator.trigger('widget_success:' + this.getAlias());
+                mediator.trigger('widget_success:' + this.getWid());
+            }
+
+            if (_.has(content, 'trigger')) {
+                var events = content.trigger;
+
+                if (!_.isObject(events)) {
+                    events = [events];
+                }
+
+                _.each(content.trigger, function(eventName) {
+                    mediator.trigger(eventName);
+                });
+            }
+
+            if (_.has(content, 'remove') && content.remove) {
+                this.remove();
             }
         },
 
