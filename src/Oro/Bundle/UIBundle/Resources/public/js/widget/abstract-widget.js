@@ -730,9 +730,11 @@ define(function(require) {
          * @private
          */
         _onContentLoad: function(content) {
-            try {
-                return this._onJsonContentResponse($.parseJSON(content));
-            } catch (e) {} // if response is not JSON use default handler
+            var json  = this._getJson(content);
+
+            if (json) {
+                return this._onJsonContentResponse(json);
+            } // if response is not JSON use default handler
 
             delete this.loading;
             this.disposePageComponents();
@@ -752,6 +754,19 @@ define(function(require) {
         },
 
         /**
+         * @param {String} content
+         * @returns {json|null}
+         * @private
+         */
+        _getJson: function(content) {
+            try {
+                return $.parseJSON(content);
+            } catch (e) {}
+
+            return null;
+        },
+
+        /**
          * Handle returned json response
          *
          * @param {Object} content
@@ -760,12 +775,7 @@ define(function(require) {
         _onJsonContentResponse: function(content) {
             if (_.has(content, 'flashMessage')) {
                 var message = content.flashMessage;
-                messenger.notificationFlashMessage(message.type, message.text);
-            }
-
-            if (_.has(content, 'triggerSuccess') && content.triggerSuccess) {
-                mediator.trigger('widget_success:' + this.getAlias());
-                mediator.trigger('widget_success:' + this.getWid());
+                messenger.notificationFlashMessage(message.type, __(message.text));
             }
 
             if (_.has(content, 'trigger')) {
@@ -775,9 +785,19 @@ define(function(require) {
                     events = [events];
                 }
 
-                _.each(content.trigger, function(eventName) {
-                    mediator.trigger(eventName);
+                _.each(content.trigger, function(event) {
+                    if (_.isObject(event)) {
+                        var args = [event.name].concat(event.args);
+                        mediator.trigger.apply(mediator, args);
+                    } else {
+                        mediator.trigger(event);
+                    }
                 });
+            }
+
+            if (_.has(content, 'triggerSuccess') && content.triggerSuccess) {
+                mediator.trigger('widget_success:' + this.getAlias());
+                mediator.trigger('widget_success:' + this.getWid());
             }
 
             if (_.has(content, 'remove') && content.remove) {
