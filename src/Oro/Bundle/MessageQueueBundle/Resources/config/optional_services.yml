@@ -3,4 +3,4 @@ services:
         class: 'Oro\Component\MessageQueue\Consumption\Extension\SignalExtension'
         public: false
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            - { name: 'oro_message_queue.consumption.extension', persistent: true }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -19,6 +20,8 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
@@ -27,9 +30,15 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroPageObjectAware,
-    KernelAwareContext
+    KernelAwareContext,
+    MessageQueueIsolatorAwareInterface
 {
     use AssertTrait, KernelDictionary, PageObjectDictionary;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
 
     /**
      * @BeforeScenario
@@ -37,6 +46,27 @@ class OroMainContext extends MinkContext implements
     public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
+
+    /**
+     * @AfterStep
+     * @param AfterStepScope $scope
+     */
+    public function afterStep(AfterStepScope $scope)
+    {
+        if (!$this->getMink()->isSessionStarted()) {
+            return;
+        }
+
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**

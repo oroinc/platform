@@ -96,6 +96,12 @@ services:
         tags:
             - { name: 'context.initializer' }
 
+    oro_behat_extension.message_queue_isolator_initializer:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\MessageQueueIsolatorInitializer
+        tags:
+            - { name: 'context.initializer' }
+            - { name: 'message_queue_isolator_aware' }
+
     oro_test.context.fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader
         arguments:

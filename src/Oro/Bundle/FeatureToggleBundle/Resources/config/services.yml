@@ -100,3 +100,10 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: oro_navigation.menu_extension, priority: 90 }
+
+    oro_featuretoggle.event_listener.cache_state:
+        class:  Oro\Bundle\FeatureToggleBundle\EventListener\CacheStateChangeListener
+        arguments:
+            - '@oro_message_queue.consumption.cache_state'
+        tags:
+            - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: onFeaturesChange }

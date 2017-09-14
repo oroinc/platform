@@ -47,6 +47,13 @@ parameters:
     validator.builder.factory.class: Oro\Bundle\EntityExtendBundle\Validator\Validation
 
 services:
+    # the metadata factory for default entity manager
+    # it is declared as a service to allow make it as the persistent service for MQ consumer
+    # see Oro/Bundle/EntityExtendBundle/Resources/config/oro/app.yml
+    # and Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass
+    oro_entity_extend.orm.metadata_factory:
+        class: Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory
+
     oro_entity_extend.entity.cache.warmer:
         public: true
         class: Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer

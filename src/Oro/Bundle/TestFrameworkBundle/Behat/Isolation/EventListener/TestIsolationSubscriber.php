@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
+namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener;
 
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
@@ -13,6 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -119,7 +120,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event = new BeforeIsolatedTestEvent($event->getFeature());
+        $event = new BeforeIsolatedTestEvent($this->output, $event->getFeature());
 
         foreach ($this->isolators as $isolator) {
             $isolator->beforeTest($event);
@@ -146,7 +147,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event = new AfterIsolatedTestEvent();
+        $event = new AfterIsolatedTestEvent($this->output);
 
         foreach ($this->reverseIsolators as $isolator) {
             $isolator->afterTest($event);

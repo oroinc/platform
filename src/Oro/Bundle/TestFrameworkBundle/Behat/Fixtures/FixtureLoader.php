@@ -7,7 +7,6 @@ use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DbalMessageQueueIsolator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -112,7 +111,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
     }
 
     /**
@@ -156,7 +154,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
 
         return $entities;
     }
@@ -170,7 +167,6 @@ class FixtureLoader implements SuiteAwareInterface
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         $this->aliceLoader->setDoctrine($doctrine);
         $result = $this->aliceLoader->load($dataOrFilename);
-        DbalMessageQueueIsolator::waitForMessageQueue($doctrine->getManager()->getConnection());
 
         return $result;
     }
@@ -196,7 +192,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
     }
 
     /**

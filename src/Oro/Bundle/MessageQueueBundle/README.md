@@ -4,6 +4,7 @@
 
  - [Overview](#overview)
  - [Usage](#usage)
+ - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Supervisord](#supervisord)
  - [Internals](#internals)
    - [Structure](#structure)

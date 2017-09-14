@@ -11,11 +11,15 @@ use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -25,6 +29,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 {
     const ISOLATOR_TAG = 'oro_behat.isolator';
     const SUITE_AWARE_TAG = 'suite_aware';
+    const MESSAGE_QUEUE_ISOLATOR_AWARE_TAG = 'message_queue_isolator_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
     const PAGES_CONFIG_ROOT = 'pages';
 
@@ -35,6 +40,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
+        $this->injectMessageQueueIsolator($container);
         $this->processElements($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
@@ -139,6 +145,40 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container
             ->getDefinition('mink.listener.sessions')
             ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function injectMessageQueueIsolator(ContainerBuilder $container)
+    {
+        $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
+        $applicableIsolatorId = null;
+
+        foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
+            /** @var IsolatorInterface $isolator */
+            $isolator = $container->get($id);
+
+            if ($isolator->isApplicable($applicationContainer) && $isolator instanceof MessageQueueIsolatorInterface) {
+                $applicableIsolatorId = $id;
+                break;
+            }
+        }
+
+        if (null === $applicableIsolatorId) {
+            throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
+        }
+
+        foreach ($container->findTaggedServiceIds(self::MESSAGE_QUEUE_ISOLATOR_AWARE_TAG) as $id => $attributes) {
+            if (!$container->hasDefinition($id)) {
+                continue;
+            }
+            $definition = $container->getDefinition($id);
+
+            if (is_a($definition->getClass(), MessageQueueIsolatorAwareInterface::class, true)) {
+                $definition->addMethodCall('setMessageQueueIsolator', [new Reference($applicableIsolatorId)]);
+            }
+        }
     }
 
     private function processSuiteAwareSubscriber(ContainerBuilder $container)

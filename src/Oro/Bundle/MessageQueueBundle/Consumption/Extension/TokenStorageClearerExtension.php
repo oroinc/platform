@@ -7,19 +7,17 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
+/**
+ * @deprecated since 2.0
+ * @see \Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension
+ */
 class TokenStorageClearerExtension extends AbstractExtension
 {
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
     /**
      * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -27,6 +25,5 @@ class TokenStorageClearerExtension extends AbstractExtension
      */
     public function onPostReceived(Context $context)
     {
-        $this->tokenStorage->setToken(null);
     }
 }

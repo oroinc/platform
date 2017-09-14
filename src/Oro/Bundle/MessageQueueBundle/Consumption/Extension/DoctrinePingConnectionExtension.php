@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -26,22 +25,20 @@ class DoctrinePingConnectionExtension extends AbstractExtension
      */
     public function onPreReceived(Context $context)
     {
-        /** @var Connection $connection */
-        foreach ($this->registry->getConnections() as $connection) {
+        $logger = $context->getLogger();
+        $connections = $this->registry->getConnectionNames();
+        foreach ($connections as $name => $serviceId) {
+            $connection = $this->registry->getConnection($name);
             if ($connection->ping()) {
                 return;
             }
 
-            $context->getLogger()->debug(
-                '[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.'
-            );
+            $logger->debug('[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.');
 
             $connection->close();
             $connection->connect();
 
-            $context->getLogger()->debug(
-                '[DoctrinePingConnectionExtension] Connection is active now.'
-            );
+            $logger->debug('[DoctrinePingConnectionExtension] Connection is active now.');
         }
     }
 }
