@@ -1,17 +1,4 @@
 oro_behat_extension:
-  suites:
-    OroActivityBundle:
-      contexts:
-        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroCalendarBundle::FeatureContext
-        - OroImportExportBundle::ImportExportContext:
-          - '@oro_entity.entity_alias_resolver'
-          - '@oro_importexport.processor.registry'
-      paths:
-        - '@OroActivityBundle/Tests/Behat/Features'
-
   elements:
     Activity Dropdown Menu:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -25,61 +12,9 @@ oro_behat_extension:
         locator: '//button[@class="activity-context-current-block dropdown-toggle"]'
         type: xpath
 
-    Lead:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector:
-        locator: '//ul[@class="context-items-dropdown dropdown-menu"]/li[contains(text(),"Lead")]'
-        type: xpath
-
-    Call log accordion:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector:
-        locator: '//div[@class="accordion-heading clearfix"]'
-        type: xpath
-
-    Empty slot:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector:
-        locator: '//tr[@data-time="10:30:00"]'
-        type: xpath
-
-    Opportunity Form:
-      selector: 'form[name="oro_sales_opportunity_form"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
-      options:
-        mapping:
-          Budget Amount: 'oro_sales_opportunity_form[budgetAmount][value]'
-
-    Channel Form:
-      selector: 'form[name="oro_channel_form"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
-      options:
-        mapping:
-          Entities Select:
-            locator: '//input[@class="select2-focusser select2-offscreen"]'
-            type: xpath
-    Select Expected Close Date:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector:
-        locator: '//input[@placeholder="Choose a date"]'
-        type: xpath
-
-    Today:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector:
-        locator: '//button[@class="ui-datepicker-current ui-state-default ui-priority-secondary ui-corner-all"]'
-        type: xpath
-
     View selector:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
         locator: '//a[contains(@class,"dropdown-toggle") and contains(@class,"mode-text-only") and @data-drop-secondary-location="left"]'
         type: xpath
 
-    ImportLead:
-      selector: 'div[class="opportunity-card-view card-view ui-sortable-handle"]'
-
-    Closed Lost:
-      selector:
-        locator: '//div[7][@class="board-column ui-sortable"]'
-        type: xpath
