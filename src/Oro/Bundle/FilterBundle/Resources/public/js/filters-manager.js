@@ -413,6 +413,7 @@ define(function(require) {
                     this.$el.hide();
                 }
             }
+            this.initLayout();
 
             return this;
         },

@@ -1,0 +1,6 @@
+layout:
+    actions:
+        - '@setOption':
+            id: __datagrid
+            optionName: grid_render_parameters.enableToggleFilters
+            optionValue: false

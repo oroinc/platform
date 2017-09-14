@@ -3,5 +3,7 @@ styles:
         - 'bundles/orofilter/blank/scss/variables/filters-config.scss'
         - 'bundles/orofilter/blank/scss/variables/filters-dropdown-mode-config.scss'
         - 'bundles/orofilter/blank/scss/variables/filters-toggle-mode-config.scss'
+        - 'bundles/orofilter/blank/scss/variables/filters-collapse-mode-config.scss'
+        - 'bundles/orofilter/blank/scss/variables/filters-box-collapse-config.scss'
 
         - 'bundles/orofilter/blank/scss/styles.scss'

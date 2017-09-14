@@ -1,0 +1,137 @@
+// @theme: blank;
+
+.collapse-mode {
+    .ui-multiselect-menu {
+        position: absolute;
+        z-index: $filter-collapse-mode-ui-multiselect-menu-z-ndex;
+
+        // Break inline styles
+        max-width: $filter-collapse-mode-ui-multiselect-menu-max-width !important;
+        // Break inline styles
+        width: $filter-collapse-mode-ui-multiselect-menu-max-width !important;
+        margin-top: 0;
+
+        text-align: left;
+
+        background: $filter-collapse-mode-ui-multiselect-menu-bg;
+
+        .ui-helper-reset,
+        .ui-multiselect-checkboxes {
+            padding: $filter-collapse-mode-ui-multiselect-menu-helper-reset-offset-inner;
+        }
+
+        .ui-multiselect-header {
+            div {
+                padding: $filter-collapse-mode-ui-multiselect-menu-header-div-offset-inner;
+            }
+        }
+    }
+
+    .filter-criteria-selector {
+        padding: $filter-collapse-mode-criteria-selector-offset-inner;
+        border: $filter-collapse-mode-criteria-selector-border;
+        border-radius: $filter-collapse-mode-criteria-selector-border-radius;
+
+        background: $filter-collapse-mode-criteria-selector-bg;
+        color: $filter-collapse-mode-criteria-selector-color;
+
+        cursor: pointer;
+
+        user-select: none;
+
+        @include ellipsis();
+    }
+
+    .filter-criteria {
+        visibility: hidden;
+        min-width: $filter-collapse-mode-criteria-min-width;
+        padding: $filter-collapse-mode-criteria-offset-inner;
+        margin-top: $filter-collapse-mode-criteria-offset-top;
+
+        .value-field-frame {
+            width: $filter-collapse-mode-criteria-value-field-frame-width;
+            // Break inline styles
+            margin-left: 0 !important;
+            // Break inline styles
+            padding-right: 0 !important;
+        }
+    }
+
+    .filter-criteria-selector-icon-wrap {
+        top: $filter-collapse-mode-criteria-selector-icon-top;
+        right: $filter-collapse-mode-criteria-selector-icon-right;
+    }
+
+    .fields-row {
+        min-width: $filter-collapse-mode-fields-row-min-width;
+    }
+
+    .filter-items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: baseline;
+
+        padding: $filter-collapse-mode-items-offset-inner;
+    }
+
+    .filter-item {
+        margin: $filter-collapse-mode-item-offset;
+        padding: $filter-collapse-mode-item-offset-inner;
+
+        position: relative;
+
+        flex-basis: $filter-collapse-mode-item-flex-basis;
+    }
+
+    .filter-items-hint {
+        padding: $filter-collapse-mode-items-hint-offset-inner;
+
+        line-height: $filter-collapse-mode-items-hint-line-height;
+        font-size: $filter-collapse-mode-items-hint-font-size;
+        text-align: $filter-collapse-mode-items-hint-text-align;
+
+        clear: both;
+    }
+
+    .filter-criteria-hint-item {
+        display: inline-block;
+        vertical-align: middle;
+        margin: $filter-collapse-mode-criteria-hint-item-offset;
+        padding: $filter-collapse-mode-criteria-hint-item-offset-inner;
+
+        border-radius: $filter-collapse-mode-criteria-hint-item-border-radius;
+    }
+
+    .reset-filter-button {
+        position: absolute;
+        left: $filter-collapse-mode-reset-filter-button-right-pos;
+        bottom: $filter-collapse-mode-reset-filter-button-top-pos;
+        transform: $filter-collapse-mode-reset-filter-transform;
+    }
+
+    .ui-multiselect {
+        float: right;
+        margin: $filter-collapse-mode-ui-multiselect-offset;
+        //Bug in jquery-ui-multiselect-widget
+        width: auto !important;
+    }
+
+    .timepicker-input {
+        max-width: $filter-collapse-mode-timepicker-input-max-width;
+    }
+
+    .open-filter {
+        .filter-criteria {
+            display: block;
+        }
+
+        .filter-criteria-selector-icon {
+            transform: rotate(180deg);
+        }
+    }
+
+    .filter-select-oro-wrapper {
+        margin-bottom: $offset-y-m;
+    }
+}
