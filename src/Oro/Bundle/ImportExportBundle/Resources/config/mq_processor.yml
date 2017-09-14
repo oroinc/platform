@@ -13,6 +13,8 @@ services:
             - '@oro_importexport.async.import_export_job_summary_result_service'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+        calls:
+            - [setTokenSerializer, ['@oro_security.token_serializer']]
 
     oro_importexport.async.cli_import:
         class: Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor

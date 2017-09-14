@@ -49,15 +49,23 @@ class ExportMessageProcessorTest extends WebTestCase
         $expectedResult,
         $expectedContentType
     ) {
+        $userId = 1;
+        $organizationId = 1;
         /** @var User $user */
-        $user = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(User::class)->find(1);
-
+        $user = $this->getContainer()
+            ->get('oro_entity.doctrine_helper')->getEntityRepository(User::class)->find($userId);
+        $token = sprintf(
+            'organizationId=%s;userId=%s;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR',
+            $organizationId,
+            $userId
+        );
         $message = new NullMessage();
         $message->setMessageId('abc');
         $message->setBody(json_encode([
             'jobName' => 'job_name',
             'processorAlias' => 'alias',
             'userId' => $user->getId(),
+            'securityToken' => $token
         ]));
 
         $exportHandler = $this->createExportHandlerMock();

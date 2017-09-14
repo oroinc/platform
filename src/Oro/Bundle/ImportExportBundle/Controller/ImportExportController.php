@@ -2,31 +2,36 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
-use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-
-use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
-use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
-use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
-use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+
+use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ImportExportController extends Controller
 {
@@ -216,9 +221,9 @@ class ImportExportController extends Controller
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
         $filePrefix = $request->get('filePrefix', null);
         $options = $this->getOptionsFromRequest($request);
-
         $organization = $this->getSecurityFacade()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
+        $token = $this->getTokenStorage()->getToken();
 
         $this->getMessageProducer()->send(Topics::EXPORT, [
             'jobName' => $jobName,
@@ -227,6 +232,7 @@ class ImportExportController extends Controller
             'options' => $options,
             'userId' => $this->getUser()->getId(),
             'organizationId' => $organizationId,
+            'securityToken' => $this->getTokenSerializer()->serialize($token),
         ]);
 
         return new JsonResponse(['success' => true]);
@@ -459,5 +465,21 @@ class ImportExportController extends Controller
     protected function getSecurityFacade()
     {
         return $this->get('oro_security.security_facade');
+    }
+
+    /**
+     * @return TokenSerializerInterface
+     */
+    protected function getTokenSerializer()
+    {
+        return $this->get('oro_security.token_serializer');
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    protected function getTokenStorage()
+    {
+        return $this->get('security.token_storage');
     }
 }

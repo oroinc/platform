@@ -28,13 +28,20 @@ class ImportExportControllerTest extends WebTestCase
         $organization = $this->getSecurityFacade()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
 
+        $userId = $this->getCurrentUser()->getId();
+        $token = sprintf(
+            'organizationId=%s;userId=%s;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR',
+            $organizationId,
+            $userId
+        );
         $this->assertMessageSent(Topics::EXPORT, [
             'jobName' => JobExecutor::JOB_EXPORT_TO_CSV,
             'processorAlias' => 'oro_account',
             'outputFilePrefix' => null,
             'options' => [],
-            'userId' => $this->getCurrentUser()->getId(),
+            'userId' => $userId,
             'organizationId' => $organizationId,
+            'securityToken' => $token
         ]);
     }
 
@@ -57,7 +64,12 @@ class ImportExportControllerTest extends WebTestCase
 
         $organization = $this->getSecurityFacade()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
-
+        $userId = $this->getCurrentUser()->getId();
+        $token = sprintf(
+            'organizationId=%s;userId=%s;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR',
+            $organizationId,
+            $userId
+        );
         $this->assertMessageSent(Topics::EXPORT, [
             'jobName' => JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
             'processorAlias' => 'oro_account',
@@ -68,6 +80,7 @@ class ImportExportControllerTest extends WebTestCase
             ],
             'userId' => $this->getCurrentUser()->getId(),
             'organizationId' => $organizationId,
+            'securityToken' => $token
         ]);
     }
 
