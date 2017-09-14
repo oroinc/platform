@@ -55,6 +55,11 @@ define(function(require) {
         filterSelector: '[data-action=add-filter-select]',
 
         /**
+         * @property {String}
+         */
+        renderMode: '',
+
+        /**
          * Add filter button hint
          *
          * @property
@@ -153,7 +158,6 @@ define(function(require) {
                 if (filter.wrappable) {
                     _.extend(filter, filterWrapper);
                 }
-
                 this.listenTo(filter, filterListeners);
             }, this);
 
@@ -365,7 +369,10 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            return {filters: this.filters};
+            return {
+                filters: this.filters,
+                renderMode: this.renderMode
+            };
         },
 
         /**
@@ -391,6 +398,8 @@ define(function(require) {
                     $filterItems.append(filter.$el);
                     return;
                 }
+
+                filter.setRenderMode(this.renderMode);
                 filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();

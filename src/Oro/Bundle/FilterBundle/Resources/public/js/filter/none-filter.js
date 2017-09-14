@@ -142,7 +142,8 @@ define(function(require) {
          */
         render: function() {
             var $filter = $(this.template({
-                popupHint: this._getPopupHint()
+                popupHint: this._getPopupHint(),
+                renderMode: this.renderMode
             }));
             this._wrap($filter);
             return this;

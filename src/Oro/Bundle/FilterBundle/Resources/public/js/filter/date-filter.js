@@ -315,7 +315,8 @@ define(function(require) {
                     inputClass: this.inputClass,
                     value: displayValue,
                     parts: this._getParts(),
-                    popoverContent: __('oro.filter.date.info')
+                    popoverContent: __('oro.filter.date.info'),
+                    renderMode: this.renderMode
                 })
             );
 
