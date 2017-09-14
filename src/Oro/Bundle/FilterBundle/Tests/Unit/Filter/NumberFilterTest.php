@@ -77,6 +77,27 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider applyProviderForDivisor
+     *
+     * @param array $inputData
+     * @param array $expectedData
+     */
+    public function testApplyForDivisor(array $inputData, array $expectedData)
+    {
+        $ds = $this->prepareDatasource();
+
+        $this->filter->init($this->filterName, [
+            FilterUtility::DATA_NAME_KEY => $this->dataName,
+            FilterUtility::DIVISOR_KEY => 100,
+        ]);
+        $this->filter->apply($ds, $inputData['data']);
+
+        $where = $this->parseQueryCondition($ds);
+
+        $this->assertEquals($expectedData['where'], $where);
+    }
+
+    /**
      * @dataProvider parseDataProvider
      *
      * @param mixed $inputData
@@ -202,6 +223,103 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'where' => 'field-name NOT IN(1,3,5)',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function applyProviderForDivisor()
+    {
+        return [
+            'GREATER_EQUAL' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_GREATER_EQUAL,
+                        'value' => 1,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name >= 100',
+                ],
+            ],
+            'GREATER_THAN' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_GREATER_THAN,
+                        'value' => 2,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name > 200',
+                ],
+            ],
+            'EQUAL' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_EQUAL,
+                        'value' => 3,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name = 300',
+                ],
+            ],
+            'NOT_EQUAL' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_NOT_EQUAL,
+                        'value' => 4,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name <> 400',
+                ],
+            ],
+            'LESS_EQUAL' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_LESS_EQUAL,
+                        'value' => 5,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name <= 500',
+                ],
+            ],
+            'LESS_THAN' => [
+                'input' => [
+                    'data' => [
+                        'type' => NumberFilterType::TYPE_LESS_THAN,
+                        'value' => 6,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name < 600',
+                ],
+            ],
+            'EMPTY' => [
+                'input' => [
+                    'data' => [
+                        'type' => FilterUtility::TYPE_EMPTY,
+                        'value' => null,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name IS NULL',
+                ],
+            ],
+            'NOT_EMPTY' => [
+                'input' => [
+                    'data' => [
+                        'type' => FilterUtility::TYPE_NOT_EMPTY,
+                        'value' => null,
+                    ],
+                ],
+                'expected' => [
+                    'where' => 'field-name IS NOT NULL',
                 ],
             ],
         ];
