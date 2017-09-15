@@ -759,6 +759,10 @@ define(function(require) {
          * @private
          */
         _getJson: function(content) {
+            if (_.isObject(content)) {
+                return content; // return application/json content
+            }
+
             try {
                 return $.parseJSON(content);
             } catch (e) {}
@@ -775,6 +779,11 @@ define(function(require) {
         _onJsonContentResponse: function(content) {
             if (_.has(content, 'flashMessage')) {
                 var message = content.flashMessage;
+
+                if (_.isString(message)) {
+                    messenger.notificationFlashMessage('success', message);
+                }
+
                 messenger.notificationFlashMessage(message.type, message.text);
             }
 

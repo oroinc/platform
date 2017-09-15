@@ -211,7 +211,10 @@ class ImportExportController extends Controller
             ]
         );
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'flashMessage' => $this->get('translator')->trans('oro.importexport.import.start'),
+            'remove' => true
+        ]);
     }
 
     /**

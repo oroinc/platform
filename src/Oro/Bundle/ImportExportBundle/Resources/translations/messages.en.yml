@@ -33,6 +33,7 @@ oro:
             label:          "Import file"
             validation_label: "Validate Data File"
             success:        "File was successfully imported."
+            start:          "Import started successfully. You will receive email notification upon completion."
             alert:          "%added% %entities% were added, %updated% %entities% were updated"
             entity:         Import %entityName%
             entity_validation:         Import %entityName% Validation

@@ -10,10 +10,7 @@
 {% block page_container %}
     {% if saved %}
         {% set data = {
-            flashMessage: {
-                type: 'success',
-                text: 'oro.email.the_email_was_sent'|trans,
-            },
+            flashMessage: 'oro.email.the_email_was_sent'|trans,
             triggerSuccess: true,
             trigger: ['datagrid:doRefresh:attachment-grid', 'widget:doRefresh:email-thread'],
             remove: true

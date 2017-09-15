@@ -1,9 +1,6 @@
 {% if saved is defined and saved %}
     {% set data = {
-        flashMessage: {
-            type: 'success',
-            text: 'oro.dashboard.widget.configuration.success'|trans
-        },
+        flashMessage: 'oro.dashboard.widget.configuration.success'|trans,
         triggerSuccess: true,
         remove: true
     } %}

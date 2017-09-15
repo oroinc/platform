@@ -7,6 +7,7 @@ define(function(require) {
     var $ = require('jquery');
     var routing = require('routing');
     var DialogWidget = require('oro/dialog-widget');
+    var ImportDialogWidget = require('oroimportexport/js/widget/import-dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
@@ -81,7 +82,7 @@ define(function(require) {
         },
 
         handleImport: function() {
-            this._renderDialogWidget({
+            this._renderImportDialogWidget({
                 url: routing.generate(this.options.importRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importTitle
@@ -167,16 +168,26 @@ define(function(require) {
 
         /**
          * @param {Object} options
+         * @param {Object|undefined} Dialog
          * @returns {DialogWidget}
          */
-        _renderDialogWidget: function(options) {
+        _renderDialogWidget: function(options, Dialog) {
+            var Widget = Dialog ? Dialog : DialogWidget;
             var opts = $.extend(true, {}, this.options.dialogOptions, options);
 
-            var widget = new DialogWidget(opts);
+            var widget = new Widget(opts);
 
             widget.render();
 
             return widget;
+        },
+
+        /**
+         * @param {Object} options
+         * @returns {DialogWidget}
+         */
+        _renderImportDialogWidget: function(options) {
+            return this._renderDialogWidget(options, ImportDialogWidget);
         }
     });
 
