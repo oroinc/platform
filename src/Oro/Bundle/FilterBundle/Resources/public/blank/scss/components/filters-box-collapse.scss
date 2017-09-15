@@ -1,17 +1,6 @@
 // @theme: blank;
 
 .filters-box-collapse {
-    &.expanded {
-        .filters-box-collapse__icon {
-            .fa-plus {
-                display: none;
-            }
-            .fa-minus {
-                display: block;
-            }
-        }
-    }
-
     &__trigger {
         background: $filters-box-collapse-trigger-background;
         text-transform: $filters-box-collapse-text-transform;
@@ -33,6 +22,25 @@
     }
 
     &__container {
+        display: none;
+
         background: $filters-box-collapse-container-background;
+    }
+
+    .init {
+        .filters-box-collapse__container {
+            display: block;
+        }
+    }
+
+    &.expanded {
+        .filters-box-collapse__icon {
+            .fa-plus {
+                display: none;
+            }
+            .fa-minus {
+                display: block;
+            }
+        }
     }
 }

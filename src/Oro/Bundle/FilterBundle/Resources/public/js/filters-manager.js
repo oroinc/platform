@@ -413,9 +413,13 @@ define(function(require) {
                     this.$el.hide();
                 }
             }
-            this.initLayout();
 
+            this.finallyOfRender();
             return this;
+        },
+
+        finallyOfRender: function() {
+            // Empty by default
         },
 
         /**
