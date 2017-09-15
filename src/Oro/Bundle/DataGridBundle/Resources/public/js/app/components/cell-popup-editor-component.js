@@ -600,10 +600,9 @@ define(function(require) {
             var fieldName = metadata.name;
             if (_.has(metadata, 'divisor')) {
                 if (!isNaN(fields[fieldName])) {
-                fields[fieldName] = toResponse ?
-           	        fields[fieldName] / metadata.divisor
-           	        : 
-           	        fields[fieldName] * metadata.divisor;
+                    fields[fieldName] = toResponse ?
+                        fields[fieldName] / metadata.divisor :
+                        fields[fieldName] * metadata.divisor;
                 }
             }
         }

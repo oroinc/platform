@@ -65,6 +65,7 @@ class FieldProperty extends AbstractProperty
      * Apply configured divisor to a numeric raw value
      *
      * @param mixed $value
+     *
      * @return float
      */
     protected function applyDivisor($value)
@@ -72,9 +73,11 @@ class FieldProperty extends AbstractProperty
         if (!is_numeric($value)) {
             return $value;
         }
+
         if ($divisor = $this->getOr(self::DIVISOR_KEY)) {
             $value = $value / $divisor;
         }
+
         return $value;
     }
 }

@@ -183,6 +183,7 @@ class NumberFilter extends AbstractFilter
      * Apply configured divisor to a numeric raw value. For filtering this means to multiply the filter value.
      *
      * @param mixed $value
+     *
      * @return float
      */
     protected function applyDivisor($value)
@@ -190,9 +191,11 @@ class NumberFilter extends AbstractFilter
         if (!is_numeric($value)) {
             return $value;
         }
+
         if ($divisor = $this->getOr(FilterUtility::DIVISOR_KEY)) {
             $value = $value * $divisor;
         }
+
         return $value;
     }
 }
