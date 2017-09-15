@@ -8,10 +8,6 @@
     @import "filters-toggle-mode";
 }
 
-@if ($apply-filters-collapse-mode-design) {
-    @import "filters-collapse-mode";
-}
-
 .filter-criteria-selector {
     position: relative;
 }
@@ -177,12 +173,6 @@
         &.toggle-mode {
             display: none;
             padding: $offset-y-m 0;
-        }
-    }
-
-    @if ($apply-filters-collapse-mode-design) {
-        &.collapse-mode {
-            margin: $filter-box-collapse-mode-offset;
         }
     }
 }
