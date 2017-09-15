@@ -1,22 +1,5 @@
 // @theme: blank;
 
-$filter-collapse-mode-ui-multiselect-menu-z-ndex: z('popup') !default;
-$filter-collapse-mode-ui-multiselect-menu-max-width: 320px !default;
-$filter-collapse-mode-ui-multiselect-menu-bg: get-color('additional', 'ultra') !default;
-$filter-collapse-mode-ui-multiselect-menu-helper-reset-offset-inner: 0 20px !default;
-$filter-collapse-mode-ui-multiselect-menu-header-div-offset-inner: 13px 20px $offset-y-m !default;
-
-$filter-collapse-mode-criteria-min-width: 340px !default;
-$filter-collapse-mode-criteria-offset-inner: 7px 20px 20px !default;
-$filter-collapse-mode-criteria-offset-top: 0 !default;
-$filter-collapse-mode-criteria-value-field-frame-width: 100% !default;
-$filter-collapse-mode-criteria-selector-offset-inner: 9px 24px 9px 12px !default;
-$filter-collapse-mode-criteria-selector-border: 1px solid get-color('additional', 'light') !default;
-$filter-collapse-mode-criteria-selector-border-radius: 5px !default;
-$filter-collapse-mode-criteria-selector-bg: get-color('additional', 'ultra') !default;
-$filter-collapse-mode-criteria-selector-color: get-color('additional', 'dark') !default;
-$filter-collapse-mode-criteria-selector-icon-top: 10px !default;
-$filter-collapse-mode-criteria-selector-icon-right: 8px !default;
 $filter-collapse-mode-criteria-hint-item-offset: 0 $offset-x-s $offset-y-s 0 !default;
 $filter-collapse-mode-criteria-hint-item-offset-inner: 1px 0 1px 7px !default;
 $filter-collapse-mode-criteria-hint-item-border-radius: 2px !default;
@@ -25,17 +8,7 @@ $filter-collapse-mode-reset-filter-button-top-pos: 0 !default;
 $filter-collapse-mode-reset-filter-button-right-pos: 50% !default;
 $filter-collapse-mode-reset-filter-transform: translate(-50%, 0) !default;
 
-$filter-collapse-mode-fields-row-min-width: 225px !default;
-
-$filter-collapse-mode-items-offset-inner: 0 $offset-y-m $offset-x-s $offset-y-m !default;
-$filter-collapse-mode-item-offset: 0 $offset-x-s 0 0 !default;
-$filter-collapse-mode-item-offset-inner: 0 0 $offset-x-s !default;
-$filter-collapse-mode-item-flex-basis: 225px !default;
-$filter-collapse-mode-items-hint-offset-inner: 7px 10px 38px 10px !default;
+$filter-collapse-mode-items-hint-offset-inner: 7px 10px 32px 10px !default;
 $filter-collapse-mode-items-hint-line-height: 20px !default;
 $filter-collapse-mode-items-hint-font-size: 13px !default;
 $filter-collapse-mode-items-hint-text-align: center !default;
-
-$filter-collapse-mode-ui-multiselect-offset: 0 $offset-x-m $offset-y-m 0 !default;
-
-$filter-collapse-mode-timepicker-input-max-width: 90px !default;
