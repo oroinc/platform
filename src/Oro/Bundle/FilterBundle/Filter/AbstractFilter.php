@@ -114,8 +114,8 @@ abstract class AbstractFilter implements FilterInterface
                     ->andWhere($comparisonExpr)
                     ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
                 if ($groupBy) {
-                    // replace aliases from SELECT by expressions, since SELECT clause is changed
-                    $subQb->groupBy($groupBy);
+                    // replace aliases from SELECT by expressions, since SELECT clause is changed, add current field
+                    $subQb->groupBy(sprintf('%s, %s', $groupBy, $fieldExpr));
                 }
                 list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
                 list($fieldAlias, $field) = explode('.', $fieldExpr);
@@ -414,11 +414,6 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function createConditionFieldExprs(QueryBuilder $qb)
     {
-        $groupByFields = $this->getSelectFieldFromGroupBy($qb);
-        if ($groupByFields) {
-            return $groupByFields;
-        }
-
         $entities = $qb->getRootEntities();
         $idField = $qb
             ->getEntityManager()
