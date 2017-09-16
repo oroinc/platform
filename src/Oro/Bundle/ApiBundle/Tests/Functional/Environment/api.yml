@@ -83,3 +83,4 @@ api:
                 fields:
                     renamedName:
                         exclude: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestWithoutIdGenerator: ~

@@ -33,7 +33,7 @@ class ValidateRequestData extends BaseProcessor
         // do matching only if the identifier is not normalized yet
         $id = $this->context->getId();
         if (is_string($id) && $id !== $data[JsonApiDoc::ID]) {
-            $this->addError(
+            $this->addConflictError(
                 $this->buildPointer($pointer, JsonApiDoc::ID),
                 sprintf(
                     'The \'%1$s\' property of the primary data object'
