@@ -333,7 +333,7 @@ define(function(require) {
             }
 
             if (optionsSelectors.length) {
-                this.selectWidget.multiselect('refresh');
+                this._refreshSelectWidget();
             }
 
             return this;
@@ -557,6 +557,16 @@ define(function(require) {
             this._setButtonDesign($button);
             this._setButtonReset();
         },
+
+        /**
+         * Refresh multiselect widget
+         *
+         * @protected
+         */
+        _refreshSelectWidget: function() {
+            this.selectWidget.multiselect('refresh');
+        },
+
         /**
          * Set design for filter manager button
          *
