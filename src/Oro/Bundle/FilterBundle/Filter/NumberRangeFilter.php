@@ -200,9 +200,14 @@ class NumberRangeFilter extends NumberFilter
             case NumberRangeFilterType::TYPE_NOT_BETWEEN:
                 if (!isset($data['value'])) {
                     $data['value'] = null;
+                } else {
+                    $data['value'] = $this->applyDivisor($data['value']);
                 }
+
                 if (!isset($data['value_end'])) {
                     $data['value_end'] = null;
+                } else {
+                    $data['value_end'] = $this->applyDivisor($data['value_end']);
                 }
                 break;
         }

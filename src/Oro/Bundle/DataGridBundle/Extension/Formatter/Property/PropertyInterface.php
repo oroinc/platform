@@ -37,6 +37,7 @@ interface PropertyInterface
     const DATA_NAME_KEY     = 'data_name';
     const TRANSLATABLE_KEY  = 'translatable';
     const FRONTEND_TYPE_KEY = 'frontend_type';
+    const DIVISOR_KEY       = 'divisor';
 
     /**
      * Initialize property for each cell

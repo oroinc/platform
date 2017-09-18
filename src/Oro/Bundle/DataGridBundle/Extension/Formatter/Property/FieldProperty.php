@@ -52,9 +52,30 @@ class FieldProperty extends AbstractProperty
             if ($this->getOr(self::FRONTEND_TYPE_KEY) === self::TYPE_MULTI_SELECT) {
                 $value = explode(',', $value);
             }
+            $value = $this->applyDivisor($value);
         } catch (\LogicException $e) {
             // default value
             $value = null;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Apply configured divisor to a numeric raw value
+     *
+     * @param mixed $value
+     *
+     * @return float
+     */
+    protected function applyDivisor($value)
+    {
+        if (!is_numeric($value)) {
+            return $value;
+        }
+
+        if ($divisor = $this->getOr(self::DIVISOR_KEY)) {
+            $value = $value / $divisor;
         }
 
         return $value;
