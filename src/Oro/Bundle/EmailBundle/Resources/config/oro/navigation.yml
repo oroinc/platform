@@ -71,3 +71,4 @@ navigation:
         oro_email_thread_view: "%subject% - My Emails"
         oro_email_mailbox_update: "Mailbox %label% - Edit"
         oro_email_mailbox_create: "Create Mailbox"
+        oro_email_user_thread_view: "%subject% - My Emails"
