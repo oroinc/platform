@@ -334,7 +334,10 @@ class Job
      */
     public function getData()
     {
-        return $this->data;
+        $data = $this->data;
+        unset($data['_properties']);
+
+        return $data;
     }
 
     /**
@@ -342,7 +345,30 @@ class Job
      */
     public function setData(array $data)
     {
+        if (array_key_exists('_properties', $this->data)) {
+            $data['_properties'] = $this->data['_properties'];
+        }
         $this->data = $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getProperties()
+    {
+        if (!array_key_exists('_properties', $this->data)) {
+            return [];
+        }
+
+        return $this->data['_properties'];
+    }
+
+    /**
+     * @param array $properties
+     */
+    public function setProperties(array $properties)
+    {
+        $this->data['_properties'] = $properties;
     }
 
     /**

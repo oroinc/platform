@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Client\Message;
@@ -12,25 +13,19 @@ use Psr\Log\LoggerInterface;
 
 class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var JobStorage
-     */
+    /** @var JobStorage */
     private $jobStorage;
 
-    /**
-     * @var MessageProducerInterface
-     */
+    /** @var MessageProducerInterface */
     private $producer;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     /**
-     * @param JobStorage $jobStorage
+     * @param JobStorage               $jobStorage
      * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
+     * @param LoggerInterface          $logger
      */
     public function __construct(JobStorage $jobStorage, MessageProducerInterface $producer, LoggerInterface $logger)
     {
@@ -45,62 +40,35 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = JSON::decode($message->getBody());
-
-        if (! isset($data['jobId'])) {
+        if (!isset($data['jobId'])) {
             $this->logger->critical('Got invalid message');
 
             return self::REJECT;
         }
 
         $job = $this->jobStorage->findJobById($data['jobId']);
-        if (! $job) {
-            $this->logger->critical(sprintf(
-                'Job was not found. id: "%s"',
-                $data['jobId']
-            ));
+        if (null === $job) {
+            $this->logger->critical(sprintf('Job was not found. id: "%s"', $data['jobId']));
 
             return self::REJECT;
         }
-
-        if (! $job->isRoot()) {
-            $this->logger->critical(sprintf(
-                'Expected root job but got child. id: "%s"',
-                $data['jobId']
-            ));
+        if (!$job->isRoot()) {
+            $this->logger->critical(sprintf('Expected root job but got child. id: "%s"', $data['jobId']));
 
             return self::REJECT;
         }
 
         $jobData = $job->getData();
-
-        if (! isset($jobData['dependentJobs'])) {
+        if (!isset($jobData['dependentJobs'])) {
             return self::ACK;
         }
 
         $dependentJobs = $jobData['dependentJobs'];
-
-        foreach ($dependentJobs as $dependentJob) {
-            if (! isset($dependentJob['topic']) || ! isset($dependentJob['message'])) {
-                $this->logger->critical(sprintf(
-                    'Got invalid dependent job data. job: "%s", dependentJob: "%s"',
-                    $job->getId(),
-                    JSON::encode($dependentJob)
-                ));
-
-                return self::REJECT;
-            }
+        if (!$this->validateDependentJobs($dependentJobs, $job)) {
+            return self::REJECT;
         }
 
-        foreach ($dependentJobs as $dependentJob) {
-            $message = new Message();
-            $message->setBody($dependentJob['message']);
-
-            if (isset($dependentJob['priority'])) {
-                $message->setPriority($dependentJob['priority']);
-            }
-
-            $this->producer->send($dependentJob['topic'], $message);
-        }
+        $this->processDependentJobs($dependentJobs, $job);
 
         return self::ACK;
     }
@@ -111,5 +79,50 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
     public static function getSubscribedTopics()
     {
         return [Topics::ROOT_JOB_STOPPED];
+    }
+
+    /**
+     * @param array $dependentJobs
+     * @param Job   $job
+     *
+     * @return bool
+     */
+    private function validateDependentJobs(array $dependentJobs, Job $job)
+    {
+        $result = true;
+        foreach ($dependentJobs as $dependentJob) {
+            if (!isset($dependentJob['topic'], $dependentJob['message'])) {
+                $this->logger->critical(sprintf(
+                    'Got invalid dependent job data. job: "%s", dependentJob: "%s"',
+                    $job->getId(),
+                    JSON::encode($dependentJob)
+                ));
+                $result = false;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $dependentJobs
+     * @param Job   $job
+     */
+    private function processDependentJobs(array $dependentJobs, Job $job)
+    {
+        foreach ($dependentJobs as $dependentJob) {
+            $jobMessage = new Message();
+            $jobMessage->setBody($dependentJob['message']);
+            if (isset($dependentJob['priority'])) {
+                $jobMessage->setPriority($dependentJob['priority']);
+            }
+            $jobProperties = $job->getProperties();
+            if (!empty($jobProperties)) {
+                $jobMessage->setProperties($jobProperties);
+            }
+
+            $this->producer->send($dependentJob['topic'], $jobMessage);
+        }
     }
 }
