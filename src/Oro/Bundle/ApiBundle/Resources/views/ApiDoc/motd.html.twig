@@ -120,7 +120,9 @@
          */
         $('#sandbox_configuration').prepend(
             (wsseAllowed ? '' : '<span class="authentication-warning"' +
-            ' title="To use WSSE authentication you need to generate API key"' +
+            ' title="To use WSSE authentication you need to generate API key for the current logged-in user.' +
+            ' To do this, go to the My User page and click Generate Key near to API Key.' +
+            ' After that reload this page."' +
             '>{{ include('@OroApi/ApiDoc/warning.svg') }}</span>') +
             'authentication: ' +
             '<select id="authentication_type">' +
@@ -128,6 +130,9 @@
                 '<option value="wsse"' + (wsseAllowed ? ' selected=""' : ' disabled=""') + '>WSSE</option>' +
             '</select>'
         );
+        if (!wsseAllowed) {
+            $('#header').css('background-color', '#F7FE2E');
+        }
 
         /**
          * Make JSON as default body format for JSON.API sandbox

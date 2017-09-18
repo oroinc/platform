@@ -97,7 +97,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'null' => [],
             ],
             'persistent_services' => [],
-            'persistent_processors' => []
+            'persistent_processors' => [],
+            'security_agnostic_topics' => [],
+            'security_agnostic_processors' => []
         ], $config);
     }
 
@@ -125,7 +127,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'foo' => ['foo_param' => 'aParam'],
             ],
             'persistent_services' => [],
-            'persistent_processors' => []
+            'persistent_processors' => [],
+            'security_agnostic_topics' => [],
+            'security_agnostic_processors' => []
         ], $config);
     }
 
@@ -160,7 +164,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'persistent_services' => [],
-            'persistent_processors' => []
+            'persistent_processors' => [],
+            'security_agnostic_topics' => [],
+            'security_agnostic_processors' => []
         ], $config);
     }
 
@@ -189,7 +195,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'redelivered_delay_time' => 10
             ],
             'persistent_services' => [],
-            'persistent_processors' => []
+            'persistent_processors' => [],
+            'security_agnostic_topics' => [],
+            'security_agnostic_processors' => []
         ], $config);
     }
 

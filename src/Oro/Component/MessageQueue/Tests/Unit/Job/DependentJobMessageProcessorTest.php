@@ -316,6 +316,47 @@ class DependentJobMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('priority', $expectedMessage->getPriority());
     }
 
+    public function testShouldPublishDependentMessageWithAdditionalProperties()
+    {
+        $job = new Job();
+        $job->setId(123);
+        $job->setData([
+            'dependentJobs' => [
+                ['topic' => 'topic-name', 'message' => 'message']
+            ]
+        ]);
+        $job->setProperties(['key' => 'value']);
+
+        $jobStorage = $this->createJobStorageMock();
+        $jobStorage->expects($this->once())
+            ->method('findJobById')
+            ->with(12345)
+            ->will($this->returnValue($job));
+
+        $expectedMessage = null;
+        $producer = $this->createMessageProducerMock();
+        $producer->expects($this->once())
+            ->method('send')
+            ->with('topic-name', $this->isInstanceOf(Message::class))
+            ->will($this->returnCallback(function ($topic, Message $message) use (&$expectedMessage) {
+                $expectedMessage = $message;
+            }));
+
+        $logger = $this->createLoggerMock();
+
+        $message = new NullMessage();
+        $message->setBody(json_encode(['jobId' => 12345]));
+
+        $processor = new DependentJobMessageProcessor($jobStorage, $producer, $logger);
+
+        $result = $processor->process($message, $this->createSessionMock());
+
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+
+        $this->assertEquals('message', $expectedMessage->getBody());
+        $this->assertEquals(['key' => 'value'], $expectedMessage->getProperties());
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */

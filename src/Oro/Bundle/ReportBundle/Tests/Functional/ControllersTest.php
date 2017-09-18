@@ -171,8 +171,6 @@ class ControllersTest extends WebTestCase
                     'gridParameters' => [],
                     'format_type' => 'excel'
                 ],
-                'securityToken' =>
-                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
             ]
         );
     }

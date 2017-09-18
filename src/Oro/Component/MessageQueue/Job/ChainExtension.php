@@ -41,10 +41,20 @@ class ChainExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function onCreateDelayed(Job $job, $createResult)
+    public function onPreCreateDelayed(Job $job)
     {
         foreach ($this->extensions as $extension) {
-            $extension->onCreateDelayed($job, $createResult);
+            $extension->onPreCreateDelayed($job);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onPostCreateDelayed(Job $job, $createResult)
+    {
+        foreach ($this->extensions as $extension) {
+            $extension->onPostCreateDelayed($job, $createResult);
         }
     }
 
