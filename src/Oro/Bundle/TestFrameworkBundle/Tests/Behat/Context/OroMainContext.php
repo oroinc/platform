@@ -23,6 +23,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
@@ -1690,6 +1691,31 @@ class OroMainContext extends MinkContext implements
                 $this->getPage()->findLink($item),
                 "Button with name $item still present on page (link selector, actually)"
             );
+        }
+    }
+
+    /**
+     * Example: I should see next rows in "Discounts" table:
+     *   | Description | Discount |
+     *   | Amount      | -$2.00   |
+     *
+     * @Then /^I should see next rows in "(?P<elementName>[\w\s]+)" table$/
+     * @param TableNode $expectedTableNode
+     * @param string $elementName
+     */
+    public function iShouldSeeNextRowsInTable(TableNode $expectedTableNode, $elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $rows = $table->getRows();
+        $expectedRows = $expectedTableNode->getRows();
+        $headers = array_shift($expectedRows);
+
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertEquals($expectedRow, $rows[$rowKey]->getCellValues($headers));
         }
     }
 }
