@@ -89,7 +89,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @param object           $entity
      * @param bool             $isFullData
      * @param bool             $isPersistNew
@@ -98,7 +97,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param bool             $entityIsRelation
      *
      * @return null|object
-     * @todo Remove after the problem will be fixed, details in https://magecore.atlassian.net/browse/CRM-8268
      */
     protected function processEntity(
         $entity,
@@ -122,15 +120,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                     ['%entity_name%' => $entityClass,]
                 );
                 $this->context->addError($error);
-                $this->temporaryContextDumper(
-                    'EDIT',
-                    $entityClass,
-                    $isFullData,
-                    $isPersistNew,
-                    $itemData,
-                    $searchContext,
-                    $entityIsRelation
-                );
+
                 return null;
             }
             $existingOid = spl_object_hash($existingEntity);
@@ -177,15 +167,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                     ['%entity_name%' => $entityClass,]
                 );
                 $this->context->addError($error);
-                $this->temporaryContextDumper(
-                    'CREATE',
-                    $entityClass,
-                    $isFullData,
-                    $isPersistNew,
-                    $itemData,
-                    $searchContext,
-                    $entityIsRelation
-                );
+
                 return null;
             }
             $this->cachedEntities[$oid] = $entity;
@@ -235,8 +217,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                     ]
                 );
                 $this->context->addError($error);
-                $this->temporaryContextDumper($action, $entityName);
-
                 if ($existingEntity) {
                     $existingValue = $this->fieldHelper->getObjectValue($existingEntity, $fieldName);
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $existingValue);
@@ -455,47 +435,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         return !empty($notEmptyValues)
             ? array_merge($notEmptyValues, $nullRequiredValues)
             : null;
-    }
-
-    /**
-     * @param string           $action
-     * @param string           $entityName
-     * @param bool             $isFullData
-     * @param bool             $isPersistNew
-     * @param mixed|array|null $itemData
-     * @param array            $searchContext
-     * @param bool             $entityIsRelation
-     *
-     * @deprecated Method should not been used. Created only in purpose of Access Denied issues investigation.
-     * @todo Remove after the problem will be fixed, details in https://magecore.atlassian.net/browse/CRM-8268
-     */
-    private function temporaryContextDumper(
-        $action,
-        $entityName,
-        $isFullData = false,
-        $isPersistNew = false,
-        $itemData = null,
-        array $searchContext = [],
-        $entityIsRelation = false
-    ) {
-        if ($this->container !== null) {
-            $errorContext = [
-                'action' => $action,
-                'entityName' => $entityName,
-                'isFullData' => $isFullData,
-                'isPersistNew' => $isPersistNew,
-                'itemData' => $itemData,
-                'searchContext' => $searchContext,
-                'entityIsRelation' => $entityIsRelation,
-                'securityFacade' => $this->container->get('oro_security.security_facade'),
-                'trace' => debug_backtrace()
-            ];
-
-            $this->container->get('logger')->debug(
-                'Access Denied in ConfigurableAddOrReplaceStrategy',
-                $errorContext
-            );
-        }
     }
 
     /**

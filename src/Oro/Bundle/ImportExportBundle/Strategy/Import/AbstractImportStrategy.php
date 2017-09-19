@@ -51,9 +51,12 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
 
     /**
      * @var ContainerInterface
+     *
+     * @deprecated This property was added for debugging purposes only in
+     * scope of https://magecore.atlassian.net/browse/CRM-8268 and should not be used.
      */
     protected $container;
-    
+
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param ImportStrategyHelper $strategyHelper
@@ -209,13 +212,11 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
     /**
      * @param ContainerInterface    $container
      *
-     * @deprecated Method should not been used. Created only in purpose of Access Denied issues investigation.
-     * @todo Remove after the problem will be fixed, details in https://magecore.atlassian.net/browse/CRM-8268
+     * @deprecated This method was added for debugging purposes only in
+     * scope of https://magecore.atlassian.net/browse/CRM-8268 and should not be used.
+     *
      */
-    public function temporaryDumperInit(
-        ContainerInterface $container
-    ) {
-        $this->container = $container;
-        $this->container->get('logger')->debug('Dumper ready');
+    public function temporaryDumperInit(ContainerInterface $container)
+    {
     }
 }
