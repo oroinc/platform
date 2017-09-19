@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -55,28 +58,40 @@ class UserController extends Controller
 
     /**
      * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
+     * @Method({"GET","POST"})
      */
     public function apigenAction(User $user)
     {
-        $securityFacade = $this->get('oro_security.security_facade');
-        if ($securityFacade->getLoggedUserId() !== $user->getId()
-            && !$securityFacade->isGranted('MANAGE_API_KEY', $user)
-        ) {
+        if (!$this->isUserApiGenAllowed($user)) {
             throw $this->createAccessDeniedException();
         }
-
-        $em      = $this->getDoctrine()->getManager();
         $userApi = $this->getUserApi($user);
-        $userApi->setApiKey($userApi->generateKey())
-            ->setUser($user)
-            ->setOrganization($this->getOrganization());
+        $form = $this->createForm('oro_user_apikey_gen', $userApi);
 
-        $em->persist($userApi);
-        $em->flush();
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        if ($request->getMethod() === 'POST') {
+            $userApi->setApiKey($userApi->generateKey());
+            $form->setData($userApi);
+            $form->submit($request);
 
-        return $this->getRequest()->isXmlHttpRequest()
-            ? new JsonResponse($userApi->getApiKey())
-            : $this->forward('OroUserBundle:User:view', array('user' => $user));
+            $responseData = ['data' => [], 'status' => 'success'];
+            $status = Response::HTTP_OK;
+            if ($form->isValid()) {
+                $this->saveUserApi($user, $userApi);
+                $responseData['data'] = ['apiKey' => $userApi->getApiKey()];
+            } else {
+                $status = Response::HTTP_BAD_REQUEST;
+                $responseData['status'] = 'error';
+                $responseData['errors'] = $form->getErrors();
+            }
+
+            return new JsonResponse($responseData, $status);
+        }
+
+        return $this->render(
+            'OroUserBundle:User/widget:apiKeyGen.html.twig',
+            ['form' => $form->createView(), 'user' => $user]
+        );
     }
 
     /**
@@ -207,6 +222,7 @@ class UserController extends Controller
         $userManager  = $this->get('oro_user.manager');
         if (!$userApi = $userManager->getApi($user, $this->getOrganization())) {
             $userApi = new UserApi();
+            $userApi->setUser($user);
         }
 
         return $userApi;
@@ -236,5 +252,38 @@ class UserController extends Controller
             && !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity);
 
         return $isDeleteAllowed;
+    }
+
+    /**
+     * @param User $entity
+     *
+     * @return bool
+     */
+    protected function isUserApiGenAllowed(User $entity)
+    {
+        $securityFacade = $this->get('oro_security.security_facade');
+        $currentUser = $securityFacade->getLoggedUser();
+        if (!$currentUser instanceof User) {
+            return false;
+        }
+        $isSelf = $currentUser->getId() === $entity->getId();
+
+        return $isSelf || $securityFacade->isGranted('MANAGE_API_KEY', $entity);
+    }
+
+    /**
+     * @param User    $user
+     * @param UserApi $userApi
+     */
+    protected function saveUserApi(User $user, UserApi $userApi)
+    {
+        $em = $this->getDoctrine()->getManagerForClass(User::class);
+
+        $userApi
+            ->setUser($user)
+            ->setOrganization($this->getOrganization());
+
+        $em->persist($userApi);
+        $em->flush();
     }
 }
