@@ -30,3 +30,8 @@ ImportExportBundle
     - changed the constructor signature: parameters `TokenStorageInterface $tokenStorage` and `TokenSerializerInterface $tokenSerializer` were removed
 - Class `Oro\Bundle\ImportExportBundle\Controller\ImportExportController`
     - removed method `getTokenSerializer`
+
+SecurityBundle
+--------------
+ - Class `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider`
+     - internal cache parameter `$tree` was removed cause all cache providers are already automatically decorated by the memory cache provider
