@@ -1,0 +1,33 @@
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+{% set userId = user.id %}
+{% set formId = 'user-apikey-gen-form-' ~ userId %}
+{% set apiKeyElementId = 'user-apikey-gen-elem-' ~ userId %}
+{% set options  = {
+    'view': 'orouser/js/views/user-apikey-gen-view',
+    'apiKeyElementSelector': '#' ~ apiKeyElementId,
+    'formSelector': '#' ~ formId,
+    'responseMessage': 'oro.user.apikey_gen.new_key.success'
+} %}
+<div class="control-group api-block"
+     data-nohash="true"
+     data-page-component-module="oroui/js/app/components/view-component"
+     data-page-component-options="{{ options|json_encode }}"
+     data-layout="separate">
+    <label class="control-label control-label-api-key">
+        {{ ui.tooltip('oro.user.api.tooltip_text', {}, 'bottom') }}
+        {{ 'oro.user.api.label'|trans }}
+    </label>
+    <div class="controls">
+        <div class="control-label html-content">
+            {{ form_row(
+                form,
+                {
+                    method: 'POST',
+                    action: path('oro_user_apigen', {'id': userId}),
+                    attr: {'id': formId},
+                    apiKeyElementId: apiKeyElementId
+                }
+            ) }}
+        </div>
+    </div>
+</div>

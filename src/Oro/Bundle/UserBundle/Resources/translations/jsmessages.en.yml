@@ -9,6 +9,9 @@ oro:
         change_password:
             flash:
                 success: The password has been changed
+        apikey_gen:
+            new_key:
+                success: Generate key was successful. New key:{{ new_api_key }}
     role:
         tabs:
             all.label: All

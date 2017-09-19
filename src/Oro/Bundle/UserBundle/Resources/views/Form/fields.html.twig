@@ -47,3 +47,15 @@
         {{ form_row(child) }}
     {% endfor %}
 {% endblock %}
+
+{% block oro_user_apikey_gen_row %}
+    {{ form_start(form) }}
+    {{ form_errors(form) }}
+    {{ form_row(form.apiKey, {'apiKeyElementId': apiKeyElementId}) }}
+    <button class="btn btn-mini no-hash" id="btn-apigen" title="{{ 'Generate key'|trans }}" type="submit">{{ 'Generate key'|trans }}</button>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block oro_user_apikey_gen_key_row %}
+    <span class="api-key" id="{{ apiKeyElementId }}">{{ value|escape|default('N/A') }}</span>
+{% endblock %}
