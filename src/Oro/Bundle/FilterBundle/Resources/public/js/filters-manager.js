@@ -161,7 +161,7 @@ define(function(require) {
                 this.listenTo(filter, filterListeners);
             }, this);
 
-            if ('filtersStateElement' in options) {
+            if (this.initFiltersStateElement(options)) {
                 var $container = this.$el.closest('body, .ui-dialog');
                 var filtersStateView = new FiltersStateView({
                     el: $container.find(options.filtersStateElement).first(),
@@ -175,6 +175,15 @@ define(function(require) {
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @param {object} options
+         * @returns {boolean}
+         * @constructor
+         */
+        initFiltersStateElement: function(options) {
+            return 'filtersStateElement' in options;
         },
 
         /**
