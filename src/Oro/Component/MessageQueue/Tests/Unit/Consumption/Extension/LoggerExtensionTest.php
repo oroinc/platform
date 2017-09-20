@@ -42,7 +42,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with($this->stringStartsWith('Set context\'s logger'))
+            ->with('Set logger to the context')
         ;
 
         $extension = new LoggerExtension($logger);

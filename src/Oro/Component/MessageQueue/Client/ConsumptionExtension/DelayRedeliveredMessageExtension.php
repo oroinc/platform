@@ -52,10 +52,7 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
 
         if ($properties[self::PROPERTY_REDELIVER_COUNT] > self::REDELIVER_COUNT_LIMIT) {
             $context->setStatus(MessageProcessorInterface::REJECT);
-            $context->getLogger()->debug(
-                '[DelayRedeliveredMessageExtension] '.
-                'Redeliver count limit reached - message has been killed.'
-            );
+            $context->getLogger()->debug('Redeliver count limit reached - message has been killed.');
             return;
         }
 
@@ -69,12 +66,9 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
         $queue = $context->getSession()->createQueue($context->getQueueName());
 
         $this->driver->send($queue, $delayedMessage);
-        $context->getLogger()->debug('[DelayRedeliveredMessageExtension] Send delayed message');
+        $context->getLogger()->debug('Send delayed message');
 
         $context->setStatus(MessageProcessorInterface::REJECT);
-        $context->getLogger()->debug(
-            '[DelayRedeliveredMessageExtension] '.
-            'Reject redelivered original message by setting reject status to context.'
-        );
+        $context->getLogger()->debug('Reject redelivered original message by setting reject status to context.');
     }
 }

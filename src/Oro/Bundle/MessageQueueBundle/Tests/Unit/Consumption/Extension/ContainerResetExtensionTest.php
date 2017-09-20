@@ -64,7 +64,7 @@ class ContainerResetExtensionTest extends \PHPUnit_Framework_TestCase
 
         $logger->expects($this->once())
             ->method('info')
-            ->with('[ContainerResetExtension] Reset the container');
+            ->with('Reset the container');
 
         // guard
         $this->assertTrue($container->initialized('persistent_service'));

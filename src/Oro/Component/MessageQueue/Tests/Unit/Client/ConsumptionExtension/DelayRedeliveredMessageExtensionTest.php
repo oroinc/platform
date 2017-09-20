@@ -55,13 +55,12 @@ class DelayRedeliveredMessageExtensionTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->at(0))
             ->method('debug')
-            ->with('[DelayRedeliveredMessageExtension] Send delayed message')
+            ->with('Send delayed message')
         ;
         $logger
             ->expects($this->at(1))
             ->method('debug')
             ->with(
-                '[DelayRedeliveredMessageExtension] '.
                 'Reject redelivered original message by setting reject status to context.'
             )
         ;
@@ -218,7 +217,7 @@ class DelayRedeliveredMessageExtensionTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('[DelayRedeliveredMessageExtension] Redeliver count limit reached - message has been killed.')
+            ->with('Redeliver count limit reached - message has been killed.')
         ;
 
         $context = new Context($session);

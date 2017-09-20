@@ -77,7 +77,7 @@ class SignalExtension extends AbstractExtension
     public function interruptExecutionIfNeeded(Context $context)
     {
         if ($this->interruptConsumption && !$context->isExecutionInterrupted()) {
-            $this->logger->debug('[SignalExtension] Interrupt execution');
+            $this->logger->debug('Interrupt execution');
             $context->setExecutionInterrupted($this->interruptConsumption);
 
             $this->interruptConsumption = false;
@@ -90,14 +90,14 @@ class SignalExtension extends AbstractExtension
     public function handleSignal($signal)
     {
         if ($this->logger) {
-            $this->logger->debug(sprintf('[SignalExtension] Caught signal: %s', $signal));
+            $this->logger->debug(sprintf('Caught signal: %s', $signal));
         }
         
         switch ($signal) {
             case SIGTERM:  // 15 : supervisor default stop
             case SIGQUIT:  // 3  : kill -s QUIT
             case SIGINT:   // 2  : ctrl+c
-                $this->logger->debug('[SignalExtension] Interrupt consumption');
+                $this->logger->debug('Interrupt consumption');
                 $this->interruptConsumption = true;
                 break;
             default:

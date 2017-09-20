@@ -141,8 +141,8 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
-            ->method('alert')
-            ->with('[RedeliverOrphanMessagesDbalExtension] Orphans were found and redelivered. '.
+            ->method('critical')
+            ->with('Orphans were found and redelivered. '.
                 'consumerIds: "consumer-id-1, consumer-id-2"')
         ;
 

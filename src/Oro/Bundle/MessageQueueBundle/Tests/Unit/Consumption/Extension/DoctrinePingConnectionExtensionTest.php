@@ -69,10 +69,10 @@ class DoctrinePingConnectionExtensionTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->at(0))
             ->method('debug')
-            ->with('[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.');
+            ->with('Connection "connection-name" is not active, trying to reconnect.');
         $logger->expects($this->at(1))
             ->method('debug')
-            ->with('[DoctrinePingConnectionExtension] Connection is active now.');
+            ->with('Connection "connection-name" is active now.');
 
         $this->doctrine->expects($this->once())
             ->method('getConnectionNames')

@@ -58,7 +58,7 @@ class LimitConsumerMemoryExtension extends AbstractExtension
         $memoryUsage = memory_get_usage(true);
         if ($memoryUsage >= $this->memoryLimit) {
             $context->getLogger()->debug(sprintf(
-                '[LimitConsumerMemoryExtension] Interrupt execution as memory limit reached. limit: "%s", used: "%s"',
+                'Interrupt execution as memory limit reached. limit: "%s", used: "%s"',
                 $this->memoryLimit,
                 $memoryUsage
             ));

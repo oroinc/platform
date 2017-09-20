@@ -1,6 +1,11 @@
 parameters:
     oro_logger.detailed_logs_default_level: error
 services:
+    oro_logger.cache:
+        parent: doctrine_cache.abstract.array
+        calls:
+            - [ setNamespace, [ 'oro_logger' ] ]
+
     oro_logger.event_subscriber.console_command:
         class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber
         arguments:

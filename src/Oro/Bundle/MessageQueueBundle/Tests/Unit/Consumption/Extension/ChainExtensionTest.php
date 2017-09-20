@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtensionAwareInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
+use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -64,7 +65,19 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('onStart')
             ->with($this->identicalTo($context));
 
+        $consumerState = $this->createConsumerState();
+        $consumerState->expects($this->at(0))
+            ->method('setExtension')
+            ->with($this->identicalTo($fooExtension));
+        $consumerState->expects($this->at(1))
+            ->method('setExtension')
+            ->with($this->identicalTo($barExtension));
+        $consumerState->expects($this->at(2))
+            ->method('setExtension')
+            ->with($this->isNull());
+
         $chainExtension = new ChainExtension([$fooExtension, $barExtension]);
+        $chainExtension->setConsumerState($consumerState);
         $chainExtension->onStart($context);
     }
 
@@ -81,7 +94,19 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('onBeforeReceive')
             ->with($this->identicalTo($context));
 
+        $consumerState = $this->createConsumerState();
+        $consumerState->expects($this->at(0))
+            ->method('setExtension')
+            ->with($this->identicalTo($fooExtension));
+        $consumerState->expects($this->at(1))
+            ->method('setExtension')
+            ->with($this->identicalTo($barExtension));
+        $consumerState->expects($this->at(2))
+            ->method('setExtension')
+            ->with($this->isNull());
+
         $chainExtension = new ChainExtension([$fooExtension, $barExtension]);
+        $chainExtension->setConsumerState($consumerState);
         $chainExtension->onBeforeReceive($context);
     }
 
@@ -98,7 +123,19 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('onPreReceived')
             ->with($this->identicalTo($context));
 
+        $consumerState = $this->createConsumerState();
+        $consumerState->expects($this->at(0))
+            ->method('setExtension')
+            ->with($this->identicalTo($fooExtension));
+        $consumerState->expects($this->at(1))
+            ->method('setExtension')
+            ->with($this->identicalTo($barExtension));
+        $consumerState->expects($this->at(2))
+            ->method('setExtension')
+            ->with($this->isNull());
+
         $chainExtension = new ChainExtension([$fooExtension, $barExtension]);
+        $chainExtension->setConsumerState($consumerState);
         $chainExtension->onPreReceived($context);
     }
 
@@ -115,7 +152,19 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('onPostReceived')
             ->with($this->identicalTo($context));
 
+        $consumerState = $this->createConsumerState();
+        $consumerState->expects($this->at(0))
+            ->method('setExtension')
+            ->with($this->identicalTo($fooExtension));
+        $consumerState->expects($this->at(1))
+            ->method('setExtension')
+            ->with($this->identicalTo($barExtension));
+        $consumerState->expects($this->at(2))
+            ->method('setExtension')
+            ->with($this->isNull());
+
         $chainExtension = new ChainExtension([$fooExtension, $barExtension]);
+        $chainExtension->setConsumerState($consumerState);
         $chainExtension->onPostReceived($context);
     }
 
@@ -132,7 +181,19 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('onIdle')
             ->with($this->identicalTo($context));
 
+        $consumerState = $this->createConsumerState();
+        $consumerState->expects($this->at(0))
+            ->method('setExtension')
+            ->with($this->identicalTo($fooExtension));
+        $consumerState->expects($this->at(1))
+            ->method('setExtension')
+            ->with($this->identicalTo($barExtension));
+        $consumerState->expects($this->at(2))
+            ->method('setExtension')
+            ->with($this->isNull());
+
         $chainExtension = new ChainExtension([$fooExtension, $barExtension]);
+        $chainExtension->setConsumerState($consumerState);
         $chainExtension->onIdle($context);
     }
 
@@ -149,7 +210,19 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('onInterrupted')
             ->with($this->identicalTo($context));
 
+        $consumerState = $this->createConsumerState();
+        $consumerState->expects($this->at(0))
+            ->method('setExtension')
+            ->with($this->identicalTo($fooExtension));
+        $consumerState->expects($this->at(1))
+            ->method('setExtension')
+            ->with($this->identicalTo($barExtension));
+        $consumerState->expects($this->at(2))
+            ->method('setExtension')
+            ->with($this->isNull());
+
         $chainExtension = new ChainExtension([$fooExtension, $barExtension]);
+        $chainExtension->setConsumerState($consumerState);
         $chainExtension->onInterrupted($context);
     }
 
@@ -158,7 +231,9 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
         $extension1 = $this->createExtension();
         $extension2 = $this->createMock(ChainExtension::class);
 
+        $consumerState = $this->createConsumerState();
         $chainExtension = new ChainExtension([$extension1, $extension2]);
+        $chainExtension->setConsumerState($consumerState);
 
         $extension2->expects(self::once())
             ->method('reset');
@@ -171,7 +246,9 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
         $extension1 = $this->createExtension();
         $extension2 = $this->createMock(ChainExtension::class);
 
+        $consumerState = $this->createConsumerState();
         $chainExtension = new ChainExtension([$extension1, $extension2]);
+        $chainExtension->setConsumerState($consumerState);
 
         $anotherChainExtension = $this->createMock(ChainExtension::class);
         $extension2->expects(self::once())
@@ -195,5 +272,13 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
     protected function createExtension()
     {
         return $this->createMock(ExtensionInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ConsumerState
+     */
+    protected function createConsumerState()
+    {
+        return $this->createMock(ConsumerState::class);
     }
 }

@@ -14,8 +14,20 @@ oro_message_queue:
         - 'oro_message_queue.client.route_message_processor'
         - 'oro_message_queue.client.config'
         - 'oro_message_queue.client.created_queues'
+        - 'oro_message_queue.log.consumer_state'
+        - 'oro_message_queue.log.message_to_array_converter'
     persistent_processors:
         - 'oro_message_queue.client.route_message_processor'
         - 'oro_message_queue.job.calculate_root_job_status_processor'
         - 'oro_message_queue.job.calculate_root_job_progress_processor'
         - 'oro_message_queue.job.dependent_job_processor'
+
+monolog:
+    handlers:
+        # write all log records to the consume CLI command console output
+        message_queue.consumer.console:
+            type: service
+            id: oro_message_queue.log.handler.console
+            # should be one of the first handlers to avoid cancelling of this handler
+            # by another not bubbled handler with higher priority
+            priority: 256

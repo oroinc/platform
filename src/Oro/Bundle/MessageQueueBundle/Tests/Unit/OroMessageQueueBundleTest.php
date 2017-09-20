@@ -7,12 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageToArrayConverterPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureDbalTransportExtensionsPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationReaderServicesPersistentPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
-use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 
@@ -47,6 +49,15 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->at(5))
             ->method('addCompilerPass')
             ->with($this->isInstanceOf(BuildDestinationMetaRegistryPass::class));
+        $container->expects($this->at(6))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(BuildMessageToArrayConverterPass::class));
+        $container->expects($this->at(7))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(MakeLoggerServicesPersistentPass::class));
+        $container->expects($this->at(8))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(MakeAnnotationReaderServicesPersistentPass::class));
 
         $container->expects($this->once())
             ->method('getExtension')
@@ -59,15 +70,13 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
     public function testShouldRegisterExpectedTransportFactories()
     {
         $extension = $this->createMock(OroMessageQueueExtension::class);
+
         $extension->expects($this->at(0))
             ->method('addTransportFactory')
             ->with($this->isInstanceOf(DefaultTransportFactory::class));
         $extension->expects($this->at(1))
             ->method('addTransportFactory')
             ->with($this->isInstanceOf(NullTransportFactory::class));
-        $extension->expects($this->at(2))
-            ->method('addTransportFactory')
-            ->with($this->isInstanceOf(DbalTransportFactory::class));
 
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
