@@ -50,20 +50,27 @@ class UpgradeCommand extends AbstractCommand
 
         if ($force) {
             $commandExecutor = $this->getCommandExecutor($input, $output);
-            $commandExecutor->runCommand('oro:platform:upgrade20:db-configs', ['--force' => true]);
 
-            $commandExecutor->runCommand(
-                'cache:warmup',
-                ['--no-optional-warmers' => true, '--process-isolation' => true]
-            );
+            try {
+                $commandExecutor->runCommand('oro:platform:upgrade20:db-configs', ['--force' => true]);
 
-            $updateParams = ['--process-isolation' => true];
-            foreach ($input->getOptions() as $key => $value) {
-                if ($value !== '' && $value !== null) {
-                    $updateParams['--' . $key] = $value;
+                $commandExecutor->runCommand(
+                    'cache:warmup',
+                    ['--no-optional-warmers' => true, '--process-isolation' => true]
+                );
+
+                $updateParams = ['--process-isolation' => true];
+                foreach ($input->getOptions() as $key => $value) {
+                    if ($value !== '' && $value !== null) {
+                        $updateParams['--' . $key] = $value;
+                    }
                 }
+                $commandExecutor->runCommand('oro:platform:update', $updateParams);
+
+                return 0;
+            } catch (\Exception $exception) {
+                return $commandExecutor->getLastCommandExitCode();
             }
-            $commandExecutor->runCommand('oro:platform:update', $updateParams);
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'
@@ -72,6 +79,8 @@ class UpgradeCommand extends AbstractCommand
             $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+
+            return 0;
         }
     }
 }

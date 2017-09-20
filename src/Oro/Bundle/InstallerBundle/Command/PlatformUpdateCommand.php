@@ -60,49 +60,55 @@ class PlatformUpdateCommand extends AbstractCommand
 
             $commandExecutor = $this->getCommandExecutor($input, $output);
 
-            $commandExecutor
-                ->runCommand(
-                    'oro:migration:load',
-                    [
-                        '--process-isolation' => true,
-                        '--force'             => true,
-                        '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
-                    ]
-                )
-                ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
-                ->runCommand(
-                    'oro:cron:definitions:load',
-                    [
-                        '--process-isolation' => true
-                    ]
-                )
-                ->runCommand(
-                    'oro:workflow:definitions:load',
-                    ['--process-isolation' => true]
-                )
-                ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
-                ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
-                ->runCommand('oro:navigation:init', ['--process-isolation' => true])
-                ->runCommand('router:cache:clear', ['--process-isolation' => true])
-                ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
-            ;
-
-            if (!$input->getOption('skip-translations')) {
+            try {
                 $commandExecutor
-                    ->runCommand('oro:translation:load', ['--process-isolation' => true]);
-            }
-
-            if (!$input->getOption('skip-assets')) {
-                $commandExecutor
-                    ->runCommand('oro:assets:install', $assetsOptions)
-                    ->runCommand('assetic:dump')
-                    ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
-                    ->runCommand('oro:localization:dump', ['--process-isolation' => true])
-                    ->runCommand('oro:translation:dump', ['--process-isolation' => true])
                     ->runCommand(
-                        'oro:requirejs:build',
-                        ['--ignore-errors' => true, '--process-isolation' => true]
-                    );
+                        'oro:migration:load',
+                        [
+                            '--process-isolation' => true,
+                            '--force'             => true,
+                            '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
+                        ]
+                    )
+                    ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
+                    ->runCommand(
+                        'oro:cron:definitions:load',
+                        [
+                            '--process-isolation' => true
+                        ]
+                    )
+                    ->runCommand(
+                        'oro:workflow:definitions:load',
+                        ['--process-isolation' => true]
+                    )
+                    ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
+                    ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
+                    ->runCommand('oro:navigation:init', ['--process-isolation' => true])
+                    ->runCommand('router:cache:clear', ['--process-isolation' => true])
+                    ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
+                ;
+
+                if (!$input->getOption('skip-translations')) {
+                    $commandExecutor
+                        ->runCommand('oro:translation:load', ['--process-isolation' => true]);
+                }
+
+                if (!$input->getOption('skip-assets')) {
+                    $commandExecutor
+                        ->runCommand('oro:assets:install', $assetsOptions)
+                        ->runCommand('assetic:dump')
+                        ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
+                        ->runCommand('oro:localization:dump', ['--process-isolation' => true])
+                        ->runCommand('oro:translation:dump', ['--process-isolation' => true])
+                        ->runCommand(
+                            'oro:requirejs:build',
+                            ['--ignore-errors' => true, '--process-isolation' => true]
+                        );
+                }
+
+                return 0;
+            } catch (\Exception $exception) {
+                return $commandExecutor->getLastCommandExitCode();
             }
         } else {
             $output->writeln(
@@ -112,6 +118,8 @@ class PlatformUpdateCommand extends AbstractCommand
             $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+
+            return 0;
         }
     }
 

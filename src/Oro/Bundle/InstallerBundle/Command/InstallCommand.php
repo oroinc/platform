@@ -19,6 +19,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
  */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
@@ -106,7 +107,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             );
             $output->writeln('');
 
-            return;
+            return 0;
         }
 
         if ($forceInstall) {
@@ -134,11 +135,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             }
         }
 
-        $this
-            ->checkStep($output)
-            ->prepareStep($commandExecutor, $dropDatabase)
-            ->loadDataStep($commandExecutor, $output)
-            ->finalStep($commandExecutor, $output, $input, $skipAssets);
+        try {
+            $this
+                ->checkStep($output)
+                ->prepareStep($commandExecutor, $dropDatabase)
+                ->loadDataStep($commandExecutor, $output)
+                ->finalStep($commandExecutor, $output, $input, $skipAssets);
+        } catch (\Exception $exception) {
+            return $commandExecutor->getLastCommandExitCode();
+        }
 
         $output->writeln('');
         $output->writeln(
@@ -159,6 +164,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'API documentation cache</info>'
             );
         }
+
+        return 0;
     }
 
     /**
