@@ -1,45 +1,53 @@
 .system-configuration-container {
-  .content-with-sidebar--controls {
-    height: 37px;
-  }
-
-  .jstree-search-component {
-    margin-right: 50px;
-  }
-
-  .jstree-wrapper {
-    > div {
-      position: relative;
-    }
-
-    &__title {
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-
-    &__label {
-      display: none;
-    }
-  }
-
-  .jstree-actions {
-    &__handle {
-      height: 30px;
+  .content-with-sidebar {
+    &--sidebar {
+      .jstree-container {
+        overflow: auto;
+      }
     }
   }
 
   .jstree {
-    i {
-      &.jstree-icon {
+    &-node {
+      position: static;
+      margin-left: 20px;
+    }
+
+    &-anchor {
+      overflow: visible;
+      padding: 0 8px 8px 2px;
+    }
+
+    &-actions {
+      &__menu {
+        &--inline {
+          float: left;
+
+          font-size: 11px;
+          line-height: 11px;
+        }
+      }
+    }
+
+    &-icon:empty {
+      width: 20px;
+      margin-right: 1px;
+    }
+
+    &-ocl {
+      display: inline-block;
+    }
+
+    &-leaf {
+      .jstree-ocl {
         display: none;
       }
-      &.jstree-icon.jstree-ocl {
-        display: inline-block;
-      }
-      &[class^="fa-"], &[class*=" fa-"] {
-        display: inline-block;
-      }
+    }
+
+    [class^="fa-"], [class*=" fa-"] {
+      display: inline-block;
+      text-align: left;
+      margin: 0 -2px 0 2px;
     }
   }
 }

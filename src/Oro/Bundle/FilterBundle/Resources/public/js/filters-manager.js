@@ -103,6 +103,13 @@ define(function(require) {
          */
         dropdownContainer: 'body',
 
+        /**
+         * Flag for close previous open filters
+         *
+         * @property
+         */
+        hidePreviousOpenFilters: true,
+
         /** @property */
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
@@ -131,6 +138,7 @@ define(function(require) {
 
             var filterListeners = {
                 'update': this._onFilterUpdated,
+                'change': this._onFilterChanged,
                 'disable': this._onFilterDisabled,
                 'showCriteria': this._onFilterShowCriteria
             };
@@ -193,6 +201,19 @@ define(function(require) {
         _onFilterUpdated: function(filter) {
             this._resetHintContainer();
             this.trigger('updateFilter', filter);
+
+            this._publishCountSelectedFilters();
+        },
+
+        /**
+         * Triggers when filter DOM Value is changed
+         *
+         * @param {oro.filter.AbstractFilter} filter
+         * @protected
+         */
+        _onFilterChanged: function() {
+            this._publishCountChangedFilters();
+            this._publishCountSelectedFilters();
         },
 
         /**
@@ -205,14 +226,21 @@ define(function(require) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
             this.trigger('afterDisableFilter', filter);
+
+            this._publishCountSelectedFilters();
+            this._publishCountChangedFilters();
         },
 
         _onFilterShowCriteria: function(shownFilter) {
-            _.each(this.filters, function(filter) {
-                if (filter !== shownFilter) {
-                    _.result(filter, 'ensurePopupCriteriaClosed');
-                }
-            });
+            if (this.hidePreviousOpenFilters) {
+                _.each(this.filters, function(filter) {
+                    if (filter !== shownFilter) {
+                        _.result(filter, 'ensurePopupCriteriaClosed');
+                    }
+                });
+            }
+
+            this._publishCountSelectedFilters();
         },
 
         /**
@@ -390,6 +418,66 @@ define(function(require) {
             return this;
         },
 
+        /**
+         * @param {Number} [count]
+         * @private
+         */
+        _publishCountSelectedFilters: function(count) {
+            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateSelectedFilters();
+
+            mediator.trigger(
+                'filterManager:selectedFilters:count:' + this.collection.options.gridName,
+                countFilters
+            );
+        },
+
+        /**
+         * @param {Number} [count]
+         * @private
+         */
+        _publishCountChangedFilters: function(count) {
+            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateChangedFilters();
+
+            mediator.trigger(
+                'filterManager:changedFilters:count:' + this.collection.options.gridName,
+                countFilters
+            );
+        },
+
+        /**
+         * @returns {Number} count of selected filters
+         * @private
+         */
+        _calculateSelectedFilters: function() {
+            return _.reduce(this.filters, function(memo, filter) {
+                var num = (filter.enabled &&
+                           !filter.isEmptyValue() &&
+                           !_.isEqual(filter.emptyValue, filter.value)
+                          ) ? 1 : 0;
+
+                return memo + num;
+            }, 0);
+        },
+
+        /**
+         * @returns {Number} count of selected filters
+         * @private
+         */
+        _calculateChangedFilters: function() {
+            return _.reduce(this.filters, function(memo, filter) {
+                var domVal = filter._readDOMValue();
+
+                var num = (filter.enabled &&
+                   !_.isEqual(filter.value, domVal) &&
+                   !_.isEqual(filter.emptyValue, domVal) &&
+                   !_.isUndefined(domVal.type) &&
+                   !_.isEmpty(domVal.value)
+                ) ? 1 : 0;
+
+                return memo + num;
+            }, 0);
+        },
+
         _resetHintContainer: function() {
             var $container = this.dropdownContainer.find('.filter-items-hint');
             var show = false;
@@ -404,6 +492,8 @@ define(function(require) {
             } else {
                 $container.hide();
             }
+
+            this._publishCountSelectedFilters();
         },
 
         /**
@@ -591,6 +681,15 @@ define(function(require) {
             this.viewMode = mode;
             persistentStorage.setItem(FiltersManager.STORAGE_KEY, mode);
             this.trigger('changeViewMode', mode);
+        },
+
+        getChangedFilters: function() {
+            return _.filter(this.filters, function(filter) {
+                return (
+                    filter.enabled &&
+                    filter._isDOMValueChanged()
+                );
+            });
         }
     });
 

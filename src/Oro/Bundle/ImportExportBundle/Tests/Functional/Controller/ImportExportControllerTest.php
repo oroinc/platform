@@ -42,8 +42,6 @@ class ImportExportControllerTest extends WebTestCase
             'options' => [],
             'userId' => $this->getCurrentUser()->getId(),
             'organizationId' => $organizationId,
-            'securityToken' =>
-                'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
         ]);
     }
 
@@ -77,8 +75,6 @@ class ImportExportControllerTest extends WebTestCase
             ],
             'userId' => $this->getCurrentUser()->getId(),
             'organizationId' => $organizationId,
-            'securityToken' =>
-                'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
         ]);
     }
 
@@ -114,8 +110,6 @@ class ImportExportControllerTest extends WebTestCase
                 'originFileName' => 'test_file_original',
                 'options' => $options,
                 'userId' => $this->getCurrentUser()->getId(),
-                'securityToken' =>
-                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
             ]
         );
     }
@@ -152,9 +146,6 @@ class ImportExportControllerTest extends WebTestCase
                 'originFileName' => 'test_file_original',
                 'options' => $options,
                 'userId' => $this->getCurrentUser()->getId(),
-                'securityToken' =>
-                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
-
             ]
         );
     }

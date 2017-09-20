@@ -75,6 +75,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestCustomEntityTablesWithCascadeOption($schema);
         $this->createTestDepartmentTable($schema);
         $this->createTestEmployeeTable($schema);
         $this->createTestProductTable($schema);
@@ -470,6 +471,138 @@ class OroTestFrameworkBundleInstaller implements
             'biO2MNDOwner',
             'name',
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+    }
+
+    /**
+     * Create custom entity tables that have associations with "cascade"=['all'] option
+     *
+     * @param Schema $schema
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    protected function createTestCustomEntityTablesWithCascadeOption(Schema $schema)
+    {
+        $extendFields = [
+            'owner' => ExtendScope::OWNER_CUSTOM,
+            'target_title' => ['id'],
+            'target_detailed' => ['id'],
+            'target_grid' => ['id']
+        ];
+
+        $table1 = $this->extendExtension->createCustomEntityTable($schema, 'TestEntity3');
+        $table1->addColumn(
+            'name',
+            'string',
+            [
+                'length'        => 255,
+                OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+            ]
+        );
+        $table2 = $this->extendExtension->createCustomEntityTable($schema, 'TestEntity4');
+        $table2->addColumn(
+            'name',
+            'string',
+            [
+                'length'        => 255,
+                OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+            ]
+        );
+
+        // unidirectional many-to-one
+        $this->extendExtension->addManyToOneRelation(
+            $schema,
+            $table1,
+            'uniM2OTarget',
+            $table2,
+            'name',
+            ['extend' => array_merge($extendFields, ['cascade' => ['all']])]
+        );
+        // bidirectional many-to-one
+        $this->extendExtension->addManyToOneRelation(
+            $schema,
+            $table1,
+            'biM2OTarget',
+            $table2,
+            'name',
+            ['extend' => array_merge($extendFields, ['cascade' => ['all']])]
+        );
+        $this->extendExtension->addManyToOneInverseRelation(
+            $schema,
+            $table1,
+            'biM2OTarget',
+            $table2,
+            'biM2OOwners',
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'cascade' => ['all']]]
+        );
+
+        // unidirectional many-to-many
+        $this->extendExtension->addManyToManyRelation(
+            $schema,
+            $table1,
+            'uniM2MTargets',
+            $table2,
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => array_merge($extendFields, ['cascade' => ['all']])]
+        );
+        // bidirectional many-to-many
+        $this->extendExtension->addManyToManyRelation(
+            $schema,
+            $table1,
+            'biM2MTargets',
+            $table2,
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => array_merge($extendFields, ['cascade' => ['all']])]
+        );
+        $this->extendExtension->addManyToManyInverseRelation(
+            $schema,
+            $table1,
+            'biM2MTargets',
+            $table2,
+            'biM2MOwners',
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'cascade' => ['all']]]
+        );
+
+        // unidirectional one-to-many
+        $this->extendExtension->addOneToManyRelation(
+            $schema,
+            $table1,
+            'uniO2MTargets',
+            $table2,
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => array_merge($extendFields, ['cascade' => ['all']])]
+        );
+        // bidirectional one-to-many
+        $this->extendExtension->addOneToManyRelation(
+            $schema,
+            $table1,
+            'biO2MTargets',
+            $table2,
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'cascade' => ['all']]]
+        );
+        $this->extendExtension->addOneToManyInverseRelation(
+            $schema,
+            $table1,
+            'biO2MTargets',
+            $table2,
+            'biO2MOwner',
+            'name',
+            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'cascade' => ['all']]]
         );
     }
 

@@ -6,6 +6,7 @@ define([
 
     var BookmarkButtonView;
     var document = window.document;
+    var titleRendered = null;
 
     BookmarkButtonView = PageRegionView.extend({
         pageItems: ['navigationElements', 'titleShort', 'titleSerialized'],
@@ -34,6 +35,11 @@ define([
             }
 
             this.navigationElementType = options.navigationElementType;
+
+            // handles page update
+            mediator.on('page:update', function(page, args) {
+                titleRendered = page.title;
+            });
         },
 
         render: function() {
@@ -90,7 +96,7 @@ define([
             var title = this.$el.data('title');
             return {
                 url: mediator.execute('currentUrl'),
-                title_rendered: document.title,
+                title_rendered: titleRendered || this.$el.data('title-rendered'),
                 title_rendered_short: this.$el.data('title-rendered-short') || document.title,
                 title: title ? JSON.stringify(title) : '{"template": "' + document.title + '"}'
             };

@@ -2,14 +2,14 @@
 {% import "OroActivityBundle::macros.html.twig" as AC %}
 {% import "OroEmailBundle::actions.html.twig" as Actions %}
 
-{% oro_title_set({params : {"%subject%": entity.subject} }) %}
+{% oro_title_set({params : {"%subject%": entity.subject|oro_html_purify} }) %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_email_user_emails'),
         'indexLabel':  'oro.email.entity_plural_label'|trans,
-        'entityTitle': entity.subject,
+        'entityTitle': entity.subject|oro_html_purify,
     } %}
     {{ parent() }}
 {% endblock pageHeader %}

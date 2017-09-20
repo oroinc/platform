@@ -8,6 +8,13 @@
     display: block;
 }
 
+// Ellipsis text
+@mixin ellipsis() {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 // Helper to clear inner floats
 @mixin clearfix {
     &::after {
@@ -405,12 +412,14 @@
     }
 
     @else if $state == 'visited' {
+        &--visited,
         &:visited {
             @content;
         }
     }
 
     @else if $state == 'focus' {
+        &--focus,
         &:focus {
             @content;
         }

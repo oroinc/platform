@@ -6,10 +6,11 @@ use CG\Generator\PhpClass;
 use CG\Generator\PhpParameter;
 use CG\Generator\PhpProperty;
 
+use Symfony\Component\PropertyAccess\StringUtil;
+
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper;
-use Symfony\Component\PropertyAccess\StringUtil;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * The main extension of the entity generator. This extension is responsible for generate extend entity skeleton
@@ -140,6 +141,12 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
         }
     }
 
+    /**
+     * @param array  $schema
+     * @param string $fieldName
+     *
+     * @return bool
+     */
     protected function isSupportedRelation($schema, $fieldName)
     {
         $isSupportedRelation = true;
@@ -148,11 +155,13 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
             foreach ($schema['relationData'] as $relationData) {
                 /** @var FieldConfigId $fieldId */
                 $fieldId = $relationData['field_id'];
-                if ($fieldId instanceof FieldConfigId) {
-                    if ($fieldId->getFieldName() === $fieldName) {
-                        $isSupportedRelation = ExtendScopeHelper::isStateAvailableForProcessing($relationData['state']);
-                        break;
-                    }
+                if ($fieldId instanceof FieldConfigId && $fieldId->getFieldName() === $fieldName) {
+                    $isSupportedRelation = !in_array(
+                        $relationData['state'],
+                        [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE],
+                        true
+                    );
+                    break;
                 }
             }
         }

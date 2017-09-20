@@ -32,6 +32,11 @@ class JobResult
     protected $failureExceptions = array();
 
     /**
+     * @var bool
+     */
+    protected $needRedelivery;
+
+    /**
      * @return ContextInterface|null
      */
     public function getContext()
@@ -63,6 +68,26 @@ class JobResult
     public function setSuccessful($successful)
     {
         $this->successful = $successful;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function needRedelivery()
+    {
+        return $this->needRedelivery;
+    }
+
+    /**
+     * @param $needRedelivery
+     *
+     * @return JobResult
+     */
+    public function setNeedRedelivery(bool $needRedelivery)
+    {
+        $this->needRedelivery = $needRedelivery;
+
         return $this;
     }
 

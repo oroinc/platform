@@ -3,10 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Processor\Create;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+
+use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -45,16 +50,26 @@ class SaveEntity implements ProcessorInterface
         }
 
         $em->persist($entity);
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (UniqueConstraintViolationException $e) {
+            $context->addError(
+                Error::createValidationError(Constraint::CONFLICT, 'The entity already exists')
+                    ->setStatusCode(Response::HTTP_CONFLICT)
+                    ->setInnerException($e)
+            );
+        }
 
         // save entity id into the Context
-        $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
-        $id = $metadata->getIdentifierValues($entity);
-        if (!empty($id)) {
-            if (1 === count($id)) {
-                $id = reset($id);
+        if (!$context->hasErrors()) {
+            $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
+            $id = $metadata->getIdentifierValues($entity);
+            if (!empty($id)) {
+                if (1 === count($id)) {
+                    $id = reset($id);
+                }
+                $context->setId($id);
             }
-            $context->setId($id);
         }
     }
 }

@@ -291,10 +291,11 @@ services:
             - '@oro_email.link.email.thread.manager'
             - '@oro_email.model.email_activity_updates'
             - '@oro_message_queue.client.message_producer'
+            - '@oro_email.email.address.manager'
         tags:
-            - { name: doctrine.event_listener, event: onFlush }
-            - { name: doctrine.event_listener, event: postFlush }
-            - { name: doctrine.event_listener, event: postRemove }
+            - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: postFlush, connection: default }
+            - { name: doctrine.event_listener, event: postRemove, connection: default }
 
     oro_email.acl.manager.link:
         tags:

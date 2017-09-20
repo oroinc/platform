@@ -8,6 +8,7 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
+use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
 use Oro\Component\DoctrineUtils\ORM\SqlWalker;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
@@ -197,5 +198,54 @@ class SqlWalkerTest extends OrmTestCase
         $q->setHint(SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, true);
 
         $this->assertEquals('SELECT p0_.name AS name_0 FROM Person p0_ ORDER BY p0_.name ASC', $q->getSQL());
+    }
+
+    public function testWalkSubselectWithoutHooks()
+    {
+        $query = $this->em->getRepository('Test:Group')->createQueryBuilder('g1_')
+            ->select('g1_.id')
+            ->getQuery();
+
+        $this->assertEquals('SELECT g0_.id AS id_0 FROM Group g0_', $query->getSQL());
+    }
+
+    public function testWalkSubselectWithoutUnionHookInRawSQL()
+    {
+        $query = $this->em->getRepository('Test:Group')->createQueryBuilder('g1_')
+            ->select('g1_.id')
+            ->getQuery();
+
+        $unionSQL = 'raw sql';
+        $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
+        $query->setHint(HookUnionTrait::$walkerHookUnionKey, "'union_id' = 'union_id'");
+        $query->setHint(HookUnionTrait::$walkerHookUnionValue, $unionSQL);
+
+        $this->assertNotContains($unionSQL, $query->getSQL());
+    }
+
+    public function testWalkSubselectWithUnionHook()
+    {
+        $repository = $this->em->getRepository('Test:Group');
+        $subSelect  = $repository->createQueryBuilder('g0_')
+            ->select('g0_.id')
+            ->where('g0_.id = 1');
+
+        $unionHook  = " AND 'union_id' = 'union_id'";
+        $qb         = $repository->createQueryBuilder('g1_');
+        $query      = $qb
+            ->select('g1_.id')
+            ->where($qb->expr()->in('g1_.id', $subSelect->getQuery()->getDQL().$unionHook))
+            ->getQuery();
+
+        $unionSQL = 'raw sql';
+        $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
+        $query->setHint(HookUnionTrait::$walkerHookUnionKey, $unionHook);
+        $query->setHint(HookUnionTrait::$walkerHookUnionValue, $unionSQL);
+
+        $this->assertEquals(
+            'SELECT g0_.id AS id_0 FROM Group g0_ '.
+            'WHERE g0_.id IN (SELECT g1_.id FROM Group g1_ WHERE g1_.id = 1 UNION raw sql)',
+            $query->getSQL()
+        );
     }
 }

@@ -81,7 +81,8 @@ define(function(require) {
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter'
+            'click .disable-filter': '_onClickDisableFilter',
+            'change input': '_onValueChanged'
         },
 
         listen: {
@@ -166,6 +167,19 @@ define(function(require) {
             }
 
             return true;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _isDOMValueChanged: function() {
+            var thisDOMValue = this._readDOMValue();
+            return (
+                !_.isEmpty(thisDOMValue.value) &&
+                !_.isUndefined(thisDOMValue.value) &&
+                !_.isNull(thisDOMValue.value) &&
+                !_.isEqual(this.value, thisDOMValue)
+            );
         },
 
         /**

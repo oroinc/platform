@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -23,13 +24,16 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     /** @var TestAttachment */
     protected $attachment;
 
+    /** @var array */
+    protected $fileIcons;
+
     public function setUp()
     {
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileIcons = [
+        $this->fileIcons = [
             'default' => 'icon_default',
             'txt' => 'icon_txt'
         ];
@@ -45,8 +49,10 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->attachmentManager = new AttachmentManager(
             $this->router,
-            $fileIcons,
-            $this->associationManager
+            $this->fileIcons,
+            $this->associationManager,
+            true,
+            true
         );
     }
 

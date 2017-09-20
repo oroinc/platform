@@ -6,15 +6,34 @@ define(function(require) {
     var layoutHelper = require('oroui/js/tools/layout-helper');
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
+    var _ = require('underscore');
+    var config = require('module').config();
+    config = _.extend({
+        autoRender: true,
+        fixSidebarHeight: true,
+        sidebar: '[data-role="sidebar"]',
+        scrollbar: '[data-role="sidebar"]',
+        content: '[data-role="content"]'
+    }, config);
 
     ContentSidebarView = BaseView.extend({
-        autoRender: true,
+        optionNames: BaseView.prototype.optionNames.concat([
+            'autoRender',
+            'fixSidebarHeight',
+            'sidebar',
+            'scrollbar',
+            'content'
+        ]),
 
-        fixSidebarHeight: true,
+        autoRender: config.autoRender,
 
-        sidebar: '[data-role="sidebar"]',
+        fixSidebarHeight: config.fixSidebarHeight,
 
-        content: '[data-role="content"]',
+        sidebar: config.sidebar,
+
+        scrollbar: config.scrollbar,
+
+        content: config.content,
 
         events: {
             'click [data-role="sidebar-minimize"]': 'minimize',
@@ -26,7 +45,7 @@ define(function(require) {
          */
         render: function() {
             if (this.fixSidebarHeight) {
-                layoutHelper.setAvailableHeight(this.sidebar, this.$el);
+                layoutHelper.setAvailableHeight(this.scrollbar, this.$el);
             }
 
             var state = tools.unpackFromQueryString(location.search).sidebar || 'on';
