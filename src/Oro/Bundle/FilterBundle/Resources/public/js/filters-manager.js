@@ -55,7 +55,8 @@ define(function(require) {
         filterSelector: '[data-action=add-filter-select]',
 
         /**
-         * @property {String}
+         *  Is used in template for render additional html
+         * @property {String} 'collapse-mode' | 'toggle-mode'
          */
         renderMode: '',
 
@@ -161,7 +162,7 @@ define(function(require) {
                 this.listenTo(filter, filterListeners);
             }, this);
 
-            if (this.initFiltersStateElement(options)) {
+            if (this.isFiltersStateViewNeeded(options)) {
                 var $container = this.$el.closest('body, .ui-dialog');
                 var filtersStateView = new FiltersStateView({
                     el: $container.find(options.filtersStateElement).first(),
@@ -180,9 +181,8 @@ define(function(require) {
         /**
          * @param {object} options
          * @returns {boolean}
-         * @constructor
          */
-        initFiltersStateElement: function(options) {
+        isFiltersStateViewNeeded: function(options) {
             return 'filtersStateElement' in options;
         },
 
@@ -431,13 +431,7 @@ define(function(require) {
                     this.$el.hide();
                 }
             }
-
-            this.finallyOfRender();
             return this;
-        },
-
-        finallyOfRender: function() {
-            // Empty by default
         },
 
         /**
