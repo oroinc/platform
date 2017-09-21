@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -83,6 +84,63 @@ class ImportExportController extends Controller
             'options' => $this->getOptionsFromRequest($request),
             'importJob' => $importJob,
             'importValidateJob' => $importValidateJob
+        ];
+    }
+
+    /**
+     * @Route("/import_validate_export", name="oro_importexport_import_validate_export_template_form")
+     * @AclAncestor("oro_importexport_import")
+     * @Template("OroImportExportBundle:ImportExport/widget:importValidateExportTemplate.html.twig")
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function importValidateExportTemplateForm(Request $request)
+    {
+        $configAlias = $request->get('alias');
+
+        if (!$configAlias) {
+            throw new BadRequestHttpException('Alias should be provided in request');
+        }
+
+        $isValidate = $request->request->getBoolean('isValidateJob', false);
+
+        $entityName = $request->get('entity');
+
+        if ($entityName && $request->isMethod('POST')) {
+            $importForm = $this->getImportForm($entityName);
+            $importForm->submit($request);
+            if ($importForm->isValid()) {
+                /** @var ImportData $data */
+                $data           = $importForm->getData();
+                $file           = $data->getFile();
+                $processorAlias = $data->getProcessorAlias();
+                if ($file->getClientOriginalExtension() === 'csv') {
+                    $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
+                }
+                $fileName = $this->getFileManager()->saveImportingFile($file);
+
+                $importForward = 'OroImportExportBundle:ImportExport:importProcess';
+                $validateForward = 'OroImportExportBundle:ImportExport:importValidate';
+
+                $forward = $isValidate ? $validateForward : $importForward;
+
+                return $this->forward(
+                    $forward,
+                    [
+                        'processorAlias' => $processorAlias,
+                        'fileName' => $fileName,
+                        'originFileName' => $file->getClientOriginalName()
+                    ],
+                    $request->query->all()
+                );
+            }
+        }
+
+        return [
+            'options' => $this->getOptionsFromRequest($request),
+            'alias' => $configAlias
         ];
     }
 

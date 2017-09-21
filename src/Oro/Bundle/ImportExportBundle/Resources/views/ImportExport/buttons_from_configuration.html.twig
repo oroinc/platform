@@ -4,6 +4,7 @@
 {% set importHtml = '' %}
 
 {% set counter = 0 %}
+{% set importOptions = [] %}
 {% for configuration in get_import_export_configuration(alias) %}
 
     {% set counter = counter + 1 %}
@@ -30,6 +31,24 @@
     {% endif %}
 
     {% set exportTemplateLabel = configuration.exportTemplateButtonLabel|default('oro.importexport.export_template.label'|trans) %}
+
+    {# separate page options from concrete import/export options #}
+    {% set importOptions = importOptions|merge([{
+        'entity': configuration.entityClass,
+        'routeOptions': configuration.routeOptions|default({}),
+        'importTitle': configuration.importPopupTitle|default(importLabel),
+        'importJob': configuration.importJobName|default(null),
+        'importValidateJob': configuration.importValidationJobName|default(null),
+        'exportTemplateTitle': configuration.exportTemplatePopupTitle|default(exportLabel),
+        'exportTemplateJob': configuration.exportTemplateJobName|default(null),
+        'exportTemplateProcessor': exportTemplateProcessor|default(null),
+
+        'isExportTemplatePopupRequired': isExportTemplatePopupRequired|default(false),
+        'filePrefix': configuration.filePrefix|default(null),
+        'datagridName': configuration.dataGridName|default(null),
+        'afterRefreshPageMessage': configuration.afterRefreshPageMessage|default(null),
+        'refreshPageOnSuccess': configuration.refreshPageOnSuccess|default(false)
+    }]) %}
 
     {% if exportAllowed or importAllowed %}
         <span data-page-component-module="oroui/js/app/components/view-component"
@@ -61,8 +80,8 @@
                       'afterRefreshPageMessage': configuration.afterRefreshPageMessage|default(null),
                       'refreshPageOnSuccess': configuration.refreshPageOnSuccess|default(false)
                   }
-              }|json_encode }}"
-        >
+              }|json_encode }}">
+
             {% if exportAllowed %}
                 {% set html %}
                     <a type="button" class="btn export-btn icons-holder-text no-hash exportButton{{ counter }}" href="#">
@@ -100,15 +119,25 @@
 {% endfor %}
 
 <div data-target="import-export-container" class="pull-left">
+   {# check if EXPORT AVAILABLE @TODO #}
     <div class="btn-group">
         {{ UI.pinnedDropdownButton({
             'html': exportHtml
         }) }}
     </div>
 
-    <div class="btn-group">
-        {{ UI.pinnedDropdownButton({
-            'html': importHtml
-        }) }}
+    {# check if IMPORT AVAILABLE @TODO #}
+    <div class="btn-group"
+         data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{
+         {
+             'view': 'oroimportexport/js/app/views/import-button-view',
+             "alias": alias
+         }|json_encode
+     }}">
+        {# @todo: OPTIONS #}
+        <a type="button" class="btn import-btn icons-holder-text no-hash" href="#">
+            <i class="fa-download hide-text">{{ 'Import'|trans }}</i>{{ 'Import'|trans }}
+        </a>
     </div>
 </div>

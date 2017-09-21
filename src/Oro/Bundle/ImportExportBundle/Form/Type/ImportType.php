@@ -43,6 +43,8 @@ class ImportType extends AbstractType
                 'choices' => $processorChoices,
                 'required' => true,
                 'preferred_choices' => $processorChoices ? [reset($processorChoices)] : [],
+                'expanded' => true,
+                'multiple' => false,//@TODO: remove from here?
             ]
         );
     }
