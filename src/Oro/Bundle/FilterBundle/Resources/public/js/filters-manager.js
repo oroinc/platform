@@ -318,6 +318,7 @@ define(function(require) {
          * @return {*}
          */
         enableFilters: function(filters) {
+            var self = this;
             if (_.isEmpty(filters)) {
                 return this;
             }
@@ -326,6 +327,7 @@ define(function(require) {
             _.each(filters, function(filter) {
                 if (filter.visible && !filter.isRendered()) {
                     var oldEl = filter.$el;
+                    filter.setRenderMode(self.renderMode);
                     // filter rendering process replaces $el
                     filter.render();
                     // so we need to replace element which keeps place in DOM with actual filter $el after rendering
