@@ -284,6 +284,7 @@ class RestDocHandler implements HandlerInterface
         $statusCodes = $config->getStatusCodes();
         if (null !== $statusCodes) {
             $codes = $statusCodes->getCodes();
+            ksort($codes);
             foreach ($codes as $statusCode => $code) {
                 if (!$code->isExcluded()) {
                     $annotation->addStatusCode($statusCode, $code->getDescription());

@@ -18,6 +18,7 @@ class TestEntitiesMigration implements Migration
         $this->createTestPersonTable($schema);
         $this->createTestDefaultAndNullTable($schema);
         $this->createTestNestedObjectsTable($schema);
+        $this->createTestWithoutIdGeneratorTable($schema);
     }
 
     /**
@@ -139,6 +140,23 @@ class TestEntitiesMigration implements Migration
         $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('related_class', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('related_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_api_without_id_generator table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestWithoutIdGeneratorTable(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_without_id_generator')) {
+            return;
+        }
+
+        $table = $schema->createTable('test_api_without_id_generator');
+        $table->addColumn('id', 'string', ['notnull' => true, 'length' => 50]);
+        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
     }
 }

@@ -35,7 +35,6 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
     {
         if (! isset(
             $body['userId'],
-            $body['securityToken'],
             $body['jobName'],
             $body['process'],
             $body['fileName'],

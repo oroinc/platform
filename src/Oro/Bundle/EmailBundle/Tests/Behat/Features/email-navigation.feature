@@ -22,12 +22,11 @@ Feature: Email Navigation Items
     When I add page to favorites
     Then "My Emails - Charlie Sheen" link must be in pin holder
     And Favorites must contain "My Emails - Charlie Sheen"
-    #Should be fixed at BAP-15037
-#    When I click View Subject 1 in grid
-#    And pin page
-#    And add page to favorites
-#    Then ??? link must be in pin holder
-#    And Favorites must contain "???"
+    When I click View Subject 1 in grid
+    And pin page
+    And add page to favorites
+    Then "Subject 1 - My Emails" link must be in pin holder
+    And Favorites must contain "Subject 1 - My Emails"
 
   Scenario: Disable feature and validate links
     Given I go to Dashboards/Dashboard
@@ -35,9 +34,8 @@ Feature: Email Navigation Items
     And I reload the page
     Then "My Emails - Charlie Sheen" link must not be in pin holder
     And Favorites must not contain "My Emails - Charlie Sheen"
-    #Should be fixed at BAP-15037
-#    And ??? link must not be in pin holder
-#    And Favorites must not contain "???"
+    And "Subject 1 - My Emails" link must not be in pin holder
+    And Favorites must not contain "Subject 1 - My Emails"
 
   Scenario: Re-Enable feature and validate links
     Given I go to Dashboards/Dashboard
@@ -45,6 +43,5 @@ Feature: Email Navigation Items
     And I reload the page
     Then "My Emails - Charlie Sheen" link must be in pin holder
     And Favorites must contain "My Emails - Charlie Sheen"
-    #Should be fixed at BAP-15037
-#    And ??? link must be in pin holder
-#    And Favorites must contain "???"
+    And "Subject 1 - My Emails" link must be in pin holder
+    And Favorites must contain "Subject 1 - My Emails"

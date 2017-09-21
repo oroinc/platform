@@ -23,6 +23,8 @@ class OroAttachmentExtension extends Extension
         $loader->load('services_api.yml');
         $loader->load('form.yml');
 
+        $container->setParameter('oro_attachment.debug_images', $config['debug_images']);
+
         $yaml  = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
         $container->setParameter('oro_attachment.files', $value['file-icons']);

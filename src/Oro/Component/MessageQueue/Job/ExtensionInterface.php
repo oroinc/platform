@@ -23,12 +23,19 @@ interface ExtensionInterface
     public function onPostRunUnique(Job $job, $jobResult);
 
     /**
+     * Executed before delayed job was created.
+     *
+     * @param Job $job
+     */
+    public function onPreCreateDelayed(Job $job);
+
+    /**
      * Executed after delayed job was created.
      *
      * @param Job   $job
      * @param mixed $createResult
      */
-    public function onCreateDelayed(Job $job, $createResult);
+    public function onPostCreateDelayed(Job $job, $createResult);
 
     /**
      * Executed before delayed job start process.

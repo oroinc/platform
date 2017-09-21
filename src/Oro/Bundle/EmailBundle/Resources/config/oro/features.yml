@@ -25,6 +25,7 @@ features:
             - 'oro_email_widget_base_emails'
             - 'oro_email_user_emails'
             - 'oro_email_user_sync_emails'
+            - 'oro_email_user_thread_view'
             - 'oro_email_toggle_seen'
             - 'oro_email_mark_seen'
             - 'oro_email_mark_all_as_seen'

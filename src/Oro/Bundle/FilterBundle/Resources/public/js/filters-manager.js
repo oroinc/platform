@@ -226,6 +226,7 @@ define(function(require) {
          */
         _onFilterChanged: function() {
             this._publishCountChangedFilters();
+            this._publishCountSelectedFilters();
         },
 
         /**

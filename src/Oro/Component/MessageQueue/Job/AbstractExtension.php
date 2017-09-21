@@ -24,7 +24,14 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function onCreateDelayed(Job $job, $createResult)
+    public function onPreCreateDelayed(Job $job)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onPostCreateDelayed(Job $job, $createResult)
     {
     }
 

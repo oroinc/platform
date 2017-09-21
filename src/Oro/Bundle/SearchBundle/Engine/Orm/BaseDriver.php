@@ -166,21 +166,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     }
 
     /**
-     * Returns an unique ID hash, used for SQL aliases
-     *
-     * @param string|array $prefix
-     * @return string
-     */
-    public function getUniqueId($prefix = '')
-    {
-        if (is_array($prefix)) {
-            $prefix = implode('_', $prefix);
-        }
-
-        return str_replace('.', '_', uniqid($prefix, true));
-    }
-
-    /**
      * Returning the DQL name of the search attribute entity
      * for given type.
      *
@@ -190,6 +175,30 @@ abstract class BaseDriver implements DBALPersisterInterface
     public function getJoinField($type)
     {
         return sprintf('search.%sFields', $type);
+    }
+
+    /**
+     * Returns an unique (in terms of single query) alias & index, used for SQL aliases for joins
+     *
+     * @param string|array $fieldName
+     * @param string $type
+     * @param array $existingAliases
+     * @return array
+     */
+    public function getJoinAttributes($fieldName, $type, array $existingAliases)
+    {
+        if (is_array($fieldName)) {
+            $fieldName = implode('_', $fieldName);
+        }
+
+        $i = 0;
+        do {
+            $i++;
+            $index = $fieldName . '_' . $i;
+            $joinAlias = $this->getJoinAlias($type, $index);
+        } while (in_array($joinAlias, $existingAliases));
+
+        return [$joinAlias, $index, $i];
     }
 
     /**
@@ -401,9 +410,8 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
 
-            $uniqIndex = $this->getUniqueId($name);
             $joinField = $this->getJoinField($type);
-            $joinAlias = $this->getJoinAlias($type, $uniqIndex);
+            list($joinAlias, $uniqIndex) = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
 
             $param = sprintf('param%s', $uniqIndex);
             $withClause = sprintf('%s.field = :%s', $joinAlias, $param);

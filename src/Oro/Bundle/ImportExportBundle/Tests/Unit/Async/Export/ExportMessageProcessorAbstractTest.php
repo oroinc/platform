@@ -3,11 +3,8 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
@@ -31,8 +28,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $this->createJobRunnerMock(),
                 $this->createJobStorageMock(),
-                $this->createTokenStorageMock(),
-                $this->createTokenSerializerMock(),
                 $this->createLoggerMock(),
             ])
             ->setMethods(['getSubscribedTopics', 'handleExport', 'getMessageBody'])
@@ -90,8 +85,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $jobRunner,
                 $this->createJobStorageMock(),
-                $this->createTokenStorageMock(),
-                $this->createTokenSerializerMock(),
                 $this->createLoggerMock(),
             ])
             ->setMethods(['getSubscribedTopics', 'handleExport', 'getMessageBody'])
@@ -143,8 +136,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $jobRunner,
                 $jobStorage,
-                $this->createTokenStorageMock(),
-                $this->createTokenSerializerMock(),
                 $logger,
             ])
             ->setMethods(['getSubscribedTopics', 'handleExport', 'getMessageBody'])
@@ -183,22 +174,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     private function createJobStorageMock()
     {
         return $this->createMock(JobStorage::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
-     */
-    private function createTokenStorageMock()
-    {
-        return $this->createMock(TokenStorageInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
-     */
-    private function createTokenSerializerMock()
-    {
-        return $this->createMock(TokenSerializerInterface::class);
     }
 
     /**

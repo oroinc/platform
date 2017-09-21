@@ -27,6 +27,7 @@ class OroTranslationExtension extends Extension
             ->replaceArgument(3, $config['js_translation']);
 
         $container->setParameter('oro_translation.js_translation.domains', $config['js_translation']['domains']);
+        $container->setParameter('oro_translation.js_translation.debug', $config['js_translation']['debug']);
 
         if (!empty($config['api'])) {
             foreach ($config['api'] as $serviceId => $params) {

@@ -37,7 +37,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'jsmessages',
                     'validators'
                 ],
-                'debug' => '%kernel.debug%'
+                'debug' => true
             ],
             'api' => [
                 'crowdin' => [

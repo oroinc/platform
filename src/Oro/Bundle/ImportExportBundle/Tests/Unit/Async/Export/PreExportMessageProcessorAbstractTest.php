@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
 
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -35,7 +34,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $this->createJobRunnerMock(),
                 $this->createMessageProducerMock(),
-                $this->createTokenSerializerMock(),
                 $this->createTokenStorageMock(),
                 $this->createDependentJobMock(),
                 $this->createLoggerMock(),
@@ -116,7 +114,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $jobRunner,
                 $this->createMessageProducerMock(),
-                $this->createTokenSerializerMock(),
                 $this->createTokenStorageMock(),
                 $this->createDependentJobMock(),
                 $this->createLoggerMock(),
@@ -203,7 +200,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $jobRunner,
                 $this->createMessageProducerMock(),
-                $this->createTokenSerializerMock(),
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
@@ -332,7 +328,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $jobRunner,
                 $this->createMessageProducerMock(),
-                $this->createTokenSerializerMock(),
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
@@ -448,7 +443,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $jobRunner,
                 $this->createMessageProducerMock(),
-                $this->createTokenSerializerMock(),
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
@@ -568,7 +562,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([
                 $jobRunner,
                 $this->createMessageProducerMock(),
-                $this->createTokenSerializerMock(),
                 $tokenStorage,
                 $dependentJob,
                 $this->createLoggerMock(),
@@ -634,14 +627,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     private function createMessageProducerMock()
     {
         return $this->createMock(MessageProducerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
-     */
-    private function createTokenSerializerMock()
-    {
-        return $this->createMock(TokenSerializerInterface::class);
     }
 
     /**
