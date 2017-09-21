@@ -73,8 +73,12 @@ var ORO = (function(ORO) {
             var scripts = this.container.querySelectorAll('script');
             if (scripts.length > 0) {
                 var scriptsFragment = document.createDocumentFragment();
-                var realTag = null;
-                for (var k in scripts) if (scripts.hasOwnProperty(k)) {
+                var realTag;
+                for (var k in scripts) {
+                    if (!scripts.hasOwnProperty(k)) {
+                        continue;
+                    }
+                    
                     realTag = document.createElement('script');
 
                     if (scripts[k].hasAttribute('src')) {
