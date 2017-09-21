@@ -355,6 +355,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Given I click "Discounts" tab in navigation menu
+     *
+     * @Given /^(?:|I )click "(?P<needle>[\w\s]+)" tab in navigation menu$/
+     */
+    public function iClickLinkInNavigationMenu($needle)
+    {
+        $navigationMenu = $this->createElement('NavigationMenu');
+        self::assertTrue($navigationMenu->isValid());
+        $navigationMenu->clickLink($needle);
+    }
+
+    /**
      * Example: Given I click Websites in sidebar menu
      *
      * @Given /^(?:|I )click (?P<needle>[\w\s]+) in sidebar menu$/
