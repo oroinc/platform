@@ -315,7 +315,8 @@ define(function(require) {
                     inputClass: this.inputClass,
                     value: displayValue,
                     parts: this._getParts(),
-                    popoverContent: __('oro.filter.date.info')
+                    popoverContent: __('oro.filter.date.info'),
+                    renderMode: this.renderMode
                 })
             );
 
@@ -356,7 +357,8 @@ define(function(require) {
                         choices: this.dateParts,
                         selectedChoice: value.part,
                         selectedChoiceLabel: selectedPartLabel,
-                        selectedChoiceTooltip: this._getPartTooltip(value.part)
+                        selectedChoiceTooltip: this._getPartTooltip(value.part),
+                        renderMode: this.renderMode
                     })
                 );
             }
@@ -367,7 +369,8 @@ define(function(require) {
                     choices: this.choices,
                     selectedChoice: value.type,
                     selectedChoiceLabel: selectedChoiceLabel,
-                    popoverContent: __('oro.filter.date.info')
+                    popoverContent: __('oro.filter.date.info'),
+                    renderMode: this.renderMode
                 })
             );
 

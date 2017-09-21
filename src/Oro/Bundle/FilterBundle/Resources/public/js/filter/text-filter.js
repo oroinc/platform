@@ -260,7 +260,9 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            var $filter = $(this.template());
+            var $filter = $(this.template({
+                renderMode: this.renderMode
+            }));
             this._wrap($filter);
             return this;
         },

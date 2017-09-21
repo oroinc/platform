@@ -202,7 +202,8 @@ define(function(require) {
                 options: options,
                 canDisable: this.canDisable,
                 selected: _.extend({}, this.emptyValue, this.value),
-                isEmpty: this.isEmpty()
+                isEmpty: this.isEmpty(),
+                renderMode: this.renderMode
             });
 
             if (!this.selectWidget) {
