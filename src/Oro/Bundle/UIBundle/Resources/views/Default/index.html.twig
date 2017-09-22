@@ -76,7 +76,7 @@
             {% endblock header %}
             {% if isDesktopVersion() %}
                 {% block left_panel %}
-                    <div id="left-panel">
+                    <div id="left-panel" data-layout="separate">
                         {% placeholder left_panel with {placement: 'left'} %}
                     </div>
                 {% endblock left_panel %}
