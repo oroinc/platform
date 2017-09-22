@@ -230,7 +230,8 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                                 'sub_config1' => 'data1',
                                 'sub_config2' => 'data2',
                                 'sub_config3' => 'data3',
-                            ]
+                            ],
+                            'message' => 'custom value with %%percent escaped string%% parameter'
                         ]
                     ],
                     self::BUNDLE2 => [
@@ -242,7 +243,8 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'some_config' => [
                                 'replace' => ['sub_config1', 'sub_config3'],
                                 'sub_config3' => 'replaced data',
-                            ]
+                            ],
+                            'custom key with %%percent escaped string%% parameter' => 'value'
                         ]
                     ],
                     self::BUNDLE3 => [
@@ -271,7 +273,9 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                     ],
                     'test_action4' => [
                         'label' => 'Test Action4',
-                        'some_config' => ['sub_config2' => 'data2', 'sub_config3' => 'replaced data']
+                        'some_config' => ['sub_config2' => 'data2', 'sub_config3' => 'replaced data'],
+                        'message' => 'custom value with %percent escaped string% parameter',
+                        'custom key with %percent escaped string% parameter' => 'value'
                     ],
                     'test_action3' => [
                         'label' => 'Test Action2 Bundle3',

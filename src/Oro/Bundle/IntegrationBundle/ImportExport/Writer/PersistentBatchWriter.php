@@ -81,7 +81,7 @@ class PersistentBatchWriter implements
                 ->getConfiguration();
 
             if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
-                $em->clear();
+                $this->doClear();
             }
         } catch (\Exception $exception) {
             $em->rollback();
@@ -147,5 +147,13 @@ class PersistentBatchWriter implements
         }
 
         $em->flush();
+    }
+
+    /**
+     * Clear entity manager state
+     */
+    protected function doClear()
+    {
+        $this->registry->getManager()->clear();
     }
 }
