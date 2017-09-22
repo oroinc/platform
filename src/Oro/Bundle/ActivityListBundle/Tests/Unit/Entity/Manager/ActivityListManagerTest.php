@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -64,6 +65,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowDataHelper */
     protected $workflowHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagHelper;
+
     public function setUp()
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -78,6 +82,16 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->inheritanceHelper = $this->createMock(ActivityInheritanceTargetsHelper::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->workflowHelper = $this->createMock(WorkflowDataHelper::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $this->htmlTagHelper->expects($this->any())
+            ->method('purify')
+            ->will(
+                $this->returnCallback(
+                    function ($value) {
+                        return $value;
+                    }
+                )
+            );
 
         $this->activityListManager = new ActivityListManager(
             $this->authorizationChecker,
@@ -92,6 +106,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->eventDispatcher,
             $this->workflowHelper
         );
+        $this->activityListManager->setHtmlTagHelper($this->htmlTagHelper);
     }
 
     public function testGetRepository()

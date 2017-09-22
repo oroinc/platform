@@ -26,6 +26,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInte
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
+use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
 
 /**
@@ -246,6 +247,42 @@ class OroMainContext extends MinkContext implements
             $message,
             $title
         ));
+    }
+
+    /**
+     * Assert alert is not present
+     * Example: Then I should not see alert
+     *
+     * @Then I should not see alert
+     */
+    public function iShouldNotSeeAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        try {
+            $session->accept_alert();
+            $alertMessage = $session->getAlert_text();
+        } catch (NoAlertOpenError $e) {
+            return;
+        }
+
+        self::fail('Expect to see no alert but alert with "'.$alertMessage.'" message is present');
+    }
+
+    /**
+     * Assert that no malicious scripts present on page
+     * Example: Then I should not see malicious scripts
+     *
+     * @Then I should not see malicious scripts
+     */
+    public function iShouldNotSeeMaliciousScripts()
+    {
+        $this->assertPageNotContainsText('<script>');
+        $this->assertPageNotContainsText('<Script>');
+        $this->assertPageNotContainsText('&lt;script&gt;');
+        $this->assertPageNotContainsText('&lt;Script&gt;');
     }
 
     /**

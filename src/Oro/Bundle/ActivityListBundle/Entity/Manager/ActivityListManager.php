@@ -25,6 +25,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -66,6 +67,9 @@ class ActivityListManager
     /** @var WorkflowDataHelper */
     protected $workflowHelper;
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
      * @param AuthorizationCheckerInterface    $authorizationChecker
      * @param EntityNameResolver               $entityNameResolver
@@ -78,6 +82,7 @@ class ActivityListManager
      * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
      * @param EventDispatcherInterface         $eventDispatcher
      * @param WorkflowDataHelper               $workflowHelper
+     * @param HtmlTagHelper                    $htmlTagHelper
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -104,6 +109,14 @@ class ActivityListManager
         $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
         $this->eventDispatcher = $eventDispatcher;
         $this->workflowHelper = $workflowHelper;
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -369,8 +382,8 @@ class ActivityListManager
             'editor'               => $editorName,
             'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
-            'subject'              => $entity->getSubject(),
-            'description'          => $entity->getDescription(),
+            'subject'              => $this->htmlTagHelper->purify($entity->getSubject()),
+            'description'          => $this->htmlTagHelper->purify($entity->getDescription()),
             'data'                 => $data,
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),

@@ -32,7 +32,7 @@ parameters:
     # Strategies
     oro_activity_list.strategy.replace.class: Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy
     oro_activity_list.strategy.unite.class: Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy
-    
+
     # merge
     oro_activity_list.listener.merge_listener.class: Oro\Bundle\ActivityListBundle\EventListener\MergeListener
     oro_activity_list.accessor.activity.class: Oro\Bundle\ActivityListBundle\Model\Accessor\ActivityAccessor
@@ -51,6 +51,8 @@ services:
             - "@oro_activity_list.helper.activity_inheritance_targets"
             - "@event_dispatcher"
             - "@oro_workflow.data_helper"
+        calls:
+            - ["setHtmlTagHelper", ["@oro_ui.html_tag_helper"]]
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -192,7 +194,7 @@ services:
         arguments:
             - "@oro_entity_config.config_manager"
             - "@doctrine"
-   
+
     # Strategies
     oro_activity_list.strategy.replace:
         class: %oro_activity_list.strategy.replace.class%
