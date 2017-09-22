@@ -34,30 +34,68 @@
 {#
     Render page scrollable data
     params:
-        data             - tree of current configuration
+        configTree       - tree of current configuration
         form             - form view of active group
         activeTabName    - active tab name
         activeSubTabName - active subtab name
         routeName        - route name for tabs switch
         routeParameters  - additional route parameters
 #}
-{% macro renderScrollData(data, form, activeTabName = false, activeSubTabName = false, routeName = 'oro_config_configuration_system', routeParameters = {}) %}
+{% macro renderScrollData(configTree, form, activeTabName = false, activeSubTabName = false, routeName = 'oro_config_configuration_system', routeParameters = {}) %}
+    {{ _self.renderConfigurationScrollData({
+        configTree: configTree,
+        form: form,
+        content: {},
+        activeTabName: activeTabName,
+        activeSubTabName: activeSubTabName,
+        routeName: routeName,
+        routeParameters: routeParameters
+    }) }}
+{% endmacro %}
+
+{% macro renderConfigurationScrollData(data) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set content = _self.renderTabContent(form) %}
+
+    {% set content %}
+        <div data-page-component-view="{{ {
+            view: 'oroui/js/app/views/highlight-text-view',
+            highlightSelectors: [
+                'div.system-configuration-content-title',
+                'h5.user-fieldset span',
+                'div.control-label label',
+                'i.tooltip-icon'
+            ],
+            toggleSelectors: {
+                'div.control-group': 'div.control-group-wrapper',
+                'fieldset.form-horizontal': 'div.system-configuration-content-inner'
+            },
+            viewGroup: 'configuration'
+        }|json_encode }}">
+            {{ _self.renderTabContent(data.form, data.content) }}
+        </div>
+    {% endset %}
     <div class="system-configuration-container">
-        {% embed "OroUIBundle::content_sidebar.html.twig" %}
+        {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
+            scrollbar: '[data-role="jstree-container"]'
+        }} %}
+            {% block header %}
+                <div id="system-configuration-jstree-inline-actions"></div>
+            {% endblock header %}
             {% block sidebar %}
-                {% set treeOptions = {
-                    'data' : data,
-                    'nodeId': activeSubTabName,
-                    'onSelectRoute': routeName,
-                    'onSelectRouteParameters': routeParameters,
-                    'autoSelectFoundNode': true,
-                    'view': 'oroconfig/js/app/views/configuration-tree-view'
-                } %}
                 {{ UI.renderJsTree({
-                    'label': 'oro.config.menu.system_configuration.label'|trans,
-                    'treeOptions': treeOptions
+                    'label': null,
+                    'treeOptions': {
+                        'data' : data.configTree,
+                        'viewGroup': 'configuration',
+                        'nodeId': data.activeSubTabName,
+                        'onSelectRoute': data.routeName,
+                        'onSelectRouteParameters': data.routeParameters,
+                        'view': 'oroconfig/js/app/views/configuration-tree-view'
+                    },
+                    'actionsOptions': {
+                        inlineActionsCount: 2,
+                        inlineActionsElement: '#system-configuration-jstree-inline-actions'
+                    }
                 }) }}
             {% endblock sidebar %}
 
@@ -75,58 +113,67 @@
     params:
         form        - form view for active tab tree configuration
 #}
-{% macro renderTabContent(form) %}
-    {% set data = {
-        'formErrors': form_errors(form),
-        'dataBlocks': form_data_blocks(form),
-        'hiddenData': form_rest(form)
-    } %}
+{% macro renderTabContent(form, content) %}
+    {% set content = content|default({}) %}
+    {% set processForm = false %}
+    {% if content.formErrors is not defined %}
+        {% set content = content|merge({
+            formErrors: form_errors(form)
+        }) %}
+    {% endif %}
+    {% if content.dataBlocks is not defined %}
+        {% set content = content|merge({
+            dataBlocks: form_data_blocks(form)
+        }) %}
+        {% set processForm = true %}
+    {% endif %}
+    {% if content.hiddenData is not defined %}
+        {% set content = content|merge({
+            hiddenData: form_rest(form)
+        }) %}
+    {% endif %}
+    {% if processForm %}
+        {% set content = oro_form_process(content, form) %}
+    {% endif %}
 
-    {% set data = oro_form_process(data, form) %}
-    <div class="scrollable-container">
-        <div class="system-configuration-content content form-container" id="configuration-options-block">
-            <div class="pull-right">
-                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
-            </div>
-            {% if data.formErrors is defined and data.formErrors | length %}
-                <div class="customer-info-actions container-fluid well-small alert-wrap">
-                    <div class="alert alert-error">
-                        <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
-                        {{ data.formErrors|raw }}
-                    </div>
+    <div class="placeholder">
+        <div class="scrollable-container">
+            <div class="system-configuration-content content form-container" id="configuration-options-block">
+                <div class="pull-right">
+                    <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
                 </div>
-            {% endif %}
-
-            {% for scrollBlock in data.dataBlocks %}
-            {% set accordionId = 'system-configuration-collapse' ~ loop.index %}
-            <div class="accordion">
-                <div class="accordion-group">
-                    <div class="accordion-heading">
-                        {% if loop.first %}
-                        <div class="pull-right">
-                            {{ _self.renderCollapseExpandActions('#configuration-options-block') }}
+                {% if content.formErrors is defined and content.formErrors | length %}
+                    <div class="customer-info-actions container-fluid well-small alert-wrap">
+                        <div class="alert alert-error">
+                            <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                            {{ content.formErrors|raw }}
                         </div>
+                    </div>
+                {% endif %}
+
+                {% for scrollBlock in content.dataBlocks %}
+                <div class="system-configuration-content-wrapper">
+                    <div class="system-configuration-content-title">
+                        {{ scrollBlock.title|trans }}
+                    </div>
+                    <div class="system-configuration-content-inner">
+                        {% if scrollBlock.description is defined and scrollBlock.description != '' %}
+                            <p>{{ scrollBlock.description|trans }}</p>
                         {% endif %}
-                        <a href="#{{ accordionId }}" data-toggle="collapse" class="accordion-toggle">
-                            {{ scrollBlock.title|trans }}
-                        </a>
-                    </div>
-                    <div class="accordion-body in collapse" id="{{ accordionId }}" >
-                        <div class="accordion-inner">
-                            {% if scrollBlock.description is defined and scrollBlock.description != '' %}
-                                <p>{{ scrollBlock.description|trans }}</p>
-                            {% endif %}
 
-                            {% for subblock in scrollBlock.subblocks %}
+                        {% for subblock in scrollBlock.subblocks %}
+                            {% if subblock is iterable %}
                                 {{ _self.renderFieldset(subblock) }}
-                            {% endfor %}
-                        </div>
+                            {% else %}
+                                {{ subblock|raw }}
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-            <div class="hide">
-                {{ data.hiddenData|raw }}
+                {% endfor %}
+                <div class="hide">
+                    {{ content.hiddenData|raw }}
+                </div>
             </div>
         </div>
     </div>
@@ -159,21 +206,10 @@
             </div>
         {% endif %}
 
-        {% for dataBlock in block.data %}
-            {{ dataBlock|raw }}
-        {% endfor %}
+        <div class="control-group-wrapper">
+            {% for dataBlock in block.data %}
+                {{ dataBlock|raw }}
+            {% endfor %}
+        </div>
     </fieldset>
-{% endmacro %}
-
-{#
-    Renders 'Expand All' and 'Collapse All' links
-    params:
-        target - CSS selector for accordions container
-#}
-{% macro renderCollapseExpandActions(target) %}
-    <ul class="inline small-text">
-        <li><a href="{{ target }}" data-action="accordion:expand-all">{{ 'oro.config.actions.expand_all'|trans }}</a></li>
-        <li class="separator">|</li>
-        <li><a href="{{ target }}" data-action="accordion:collapse-all">{{ 'oro.config.actions.collapse_all'|trans }}</a></li>
-    </ul>
 {% endmacro %}

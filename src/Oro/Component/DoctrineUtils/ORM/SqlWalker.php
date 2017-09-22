@@ -7,8 +7,13 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\Query\AST;
 use Doctrine\ORM\Query\SqlWalker as BaseSqlWalker;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class SqlWalker extends BaseSqlWalker
 {
+    use HookUnionTrait;
+
     /**
      * @see https://dev.mysql.com/doc/refman/5.7/en/index-hints.html
      */
@@ -214,5 +219,15 @@ class SqlWalker extends BaseSqlWalker
                 ];
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function walkSubselect($subselect)
+    {
+        $sql = parent::walkSubselect($subselect);
+
+        return $this->hookUnion($sql);
     }
 }

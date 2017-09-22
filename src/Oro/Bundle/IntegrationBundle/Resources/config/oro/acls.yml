@@ -1,9 +1,7 @@
 acls:
     oro_integration_assign:
-        type: action
+        type: entity
         class: OroIntegrationBundle:Channel
         permission: ASSIGN
-        label: oro.integration.action.assign.label
         group_name: ""
         bindings: ~
-        category: "application"

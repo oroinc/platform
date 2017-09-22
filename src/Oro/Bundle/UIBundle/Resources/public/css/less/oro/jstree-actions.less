@@ -9,6 +9,30 @@
         position: absolute;
         right: 0;
         left: auto;
+
+        &--inline {
+            margin: 0;
+            list-style: none;
+            li {
+                display: inline-block;
+                padding: 0 5px 0 0;
+
+                &:before {
+                    content: "|";
+                    display: inline-block;
+                }
+
+                &:first-child {
+                    &:before {
+                        display: none;
+                    }
+                }
+
+                [class*="fa-"] {
+                    display: none;
+                }
+            }
+        }
     }
 
     &__icon {

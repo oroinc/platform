@@ -21,7 +21,7 @@ class TableHeader extends Element
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            $currentHeader = $th->textContent;
+            $currentHeader = trim($th->textContent);
             if (strtolower($currentHeader) === strtolower($headerText)) {
                 return $i;
             }

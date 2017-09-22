@@ -286,7 +286,6 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
 
-        $this->treeProvider->warmUpCache();
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
 
@@ -383,7 +382,6 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
 
-        $this->treeProvider->warmUpCache();
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
 
@@ -482,7 +480,6 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
 
-        $this->treeProvider->warmUpCache();
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
 
@@ -565,7 +562,6 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
 
-        $this->treeProvider->warmUpCache();
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
 
@@ -660,7 +656,6 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
 
-        $this->treeProvider->warmUpCache();
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
 
@@ -811,7 +806,6 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
 
-        $this->treeProvider->warmUpCache();
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
 

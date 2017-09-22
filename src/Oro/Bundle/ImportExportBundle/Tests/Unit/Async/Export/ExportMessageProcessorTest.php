@@ -3,9 +3,6 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -13,7 +10,6 @@ use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
@@ -31,19 +27,15 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'Got invalid message',
-                ['jobName' => 'name', 'processorAlias' => 'alias', 'securityToken' => 'token'],
+                ['jobName' => 'name', 'processorAlias' => 'alias'],
             ],
             [
                 'Got invalid message',
-                ['jobId' => 1, 'processorAlias' => 'alias', 'securityToken' => 'token'],
+                ['jobId' => 1, 'processorAlias' => 'alias'],
             ],
             [
                 'Got invalid message',
-                ['jobId' => 1, 'jobName' => 'name', 'securityToken' => 'token'],
-            ],
-            [
-                'Got invalid message',
-                ['jobId' => 1, 'jobName' => 'name', 'processorAlias' => 'alias'],
+                ['jobId' => 1, 'jobName' => 'name'],
             ],
         ];
     }
@@ -69,52 +61,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new ExportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createJobStorageMock(),
-            $this->createTokenStorageMock(),
-            $this->createTokenSerializerMock(),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageAndLogCriticalIfSecurityTokenInvalid()
-    {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('Cannot set security token')
-        ;
-
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('test'))
-            ->willReturn(null)
-        ;
-
-        $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage
-            ->expects($this->never())
-            ->method('setToken')
-        ;
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'jobId' => 1,
-            'jobName' => 'name',
-            'processorAlias' => 'alias',
-            'securityToken' =>'test',
-        ]));
-
-        $processor = new ExportMessageProcessor(
-            $this->createJobRunnerMock(),
-            $this->createJobStorageMock(),
-            $tokenStorage,
-            $tokenSerializer,
             $logger
         );
 
@@ -152,23 +98,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('saveJob')
         ;
 
-        $token = $this->createTokenMock();
-
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('test'))
-            ->willReturn($token)
-        ;
-
-        $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
-
         $organizationRepository = $this->createOrganizationRepositoryMock();
         $organizationRepository
             ->expects($this->once())
@@ -193,8 +122,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new ExportMessageProcessor(
             $jobRunner,
             $jobStorage,
-            $tokenStorage,
-            $tokenSerializer,
             $logger
         );
         $processor->setDoctrineHelper($doctrineHelper);
@@ -206,7 +133,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             'jobId' => 1,
             'jobName' => 'name',
             'processorAlias' => 'alias',
-            'securityToken' =>'test',
             'organizationId' => 2,
         ]));
 
@@ -232,22 +158,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
-     */
-    private function createTokenStorageMock()
-    {
-        return $this->createMock(TokenStorageInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
-     */
-    private function createTokenSerializerMock()
-    {
-        return $this->createMock(TokenSerializerInterface::class);
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
     private function createSessionMock()
@@ -261,14 +171,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createLoggerMock()
     {
         return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenInterface
-     */
-    private function createTokenMock()
-    {
-        return $this->createMock(TokenInterface::class);
     }
 
     /**

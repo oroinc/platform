@@ -45,7 +45,9 @@
 
     <div class="container-change-account-type"
         data-page-component-module="oroimap/js/app/components/account-type-component"
-        data-page-component-options="{{ options|json_encode }}">
+        data-page-component-options="{{ options|json_encode }}"
+        data-layout="separate"
+    >
         <div {{ block('widget_container_attributes') }}>
             {%- if form.parent is empty -%}
                 {{ form_errors(form) }}
@@ -84,7 +86,9 @@
 
     <div class="container-imap-gmail-container"
          data-page-component-module="oroimap/js/app/components/imap-gmail-component"
-         data-page-component-options="{{ options|json_encode }}">
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate"
+    >
         <div {{ block('widget_container_attributes') }}>
             {%- if form.parent is empty -%}
                 {{ form_errors(form) }}

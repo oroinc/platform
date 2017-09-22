@@ -51,8 +51,8 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
             $params
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertEquals($expected, json_decode($response->getContent(), true));
     }
 
     public function testFilteringByRenamedField()
@@ -72,8 +72,8 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
             $params
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertEquals($expected, json_decode($response->getContent(), true));
     }
 
     public function testFilteringByRenamedRelatedField()
@@ -93,8 +93,8 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
             $params
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertEquals($expected, json_decode($response->getContent(), true));
     }
 
     /**
@@ -116,8 +116,8 @@ class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
             $params
         );
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-        $this->assertEquals($expected, json_decode($response->getContent(), true));
+        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        self::assertEquals($expected, json_decode($response->getContent(), true));
     }
 
     /**

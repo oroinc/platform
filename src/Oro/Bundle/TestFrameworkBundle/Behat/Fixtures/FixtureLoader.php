@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\Exception\FileNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -196,7 +197,7 @@ class FixtureLoader
     public function findFile($filename)
     {
         if (false === strpos($filename, ':')) {
-            throw new \InvalidArgumentException(
+            throw new FileNotFoundException(
                 'Please define a bundle name for fixtures e.g. "BundleName:fixture.yml"'
             );
         }
@@ -206,7 +207,7 @@ class FixtureLoader
         $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
 
         if (!$file = $this->findFileInPath($filename, $suitePaths)) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new FileNotFoundException(sprintf(
                 'Can\'t find "%s" in pahts "%s"',
                 $filename,
                 implode(',', $suitePaths)

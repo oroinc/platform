@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtensionAwareInterface;
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
+use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
-
-use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 
 class ChainExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,12 +19,39 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertClassImplements(ExtensionInterface::class, ChainExtension::class);
     }
 
+    public function testShouldImplementResettableExtensionInterface()
+    {
+        $this->assertClassImplements(ResettableExtensionInterface::class, ChainExtension::class);
+    }
+
+    public function testShouldImplementChainExtensionAwareInterface()
+    {
+        $this->assertClassImplements(ChainExtensionAwareInterface::class, ChainExtension::class);
+    }
+
     public function testCouldBeConstructedWithExtensionsArray()
     {
         new ChainExtension(
             [$this->createExtension(), $this->createExtension()],
             $this->createConsumerState()
         );
+    }
+
+    public function testWhenConstructedShouldPassItselfToAllToAllChainExtensionAwareExtensions()
+    {
+        $extension1 = $this->createExtension();
+        $extension2 = $this->createMock(ChainExtension::class);
+
+        $passedChainExtension = null;
+        $extension2->expects(self::once())
+            ->method('setChainExtension')
+            ->willReturnCallback(function ($extension) use (&$passedChainExtension) {
+                $passedChainExtension = $extension;
+            });
+
+        $consumerState = $this->createConsumerState();
+        $chainExtension = new ChainExtension([$extension1, $extension2], $consumerState);
+        self::assertSame($chainExtension, $passedChainExtension);
     }
 
     public function testShouldProxyOnStartToAllInternalExtensions()
@@ -192,6 +220,36 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
 
         $chainExtension = new ChainExtension([$fooExtension, $barExtension], $consumerState);
         $chainExtension->onInterrupted($context);
+    }
+
+    public function testShouldResetAllResettableExtensions()
+    {
+        $extension1 = $this->createExtension();
+        $extension2 = $this->createMock(ChainExtension::class);
+
+        $consumerState = $this->createConsumerState();
+        $chainExtension = new ChainExtension([$extension1, $extension2], $consumerState);
+
+        $extension2->expects(self::once())
+            ->method('reset');
+
+        $chainExtension->reset();
+    }
+
+    public function testShouldSetChainExtensionToAllToAllChainExtensionAwareExtensions()
+    {
+        $extension1 = $this->createExtension();
+        $extension2 = $this->createMock(ChainExtension::class);
+
+        $consumerState = $this->createConsumerState();
+        $chainExtension = new ChainExtension([$extension1, $extension2], $consumerState);
+
+        $anotherChainExtension = $this->createMock(ChainExtension::class);
+        $extension2->expects(self::once())
+            ->method('setChainExtension')
+            ->with(self::identicalTo($anotherChainExtension));
+
+        $chainExtension->setChainExtension($anotherChainExtension);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 
-final class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
+class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
 {
     /** @var array */
     protected $cacheDirectories = [
@@ -17,6 +17,10 @@ final class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
+        if ('session.handler.native_file' !== $container->getParameter('session_handler')) {
+            return false;
+        }
+
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $this->cacheDirectories['oro'] = 'oro';
         }

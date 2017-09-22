@@ -141,6 +141,29 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Start inline editing in grid without changing the value and assert inline editor value
+     *
+     * Example: When I start inline editing on "Test Warehouse" Quantity field I should see "10000000" value
+     *
+     * @param string|null $field
+     * @param string|null $value
+     * @param string|null $entityTitle
+     *
+     * @When /^(?:|I )start inline editing on "(?P<field>[^"]+)" field I should see "(?P<value>.*)" value$/
+     * @codingStandardsIgnoreStart
+     * @When /^(?:|I )start inline editing on "(?P<entityTitle>[^"]+)" "(?P<field>.+)" field I should see "(?P<value>.*)" value$/
+     * @codingStandardsIgnoreEnd
+     */
+    public function startInlineEditingAndAssertEditorValue($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+        $cell = $row->startInlineEditing($field);
+        $inlineEditor = $cell->findField('value');
+
+        self::assertEquals($inlineEditor->getValue(), $value);
+    }
+
+    /**
      * @param string|null $entityTitle
      * @param string|null $gridName
      * @return GridRow
@@ -1246,7 +1269,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $errorMessage = <<<TEXT
             ---
             You can't use more then one column in this method
-            It just assert thet given strings are in the grig
+            It just asserts that given strings are in the grid
             Example: Then I should see following records in grid:
                        | Alice1  |
                        | Alice10 |
@@ -1612,10 +1635,10 @@ TEXT;
             $gridToolbarActions = $this->elementFactory->createElement($gridName . 'ToolbarActions');
             if ($gridToolbarActions->isVisible()) {
                 $gridToolbarActions->getActionByTitle('Filters')->click();
-            } else {
-                $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
-                self::assertNotNull($filterState);
+            }
 
+            $filterState = $this->elementFactory->createElement($gridName . 'FiltersState');
+            if ($filterState->isValid()) {
                 $filterState->click();
             }
         }

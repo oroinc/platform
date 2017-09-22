@@ -6,3 +6,7 @@ doctrine:
                     OroEntityConfigBundle:
                         mapping:   true
                         is_bundle: true
+
+oro_message_queue:
+    persistent_services:
+        - 'oro_entity_config.cache'

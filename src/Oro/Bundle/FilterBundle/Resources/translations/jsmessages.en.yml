@@ -73,3 +73,5 @@ oro:
             max_length: Please enter at most {{ max_length }} characters
         datagrid-toolbar:
             filters: Filters
+            filters_count: Filters ({{ count }})
+            save_filters: Save Filters

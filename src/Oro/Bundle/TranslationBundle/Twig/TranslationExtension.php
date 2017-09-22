@@ -14,16 +14,11 @@ class TranslationExtension extends \Twig_Extension
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var bool */
-    protected $debugTranslator = false;
-
     /**
      * @param ContainerInterface $container
-     * @param bool               $debugTranslator
      */
-    public function __construct(ContainerInterface $container, $debugTranslator)
+    public function __construct(ContainerInterface $container)
     {
-        $this->debugTranslator = $debugTranslator;
         $this->container = $container;
     }
 
@@ -50,6 +45,7 @@ class TranslationExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_translation_debug_translator', [$this, 'isDebugTranslator']),
+            new \Twig_SimpleFunction('oro_translation_debug_js_translations', [$this, 'isDebugJsTranslations']),
             new \Twig_SimpleFunction('translation_grid_link', [$this, 'getTranslationGridLink'])
         ];
     }
@@ -59,7 +55,15 @@ class TranslationExtension extends \Twig_Extension
      */
     public function isDebugTranslator()
     {
-        return $this->debugTranslator;
+        return $this->container->getParameter('oro_translation.debug_translator');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebugJsTranslations()
+    {
+        return $this->container->getParameter('oro_translation.js_translation.debug');
     }
 
     /**

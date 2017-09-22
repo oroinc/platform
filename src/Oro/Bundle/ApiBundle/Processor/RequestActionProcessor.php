@@ -83,12 +83,12 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
                 if ($context->isSoftErrorsHandling()) {
                     $this->logger->warning(
                         sprintf('An exception occurred in "%s" processor.', $processorId),
-                        ['exception' => $e]
+                        array_merge(['exception' => $e], $this->getLogContext($context))
                     );
                 } else {
                     $this->logger->error(
                         sprintf('The execution of "%s" processor is failed.', $processorId),
-                        ['exception' => $e]
+                        array_merge(['exception' => $e], $this->getLogContext($context))
                     );
                 }
             }
@@ -129,7 +129,7 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
                 if (null !== $this->logger) {
                     $this->logger->error(
                         sprintf('The execution of "%s" processor is failed.', $processors->getProcessorId()),
-                        ['exception' => $e]
+                        array_merge(['exception' => $e], $this->getLogContext($context))
                     );
                 }
 
@@ -158,5 +158,27 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
         }
 
         return $exception;
+    }
+
+    /**
+     * @param ComponentContextInterface $context
+     *
+     * @return array
+     */
+    protected function getLogContext(ComponentContextInterface $context)
+    {
+        $result = ['action' => $context->getAction()];
+        if ($context instanceof ApiContext) {
+            $result['requestType'] = (string)$context->getRequestType();
+            $result['version'] = $context->getVersion();
+        }
+        if ($context instanceof Context) {
+            $result['class'] = $context->getClassName();
+        }
+        if ($context instanceof SingleItemContext) {
+            $result['id'] = $context->getId();
+        }
+
+        return $result;
     }
 }

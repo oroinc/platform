@@ -95,8 +95,9 @@ define(function(require) {
                 });
                 $checkboxes
                     .prop('checked', true)
-                    .attr('checked', true)
-                    .trigger('change');
+                    .attr('checked', true);
+
+                this.$el.find(':input').change();
             }, this));
 
             confirm.open();

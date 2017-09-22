@@ -9,11 +9,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
-use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 
 class UpdateSchemaCommand extends ContainerAwareCommand
 {
@@ -109,11 +108,9 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs();
         $metadata = [];
         foreach ($extendConfigs as $extendConfig) {
-            if (!ExtendScopeHelper::isAvailableForProcessing($extendConfig)) {
-                continue;
+            if (!$extendConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
+                $metadata[] = $em->getClassMetadata($extendConfig->getId()->getClassName());
             }
-
-            $metadata[] = $em->getClassMetadata($extendConfig->getId()->getClassName());
         }
 
         return $metadata;

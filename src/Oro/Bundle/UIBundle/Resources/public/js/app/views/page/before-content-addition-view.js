@@ -9,6 +9,12 @@ function(PageRegionView) {
 
         template: function(data) {
             return data.beforeContentAddition;
+        },
+
+        render: function() {
+            PageBeforeContentAdditionView.__super__.render.call(this);
+            this.initLayout();
+            return this;
         }
     });
 
