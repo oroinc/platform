@@ -195,6 +195,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
     /**
      * @param object $entity
+     * @param null $existingEntity
      * @param array|null $itemData
      */
     protected function checkEntityAcl($entity, $existingEntity = null, $itemData = null)
