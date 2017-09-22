@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Twig;
 
 class BasenameTwigExtension extends \Twig_Extension
 {
+    /**
+     * @return array
+     */
     public function getFilters()
     {
         return [
@@ -13,9 +16,10 @@ class BasenameTwigExtension extends \Twig_Extension
 
     /**
      * @var string $value
+     *
      * @return string
      */
-    public function basenameFilter($value, $suffix = '')
+    public function basenameFilter(string $value): string
     {
         return basename(str_replace('\\', '/', $value));
     }

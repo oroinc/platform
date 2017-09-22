@@ -14,12 +14,10 @@ define(function(require) {
         options: {
             exportTemplateRoute: 'oro_importexport_export_template',
             exportTemplateProcessor: null,
-            exportTemplateJob: null
+            exportTemplateJob: null,
+            routeOptions: {}
         },
 
-        routeOptions: {},
-
-        $container: null,
         $exportTemplateButton: null,
 
         /**

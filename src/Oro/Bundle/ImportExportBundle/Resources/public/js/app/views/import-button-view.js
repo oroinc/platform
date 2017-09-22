@@ -13,10 +13,6 @@ define(function(require) {
          * @property {Object}
          */
         options: {
-            selectors: {
-                container: null,
-                importButton: '.import-btn',
-            },
             alias: null,
             importRoute: 'oro_importexport_import_validate_export_template_form',
             dialogOptions: {
@@ -29,12 +25,12 @@ define(function(require) {
                     modal: true,
                     minHeight: 100
                 }
-            }
+            },
+            routeOptions: {}
         },
 
         routeOptions: {},
 
-        $container: null,
         $importButton: null,
 
         /**
@@ -43,14 +39,12 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-
-            this.$container = this.$el;
-
-            this.$importButton = this.$container.find(this.options.selectors.importButton);
+            this.$importButton = this.$el;
             this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
 
             this.routeOptions = {
-                'alias': this.options.alias
+                alias: this.options.alias,
+                options: this.options.routeOptions
             };
         },
 

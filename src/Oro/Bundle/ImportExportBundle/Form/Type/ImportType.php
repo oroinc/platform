@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImportExportBundle\Form\Type;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\Form\AbstractType;
-
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -39,30 +38,43 @@ class ImportType extends AbstractType
         $builder->add(
             'processorAlias',
             'choice',
-            [
-                'choices' => $processorChoices,
-                'required' => true,
-                'preferred_choices' => $processorChoices ? [reset($processorChoices)] : [],
-                'expanded' => true,
-                'multiple' => false,//@TODO: remove from here?
-            ]
+            array_merge(
+                [
+                    'choices' => $processorChoices,
+                    'required' => true,
+                    'preferred_choices' => $processorChoices ? [reset($processorChoices)] : [],
+                ],
+                $options['processorAliasOptions']
+            )
         );
     }
 
-    protected function getImportProcessorsChoices($entityName)
+    /**
+     * @param string $entityName
+     *
+     * @return string[]
+     */
+    protected function getImportProcessorsChoices(string $entityName): array
     {
         $aliases = $this->processorRegistry->getProcessorAliasesByEntity(
             ProcessorRegistry::TYPE_IMPORT,
             $entityName
         );
+
         $result = [];
         foreach ($aliases as $alias) {
             $result[$alias] = $this->generateProcessorLabel($alias);
         }
+
         return $result;
     }
 
-    protected function generateProcessorLabel($alias)
+    /**
+     * @param string $alias
+     *
+     * @return string
+     */
+    protected function generateProcessorLabel(string $alias): string
     {
         return sprintf('oro.importexport.import.%s', $alias);
     }
@@ -75,12 +87,14 @@ class ImportType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' =>  ImportData::class,
+                'processorAliasOptions' => [],
             ]
         );
         $resolver->setRequired(['entityName']);
         $resolver->setAllowedTypes(
             [
-                'entityName' => 'string'
+                'entityName' => 'string',
+                'processorAliasOptions' => 'array',
             ]
         );
     }

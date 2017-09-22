@@ -38,6 +38,16 @@ class GetImportFormExtension extends \Twig_Extension
      */
     public function getImportForm(string $entityName): FormInterface
     {
-        return $this->formFactory->create(ImportType::NAME, null, ['entityName' => $entityName]);
+        return $this->formFactory->create(
+            ImportType::NAME,
+            null,
+            [
+                'entityName' => $entityName,
+                'processorAliasOptions' => [
+                    'expanded' => true,
+                    'multiple' => false,
+                ]
+            ]
+        );
     }
 }

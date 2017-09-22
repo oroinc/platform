@@ -5,7 +5,9 @@
     <ul class="nav nav-tabs">
         {% for configuration in configurations %}
             {% set shortEntityName = configuration.entityClass|basename %}
-            <li {% if loop.index == 1 %} class="active" {% endif %}><a data-toggle="tab" href="#{{ shortEntityName }}">{{ shortEntityName }}</a></li>
+            <li {% if loop.index == 1 %} class="active" {% endif %}>
+                <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ shortEntityName }}</a>
+            </li>
         {% endfor %}
     </ul>
 
@@ -20,14 +22,20 @@
 
             {% set isMultipleProcessorsRequired = config.exportProcessorAlias is iterable %}
 
-            <div id="{{ shortEntityName }}" class="tab-pane fade in {% if loop.index == 1 %} active{% endif %}">
+            <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if loop.index == 1 %} active{% endif %}">
                 <div class="form-container">
                     <form method="post"
                           data-nohash="true"
                           id="{{ form.vars.id }}"
                           name="{{ form.vars.name }}"
-                          action="{{ path('oro_importexport_import_validate_export_template_form', {entity: config.entityClass, importJob: config.importJobName, importValidateJob: config.importValidationJobName, alias: alias}) }}"
-                          class="form-horizontal" {{ form_enctype(form) }}>
+                          action="{{ path('oro_importexport_import_validate_export_template_form', {
+                              entity: config.entityClass,
+                              importJob: config.importJobName,
+                              importValidateJob: config.importValidationJobName,
+                              alias: alias
+                          }) }}"
+                          class="form-horizontal" {{ form_enctype(form) }}
+                    >
                          {# @todo: options #}
 
                         <input type="hidden" name="isValidateJob" value="false">
@@ -55,11 +63,12 @@
                                             'iCss':'fa-file-o hide-text',
                                             'label': label|trans,
                                             'data': {
-                                                'page-component-module': "oroui/js/app/components/view-component",
+                                                'page-component-module': 'oroui/js/app/components/view-component',
                                                 'page-component-options': {
                                                     'view': 'oroimportexport/js/app/views/export-template-button-view',
                                                     'exportTemplateProcessor': alias,
-                                                    'exportTemplateJob': config.exportTemplateJob|default(null)
+                                                    'exportTemplateJob': config.exportTemplateJob|default(null),
+                                                    'routeOptions': options|default({})
                                                 }|json_encode
                                             }
                                         }])
@@ -67,22 +76,23 @@
                                 {% endfor %}
 
                                 {{ UI.dropdownButton({
-                                    'label': 'Download Template'|trans,
+                                    'label': 'oro.importexport.export_template.label'|trans,
                                     'elements': exportTemplateButtons
                                 }) }}
                             {% else %}
                                 {{ UI.button({
                                     'path':'#',
                                     'aCss':'icons-holder-text no-hash',
-                                    'title': 'Download Template'|trans,
+                                    'title': 'oro.importexport.export_template.label'|trans,
                                     'iCss':'fa-file-o hide-text',
-                                    'label': 'Download Template'|trans,
+                                    'label': 'oro.importexport.export_template.label'|trans,
                                     'data': {
-                                        'page-component-module': "oroui/js/app/components/view-component",
+                                        'page-component-module': 'oroui/js/app/components/view-component',
                                         'page-component-options': {
                                             'view': 'oroimportexport/js/app/views/export-template-button-view',
                                             'exportTemplateProcessor': config.exportTemplateProcessorAlias,
-                                            'exportTemplateJob': config.exportTemplateJob|default(null)
+                                            'exportTemplateJob': config.exportTemplateJob|default(null),
+                                            'routeOptions': options|default({})
                                         }|json_encode
                                     }
                                 }) }}
@@ -99,8 +109,8 @@
 
         <div class="widget-actions">
                 <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                <button class="btn btn-primary" type="button" id="validate_import_button">{{ 'Validate'|trans }}</button>
-                <button class="btn btn-success" type="button" id="import_button">{{ 'Import'|trans }}</button>
+                <button class="btn btn-primary" type="button" id="validate_import_button">{{ 'oro.importexport.import.validation_label'|trans }}</button>
+                <button class="btn btn-success" type="button" id="import_button">{{ 'oro.importexport.import.label'|trans }}</button>
         </div>
 
     <script type="text/javascript">
@@ -162,4 +172,3 @@
             });
     </script>
 </div>
-

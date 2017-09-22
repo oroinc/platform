@@ -1,0 +1,22 @@
+{% set showImportButton = false %}
+
+{% for configuration in get_import_export_configuration(alias) %}
+    {% if configuration.importProcessorAlias is defined and configuration.importProcessorAlias is not empty and is_granted('oro_importexport_import') %}
+        {% set showImportButton = true %}
+    {% endif %}
+{% endfor %}
+
+{% if showImportButton %}
+    <div class="btn-group"
+         data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ {
+             'view': 'oroimportexport/js/app/views/import-button-view',
+             'alias': alias,
+             'routeOptions': options|default({})
+         }|json_encode }}"
+    >
+        <a type="button" class="btn import-btn icons-holder-text no-hash">
+            <i class="fa-download hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+        </a>
+    </div>
+{% endif %}

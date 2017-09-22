@@ -34,12 +34,13 @@ class GetExportTemplateProcessorChoices extends \Twig_Extension
      *
      * @return array
      */
-    public function getExportProcessorsChoices($entityName)
+    public function getExportProcessorsChoices(string $entityName): array
     {
         $aliases = $this->processorRegistry->getProcessorAliasesByEntity(
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             $entityName
         );
+
         $result = [];
         foreach ($aliases as $alias) {
             $result[$alias] = $this->generateProcessorLabel($alias);
@@ -53,7 +54,7 @@ class GetExportTemplateProcessorChoices extends \Twig_Extension
      *
      * @return string
      */
-    protected function generateProcessorLabel($alias)
+    protected function generateProcessorLabel(string $alias): string
     {
         return sprintf('oro.importexport.export_template.%s', $alias);
     }
