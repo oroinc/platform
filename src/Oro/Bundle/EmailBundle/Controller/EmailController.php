@@ -33,9 +33,7 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 
 /**
@@ -302,7 +300,7 @@ class EmailController extends Controller
      *     "/view-group/{id}",
      *     name="oro_email_view_group",
      *     requirements={"id"="\d+"},
-     *     condition="request.get('_widgetContainer')"
+     *     condition="request !== null && request.get('_widgetContainer')"
      * )
      * @AclAncestor("oro_email_email_view")
      * @Template
@@ -345,7 +343,11 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/create", name="oro_email_email_create", condition="request.get('_widgetContainer')")
+     * @Route(
+     *     "/create",
+     *     name="oro_email_email_create",
+     *     condition="request !== null && request.get('_widgetContainer')"
+     * )
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
@@ -359,7 +361,7 @@ class EmailController extends Controller
      * @Route(
      *     "/reply/{id}", name="oro_email_email_reply",
      *     requirements={"id"="\d+"},
-     *     condition="request.get('_widgetContainer')"
+     *     condition="request !== null && request.get('_widgetContainer')"
      * )
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
@@ -378,7 +380,7 @@ class EmailController extends Controller
      *     "/replyall/{id}",
      *     name="oro_email_email_reply_all",
      *     requirements={"id"="\d+"},
-     *     condition="request.get('_widgetContainer')"
+     *     condition="request !== null && request.get('_widgetContainer')"
      * )
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
@@ -397,7 +399,7 @@ class EmailController extends Controller
      *     "/forward/{id}",
      *     name="oro_email_email_forward",
      *     requirements={"id"="\d+"},
-     *     condition="request.get('_widgetContainer')"
+     *     condition="request !== null && request.get('_widgetContainer')"
      * )
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
@@ -538,7 +540,11 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/widget", name="oro_email_widget_emails", condition="request.get('_widgetContainer')")
+     * @Route(
+     *     "/widget",
+     *     name="oro_email_widget_emails",
+     *     condition="request !== null && request.get('_widgetContainer')"
+     * )
      * @Template
      *
      * @param Request $request
@@ -553,7 +559,11 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/base-widget", name="oro_email_widget_base_emails", condition="request.get('_widgetContainer')")
+     * @Route(
+     *     "/base-widget",
+     *     name="oro_email_widget_base_emails",
+     *     condition="request !== null && request.get('_widgetContainer')"
+     * )
      * @Template
      *
      * @param Request $request

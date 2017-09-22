@@ -11,12 +11,19 @@ class JobControllerTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
     }
 
-    public function testShouldInterruptRootJob()
+    public function testShouldInterruptRootJobAndAllActiveChildrenJobs()
     {
+        $childJob = new Job();
+        $childJob->setName('child-job');
+        $childJob->setStatus(Job::STATUS_RUNNING);
+        $childJob->setCreatedAt(new \DateTime());
+
         $rootJob = new Job();
         $rootJob->setName('root-job');
         $rootJob->setStatus('');
         $rootJob->setCreatedAt(new \DateTime());
+        $rootJob->setChildJobs([$childJob]);
+        $childJob->setRootJob($rootJob);
 
         $this->getEntityManager()->persist($rootJob);
         $this->getEntityManager()->flush();
@@ -40,6 +47,9 @@ class JobControllerTest extends WebTestCase
 
         $this->getEntityManager()->refresh($rootJob);
         $this->assertTrue($rootJob->isInterrupted());
+        $this->assertNotNull($rootJob->getStoppedAt());
+        // only child job will have status cancelled, cause root status is calculated via MQ
+        $this->assertSame(Job::STATUS_CANCELLED, $childJob->getStatus());
     }
 
     /**
