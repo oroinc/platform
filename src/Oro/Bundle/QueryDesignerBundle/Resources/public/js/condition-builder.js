@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'jquery-ui',
-    'oroui/js/dropdown-select'], function($, _, __, mediator) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator',
+    'oroui/js/app/views/dropdown-select-view', 'jquery-ui'], function($, _, __, mediator, DropdownSelectView) {
     'use strict';
 
     /**
@@ -411,22 +411,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
 
         _initConditionOperation: function($condition, operation) {
             operation = operation || this.options.operations[0] || '';
-            $('<div class="operator"/>')
-                .attr('data-value', '')
-                .data('value', operation)
-                .prependTo($condition)
-                .dropdownSelect({
-                    buttonClass: 'btn btn-mini',
-                    options: $condition.is('[condition-type=aggregated-condition-item]') ?
-                        [operation] : this.options.operations,
-                    selected: operation
-                });
+            var dropdownSelectView = new DropdownSelectView({
+                autoRender: true,
+                buttonClass: 'btn btn-mini',
+                selectOptions: $condition.is('[condition-type=aggregated-condition-item]') ?
+                    [operation] : this.options.operations,
+                selectedValue: operation
+            });
+            $condition.prepend(dropdownSelectView.$el);
         },
 
         _onChangeOperator: function(e) {
-            $(e.target)
-                .data('value', e.value)
-                .trigger('changed');
+            $(e.target).trigger('changed');
         },
 
         _onConditionClose: function(e) {
