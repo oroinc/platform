@@ -5,7 +5,6 @@ define(function(require) {
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
-
     DisplayablePriorityView = BaseView.extend({
         autoRender: true,
 
