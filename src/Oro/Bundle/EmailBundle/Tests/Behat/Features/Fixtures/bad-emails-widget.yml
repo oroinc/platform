@@ -1,0 +1,65 @@
+Oro\Bundle\EmailBundle\Entity\EmailBody:
+  emailBody{1..5}:
+    bodyContent: '<script>alert("x");</script><sentences(3, true)>'
+    bodyIsText: false
+    textBody: '<sentences(3, true)>'
+    persistent: true
+
+Oro\Bundle\UserBundle\Entity\User:
+  userCharlie:
+    firstName: '<script>alert("x");</script>Charlie'
+    lastName: '<script>alert("x");</script>Sheen'
+    username (unique): <username()>
+    organization: '@organization'
+    organizations: ['@organization']
+    roles: ['@adminRole']
+    owner: '@business_unit'
+    businessUnits: ['@business_unit']
+    email (unique): <email()>
+    password: password
+    salt: salt
+
+OroEntityProxy\OroEmailBundle\EmailAddressProxy:
+  charlieAddress:
+    owner: '@userCharlie'
+    email: '<script>alert("x");</script>charlie@sheen.com'
+    hasOwner: true
+
+Oro\Bundle\EmailBundle\Entity\EmailRecipient:
+  emailRecipient{1..5}:
+    name: '<script>alert("x");</script> admin@example.com'
+    type: 'to'
+    emailAddress: '@adminEmailAddress'
+    email: '@email<current()>'
+
+Oro\Bundle\EmailBundle\Entity\Email:
+  email1:
+    subject: '<script>alert("x");</script>Merry Christmas'
+    emailBody: '@emailBody1'
+    sentAt: '<dateTimeBetween("-1 day", "now")>'
+    fromName: '<script>alert("x");</script>charlie@sheen.com'
+    fromEmailAddress: '@charlieAddress'
+    internalDate: '<dateTimeBetween("-1 day", "now")>'
+    messageId: fsdfasdf
+    emailUsers: ['@adminEmailUser2']
+  email{2..5}:
+    subject: '<script>alert("x");</script><sentence(6, true)>'
+    emailBody: '@emailBody<current()>'
+    sentAt: '<dateTimeBetween("-200 days", "now")>'
+    fromName: '<script>alert("x");</script>charlie@sheen.com'
+    fromEmailAddress: '@charlieAddress'
+    internalDate: '<dateTimeBetween("-200 days", "-1 day")>'
+    messageId: fsdfasdf
+    emailUsers: ['@adminEmailUser1']
+
+Oro\Bundle\EmailBundle\Entity\EmailUser:
+  adminEmailUser1:
+    email: '@email1'
+    receivedAt: '@email1->sentAt'
+    owner: '@admin'
+    organization: '@organization'
+  adminEmailUser{2..5}:
+    email: '@email<current()>'
+    receivedAt: '@email<current()>->sentAt'
+    owner: '@admin'
+    organization: '@organization'

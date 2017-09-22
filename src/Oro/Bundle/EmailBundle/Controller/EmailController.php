@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
@@ -32,9 +33,10 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 
 /**
@@ -118,7 +120,7 @@ class EmailController extends Controller
             $emailNotificationManager = $this->get('oro_email.manager.notification');
 
             $result = [
-                'emails' => json_encode($emailNotificationManager->getEmails(
+                'emails' => json_encode($this->get('oro_email.manager.notification')->getEmails(
                     $this->getUser(),
                     $currentOrganization,
                     $maxEmailsDisplay,
@@ -162,7 +164,7 @@ class EmailController extends Controller
             $result = [
                 'count' => $emailNotificationManager
                     ->getCountNewEmails($this->getUser(), $currentOrganization, $folderId),
-                'emails' => $emailNotificationManager->getEmails(
+                'emails' => $this->get('oro_email.manager.notification')->getEmails(
                     $this->getUser(),
                     $currentOrganization,
                     $maxEmailsDisplay,

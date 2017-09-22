@@ -9,6 +9,7 @@ use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganiza
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,6 +52,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowDataHelper */
     protected $workflowHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagHelper;
+
     public function setUp()
     {
         $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -82,6 +86,18 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->workflowHelper = $this->getMockBuilder(WorkflowDataHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->htmlTagHelper = $this->getMockBuilder(HtmlTagHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->htmlTagHelper->expects($this->any())
+            ->method('purify')
+            ->will(
+                $this->returnCallback(
+                    function ($value) {
+                        return $value;
+                    }
+                )
+            );
 
         $this->activityListManager = new ActivityListManager(
             $this->securityFacade,
@@ -96,6 +112,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->eventDispatcher,
             $this->workflowHelper
         );
+        $this->activityListManager->setHtmlTagHelper($this->htmlTagHelper);
     }
 
     public function testGetRepository()

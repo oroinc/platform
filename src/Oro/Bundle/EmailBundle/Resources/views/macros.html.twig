@@ -229,7 +229,7 @@
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
 {% macro email_address_text(emailAddress) -%}
-    {{ emailAddress.owner|oro_format_name|default('N/A')|escape }}
+    {{ emailAddress.owner|oro_format_name|default('N/A')|oro_html_purify }}
 {%- endmacro -%}
 
 {#
@@ -238,7 +238,7 @@
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
 {% macro email_address_link(emailAddress, label) -%}
-    {% set label = label|default(_self.email_address_text(emailAddress)) %}
+    {% set label = label|oro_html_purify|default(_self.email_address_text(emailAddress)) %}
     {% set route = oro_entity_route(emailAddress.owner.class) %}
     {% if route is not null %}
         <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
@@ -254,7 +254,7 @@
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
-    {% set label = label|default(emailAddressName|default('N/A')) %}
+    {% set label = label|oro_html_purify|default(emailAddressName|default('N/A')) %}
     {% set route = oro_entity_route(emailAddress.owner.class) %}
     {% if route is not null %}
         <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
@@ -275,7 +275,7 @@
 {% macro email_address(emailAddress, emailAddressName, noLink, knownOnly) -%}
     {% if emailAddress.owner is null -%}
         {% if not knownOnly|default(false) -%}
-            {{ emailAddressName }}
+            {{ emailAddressName|oro_html_purify }}
         {%- endif %}
     {%- else -%}
         {% if noLink|default(false) -%}
@@ -332,7 +332,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title|oro_html_purify }}</a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}
@@ -377,7 +377,7 @@
     {%- endfor -%}
 
     {% for address in addresses -%}
-        {{ address }}
+        {{ address|oro_html_purify }}
         {%- if not loop.last %}; {% endif %}
     {% else %}
         {{ 'N/A'|trans }}
@@ -482,7 +482,7 @@
             {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
         {%- endif %}
     {%- else -%}
-        {%- set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName)) -%}
+        {%- set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName))|oro_html_purify -%}
         {{ _self.email_address(emailAddress, name, noLink, knownOnly) }}
     {%- endif %}
 {%- endmacro %}
@@ -534,19 +534,20 @@
     {% set recipientsCc = [] %}
     {% set recipientsBcc = [] %}
     {% for recipient in email.recipients %}
+        {% set recipientName = oro_get_email_address_name(recipient.name)|oro_html_purify ~ " &lt;" ~ oro_get_email_address(recipient.name)|oro_html_purify ~ "&gt;" %}
         {% if recipient.type == 'to' %}
-            {% set recipientsTo = recipientsTo|merge([recipient.name|e])%}
+            {% set recipientsTo = recipientsTo|merge([recipientName])%}
         {% elseif recipient.type == 'cc' %}
-            {% set recipientsCc = recipientsCc|merge([recipient.name|e])%}
+            {% set recipientsCc = recipientsCc|merge([recipientName])%}
         {% elseif recipient.type == 'bcc' %}
-            {% set recipientsBcc = recipientsBcc|merge([recipient.name|e])%}
+            {% set recipientsBcc = recipientsBcc|merge([recipientName])%}
         {% endif %}
     {% endfor %}
-    {% set fromUserName = oro_get_email_address_name(email.fromName) %}
-    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName) ~ '&gt;' %}
+    {% set fromUserName = oro_get_email_address_name(email.fromName)|oro_html_purify %}
+    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName)|oro_html_purify ~ '&gt;' %}
     {% set data = [{
             label: 'From'|trans,
-            value: fromUserName ? '<b>' ~ fromUserName|e ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
+            value: fromUserName ? '<b>' ~ fromUserName ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
             cssClass: 'autor'
         }, {
             label: 'To'|trans,
@@ -562,7 +563,7 @@
             value: email.sentAt|oro_format_datetime|e
         }, {
             label: 'Subject'|trans,
-            value: email.subject|e
+            value: email.subject|oro_html_purify
     }] %}
     <ul class="form-horizontal">
     {% for item in data %}
