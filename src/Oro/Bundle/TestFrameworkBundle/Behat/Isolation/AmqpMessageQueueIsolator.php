@@ -76,6 +76,7 @@ class AmqpMessageQueueIsolator extends AbstractMessageQueueIsolator
      */
     private function createAmqpStreamConnection()
     {
+        $this->kernel->boot();
         $appContainer = $this->kernel->getContainer();
         $messageQueueParameters = $appContainer->getParameter('message_queue_transport_config');
 
