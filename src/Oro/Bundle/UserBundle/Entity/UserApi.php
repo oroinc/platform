@@ -107,7 +107,7 @@ class UserApi
      */
     public function generateKey()
     {
-        return bin2hex(hash('sha1', uniqid(mt_rand(), true), true));
+        return bin2hex(random_bytes(20));
     }
 
     /**
