@@ -27,11 +27,11 @@ class FileCacheDumper implements DumperInterface
      */
     public function dump()
     {
-       $this->runProcess(sprintf(
-           'tar -cf %scache.tar -C %s .',
-           $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
-           $this->cacheDir
-       ));
+        $this->runProcess(sprintf(
+            'tar -cf %scache.tar -C %s .',
+            $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
+            $this->cacheDir
+        ));
     }
 
     /**
@@ -43,11 +43,11 @@ class FileCacheDumper implements DumperInterface
             'rm -rf %s && mkdir %1$s',
             $this->cacheDir
         ));
-       $this->runProcess(sprintf(
-           'tar -pxf %scache.tar -C %s .',
-           $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
-           $this->cacheDir
-       ));
+        $this->runProcess(sprintf(
+            'tar -pxf %scache.tar -C %s .',
+            $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
+            $this->cacheDir
+        ));
     }
 
     /**

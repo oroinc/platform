@@ -59,7 +59,9 @@ class LoadBadEmailData extends AbstractFixture implements ContainerAwareInterfac
             'organization' => $organization,
         ]);
 
-        $objects = $loader->load($kernel->locateResource('@OroEmailBundle/Tests/Functional/DataFixtures/Data/bad-emails.yml'));
+        $objects = $loader->load(
+            $kernel->locateResource('@OroEmailBundle/Tests/Functional/DataFixtures/Data/bad-emails.yml')
+        );
 
         $persister = new Doctrine($om);
         $persister->persist($objects);
