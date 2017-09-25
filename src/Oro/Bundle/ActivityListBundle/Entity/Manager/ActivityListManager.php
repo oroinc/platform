@@ -28,6 +28,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+
 class ActivityListManager
 {
     /**
@@ -61,6 +63,9 @@ class ActivityListManager
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
 
     /**
      * @param SecurityFacade                   $securityFacade
@@ -98,6 +103,14 @@ class ActivityListManager
         $this->activityListAclHelper = $aclHelper;
         $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param HtmlTagHelper $htmlTagHelper
+     */
+    public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
+    {
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -352,8 +365,8 @@ class ActivityListManager
             'editor'               => $editorName,
             'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
-            'subject'              => $entity->getSubject(),
-            'description'          => $entity->getDescription(),
+            'subject'              => $this->htmlTagHelper->purify($entity->getSubject()),
+            'description'          => $this->htmlTagHelper->purify($entity->getDescription()),
             'data'                 => $data,
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),

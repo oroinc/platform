@@ -46,3 +46,6 @@ services:
             - '@oro_user.manager'
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
+
+    oro_test.alice_fixtures_loader:
+        class: Nelmio\Alice\Fixtures\Loader

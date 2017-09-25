@@ -50,6 +50,8 @@ services:
             - "@oro_activity_list.helper.acl_criteria"
             - "@oro_activity_list.helper.activity_inheritance_targets"
             - "@event_dispatcher"
+        calls:
+            - ["setHtmlTagHelper", ["@oro_ui.html_tag_helper"]]
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%

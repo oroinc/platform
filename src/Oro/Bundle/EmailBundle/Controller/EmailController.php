@@ -10,6 +10,8 @@ use FOS\RestBundle\Util\Codes;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -116,13 +118,13 @@ class EmailController extends Controller
             $emailNotificationManager = $this->get('oro_email.manager.notification');
 
             $result = [
-                'emails' => json_encode($emailNotificationManager->getEmails(
+                'emails' => json_encode($this->get('oro_email.manager.notification')->getEmails(
                     $this->getUser(),
                     $currentOrganization,
                     $maxEmailsDisplay,
                     null
                 )),
-                'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
+                'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
             ];
         }
 
@@ -160,7 +162,7 @@ class EmailController extends Controller
             $result = [
                 'count' => $emailNotificationManager
                     ->getCountNewEmails($this->getUser(), $currentOrganization, $folderId),
-                'emails' => $emailNotificationManager->getEmails(
+                'emails' => $this->get('oro_email.manager.notification')->getEmails(
                     $this->getUser(),
                     $currentOrganization,
                     $maxEmailsDisplay,

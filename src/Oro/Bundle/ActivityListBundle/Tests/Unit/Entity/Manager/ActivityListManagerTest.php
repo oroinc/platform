@@ -51,6 +51,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagHelper;
+
     public function setUp()
     {
         $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -79,6 +82,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->htmlTagHelper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->activityListManager = new ActivityListManager(
             $this->securityFacade,
@@ -92,6 +98,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->inheritanceHelper,
             $this->eventDispatcher
         );
+        $this->activityListManager->setHtmlTagHelper($this->htmlTagHelper);
     }
 
     public function testGetRepository()
@@ -154,6 +161,16 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $provider = new TestActivityProvider();
         $this->provider->expects($this->once())->method('getProviderForEntity')->willReturn($provider);
 
+        $this->htmlTagHelper->expects($this->any())
+            ->method('purify')
+            ->will(
+                $this->returnCallback(
+                    function ($value) {
+                        return $value . '[purified]';
+                    }
+                )
+            );
+
         $this->assertEquals(
             [
                 'id'                   => 105,
@@ -162,8 +179,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'editor'               => 'Editor_String',
                 'editor_id'            => 142,
                 'verb'                 => 'update',
-                'subject'              => 'test_subject',
-                'description'          => 'test_description',
+                'subject'              => 'test_subject[purified]',
+                'description'          => 'test_description[purified]',
                 'data'                 => ['test_data'],
                 'relatedActivityClass' => 'Acme\TestBundle\Entity\TestEntity',
                 'relatedActivityId'    => 127,

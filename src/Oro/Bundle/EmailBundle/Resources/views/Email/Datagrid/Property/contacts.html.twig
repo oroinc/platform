@@ -23,7 +23,7 @@
         </span>
     {% endif %}
 {% if sender is defined %}
-    {{ EA.wrapTextToTag(sender|truncate(22, false, '...'), isNew) }}
+    {{ EA.wrapTextToTag(sender|oro_html_purify|truncate(22, false, '...'), isNew) }}
 {% elseif (recipients is defined and recipients|length > 0 and recipients|length < 3) %}
     {{ EA.wrapTextToTag(EA.email_participants_name(recipients, true, false), isNew) }}
 {% else %}
