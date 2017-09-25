@@ -82,6 +82,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.query_validator }
 
+    oro_query_designer.validator.definition_query_validator:
+        class: Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator
+        arguments:
+            - '@oro_query_designer.entity_field_list_provider'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_query_designer.definition_query_validator }
+
     oro_query_designer.validator.grouping_validator:
         class: %oro_query_designer.validator.grouping_validator.class%
         arguments:

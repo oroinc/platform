@@ -17,7 +17,7 @@ class OroReportBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_0';
+        return 'v2_0_1';
     }
 
     /**
