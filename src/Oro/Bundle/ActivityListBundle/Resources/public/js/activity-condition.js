@@ -1,12 +1,11 @@
 define([
     'jquery',
     'underscore',
-    'base64',
     'orotranslation/js/translator',
     'oro/filter/choice-filter',
     'oro/filter/multiselect-filter',
     'oroquerydesigner/js/field-condition'
-], function($, _, base64, __, ChoiceFilter, MultiSelectFilter) {
+], function($, _, __, ChoiceFilter, MultiSelectFilter) {
     'use strict';
 
     $.widget('oroactivity.activityCondition', $.oroquerydesigner.fieldCondition, {
@@ -36,7 +35,8 @@ define([
                     criterion: {
                         data: {
                             filterType: 'hasActivity',
-                            activityType: {}
+                            activityType: {},
+                            activityFieldName: ''
                         }
                     }
                 }, this.element.data('value'));
@@ -85,7 +85,7 @@ define([
                 }, this));
 
                 this._updateFieldChoice();
-                if (data && data.columnName) {
+                if (data && data.criterion && data.criterion.data && data.criterion.data.activityFieldName) {
                     this.element.one('changed', _.bind(function() {
                         this.filter.setValue(data.criterion.data.filter.data);
                         this.element.data('value', {
@@ -93,9 +93,9 @@ define([
                                 data: data.criterion.data.filter.data
                             }
                         });
-                        this._renderFilter(base64.decode(data.columnName));
+                        this._renderFilter(data.criterion.data.activityFieldName);
                     }, this));
-                    this.selectField(base64.decode(data.columnName));
+                    this.selectField(data.criterion.data.activityFieldName);
                 }
 
                 this.activityFilter.on('update', _.bind(this._onUpdate, this));
@@ -244,7 +244,8 @@ define([
                     filterType: this.$activityChoice.find(':input').val(),
                     activityType: this.typeFilter.getValue(),
                     filter: filter,
-                    entityClassName: $(this.options.entitySelector).val()
+                    entityClassName: $(this.options.entitySelector).val(),
+                    activityFieldName: this.element.find('input.select').inputWidget('val')
                 }
             };
         },
@@ -254,7 +255,6 @@ define([
 
             if (this.filter && !this.filter.isEmptyValue()) {
                 value = {
-                    columnName: base64.encode(this.element.find('input.select').inputWidget('val')),
                     criterion: this._getFilterCriterion()
                 };
             } else {

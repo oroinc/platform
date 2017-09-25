@@ -626,7 +626,7 @@ abstract class AbstractQueryConverter
                 $context->checkOperator($token);
                 $this->processOperator($token);
                 $context->setLastTokenType(FiltersParserContext::OPERATOR_TOKEN);
-            } elseif (is_array($token) && isset($token['columnName'])) {
+            } elseif (is_array($token) && isset($token['criterion'])) {
                 $context->checkFilter($token);
                 $this->processFilter($token);
                 $context->setLastTokenType(FiltersParserContext::FILTER_TOKEN);
@@ -658,7 +658,7 @@ abstract class AbstractQueryConverter
      */
     protected function processFilter($filter)
     {
-        $columnName     = $filter['columnName'];
+        $columnName     = array_key_exists('columnName', $filter) ? $filter['columnName'] : '';
         $fieldName      = $this->getFieldName($columnName);
         $columnAliasKey = $this->buildColumnAliasKey($columnName);
         $tableAlias     = $this->getTableAliasForColumn($columnName);

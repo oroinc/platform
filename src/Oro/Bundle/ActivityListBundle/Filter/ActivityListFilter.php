@@ -57,6 +57,11 @@ class ActivityListFilter extends EntityFilter
     protected $datagridHelperLink;
 
     /**
+     * @var array
+     */
+    private $data;
+
+    /**
      * @param FormFactoryInterface      $factory
      * @param FilterUtility             $util
      * @param ActivityAssociationHelper $activityAssociationHelper
@@ -122,6 +127,7 @@ class ActivityListFilter extends EntityFilter
 
         $type = $data['filterType'];
         unset($data['filterType']);
+        $this->data = $data;
 
         $qb = $ds->getQueryBuilder();
 
@@ -136,6 +142,7 @@ class ActivityListFilter extends EntityFilter
         $this->applyFilterToClause($ds, $activityPart);
 
         $this->copyParameters($activityQb, $qb);
+        $this->data = [];
     }
 
     /**
@@ -301,7 +308,6 @@ class ActivityListFilter extends EntityFilter
             ->setDefinition(json_encode([
                 'filters' => [
                     [
-                        'columnName' => $this->getEntityField(),
                         'criterion' => $data['filter'],
                     ],
                 ],
@@ -366,14 +372,13 @@ class ActivityListFilter extends EntityFilter
      */
     protected function getEntityField()
     {
-        list(, $field) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
-
-        return base64_decode($field);
+        return $this->data['activityFieldName'];
     }
 
     /**
      * @return string
      */
+
     protected function getField()
     {
         $fieldName = $this->getEntityField();
