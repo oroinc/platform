@@ -20,7 +20,7 @@ class SearchNumberFilter extends AbstractFilter
             throw new \RuntimeException('Invalid filter datasource adapter provided: '.get_class($ds));
         }
 
-        return $this->applyRestrictions($ds, $data);
+        return $this->applyRestrictions($ds, $this->parseData($data));
     }
 
     /**
@@ -85,7 +85,7 @@ class SearchNumberFilter extends AbstractFilter
      */
     protected function getFieldName(array $data)
     {
-        return "decimal.".$this->get(FilterUtility::DATA_NAME_KEY);
+        return $this->get(FilterUtility::DATA_NAME_KEY);
     }
 
     /**
@@ -96,6 +96,9 @@ class SearchNumberFilter extends AbstractFilter
         $metadata = parent::getMetadata();
         $formView = $this->getForm()->createView();
         $metadata['formatterOptions'] = $formView->vars['formatter_options'];
+        $metadata['arraySeparator'] = $formView->vars['array_separator'];
+        $metadata['arrayOperators'] = $formView->vars['array_operators'];
+        $metadata['dataType'] = $formView->vars['data_type'];
 
         return $metadata;
     }

@@ -11,6 +11,8 @@ use Oro\Bundle\UIBundle\Route\Router;
 
 /**
  * @group dist
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AttributeControllerTest extends AbstractConfigControllerTest
 {
@@ -269,7 +271,7 @@ class AttributeControllerTest extends AbstractConfigControllerTest
 
     public function testRequiredProperties()
     {
-        $form = $this->processFirstStep('boolean', 'newBoolean');
+        $form = $this->processFirstStep('string', 'newString');
 
         $formValues = $form->getPhpValues();
         $formValues['input_action'] = 'save_and_stay';
@@ -292,6 +294,10 @@ class AttributeControllerTest extends AbstractConfigControllerTest
             ],
             [
                 'scope' => 'attribute',
+                'code' => 'searchable',
+            ],
+            [
+                'scope' => 'attribute',
                 'code' => 'filterable',
             ],
             [
@@ -302,11 +308,11 @@ class AttributeControllerTest extends AbstractConfigControllerTest
 
         foreach ($requiredProperties as $requiredProperty) {
             $filter = sprintf(
-                "//div[@class='control-group hide control-group-choice']//*[@name='oro_entity_config_type[%s][%s]']",
+                "//div[contains(@class,'control-group-choice')]//*[@name='oro_entity_config_type[%s][%s]']",
                 $requiredProperty['scope'],
                 $requiredProperty['code']
             );
-            $this->assertEquals(1, $crawler->filterXPath($filter)->count());
+            $this->assertEquals(1, $crawler->filterXPath($filter)->count(), $requiredProperty['code']);
         }
     }
 }
