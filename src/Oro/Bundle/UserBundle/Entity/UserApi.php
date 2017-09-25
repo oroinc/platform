@@ -30,7 +30,7 @@ class UserApi
     /**
      * @var string
      *
-     * @ORM\Column(name="api_key", type="string", unique=true, length=255, nullable=false)
+     * @ORM\Column(name="api_key", type="crypted_string", unique=true, length=255, nullable=false)
      */
     protected $apiKey;
 
