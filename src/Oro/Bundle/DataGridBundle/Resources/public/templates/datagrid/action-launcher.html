@@ -18,10 +18,6 @@
     title="<%= title %>"
     <% if (links) { %> data-toggle="dropdown"<% } %>>
 
-    <% if (launcherCounter) { %>
-        <span class="hidden<%= classNameCounter ? " " + classNameCounter : "" %>" data-role="action-counter"></span>
-    <% } %>
-
     <% if (launcherMode == 'icon-text') { %>
         <i class="fa-<%= icon %> hide-text"></i>
         <%= label %>

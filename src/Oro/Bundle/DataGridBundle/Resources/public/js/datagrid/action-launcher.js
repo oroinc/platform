@@ -55,17 +55,8 @@ define(function(require) {
         /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
         launcherMode: '',
 
-        /** @property {Boolean} */
-        launcherCounter: false,
-
         /** @property {String} */
         className: undefined,
-
-        /** @property {String} */
-        classNameCounter: '',
-
-        /** @property {String} */
-        counterSelector: '[data-role="action-counter"]',
 
         /** @property {String} */
         link: '#',
@@ -141,14 +132,6 @@ define(function(require) {
                 this.launcherMode = opts.launcherMode;
             }
 
-            if (opts.launcherCounter) {
-                this.launcherCounter = opts.launcherCounter;
-            }
-
-            if (opts.classNameCounter) {
-                this.classNameCounter = opts.classNameCounter;
-            }
-
             if (opts.link) {
                 this.link = opts.link;
             }
@@ -215,8 +198,6 @@ define(function(require) {
                 className: this.className,
                 iconClassName: this.iconClassName,
                 launcherMode: this.launcherMode,
-                launcherCounter: this.launcherCounter,
-                classNameCounter: this.classNameCounter,
                 link: this.link,
                 links: this.links,
                 action: this.action,
@@ -236,9 +217,7 @@ define(function(require) {
             var $el = $(this.template(this.getTemplateData()));
             this.setElement($el);
 
-            if (this.launcherCounter) {
-                this.$launcherCounter = this.$(this.counterSelector);
-            }
+            this.trigger('render');
 
             return this;
         },
@@ -301,17 +280,6 @@ define(function(require) {
             this.enabled = true;
             this.$el.removeClass('disabled');
             return this;
-        },
-
-        /**
-         * Count setter
-         */
-        setCount: function(count) {
-            if (this.launcherCounter) {
-                this.$launcherCounter
-                    .html(count || '')
-                    .toggleClass('hidden', !count);
-            }
         }
     });
 
