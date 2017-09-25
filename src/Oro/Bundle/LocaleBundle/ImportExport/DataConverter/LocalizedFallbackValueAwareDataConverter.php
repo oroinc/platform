@@ -72,6 +72,42 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
     /**
      * {@inheritdoc}
      */
+    protected function getRelatedEntityRules(
+        $entityName,
+        $singleRelationDeepLevel,
+        $multipleRelationDeepLevel,
+        $field,
+        $fieldHeader,
+        $fieldOrder
+    ) {
+        if (!is_a($field['related_entity_name'], $this->localizedFallbackValueClassName, true)) {
+            return parent::getRelatedEntityRules(
+                $entityName,
+                $singleRelationDeepLevel,
+                $multipleRelationDeepLevel,
+                $field,
+                $fieldHeader,
+                $fieldOrder
+            );
+        }
+
+        $localizationCodes = $this->getNames();
+        $targetField = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'fallback_field', 'string');
+        $fieldName = $field['name'];
+
+        list($rules, $backendHeaders) = $this->processLocalizationCodes(
+            $fieldOrder,
+            $localizationCodes,
+            $fieldName,
+            $targetField
+        );
+
+        return $rules;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getRelatedEntityRulesAndBackendHeaders(
         $entityName,
         $singleRelationDeepLevel,
@@ -84,50 +120,13 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
             $localizationCodes = $this->getNames();
             $targetField = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'fallback_field', 'string');
             $fieldName = $field['name'];
-            $rules = [];
-            $backendHeaders = [];
 
-            $subOrder = 0;
-            foreach ($localizationCodes as $localizationCode) {
-                $frontendHeader = $this->getHeader(
-                    $fieldName,
-                    $localizationCode,
-                    self::FIELD_FALLBACK,
-                    $this->relationDelimiter
-                );
-                $backendHeader = $this->getHeader(
-                    $fieldName,
-                    $localizationCode,
-                    self::FIELD_FALLBACK,
-                    $this->convertDelimiter
-                );
-                $rules[$frontendHeader] = [
-                    'value' => $backendHeader,
-                    'order' => $fieldOrder,
-                    'subOrder' => $subOrder++
-                ];
-                $backendHeaders[] = $rules[$frontendHeader];
-
-                $frontendHeader = $this->getHeader(
-                    $fieldName,
-                    $localizationCode,
-                    self::FIELD_VALUE,
-                    $this->relationDelimiter
-                );
-                $backendHeader = $this->getHeader(
-                    $fieldName,
-                    $localizationCode,
-                    $targetField,
-                    $this->convertDelimiter
-                );
-
-                $rules[$frontendHeader] = [
-                    'value' => $backendHeader,
-                    'order' => $fieldOrder,
-                    'subOrder' => $subOrder++
-                ];
-                $backendHeaders[] = $rules[$frontendHeader];
-            }
+            list($rules, $backendHeaders) = $this->processLocalizationCodes(
+                $fieldOrder,
+                $localizationCodes,
+                $fieldName,
+                $targetField
+            );
 
             return [$rules, $backendHeaders];
         }
@@ -153,5 +152,66 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
     {
         return $fieldName . $delimiter . LocalizationCodeFormatter::formatName($identity) .
             $delimiter . $targetFieldName;
+    }
+
+    /**
+     * @param int $fieldOrder
+     * @param array $localizationCodes
+     * @param string $fieldName
+     * @param string $targetField
+     * @return array
+     */
+    protected function processLocalizationCodes(
+        $fieldOrder,
+        array $localizationCodes,
+        $fieldName,
+        $targetField
+    ) {
+        $rules = [];
+        $backendHeaders = [];
+        $subOrder = 0;
+
+        foreach ($localizationCodes as $localizationCode) {
+            $frontendHeader = $this->getHeader(
+                $fieldName,
+                $localizationCode,
+                self::FIELD_FALLBACK,
+                $this->relationDelimiter
+            );
+            $backendHeader = $this->getHeader(
+                $fieldName,
+                $localizationCode,
+                self::FIELD_FALLBACK,
+                $this->convertDelimiter
+            );
+            $rules[$frontendHeader] = [
+                'value' => $backendHeader,
+                'order' => $fieldOrder,
+                'subOrder' => $subOrder++
+            ];
+            $backendHeaders[] = $rules[$frontendHeader];
+
+            $frontendHeader = $this->getHeader(
+                $fieldName,
+                $localizationCode,
+                self::FIELD_VALUE,
+                $this->relationDelimiter
+            );
+            $backendHeader = $this->getHeader(
+                $fieldName,
+                $localizationCode,
+                $targetField,
+                $this->convertDelimiter
+            );
+
+            $rules[$frontendHeader] = [
+                'value' => $backendHeader,
+                'order' => $fieldOrder,
+                'subOrder' => $subOrder++
+            ];
+            $backendHeaders[] = $rules[$frontendHeader];
+        }
+
+        return [$rules, $backendHeaders];
     }
 }

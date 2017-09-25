@@ -40,13 +40,6 @@ class JobExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function onCreateDelayed(Job $job, $createResult)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function onPreRunDelayed(Job $job)
     {
         $this->consumerState->setJob($job);

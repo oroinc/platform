@@ -89,17 +89,14 @@ class ImportCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException('Email is required for the validation!');
         }
 
-        $this->getMessageProducer()->send(
-            Topics::PRE_CLI_IMPORT,
-            [
-                'fileName' => $fileName,
-                'originFileName' => $originFileName,
-                'notifyEmail' => $email,
-                'jobName' =>  $jobName,
-                'processorAlias' => $processorAlias,
-                'process' => $processor,
-            ]
-        );
+        $this->getMessageProducer()->send(Topics::PRE_CLI_IMPORT, [
+            'fileName' => $fileName,
+            'originFileName' => $originFileName,
+            'notifyEmail' => $email,
+            'jobName' =>  $jobName,
+            'processorAlias' => $processorAlias,
+            'process' => $processor,
+        ]);
         
         if ($email) {
             $output->writeln('Scheduled successfully. The result will be sent to the email');

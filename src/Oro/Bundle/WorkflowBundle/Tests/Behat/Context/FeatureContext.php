@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Behat\Context;
 
+use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -79,5 +80,36 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         );
 
         return $workflows->isEmpty() ? null : $workflows->first();
+    }
+
+    /**
+     * Asserts that provided workflow permissions allowed on role view page
+     *
+     * Example: Then the role has following active workflow permissions:
+     *            | Test Workflow | View Workflow:Global | Perform transitions:Global |
+     *
+     * @Then /^the role has following active workflow permissions:$/
+     *
+     * @param TableNode $table
+     */
+    public function iSeeFollowingWorkflowPermissions(TableNode $table)
+    {
+        /** @var UserRoleViewForm $userRoleForm */
+        $userRoleForm = $this->elementFactory->createElement('User Role View Workflow Permissions');
+        $permissionsArray = $userRoleForm->getPermissions();
+        foreach ($table->getRows() as $row) {
+            $workflowName = array_shift($row);
+
+            foreach ($row as $cell) {
+                list($role, $value) = explode(':', $cell);
+                self::assertNotEmpty($permissionsArray[$workflowName][$role]);
+                $expected = $permissionsArray[$workflowName][$role];
+                self::assertEquals(
+                    $expected,
+                    $value,
+                    "Failed asserting that workflow permission $expected equals $value for $workflowName"
+                );
+            }
+        }
     }
 }

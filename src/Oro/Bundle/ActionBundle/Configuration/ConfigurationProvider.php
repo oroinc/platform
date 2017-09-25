@@ -106,6 +106,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
             $configuration = $this->cache->fetch($this->rootNode);
         } else {
             $configuration = $this->resolveConfiguration($errors);
+            $this->checkConfiguration($configuration);
 
             if (!$ignoreCache) {
                 $this->clearCache();
@@ -147,5 +148,29 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
         }
 
         return $data;
+    }
+
+    /**
+     * This function provides backward compatibility with original logic of Symfony`s PhpDumper.
+     * After that function all strings that have escaped % like '%%' should be replaced by '%'.
+     *
+     * @param mixed $config
+     */
+    private function checkConfiguration(&$config)
+    {
+        if (is_array($config)) {
+            $new = [];
+
+            foreach ($config as $key => $value) {
+                $this->checkConfiguration($key);
+                $this->checkConfiguration($value);
+
+                $new[$key] = $value;
+            }
+
+            $config = $new;
+        } elseif (is_string($config)) {
+            $config = str_replace('%%', '%', $config);
+        }
     }
 }

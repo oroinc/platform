@@ -1137,7 +1137,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
      * @param bool $isEntity
      * @param bool $expected
      */
-    public function testSupports($id, $type, $class, $isEntity, $expected)
+    public function testSupports($id, $type, $class, $isEntity, $isProtectedEntity, $expected)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver $entityClassResolverMock */
         $entityClassResolverMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
@@ -1147,16 +1147,16 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityClass')
             ->with($class)
             ->willReturn($class);
-        $entityClassResolverMock->expects($this->once())
-            ->method('isEntity')
-            ->with($class)
-            ->willReturn($expected);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|EntitySecurityMetadataProvider $entityMetadataProvider */
         $entityMetadataProvider = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $entityMetadataProvider->expects($this->once())
+            ->method('isProtectedEntity')
+            ->with($class)
+            ->willReturn($isProtectedEntity);
         $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
             ->disableOriginalConstructor()
             ->getMock();
@@ -1187,6 +1187,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'type' => '\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => false,
+                'isProtectedEntity' => false,
                 'expected' => false
             ],
             [
@@ -1194,6 +1195,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'type' => '\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
+                'isProtectedEntity' => true,
                 'expected' => true
             ],
             [
@@ -1201,6 +1203,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'type' => '@\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
+                'isProtectedEntity' => true,
                 'expected' => true
             ],
             [
@@ -1208,8 +1211,17 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'type' => 'group@\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
+                'isProtectedEntity' => true,
                 'expected' => true
-            ]
+            ],
+            [
+                'id' => 'entity',
+                'type' => '@\stdClass',
+                'class' => '\stdClass',
+                'isEntity' => true,
+                'isProtectedEntity' => false,
+                'expected' => false
+            ],
         ];
     }
 

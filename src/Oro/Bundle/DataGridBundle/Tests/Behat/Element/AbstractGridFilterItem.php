@@ -12,7 +12,7 @@ abstract class AbstractGridFilterItem extends Element
     public function open()
     {
         if (!$this->isOpen()) {
-            $this->find('css', '.filter-criteria-selector span.caret')->click();
+            $this->find('css', '.filter-criteria-selector')->click();
         }
     }
 

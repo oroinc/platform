@@ -2334,7 +2334,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ['name'],
             ['name'],
             ['name'],
-            ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+            [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'on_delete' => 'CASCADE'
+                ]
+            ]
         );
 
         $relationKey = 'manyToOne|Acme\AcmeBundle\Entity\Entity1|Acme\AcmeBundle\Entity\Entity2|room';
@@ -2349,8 +2354,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'Acme\AcmeBundle\Entity\Entity2',
                                 'users',
                                 'oneToMany'
-                            )
-                        ]
+                            ),
+                            'relation.' . $relationKey . '.on_delete' => 'CASCADE'
+                        ],
+
                     ],
                     'fields' => [
                         'room' => [
@@ -2384,7 +2391,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'bidirectional' => false,
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
-                                    'target_grid'     => ['name']
+                                    'target_grid'     => ['name'],
+                                    'on_delete'       => 'CASCADE'
                                 ]
                             ],
                             'type'    => 'oneToMany',
@@ -2437,7 +2445,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'Acme\AcmeBundle\Entity\Entity1',
                                 'users',
                                 'oneToMany'
-                            )
+                            ),
+                            'relation.' . $selfRelationKey . '.on_delete' => 'SET NULL'
                         ]
                     ],
                     'fields'  => [

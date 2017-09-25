@@ -8,7 +8,6 @@ use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
@@ -32,15 +31,11 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'Got invalid message',
-                ['parameters' => ['gridName' => 'name'], 'format' => 'csv'],
+                ['format' => 'csv'],
             ],
             [
                 'Got invalid message',
-                ['securityToken' => 'token', 'format' => 'csv'],
-            ],
-            [
-                'Got invalid message',
-                ['securityToken' => 'token', 'parameters' => ['gridName' => 'name']],
+                ['parameters' => ['gridName' => 'name']],
             ],
         ];
     }
@@ -62,7 +57,6 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new PreExportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createMessageProducerMock(),
-            $this->createTokenSerializerMock(),
             $this->createTokenStorageMock(),
             $this->createDependentJobServiceMock(),
             $logger,
@@ -71,51 +65,6 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode($messageBody));
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(PreExportMessageProcessor::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageAndLogCriticalIfSecurityTokenCannotBeSet()
-    {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with($this->stringContains('Cannot set security token'))
-        ;
-
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('serialized_security_token'))
-            ->willReturn(null)
-        ;
-
-        $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage
-            ->expects($this->never())
-            ->method('setToken')
-        ;
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'format' => 'csv',
-            'parameters' => ['gridName' => 'grid_name'],
-            'securityToken' => 'serialized_security_token',
-        ]));
-
-        $processor = new PreExportMessageProcessor(
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $tokenSerializer,
-            $tokenStorage,
-            $this->createDependentJobServiceMock(),
-            $logger,
-            100
-        );
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -132,7 +81,6 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $message->setBody(json_encode([
             'format' => 'csv',
             'parameters' => ['gridName' => 'grid_name'],
-            'securityToken' => 'token',
         ]));
         $message->setMessageId(123);
 
@@ -194,20 +142,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($user)
         ;
 
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('token'))
-            ->willReturn($token)
-        ;
-
         $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
         $tokenStorage
             ->expects($this->exactly(2))
             ->method('getToken')
@@ -217,7 +152,6 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new PreExportMessageProcessor(
             $jobRunner,
             $this->createMessageProducerMock(),
-            $tokenSerializer,
             $tokenStorage,
             $dependentJob,
             $this->createLoggerMock(),
@@ -318,14 +252,6 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createDependentJobServiceMock()
     {
         return $this->createMock(DependentJobService::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
-     */
-    private function createTokenSerializerMock()
-    {
-        return $this->createMock(TokenSerializerInterface::class);
     }
 
     /**

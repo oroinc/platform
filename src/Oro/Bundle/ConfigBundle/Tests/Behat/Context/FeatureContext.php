@@ -228,4 +228,32 @@ class FeatureContext extends OroFeatureContext implements
             }
         }
     }
+
+    /**
+     * Expand all items on sidebar in configuration menu
+     *
+     * Example: Then I expand all on configuration sidebar
+     *
+     * @When /^(?:|I )expand all on configuration sidebar$/
+     */
+    public function expandAllOnConfigurationSidebar()
+    {
+        /** @var SidebarConfigMenu $sidebarConfigMenu */
+        $sidebarConfigMenu = $this->createElement('SidebarConfigMenu');
+        $sidebarConfigMenu->expandAll();
+    }
+
+    /**
+     * Collapse all items on sidebar in configuration menu
+     *
+     * Example: Then I collapse all on configuration sidebar
+     *
+     * @When /^(?:|I )collapse all on configuration sidebar$/
+     */
+    public function collapseAllOnConfigurationSidebar()
+    {
+        /** @var SidebarConfigMenu $sidebarConfigMenu */
+        $sidebarConfigMenu = $this->createElement('SidebarConfigMenu');
+        $sidebarConfigMenu->collapseAll();
+    }
 }

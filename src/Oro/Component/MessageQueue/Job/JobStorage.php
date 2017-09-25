@@ -36,7 +36,7 @@ class JobStorage
     /**
      * @param int $id
      *
-     * @return Job
+     * @return Job|null
      */
     public function findJobById($id)
     {

@@ -22,6 +22,7 @@ class ActivityListFilterType extends AbstractType
         $builder
             ->add('filter')
             ->add('entityClassName')
+            ->add('activityFieldName')
             ->add('activityType', null, [
                 'constraints' => [
                     new Assert\Collection([

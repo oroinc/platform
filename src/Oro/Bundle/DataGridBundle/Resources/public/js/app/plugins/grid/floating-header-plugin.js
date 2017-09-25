@@ -184,7 +184,9 @@ define(function(require) {
 
             this.$grid.css({borderRight: 'none'});
 
-            this.$el.addClass('floatThead');
+            if (this.currentFloatTheadMode !== 'default') {
+                this.$el.addClass('floatThead');
+            }
             this.$grid.css({
                 width: totalWidth
             });
@@ -297,8 +299,11 @@ define(function(require) {
          * (hiding/showing and sorting columns)
          */
         onGridContentUpdate: function() {
-            this.$grid.find('.thead-sizing').remove();
-            this._ensureTHeadSizing();
+            var $theadSizingElement = this.$grid.find('.thead-sizing');
+            if ($theadSizingElement.length) {
+                $theadSizingElement.remove();
+                this._ensureTHeadSizing();
+            }
             this.fixHeaderCellWidth();
         },
 

@@ -140,7 +140,7 @@ class DoctrineIsolator implements IsolatorInterface
      * @param array $tags
      * @return array
      */
-    private function getFixtureFiles(array $tags)
+    public function getFixtureFiles(array $tags)
     {
         if (!$tags) {
             return [];

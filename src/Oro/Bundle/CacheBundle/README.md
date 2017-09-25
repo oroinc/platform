@@ -1,6 +1,8 @@
 OroCacheBundle
 ===============
 
+*Note:* This article is published in the Oro documentation library.
+
 The `OroCacheBundle` is responsible for operations with various kinds of caches.
 
 Table of Contents
@@ -8,6 +10,7 @@ Table of Contents
  - [Abstract cache services](#abstract-cache-services)
  - [APC cache](#apc-cache)
  - [Warm up config cache](#warm-up-config-cache)
+ - [Caching of Symfony Validation rules](#caching-of-symfony-validation-rules)
 
 Abstract cache services
 -----------------------

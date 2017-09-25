@@ -324,4 +324,117 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
         self::assertInstanceOf(Configuration::class, $configuration);
     }
+
+    public function testSetPersistenceServices()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'persistent_services' => ['first_service', 'second_service']
+                ]
+            ],
+            $container
+        );
+
+        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_reset_extension');
+        $this->assertEquals(
+            [
+                'setPersistentServices',
+                [
+                    ['first_service', 'second_service']
+                ]
+            ],
+            $extensionDefinition->getMethodCalls()[0]
+        );
+    }
+
+    public function testSetPersistenceProcessors()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'persistent_processors' => ['first_processor']
+                ]
+            ],
+            $container
+        );
+
+        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_reset_extension');
+        $this->assertEquals(
+            [
+                'setPersistentProcessors',
+                [
+                    ['first_processor']
+                ]
+            ],
+            $extensionDefinition->getMethodCalls()[0]
+        );
+    }
+
+    public function testSetSecurityAgnosticTopics()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'client' => null,
+                    'security_agnostic_topics' => ['some_topic']
+                ]
+            ],
+            $container
+        );
+
+        $driverFactoryDefinition = $container->getDefinition('oro_message_queue.client.security_aware_driver_factory');
+        $this->assertEquals(
+            ['some_topic'],
+            $driverFactoryDefinition->getArgument(1)
+        );
+    }
+
+    public function testSetSecurityAgnosticProcessors()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'security_agnostic_processors' => ['some_processor']
+                ]
+            ],
+            $container
+        );
+
+        $driverFactoryDefinition = $container->getDefinition('oro_message_queue.consumption.security_aware_extension');
+        $this->assertEquals(
+            ['some_processor'],
+            $driverFactoryDefinition->getArgument(0)
+        );
+    }
 }

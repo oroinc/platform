@@ -12,7 +12,7 @@ Feature: Display settings manage
     Given I login as administrator
     And I should see an "Recent Emails" element
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Show recent emails | false |
     And I save form
@@ -20,7 +20,7 @@ Feature: Display settings manage
 
   Scenario: Disable WYSIWYG editor
     Given I go to System/Configuration
-    And click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Enable WYSIWYG editor | true |
     And save form
@@ -28,7 +28,7 @@ Feature: Display settings manage
     And press "Create Calendar event"
     Then I should see an "WYSIWYG editor" element
     But I go to System/Configuration
-    And click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Enable WYSIWYG editor | false |
     And save form
@@ -41,7 +41,7 @@ Feature: Display settings manage
     Then per page amount should be 25
     And records in current page grid should be 25
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Items per Page by Default | 10 |
     And I save form
@@ -53,7 +53,7 @@ Feature: Display settings manage
     When I go to Activities/Cases
     Then I see that grid has scrollable header
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Lock headers in grids | off |
     And I save form
@@ -65,7 +65,7 @@ Feature: Display settings manage
     And I click view 1 in grid
     Then I should see an "Entity pagination" element
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Record Pagination | off |
     And I save form
@@ -75,7 +75,7 @@ Feature: Display settings manage
 
   Scenario: Change record pagination limit
     When I go to System/Configuration
-    And click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Record Pagination | on |
     And I save form
@@ -83,7 +83,7 @@ Feature: Display settings manage
     And I click view 1 in grid
     Then I should see an "Entity pagination" element
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Record Pagination limit | 20 |
     And I save form
@@ -97,7 +97,7 @@ Feature: Display settings manage
     Then there is 10 records in activity list
     And Activity List must be sorted descending by updated date
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Sort direction            | Ascending |
       | Items Per Page By Default | 25        |
@@ -107,7 +107,7 @@ Feature: Display settings manage
     Then there is 13 records in activity list
     And Activity List must be sorted ascending by updated date
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Sort by field             | Created date |
       | Sort direction            | Descending   |
@@ -129,7 +129,7 @@ Feature: Display settings manage
   Scenario: Change sidebar settings
     Given right sidebar is visible
     When I go to System/Configuration
-    And click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Enable left sidebar  | Yes |
       | Enable right sidebar | No  |
@@ -137,7 +137,7 @@ Feature: Display settings manage
     Then right sidebar is out of sight
     And left sidebar is visible
     When I go to System/Configuration
-    And click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And I fill "System Config Form" with:
       | Enable left sidebar  | Yes |
       | Enable right sidebar | Yes |
@@ -161,7 +161,7 @@ Feature: Display settings manage
 
   Scenario: Change taxonomy color settings
     When I go to System/Configuration
-    And I click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And fill "System Config Form" with:
       | Taxonomy Colors | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
     And save form
@@ -174,7 +174,7 @@ Feature: Display settings manage
     When I go to Reports & Segments/Calendar Events/Test Report
     Then I should not see "Show SQL Query"
     When I go to System/Configuration
-    And click "Display settings"
+    And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     And fill "System Config Form" with:
       | Display SQL in Reports and Segments | true |
     And save form

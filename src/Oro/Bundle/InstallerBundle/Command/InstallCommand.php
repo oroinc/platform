@@ -111,17 +111,21 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             );
             $output->writeln('');
 
-            return;
+            return 0;
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
-        $this
-            ->checkStep($input, $output)
-            ->prepareStep($input, $output)
-            ->loadDataStep($commandExecutor, $output)
-            ->finalStep($commandExecutor, $output, $input, $skipAssets);
+        try {
+            $this
+                ->checkStep($input, $output)
+                ->prepareStep($input, $output)
+                ->loadDataStep($commandExecutor, $output)
+                ->finalStep($commandExecutor, $output, $input, $skipAssets);
+        } catch (\Exception $exception) {
+            return $commandExecutor->getLastCommandExitCode();
+        }
 
         $output->writeln('');
         $output->writeln(
@@ -148,6 +152,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'https://www.orocrm.com/documentation/current/book/installation#activating-background-tasks' .
             '</comment></info>.'
         );
+
+        return 0;
     }
 
     /**

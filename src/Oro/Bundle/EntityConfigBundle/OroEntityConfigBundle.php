@@ -7,9 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappi
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\AttributeBlockTypeMapperPass;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceMethodPass;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 
 class OroEntityConfigBundle extends Bundle
@@ -21,9 +19,10 @@ class OroEntityConfigBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ServiceMethodPass);
-        $container->addCompilerPass(new EntityConfigPass);
-        $container->addCompilerPass(new AttributeBlockTypeMapperPass());
+        $container->addCompilerPass(new Compiler\ServiceMethodPass);
+        $container->addCompilerPass(new Compiler\EntityConfigPass);
+        $container->addCompilerPass(new Compiler\AttributeBlockTypeMapperPass());
+        $container->addCompilerPass(new Compiler\AttributeTypePass());
 
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createAnnotationMappingDriver(

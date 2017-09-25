@@ -1,14 +1,20 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
 class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var string */
     protected $filePath;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheState */
+    protected $cacheState;
 
     protected function setUp()
     {
@@ -16,6 +22,8 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         @mkdir($directory, 0777);
 
         $this->filePath = $directory . 'interrupt.tmp';
+
+        $this->cacheState = $this->createMock(CacheState::class);
     }
 
     protected function tearDown()
@@ -24,20 +32,18 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 
         @unlink($this->filePath);
         rmdir($directory);
-
-        parent::tearDown();
     }
 
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new InterruptConsumptionExtension($this->filePath);
+        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
     }
 
     public function testShouldCreateFileIfItNotExist()
     {
         $this->assertFileNotExists($this->filePath);
 
-        new InterruptConsumptionExtension($this->filePath);
+        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
 
         $this->assertFileExists($this->filePath);
     }
@@ -47,7 +53,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         touch($this->filePath, time() - 1);
         $timestamp = filemtime($this->filePath);
 
-        new InterruptConsumptionExtension($this->filePath);
+        new InterruptConsumptionExtension($this->filePath, $this->cacheState);
 
         clearstatcache(true, $this->filePath);
 
@@ -56,82 +62,108 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldInterruptConsumptionIfFileWasDeleted()
     {
-        $extension = new InterruptConsumptionExtension($this->filePath);
+        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
 
         unlink($this->filePath);
 
         $context = $this->createContextMock();
 
         $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger->expects($this->once())
             ->method('info')
             ->with(
-                'Execution interrupted: the cache was cleared.',
+                'Execution interrupted: The cache was cleared.',
                 ['context' => $context]
-            )
-        ;
+            );
 
-        $context
-            ->expects($this->once())
+        $context->expects($this->once())
             ->method('getLogger')
-            ->willReturn($logger)
-        ;
-        $context
-            ->expects($this->once())
+            ->willReturn($logger);
+        $context->expects($this->once())
             ->method('setExecutionInterrupted')
-            ->with($this->isTrue())
-        ;
+            ->with($this->isTrue());
+        $context->expects($this->once())
+            ->method('setInterruptedReason')
+            ->with('The cache was cleared.');
 
         $extension->onBeforeReceive($context);
     }
 
     public function testShouldInterruptConsumptionIfFileMetadataIncreased()
     {
-        $extension = new InterruptConsumptionExtension($this->filePath);
+        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
 
         touch($this->filePath, time() + 1);
 
         $context = $this->createContextMock();
 
         $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger->expects($this->once())
             ->method('info')
             ->with(
-                'Execution interrupted: the cache was invalidated.',
+                'Execution interrupted: The cache was invalidated.',
                 ['context' => $context]
-            )
-        ;
+            );
 
-        $context
-            ->expects($this->once())
+        $context->expects($this->once())
             ->method('getLogger')
-            ->willReturn($logger)
-        ;
-        $context
-            ->expects($this->once())
+            ->willReturn($logger);
+        $context->expects($this->once())
             ->method('setExecutionInterrupted')
-            ->with($this->isTrue())
-        ;
+            ->with($this->isTrue());
+        $context->expects($this->once())
+            ->method('setInterruptedReason')
+            ->with('The cache was invalidated.');
 
         $extension->onBeforeReceive($context);
     }
 
     public function testShouldNotInterruptIfFileExistAndMetadataNotChanged()
     {
-        $extension = new InterruptConsumptionExtension($this->filePath);
+        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
 
         $context = $this->createContextMock();
 
-        $context
-            ->expects($this->never())
+        $context->expects($this->never())
+            ->method('getLogger');
+        $context->expects($this->never())
+            ->method('setExecutionInterrupted');
+        $context->expects($this->never())
+            ->method('setInterruptedReason');
+
+        $extension->onBeforeReceive($context);
+    }
+
+    public function testShouldInterruptInCaseIfCacheWasChanged()
+    {
+        // set the cache change date in future,
+        // the case when consumer works for 30 days and after that the cache was changed
+        $changeStateDate = new \DateTime('now+30days', new \DateTimeZone('UTC'));
+
+        $extension = new InterruptConsumptionExtension($this->filePath, $this->cacheState);
+        $context = $this->createContextMock();
+
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->once())
+            ->method('info')
+            ->with(
+                'Execution interrupted: The cache has changed.',
+                ['context' => $context]
+            );
+
+        $context->expects($this->once())
             ->method('getLogger')
-        ;
-        $context
-            ->expects($this->never())
+            ->willReturn($logger);
+        $context->expects($this->once())
             ->method('setExecutionInterrupted')
-        ;
+            ->with($this->isTrue());
+        $context->expects($this->once())
+            ->method('setInterruptedReason')
+            ->with('The cache has changed.');
+
+        $this->cacheState->expects(self::once())
+            ->method('getChangeDate')
+            ->willReturn($changeStateDate);
 
         $extension->onBeforeReceive($context);
     }

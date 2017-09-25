@@ -64,14 +64,25 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
         $this->chainExtension->onPostRunDelayed($job, true);
     }
 
-    public function testOnCreateDelayed()
+    public function testOnPreCreateDelayed()
     {
         $job = new Job();
 
         $this->subExtension->expects($this->once())
-            ->method('onCreateDelayed')
+            ->method('onPreCreateDelayed')
+            ->with($job);
+
+        $this->chainExtension->onPreCreateDelayed($job);
+    }
+
+    public function testOnPostCreateDelayed()
+    {
+        $job = new Job();
+
+        $this->subExtension->expects($this->once())
+            ->method('onPostCreateDelayed')
             ->with($job, true);
 
-        $this->chainExtension->onCreateDelayed($job, true);
+        $this->chainExtension->onPostCreateDelayed($job, true);
     }
 }

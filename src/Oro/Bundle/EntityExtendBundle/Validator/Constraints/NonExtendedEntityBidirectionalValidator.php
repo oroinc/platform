@@ -31,7 +31,7 @@ class NonExtendedEntityBidirectionalValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         $config = $this->configManager->getEntityConfig('extend', $value['target_entity']);
-        $isBidirectional = (bool)$value['bidirectional'];
+        $isBidirectional = isset($value['bidirectional']) ? (bool)$value['bidirectional'] : false;
 
         if (!$config->is('is_extend') && $isBidirectional) {
             $this->context->buildViolation($constraint->message)

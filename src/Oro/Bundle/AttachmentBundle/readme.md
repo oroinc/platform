@@ -1,5 +1,4 @@
-## OroAttachmentBundle
-===================
+# OroAttachmentBundle
 
 Manipulate attachments to entities
 
@@ -15,7 +14,7 @@ Additional you can set mime types templates. For example, mime record `image/*` 
 
 ## File type
 
-File type allows to upload file to entity. 
+File type allows to upload file to entity.
 
 By create new file field type process, user should specify maximum file size for this field.
 
@@ -137,7 +136,7 @@ Configurable entities can use attachments for adding additional files to records
 
 To turn attachments for entity, administrator should turn attachments in UI for current entity configuration.
 
-Additional, admin can set array with allowed mine types and maximum attached file size. 
+Additional, admin can set array with allowed mine types and maximum attached file size.
 If mime types was not set, the mime types from `Upload settings` (system configuration) will be used for validation.
 
 After the schema was updated, for current entity will be available button `Add attachment`.
@@ -167,3 +166,15 @@ User can use 3 formatters for image type fields.
 - `height` - custom image height. By default - 100 px.
 
 - `width`- custom image width. By default - 100 px.
+
+# Debug images configuration
+
+By default in `dev` environment images are served by front controller (`app_dev.php`).
+You can allow your web server to serve images instead of front controller in `dev` environment.
+It will boost performance on all platforms and stability on Windows. To disable
+debug images set option `debug_images` to `false` in config.yml file:
+
+```yml
+oro_attachment:
+    debug_images: false
+```

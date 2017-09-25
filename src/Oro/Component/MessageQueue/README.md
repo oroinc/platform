@@ -1,6 +1,8 @@
 OroMessageQueue Component
 =========================
 
+*Note:* This article is published in the Oro documentation library.
+
 The component incorporates a message queue in your application via different transports.
 It contains several layers.
 
