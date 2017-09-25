@@ -34,7 +34,7 @@ class JobController extends FOSRestController
      */
     public function interruptRootJobAction(Job $job)
     {
-        $this->getJobProcessor()->interruptRootJob($job, false);
+        $this->getJobProcessor()->interruptRootJob($job, true);
 
         return $this->handleView($this->view(
             [

@@ -111,6 +111,13 @@ define([
         allowClear: true,
 
         /**
+         * Is used for states in template
+         * @property {String} 'dropdown-mode' | 'toggle-mode'
+         * @default ''
+         */
+        renderMode: '',
+
+        /**
          * Initialize.
          *
          * @param {Object} options
@@ -118,7 +125,7 @@ define([
          */
         initialize: function(options) {
             var opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
-                'templateSelector', 'templateTheme', 'template');
+                'templateSelector', 'templateTheme', 'template', 'renderMode');
             _.extend(this, opts);
 
             this._defineTemplate();
@@ -255,6 +262,16 @@ define([
         },
 
         /**
+         * Set renderMode to filter
+         * @param {String} value
+         */
+        setRenderMode: function(value) {
+            if (_.isString(value) && value.length) {
+                this.renderMode = value;
+            }
+        },
+
+        /**
          * Find element that dropdown of filter should fit to
          *
          * @param {string|jQuery|HTMLElement} element
@@ -315,6 +332,15 @@ define([
             this.$el.find('.filter-criteria-selector')
                 .toggleClass('filter-default-value', this.isEmptyValue());
             return this;
+        },
+
+        /**
+         * Triggers when filter value is changed
+         *
+         * @protected
+         */
+        _onValueChanged: function() {
+            this.trigger('change');
         },
 
         /**
@@ -459,6 +485,16 @@ define([
         _readDOMValue: function() {
             throw new Error('Method _readDOMValue is abstract and must be implemented');
             //return { value: this._getInputValue(this.inputValueSelector) }
+        },
+
+        /**
+         * Return true if DOM Value of filter is changed
+         *
+         * @returns {boolean}
+         * @protected
+         */
+        _isDOMValueChanged: function() {
+            throw new Error('Method _isDOMValueChanged is abstract and must be implemented');
         },
 
         /**

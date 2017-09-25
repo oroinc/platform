@@ -93,7 +93,7 @@ class QueueConsumer
 
         $extension = $this->extension;
         if (null !== $runtimeExtension) {
-            $extension = new ChainExtension([$extension, $runtimeExtension]);
+            $extension = new ChainExtension([$runtimeExtension, $extension]);
         }
         $extension->onStart($context);
 

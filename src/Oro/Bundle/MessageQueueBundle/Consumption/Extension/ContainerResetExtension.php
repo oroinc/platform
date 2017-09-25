@@ -9,15 +9,17 @@ use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 
 /**
  * This extension resets the container state between messages.
  *
  * The "persistent_services" and "persistent_processors" options can be used to configure
  * the list of services and the list of MQ processors that should not be removed during the container reset.
+ * Also other extensions can be marked as "persistent" if they should not be recreated during the container reset.
  * For details see "Resources/doc/container_in_consumer.md".
  */
-class ContainerResetExtension extends AbstractExtension
+class ContainerResetExtension extends AbstractExtension implements ChainExtensionAwareInterface
 {
     /**
      * The services that should not be removed during the container reset.
@@ -36,6 +38,9 @@ class ContainerResetExtension extends AbstractExtension
     /** @var ContainerInterface|ResettableContainerInterface|IntrospectableContainerInterface|null */
     private $container;
 
+    /** @var ExtensionInterface|null */
+    private $rootChainExtension;
+
     /**
      * @param ContainerInterface $container
      */
@@ -50,22 +55,38 @@ class ContainerResetExtension extends AbstractExtension
 
     /**
      * Sets the services that should not be removed during the container reset.
+     * The given services are added in addition to already set services.
      *
      * @param string[] $persistentServices
      */
     public function setPersistentServices(array $persistentServices)
     {
-        $this->persistentServices = $persistentServices;
+        $this->persistentServices = array_merge(
+            $this->persistentServices,
+            $persistentServices
+        );
     }
 
     /**
      * Sets the processors that can work without the container reset.
+     * The given processors are added in addition to already set processors.
      *
      * @param string[] $persistentProcessors
      */
     public function setPersistentProcessors(array $persistentProcessors)
     {
-        $this->persistentProcessors = array_fill_keys($persistentProcessors, true);
+        $this->persistentProcessors = array_merge(
+            $this->persistentProcessors,
+            array_fill_keys($persistentProcessors, true)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChainExtension(ExtensionInterface $chainExtension)
+    {
+        $this->rootChainExtension = $chainExtension;
     }
 
     /**
@@ -83,7 +104,12 @@ class ContainerResetExtension extends AbstractExtension
 
         $context->getLogger()->info('Reset the container');
 
-        // save the persistent services
+        // reset state of not persistent extensions
+        if ($this->rootChainExtension instanceof ResettableExtensionInterface) {
+            $this->rootChainExtension->reset();
+        }
+
+        // save persistent services
         $persistentServices = [];
         foreach ($this->persistentServices as $serviceId) {
             if ($this->container->initialized($serviceId)) {
@@ -91,9 +117,12 @@ class ContainerResetExtension extends AbstractExtension
             }
         }
 
+        // remove all services from the container
         $this->container->reset();
+        // clear the memory and prevent segmentation fault that might sometimes occur in "unserialize" function
+        gc_collect_cycles();
 
-        // restore the persistent services in the container
+        // restore persistent services in the container
         foreach ($persistentServices as $serviceId => $serviceInstance) {
             $this->container->set($serviceId, $serviceInstance);
         }

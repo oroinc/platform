@@ -12,6 +12,7 @@ column_name:
     type: field # default value `field`, so this key could be skipped here
     frontend_type: date|datetime|decimal|integer|percent|currency|select|text|html|boolean # optional default string
     data_name: someAlias.someField # optional, key in result that should represent this field
+    divisor: some number # optional if you need to divide a numeric value by a number before rendering it
 ```
 Represents default data field.
 
@@ -107,6 +108,7 @@ column_name:
     method: formatCurrency      # required
     context: []                 # optional
     context_resolver: @callable # optional
+    divisor: some number # optional if you need to divide a numeric value by a number before rendering it
 ```
 Using for format numbers using Oro\Bundle\LocaleBundle\Formatter\NumberFormatter on backend.
 

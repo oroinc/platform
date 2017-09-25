@@ -3,16 +3,17 @@ user_configuration:
         some_field:
             data_type: string
             type: text
-            options: []
-
+            options:
+                tooltip: tooltip some field
+                label: title some field
         some_another_field:
             data_type: string
             type: choice
-
+            options:
+                label: title some other field
         some_ui_only_field:
             ui_only: true
             type: text
-
         some_api_only_field:
             data_type: integer
 

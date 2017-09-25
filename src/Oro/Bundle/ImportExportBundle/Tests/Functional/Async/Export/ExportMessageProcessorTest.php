@@ -56,8 +56,6 @@ class ExportMessageProcessorTest extends WebTestCase
             'jobId' => $childJob->getId(),
             'jobName' => 'job_name',
             'processorAlias' => 'alias',
-            'securityToken' =>
-                'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
         ]));
 
 

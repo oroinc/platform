@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 
-use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationship\UpdateRelationshipContext;
 
-class UpdateRelationshipProcessor extends RequestActionProcessor
+class UpdateRelationshipProcessor extends SubresourceProcessor
 {
     /**
      * {@inheritdoc}

@@ -22,3 +22,8 @@ layout:
         - '@move':
             id: __datagrid_toolbar
             parentId: __datagrid
+
+        - '@add':
+            id: product_datagrid_category_product_list
+            parentId: __datagrid
+            blockType: block

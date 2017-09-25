@@ -27,6 +27,12 @@ class Registry extends BaseRegistry
         }
 
         $manager = parent::getService($name);
+        if ($manager instanceof OroEntityManager) {
+            $manager->setDefaultQueryCacheLifetime(
+                $this->container->getParameter('oro_entity.default_query_cache_lifetime')
+            );
+        }
+
         $this->cachedManagerServices[$name] = $manager;
 
         return $manager;

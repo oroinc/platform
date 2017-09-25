@@ -102,21 +102,14 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
         $body = array_replace_recursive([
             'jobName' => null,
             'processorAlias' => null,
-            'securityToken' => null,
             'outputFormat' => 'csv',
             'organizationId' => null,
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
             'options' => [],
         ], $body);
 
-        if (! isset($body['jobName'], $body['processorAlias'], $body['securityToken'])) {
+        if (! isset($body['jobName'], $body['processorAlias'])) {
             $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
-        if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical('Cannot set security token');
 
             return false;
         }

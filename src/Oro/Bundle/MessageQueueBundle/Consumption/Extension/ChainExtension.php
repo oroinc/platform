@@ -7,13 +7,13 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 
 use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 
-class ChainExtension implements ExtensionInterface
+class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwareInterface
 {
-    /** @var ConsumerState */
-    private $consumerState;
-
     /** @var ExtensionInterface[] */
     private $extensions;
+
+    /** @var ConsumerState */
+    private $consumerState;
 
     /**
      * @param ExtensionInterface[] $extensions
@@ -23,6 +23,7 @@ class ChainExtension implements ExtensionInterface
     {
         $this->extensions = $extensions;
         $this->consumerState = $consumerState;
+        $this->setChainExtension($this);
     }
 
     /**
@@ -95,5 +96,29 @@ class ChainExtension implements ExtensionInterface
             $extension->onInterrupted($context);
         }
         $this->consumerState->setExtension();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        foreach ($this->extensions as $extension) {
+            if ($extension instanceof ResettableExtensionInterface) {
+                $extension->reset();
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChainExtension(ExtensionInterface $chainExtension)
+    {
+        foreach ($this->extensions as $extension) {
+            if ($extension instanceof ChainExtensionAwareInterface) {
+                $extension->setChainExtension($chainExtension);
+            }
+        }
     }
 }

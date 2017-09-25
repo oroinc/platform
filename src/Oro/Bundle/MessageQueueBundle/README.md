@@ -7,7 +7,6 @@
  - [Overview](#overview)
  - [Usage](#usage)
  - [Cunsomer options](#cunsomer-options)
- - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Supervisord](#supervisord)
  - [Internals](#internals)
    - [Structure](#structure)
@@ -15,6 +14,8 @@
    - [Custom transport](#custom-transport)
    - [Key Classes](#key-classes)
  - [Unit and Functional tests](#unit-and-functional-tests)
+ - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
+ - [Security Context in consumer](Resources/doc/secutity_context.md)
 
 ## Overview
 

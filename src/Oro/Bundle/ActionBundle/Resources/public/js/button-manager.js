@@ -129,6 +129,36 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doResponse: function(response, e) {
+            var callback = _.bind(function() {
+                this._showFlashMessages(response);
+            }, this);
+
+            if (response.redirectUrl) {
+                if (e !== undefined) {
+                    e.stopImmediatePropagation();
+                }
+
+                mediator.once('page:afterChange', callback);
+
+                this.doRedirect(response.redirectUrl);
+            } else if (response.refreshGrid) {
+                mediator.execute('hideLoading');
+                _.each(response.refreshGrid, function(gridname) {
+                    mediator.trigger('datagrid:doRefresh:' + gridname);
+                });
+                this.doWidgetReload();
+                this._showFlashMessages(response);
+            } else {
+                mediator.once('page:afterChange', callback);
+
+                this.doPageReload(response);
+            }
+        },
+
+        /**
+         * @param {Object} response
+         */
+        _showFlashMessages: function(response) {
             if (response.flashMessages) {
                 _.each(response.flashMessages, function(messages, type) {
                     _.each(messages, function(message) {
@@ -148,21 +178,6 @@ define(function(require) {
                         messenger.notificationFlashMessage('error', response.message + ': ' + submessage);
                     });
                 }
-            }
-
-            if (response.redirectUrl) {
-                if (e !== undefined) {
-                    e.stopImmediatePropagation();
-                }
-                this.doRedirect(response.redirectUrl);
-            } else if (response.refreshGrid) {
-                mediator.execute('hideLoading');
-                _.each(response.refreshGrid, function(gridname) {
-                    mediator.trigger('datagrid:doRefresh:' + gridname);
-                });
-                this.doWidgetReload();
-            } else {
-                this.doPageReload(response);
             }
         },
 

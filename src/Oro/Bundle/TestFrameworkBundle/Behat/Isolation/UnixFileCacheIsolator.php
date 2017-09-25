@@ -17,6 +17,10 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
+        if ('session.handler.native_file' !== $container->getParameter('session_handler')) {
+            return false;
+        }
+
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $this->cacheDirectories['oro'] = 'oro';
         }

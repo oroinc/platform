@@ -9,16 +9,7 @@ class SidebarConfigMenu extends Element
 {
     public function openNestedMenu($path)
     {
-        $configMenuDropdownButton = $this->find('css', 'button[title="Mass Actions"]');
-        self::assertNotNull($configMenuDropdownButton, 'Config menu dropdown button not found');
-        $configMenuDropdownButton->click();
-
-        $configMenuDropdown = $configMenuDropdownButton->getParent()->find('css', 'ul[data-role="jstree-actions"]');
-        self::assertNotNull($configMenuDropdown, 'Config menu dropdown not found');
-
-        $collapseAllLink = $configMenuDropdown->find('css', 'a[title="Collapse all"]');
-        self::assertNotNull($collapseAllLink, 'Collapse All link not found');
-        $collapseAllLink->click();
+        $this->collapseAll();
 
         // wait for links will collapsed
         $this->spin(function (SidebarConfigMenu $element) {
@@ -59,8 +50,22 @@ class SidebarConfigMenu extends Element
      */
     public function getIntegrations()
     {
-        $this->openNestedMenu('System configuration/Integrations');
+        $this->openNestedMenu('System Configuration/Integrations');
 
         return $this->findAll('css', '#integrations ul[role="group"] li[role="treeitem"] a');
+    }
+
+    public function expandAll()
+    {
+        $expandAllLink = $this->find('css', 'a[title="Expand all"]');
+        self::assertNotNull($expandAllLink, 'Expand All link not found');
+        $expandAllLink->click();
+    }
+
+    public function collapseAll()
+    {
+        $collapseAllLink = $this->find('css', 'a[title="Collapse all"]');
+        self::assertNotNull($collapseAllLink, 'Collapse All link not found');
+        $collapseAllLink->click();
     }
 }

@@ -37,7 +37,7 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
-            ->setConstructorArgs([$router, [], $associationManager])
+            ->setConstructorArgs([$router, [], $associationManager, true, true])
             ->setMethods(['getAttachment'])
             ->getMock();
 
