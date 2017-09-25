@@ -1,0 +1,50 @@
+<?php
+namespace Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types;
+
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\StringType;
+
+use Oro\Bundle\SecurityBundle\Encoder\RepetitiveCrypter;
+
+/**
+ * Doctrine type that stores string data in crypted format.
+ */
+class CryptedStringType extends StringType
+{
+    const TYPE = 'crypted_string';
+
+    /** @var RepetitiveCrypter */
+    private static $crypter;
+
+    /**
+     * @param RepetitiveCrypter $crypter
+     */
+    public static function setCrypter(RepetitiveCrypter $crypter)
+    {
+        static::$crypter = $crypter;
+    }
+
+    /** {@inheritdoc} */
+    public function getName()
+    {
+        return self::TYPE;
+    }
+
+    /** {@inheritdoc} */
+    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    {
+        return static::$crypter->encryptData($value);
+    }
+
+    /** {@inheritdoc} */
+    public function convertToPHPValue($value, AbstractPlatform $platform)
+    {
+        return static::$crypter->decryptData($value);
+    }
+    
+    /** {@inheritdoc} */
+    public function requiresSQLCommentHint(AbstractPlatform $platform)
+    {
+        return true;
+    }
+}
