@@ -60,7 +60,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_0';
+        return 'v2_1';
     }
 
     /**
@@ -174,7 +174,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('api_key', 'string', ['length' => 255]);
+        $table->addColumn('api_key', 'crypted_string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['api_key'], 'UNIQ_296B6993C912ED9D');
         $table->addIndex(['user_id'], 'IDX_296B6993A76ED395', []);
