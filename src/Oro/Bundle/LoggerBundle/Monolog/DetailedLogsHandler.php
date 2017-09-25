@@ -18,10 +18,15 @@ class DetailedLogsHandler extends AbstractProcessingHandler implements Container
     /** @var HandlerInterface */
     protected $handler;
 
-    /** @var array */
+    /**
+     * @var array
+     * @deprecated Buffer is not used anymore. Left for BC.
+     */
     protected $buffer = [];
 
-    /** @var ContainerInterface */
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
 
     /**

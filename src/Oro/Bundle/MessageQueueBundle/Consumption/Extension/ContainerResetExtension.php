@@ -102,7 +102,7 @@ class ContainerResetExtension extends AbstractExtension implements ChainExtensio
             return;
         }
 
-        $context->getLogger()->info('[ContainerResetExtension] Reset the container');
+        $context->getLogger()->info('Reset the container');
 
         // reset state of not persistent extensions
         if ($this->rootChainExtension instanceof ResettableExtensionInterface) {

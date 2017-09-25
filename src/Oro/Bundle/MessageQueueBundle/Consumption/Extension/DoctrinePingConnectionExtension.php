@@ -33,12 +33,12 @@ class DoctrinePingConnectionExtension extends AbstractExtension
                 return;
             }
 
-            $logger->debug('[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.');
+            $logger->debug(sprintf('Connection "%s" is not active, trying to reconnect.', $name));
 
             $connection->close();
             $connection->connect();
 
-            $logger->debug('[DoctrinePingConnectionExtension] Connection is active now.');
+            $logger->debug(sprintf('Connection "%s" is active now.', $name));
         }
     }
 }

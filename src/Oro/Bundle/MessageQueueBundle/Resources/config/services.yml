@@ -8,6 +8,8 @@ services:
         public: false
         arguments:
             - []
+        calls:
+            - ['setConsumerState', ['@oro_message_queue.log.consumer_state']]
 
     oro_message_queue.consumption.container_reset_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
@@ -70,6 +72,7 @@ services:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
 
+    # needs to be register via DI due to BC
     oro_message_queue.command.consume_messages:
         class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
         tags:

@@ -55,7 +55,7 @@ class DoctrineClearIdentityMapExtensionTest extends \PHPUnit_Framework_TestCase
 
         $logger->expects($this->once())
             ->method('debug')
-            ->with('[DoctrineClearIdentityMapExtension] Clear identity map for manager "manager1"');
+            ->with('Clear identity map for manager "manager1"');
         $manager1->expects($this->once())
             ->method('clear');
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -30,6 +31,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->container = new Container();
         $this->container->set('oro_message_queue.consumption.queue_consumer', $this->consumer);
+        $this->container->set('logger', new NullLogger());
         $this->command->setContainer($this->container);
     }
 

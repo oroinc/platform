@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
@@ -31,23 +31,20 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $logger;
-
     protected function setUp()
     {
         $this->consumer = $this->createMock(QueueConsumer::class);
+        $this->processor = $this->createMock(DelegateMessageProcessor::class);
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
-        $this->processor = $this->createMock(MessageProcessorInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $logger = new NullLogger();
 
-        $this->command = new ConsumeMessagesCommand();
+        $this->command = new ConsumeMessagesCommand($this->consumer, $this->processor, $this->registry, $logger);
 
         $this->container = new Container();
         $this->container->set('oro_message_queue.client.queue_consumer', $this->consumer);
         $this->container->set('oro_message_queue.client.meta.destination_meta_registry', $this->registry);
         $this->container->set('oro_message_queue.client.delegate_message_processor', $this->processor);
-        $this->container->set('logger', $this->logger);
+        $this->container->set('logger', $logger);
         $this->command->setContainer($this->container);
     }
 
@@ -96,9 +93,6 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
                 new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')
             ]);
 
-        $this->logger->expects($this->never())
-            ->method('error');
-
         $tester = new CommandTester($this->command);
         $tester->execute([]);
     }
@@ -123,9 +117,6 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getDestinationMeta')
             ->with('non-default-queue')
             ->willReturn(new DestinationMeta('aclient', 'aprefixt.non-default-queue'));
-
-        $this->logger->expects($this->never())
-            ->method('error');
 
         $tester = new CommandTester($this->command);
         $tester->execute([
@@ -153,9 +144,6 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getDestinationMeta')
             ->with('non-default-queue')
             ->willReturn(new DestinationMeta('aclient', 'non-default-transport-queue'));
-
-        $this->logger->expects($this->never())
-            ->method('error');
 
         $tester = new CommandTester($this->command);
         $tester->execute([
@@ -187,10 +175,6 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')
             ]);
-
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with(sprintf('Consume messages command exception. "%s"', $expectedException->getMessage()));
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage($expectedException->getMessage());

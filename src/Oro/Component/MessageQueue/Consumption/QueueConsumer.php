@@ -1,11 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
+use Psr\Log\NullLogger;
+
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
-use Oro\Component\MessageQueue\Util\VarExport;
-use Psr\Log\NullLogger;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -166,15 +166,16 @@ class QueueConsumer
         if ($context->isExecutionInterrupted()) {
             throw new ConsumptionInterruptedException($context->getInterruptedReason());
         }
-        $logger->info('Pre receive Message');
-        if ($message = $messageConsumer->receive(1)) {
+        $logger->debug('Pre receive Message');
+        $message = $messageConsumer->receive(1);
+        if (null !== $message) {
             $context->setMessage($message);
             $extension->onPreReceived($context);
 
-            $logger->info('Message received');
-            $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
-            $logger->debug('Properties: {properties}', ['properties' => new VarExport($message->getProperties())]);
-            $logger->debug('Payload: {payload}', ['payload' => new VarExport($message->getBody())]);
+            $logger->info('Message received', [
+                'headers'    => $message->getHeaders(),
+                'properties' => $message->getProperties()
+            ]);
 
             if (!$context->getStatus()) {
                 $status = $messageProcessor->process($message, $session);
@@ -184,22 +185,25 @@ class QueueConsumer
             switch ($context->getStatus()) {
                 case MessageProcessorInterface::ACK:
                     $messageConsumer->acknowledge($message);
+                    $statusForLog = 'ACK';
                     break;
                 case MessageProcessorInterface::REJECT:
                     $messageConsumer->reject($message, false);
+                    $statusForLog = 'REJECT';
                     break;
                 case MessageProcessorInterface::REQUEUE:
                     $messageConsumer->reject($message, true);
+                    $statusForLog = 'REQUEUE';
                     break;
                 default:
                     throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));
             }
 
-            $logger->info(sprintf('Message processed: %s', $context->getStatus()));
+            $logger->notice(sprintf('Message processed: %s', $statusForLog));
 
             $extension->onPostReceived($context);
         } else {
-            $logger->info(sprintf('Idle'));
+            $logger->info('Idle');
 
             usleep($this->idleMicroseconds);
             $extension->onIdle($context);

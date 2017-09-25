@@ -43,10 +43,7 @@ class DoctrineClearIdentityMapExtension extends AbstractExtension
         $managers = $this->registry->getManagerNames();
         foreach ($managers as $name => $serviceId) {
             if ($this->container->initialized($serviceId)) {
-                $logger->debug(sprintf(
-                    '[DoctrineClearIdentityMapExtension] Clear identity map for manager "%s"',
-                    $name
-                ));
+                $logger->debug(sprintf('Clear identity map for manager "%s"', $name));
 
                 $manager = $this->registry->getManager($name);
                 $manager->clear();

@@ -46,7 +46,7 @@ class CreateQueueExtension extends AbstractExtension
         $this->createdQueues->set($queueName, $this->driver->createQueue($queueName));
 
         $context->getLogger()->debug(sprintf(
-            '[CreateQueueExtension] Make sure the queue %s exists on a broker side.',
+            'Make sure the queue "%s" exists on a broker side.',
             $queueName
         ));
     }

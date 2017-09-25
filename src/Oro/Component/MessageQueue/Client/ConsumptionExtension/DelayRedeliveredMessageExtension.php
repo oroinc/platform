@@ -60,12 +60,9 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
         $queue = $context->getSession()->createQueue($context->getQueueName());
 
         $this->driver->send($queue, $delayedMessage);
-        $context->getLogger()->debug('[DelayRedeliveredMessageExtension] Send delayed message');
+        $context->getLogger()->debug('Send delayed message');
 
         $context->setStatus(MessageProcessorInterface::REJECT);
-        $context->getLogger()->debug(
-            '[DelayRedeliveredMessageExtension] '.
-            'Reject redelivered original message by setting reject status to context.'
-        );
+        $context->getLogger()->debug('Reject redelivered original message by setting reject status to context.');
     }
 }

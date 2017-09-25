@@ -73,7 +73,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->once())
             ->method('info')
             ->with(
-                '[InterruptConsumptionExtension] Execution interrupted: The cache was cleared.',
+                'Execution interrupted: The cache was cleared.',
                 ['context' => $context]
             );
 
@@ -103,7 +103,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->once())
             ->method('info')
             ->with(
-                '[InterruptConsumptionExtension] Execution interrupted: The cache was invalidated.',
+                'Execution interrupted: The cache was invalidated.',
                 ['context' => $context]
             );
 
@@ -151,7 +151,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->once())
             ->method('info')
             ->with(
-                '[InterruptConsumptionExtension] Execution interrupted: The cache has changed.',
+                'Execution interrupted: The cache has changed.',
                 ['context' => $context]
             );
 

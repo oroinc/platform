@@ -80,7 +80,7 @@ class InterruptConsumptionExtension extends AbstractExtension
     private function interruptExecution(Context $context, $reason)
     {
         $context->getLogger()->info(
-            '[InterruptConsumptionExtension] Execution interrupted: ' . $reason,
+            'Execution interrupted: ' . $reason,
             ['context' => $context]
         );
 

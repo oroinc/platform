@@ -40,7 +40,6 @@ services:
 
     oro_message_queue.client.message_processor_registry:
         class: 'Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry'
-        public: false
         calls:
             - ['setContainer', ['@service_container']]
 
@@ -85,8 +84,14 @@ services:
     oro_message_queue.client.created_queues:
         class: 'Oro\Component\MessageQueue\Transport\QueueCollection'
 
+    # needs to be register via DI due to BC
     oro_message_queue.client.consume_messages_command:
-        class: 'Oro\Component\MessageQueue\Client\ConsumeMessagesCommand'
+        class: 'Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand'
+        arguments:
+            - '@oro_message_queue.client.queue_consumer'
+            - '@oro_message_queue.client.delegate_message_processor'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+            - '@logger'
         tags:
             - { name: console.command }
 
