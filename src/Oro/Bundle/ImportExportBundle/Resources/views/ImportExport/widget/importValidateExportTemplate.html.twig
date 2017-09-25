@@ -36,9 +36,11 @@
                           }) }}"
                           class="form-horizontal" {{ form_enctype(form) }}
                     >
-                         {# @todo: options #}
+                        {% for key, option in options %}
+                            <input type="hidden" name="options[{{ key }}]" value="{{ option }}" />
+                        {% endfor %}
 
-                        <input type="hidden" name="isValidateJob" value="false">
+                        <input type="hidden" name="isValidateJob" value="false" />
 
                         <fieldset class="form">
                             <div class="import-file">
