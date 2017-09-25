@@ -21,7 +21,7 @@
 #### ApiBundle
 * Added `form_event_subscriber` option to `Resources/config/oro/api.yml`. It can be used to add an event subscriber(s) to a form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`. For details see `/src/Oro/Bundle/ApiBundle/Resources/doc/configuration.md`
 #### WorkflowBundle
-* Added parameter `$activeOnly` (boolean) with default `false` to method `\Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getAllRelatedEntityClasses`
+* Added parameter `$activeOnly` (boolean) with default `false` to method `WorkflowDefinitionRepository::getAllRelatedEntityClasses`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/Entity/Repository/WorkflowDefinitionRepository.php#L56 "Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getAllRelatedEntityClasses")</sup>
 * Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`
 * Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
 ### Changed
@@ -73,8 +73,8 @@
 * Class `VariableGuesser`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/Model/VariableGuesser.php "Oro\Bundle\WorkflowBundle\Model\VariableGuesser")</sup>:
     * now extends `AbstractGuesser`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/ActionBundle/Model/AbstractGuesser.php "Oro\Bundle\ActionBundle\Model\AbstractGuesser")</sup>
     * service `oro_workflow.variable_guesser` has parent defined as `oro_action.abstract_guesser`
-* Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener` auto start workflow part were moved into `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener`
-* Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache` added:
+* Class `WorkflowItemListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/EventListener/WorkflowItemListener.php "Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener")</sup> auto start workflow part were moved into `WorkflowStartListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/EventListener/WorkflowStartListener.php "Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener")</sup>
+* Class `WorkflowAwareCache`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/EventListener/WorkflowAwareCache.php "Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache")</sup> added:
     * ***purpose***: to check whether an entity has been involved as some workflow related entity in cached manner to avoid DB calls
     * ***methods***:
         - `hasRelatedActiveWorkflows($entity)`
@@ -387,7 +387,7 @@ provided service (usually that implements `Oro\Component\DependencyInjection\Ser
 * The service `oro_workflow.twig.extension.workflow` was marked as `private`
 * Removed implementation of `CronCommandInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/CronBundle/Command/CronCommandInterface.php "Oro\Bundle\CronBundle\Command\CronCommandInterface")</sup> from `HandleProcessTriggerCommand`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/WorkflowBundle/Command/HandleProcessTriggerCommand.php "Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand")</sup>.
 * Removed implementation of `CronCommandInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/CronBundle/Command/CronCommandInterface.php "Oro\Bundle\CronBundle\Command\CronCommandInterface")</sup> from `HandleTransitionCronTriggerCommand`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/WorkflowBundle/Command/HandleTransitionCronTriggerCommand.php "Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand")</sup>.
-* Class `\Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper`:
+* Class `WorkflowTranslationHelper`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/WorkflowBundle/Helper/WorkflowTranslationHelper.php "Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper")</sup>:
     * added public method `generateDefinitionTranslationKeys`
     * added public method `generateDefinitionTranslations`
     * changed access level from `private` to `public` for method `findValue`
