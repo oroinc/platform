@@ -6,8 +6,6 @@ use ProxyManager\Proxy\ValueHolderInterface;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -16,6 +14,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\Converter\MessageToArrayConverterInterface;
+use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 
 /**
  * Adds information about the current consumer extension, message processor, message and job to the log record.
@@ -28,8 +27,8 @@ class AddConsumerStateProcessor
     /** @var ConsumerState */
     private $consumerState;
 
-    /** @var MessageProcessorRegistryInterface */
-    private $messageProcessorRegistry;
+    /** @var MessageProcessorClassProvider */
+    private $messageProcessorClassProvider;
 
     /** @var MessageToArrayConverterInterface */
     private $messageToArrayConverter;
@@ -94,15 +93,24 @@ class AddConsumerStateProcessor
 
     /**
      * @return MessageProcessorRegistryInterface
+     * @deprecated since 2.0
      */
     protected function getMessageProcessorRegistry()
     {
-        if (null === $this->messageProcessorRegistry) {
-            $this->messageProcessorRegistry = $this->container
-                ->get('oro_message_queue.client.message_processor_registry');
+        return $this->container->get('oro_message_queue.client.message_processor_registry');
+    }
+
+    /**
+     * @return MessageProcessorClassProvider
+     */
+    protected function getMessageProcessorClassProvider()
+    {
+        if (null === $this->messageProcessorClassProvider) {
+            $this->messageProcessorClassProvider = $this->container
+                ->get('oro_message_queue.log.message_processor_class_provider');
         }
 
-        return $this->messageProcessorRegistry;
+        return $this->messageProcessorClassProvider;
     }
 
     /**
@@ -167,21 +175,6 @@ class AddConsumerStateProcessor
      */
     protected function getMessageProcessorClass(MessageProcessorInterface $messageProcessor, MessageInterface $message)
     {
-        if ($messageProcessor instanceof DelegateMessageProcessor) {
-            $processorName = $message->getProperty(Config::PARAMETER_PROCESSOR_NAME);
-            if ($processorName) {
-                try {
-                    $messageProcessor = $this->getMessageProcessorRegistry()->get($processorName);
-                } catch (\Exception $e) {
-                    // ignore any exception here
-                }
-            }
-        }
-
-        if ($messageProcessor instanceof ValueHolderInterface) {
-            $messageProcessor = $messageProcessor->getWrappedValueHolderValue();
-        }
-
-        return get_class($messageProcessor);
+        return $this->getMessageProcessorClassProvider()->getMessageProcessorClass($messageProcessor, $message);
     }
 }

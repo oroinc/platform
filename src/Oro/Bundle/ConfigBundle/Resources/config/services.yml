@@ -138,3 +138,10 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@validator'
             - '@oro_attachment.file_manager'
+
+    oro_config.event_listener.cache_state:
+        class: Oro\Bundle\ConfigBundle\EventListener\CacheStateChangeListener
+        arguments:
+            - '@oro_message_queue.consumption.cache_state'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
