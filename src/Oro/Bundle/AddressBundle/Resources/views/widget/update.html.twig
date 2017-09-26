@@ -1,21 +1,22 @@
-{# Quick address update form template #}
-<div class="widget-content">
-    {% if saved %}
-        <script type="text/javascript">
-        require(['oroui/js/widget-manager'],
-        function(widgetManager) {
-            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                widget.trigger('formSave', {{ form.vars.value.id|json_encode|raw }});
-            });
-        });
-        </script>
-    {% else %}
+{% if saved %}
+    {% set data = {
+        trigger: [{
+            eventBroker: 'widget',
+            name: 'formSave',
+            args: [form.vars.value.id],
+        }],
+    } %}
+
+    {{ data|json_encode|raw }}
+{% else %}
+    {# Quick address update form template #}
+    <div class="widget-content">
         {% if not form.vars.valid and form_errors(form) %}
-        <div class="alert alert-error" style="margin:0">
-            <div class="message">
-                {{ form_errors(form) }}
+            <div class="alert alert-error" style="margin:0">
+                <div class="message">
+                    {{ form_errors(form) }}
+                </div>
             </div>
-        </div>
         {% endif %}
 
         <form id="{{ form.vars.id }}" name="{{ form.vars.name }}"
@@ -33,5 +34,5 @@
             </fieldset>
         </form>
         {{ oro_form_js_validation(form) }}
-    {% endif %}
-</div>
+    </div>
+{% endif %}

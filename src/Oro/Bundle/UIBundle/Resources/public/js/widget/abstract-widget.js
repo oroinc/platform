@@ -795,13 +795,15 @@ define(function(require) {
                 }
 
                 _.each(content.trigger, function(event) {
+                    var eventBroker = this._getEventBroker(event);
+
                     if (_.isObject(event)) {
                         var args = [event.name].concat(event.args);
-                        mediator.trigger.apply(mediator, args);
+                        eventBroker.trigger.apply(eventBroker, args);
                     } else {
-                        mediator.trigger(event);
+                        eventBroker.trigger(event);
                     }
-                });
+                }, this);
             }
 
             if (_.has(content, 'triggerSuccess') && content.triggerSuccess) {
@@ -812,6 +814,10 @@ define(function(require) {
             if (_.has(content, 'remove') && content.remove) {
                 this.remove();
             }
+        },
+
+        _getEventBroker: function(event) {
+            return event.eventBroker === 'widget' ? this : mediator;
         },
 
         _triggerContentLoadEvents: function(content) {
