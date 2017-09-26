@@ -25,14 +25,13 @@
     {{ form_widget(form, attr) }}
     {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
     {% set regionView = regionView|default('oroaddress/js/region/view') %}
-    {% set regionCollection = regionCollection|default('oroaddress/js/region/collection') %}
 
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         view: {
             _sourceElement: '#' ~ country_field.vars.id,
-            view: 'oroaddress/js/region/view',
+            view: regionView,
             target: '#' ~ id ,
             simpleEl: '#' ~ region_text_field.vars.id,
             collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),

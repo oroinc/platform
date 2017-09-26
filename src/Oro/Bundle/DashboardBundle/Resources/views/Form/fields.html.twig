@@ -16,23 +16,22 @@
 {% endblock oro_type_widget_date_range_widget %}
 
 {% block oro_type_widget_title_widget %}
-    <div class="widget-title-container">
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div class="widget-title-container" {{ UI.renderPageComponentAttributes({
+        view: {
+            view: 'oroform/js/app/views/default-field-value-view',
+            fieldSelector: 'input#' ~ form.title.vars.id,
+            prepareTinymce: false
+        }
+    }) }}>
         <div class="widget-title-widget">
             {{ form_widget(form.title) }}
         </div>
         {{ form_row(form.useDefault, { 'attr': {'data-role': 'changeUseDefault'} }) }}
     </div>
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-    <div {{ UI.renderPageComponentAttributes({
-        view: {
-            _sourceElement: '.widget-title-container',
-            view: 'oroform/js/app/views/default-field-value-view',
-            fieldSelector: 'input#' ~ form.title.vars.id,
-            prepareTinymce: false
-        }
-    }) }}></div>
 {% endblock oro_type_widget_title_widget %}
 
 {% block oro_type_widget_items_row %}

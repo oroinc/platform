@@ -7,14 +7,14 @@ define(function(require) {
 
     WidgetDatetimeRangeView = AbstractWidgetDateRangeView.extend({
         initialize: function(options) {
+            WidgetDatetimeRangeView.__super__.initialize.apply(this, arguments);
+
             var DatetimeFilterWithMeta = WidgetConfigDateTimeRangeFilter.extend(this.metadata);
             var dateRangeFilter = new DatetimeFilterWithMeta();
             var $dateRangeFilter = this._renderDateRangeFilter(dateRangeFilter);
 
             this.$('.datetime-range-filter-' + options.formName).append($dateRangeFilter);
             this._dateRangeFilterAfterRender();
-
-            WidgetDatetimeRangeView.__super__.initialize.apply(this, arguments);
         }
     });
 

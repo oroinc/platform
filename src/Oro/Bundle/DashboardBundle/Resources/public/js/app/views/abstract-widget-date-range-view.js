@@ -3,6 +3,7 @@ define(function(require) {
 
     var AbstractWidgetDateCompareView;
     var BaseView = require('oroui/js/app/views/base/view');
+    var _ = require('underscore');
 
     AbstractWidgetDateCompareView = BaseView.extend({
         autoRender: true,
@@ -12,6 +13,12 @@ define(function(require) {
         ]),
 
         valueConfig: {start: '', end: ''},
+
+        initialize: function() {
+            this.valueConfig = _.clone(this.valueConfig);
+
+            AbstractWidgetDateCompareView.__super__.initialize.apply(this, arguments);
+        },
 
         _getDataRangeFilterValue: function() {
             this.valueConfig.startEndPrefix = this.formFullName;

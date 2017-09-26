@@ -16,9 +16,7 @@ define(function(require) {
                 return;
             }
 
-            this.$('[name$="[types][]"][value="' + currentTarget.value + '"]').each(function(idx, el) {
-                el.checked = false;
-            });
+            this.$('[name$="[types][]"][value="' + currentTarget.value + '"]').prop('checked', false);
 
             currentTarget.checked = true;
         }

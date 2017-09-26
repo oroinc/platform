@@ -7,7 +7,7 @@ define(function(require) {
     WidgetDateCompareView = BaseView.extend({
         autoRender: true,
 
-        optionNames: BaseView.prototype.optionNames.concat(['useDateSelector']),
+        optionNames: BaseView.prototype.optionNames.concat(['useDateSelector', 'datepickerSelector']),
 
         datepickerSelector: '.datepicker-input',
 
@@ -27,7 +27,7 @@ define(function(require) {
                 this.$(this.datepickerSelector).datepicker('disable');
             }
 
-            WidgetDateCompareView.__super__.render.apply(this, arguments);
+            return WidgetDateCompareView.__super__.render.apply(this, arguments);
         }
     });
 

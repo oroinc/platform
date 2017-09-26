@@ -4,7 +4,7 @@ define(function(require) {
     var WidgetTabsView;
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
     WidgetTabsView = BaseView.extend({
         events: {
@@ -16,7 +16,7 @@ define(function(require) {
         widgetComponentProcessingClass: 'widget-component-processing',
 
         initialize: function() {
-            this.loadingMask = new LoadingMask({container: this._getTabContent()});
+            this.subview('loading', new LoadingMaskView({container: this._getTabContent()}));
 
             WidgetTabsView.__super__.initialize.apply(this, arguments);
         },
@@ -29,11 +29,12 @@ define(function(require) {
             var $currentTarget = $(e.currentTarget);
             var $prevTab = this.$('.nav-tabs').find('li.active');
             var $currentTab = $currentTarget.closest('li');
+            var loadingView = this.subviewsByName.loading;
 
             $prevTab.removeClass('active');
             $currentTab.addClass('active');
 
-            this.loadingMask.show();
+            loadingView.show();
 
             // add style like on standard tabs realization through tabs-component
             $currentTarget.addClass(this.widgetComponentProcessingClass);
@@ -52,7 +53,7 @@ define(function(require) {
                         .trigger('content:changed');
                 }.bind(this),
                 complete: function() {
-                    this.loadingMask.hide();
+                    loadingView.hide();
                     $currentTarget.removeClass(this.widgetComponentProcessingClass);
                 }.bind(this)
             });

@@ -4,7 +4,6 @@ define(function(require) {
     var EmailSyncView;
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
     var messenger = require('oroui/js/messenger');
 
     EmailSyncView = BaseView.extend({

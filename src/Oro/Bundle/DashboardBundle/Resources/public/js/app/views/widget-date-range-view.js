@@ -8,6 +8,8 @@ define(function(require) {
 
     WidgetDateRangeView = AbstractWidgetDateRangeView.extend({
         initialize: function(options) {
+            WidgetDateRangeView.__super__.initialize.apply(this, arguments);
+
             var DatetimeFilterWithMeta = WidgetConfigDateRangeFilter.extend(this.metadata);
             var dateRangeFilter = new DatetimeFilterWithMeta({
                 $form: $('[name="' + options.formFullName + '[part]"]').closest('form')
@@ -16,8 +18,6 @@ define(function(require) {
 
             this.$('.date-range-filter-' + options.formName).append($dateRangeFilter).trigger('content:changed');
             this._dateRangeFilterAfterRender();
-
-            WidgetDateRangeView.__super__.initialize.apply(this, arguments);
         }
     });
 

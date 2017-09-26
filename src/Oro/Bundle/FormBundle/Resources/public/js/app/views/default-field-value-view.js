@@ -9,7 +9,7 @@ define(function(require) {
     DefaultFieldValueView = BaseView.extend({
         autoRender: true,
 
-        optionNames: BaseView.prototype.optionNames.concat(['prepareTinymce', 'fieldSelector']),
+        optionNames: BaseView.prototype.optionNames.concat(['prepareTinymce', 'fieldSelector', 'checkboxSelector']),
 
         prepareTinymce: true,
 
@@ -24,14 +24,15 @@ define(function(require) {
                 this.$(this.fieldSelector).prop('disabled', true);
             }
 
-            DefaultFieldValueView.__super__.render(this, arguments);
+            return DefaultFieldValueView.__super__.render.apply(this, arguments);
         },
 
         onDefaultCheckboxChange: function(e) {
             var $currentTarget = $(e.currentTarget);
+            var $controls = $currentTarget.parents('.controls');
 
             var value = $currentTarget.is(':checked');
-            var valueEls = $currentTarget.parents('.controls').find(':input, a.btn, button')
+            var valueEls = $controls.find(':input, a.btn, button')
                 .not(this.$(this.checkboxSelector))
                 .not('[readonly]');
 
@@ -47,13 +48,13 @@ define(function(require) {
             });
 
             if (this.prepareTinymce) {
-                this._prepareTinymce($currentTarget.parents('.controls').find('textarea'));
+                this._prepareTinymce($controls.find('textarea'));
             }
         },
 
-        _prepareTinymce: function(textareas) {
-            if (textareas.length > 0) {
-                $(textareas).each(function(i, el) {
+        _prepareTinymce: function($textareas) {
+            if ($textareas.length > 0) {
+                $textareas.each(function(i, el) {
                     var editor = tinyMCE.get(el.id);
                     if (editor) {
                         editor.setMode($(el).prop('disabled') ? 'readonly' : 'code');

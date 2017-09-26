@@ -15,14 +15,12 @@
 
                 {% if form.emptyFile is defined%}
                 {% set inputId = form.emptyFile.vars.id %}
-                {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
 
                 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
                 <div id="{{ divId }}" class="well well-small oro_attachment_file" {{ UI.renderPageComponentAttributes({
                     view: {
-                        _sourceElement: '#' ~ divId,
                         view: 'oroattachment/js/app/views/attachment-view',
                         inputSelector: '#' ~ inputId,
                     }
@@ -31,8 +29,7 @@
                     {{ oro_file_view(parentEntity, fieldName, value) }}
                     {{ form_row(form.emptyFile) }}
                     {% if form.vars.allow_delete %}
-                        <button id="{{ buttonId }}"
-                                data-role="remove"
+                        <button data-role="remove"
                                 class="btn btn-action btn-link delete"
                                 type="button"
                                 data-related="{{ form.emptyFile.vars.name }}"
@@ -77,14 +74,12 @@
 
                 {% if form.emptyFile is defined%}
                 {% set inputId = form.emptyFile.vars.id %}
-                {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
 
                 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
                 <div id="{{ divId }}" class="attachment_item" {{ UI.renderPageComponentAttributes({
                     view: {
-                        _sourceElement: '#' ~ divId,
                         view: 'oroattachment/js/app/views/attachment-view',
                         inputSelector: '#' ~ inputId,
                     }
@@ -95,8 +90,7 @@
                     </a>
                     ({{ file_size(value.fileSize) }})
                     {{ form_row(form.emptyFile) }}
-                    <i id = "{{ buttonId }}"
-                       data-role="remove"
+                    <i data-role="remove"
                        class="btn btn-link fa-close remove-attachment"
                        type="button"
                        data-related="{{ form.emptyFile.vars.name }}"

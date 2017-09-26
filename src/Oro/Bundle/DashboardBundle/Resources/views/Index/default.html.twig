@@ -15,10 +15,7 @@
 {% set availableWidgets = [] %}
 {% for widgetName, widget in widgets %}
     {% if widget.acl is not defined or is_granted(widget.acl) %}
-        {% set icon = asset("bundles/orodashboard/img/no_icon.png") %}
-        {% if widget.icon is defined %}
-            {% set icon = asset(widget.icon) %}
-        {% endif %}
+        {% set icon = asset(widget.icon|default("bundles/orodashboard/img/no_icon.png")) %}
         {% set title = widget.label|trans %}
         {% set description = '' %}
         {% if widget.description is defined %}
@@ -125,9 +122,7 @@
                             <div class="dashboard-selector-container pull-right title-buttons-container">
                                 <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                                 <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
-                                    view: {
-                                        view: 'orodashboard/js/app/views/dashboard-change-view'
-                                    }
+                                    view: 'orodashboard/js/app/views/dashboard-change-view'
                                 }) }}>
                                     {% for dashboardModel in dashboards %}
                                         <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
