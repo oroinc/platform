@@ -29,7 +29,7 @@ define(function(require) {
             var $currentTarget = $(e.currentTarget);
             var $prevTab = this.$('.nav-tabs').find('li.active');
             var $currentTab = $currentTarget.closest('li');
-            var loadingView = this.subviewsByName.loading;
+            var loadingView = this.subview('loading');
 
             $prevTab.removeClass('active');
             $currentTab.addClass('active');
