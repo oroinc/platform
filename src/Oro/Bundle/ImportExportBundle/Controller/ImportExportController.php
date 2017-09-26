@@ -155,7 +155,7 @@ class ImportExportController extends Controller
      * @param Request $request
      * @param string $processorAlias
      *
-     * @return array
+     * @return JsonResponse
      */
     public function importValidateAction(Request $request, $processorAlias)
     {
@@ -178,7 +178,10 @@ class ImportExportController extends Controller
             ]
         );
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'flashMessage' => $this->get('translator')->trans('oro.importexport.import.validation.start'),
+            'remove' => true
+        ]);
     }
 
     /**

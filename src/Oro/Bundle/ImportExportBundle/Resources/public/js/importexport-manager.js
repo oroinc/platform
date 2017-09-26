@@ -91,7 +91,7 @@ define(function(require) {
         },
 
         handleImportValidation: function() {
-            this._renderDialogWidget({
+            this._renderImportDialogWidget({
                 url: routing.generate(this.options.importValidationRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importValidationTitle

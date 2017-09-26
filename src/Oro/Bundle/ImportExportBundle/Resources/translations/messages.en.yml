@@ -48,6 +48,8 @@ oro:
                 access_denied_property_entity: Access denied to property %property_name% of entity "%entity_name%"
                 wrong_owner: You have no access to set given owner
             postponed_rows: "There were %postponedRows% rows that could not be proccessed."
+            validation:
+                start: 'Import validation started successfully. You will receive email notification upon completion.'
         message:
             entities.label: "entities"
 
