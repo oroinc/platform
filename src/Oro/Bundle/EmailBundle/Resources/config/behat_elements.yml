@@ -1,0 +1,3 @@
+EmailNotificationLink:
+      selector: 'a.email-notification-icon'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

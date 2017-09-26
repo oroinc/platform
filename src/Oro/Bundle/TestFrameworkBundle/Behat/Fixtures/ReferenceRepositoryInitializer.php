@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
-use Doctrine\ORM\EntityManager;
 use Nelmio\Alice\Instances\Collection as AliceCollection;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -11,9 +13,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 class ReferenceRepositoryInitializer
 {
     /**
-     * @var EntityManager
+     * @var RegistryInterface
      */
-    protected $em;
+    protected $registry;
 
     /**
      * @var AliceCollection
@@ -21,13 +23,26 @@ class ReferenceRepositoryInitializer
     protected $referenceRepository;
 
     /**
+     * @var ReferenceRepositoryInitializerInterface[]
+     */
+    protected $initializers = [];
+
+    /**
      * @param Registry $registry
      * @param AliceCollection $referenceRepository
      */
     public function __construct(Registry $registry, AliceCollection $referenceRepository)
     {
-        $this->em = $registry->getManager();
+        $this->registry = $registry;
         $this->referenceRepository = $referenceRepository;
+    }
+
+    /**
+     * @param ReferenceRepositoryInitializerInterface $initializer
+     */
+    public function addInitializer(ReferenceRepositoryInitializerInterface $initializer)
+    {
+        $this->initializers[] = $initializer;
     }
 
     /**
@@ -43,6 +58,10 @@ class ReferenceRepositoryInitializer
         $this->referenceRepository->set('adminRole', $user->getRole(User::ROLE_ADMINISTRATOR));
         $this->referenceRepository->set('organization', $user->getOrganization());
         $this->referenceRepository->set('business_unit', $user->getOwner());
+
+        foreach ($this->initializers as $initializer) {
+            $initializer->init($this->registry, $this->referenceRepository);
+        }
     }
 
     /**
@@ -56,7 +75,7 @@ class ReferenceRepositoryInitializer
 
         foreach ($references as $key => $object) {
             $class = get_class($object);
-            $newReference = $this->em->getReference($class, $object->getId());
+            $newReference = $this->registry->getManager()->getReference($class, $object->getId());
 
             $this->referenceRepository->set($key, $newReference);
         }
@@ -77,7 +96,7 @@ class ReferenceRepositoryInitializer
     protected function getDefaultUser()
     {
         /** @var RoleRepository $repository */
-        $repository = $this->em->getRepository('OroUserBundle:Role');
+        $repository = $this->registry->getManager()->getRepository('OroUserBundle:Role');
         $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
         if (!$role) {

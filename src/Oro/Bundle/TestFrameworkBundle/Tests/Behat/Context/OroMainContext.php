@@ -7,6 +7,7 @@ use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
@@ -21,6 +22,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
+use WebDriver\Exception\NoAlertOpenError;
 
 /**
  * Defines application features from the specific context.
@@ -108,6 +110,61 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeErrorMessage($title)
     {
         $this->assertSession()->elementTextContains('css', '.alert-error', $title);
+    }
+
+    /**
+     * Assert alert is not present
+     * Example: Then I should not see alert
+     *
+     * @Then I should not see alert
+     */
+    public function iShouldNotSeeAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+        try {
+            $session->accept_alert();
+            $alertMessage = $session->getAlert_text();
+        } catch (NoAlertOpenError $e) {
+            return;
+        }
+        self::fail('Expect to see no alert but alert with "'.$alertMessage.'" message is present');
+    }
+    /**
+     * Assert that no malicious scripts present on page
+     * Example: Then I should not see malicious scripts
+     *
+     * @Then I should not see malicious scripts
+     */
+    public function iShouldNotSeeMaliciousScripts()
+    {
+        $this->assertPageNotContainsText('<script>');
+        $this->assertPageNotContainsText('<Script>');
+        $this->assertPageNotContainsText('&lt;script&gt;');
+        $this->assertPageNotContainsText('&lt;Script&gt;');
+    }
+
+    /**
+     * Click on button or link
+     * Example: Given I click "Edit"
+     * Example: When I click "Save and Close"
+     *
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
+     */
+    public function pressButton($button)
+    {
+        try {
+            parent::pressButton($button);
+        } catch (ElementNotFoundException $e) {
+            if ($this->getSession()->getPage()->hasLink($button)) {
+                $this->clickLink($button);
+            } elseif ($this->elementFactory->hasElement($button)) {
+                $this->elementFactory->createElement($button)->click();
+            } else {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -229,22 +286,6 @@ class OroMainContext extends MinkContext implements
         }
 
         self::fail(sprintf('Can\'t find "%s" item in user menu', $needle));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function pressButton($button)
-    {
-        try {
-            parent::pressButton($button);
-        } catch (ElementNotFoundException $e) {
-            if ($this->getSession()->getPage()->hasLink($button)) {
-                $this->clickLink($button);
-            } else {
-                throw $e;
-            }
-        }
     }
 
     /**

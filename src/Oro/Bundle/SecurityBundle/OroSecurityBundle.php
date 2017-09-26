@@ -14,6 +14,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipTreeProvider
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationHttpBasicFactory;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationFormLoginFactory;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
+use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 
 class OroSecurityBundle extends Bundle
 {
@@ -52,5 +53,13 @@ class OroSecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new OrganizationFormLoginFactory());
         $extension->addSecurityListenerFactory(new OrganizationHttpBasicFactory());
         $extension->addSecurityListenerFactory(new OrganizationRememberMeFactory());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+        CryptedStringType::setCrypter($this->container->get('oro_security.encoder.repetitive_crypter'));
     }
 }
