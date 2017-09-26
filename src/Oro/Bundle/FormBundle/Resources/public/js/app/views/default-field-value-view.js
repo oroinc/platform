@@ -53,14 +53,12 @@ define(function(require) {
         },
 
         _prepareTinymce: function($textareas) {
-            if ($textareas.length > 0) {
-                $textareas.each(function(i, el) {
-                    var editor = tinyMCE.get(el.id);
-                    if (editor) {
-                        editor.setMode($(el).prop('disabled') ? 'readonly' : 'code');
-                    }
-                });
-            }
+            $textareas.each(function(i, el) {
+                var editor = tinyMCE.get(el.id);
+                if (editor) {
+                    editor.setMode($(el).prop('disabled') ? 'readonly' : 'code');
+                }
+            });
         }
     });
 
