@@ -16,11 +16,11 @@ define(function(require) {
             emailVariableView: {} // link to app/views/email-variable-view
         },
         listen: {
-            'email-variable-view:click-variable mediator': 'onVariableClick'
+            'email-variable-view:click-variable mediator': '_onVariableClick'
         },
         events: {
-            'change input[name*=type]': 'onTypeChange',
-            'click .dialog-form-renderer': 'onPreview'
+            'change input[name*=type]': '_onTypeChange',
+            'click .dialog-form-renderer': '_onPreview'
         },
 
         initialize: function(options) {
@@ -49,7 +49,7 @@ define(function(require) {
             }
         },
 
-        onPreview: function(event) {
+        _onPreview: function(event) {
             event.preventDefault();
             var $currentView = this.$el;
 
@@ -100,7 +100,7 @@ define(function(require) {
             $currentView.submit();
         },
 
-        onVariableClick: function(field, value) {
+        _onVariableClick: function(field, value) {
             if (this.options.isWysiwygEnabled) {
                 this.forEachComponent(function(component) {
                     if (_.result(component.view, 'tinymceConnected') === true && component.view.$el.is(field)) {
@@ -132,7 +132,7 @@ define(function(require) {
             }
         },
 
-        onTypeChange: function(e) {
+        _onTypeChange: function(e) {
             if (this.options.hasWysiwyg) {
                 var target = $(e.target);
                 if (!target.is(':checked')) {
