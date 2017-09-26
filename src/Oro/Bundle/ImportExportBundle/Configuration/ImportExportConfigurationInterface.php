@@ -5,21 +5,6 @@ namespace Oro\Bundle\ImportExportBundle\Configuration;
 interface ImportExportConfigurationInterface
 {
     /**
-     * @return bool
-     */
-    public function isRefreshPageOnSuccess(): bool;
-
-    /**
-     * @return string|null
-     */
-    public function getAfterRefreshPageMessage();
-
-    /**
-     * @return string|null
-     */
-    public function getDataGridName();
-
-    /**
      * @return array
      */
     public function getRouteOptions(): array;
@@ -72,27 +57,12 @@ interface ImportExportConfigurationInterface
     /**
      * @return string|null
      */
-    public function getExportTemplatePopupTitle();
-
-    /**
-     * @return string|null
-     */
     public function getImportJobName();
 
     /**
      * @return string|null
      */
     public function getImportProcessorAlias();
-
-    /**
-     * @return string|null
-     */
-    public function getImportButtonLabel();
-
-    /**
-     * @return string|null
-     */
-    public function getImportPopupTitle();
 
     /**
      * @return string|null

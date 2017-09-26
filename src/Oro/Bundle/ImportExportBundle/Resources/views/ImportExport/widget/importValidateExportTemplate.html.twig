@@ -16,11 +16,6 @@
 
             {% set form = get_import_form(config.entityClass).createView() %}
             {% set shortEntityName = config.entityClass|basename %}
-            {% set exportTemplateProcessors = get_export_template_processor_choices(config.entityClass) %}
-
-            {% set hasExportTemplateProcessor = exportTemplateProcessors is not empty %}
-
-            {% set isMultipleProcessorsRequired = config.exportProcessorAlias is iterable %}
 
             <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if loop.index == 1 %} active{% endif %}">
                 <div class="form-container">
@@ -52,6 +47,10 @@
                             {{ form_rest(form) }}
                         </fieldset>
 
+                        {% set exportTemplateProcessors = config.exportTemplateProcessorAlias %}
+                        {% set hasExportTemplateProcessor = config.exportTemplateProcessorAlias is not empty %}
+                        {% set isMultipleProcessorsRequired = exportTemplateProcessors is iterable %}
+
                         {% if hasExportTemplateProcessor %}
 
                             {% if isMultipleProcessorsRequired and exportTemplateProcessors|length > 1 %}
@@ -78,16 +77,16 @@
                                 {% endfor %}
 
                                 {{ UI.dropdownButton({
-                                    'label': 'oro.importexport.export_template.label'|trans,
+                                    'label': config.exportTemplateButtonLabel|default('oro.importexport.export_template.label'|trans),
                                     'elements': exportTemplateButtons
                                 }) }}
                             {% else %}
                                 {{ UI.button({
                                     'path':'#',
                                     'aCss':'icons-holder-text no-hash',
-                                    'title': 'oro.importexport.export_template.label'|trans,
+                                    'title': config.exportTemplateButtonLabel|default('oro.importexport.export_template.label'|trans),
                                     'iCss':'fa-file-o hide-text',
-                                    'label': 'oro.importexport.export_template.label'|trans,
+                                    'label': config.exportTemplateButtonLabel|default('oro.importexport.export_template.label'|trans),
                                     'data': {
                                         'page-component-module': 'oroui/js/app/components/view-component',
                                         'page-component-options': {

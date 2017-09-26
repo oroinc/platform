@@ -118,11 +118,3 @@ services:
         public: false
         tags:
             - { name: twig.extension }
-
-    oro_importexport.twig_extension.get_export_template_processor_choices:
-        class: 'Oro\Bundle\ImportExportBundle\Twig\GetExportTemplateProcessorChoices'
-        public: false
-        arguments:
-            - '@oro_importexport.processor.registry'
-        tags:
-            - { name: twig.extension }
