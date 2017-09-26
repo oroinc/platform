@@ -20,9 +20,7 @@ class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->serializedFieldProvider = new SerializedFieldProvider($this->extendConfigProvider);
     }
@@ -87,25 +85,8 @@ class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $fieldConfigModel->fromArray('attribute', ['sortable' => true]);
-        $propertyConfigContainer = $this->getMockBuilder(PropertyConfigContainer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requiredPropertyValues = [
-            'is_serialized' => [
-                [
-                    'config_id' => ['scope' => 'attribute'],
-                    'code' => 'sortable',
-                    'value' => false,
-                ],
-            ],
-        ];
-        $propertyConfigContainer->expects($this->once())
-            ->method('getRequiredPropertiesValues')
-            ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->willReturn($requiredPropertyValues);
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getPropertyConfig')
-            ->willReturn($propertyConfigContainer);
+
+        $this->assertExtendConfigProvider();
 
         $isSerialized = $this->serializedFieldProvider->isSerialized($fieldConfigModel);
 
@@ -116,25 +97,8 @@ class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $fieldConfigModel->fromArray('attribute', ['sortable' => false, 'enabled' => true]);
-        $propertyConfigContainer = $this->getMockBuilder(PropertyConfigContainer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requiredPropertyValues = [
-            'is_serialized' => [
-                [
-                    'config_id' => ['scope' => 'attribute'],
-                    'code' => 'sortable',
-                    'value' => false,
-                ],
-            ],
-        ];
-        $propertyConfigContainer->expects($this->once())
-            ->method('getRequiredPropertiesValues')
-            ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->willReturn($requiredPropertyValues);
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getPropertyConfig')
-            ->willReturn($propertyConfigContainer);
+
+        $this->assertExtendConfigProvider();
 
         $isSerialized = $this->serializedFieldProvider->isSerialized($fieldConfigModel);
 
@@ -145,25 +109,8 @@ class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $data = ['attribute' => ['sortable' => true]];
-        $propertyConfigContainer = $this->getMockBuilder(PropertyConfigContainer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requiredPropertyValues = [
-            'is_serialized' => [
-                [
-                    'config_id' => ['scope' => 'attribute'],
-                    'code' => 'sortable',
-                    'value' => false,
-                ],
-            ],
-        ];
-        $propertyConfigContainer->expects($this->once())
-            ->method('getRequiredPropertiesValues')
-            ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->willReturn($requiredPropertyValues);
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getPropertyConfig')
-            ->willReturn($propertyConfigContainer);
+
+        $this->assertExtendConfigProvider();
 
         $isSerialized = $this->serializedFieldProvider->isSerializedByData($fieldConfigModel, $data);
 
@@ -174,25 +121,8 @@ class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $data = ['attribute' => ['sortable' => false, 'enabled' => true]];
-        $propertyConfigContainer = $this->getMockBuilder(PropertyConfigContainer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requiredPropertyValues = [
-            'is_serialized' => [
-                [
-                    'config_id' => ['scope' => 'attribute'],
-                    'code' => 'sortable',
-                    'value' => false,
-                ],
-            ],
-        ];
-        $propertyConfigContainer->expects($this->once())
-            ->method('getRequiredPropertiesValues')
-            ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->willReturn($requiredPropertyValues);
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getPropertyConfig')
-            ->willReturn($propertyConfigContainer);
+
+        $this->assertExtendConfigProvider();
 
         $isSerialized = $this->serializedFieldProvider->isSerializedByData($fieldConfigModel, $data);
         
@@ -214,5 +144,28 @@ class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'isSerialized' => false
             ]
         ];
+    }
+
+    protected function assertExtendConfigProvider()
+    {
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
+        $propertyConfigContainer->expects($this->once())
+            ->method('getRequiredPropertiesValues')
+            ->with(PropertyConfigContainer::TYPE_FIELD)
+            ->willReturn(
+                [
+                    'is_serialized' => [
+                        [
+                            'config_id' => ['scope' => 'attribute'],
+                            'code' => 'sortable',
+                            'value' => false,
+                        ],
+                    ],
+                ]
+            );
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getPropertyConfig')
+            ->willReturn($propertyConfigContainer);
     }
 }

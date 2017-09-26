@@ -28,7 +28,7 @@ abstract class AbstractIndexDecimal implements ItemFieldInterface
     /**
      * @var float
      *
-     * @ORM\Column(name="value", type="decimal", scale=2, nullable=false))
+     * @ORM\Column(name="value", type="decimal", precision=21, scale=6, nullable=false))
      */
     protected $value;
 

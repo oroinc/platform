@@ -177,7 +177,7 @@ class ActivityListFilter extends EntityFilter
                 ->join($joinField, $this->activityAlias)
                 ->andWhere(sprintf('%s.id = %s.%s', $this->activityAlias, $this->getEntityAlias(), $entityIdField));
 
-        $entityField = $this->getField();
+        $entityField = $this->getField($data);
         $dateRangeField = strpos($entityField, '$') === 0 ? substr($entityField, 1) : null;
         if ($dateRangeField) {
             $data['dateRange'] = $data['filter']['data'];
@@ -219,7 +219,7 @@ class ActivityListFilter extends EntityFilter
             $alias = end($lastGroup)->getAlias();
         }
 
-        $field = $this->getField();
+        $field = $this->getField($data);
         $ds = new OrmFilterDatasourceAdapter($grid->getDatasource()->getQueryBuilder());
         $this->applyFilter(
             $ds,
@@ -301,7 +301,6 @@ class ActivityListFilter extends EntityFilter
             ->setDefinition(json_encode([
                 'filters' => [
                     [
-                        'columnName' => $this->getEntityField(),
                         'criterion' => $data['filter'],
                     ],
                 ],
@@ -364,19 +363,17 @@ class ActivityListFilter extends EntityFilter
     /**
      * @return string
      */
-    protected function getEntityField()
+    protected function getEntityField(array $data)
     {
-        list(, $field) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
-
-        return base64_decode($field);
+        return $data['activityFieldName'];
     }
 
     /**
      * @return string
      */
-    protected function getField()
+    protected function getField(array $data)
     {
-        $fieldName = $this->getEntityField();
+        $fieldName = $this->getEntityField($data);
         if (strpos($fieldName, '\\') === false) {
             return $fieldName;
         }

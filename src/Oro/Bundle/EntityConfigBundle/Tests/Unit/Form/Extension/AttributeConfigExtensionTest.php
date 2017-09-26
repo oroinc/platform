@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Extension;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\AttributeTypeRegistry;
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\BooleanAttributeType;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -9,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeConfigExtension;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
 
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
@@ -16,36 +20,30 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class AttributeConfigExtensionTest extends TypeTestCase
 {
-    /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $attributeConfigProvider;
 
-    /**
-     * @var SerializedFieldProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var SerializedFieldProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $serializedFieldProvider;
 
-    /**
-     * @var AttributeConfigExtension
-     */
+    /** @var AttributeTypeRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $attributeTypeRegistry;
+
+    /** @var AttributeConfigExtension */
     protected $extension;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->attributeConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->serializedFieldProvider = $this->getMockBuilder(SerializedFieldProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->serializedFieldProvider = $this->createMock(SerializedFieldProvider::class);
+        $this->attributeTypeRegistry = $this->createMock(AttributeTypeRegistry::class);
 
         $this->extension = new AttributeConfigExtension(
             $this->attributeConfigProvider,
-            $this->serializedFieldProvider
+            $this->serializedFieldProvider,
+            $this->attributeTypeRegistry
         );
     }
 
@@ -53,30 +51,111 @@ class AttributeConfigExtensionTest extends TypeTestCase
     {
         $fieldConfigModel = $this->getFieldConfigModel();
 
-        $classConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
-        $classConfig->expects($this->once())
-            ->method('is')
-            ->with('has_attributes')
-            ->willReturn(true);
-        $fieldConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
-        $fieldConfig->expects($this->once())
-            ->method('is')
-            ->with('is_attribute')
-            ->willReturn(true);
-        $this->attributeConfigProvider->expects($this->exactly(2))
-            ->method('getConfig')
-            ->withConsecutive(
-                [$fieldConfigModel->getEntity()->getClassName()],
-                [$fieldConfigModel->getEntity()->getClassName(), $fieldConfigModel->getFieldName()]
-            )
-            ->willReturnOnConsecutiveCalls($classConfig, $fieldConfig);
+        $this->assertConfigProviderCalled($fieldConfigModel);
+        $this->assertAttributeTypeRegistryCalled($fieldConfigModel, false, false, false);
 
-        $this->dispatcher->expects($this->exactly(2))
-            ->method('addListener');
+        $this->dispatcher->expects($this->exactly(2))->method('addListener');
+
+        $attributeTypeBuilder = $this->createMock(FormBuilderInterface::class);
+        $attributeTypeBuilder->expects($this->any())->method('getName')->willReturn('attribute');
+        $attributeTypeBuilder->expects($this->exactly(4))
+            ->method('remove')
+            ->withConsecutive(
+                ['searchable'],
+                ['filterable'],
+                ['filter_by'],
+                ['sortable']
+            );
+
+        $this->builder->add($attributeTypeBuilder);
 
         $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
+    }
+
+    public function testBuildFormWithAllFields()
+    {
+        $fieldConfigModel = $this->getFieldConfigModel();
+
+        $this->assertConfigProviderCalled($fieldConfigModel);
+        $this->assertAttributeTypeRegistryCalled($fieldConfigModel, true, true, true);
+
+        $this->dispatcher->expects($this->exactly(2))->method('addListener');
+
+        $attributeTypeBuilder = $this->createMock(FormBuilderInterface::class);
+        $attributeTypeBuilder->expects($this->any())->method('getName')->willReturn('attribute');
+        $attributeTypeBuilder->expects($this->never())->method('remove');
+
+        $this->builder->add($attributeTypeBuilder);
+
+        $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
+    }
+
+    public function testBuildFormWithoutAttributeType()
+    {
+        $fieldConfigModel = $this->getFieldConfigModel();
+
+        $this->assertConfigProviderCalled($fieldConfigModel);
+
+        $this->dispatcher->expects($this->exactly(2))->method('addListener');
+
+        $attributeTypeBuilder = $this->createMock(FormBuilderInterface::class);
+        $attributeTypeBuilder->expects($this->any())->method('getName')->willReturn('attribute');
+        $attributeTypeBuilder->expects($this->exactly(4))
+            ->method('remove')
+            ->withConsecutive(
+                ['searchable'],
+                ['filterable'],
+                ['filter_by'],
+                ['sortable']
+            );
+
+        $this->builder->add($attributeTypeBuilder);
+
+        $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
+    }
+
+    /**
+     * @param FieldConfigModel $fieldConfigModel
+     */
+    protected function assertConfigProviderCalled(FieldConfigModel $fieldConfigModel)
+    {
+        $classConfig = $this->createMock(ConfigInterface::class);
+        $classConfig->expects($this->once())->method('is')->with('has_attributes')->willReturn(true);
+
+        $fieldConfig = $this->createMock(ConfigInterface::class);
+        $fieldConfig->expects($this->once())->method('is')->with('is_attribute')->willReturn(true);
+
+        $this->attributeConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->willReturnMap(
+                [
+                    [$fieldConfigModel->getEntity()->getClassName(), null, $classConfig],
+                    [$fieldConfigModel->getEntity()->getClassName(), $fieldConfigModel->getFieldName(), $fieldConfig]
+                ]
+            );
+    }
+
+    /**
+     * @param FieldConfigModel $attribute
+     * @param bool $isSearchable
+     * @param bool $isFilterable
+     * @param bool $isSortable
+     */
+    protected function assertAttributeTypeRegistryCalled(
+        FieldConfigModel $attribute,
+        $isSearchable,
+        $isFilterable,
+        $isSortable
+    ) {
+        $attributeType = $this->createMock(AttributeTypeInterface::class);
+        $attributeType->expects($this->once())->method('isSearchable')->willReturn($isSearchable);
+        $attributeType->expects($this->once())->method('isFilterable')->willReturn($isFilterable);
+        $attributeType->expects($this->once())->method('isSortable')->willReturn($isSortable);
+
+        $this->attributeTypeRegistry->expects($this->once())
+            ->method('getAttributeType')
+            ->with($attribute)
+            ->willReturn($attributeType);
     }
 
     public function testBuildFormNotConfigurable()

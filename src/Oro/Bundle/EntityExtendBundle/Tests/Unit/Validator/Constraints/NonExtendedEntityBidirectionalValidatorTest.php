@@ -66,8 +66,10 @@ class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintVali
             ->with('extend', $className)
             ->willReturn($config);
 
-        $value['bidirectional'] = $isBidirectional;
-        $value['target_entity'] = $className;
+        $value = ['target_entity' => $className];
+        if (is_bool($isBidirectional)) {
+            $value['bidirectional'] = $isBidirectional;
+        }
 
         $this->validator->validate($value, $this->constraint);
 
@@ -110,6 +112,13 @@ class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintVali
                 'Test\Entity1',
                 RelationType::ONE_TO_MANY,
                 false,
+                false,
+                'The field can\'t be set to \'No\' when relation type is \'oneToMany\''
+            ],
+            'oneToMany not bidirectional without parameter' => [
+                'Test\Entity1',
+                RelationType::ONE_TO_MANY,
+                null,
                 false,
                 'The field can\'t be set to \'No\' when relation type is \'oneToMany\''
             ],
