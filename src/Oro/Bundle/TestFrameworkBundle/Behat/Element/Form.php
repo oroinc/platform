@@ -41,6 +41,7 @@ class Form extends Element
             }
 
             $field = $this->wrapField($label, $field);
+            $field->focus();
             $field->setValue($value);
             $field->blur();
         }
