@@ -292,9 +292,10 @@ define(function(require) {
             return this.widget.parent();
         },
 
-        getActionsElement: function() {
+        getActionsElement: function(wrapperClass) {
+            var wrapperClass = wrapperClass ? wrapperClass : 'pull-right';
             if (!this.actionsEl) {
-                this.actionsEl = $('<div class="pull-right"/>').appendTo(
+                this.actionsEl = $('<div class="'+ wrapperClass + '"/>').appendTo(
                     $('<div class="form-actions widget-actions"/>').appendTo(
                         this.widget.dialog('actionsContainer')
                     )
