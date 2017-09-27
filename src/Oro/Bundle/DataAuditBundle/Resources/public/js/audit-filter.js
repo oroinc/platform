@@ -13,7 +13,7 @@ define(function(require) {
         template: template,
         templateSelector: null,
         criteriaValueSelectors: _.extend({}, DateTimeFilter.prototype.criteriaValueSelectors, {
-            date_type: 'select[name=datetime]'
+            date_type: '.audit-type-filter-container select[name=datetime]'
         }),
         auditTypeFilterContainerSelector: '.audit-type-filter-container',
 
