@@ -106,6 +106,11 @@ define(function(require) {
             return this;
         },
 
+        getType: function() {
+            var value = this._readDOMValue();
+            return value.type;
+        },
+
         /**
          * @inheritDoc
          */

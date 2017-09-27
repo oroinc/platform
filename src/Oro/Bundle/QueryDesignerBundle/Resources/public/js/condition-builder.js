@@ -41,8 +41,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
 
         currentDraggingElementHeight: 0,
 
+        loadedModules: null,
+
         _create: function() {
             var modules;
+            this.loadedModules = {};
             this.$criteriaList = $(this.options.criteriaListSelector);
             this._prepareOptions();
 
@@ -55,12 +58,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
             });
 
             // if some criteria requires addition modules, load them before initialization
+
             modules = this.$criteriaList.find('[data-module]').map(function() {
                 return $(this).data('module');
             }).get();
 
             if (modules.length) {
-                require(modules, $.proxy(this._initControl, this));
+                require(modules, _.bind(function() {
+                    this.loadedModules = _.object(modules, arguments);
+                    this._initControl();
+                }, this));
             } else {
                 this._initControl();
             }
@@ -283,8 +290,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
             var  $condition;
             var  $criteria;
             var  $validationInput;
-            var  widgetOptions;
-            var  widgetName;
             if (!criteria) {
                 // if criteria is not passed, define it from value
                 criteria = $.isArray(value) ? 'conditions-group' : (value.criteria || 'condition-item');
@@ -296,15 +301,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
             } else {
                 $content = this._createConditionContent(this.options.conditionItemHTML, value || {});
                 $criteria = this._getCriteriaOrigin(criteria);
-                widgetOptions = $criteria.data('options') || {};
-                widgetName = $criteria.data('widget');
-                if ($.isFunction($content[widgetName])) {
-                    $content[widgetName](widgetOptions);
+                var modulePath = $criteria.data('module');
+                if (modulePath in this.loadedModules) {
+                    var view = new this.loadedModules[modulePath](_.extend({
+                        el: $content,
+                        autoRender: true
+                    }, $criteria.data('options')));
+                    view.on('close', this.closeCondition.bind(this, $content));
                 }
             }
 
             $condition = $(this.options.conditionHTML)
                 .attr('data-criteria', criteria)
+                .addClass(criteria)
                 .prepend($content)
                 .prepend('<a class="close" href="#">&times;</a>');
 
@@ -426,9 +435,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         },
 
         _onConditionClose: function(e) {
-            var $condition = $(e.target).parent();
-            var $group = $condition.parent();
             e.preventDefault();
+            var $condition = $(e.target).parent();
+            this.closeCondition($condition);
+        },
+
+        closeCondition: function($condition) {
+            var $group = $condition.parent();
             $condition.remove();
             this._updateOperators();
             $group.trigger('changed');

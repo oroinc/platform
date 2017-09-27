@@ -4,12 +4,11 @@ define(function(require) {
     var $ = require('jquery');
     var markup = require('text!./Fixture/field-condition/markup.html');
     var data = JSON.parse(require('text!./Fixture/field-condition/entities.json'));
-    require('oroquerydesigner/js/field-condition');
 
     /**
      * Will be refactored in BAP-8667
      */
-    xdescribe('oroquerydesigner/js/field-condition', function() {
+    xdescribe('oroquerydesigner/js/app/views/base-condition-view', function() {
         var $el = null;
 
         beforeEach(function() {
@@ -50,7 +49,7 @@ define(function(require) {
 
         it('is $ widget', function(done) {
             expect(function() {
-                $el.fieldCondition();
+                $el.baseConditionWidget();
                 waitForFilter(function() {
                     done();
                 });
@@ -66,7 +65,7 @@ define(function(require) {
             $el.data('value', {
                 columnName: 'name'
             });
-            $el.fieldCondition({
+            $el.baseConditionWidget({
                 fieldChoice: {
                     fieldsLoaderSelector: '#fields_loader'
                 }
@@ -90,7 +89,7 @@ define(function(require) {
                     }
                 }
             });
-            $el.fieldCondition({
+            $el.baseConditionWidget({
                 'fieldChoice': {
                     'select2': {
                         'placeholder': 'Choose a field...',
@@ -124,7 +123,7 @@ define(function(require) {
                     }
                 }
             });
-            $el.fieldCondition({
+            $el.baseConditionWidget({
                 'fieldChoice': {
                     'select2': {
                         'placeholder': 'Choose a field...',
@@ -218,7 +217,7 @@ define(function(require) {
                     }
                 }
             });
-            $el.fieldCondition({
+            $el.baseConditionWidget({
                 'fieldChoice': {
                     'select2': {
                         'placeholder': 'Choose a field...',
@@ -372,7 +371,7 @@ define(function(require) {
                 ]
             });
             waitForFilter(function(timeout) {
-                $el.fieldCondition('selectField', 'createdAt');
+                $el.baseConditionWidget('selectField', 'createdAt');
                 waitForFilter(function(timeout) {
                     var $f = $el.find('.active-filter');
 

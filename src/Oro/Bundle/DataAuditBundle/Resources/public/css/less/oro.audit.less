@@ -6,3 +6,41 @@
     }
   }
 }
+.filter-conditions-tree {
+  .condition-data-audit {
+    .inner-filter-container > div {
+      display: inline;
+      > span:first-child {
+        display: none;
+      }
+    }
+    .audit-type-filter-container > div {
+      display: inline;
+    }
+    .changed-to-value-mode {
+      .separator {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .value-label {
+        display: none;
+      }
+      .value-that-label {
+        display: inline-block;
+      }
+      &.date-condition-type {
+        .value-label {
+          display: inline-block;
+        }
+        .value-that-label {
+          display: none;
+        }
+      }
+    }
+    .changed-value-mode {
+      .inner-filter-container, .value-label, .value-that-label, .separator {
+        display: none;
+      }
+    }
+  }
+}

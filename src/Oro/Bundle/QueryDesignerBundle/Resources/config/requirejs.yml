@@ -1,8 +1,9 @@
 config:
     paths:
         'oroquerydesigner/js/condition-builder': 'bundles/oroquerydesigner/js/condition-builder.js'
-        'oroquerydesigner/js/field-condition': 'bundles/oroquerydesigner/js/field-condition.js'
-        'oroquerydesigner/js/aggregated-field-condition': 'bundles/oroquerydesigner/js/aggregated-field-condition.js'
+        'oroquerydesigner/js/app/views/abstract-condition-view': 'bundles/oroquerydesigner/js/app/views/abstract-condition-view.js'
+        'oroquerydesigner/js/app/views/field-condition-view': 'bundles/oroquerydesigner/js/app/views/field-condition-view.js'
+        'oroquerydesigner/js/app/views/aggregated-field-condition-view': 'bundles/oroquerydesigner/js/app/views/aggregated-field-condition-view.js'
         'oroquerydesigner/js/function-choice': 'bundles/oroquerydesigner/js/function-choice.js'
         'oroquerydesigner/js/items-manager/grouping-model': 'bundles/oroquerydesigner/js/items-manager/grouping-model.js'
         'oroquerydesigner/js/items-manager/column-model': 'bundles/oroquerydesigner/js/items-manager/column-model.js'

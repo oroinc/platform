@@ -28,8 +28,7 @@
                 <ul class="criteria-list" id="{{ params.criteria_list_id }}">
                     {% placeholder segment_criteria_list with {params: params} %}
                     <li class="option" data-criteria="condition-segment"
-                        data-module="orosegment/js/segment-condition"
-                        data-widget="segmentCondition"
+                        data-module="orosegment/js/app/views/segment-condition-view"
                         data-options="{{ segmentConditionOptions|json_encode }}">
                         {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
                     </li>
@@ -38,7 +37,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="right-area">
+            <div class="right-area filter-conditions-tree">
                 <div id="{{ params.id }}"
                      data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
                      data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>

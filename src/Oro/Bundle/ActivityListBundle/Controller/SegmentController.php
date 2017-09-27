@@ -42,8 +42,7 @@ class SegmentController extends Controller
                             'oro.query_designer.condition_builder.choose_entity_field'
                         ),
                     ],
-                ],
-                'extensions' => [],
+                ]
             ]
         ];
 
