@@ -229,7 +229,8 @@ class ImapEmailManager
         } catch (\Throwable $e) {
             throw new \RuntimeException(
                 sprintf(
-                    "Cannot parse email message. Error: %s. Stacktrace:\n%s",
+                    "Cannot parse email message. Subject: %s. Error: %s. Stacktrace:\n%s",
+                    $email->getSubject(),
                     $e->getMessage(),
                     $e->getTraceAsString()
                 )
