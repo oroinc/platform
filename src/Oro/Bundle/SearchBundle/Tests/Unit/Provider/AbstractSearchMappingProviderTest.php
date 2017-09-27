@@ -88,24 +88,30 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
 
     public function testIsClassSupported()
     {
-        $this->assertTrue($this->getProvider()->isClassSupported('Oro\TestBundle\Entity\TestEntity'));
-        $this->assertFalse($this->getProvider()->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
+        $provider = $this->getProvider();
+
+        $this->assertTrue($provider->isClassSupported('Oro\TestBundle\Entity\TestEntity'));
+        $this->assertFalse($provider->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
     }
 
     public function testHasFieldsMapping()
     {
-        $this->assertTrue($this->getProvider()->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
-        $this->assertFalse($this->getProvider()->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
+        $provider = $this->getProvider();
+
+        $this->assertTrue($provider->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
+        $this->assertFalse($provider->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
     }
 
     public function testGetEntityMapParameter()
     {
+        $provider = $this->getProvider();
+
         $this->assertEquals(
             'test_entity',
-            $this->getProvider()->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'alias')
+            $provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'alias')
         );
         $this->assertFalse(
-            $this->getProvider()->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'badParameter', false)
+            $provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'badParameter', false)
         );
     }
 
