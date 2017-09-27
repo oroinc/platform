@@ -277,7 +277,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
     * `oro_workflow.configuration.builder.workflow_definition.handle.class`
     * `oro_workflow.configuration.builder.process_configuration.class`
 ## 2.2.0 (2017-05-31)
-[Show detailed list of changes](file-incompatibilities-2-2-0.md)
+[Show detailed list of changes](incompatibilities-2-2-0.md)
 
 ### Added
 #### ApiBundle
@@ -364,7 +364,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 #### ApiBundle
 * Fixed handling of `property_path` option from `api.yml` for cases when the property path contains several fields, e.g. `customerAssociation.account`
 ## 2.1.0 (2017-03-30)
-[Show detailed list of changes](file-incompatibilities-2-1-0.md)
+[Show detailed list of changes](incompatibilities-2-1-0.md)
 
 ### Added
 #### Action Component
