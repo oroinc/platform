@@ -166,7 +166,6 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $driver->waitPageToLoad();
     }
 
@@ -207,6 +206,8 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
+
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
