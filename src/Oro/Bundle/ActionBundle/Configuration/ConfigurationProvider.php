@@ -106,7 +106,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
             $configuration = $this->cache->fetch($this->rootNode);
         } else {
             $configuration = $this->resolveConfiguration($errors);
-            $this->checkConfiguration($configuration);
 
             if (!$ignoreCache) {
                 $this->clearCache();
@@ -136,6 +135,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
         $merger = new ConfigurationMerger($this->kernelBundles);
         $configs = $merger->mergeConfiguration($rawConfiguration);
         $data = [];
+
+        $this->checkConfiguration($configs);
 
         try {
             if (!empty($configs)) {

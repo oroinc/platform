@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Extension;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\AttributeTypeRegistry;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
@@ -13,26 +14,30 @@ use Symfony\Component\Form\FormEvents;
 
 class AttributeConfigExtension extends AbstractTypeExtension
 {
-    /**
-     * @var ConfigProvider
-     */
+    use AttributeConfigExtensionApplicableTrait;
+
+    /** @var ConfigProvider */
     protected $attributeConfigProvider;
 
-    /**
-     * @var SerializedFieldProvider
-     */
+    /** @var SerializedFieldProvider */
     protected $serializedFieldProvider;
+
+    /** @var AttributeTypeRegistry */
+    protected $attributeTypeRegistry;
 
     /**
      * @param ConfigProvider $attributeConfigProvider
      * @param SerializedFieldProvider $serializedFieldProvider
+     * @param AttributeTypeRegistry $attributeTypeRegistry
      */
     public function __construct(
         ConfigProvider $attributeConfigProvider,
-        SerializedFieldProvider $serializedFieldProvider
+        SerializedFieldProvider $serializedFieldProvider,
+        AttributeTypeRegistry $attributeTypeRegistry
     ) {
         $this->attributeConfigProvider = $attributeConfigProvider;
         $this->serializedFieldProvider = $serializedFieldProvider;
+        $this->attributeTypeRegistry = $attributeTypeRegistry;
     }
 
     /**
@@ -42,18 +47,51 @@ class AttributeConfigExtension extends AbstractTypeExtension
     {
         $configModel = $options['config_model'];
         if ($configModel instanceof FieldConfigModel) {
-            $className = $configModel->getEntity()->getClassName();
-            $fieldName = $configModel->getFieldName();
-
-            $hasAttributes = $this->attributeConfigProvider->getConfig($className)->is('has_attributes');
-            $isAttribute = $this->attributeConfigProvider->getConfig($className, $fieldName)->is('is_attribute');
-            if ($hasAttributes && $isAttribute) {
+            if ($this->isApplicable($configModel)) {
                 $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPostSetData']);
                 $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit']);
+
+                $this->ensureAttributeFields($builder, $configModel);
             } else {
                 // Remove fields from 'attribute' scope for regular FieldConfigModel
                 $builder->remove('attribute');
             }
+        }
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param FieldConfigModel $configModel
+     */
+    protected function ensureAttributeFields(FormBuilderInterface $builder, FieldConfigModel $configModel)
+    {
+        if (!$builder->has('attribute')) {
+            return;
+        }
+
+        $attribute = $builder->get('attribute');
+
+        $attributeType = $this->attributeTypeRegistry->getAttributeType($configModel);
+        if (!$attributeType) {
+            $attribute->remove('searchable');
+            $attribute->remove('filterable');
+            $attribute->remove('filter_by');
+            $attribute->remove('sortable');
+
+            return;
+        }
+
+        if (!$attributeType->isSearchable($configModel)) {
+            $attribute->remove('searchable');
+        }
+
+        if (!$attributeType->isFilterable($configModel)) {
+            $attribute->remove('filterable');
+            $attribute->remove('filter_by');
+        }
+
+        if (!$attributeType->isSortable($configModel)) {
+            $attribute->remove('sortable');
         }
     }
 

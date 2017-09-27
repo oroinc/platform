@@ -8,3 +8,8 @@ security:
     access_decision_manager:
         strategy: unanimous
         allow_if_all_abstain: true
+
+doctrine:
+    dbal:
+        types:
+            crypted_string: Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType

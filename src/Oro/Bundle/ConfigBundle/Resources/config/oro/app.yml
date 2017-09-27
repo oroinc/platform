@@ -9,3 +9,7 @@ doctrine:
                 metadata_cache_driver:
                     type: service
                     id:   oro_config.cache.doctrine_metadata
+
+oro_message_queue:
+    persistent_services:
+        - 'oro_config.cache'
