@@ -10,6 +10,7 @@ Oro\Bundle\ReportBundle\Entity\Report:
         - Oro\Bundle\ReportBundle\Validator\Constraints\ReportDateGroupingConstraint:
             groups: [PreQueryValidate]
         - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint: ~
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint: ~
         - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint: ~
     properties:
         name:

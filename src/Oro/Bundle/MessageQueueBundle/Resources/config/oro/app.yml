@@ -8,6 +8,7 @@ oro_message_queue:
         - 'oro_message_queue.client.created_queues'
         - 'oro_message_queue.log.consumer_state'
         - 'oro_message_queue.log.message_to_array_converter'
+        - 'oro_message_queue.log.message_processor_class_provider'
     persistent_processors:
         - 'oro_message_queue.client.route_message_processor'
         - 'oro_message_queue.job.calculate_root_job_status_processor'

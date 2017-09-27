@@ -30,7 +30,7 @@ class UserApi
     /**
      * @var string
      *
-     * @ORM\Column(name="api_key", type="string", unique=true, length=255, nullable=false)
+     * @ORM\Column(name="api_key", type="crypted_string", unique=true, length=255, nullable=false)
      */
     protected $apiKey;
 
@@ -107,7 +107,7 @@ class UserApi
      */
     public function generateKey()
     {
-        return bin2hex(hash('sha1', uniqid(mt_rand(), true), true));
+        return bin2hex(random_bytes(20));
     }
 
     /**

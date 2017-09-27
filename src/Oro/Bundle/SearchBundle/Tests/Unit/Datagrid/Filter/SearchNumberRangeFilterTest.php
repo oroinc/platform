@@ -55,7 +55,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyBetween()
     {
-        $fieldName = 'field';
+        $fieldName = 'decimal.field';
 
         $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
             ->disableOriginalConstructor()
@@ -64,8 +64,8 @@ class SearchNumberRangeFilterTest extends \PHPUnit_Framework_TestCase
         $ds->expects($this->exactly(2))
             ->method('addRestriction')
             ->withConsecutive(
-                [new BaseComparison("decimal.".$fieldName, Comparison::GTE, 123), FilterUtility::CONDITION_AND, false],
-                [new BaseComparison("decimal.".$fieldName, Comparison::LTE, 155), FilterUtility::CONDITION_AND, false]
+                [new BaseComparison($fieldName, Comparison::GTE, 123), FilterUtility::CONDITION_AND, false],
+                [new BaseComparison($fieldName, Comparison::LTE, 155), FilterUtility::CONDITION_AND, false]
             );
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
@@ -83,7 +83,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyNotBetween()
     {
-        $fieldName = 'field';
+        $fieldName = 'decimal.field';
 
         $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
             ->disableOriginalConstructor()

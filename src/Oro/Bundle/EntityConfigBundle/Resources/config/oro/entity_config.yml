@@ -39,6 +39,11 @@ entity_config:
                         value_type: boolean
                         default_value: false
         field:
+            form:
+                block_config:
+                    attribute:
+                        title: oro.entity_config.block_titles.attribute.label
+                        priority: 50
             items:
                 is_attribute:
                     options:
@@ -65,8 +70,7 @@ entity_config:
                         options:
                             choices: ['No', 'Yes']
                             empty_value: false
-                            block: other
-                            subblock: frontend
+                            block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.searchable
                 filterable:
                     options:
@@ -77,9 +81,22 @@ entity_config:
                         options:
                             choices: ['No', 'Yes']
                             empty_value: false
-                            block: other
-                            subblock: frontend
+                            block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filterable
+                filter_by:
+                    options:
+                        value_type: string
+                        default_value: 'exact_value'
+                    form:
+                        type: choice
+                        options:
+                            choices:
+                                exact_value: 'oro.entity_config.field_config.filter_by.exact_value.label'
+                                fuzzy_search: 'oro.entity_config.field_config.filter_by.fuzzy_search.label'
+                            empty_value: false
+                            block: attribute
+                            label: oro.entity_config.entity_config.attribute.field.items.filter_by.label
+                            tooltip: oro.entity_config.entity_config.attribute.field.items.filter_by.tooltip
                 sortable:
                     options:
                         value_type: boolean
@@ -89,8 +106,7 @@ entity_config:
                         options:
                             choices: ['No', 'Yes']
                             empty_value: false
-                            block: other
-                            subblock: frontend
+                            block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.sortable
                 enabled:
                     options:
@@ -101,8 +117,7 @@ entity_config:
                         options:
                             choices: ['No', 'Yes']
                             empty_value: false
-                            block: other
-                            subblock: frontend
+                            block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.enabled
                 visible:
                     options:
@@ -118,6 +133,5 @@ entity_config:
                         options:
                             choices: ['No', 'Yes']
                             empty_value: false
-                            block: other
-                            subblock: frontend
+                            block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.visible
