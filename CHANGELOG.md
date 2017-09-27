@@ -1,77 +1,51 @@
-## 2.4.0 (Unreleased)
+## 2.3.1 (2017-07-28)
 
-### Added
-#### CacheBundle
-* Added tag `oro.config_cache_warmer.provider` to be able to register custom warmer configuration provider for `CacheWarmerListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/CacheBundle/EventListener/CacheWarmerListener.php "Oro\Bundle\CacheBundle\EventListener\CacheWarmerListener")</sup>. It must implement `ConfigCacheWarmerInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/CacheBundle/Provider/ConfigCacheWarmerInterface.php "Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface")</sup>.
-#### ImportExportBundle
-* Was added new parameter to `ConfigurableAddOrReplaceStrategy`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Strategy/Import/ConfigurableAddOrReplaceStrategy.php "Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy")</sup> class constructor and 
-`oro_importexport.strategy.configurable_add_or_replace` service. New parameter id `oro_security.owner.checker` service that helps check the owner during import.
-* `JobResult`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Job/JobResult.php "Oro\Bundle\ImportExportBundle\Job\JobResult")</sup> have new `needRedelivery` flag.
-`JobExecutor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Job/JobExecutor.php "Oro\Bundle\ImportExportBundle\Job\JobExecutor")</sup> in case of any of catched exception during Job processing is a type of
-`Doctrine\DBAL\Exception\UniqueConstraintViolationException` JobResult will have a `needRedelivery` flag set to true.
-* `ImportMessageProcessor`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Async/Import/ImportMessageProcessor.php "Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor")</sup> is able to catch new 
-`Oro\Component\MessageQueue\Exception\JobRedeliveryException` and it this case is able to requeue a message to process
-#### MessageQueue component
-* Added interface `Oro\Component\MessageQueue\Job\ExtensionInterface` that can be used to do some additional work before and after job processing.
 ### Changed
-#### ApiBundle
-* Class `HtmlFormatter`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/ApiDoc/HtmlFormatter.php "Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter")</sup> was renamed to `NewHtmlFormatter`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/ApiDoc/NewHtmlFormatter.php "Oro\Bundle\ApiBundle\ApiDoc\NewHtmlFormatter")</sup>
-#### DataGridBundle
-* Some inline underscore templates were moved to separate .html file for each template.
-* Class `PreciseOrderByExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/DataGridBundle/Extension/Sorter/PreciseOrderByExtension.php "Oro\Bundle\DataGridBundle\Extension\Sorter\PreciseOrderByExtension")</sup> was renamed to `HintExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/DataGridBundle/Extension/Sorter/HintExtension.php "Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension")</sup>. Hint name and priority now passed as 2nd and 3rd constructor arguments
-* `HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS` was enabled by default for all data grids. To enable order by nulls behavior same to MySQL for PostgreSQL next hint should be added to data grid config
-```yaml
-datagrids:
-    grid-name:
-       ...
-       source:
-           ...
-           hints:
-               - { name: HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, value: false }
-```
-#### ElasticSearchBundle
-* Tokenizer configuration has been changed. A full rebuilding of the backend search index is required.
-#### EmailBundle
-* Email entity is not ACL protected entity so it should not contain any permissions for it.
-* method `handleChangedAddresses` in class `EmailOwnerManager`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/EmailBundle/Entity/Manager/EmailOwnerManager.php "Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager")</sup> does not persist new EmailAddresses anymore, but returns array of updated entities and entities to create
-#### FilterBundle
-* Some inline underscore templates were moved to separate .html file for each template.
-#### ImportExportBundle
-* Class `ConfigurableTableDataConverter`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ImportExportBundle/Converter/ConfigurableTableDataConverter.php "Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter")</sup> does not initialize backend headers
-    during import anymore. Method `getHeaderConversionRules` previously called `initialize` method to load both conversion
-    rules and backend headers, but now it calls only `initializeRules`
-#### MessageQueueBundle
-* Parameter `oro_message_queue.maintance.idle_time` was renamed to `oro_message_queue.maintenance.idle_time`
-* Class `Oro\Component\MessageQueue\Consumption\Extension\SignalExtension`
-    * the visibility of method `interruptExecutionIfNeeded` was changed from `public` to `protected`
-#### UIBundle
-* Some inline underscore templates were moved to separate .html file for each template.
-* `'oroui/js/tools'` JS-module does not contain utils methods from `Caplin.utils` any more. Require `'chaplin'` directly to get access to them.
-* `'oroui/js/app/components/base/component-container-mixin'` Each view on which we want to call `'initLayout()'` method 
-(to intialize all components within) have to be marked as separated layout by adding `'data-layout="separate"'` 
-attribute. Otherwise `'Error'` will be thrown.
-### Removed
-#### ApiBundle
-* The `data_transformer` option for fields was removed from `Resources/config/oro/api.yml`. This option is required very very rarely and it is quite confusing for developers because its name is crossed with data transformers used in Symfony Forms, but the purpose of this option was very different and it was used to transform a field value from one data type to another during loading data. If you used this option for some of your API resources, please replace it with a processor for [customize_loaded_data](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md#customize_loaded_data-action) action.
-* Class `ApiActions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/Request/ApiActions.php "Oro\Bundle\ApiBundle\Request\ApiActions")</sup>
-    * removed methods `isInputAction`, `isOutputAction` and `getActionOutputFormatActionType`. They were moved to `RestDocHandler`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/ApiDoc/RestDocHandler.php "Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler")</sup>
-    * removed method `isIdentifierNeededForAction`. This code was moved to `ApiDocMetadataParser`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/ApiDoc/Parser/ApiDocMetadataParser.php "Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser")</sup>
-#### FormBundle
-* Removed usage of `'tinymce/jquery.tinymce'` extension. Use `'tinymce/tinymce'` directly instead
-#### SearchBundle
-* Removed method `getUniqueId` from class `BaseDriver`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/SearchBundle/Engine/Orm/BaseDriver.php "Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver")</sup>. Use method `getJoinAttributes` instead.
 #### SegmentBundle
-* Services `oro_segment.query_converter.segment` and `oro_segment.query_converter.segment.link` were removed.
-#### UserBundle
-* Removed the use of js-application build `js/oro.min.js` from login page. Use `head_script` twig placeholder to include custom script on login page.
-### Fixed
-#### MessageQueueBundle
-* Fixed handling of `priority` attribute of the tag `oro_message_queue.consumption.extension` to work in the same way
-as other Symfony's tagged services. From now the highest the priority number, the earlier the extension is executed.
-* Service `oro_message_queue.client.consume_messages_command` was removed
-* Service `oro_message_queue.command.consume_messages` was removed
-* The extension `TokenStorageClearerExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/MessageQueueBundle/Consumption/Extension/TokenStorageClearerExtension.php "Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension")</sup> was removed. This 
-job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/MessageQueueBundle/Consumption/Extension/ContainerResetExtension.php "Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension")</sup> extension.
+
+- Class `SegmentQueryConverterFactory`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.1/src/Oro/Bundle/SegmentBundle/Query/SegmentQueryConverterFactory.php "Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory")</sup> was created. It was registered as the service `oro_segment.query.segment_query_converter_factory`.
+
+    services.yml
+    ```yml
+    oro_segment.query.segment_query_converter_factory:
+        class: 'Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory'
+        arguments:
+            - '@oro_query_designer.query_designer.manager'
+            - '@oro_entity.virtual_field_provider.chain'
+            - '@doctrine'
+            - '@oro_query_designer.query_designer.restriction_builder'
+            - '@oro_entity.virtual_relation_provider.chain'
+        public: false
+    ```
+- Service `oro_segment.query.segment_query_converter_factory.link` was created to initialize the service `oro_segment.query.segment_query_converter_factory` in `DynamicSegmentQueryBuilder`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.1/src/Oro/Bundle/SegmentBundle/Query/DynamicSegmentQueryBuilder.php "Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder")</sup>.
+
+    services.yml
+    ```yml
+    oro_segment.query.segment_query_converter_factory.link:
+        tags:
+            - { name: oro_service_link,  service: oro_segment.query.segment_query_converter_factory }
+    ```
+- Class `DynamicSegmentQueryBuilder`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.1/src/Oro/Bundle/SegmentBundle/Query/DynamicSegmentQueryBuilder.php "Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder")</sup> was changed to use service `oro_segment.query.segment_query_converter_factory.link` instead of `oro_segment.query_converter.segment.link`.
+    - public method `setSegmentQueryConverterFactoryLink(ServiceLink $segmentQueryConverterFactoryLink)` was added.
+- Definition of service `oro_segment.query.dynamic_segment.query_builder` was changed in services.yml.
+    Before
+    ```yml
+    oro_segment.query.dynamic_segment.query_builder:
+        class: %oro_segment.query.dynamic_segment.query_builder.class%
+        arguments:
+            - '@oro_segment.query_converter.segment.link'
+            - '@doctrine'
+    ```
+    After
+    ```yml
+    oro_segment.query.dynamic_segment.query_builder:
+        class: %oro_segment.query.dynamic_segment.query_builder.class%
+        arguments:
+            - '@oro_segment.query_converter.segment.link'
+            - '@doctrine'
+        calls:
+            - [setSegmentQueryConverterFactoryLink, ['@oro_segment.query.segment_query_converter_factory.link']]
+    ```
 ## 2.3.0 (2017-07-28)
 
 ### Added
