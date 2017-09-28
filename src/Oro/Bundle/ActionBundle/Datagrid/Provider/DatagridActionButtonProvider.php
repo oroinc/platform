@@ -82,9 +82,9 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
     public function hasActions(DatagridConfiguration $configuration)
     {
         // datasource types other than ORM are not handled
-        if (!$configuration->isOrmDatasource()) {
-            return false;
-        }
+//        if (!$configuration->isOrmDatasource()) {
+//            return true;
+//        }
 
         return 0 !== count($this->getButtons($this->getButtonSearchContext($configuration), $configuration));
     }
@@ -325,9 +325,15 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
     protected function getButtonSearchContext(DatagridConfiguration $config)
     {
         $context = new ButtonSearchContext();
-        $context->setDatagrid($config->getName())
-            ->setEntity($config->getOrmQuery()->getRootEntity($this->entityClassResolver, true))
-            ->setGroup($this->groups);
+        if (!$config->isOrmDatasource()) {
+            $context->setDatagrid($config->getName())
+                ->setEntity('index')
+                ->setGroup($this->groups);
+        } else {
+            $context->setDatagrid($config->getName())
+                ->setEntity($config->getOrmQuery()->getRootEntity($this->entityClassResolver, true))
+                ->setGroup($this->groups);
+        }
 
         return $context;
     }
