@@ -62,7 +62,7 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
                 (string) $input,
                 $event->getException()->getMessage()
             ),
-            $this->getContext($input, ['exit_code' => $event->getExitCode()])
+            $this->getContext($input, ['exit_code' => $event->getExitCode(), 'exception' => $event->getException()])
         );
     }
 
