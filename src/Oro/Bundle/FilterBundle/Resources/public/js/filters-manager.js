@@ -55,6 +55,12 @@ define(function(require) {
         filterSelector: '[data-action=add-filter-select]',
 
         /**
+         *  Is used in template for render additional html
+         * @property {String} 'collapse-mode' | 'toggle-mode'
+         */
+        renderMode: '',
+
+        /**
          * Add filter button hint
          *
          * @property
@@ -153,11 +159,10 @@ define(function(require) {
                 if (filter.wrappable) {
                     _.extend(filter, filterWrapper);
                 }
-
                 this.listenTo(filter, filterListeners);
             }, this);
 
-            if ('filtersStateElement' in options) {
+            if (this.isFiltersStateViewNeeded(options)) {
                 var $container = this.$el.closest('body, .ui-dialog');
                 var filtersStateView = new FiltersStateView({
                     el: $container.find(options.filtersStateElement).first(),
@@ -171,6 +176,14 @@ define(function(require) {
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @param {object} options
+         * @returns {boolean}
+         */
+        isFiltersStateViewNeeded: function(options) {
+            return 'filtersStateElement' in options;
         },
 
         /**
@@ -306,6 +319,7 @@ define(function(require) {
          * @return {*}
          */
         enableFilters: function(filters) {
+            var self = this;
             if (_.isEmpty(filters)) {
                 return this;
             }
@@ -314,6 +328,7 @@ define(function(require) {
             _.each(filters, function(filter) {
                 if (filter.visible && !filter.isRendered()) {
                     var oldEl = filter.$el;
+                    filter.setRenderMode(self.renderMode);
                     // filter rendering process replaces $el
                     filter.render();
                     // so we need to replace element which keeps place in DOM with actual filter $el after rendering
@@ -330,7 +345,7 @@ define(function(require) {
             }
 
             if (optionsSelectors.length) {
-                this.selectWidget.multiselect('refresh');
+                this._refreshSelectWidget();
             }
 
             return this;
@@ -366,7 +381,10 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            return {filters: this.filters};
+            return {
+                filters: this.filters,
+                renderMode: this.renderMode
+            };
         },
 
         /**
@@ -392,6 +410,8 @@ define(function(require) {
                     $filterItems.append(filter.$el);
                     return;
                 }
+
+                filter.setRenderMode(this.renderMode);
                 filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();
@@ -414,7 +434,6 @@ define(function(require) {
                     this.$el.hide();
                 }
             }
-
             return this;
         },
 
@@ -544,6 +563,16 @@ define(function(require) {
             this._setButtonDesign($button);
             this._setButtonReset();
         },
+
+        /**
+         * Refresh multiselect widget
+         *
+         * @protected
+         */
+        _refreshSelectWidget: function() {
+            this.selectWidget.multiselect('refresh');
+        },
+
         /**
          * Set design for filter manager button
          *

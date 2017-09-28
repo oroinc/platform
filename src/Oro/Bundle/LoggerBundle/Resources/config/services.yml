@@ -36,3 +36,12 @@ services:
         class: Monolog\Processor\PsrLogMessageProcessor
         tags:
             - { name: monolog.processor }
+
+    oro_logger.consumption_extension.interruption_detail:
+        class: Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension
+        public: false
+        arguments:
+            - '@service_container'
+            - '@oro_message_queue.log.message_processor_class_provider'
+        tags:
+            - { name: oro_message_queue.consumption.extension, persistent: true }
