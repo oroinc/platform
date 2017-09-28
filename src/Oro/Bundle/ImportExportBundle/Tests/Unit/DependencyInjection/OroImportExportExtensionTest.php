@@ -14,6 +14,8 @@ class OroImportExportExtensionTest extends ExtensionTestCase
         $expectedDefinitions = [
             'oro_importexport.configuration.registry',
             'oro_importexport.twig_extension.get_import_export_configuration',
+            'oro_importexport.twig_extension.get_import_form',
+            'oro_importexport.twig_extension.basename',
         ];
 
         $this->assertDefinitionsLoaded($expectedDefinitions);

@@ -79,12 +79,26 @@ class ImportTypeTest extends FormIntegrationTestCase
 
     public function submitDataProvider()
     {
+        $data = new ImportData();
+        $data->setProcessorAlias('importname');
+
         return array(
             'empty data' => array(
                 'submitData' => array(),
-                'formData' => new ImportData(),
+                'formData' => $data,
                 'formOptions' => array(
-                    'entityName' => '\stdClass'
+                    'entityName' => 'name'
+                )
+            ),
+            'alias options' => array(
+                'submitData' => array(),
+                'formData' => $data,
+                'formOptions' => array(
+                    'entityName' => 'name',
+                    'processorAliasOptions' => [
+                        'expanded' => true,
+                        'multiple' => false,
+                    ],
                 )
             ),
         );
