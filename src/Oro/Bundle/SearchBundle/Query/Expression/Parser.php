@@ -26,6 +26,7 @@ class Parser
         Query::KEYWORD_SELECT,
         Query::KEYWORD_FROM,
         Query::KEYWORD_WHERE,
+        Query::KEYWORD_GROUP_BY,
 
         Query::KEYWORD_AND,
         Query::KEYWORD_OR,
@@ -116,6 +117,15 @@ class Parser
     ];
 
     /** @var array */
+    protected $groupingFunctions = [
+        Query::GROUP_FUNCTION_COUNT,
+        Query::GROUP_FUNCTION_SUM,
+        Query::GROUP_FUNCTION_MAX,
+        Query::GROUP_FUNCTION_MIN,
+        Query::GROUP_FUNCTION_AVG,
+    ];
+
+    /** @var array */
     protected $orderDirections = [
         Query::ORDER_ASC,
         Query::ORDER_DESC,
@@ -173,6 +183,9 @@ class Parser
                 break;
             case Query::KEYWORD_WHERE:
                 $this->parseWhereExpression();
+                break;
+            case Query::KEYWORD_GROUP_BY:
+                $this->parseGroupByExpression();
                 break;
             case Query::KEYWORD_OFFSET:
                 $this->parseOffsetExpression();
@@ -277,6 +290,44 @@ class Parser
             $token = $this->stream->current;
             $exit = $this->parseToken($token);
         }
+    }
+
+    /**
+     * Parse group_by expression from string query
+     */
+    protected function parseGroupByExpression()
+    {
+        /** @var Criteria $criteria */
+        $criteria = $this->query->getCriteria();
+
+        // skip GROUP_BY keyword
+        $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_GROUP_BY);
+
+        // parse field name
+        $fieldTypeToken = $this->stream->expect(Token::STRING_TYPE, $this->types, null, false);
+        $field = $criteria->implodeFieldTypeName(
+            $fieldTypeToken ? $fieldTypeToken->value : Query::TYPE_TEXT,
+            $this->stream->expect(Token::STRING_TYPE, null, 'Grouping field is expected')->value
+        );
+
+        // parse function
+        $functionToken = $this->stream->expect(
+            Token::STRING_TYPE,
+            $this->groupingFunctions,
+            'Grouping operation expected'
+        );
+        $function = $functionToken->value;
+
+        // skip optional AS keyword
+        if ($this->stream->current->test(Token::KEYWORD_TYPE, Query::KEYWORD_AS)) {
+            $this->stream->next();
+        }
+
+        // parse grouping name
+        $nameToken = $this->stream->expect(Token::STRING_TYPE, null, 'Grouping name is expected');
+        $name = $nameToken->value;
+
+        $this->query->addGroupBy($name, $field, $function);
     }
 
     /**

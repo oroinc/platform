@@ -49,6 +49,7 @@ abstract class AbstractEngine implements EngineInterface
      * array(
      *   'results' - array of Oro\Bundle\SearchBundle\Query\Result\Item objects
      *   'records_count' - count of records without limit parameters in query
+     *   'grouped_data' - results of grouping operations
      * )
      *
      * @param Query $query
@@ -69,7 +70,12 @@ abstract class AbstractEngine implements EngineInterface
         // search must be performed as fast as possible and it might return lots of entities (10M and more)
         // it's important to not trigger any additional or processing for all entities here
         $searchResult = $this->doSearch($query);
-        $result       = new Result($query, $searchResult['results'], $searchResult['records_count']);
+        $result       = new Result(
+            $query,
+            $searchResult['results'],
+            $searchResult['records_count'],
+            $searchResult['grouped_data']
+        );
 
         if ($this->logQueries) {
             $this->logQuery($result);

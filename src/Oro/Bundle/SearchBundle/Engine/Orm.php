@@ -79,7 +79,8 @@ class Orm extends AbstractEngine
 
         return [
             'results'       => $results,
-            'records_count' => $recordsCount
+            'records_count' => $recordsCount,
+            'grouped_data'  => [], // ORM engine does not support grouping operations
         ];
     }
 

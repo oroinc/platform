@@ -28,6 +28,14 @@ class Result extends ArrayCollection
     protected $count;
 
     /**
+     * Return format for count operations: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
+     * Return format for mathematical operations: ['<groupingName>' => <groupedValue>, ...]
+     *
+     * @var array
+     */
+    protected $groupedData;
+
+    /**
      * @var Result\Item[]
      */
     protected $elements;
@@ -38,11 +46,17 @@ class Result extends ArrayCollection
      * @param Query   $query
      * @param array   $elements
      * @param integer $recordsCount
+     * @param array   $groupedData
      */
-    public function __construct(Query $query, array $elements = array(), $recordsCount = 0)
-    {
+    public function __construct(
+        Query $query,
+        array $elements = [],
+        $recordsCount = 0,
+        $groupedData = []
+    ) {
         $this->query        = $query;
         $this->recordsCount = $recordsCount;
+        $this->groupedData  = $groupedData;
 
         parent::__construct($elements);
 
@@ -71,6 +85,16 @@ class Result extends ArrayCollection
     }
 
     /**
+     * Return grouped data collected during the query execution
+     *
+     * @return array
+     */
+    public function getGroupedData()
+    {
+        return $this->groupedData;
+    }
+
+    /**
      * Gets the PHP array representation of this collection.
      * @return array
      */
@@ -79,7 +103,8 @@ class Result extends ArrayCollection
         $resultData =[
             'records_count' => $this->recordsCount,
             'data' => [],
-            'count' => $this->count()
+            'count' => $this->count(),
+            'grouped_data' => $this->groupedData
         ];
 
         if ($this->count()) {

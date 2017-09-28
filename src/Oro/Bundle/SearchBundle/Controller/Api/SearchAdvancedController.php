@@ -31,6 +31,10 @@ class SearchAdvancedController extends FOSRestController
      *
      * Syntax: and(or) field_type field_name operator value
      *
+     *   group_by: Allows to builds extra grouping operations
+     *
+     * Syntax: field_type field_name grouping_function grouping_name
+     *
      *   offset: Allow to set offset of first result.
      *
      *   max_results: Set results count for the query.
@@ -65,6 +69,18 @@ class SearchAdvancedController extends FOSRestController
      *  !in Used for search records where field not in the specified set of data
      *
      *  replace spaces with _ underscore for fulltext search
+     *
+     * Grouping functions:
+     *
+     *  count
+     *
+     *  sum
+     *
+     *  avg
+     *
+     *  min
+     *
+     *  max
      *
      * Examples:
      *

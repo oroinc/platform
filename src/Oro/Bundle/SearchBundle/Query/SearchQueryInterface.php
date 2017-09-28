@@ -154,4 +154,21 @@ interface SearchQueryInterface
      * @return int
      */
     public function getMaxResults();
+
+    /**
+     * Add grouping operation to a search query
+     *
+     * @param string $name Name of the grouping
+     * @param string $field Fields that should be used to perform grouping
+     * @param string $function Applied grouping function
+     * @return SearchQueryInterface
+     */
+    public function addGroupBy($name, $field, $function);
+
+    /**
+     * Return list of all applied grouping operation
+     *
+     * @return array ['<name>' => ['field' => <field>, 'function' => '<function>']]
+     */
+    public function getGroupBy();
 }

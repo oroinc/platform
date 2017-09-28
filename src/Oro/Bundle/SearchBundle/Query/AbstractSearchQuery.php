@@ -227,4 +227,22 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         return $this->query->getCriteria();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addGroupBy($name, $field, $function)
+    {
+        $this->query->addGroupBy($name, $field, $function);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupBy()
+    {
+        return $this->query->getGroupBy();
+    }
 }
