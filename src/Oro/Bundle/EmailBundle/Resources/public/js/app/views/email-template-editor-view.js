@@ -4,7 +4,9 @@ define(function(require) {
     var EmailTemplateEditorView;
     var $ = require('jquery');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var BaseView = require('oroui/js/app/views/base/view');
+    var DialogWidget = require('oro/dialog-widget');
 
     EmailTemplateEditorView = BaseView.extend({
         options: {
@@ -17,7 +19,8 @@ define(function(require) {
             'email-variable-view:click-variable mediator': '_onVariableClick'
         },
         events: {
-            'change input[name*=type]': '_onTypeChange'
+            'change input[name*=type]': '_onTypeChange',
+            'click .dialog-form-renderer': '_onPreview'
         },
 
         initialize: function(options) {
@@ -44,6 +47,57 @@ define(function(require) {
                     this._switchWysiwygEditor(false);
                 }
             }
+        },
+
+        _onPreview: function(event) {
+            event.preventDefault();
+            var $currentView = this.$el;
+
+            var iframeId = 'preview-frame';
+            var iframe = $('<iframe />', {
+                name: iframeId,
+                id: iframeId,
+                frameborder: 0,
+                marginwidth: 20,
+                marginheight: 20,
+                allowfullscreen: true
+            });
+
+            var formAction = $currentView.attr('action');
+
+            $currentView.one('submit', function(e) {
+                if (!e.result) {
+                    return;
+                }
+                var confirmModal = new DialogWidget({
+                    title: __('Preview'),
+                    'dialogOptions': {
+                        'modal': true,
+                        'resizable': true,
+                        'width': '85%',
+                        'height': '70%',
+                        'autoResize': true
+                    }
+                });
+                confirmModal.render();
+                confirmModal._onContentLoad('<div class="widget-content"></div>');
+                confirmModal._showLoading();
+                confirmModal.widget.addClass('dialog-single-iframe-container');
+                confirmModal.$el.append(iframe);
+                $currentView.attr('target', iframeId);
+                $currentView.attr('action', $(event.currentTarget).attr('href'));
+
+                iframe.one('load', function() {
+                    confirmModal._hideLoading();
+                    $currentView.removeAttr('target');
+                    $currentView.attr('action', formAction);
+                });
+
+                // prevent navigation form processing
+                e.stopImmediatePropagation();
+            });
+
+            $currentView.submit();
         },
 
         _onVariableClick: function(field, value) {

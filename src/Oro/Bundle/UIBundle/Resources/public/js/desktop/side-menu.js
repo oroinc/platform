@@ -40,5 +40,5 @@ define(['../side-menu', '../mediator', 'oroui/js/persistent-storage'], function(
         }
     });
 
-    return $;
+    return 'desktopSideMenu';
 });
