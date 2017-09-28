@@ -1,3 +1,7 @@
+## FROM 2.3.0 to 2.3.1
+
+* A full rebuilding of the backend search index is required due to tokenizer configuration has been changed.
+
 ## FROM 2.0.0 to 2.1.0
 * Changed minimum required php version to 7.0
 * Updated dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin to version 1.3.
