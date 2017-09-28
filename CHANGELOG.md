@@ -72,6 +72,56 @@ as other Symfony's tagged services. From now the highest the priority number, th
 * Service `oro_message_queue.command.consume_messages` was removed
 * The extension `TokenStorageClearerExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/MessageQueueBundle/Consumption/Extension/TokenStorageClearerExtension.php "Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension")</sup> was removed. This 
 job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/MessageQueueBundle/Consumption/Extension/ContainerResetExtension.php "Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension")</sup> extension.
+
+## 2.3.1 (2017-07-28)
+
+### Changed
+#### SegmentBundle
+
+- Class `SegmentQueryConverterFactory`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.1/src/Oro/Bundle/SegmentBundle/Query/SegmentQueryConverterFactory.php "Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory")</sup> was created. It was registered as the service `oro_segment.query.segment_query_converter_factory`.
+
+    services.yml
+    ```yml
+    oro_segment.query.segment_query_converter_factory:
+        class: 'Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory'
+        arguments:
+            - '@oro_query_designer.query_designer.manager'
+            - '@oro_entity.virtual_field_provider.chain'
+            - '@doctrine'
+            - '@oro_query_designer.query_designer.restriction_builder'
+            - '@oro_entity.virtual_relation_provider.chain'
+        public: false
+    ```
+- Service `oro_segment.query.segment_query_converter_factory.link` was created to initialize the service `oro_segment.query.segment_query_converter_factory` in `DynamicSegmentQueryBuilder`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.1/src/Oro/Bundle/SegmentBundle/Query/DynamicSegmentQueryBuilder.php "Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder")</sup>.
+
+    services.yml
+    ```yml
+    oro_segment.query.segment_query_converter_factory.link:
+        tags:
+            - { name: oro_service_link,  service: oro_segment.query.segment_query_converter_factory }
+    ```
+- Class `DynamicSegmentQueryBuilder`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.1/src/Oro/Bundle/SegmentBundle/Query/DynamicSegmentQueryBuilder.php "Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder")</sup> was changed to use service `oro_segment.query.segment_query_converter_factory.link` instead of `oro_segment.query_converter.segment.link`.
+    - public method `setSegmentQueryConverterFactoryLink(ServiceLink $segmentQueryConverterFactoryLink)` was added.
+- Definition of service `oro_segment.query.dynamic_segment.query_builder` was changed in services.yml.
+    Before
+    ```yml
+    oro_segment.query.dynamic_segment.query_builder:
+        class: %oro_segment.query.dynamic_segment.query_builder.class%
+        arguments:
+            - '@oro_segment.query_converter.segment.link'
+            - '@doctrine'
+    ```
+    After
+    ```yml
+    oro_segment.query.dynamic_segment.query_builder:
+        class: %oro_segment.query.dynamic_segment.query_builder.class%
+        arguments:
+            - '@oro_segment.query_converter.segment.link'
+            - '@doctrine'
+        calls:
+            - [setSegmentQueryConverterFactoryLink, ['@oro_segment.query.segment_query_converter_factory.link']]
+    ```
+
 ## 2.3.0 (2017-07-28)
 
 ### Added
