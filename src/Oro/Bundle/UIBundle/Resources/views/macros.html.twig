@@ -586,24 +586,17 @@
 
 {#
     Renders page component attributes passed in array
-
-    Parameters - array:
-        [
-            'module' - module name to load, will be loaded through RequireJS
-            'options' - options to pass into page-component
-        ]
 #}
 {% macro renderPageComponentAttributes(pageComponent) %}
-    data-page-component-module="{{ pageComponent.module }}"
-    {% if pageComponent.options is defined %}
-        data-page-component-options="{{ pageComponent.options|json_encode }}"
-    {% endif %}
-    {% if pageComponent.name is defined %}
-        data-page-component-name="{{ pageComponent.name }}"
-    {% endif %}
-    {% if pageComponent.layout is defined %}
-        data-layout="{{ pageComponent.layout }}"
-    {% endif %}
+    {% for key,value in pageComponent %}
+        {% if key == 'layout' %}
+            data-layout="{{ pageComponent.layout }}"
+        {% elseif value is iterable %}
+            data-page-component-{{ key }}="{{ value|json_encode }}"
+        {% else %}
+            data-page-component-{{ key }}="{{ value }}"
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
 
 {#

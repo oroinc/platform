@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    var DashboardContainerView;
+    var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
     var _ = require('underscore');
     var routing = require('routing');
@@ -11,13 +13,10 @@ define(function(require) {
     var dashboardUtil = require('orodashboard/js/dashboard-util');
     var ConfigurationWidget = require('orodashboard/js/widget/configuration-widget');
     var WidgetPickerModal = require('orodashboard/js/widget-picker-modal');
+    var contentManager = require('orosync/js/content-manager');
     require('jquery-ui');
 
-    /**
-     * @export orodashboard/js/dashboard-container
-     * @class  orodashboard.DashboardContainer
-     */
-    return {
+    DashboardContainerView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -93,6 +92,11 @@ define(function(require) {
             });
 
             $('.dashboard-widgets-add').on('click', _.bind(this._onClickAddWidget, this));
+
+            DashboardContainerView.__super__.initialize.apply(this, arguments);
+
+            // prevents caching dashboard page, to keep it actual
+            contentManager.cacheIgnore();
         },
 
         /**
@@ -348,5 +352,7 @@ define(function(require) {
                 widgetId: widget.state.id
             });
         }
-    };
+    });
+
+    return DashboardContainerView;
 });

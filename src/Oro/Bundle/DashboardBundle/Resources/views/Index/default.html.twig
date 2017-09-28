@@ -11,7 +11,48 @@
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
 {% set allowEdit = is_granted('EDIT', dashboard.entity) %}
-<div class="layout-content dashboard-container-wrapper">
+
+{% set availableWidgets = [] %}
+{% for widgetName, widget in widgets %}
+    {% if widget.acl is not defined or is_granted(widget.acl) %}
+        {% set icon = asset(widget.icon|default("bundles/orodashboard/img/no_icon.png")) %}
+        {% set title = widget.label|trans %}
+        {% set description = '' %}
+        {% if widget.description is defined %}
+            {% set description = widget.description|trans %}
+        {% endif %}
+        {% set availableWidgets = availableWidgets|merge([{
+            'dialogIcon': icon,
+            'title': title,
+            'widgetName': widgetName,
+            'description': description,
+            'isNew': widget.isNew,
+            'configurationDialogOptions':  widget.configuration_dialog_options
+        }]) %}
+    {% endif %}
+{% endfor %}
+
+{% set widgetIds = [] %}
+{% for widget in dashboard.widgets %}
+    {% if widget.config.acl is not defined or is_granted(widget.config.acl) %}
+        {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.id]) %}
+    {% endif %}
+{% endfor %}
+
+{% set dashboardContainerOptions = {
+    view: 'orodashboard/js/app/views/dashboard-container-view',
+    widgetIds: widgetIds,
+    dashboardId: dashboard.id,
+    columnsSelector: '.dashboard-column',
+    allowEdit: allowEdit ? 'true' : 'false',
+    availableWidgets: availableWidgets
+} %}
+
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+<div class="layout-content dashboard-container-wrapper" {{ UI.renderPageComponentAttributes({
+    view: dashboardContainerOptions
+}) }}>
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
@@ -80,7 +121,9 @@
                         {% if dashboards|length > 1 %}
                             <div class="dashboard-selector-container pull-right title-buttons-container">
                                 <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
-                                <select id="dashboard_selector">
+                                <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
+                                    view: 'orodashboard/js/app/views/dashboard-change-view'
+                                }) }}>
                                     {% for dashboardModel in dashboards %}
                                         <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
                                             {{ dashboardModel.getLabel()|trans|truncate(50) }}
@@ -88,16 +131,6 @@
                                     {% endfor %}
                                 </select>
                             </div>
-
-                            <script type="text/javascript">
-                                require(['jquery', 'routing', 'oroui/js/mediator'],
-                                function($, routing, mediator){
-                                    $('#dashboard_selector').on('change', function (e) {
-                                        var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true});
-                                        mediator.execute('redirectTo', {url: url}, {redirect: true});
-                                    });
-                                });
-                            </script>
                         {% endif %}
                     {% endblock navButtons %}
 
@@ -136,55 +169,6 @@
             </div>
         </div>
     {% endblock widgets_content %}
-
-    {% set availableWidgets = [] %}
-    {% for widgetName, widget in widgets %}
-        {% if widget.acl is not defined or is_granted(widget.acl) %}
-            {% set icon = asset("bundles/orodashboard/img/no_icon.png") %}
-            {% if widget.icon is defined %}
-                {% set icon = asset(widget.icon) %}
-            {% endif %}
-            {% set title = widget.label|trans %}
-            {% set description = '' %}
-            {% if widget.description is defined %}
-                {% set description = widget.description|trans %}
-            {% endif %}
-            {% set availableWidgets = availableWidgets|merge([{
-            'dialogIcon': icon,
-            'title': title,
-            'widgetName': widgetName,
-            'description': description,
-            'isNew': widget.isNew,
-            'configurationDialogOptions':  widget.configuration_dialog_options
-            }]) %}
-        {% endif %}
-    {% endfor %}
-
-    <script type="text/javascript">
-        require(['orodashboard/js/dashboard-container'],
-            function(dashboardContainer) {
-                {% set widgetIds = [] %}
-                {% for widget in dashboard.widgets %}
-                    {% if widget.config.acl is not defined or is_granted(widget.config.acl) %}
-                        {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.id]) %}
-                    {% endif %}
-                {% endfor %}
-                dashboardContainer.initialize({
-                    widgetIds: {{ widgetIds|json_encode|raw }},
-                    dashboardId: {{ dashboard.id|json_encode|raw }},
-                    columnsSelector: '.dashboard-column',
-                    allowEdit: {{ allowEdit ? 'true' : 'false' }},
-                    availableWidgets: {{ availableWidgets|json_encode|raw }}
-                });
-            }
-        );
-    </script>
-    <script type="text/javascript">
-        require(['orosync/js/content-manager'], function (contentManager) {
-            // prevents caching dashboard page, to keep it actual
-            contentManager.cacheIgnore();
-        });
-    </script>
 </div>
 {% endblock content %}
 

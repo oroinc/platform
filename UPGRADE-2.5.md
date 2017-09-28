@@ -58,3 +58,10 @@ SecurityBundle
 --------------
  - Class `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider`
      - internal cache parameter `$tree` was removed cause all cache providers are already automatically decorated by the memory cache provider
+
+WorkflowBundle
+--------------
+- Removed `renderResetButton()` macro from Oro/Bundle/WorkflowBundle/Resources/views/macros.html.twig.
+This functionality was deprecated since 2.0. Also removed usage of this macro from two files:
+    - `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/button.html.twig`
+    - `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/buttons.html.twig`
