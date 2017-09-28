@@ -29,7 +29,8 @@ define([
                 showLabel: this.showLabel,
                 criteriaHint: this._getCriteriaHint(),
                 canDisable: this.canDisable,
-                isEmpty: this.isEmptyValue()
+                isEmpty: this.isEmptyValue(),
+                renderMode: this.renderMode
             }));
 
             this._appendFilter($filter);

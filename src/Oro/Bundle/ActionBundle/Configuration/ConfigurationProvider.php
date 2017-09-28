@@ -136,6 +136,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
         $configs = $merger->mergeConfiguration($rawConfiguration);
         $data = [];
 
+        $this->checkConfiguration($configs);
+
         try {
             if (!empty($configs)) {
                 $data = $this->configurationDefinition->processConfiguration($configs);
@@ -147,5 +149,29 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
         }
 
         return $data;
+    }
+
+    /**
+     * This function provides backward compatibility with original logic of Symfony`s PhpDumper.
+     * After that function all strings that have escaped % like '%%' should be replaced by '%'.
+     *
+     * @param mixed $config
+     */
+    private function checkConfiguration(&$config)
+    {
+        if (is_array($config)) {
+            $new = [];
+
+            foreach ($config as $key => $value) {
+                $this->checkConfiguration($key);
+                $this->checkConfiguration($value);
+
+                $new[$key] = $value;
+            }
+
+            $config = $new;
+        } elseif (is_string($config)) {
+            $config = str_replace('%%', '%', $config);
+        }
     }
 }

@@ -43,10 +43,21 @@
     }
 
     .filter-criteria {
-        visibility: hidden;
+        display: block;
+
         min-width: $filter-dropdown-mode-criteria-min-width;
         padding: $filter-dropdown-mode-criteria-offset-inner;
         margin-top: $filter-dropdown-mode-criteria-offset-top;
+
+        opacity: 0;
+        visibility: hidden;
+
+        // All hidden filters should align for right side
+        &:not([style]),
+        &[style*=hidden] {
+            right: 0;
+            left: auto;
+        }
 
         .value-field-frame {
             width: $filter-dropdown-mode-criteria-value-field-frame-width;
@@ -121,7 +132,8 @@
 
     .open-filter {
         .filter-criteria {
-            display: block;
+            opacity: 1;
+            visibility: visible;
         }
 
         .filter-criteria-selector-icon {

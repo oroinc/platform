@@ -53,6 +53,12 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->arrayNode('persistent_processors')
                 ->prototype('scalar')->end()
+            ->end()
+            ->arrayNode('security_agnostic_topics')
+                ->prototype('scalar')->end()
+            ->end()
+            ->arrayNode('security_agnostic_processors')
+                ->prototype('scalar')->end()
             ->end();
 
         return $tb;

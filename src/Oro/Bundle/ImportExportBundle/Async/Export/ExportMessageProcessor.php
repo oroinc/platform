@@ -77,7 +77,6 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
         $body = array_replace_recursive([
             'jobName' => null,
             'processorAlias' => null,
-            'securityToken' => null,
             'organizationId' => null,
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
             'outputFormat' => 'csv',
@@ -85,14 +84,8 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
             'options' => [],
         ], $body);
 
-        if (! isset($body['jobId'], $body['jobName'], $body['processorAlias'], $body['securityToken'])) {
+        if (! isset($body['jobId'], $body['jobName'], $body['processorAlias'])) {
             $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
-        if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical('Cannot set security token');
 
             return false;
         }

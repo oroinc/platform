@@ -77,3 +77,13 @@ services:
 
     oro_message_queue.job.grid.root_job_action_configuration:
         class: 'Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration'
+
+    oro_message_queue.job.security_aware_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareJobExtension'
+        public: false
+        arguments:
+            - '@security.token_storage'
+            - '@oro_security.token_serializer'
+            - '@oro_message_queue.job.storage'
+        tags:
+            - { name: oro_message_queue.job.extension }
