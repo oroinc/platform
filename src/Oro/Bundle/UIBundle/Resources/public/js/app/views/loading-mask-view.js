@@ -3,7 +3,7 @@ define(function(require) {
 
     var LoadingMaskView;
     var BaseView = require('./base/view');
-    var template = require('text!../../../templates/loading-mask-view.html');
+    var template = require('tpl!oroui/templates/loading-mask-view.html');
     var _ = require('underscore');
 
     LoadingMaskView = BaseView.extend({
