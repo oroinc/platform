@@ -152,12 +152,11 @@ abstract class BaseDriver implements DBALPersisterInterface
                     ]);
                     $queryBuilder->groupBy($fieldName);
 
-                    $groupedData[$name] = [];
                     foreach ($queryBuilder->getQuery()->getArrayResult() as $row) {
                         $key = $row[$fieldName];
                         // skip null values to maintain similar behaviour cross all engines
-                        if ($key) {
-                            $groupedData[$name][$key] = (int)$row['countValue'];
+                        if (null !== $key) {
+                            $groupedData[$name][(string)$key] = (int)$row['countValue'];
                         }
                     }
                     break;

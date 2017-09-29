@@ -14,12 +14,12 @@ class Result extends ArrayCollection
     /**
      * @var Result\Item[]
      */
-    protected $elements;
+    protected $elements = null;
 
     /**
      * @var integer
      */
-    protected $recordsCount;
+    protected $recordsCount = null;
 
     /**
      * Format for count function: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
@@ -27,7 +27,7 @@ class Result extends ArrayCollection
      *
      * @var array
      */
-    protected $groupedData;
+    protected $groupedData = null;
 
     /**
      * @param Query   $query

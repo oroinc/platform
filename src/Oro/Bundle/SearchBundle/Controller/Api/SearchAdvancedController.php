@@ -98,6 +98,8 @@ class SearchAdvancedController extends FOSRestController
      *
      *  integer count !in (1, 3, 5)
      *
+     *  from demo_products group_by integer price sum price_sum
+     *
      * @ApiDoc(
      *  description="Get advanced search result.",
      *  resource=true,
