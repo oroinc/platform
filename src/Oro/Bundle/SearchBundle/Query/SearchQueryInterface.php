@@ -10,7 +10,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 interface SearchQueryInterface
 {
     /**
-     * Returning the wrapped Query object. Should be used only for internal purposes.
+     * Returning the wrapped Query object. Should be used only at storage level.
      *
      * @return Query
      */

@@ -4,28 +4,22 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
-
 class Result extends ArrayCollection
 {
     /**
-     * @Type("Oro\Bundle\SearchBundle\Query\Query")
-     * @Exclude
+     * @var Query
      */
     protected $query;
 
     /**
-     * @Type("integer")
+     * @var Result\Item[]
+     */
+    protected $elements;
+
+    /**
      * @var integer
      */
     protected $recordsCount;
-
-    /**
-     * @Type("integer")
-     * @var integer
-     */
-    protected $count;
 
     /**
      * Return format for count operations: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
@@ -36,13 +30,6 @@ class Result extends ArrayCollection
     protected $groupedData;
 
     /**
-     * @var Result\Item[]
-     */
-    protected $elements;
-
-    /**
-     * Initializes a new Result.
-     *
      * @param Query   $query
      * @param array   $elements
      * @param integer $recordsCount
@@ -52,16 +39,14 @@ class Result extends ArrayCollection
         Query $query,
         array $elements = [],
         $recordsCount = 0,
-        $groupedData = []
+        array $groupedData = []
     ) {
         $this->query        = $query;
+        $this->elements     = $elements;
         $this->recordsCount = $recordsCount;
         $this->groupedData  = $groupedData;
 
         parent::__construct($elements);
-
-        $this->count    = $this->count();
-        $this->elements = $elements;
     }
 
     /**
@@ -72,6 +57,14 @@ class Result extends ArrayCollection
     public function getQuery()
     {
         return $this->query;
+    }
+
+    /**
+     * @return Result\Item[]
+     */
+    public function getElements()
+    {
+        return $this->elements;
     }
 
     /**
@@ -101,27 +94,18 @@ class Result extends ArrayCollection
     public function toSearchResultData()
     {
         $resultData =[
-            'records_count' => $this->recordsCount,
+            'records_count' => $this->getRecordsCount(),
             'data' => [],
             'count' => $this->count(),
-            'grouped_data' => $this->groupedData
+            'grouped_data' => $this->getGroupedData()
         ];
 
         if ($this->count()) {
-            /** @var Result\Item $resultRecord */
-            foreach ($this as $resultRecord) {
+            foreach ($this->getElements() as $resultRecord) {
                 $resultData['data'][] = $resultRecord->toArray();
             }
         }
 
         return $resultData;
-    }
-
-    /**
-     * @return Result\Item[]
-     */
-    public function getElements()
-    {
-        return $this->elements;
     }
 }
