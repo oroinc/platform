@@ -22,8 +22,8 @@ class Result extends ArrayCollection
     protected $recordsCount;
 
     /**
-     * Return format for count operations: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
-     * Return format for mathematical operations: ['<groupingName>' => <groupedValue>, ...]
+     * Format for count function: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
+     * Format for mathematical functions: ['<groupingName>' => <groupedValue>, ...]
      *
      * @var array
      */
@@ -79,6 +79,8 @@ class Result extends ArrayCollection
 
     /**
      * Return grouped data collected during the query execution
+     * Format for count function: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
+     * Format for mathematical functions: ['<groupingName>' => <groupedValue>, ...]
      *
      * @return array
      */

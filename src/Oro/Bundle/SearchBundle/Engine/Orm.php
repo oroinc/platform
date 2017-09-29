@@ -77,10 +77,12 @@ class Orm extends AbstractEngine
             }
         }
 
+        $groupedData = $this->getIndexRepository()->getGroupedData($query);
+
         return [
             'results'       => $results,
             'records_count' => $recordsCount,
-            'grouped_data'  => [], // ORM engine does not support grouping operations
+            'grouped_data'  => $groupedData,
         ];
     }
 

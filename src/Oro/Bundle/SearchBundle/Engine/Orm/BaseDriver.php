@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
@@ -120,6 +121,63 @@ abstract class BaseDriver implements DBALPersisterInterface
         $qb->select($qb->expr()->countDistinct('search.id'));
 
         return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param Query $query
+     * @return array
+     */
+    public function getGroupedData(Query $query)
+    {
+        $groupedData = [];
+        foreach ($query->getGroupBy() as $name => $options) {
+            $field = $options['field'];
+            $function = $options['function'];
+            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($field);
+
+            // prepare query builder to apply grouping
+            $groupedQuery = clone $query;
+            $groupedQuery->select($field);
+            $queryBuilder = $this->getRequestQB($groupedQuery, false);
+            /** @var Select $fieldSelectExpression */
+            $fieldSelectExpression = $queryBuilder->getDQLPart('select')[1];
+            $fieldSelect = (string)$fieldSelectExpression;
+            $queryBuilder->resetDQLPart('select');
+
+            switch ($function) {
+                case Query::GROUP_FUNCTION_COUNT:
+                    $queryBuilder->select([
+                        $fieldSelect,
+                        sprintf('%s as countValue', $queryBuilder->expr()->countDistinct('search.id'))
+                    ]);
+                    $queryBuilder->groupBy($fieldName);
+
+                    $groupedData[$name] = [];
+                    foreach ($queryBuilder->getQuery()->getArrayResult() as $row) {
+                        $key = $row[$fieldName];
+                        // skip null values to maintain similar behaviour cross all engines
+                        if ($key) {
+                            $groupedData[$name][$key] = (int)$row['countValue'];
+                        }
+                    }
+                    break;
+
+                case Query::GROUP_FUNCTION_MAX:
+                case Query::GROUP_FUNCTION_MIN:
+                case Query::GROUP_FUNCTION_AVG:
+                case Query::GROUP_FUNCTION_SUM:
+                    $fieldSelect = explode(' as ', $fieldSelect)[0];
+                    $queryBuilder->select(sprintf('%s(%s)', $function, $fieldSelect));
+                    $groupedData[$name] = (float)$queryBuilder->getQuery()->getSingleScalarResult();
+                    break;
+
+                default:
+                    throw new \LogicException(sprintf('Grouping function %s is not suppored', $function));
+
+            }
+        }
+
+        return $groupedData;
     }
 
     /**
