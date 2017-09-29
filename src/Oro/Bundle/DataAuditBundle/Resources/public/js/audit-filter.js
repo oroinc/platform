@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var AuditFilter;
+    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var DateTimeFilter = require('oro/filter/datetime-filter');
@@ -13,8 +14,21 @@ define(function(require) {
         template: template,
         templateSelector: null,
         criteriaValueSelectors: _.extend({}, DateTimeFilter.prototype.criteriaValueSelectors, {
-            date_type: '.audit-type-filter-container select[name=datetime]'
+            date_type: 'select[name=audit]',
+            type: 'select[name=audit]',
+            date_part: '.inner-filter-container select[name=datetime_part]',
+            value: {
+                start: '.audit-filter-container input[name="start"]',
+                end:   '.audit-filter-container input[name="end"]'
+            }
         }),
+
+        selectors: {
+            startContainer: '.audit-filter-container .filter-start-date',
+            separator: '.audit-filter-container .filter-separator',
+            endContainer: '.audit-filter-container .filter-end-date'
+        },
+
         auditTypeFilterContainerSelector: '.audit-type-filter-container',
 
         events: function() {
@@ -51,6 +65,18 @@ define(function(require) {
             this.$el.find(this.auditTypeFilterContainerSelector).empty().append(this.auditTypeFilter.render().$el);
         },
 
+        onChangeFilterType: function(e) {
+            if (!$.contains(this.getOriginalFilterContainer().get(0), e.currentTarget)) {
+                AuditFilter.__super__.onChangeFilterType.call(this, e);
+            }
+        },
+
+        _onClickChoiceValue: function(e) {
+            if (!$.contains(this.getOriginalFilterContainer().get(0), e.currentTarget)) {
+                AuditFilter.__super__._onClickChoiceValue.call(this, e);
+            }
+        },
+
         _onAuditTypeFilterChange: function() {
             this.auditTypeFilter.applyValue();
             this.trigger('audit-type-change');
@@ -68,7 +94,7 @@ define(function(require) {
             var datePartTemplate = this._getTemplate('fieldTemplate');
             var parts = [];
             parts.push(datePartTemplate({
-                name: this.name,
+                name: 'audit',
                 choices: this.choices,
                 selectedChoice: value.type,
                 selectedChoiceLabel: selectedChoiceLabel,
