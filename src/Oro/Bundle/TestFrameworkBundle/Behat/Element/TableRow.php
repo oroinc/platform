@@ -46,6 +46,20 @@ class TableRow extends Element
     }
 
     /**
+     * @param array $headers
+     * @return array
+     */
+    public function getCellValues(array $headers): array
+    {
+        $values = [];
+        foreach ($headers as $header) {
+            $values[] = $this->getCellValue($header);
+        }
+
+        return $values;
+    }
+
+    /**
      * Try to guess type of value and return that data in that type
      * @param string $value
      * @return \DateTime|int|string
