@@ -806,6 +806,10 @@ define(function(require) {
                 }, this);
             }
 
+            if (_.has(content, 'execute')) {
+                mediator.execute(content.execute);
+            }
+
             if (_.has(content, 'triggerSuccess') && content.triggerSuccess) {
                 mediator.trigger('widget_success:' + this.getAlias());
                 mediator.trigger('widget_success:' + this.getWid());
