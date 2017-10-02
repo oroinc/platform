@@ -1,5 +1,15 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set exportConfigurableViewOptions = {
+    view: {
+        view: 'oroimportexport/js/app/views/export-configurable-view',
+        wid: app.request.get('_wid'),
+        errorMessage: 'Errors occured during file export.'|trans
+    }
+} %}
+
 <div class="widget-content import-widget-content">
-    <div class="form-container">
+    <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableViewOptions) }}>
         <form method="post"
               data-nohash="true"
               id="{{ form.vars.id }}"
@@ -24,27 +34,4 @@
         </form>
         {{ oro_form_js_validation(form) }}
     </div>
-
-    <script type="text/javascript">
-        require(['oroui/js/widget-manager', 'jquery', 'oroimportexport/js/export-handler', 'oroui/js/mediator'],
-                function(WidgetManager, $, exportHandler, mediator) {
-                    WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                        var form = $('[name="oro_importexport_export"]');
-                        form.on('submit', function(e) {
-                            e.preventDefault();
-                            mediator.execute('showLoading');
-                            $.ajax(e.target.action, {
-                                data: form.serialize(),
-                                method: e.target.method,
-                                errorHandlerMessage: '{{ 'Errors occured during file export.'|trans }}'
-                            }).done(function(data) {
-                                exportHandler.handleExportResponse(data);
-                                widget.remove();
-                            }).always(function() {
-                                mediator.execute('hideLoading');
-                            });
-                        });
-                    });
-                });
-    </script>
 </div>
