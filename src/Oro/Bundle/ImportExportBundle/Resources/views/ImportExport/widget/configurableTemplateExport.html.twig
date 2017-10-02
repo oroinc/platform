@@ -1,5 +1,15 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set exportConfigurableTemplateViewOptions = {
+    view: {
+        view: 'oroimportexport/js/app/views/export-configurable-template-view',
+        wid: app.request.get('_wid'),
+        downloadMessage: 'Downloading data template...'|trans
+    }
+} %}
+
 <div class="widget-content import-widget-content">
-    <div class="form-container">
+    <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableTemplateViewOptions) }}>
         <form method="post"
               data-nohash="true"
               id="{{ form.vars.id }}"
@@ -21,36 +31,4 @@
         </form>
         {{ oro_form_js_validation(form) }}
     </div>
-
-    <script type="text/javascript">
-        require(['oroui/js/widget-manager', 'jquery', 'oroimportexport/js/export-handler', 'oroui/js/messenger'],
-                function(WidgetManager, $, exportHandler, messenger) {
-                    WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                        var form = $('[name="oro_importexport_export_template"]');
-                        form.on('submit', function(e) {
-                            e.preventDefault();
-                            widget.remove();
-                            var downloadingMessage = messenger.notificationMessage(
-                                    'info',
-                                    '{{ 'Downloading data template...'|trans }}'
-                            );
-                            $.ajax(e.target.action, {
-                                data: form.serialize(),
-                                method: e.target.method,
-                                errorHandlerMessage: false
-                            }).done(function(data) {
-                                if (typeof data.url == 'undefined') {
-                                    exportHandler.handleDataTemplateDownloadErrorMessage();
-                                } else {
-                                    window.open(data.url, '_blank');
-                                }
-                            }).fail(function() {
-                                exportHandler.handleDataTemplateDownloadErrorMessage();
-                            }).always(function() {
-                                downloadingMessage.close();
-                            });
-                        });
-                    });
-                });
-    </script>
 </div>
