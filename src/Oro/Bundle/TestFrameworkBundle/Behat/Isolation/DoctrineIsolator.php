@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureFinder;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
@@ -26,11 +24,6 @@ class DoctrineIsolator implements IsolatorInterface
      * @var FixtureLoader
      */
     protected $fixtureLoader;
-
-    /**
-     * @var ReferenceRepositoryInitializer
-     */
-    protected $referenceRepositoryInitializer;
 
     /**
      * @var ReferenceRepositoryInitializerInterface[]
@@ -81,7 +74,7 @@ class DoctrineIsolator implements IsolatorInterface
         $referenceRepository->clear();
 
         foreach ($this->initializers as $initializer) {
-            $initializer::init($doctrine, $referenceRepository);
+            $initializer->init($doctrine, $referenceRepository);
         }
 
         $this->loadFixtures($event);
