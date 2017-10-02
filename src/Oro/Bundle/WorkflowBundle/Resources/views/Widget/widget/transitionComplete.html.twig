@@ -1,26 +1,22 @@
-<div class="widget-content">
-    <script>
-        require([
-            'jquery',
-            'oroui/js/widget-manager'
-        ], function(
-                $,
-                widgetManager
-        ) {
-            var response = {{ response|json_encode|raw }};
-            var responseCode = {{ responseCode|json_encode|raw }};
-            var responseMessage = {{ responseMessage|json_encode|raw }};
-            var transitionSuccess = {{ transitionSuccess|json_encode|raw }};
+{% if transitionSuccess  %}
+    {% set responseData = {
+        trigger: [{
+            eventBroker: 'widget',
+            name: 'transitionSuccess',
+            args: [response|json_encode]
+        }],
+    } %}
+{% else %}
+    {% set responseData = {
+        trigger: [{
+            eventBroker: 'widget',
+            name: 'transitionFailure',
+            args: [{
+                status: responseCode,
+                message: responseMessage
+            }]
+        }],
+    } %}
+{% endif %}
 
-            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                if (transitionSuccess) {
-                    widget.trigger('transitionSuccess', response);
-
-                    return;
-                }
-
-                widget.trigger('transitionFailure', {status: responseCode, message: responseMessage});
-            });
-        });
-    </script>
-</div>
+{{ responseData|json_encode|raw }}
