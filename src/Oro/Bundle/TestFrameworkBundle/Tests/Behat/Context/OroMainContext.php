@@ -166,6 +166,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $driver->waitPageToLoad();
     }
 
@@ -206,8 +207,6 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
-
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -695,15 +694,23 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeModalWithElements($dialogName, TableNode $table)
     {
-        $modal = $this->elementFactory->createElement($dialogName);
+        $modals = $this->elementFactory->findAllElements($dialogName);
 
-        self::assertTrue($modal->isValid(), 'There is no modal on page at this moment');
-        self::assertTrue($modal->isVisible(), 'There is no visible modal on page at this moment');
+        $dialog = null;
+
+        foreach ($modals as $modal) {
+            if ($modal->isValid() && $modal->isVisible()) {
+                $dialog = $modal;
+                break;
+            }
+        }
+
+        self::assertNotNull($dialog, 'There is no modal on page at this moment');
 
         foreach ($table->getRows() as $row) {
             list($elementName, $expectedTitle) = $row;
 
-            $element = $modal->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
+            $element = $dialog->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
             self::assertTrue($element->isValid(), sprintf('Element with "%s" text not found', $expectedTitle));
         }
     }

@@ -1,5 +1,6 @@
 @regression
 @ticket-BAP-14163
+@ticket-BB-12106
 @automatically-ticket-tagged
 Feature: Language management
   In order to manage available languages
@@ -30,8 +31,12 @@ Feature: Language management
   Scenario: Install translations for Germany language from Crowdin
     Given I go to System/Localization/Languages
     When I click Install "German (Germany)" in grid
-    And I press "Install"
-    And should see "German (Germany)" in grid with following data:
+    Then I should see "UiDialog" with elements:
+      | Title    | Install "German (Germany)" language |
+      | okButton | Install                             |
+
+    When I press "Install"
+    Then I should see "German (Germany)" in grid with following data:
       | Status  | Enabled    |
       | Updates | Up to date |
 
