@@ -794,7 +794,7 @@ define(function(require) {
                     events = [events];
                 }
 
-                _.each(content.trigger, function(event) {
+                _.each(events, function(event) {
                     var eventBroker = this._getEventBroker(event);
 
                     if (_.isObject(event)) {
