@@ -226,15 +226,14 @@ class ImapEmailManager
             }
 
             return $email;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw new \RuntimeException(
                 sprintf(
-                    'Cannot parse email message. Subject: %s. Error: %s',
+                    "Cannot parse email message. Subject: %s. Error: %s. Stacktrace:\n%s",
                     $email->getSubject(),
-                    $e->getMessage()
-                ),
-                0,
-                $e
+                    $e->getMessage(),
+                    $e->getTraceAsString()
+                )
             );
         }
     }
