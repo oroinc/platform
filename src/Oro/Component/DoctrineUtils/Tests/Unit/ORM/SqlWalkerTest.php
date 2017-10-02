@@ -248,4 +248,31 @@ class SqlWalkerTest extends OrmTestCase
             $query->getSQL()
         );
     }
+
+    public function testWalkSubselectWithExprAfterUnionHook()
+    {
+        $groupRepository  = $this->em->getRepository('Test:Group');
+        $personRepository = $this->em->getRepository('Test:Person');
+        $subSelect        = $groupRepository->createQueryBuilder('g1_')
+            ->select('g1_.id')
+            ->where('g1_.id = 1');
+
+        $unionHook  = " AND 'union_id' = 'union_id'";
+        $qb         = $personRepository->createQueryBuilder('p0_');
+        $query      = $qb
+            ->select('p0_.id')
+            ->where($qb->expr()->in('p0_.id', $subSelect->getQuery()->getDQL().$unionHook.' AND g1_.id = 2'))
+            ->getQuery();
+
+        $unionSQL = 'raw sql';
+        $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class);
+        $query->setHint(HookUnionTrait::$walkerHookUnionKey, $unionHook);
+        $query->setHint(HookUnionTrait::$walkerHookUnionValue, $unionSQL);
+
+        $this->assertEquals(
+            'SELECT p0_.id AS id_0 FROM Person p0_ '.
+            'WHERE p0_.id IN (SELECT g1_.id FROM Group g1_ WHERE g1_.id = 1 AND g1_.id = 2 UNION raw sql)',
+            $query->getSQL()
+        );
+    }
 }
