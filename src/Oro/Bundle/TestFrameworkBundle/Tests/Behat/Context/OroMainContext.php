@@ -101,6 +101,8 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
+
         $start = microtime(true);
         $result = $driver->waitForAjax();
         $timeElapsedSecs = microtime(true) - $start;
@@ -126,8 +128,6 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
-
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
