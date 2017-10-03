@@ -16,3 +16,7 @@ services:
         class: Symfony\Component\Validator\Mapping\Cache\DoctrineCache
         arguments:
             - '@oro_cache.provider.validation'
+
+    oro.cache.memory_cache_chain:
+        public: false
+        class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
