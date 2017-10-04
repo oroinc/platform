@@ -17,10 +17,6 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        if ('session.handler.native_file' !== $container->getParameter('session_handler')) {
-            return false;
-        }
-
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $this->cacheDirectories['oro'] = 'oro';
         }
@@ -42,9 +38,15 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheTempDirPath = $this->cacheTempDir.DIRECTORY_SEPARATOR.$directory;
+
+            if (!is_dir($cacheTempDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf(
                 "mv %s %s",
-                $this->cacheTempDir.DIRECTORY_SEPARATOR.$directory,
+                $cacheTempDirPath,
                 $this->cacheDir.DIRECTORY_SEPARATOR.$directory
             );
         }
@@ -70,9 +72,15 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheDirPath = $this->cacheDir.DIRECTORY_SEPARATOR.$directory;
+
+            if (!is_dir($cacheDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf(
                 'cp -rp %s %s',
-                $this->cacheDir.DIRECTORY_SEPARATOR.$directory,
+                $cacheDirPath,
                 $this->cacheDumpDir.DIRECTORY_SEPARATOR.$directory
             );
         }
@@ -100,7 +108,13 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
-            $commands[] = sprintf('rm -rf %s', $this->cacheDir.DIRECTORY_SEPARATOR.$directory);
+            $cacheDirPath = $this->cacheDir.DIRECTORY_SEPARATOR.$directory;
+
+            if (!is_dir($cacheDirPath)) {
+                continue;
+            }
+
+            $commands[] = sprintf('rm -rf %s', $cacheDirPath);
         }
 
         $this->runProcess(implode(' && ', $commands));

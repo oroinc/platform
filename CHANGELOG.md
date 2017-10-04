@@ -16,7 +16,12 @@
     * changed decimal field `value`:
         * `precision` changed from `10` to `21`.
         * `scale` changed from `2` to `6`.  
+### Deprecated
+#### SearchBundle
+* Class `Oro/Bundle/SearchBundle/Engine/Orm/DBALPersistenceDriverTrait` is deprecated. The functionality was merged into `BaseDriver`
 ### Removed
+#### SearchBundle
+* Removed service `oro_search.search.engine.storer`
 #### SecurityBundle
 * Class `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider`
      * internal cache parameter `$tree` was removed cause all cache providers are already automatically decorated by the memory cache provider

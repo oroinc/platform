@@ -17,10 +17,6 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implem
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        if ('session.handler.native_file' !== $container->getParameter('session_handler')) {
-            return false;
-        }
-
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $this->cacheDirectories['oro'] = 'oro';
         }
@@ -49,9 +45,15 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implem
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheTempDirPath = $this->cacheTempDir.'\\'.$directory;
+
+            if (!is_dir($cacheTempDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf(
                 "move %s %s",
-                $this->cacheTempDir.'\\'.$directory,
+                $cacheTempDirPath,
                 $this->cacheDir.'\\'.$directory
             );
         }
@@ -83,9 +85,15 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implem
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheDirPath = $this->cacheDir.'\\'.$directory;
+
+            if (!is_dir($cacheDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf(
                 'xcopy %s %s /E /R /H /I /K /Y',
-                $this->cacheDir.'\\'.$directory,
+                $cacheDirPath,
                 $this->cacheDumpDir.'\\'.$directory
             );
         }
@@ -113,6 +121,12 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implem
         $commands = [];
 
         foreach ($this->cacheDirectories as $directory) {
+            $cacheDirPath = $this->cacheDir.'\\'.$directory;
+
+            if (!is_dir($cacheDirPath)) {
+                continue;
+            }
+
             $commands[] = sprintf('rd /s /q %s', $this->cacheDir.'\\'.$directory);
         }
 
