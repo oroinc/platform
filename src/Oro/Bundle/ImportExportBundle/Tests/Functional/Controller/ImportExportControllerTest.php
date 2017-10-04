@@ -3,7 +3,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -240,6 +240,175 @@ class ImportExportControllerTest extends WebTestCase
         );
         unlink($tmpFile->getPathname());
         unlink($file . '_formatted');
+    }
+
+    public function testImportValidateExportTemplateFormNoAlias()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_import_validate_export_template_form')
+        );
+
+        static::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+    }
+
+    public function testImportValidateExportTemplateFormGetRequest()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_import_validate_export_template_form'),
+            [
+                'alias' => 'alias',
+                'entity' => 'entity',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+
+        static::assertResponseStatusCodeEquals($response, 200);
+        static::assertContains('Cancel', $response->getContent());
+        static::assertContains('Validate Data File', $response->getContent());
+        static::assertContains('Import file', $response->getContent());
+    }
+
+    public function testImportValidateExportTemplateFormImportValidate()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_import_validate_export_template_form'),
+            [
+                '_widgetContainer' => 'dialog',
+                '_wid' => 'test',
+                'alias' => 'oro_user',
+                'entity' => User::class,
+            ]
+        );
+        
+        $form = $crawler->filter('form')->form();
+
+        $fileDir = __DIR__ . '/Import/fixtures';
+        $filePath = $fileDir . '/testLineEndings.csv';
+        $csvFile = new UploadedFile(
+            $filePath,
+            'testLineEndings.csv',
+            'text/csv'
+        );
+
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_importexport_import_validate_export_template_form'),
+            [
+                'alias' => 'oro_user',
+                'entity' => User::class,
+                'isValidateJob' => true,
+                'oro_importexport_import' => [
+                    '_token' => $form['oro_importexport_import[_token]']->getValue(),
+                ],
+            ],
+            [
+                'oro_importexport_import' =>  [
+                    'file' => $csvFile,
+                ],
+            ]
+        );
+
+        $this->assertJsonResponseSuccess();
+
+        $tmpDirPath = static::getContainer()->getParameter('kernel.root_dir') . '/import_export';
+        $tmpFiles = glob($tmpDirPath . DIRECTORY_SEPARATOR . '*.csv');
+        $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
+
+        static::assertEquals(
+            substr_count(file_get_contents($filePath), "\n"),
+            substr_count(file_get_contents($tmpFile->getPathname()), "\r\n")
+        );
+
+        static::assertMessageSent(
+            Topics::PRE_HTTP_IMPORT,
+            [
+                'fileName' => $tmpFile->getBasename(),
+                'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
+                'originFileName' => 'testLineEndings.csv',
+                'userId' => $this->getCurrentUser()->getId(),
+                'securityToken' =>
+                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR',
+                'jobName' => 'entity_import_validation_from_csv',
+                'processorAlias' => 'oro_user.add_or_replace',
+                'options' => [],
+            ]
+        );
+
+        unlink($tmpFile->getPathname());
+    }
+
+    public function testImportValidateExportTemplateFormImport()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_importexport_import_validate_export_template_form'),
+            [
+                '_widgetContainer' => 'dialog',
+                '_wid' => 'test',
+                'alias' => 'oro_user',
+                'entity' => User::class,
+            ]
+        );
+
+        $form = $crawler->filter('form')->form();
+
+        $fileDir = __DIR__ . '/Import/fixtures';
+        $filePath = $fileDir . '/testLineEndings.csv';
+        $csvFile = new UploadedFile(
+            $filePath,
+            'testLineEndings.csv',
+            'text/csv'
+        );
+
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_importexport_import_validate_export_template_form'),
+            [
+                'alias' => 'oro_user',
+                'entity' => User::class,
+                'isValidateJob' => false,
+                'oro_importexport_import' => [
+                    '_token' => $form['oro_importexport_import[_token]']->getValue(),
+                ],
+            ],
+            [
+                'oro_importexport_import' =>  [
+                    'file' => $csvFile,
+                ],
+            ]
+        );
+
+        $this->assertJsonResponseSuccess();
+
+        $tmpDirPath = static::getContainer()->getParameter('kernel.root_dir') . '/import_export';
+        $tmpFiles = glob($tmpDirPath . DIRECTORY_SEPARATOR . '*.csv');
+        $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
+
+        static::assertEquals(
+            substr_count(file_get_contents($filePath), "\n"),
+            substr_count(file_get_contents($tmpFile->getPathname()), "\r\n")
+        );
+
+        static::assertMessageSent(
+            Topics::PRE_HTTP_IMPORT,
+            [
+                'fileName' => $tmpFile->getBasename(),
+                'process' => ProcessorRegistry::TYPE_IMPORT,
+                'userId' => $this->getCurrentUser()->getId(),
+                'originFileName' => 'testLineEndings.csv',
+                'securityToken' =>
+                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR',
+                'jobName' => 'entity_import_from_csv',
+                'processorAlias' => 'oro_user.add_or_replace',
+                'options' => [],
+            ]
+        );
+
+        unlink($tmpFile->getPathname());
     }
 
     /**

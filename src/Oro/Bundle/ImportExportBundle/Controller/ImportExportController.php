@@ -98,7 +98,7 @@ class ImportExportController extends Controller
      *
      * @return array|Response
      */
-    public function importValidateExportTemplateForm(Request $request)
+    public function importValidateExportTemplateFormAction(Request $request)
     {
         $configAlias = $request->get('alias');
 
