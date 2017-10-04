@@ -13,8 +13,6 @@ define(function(require) {
             'addressListUrl', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute', 'addresses', 'wid'
         ]),
 
-        addressBookEl: '#address-book',
-
         initialize: function() {
             this.addressBook = this._initializeAddressBook();
 
@@ -37,7 +35,7 @@ define(function(require) {
             var addressUpdateRoute = this.addressUpdateRoute;
 
             return new AddressBook({
-                el: this.addressBookEl,
+                el: '#address-book',
                 addressListUrl: this.addressListUrl,
                 addressCreateUrl: this.addressCreateUrl,
                 addressUpdateUrl: function() {
