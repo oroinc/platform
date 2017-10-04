@@ -293,13 +293,15 @@ define(function(require) {
         },
 
         getActionsElement: function(wrapperClass) {
-            var wrapperClass = wrapperClass ? wrapperClass : 'pull-right';
             if (!this.actionsEl) {
-                this.actionsEl = $('<div class="'+ wrapperClass + '"/>').appendTo(
+                this.actionsEl = $('<div class="pull-right"/>').appendTo(
                     $('<div class="form-actions widget-actions"/>').appendTo(
                         this.widget.dialog('actionsContainer')
                     )
                 );
+            }
+            if (wrapperClass) {
+                this.actionsEl[0].className = wrapperClass;
             }
             return this.actionsEl;
         },
