@@ -5,12 +5,13 @@ Table of contents
 ----------------
 
 - [Debug translator](#debug-translator)
+- [Debug js translations](#debug-js-translations)
 
 Debug translator
 ----------------
 
 Debug translator allows developer to easy check and debug translations on UI. To enable it developer have to set
-option _debug\_translator_ to true in config.yml file:
+option `debug_translator` to `true` in config.yml file:
 
 ```yml
 oro_translation:
@@ -27,4 +28,25 @@ have suffix "JS" to distinguish them from backend translations.
 
 [Reset]JS - translated frontend string
 !!!---Refresh---!!!JS - not translated frontend string
+```
+
+Debug JS translations
+---------------------
+
+Debug JS translations allows to turn off on fly JS translations generation, it can
+slightly boost performance on slow hardware configurations and also makes app more
+stable on Windows. If `kernel.debug` is set to `false` value of debug JS translations
+is ignored. To turn off JS translations generation set option `js_translation.debug`
+to `false` in config.yml file:
+
+```yml
+oro_translation:
+    js_translation:
+        debug: false
+```
+
+If you turned off JS translations generation you must do it manually by executing following command:
+
+```bash
+php app/console oro:translation:dump
 ```

@@ -144,7 +144,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
 
         $processor->process($message, new NullSession());
-        
+
         $this->assertMessageSent(
             Topics::ENTITIES_INVERSED_RELATIONS_CHANGED,
             $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
@@ -426,7 +426,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
     {
         $message = new NullMessage();
         $message->setBody(json_encode($body));
-        
+
         return $message;
     }
 

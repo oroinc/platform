@@ -37,8 +37,6 @@
 
     {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
 
-    {% set enableToggleFilters = false %}
-
     {% set options  = {
         el: '#' ~ gridId,
         gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
@@ -46,7 +44,7 @@
         metadata: datagridMetaData,
         data: datagridData,
         enableFilters: enableFilters,
-        enableToggleFilters: enableToggleFilters,
+        enableToggleFilters: renderParams.enableToggleFilters is defined ? renderParams.enableToggleFilters : false,
         filterContainerSelector: renderParams.filterContainerSelector is defined ? renderParams.filterContainerSelector : null,
         filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : null,
         enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
@@ -59,6 +57,7 @@
 
     <div id="{{ gridId }}"
          data-page-component-module="oroproduct/js/app/datagrid/backend-datagrid-component"
+         data-server-render=""
          data-page-component-name="{{ options.gridName }}"
          data-page-component-options="{{ options|json_encode }}"
          data-server-render
@@ -67,6 +66,7 @@
     >
         <div class="oro-datagrid"
              data-skip-input-widgets
+             data-layout="separate"
         >
 
             {% if toolbarOptions.placement.top %}
@@ -77,8 +77,9 @@
 
             <div class="other-scroll-container">
                 <div class="other-scroll"></div>
-
-                <div class="grid-scrollable-container">
+                {% if themeOptions.disableGridScrollbar is not defined or themeOptions.disableGridScrollbar == false %}
+                    <div class="grid-scrollable-container">
+                {% endif %}
                     <div class="grid-container">
                         <div class="grid table-hover table table-bordered table-condensed">
                             {% if themeOptions.headerHide is not defined or themeOptions.headerHide == false %}
@@ -86,29 +87,19 @@
                                     {{ block_widget(block[id ~ '_header_row']) }}
                                 </div>
                             {% endif %}
-
-                            <div class="{{ themeOptions.bodyClassName }}">
-                                {% for datagrid_row in datagridData.data %}
-                                    {% set child = block[id ~'_row'] %}
-
-                                    {% set childAttr = layout_attr_defaults(child.vars.attr, {
-                                        'class': themeOptions.rowClassName
-                                    }) %}
-                                    {% set childAttr = layout_attr_defaults(childAttr, themeOptions.rowAttributes) %}
-
-                                    {% do child|merge_context({
-                                        'datagrid_row': datagrid_row,
-                                        'themeOptions': themeOptions
-                                    }) %}
-                                    {{ block_widget(child, {'attr': childAttr}) }}
-                                {% endfor %}
-                            </div>
+                            {{ block_widget(block[id ~ '_category_product_list'], {
+                                'datagridData': datagridData,
+                                'themeOptions': themeOptions,
+                                'block'       : block,
+                                'id'          : id
+                            }) }}
 
                             <div class="grid-footer"></div>
                         </div>
                     </div>
-                </div>
-
+                {% if themeOptions.disableGridScrollbar is not defined or themeOptions.disableGridScrollbar == false %}
+                    </div>
+                {% endif %}
                 <div class="no-data"></div>
             </div>
 
@@ -185,3 +176,22 @@
 {%- block __oro_datagrid_server_render__datagrid_cell_value_widget -%}
     {{ datagrid_row[column_name] }}
 {%- endblock -%}
+
+{% block _product_datagrid_category_product_list_widget %}
+    <div class="{{ themeOptions.bodyClassName }}">
+        {% for datagrid_row in datagridData.data %}
+            {% set child = block[id ~'_row'] %}
+
+            {% set childAttr = layout_attr_defaults(child.vars.attr, {
+            'class': themeOptions.rowClassName
+            }) %}
+            {% set childAttr = layout_attr_defaults(childAttr, themeOptions.rowAttributes) %}
+
+            {% do child|merge_context({
+            'datagrid_row': datagrid_row,
+            'themeOptions': themeOptions
+            }) %}
+            {{ block_widget(child, {'attr': childAttr}) }}
+        {% endfor %}
+    </div>
+{% endblock %}

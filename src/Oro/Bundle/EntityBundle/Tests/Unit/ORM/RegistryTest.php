@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 
 class RegistryTest extends \PHPUnit_Framework_TestCase
@@ -35,17 +36,24 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $manager1 = $this->getManagerMock();
         $manager2 = $this->getManagerMock();
 
-        $this->container->expects($this->at(0))
+        $manager1->expects($this->atLeastOnce())
+            ->method('setDefaultQueryCacheLifetime')
+            ->with(3600);
+        $manager2->expects($this->atLeastOnce())
+            ->method('setDefaultQueryCacheLifetime')
+            ->with(3600);
+
+        $this->container->expects($this->atLeastOnce())
             ->method('get')
             ->with('service.default')
-            ->willReturn($manager1);
-        $this->container->expects($this->at(1))
+            ->will($this->onConsecutiveCalls($manager1, $manager2));
+        $this->container->expects($this->atLeastOnce())
+            ->method('getParameter')
+            ->with('oro_entity.default_query_cache_lifetime')
+            ->willReturn(3600);
+        $this->container->expects($this->atLeastOnce())
             ->method('set')
             ->with('service.default', null);
-        $this->container->expects($this->at(2))
-            ->method('get')
-            ->with('service.default')
-            ->willReturn($manager2);
 
         $this->assertSame($manager1, $this->registry->getManager('default'));
         // test that a manager service cached
@@ -63,17 +71,24 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $manager1 = $this->getManagerMock();
         $manager2 = $this->getManagerMock();
 
-        $this->container->expects($this->at(0))
+        $manager1->expects($this->atLeastOnce())
+            ->method('setDefaultQueryCacheLifetime')
+            ->with(3600);
+        $manager2->expects($this->atLeastOnce())
+            ->method('setDefaultQueryCacheLifetime')
+            ->with(3600);
+
+        $this->container->expects($this->atLeastOnce())
             ->method('get')
             ->with('service.default')
-            ->willReturn($manager1);
-        $this->container->expects($this->at(1))
+            ->will($this->onConsecutiveCalls($manager1, $manager2));
+        $this->container->expects($this->atLeastOnce())
+            ->method('getParameter')
+            ->with('oro_entity.default_query_cache_lifetime')
+            ->willReturn(3600);
+        $this->container->expects($this->atLeastOnce())
             ->method('set')
             ->with('service.default', null);
-        $this->container->expects($this->at(2))
-            ->method('get')
-            ->with('service.default')
-            ->willReturn($manager2);
 
         $this->assertSame($manager1, $this->registry->getManagerForClass(self::TEST_ENTITY_CLASS));
         // test that a manager cached
@@ -156,9 +171,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
             ->method('isTransient')
             ->willReturn(false);
 
-        $manager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $manager = $this->createMock(OroEntityManager::class);
         $manager->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($managerConfiguration);

@@ -23,10 +23,6 @@ define(function(require) {
             _.extend(this, _.pick(options, ['entity', 'entityId', 'organization']));
         },
 
-        render: function() {
-            this.initLayout();
-        },
-
         checkSmtpConnection: function(event) {
             var data = this.$el.find('[data-class="smtp_settings"]').serializeArray();
             var $messageContainer = this.$el.find('.check-smtp-connection-messages');

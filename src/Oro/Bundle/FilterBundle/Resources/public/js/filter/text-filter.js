@@ -81,7 +81,8 @@ define(function(require) {
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter'
+            'click .disable-filter': '_onClickDisableFilter',
+            'change input': '_onValueChanged'
         },
 
         listen: {
@@ -169,6 +170,19 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        _isDOMValueChanged: function() {
+            var thisDOMValue = this._readDOMValue();
+            return (
+                !_.isEmpty(thisDOMValue.value) &&
+                !_.isUndefined(thisDOMValue.value) &&
+                !_.isNull(thisDOMValue.value) &&
+                !_.isEqual(this.value, thisDOMValue)
+            );
+        },
+
+        /**
          * @private
          */
         _showMinLengthWarning: function() {
@@ -246,7 +260,9 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            var $filter = $(this.template());
+            var $filter = $(this.template({
+                renderMode: this.renderMode
+            }));
             this._wrap($filter);
             return this;
         },

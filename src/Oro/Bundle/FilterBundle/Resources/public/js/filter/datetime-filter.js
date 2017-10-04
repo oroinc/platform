@@ -10,6 +10,17 @@ define(function(require) {
     var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
     var DateFilter = require('./date-filter');
     var tools = require('oroui/js/tools');
+    var config = require('module').config();
+
+    config = _.extend({
+        inputClass: 'datetime-visual-element',
+        timeInputAttrs: {
+            'class': 'timepicker-input',
+            'placeholder': 'oro.form.choose_time'
+        }
+    }, config);
+
+    config.timeInputAttrs.placeholder = __(config.timeInputAttrs.placeholder);
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
@@ -20,7 +31,7 @@ define(function(require) {
          *
          * @property
          */
-        inputClass: 'datetime-visual-element',
+        inputClass: config.inputClass,
 
         /**
          * View constructor for picker element
@@ -95,10 +106,7 @@ define(function(require) {
             _.extend(options, {
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
                 timezone: 'UTC',
-                timeInputAttrs: {
-                    'class': 'timepicker-input',
-                    'placeholder': __('oro.form.choose_time')
-                }
+                timeInputAttrs: config.timeInputAttrs
             });
             return options;
         },

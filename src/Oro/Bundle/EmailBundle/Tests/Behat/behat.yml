@@ -9,6 +9,7 @@ oro_behat_extension:
         - OroEmailBundle::EmailFeatureToggleContext
         - OroFormBundle::FormContext
         - OroUserBundle::FeatureContext
+        - OroActivityListBundle::ActivityContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:

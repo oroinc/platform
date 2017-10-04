@@ -586,24 +586,17 @@
 
 {#
     Renders page component attributes passed in array
-
-    Parameters - array:
-        [
-            'module' - module name to load, will be loaded through RequireJS
-            'options' - options to pass into page-component
-        ]
 #}
 {% macro renderPageComponentAttributes(pageComponent) %}
-    data-page-component-module="{{ pageComponent.module }}"
-    {% if pageComponent.options is defined %}
-        data-page-component-options="{{ pageComponent.options|json_encode }}"
-    {% endif %}
-    {% if pageComponent.name is defined %}
-        data-page-component-name="{{ pageComponent.name }}"
-    {% endif %}
-    {% if pageComponent.layout is defined %}
-        data-layout="{{ pageComponent.layout }}"
-    {% endif %}
+    {% for key,value in pageComponent %}
+        {% if key == 'layout' %}
+            data-layout="{{ pageComponent.layout }}"
+        {% elseif value is iterable %}
+            data-page-component-{{ key }}="{{ value|json_encode }}"
+        {% else %}
+            data-page-component-{{ key }}="{{ value }}"
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
 
 {#
@@ -1237,54 +1230,9 @@
 {%- endmacro -%}
 
 {%- macro renderJsTree(data, actions) -%}
-    {% set defaultTreeData = {
-        treeOptions: {
-            view: 'oroui/js/app/views/jstree/base-tree-view'
-        }
+    {% embed "OroUIBundle::jstree.html.twig" with {
+        data: data,
+        actions: actions
     } %}
-    <div class="jstree-wrapper collapse-view expanded" data-role="jstree-wrapper">
-        <div data-page-component-module="oroui/js/app/components/view-component"
-             data-page-component-options="{{ defaultTreeData.treeOptions|merge(data.treeOptions)|json_encode }}">
-            {% if data.label|default('') %}
-                <div class="jstree-wrapper__title">
-                    <span class="jstree-wrapper__label">
-                        <label class="custom-checkbox jstree-wrapper__checkbox"
-                               data-role="jstree-checkall">
-                            <input class="custom-checkbox__input"
-                                   type="checkbox"
-                                   name="jstree-items"
-                                   data-action-type="checkAll"/>
-                            <span class="custom-checkbox__text"></span>
-                        </label>
-                        <span class="jstree-wrapper__text"
-                            data-collapse-trigger>
-                            {{ data.label }}
-                        </span>
-                    </span>
-                    <div class="jstree-actions dropdown btn-group"
-                        data-page-component-module="oroui/js/app/components/view-component"
-                        data-page-component-options="{{ {
-                            'view': 'oroui/js/app/views/jstree/action-manager-view',
-                            'actions': actions|default({})
-                        }|json_encode}}">
-                        <button type="button" class="jstree-actions__handle btn btn-default btn-small dropdown-toggle"
-                                data-toggle="dropdown" title="Mass Actions">
-                            <i class="fa-ellipsis-h"></i>
-                            <i class="caret"></i>
-                        </button>
-                        <ul class="jstree-actions__menu dropdown-menu dropdown-menu__action-column" data-role="jstree-actions">
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
-            <div data-collapse-container>
-                {% if not data.disableSearch|default(false) and data.treeOptions.data|default([]) %}
-                <div class="jstree-search-component">
-                    <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
-                </div>
-                {% endif %}
-                <div data-role="jstree-container"></div>
-            </div>
-        </div>
-    </div>
+    {% endembed %}
 {%- endmacro -%}

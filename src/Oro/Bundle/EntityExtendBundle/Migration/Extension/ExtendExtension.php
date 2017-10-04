@@ -739,11 +739,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->checkColumnsExist($targetTable, [$targetTitleColumnName]);
 
         $relation = $options['extend'];
-        if (array_key_exists('on_delete', $relation)) {
-            $onDelete = $relation['on_delete'];
-        } else {
-            $onDelete = 'SET NULL';
-        }
 
         if (array_key_exists('nullable', $relation)) {
             $notnull = !$relation['nullable'];
@@ -756,7 +751,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             $selfColumnName,
             $targetTable,
             ['notnull' => $notnull],
-            ['onDelete' => $onDelete]
+            ['onDelete' => $this->getOnDeleteAction($relation)]
         );
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
@@ -825,6 +820,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         );
 
         $selfTableOptions['extend']['relation.' . $selfRelationKey . '.target_field_id'] = $targetFieldId;
+        $selfTableOptions['extend']['relation.' . $selfRelationKey . '.on_delete']
+            = $this->getOnDeleteAction($options['extend']);
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
@@ -1120,5 +1117,18 @@ class ExtendExtension implements NameGeneratorAwareInterface
             && $options[$keyName][ExtendOptionsManager::MODE_OPTION] === ConfigModel::MODE_HIDDEN) {
             throw new \InvalidArgumentException('Target field can\'t be hidden.');
         }
+    }
+
+    /**
+     * @param array $relation
+     * @return mixed|string
+     */
+    private function getOnDeleteAction(array $relation)
+    {
+        if (array_key_exists('on_delete', $relation)) {
+            return $relation['on_delete'];
+        }
+
+        return 'SET NULL';
     }
 }

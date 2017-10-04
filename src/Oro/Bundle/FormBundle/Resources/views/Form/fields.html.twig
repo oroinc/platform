@@ -700,7 +700,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {{ UI.renderJsTree(
         {
-            'treeOptions': form.vars.treeOptions
+            'treeOptions': form.vars.treeOptions,
+            'disableActions': true
         }
     ) }}
 

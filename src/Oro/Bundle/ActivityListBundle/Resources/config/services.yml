@@ -51,6 +51,7 @@ services:
             - "@oro_activity_list.helper.activity_inheritance_targets"
             - "@event_dispatcher"
             - "@oro_workflow.data_helper"
+            - "@oro_ui.html_tag_helper"
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%

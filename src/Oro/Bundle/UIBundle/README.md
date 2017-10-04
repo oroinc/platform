@@ -12,6 +12,7 @@ User interface layouts and controls.
 - [TWIG Filters](./Resources/doc/reference/twig-filters.md)
 - [JavaScript Widgets](./Resources/doc/reference/widgets.md)
 - [Layout Subtree View](./Resources/doc/reference/client-side/layout-subtree-view.md)
+- [Highlight Text View](./Resources/doc/reference/client-side/highlight-text-view.md)
 - [Viewport Manager](./Resources/doc/reference/client-side/viewport-manager.md)
 - [Ui tool](./Resources/doc/reference/client-side/tool.md)
 - [Items Manager](./Resources/doc/reference/items-manager.md)

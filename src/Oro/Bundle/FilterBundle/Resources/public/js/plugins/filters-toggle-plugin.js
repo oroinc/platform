@@ -15,11 +15,17 @@ define(function(require) {
     }, config.launcherOptions || {});
 
     FiltersTogglePlugin = BasePlugin.extend({
+        /**
+         * @inheritDoc
+         */
         enable: function() {
             this.listenTo(this.main, 'beforeToolbarInit', this.onBeforeToolbarInit);
             FiltersTogglePlugin.__super__.enable.call(this);
         },
 
+        /**
+         * @inheritDoc
+         */
         onBeforeToolbarInit: function(toolbarOptions) {
             var options = {
                 datagrid: this.main,

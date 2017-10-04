@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\SimpleProcessorFactory;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -57,6 +58,10 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context($this->configProvider, $this->metadataProvider);
         $context->setAction(self::TEST_ACTION);
+        $context->getRequestType()->add(RequestType::REST);
+        $context->getRequestType()->add(RequestType::JSON_API);
+        $context->setVersion('1.2');
+        $context->setClassName('Test\Class');
 
         return $context;
     }
@@ -149,7 +154,16 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         if (null !== $logger) {
             $logger->expects($this->once())
                 ->method('error')
-                ->with('The execution of "processor1" processor is failed.', ['exception' => $exception]);
+                ->with(
+                    'The execution of "processor1" processor is failed.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2',
+                        'class'       => 'Test\Class'
+                    ]
+                );
             $logger->expects($this->never())
                 ->method('warning');
         }
@@ -202,7 +216,16 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
                 ->method('error');
             $logger->expects($this->once())
                 ->method('warning')
-                ->with('An exception occurred in "processor1" processor.', ['exception' => $exception]);
+                ->with(
+                    'An exception occurred in "processor1" processor.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2',
+                        'class'       => 'Test\Class'
+                    ]
+                );
         }
 
         $this->processor->process($context);
@@ -355,7 +378,16 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         if (null !== $logger) {
             $logger->expects($this->once())
                 ->method('error')
-                ->with('The execution of "processor1" processor is failed.', ['exception' => $exception]);
+                ->with(
+                    'The execution of "processor1" processor is failed.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2',
+                        'class'       => 'Test\Class'
+                    ]
+                );
             $logger->expects($this->never())
                 ->method('warning');
         }
@@ -404,7 +436,16 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
                 ->method('error');
             $logger->expects($this->once())
                 ->method('warning')
-                ->with('An exception occurred in "processor1" processor.', ['exception' => $exception]);
+                ->with(
+                    'An exception occurred in "processor1" processor.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2',
+                        'class'       => 'Test\Class'
+                    ]
+                );
         }
 
         $this->processor->process($context);
@@ -554,7 +595,16 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         if (null !== $logger) {
             $logger->expects($this->once())
                 ->method('error')
-                ->with('The execution of "processor10" processor is failed.', ['exception' => $exception]);
+                ->with(
+                    'The execution of "processor10" processor is failed.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2',
+                        'class'       => 'Test\Class'
+                    ]
+                );
             $logger->expects($this->never())
                 ->method('warning');
         }
@@ -599,7 +649,16 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
                 ->method('error');
             $logger->expects($this->once())
                 ->method('warning')
-                ->with('An exception occurred in "processor10" processor.', ['exception' => $exception]);
+                ->with(
+                    'An exception occurred in "processor10" processor.',
+                    [
+                        'exception'   => $exception,
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2',
+                        'class'       => 'Test\Class'
+                    ]
+                );
         }
 
         $this->processor->process($context);

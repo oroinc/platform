@@ -75,12 +75,13 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function charlieCanLogin()
     {
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->oroMainContext->loginAsUserWithPassword('charlie');
         $this->waitForAjax();
 
         $this->oroMainContext->assertPage('Admin Dashboard');
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -91,7 +92,8 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function charlieCantLogin()
     {
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->oroMainContext->loginAsUserWithPassword('charlie');
 
         $error = $this->spin(function (FeatureContext $context) {
@@ -102,7 +104,7 @@ class FeatureContext extends OroFeatureContext implements
         self::assertEquals('Account is locked.', $error->getText());
 
         $this->oroMainContext->assertPage('Login');
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 }

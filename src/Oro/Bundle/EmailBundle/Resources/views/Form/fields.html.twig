@@ -282,20 +282,36 @@
     <div data-page-component-module="oroemail/js/app/views/mailbox-update-view"
          data-page-component-options="{{ options|json_encode }}">
         <fieldset class="form-horizontal form-horizontal-large">
-            <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
-            {{ form_widget(form) }}
+            <h5 class="user-fieldset">
+                <span>{{ 'oro.email.mailbox.general.label'|trans }}</span>
+            </h5>
+            <div class="control-group-wrapper">
+                {{ form_widget(form) }}
+            </div>
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
-            <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
-            {{ imapAccountType|raw }}
+            <h5 class="user-fieldset">
+                <span>{{ 'oro.email.mailbox.origin.label'|trans }}</span>
+            </h5>
+            <div class="control-group-wrapper">
+                {{ imapAccountType|raw }}
+            </div>
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
-            <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
-            {{ process|raw }}
+            <h5 class="user-fieldset">
+                <span>{{ 'oro.email.mailbox.process.label'|trans }}</span>
+            </h5>
+            <div class="control-group-wrapper">
+                {{ process|raw }}
+            </div>
         </fieldset>
         <fieldset class="form-horizontal form-horizontal-large">
-            <h5>{{ 'oro.email.mailbox.access.label'|trans }}</h5>
-            {{ access|raw }}
+            <h5 class="user-fieldset">
+                <span>{{ 'oro.email.mailbox.access.label'|trans }}</span>
+            </h5>
+            <div class="control-group-wrapper">
+                {{ access|raw }}
+            </div>
         </fieldset>
     </div>
 {% endblock %}

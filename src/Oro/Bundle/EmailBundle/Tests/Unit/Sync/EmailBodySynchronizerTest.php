@@ -150,7 +150,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
 
         $this->logger->expects($this->once())
-            ->method('notice');
+            ->method('info');
 
         $this->synchronizer->syncOneEmailBody($email);
 

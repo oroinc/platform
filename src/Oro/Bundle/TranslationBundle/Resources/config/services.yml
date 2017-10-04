@@ -159,7 +159,6 @@ services:
         public: false
         arguments:
             - '@service_container'
-            - '%oro_translation.debug_translator%'
         tags:
             - { name: twig.extension }
 

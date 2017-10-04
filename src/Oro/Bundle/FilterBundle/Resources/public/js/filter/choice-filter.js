@@ -129,7 +129,8 @@ define(function(require) {
                 choices: this.choices,
                 selectedChoice: value.type,
                 selectedChoiceLabel: selectedChoiceLabel,
-                value: value.value
+                value: value.value,
+                renderMode: this.renderMode
             }));
             this._appendFilter($filter);
             this._updateDOMValue();

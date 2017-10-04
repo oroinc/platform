@@ -6,7 +6,7 @@
     align-content: stretch;
     justify-content: center;
 
-    margin: 10px 0;
+    margin: 10px -($offset-x-s);
     padding: 0;
 
     &__side,
@@ -74,11 +74,7 @@
 }
 
 .datagrid-tool {
-    margin: 3px 5px 3px 0;
-
-    &:not(:first-child) {
-        margin-left: $offset-x-s;
-    }
+    margin: $offset-x-s;
 
     &:first-child {
         position: relative;
@@ -120,6 +116,28 @@
             text-align: right;
         }
     }
+
+    .datagrid-tool {
+        &.display-options {
+            flex-basis: auto;
+            order: 2;
+        }
+
+        &.page-size {
+            order: 2;
+        }
+    }
+}
+
+@include breakpoint('tablet-small') {
+    .datagrid-toolbar {
+        margin-left: -($offset-x-s/2);
+        margin-right: -($offset-x-s/2);
+    }
+
+    .datagrid-tool {
+        margin: $offset-y-s ($offset-x-s/2);
+    }
 }
 
 @include breakpoint('mobile-landscape') {
@@ -131,6 +149,15 @@
 }
 
 @include breakpoint('mobile') {
+    .datagrid-tool {
+        margin-left: 0;
+        margin-right: 1px;
+
+        &:not(:first-child) {
+            margin-left: 1px;
+        }
+    }
+
     .datagrid-toolbar {
         justify-content: space-between;
 

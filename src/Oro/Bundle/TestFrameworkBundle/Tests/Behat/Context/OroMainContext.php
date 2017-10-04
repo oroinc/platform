@@ -28,6 +28,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
+use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
 
 /**
@@ -165,6 +166,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $driver->waitPageToLoad();
     }
 
@@ -205,8 +207,6 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
-
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -385,6 +385,42 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert alert is not present
+     * Example: Then I should not see alert
+     *
+     * @Then I should not see alert
+     */
+    public function iShouldNotSeeAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        try {
+            $session->accept_alert();
+            $alertMessage = $session->getAlert_text();
+        } catch (NoAlertOpenError $e) {
+            return;
+        }
+
+        self::fail('Expect to see no alert but alert with "'.$alertMessage.'" message is present');
+    }
+
+    /**
+     * Assert that no malicious scripts present on page
+     * Example: Then I should not see malicious scripts
+     *
+     * @Then I should not see malicious scripts
+     */
+    public function iShouldNotSeeMaliciousScripts()
+    {
+        $this->assertPageNotContainsText('<script>');
+        $this->assertPageNotContainsText('<Script>');
+        $this->assertPageNotContainsText('&lt;script&gt;');
+        $this->assertPageNotContainsText('&lt;Script&gt;');
+    }
+
+    /**
      * @param \Closure $lambda
      * @param int $timeLimit in seconds
      * @return null|mixed Return null if closure throw error or return not true value.
@@ -430,6 +466,18 @@ class OroMainContext extends MinkContext implements
     public function closeUiDialog()
     {
         $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
+    }
+
+    /**
+     * Open dashboard
+     *
+     * @Given I am on dashboard
+     * @And I am on dashboard
+     */
+    public function iAmOnDashboard()
+    {
+        $router = $this->getContainer()->get('router');
+        $this->visit($router->generate('oro_default'));
     }
 
     /**
@@ -646,15 +694,23 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeModalWithElements($dialogName, TableNode $table)
     {
-        $modal = $this->elementFactory->createElement($dialogName);
+        $modals = $this->elementFactory->findAllElements($dialogName);
 
-        self::assertTrue($modal->isValid(), 'There is no modal on page at this moment');
-        self::assertTrue($modal->isVisible(), 'There is no visible modal on page at this moment');
+        $dialog = null;
+
+        foreach ($modals as $modal) {
+            if ($modal->isValid() && $modal->isVisible()) {
+                $dialog = $modal;
+                break;
+            }
+        }
+
+        self::assertNotNull($dialog, 'There is no modal on page at this moment');
 
         foreach ($table->getRows() as $row) {
             list($elementName, $expectedTitle) = $row;
 
-            $element = $modal->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
+            $element = $dialog->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
             self::assertTrue($element->isValid(), sprintf('Element with "%s" text not found', $expectedTitle));
         }
     }
@@ -1086,6 +1142,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iRestartMessageConsumer()
     {
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $this->messageQueueIsolator->stopMessageQueue();
         $this->messageQueueIsolator->startMessageQueue();
     }
@@ -1289,9 +1346,6 @@ class OroMainContext extends MinkContext implements
             $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
         } catch (\Exception $e) {
             throw $e;
-        } finally {
-            $this->messageQueueIsolator->stopMessageQueue();
-            $this->messageQueueIsolator->startMessageQueue();
         }
     }
 
@@ -1554,6 +1608,62 @@ class OroMainContext extends MinkContext implements
         self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
             'Element "%s" exists inside element "%s" when it should not',
             $childElementName,
+            $parentElementName
+        ));
+    }
+
+    /**
+     * Example: Then I should see "Map container" element with text "Address" inside "Default Addresses" element
+     *
+     * @Then I should see :childElementName element with text :text inside :parentElementName element
+     * @param string $parentElementName
+     * @param string $childElementName
+     * @param string $text
+     */
+    public function iShouldSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->findElementContains($childElementName, $text);
+        self::assertTrue($childElement->isIsset(), sprintf(
+            'Element "%s" with text "%s" not found inside element "%s"',
+            $childElementName,
+            $text,
+            $parentElementName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" with text "%s" found inside element "%s", but it\'s not visible',
+            $childElementName,
+            $text,
+            $parentElementName
+        ));
+    }
+
+    /**
+     * Example: Then I should not see "Map container" element with text "Address" inside "Default Addresses" element
+     *
+     * @Then I should not see :childElementName element with text :text inside :parentElementName element
+     * @param string $parentElementName
+     * @param string $childElementName
+     * @param string $text
+     */
+    public function iShouldNotSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
+    {
+        $parentElement = $this->createElement($parentElementName);
+        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
+            'Parent element "%s" not found on page',
+            $parentElementName
+        ));
+
+        $childElement = $parentElement->findElementContains($childElementName, $text);
+        self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
+            'Element "%s" with text "%s" exists inside element "%s" when it should not',
+            $childElementName,
+            $text,
             $parentElementName
         ));
     }

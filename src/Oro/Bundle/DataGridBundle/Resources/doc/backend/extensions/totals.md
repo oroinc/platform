@@ -36,6 +36,11 @@ datagrids:
                   label: 'Summary'
                   expr: 'SUM(o.probability)'
                   formatter: percent
+              budget:
+                  label: 'Budget Amount'
+                  expr: 'SUM(o.budget)'
+                  formatter: currency
+                  divisor: 100
               statusLabel:
                   label: oro.sales.opportunity.status.label
 ```
@@ -51,3 +56,4 @@ datagrids:
 - total config can be taken from another total row with **extends** parameter.
 - **per_page** parameter switch data calculation only for current page data
 - if **hide_if_one_page** is true, then this total row will be hidden on full data set.
+- **divisor** if you need to divide the value by a number before rendering it to the user (***not required***)

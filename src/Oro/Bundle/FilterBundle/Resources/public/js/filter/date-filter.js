@@ -17,6 +17,11 @@ define(function(require) {
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var localeSettings = require('orolocale/js/locale-settings');
     var layout = require('oroui/js/layout');
+    var config = require('module').config();
+
+    config = _.extend({
+        inputClass: 'date-visual-element'
+    }, config);
 
     require('orofilter/js/datevariables-widget');
 
@@ -74,7 +79,7 @@ define(function(require) {
          *
          * @property
          */
-        inputClass: 'date-visual-element',
+        inputClass: config.inputClass,
 
         /**
          * Date widget options
@@ -320,7 +325,8 @@ define(function(require) {
                     inputClass: this.inputClass,
                     value: displayValue,
                     parts: this._getParts(),
-                    popoverContent: __('oro.filter.date.info')
+                    popoverContent: __('oro.filter.date.info'),
+                    renderMode: this.renderMode
                 })
             );
 
@@ -361,7 +367,8 @@ define(function(require) {
                         choices: this.dateParts,
                         selectedChoice: value.part,
                         selectedChoiceLabel: selectedPartLabel,
-                        selectedChoiceTooltip: this._getPartTooltip(value.part)
+                        selectedChoiceTooltip: this._getPartTooltip(value.part),
+                        renderMode: this.renderMode
                     })
                 );
             }
@@ -372,7 +379,8 @@ define(function(require) {
                     choices: this.choices,
                     selectedChoice: value.type,
                     selectedChoiceLabel: selectedChoiceLabel,
-                    popoverContent: __('oro.filter.date.info')
+                    popoverContent: __('oro.filter.date.info'),
+                    renderMode: this.renderMode
                 })
             );
 
@@ -689,6 +697,18 @@ define(function(require) {
             } else {
                 this.$('.field-condition-date-popover').addClass('hide');
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _isDOMValueChanged: function() {
+            var thisDOMValue = this._readDOMValue();
+            return (
+                !_.isUndefined(thisDOMValue.value) &&
+                !_.isUndefined(thisDOMValue.type) &&
+                !_.isEqual(this.value, thisDOMValue)
+            );
         }
     });
 

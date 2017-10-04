@@ -1,21 +1,16 @@
-/*jslint nomen:true*/
-/*global define*/
-define([
-    'underscore',
-    'backbone',
-    'orotranslation/js/translator',
-    'oroui/js/mediator',
-    'oroui/js/messenger',
-    'oroconfig/js/form/default',
-    'oroui/js/modal',
-    'jquery'
-], function(_, Backbone, __, mediator, messenger, formDefault, Modal, $) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @extends Backbone.View
-     */
-    var ConfigForm = Backbone.View.extend({
+    var ConfigForm;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var messenger = require('oroui/js/messenger');
+    var Modal = require('oroui/js/modal');
+    var DefaultFieldValueView = require('oroform/js/app/views/default-field-value-view');
+
+    ConfigForm = DefaultFieldValueView.extend({
 
         /**
          * @param {Object} Where key is input name and value is changed value
@@ -38,7 +33,6 @@ define([
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.defaults, this.options);
             mediator.trigger('config-form:init', this.options);
-            formDefault();
             if (!this.options.pageReload) {
                 this.$el.on(
                     'change',
@@ -101,8 +95,9 @@ define([
                 });
                 $checkboxes
                     .prop('checked', true)
-                    .attr('checked', true)
-                    .trigger('change');
+                    .attr('checked', true);
+
+                this.$el.find(':input').change();
             }, this));
 
             confirm.open();

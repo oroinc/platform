@@ -1,0 +1,147 @@
+// @theme: blank;
+
+.dropdown-mode {
+    .ui-multiselect-menu {
+        position: absolute;
+        z-index: $filter-dropdown-mode-ui-multiselect-menu-z-ndex;
+
+        // Break inline styles
+        max-width: $filter-dropdown-mode-ui-multiselect-menu-max-width !important;
+        // Break inline styles
+        width: $filter-dropdown-mode-ui-multiselect-menu-max-width !important;
+        margin-top: 0;
+
+        text-align: left;
+
+        background: $filter-dropdown-mode-ui-multiselect-menu-bg;
+
+        .ui-helper-reset,
+        .ui-multiselect-checkboxes {
+            padding: $filter-dropdown-mode-ui-multiselect-menu-helper-reset-offset-inner;
+        }
+
+        .ui-multiselect-header {
+            div {
+                padding: $filter-dropdown-mode-ui-multiselect-menu-header-div-offset-inner;
+            }
+        }
+    }
+
+    .filter-criteria-selector {
+        padding: $filter-dropdown-mode-criteria-selector-offset-inner;
+        border: $filter-dropdown-mode-criteria-selector-border;
+        border-radius: $filter-dropdown-mode-criteria-selector-border-radius;
+
+        background: $filter-dropdown-mode-criteria-selector-bg;
+        color: $filter-dropdown-mode-criteria-selector-color;
+
+        cursor: pointer;
+
+        user-select: none;
+
+        @include ellipsis();
+    }
+
+    .filter-criteria {
+        display: block;
+
+        min-width: $filter-dropdown-mode-criteria-min-width;
+        padding: $filter-dropdown-mode-criteria-offset-inner;
+        margin-top: $filter-dropdown-mode-criteria-offset-top;
+
+        opacity: 0;
+        visibility: hidden;
+
+        // All hidden filters should align for right side
+        &:not([style]),
+        &[style*=hidden] {
+            right: 0;
+            left: auto;
+        }
+
+        .value-field-frame {
+            width: $filter-dropdown-mode-criteria-value-field-frame-width;
+            // Break inline styles
+            margin-left: 0 !important;
+            // Break inline styles
+            padding-right: 0 !important;
+        }
+    }
+
+    .filter-criteria-selector-icon-wrap {
+        top: $filter-dropdown-mode-criteria-selector-icon-top;
+        right: $filter-dropdown-mode-criteria-selector-icon-right;
+    }
+
+    .fields-row {
+        min-width: $filter-dropdown-mode-fields-row-min-width;
+    }
+
+    .filter-items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: baseline;
+
+        padding: $filter-dropdown-mode-items-offset-inner;
+    }
+
+    .filter-item {
+        margin: $filter-dropdown-mode-item-offset;
+        padding: $filter-dropdown-mode-item-offset-inner;
+
+        position: relative;
+
+        flex-basis: $filter-dropdown-mode-item-flex-basis;
+    }
+
+    .filter-items-hint {
+        padding: $filter-dropdown-mode-items-hint-inner-offset;
+
+        line-height: $filter-dropdown-mode-items-hint-line-height;
+        font-size: $filter-dropdown-mode-items-hint-font-size;
+
+        clear: both;
+    }
+
+    .filter-criteria-hint-item {
+        display: inline-block;
+        vertical-align: middle;
+        margin: $filter-dropdown-mode-criteria-hint-item-offset;
+        padding: $filter-dropdown-mode-criteria-hint-item-offset-inner;
+
+        border-radius: $filter-dropdown-mode-criteria-hint-item-border-radius;
+    }
+
+    .reset-filter-button {
+        position: absolute;
+        top: $filter-dropdown-mode-reset-filter-button-top-pos;
+        right: $filter-dropdown-mode-reset-filter-button-right-pos;
+    }
+
+    .ui-multiselect {
+        float: right;
+        margin: $filter-dropdown-mode-ui-multiselect-offset;
+        //Bug in jquery-ui-multiselect-widget
+        width: auto !important;
+    }
+
+    .timepicker-input {
+        max-width: $filter-dropdown-mode-timepicker-input-max-width;
+    }
+
+    .open-filter {
+        .filter-criteria {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .filter-criteria-selector-icon {
+            transform: rotate(180deg);
+        }
+    }
+
+    .filter-select-oro-wrapper {
+        margin-bottom: $offset-y-m;
+    }
+}

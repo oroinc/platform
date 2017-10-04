@@ -92,6 +92,9 @@ define(function(require) {
 
         var doFormat = function(value, options, formattersChain) {
             var result = value;
+            if (formattersChain.length) {
+                result = Number(result);
+            }
             for (var i = 0; i < formattersChain.length; ++i) {
                 var formatter = formattersChain[i];
                 result = formatter.call(this, result, options, value);
@@ -100,6 +103,7 @@ define(function(require) {
         };
 
         var allowedCustomOptions = [
+            'grouping_used',
             'min_fraction_digits',
             'max_fraction_digits'
         ];

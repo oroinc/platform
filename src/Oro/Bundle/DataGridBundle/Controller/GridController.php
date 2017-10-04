@@ -9,7 +9,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\DataGridBundle\Async\Topics;
@@ -19,7 +18,6 @@ use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class GridController extends Controller
@@ -137,7 +135,6 @@ class GridController extends Controller
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
         $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
-        $token = $this->getSecurityToken()->getToken();
 
         $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
             'format' => $format,
@@ -145,8 +142,7 @@ class GridController extends Controller
                 'gridName' => $gridName,
                 'gridParameters' => $gridParameters,
                 FormatterProvider::FORMAT_TYPE => $formatType,
-            ],
-            'securityToken' => $this->getTokenSerializer()->serialize($token),
+            ]
         ]);
 
         return new JsonResponse([
@@ -228,21 +224,5 @@ class GridController extends Controller
     protected function getRequestParametersFactory()
     {
         return $this->get('oro_datagrid.datagrid.request_parameters_factory');
-    }
-
-    /**
-     * @return TokenStorageInterface
-     */
-    protected function getSecurityToken()
-    {
-        return $this->get('security.token_storage');
-    }
-
-    /**
-     * @return TokenSerializerInterface
-     */
-    protected function getTokenSerializer()
-    {
-        return $this->get('oro_security.token_serializer');
     }
 }

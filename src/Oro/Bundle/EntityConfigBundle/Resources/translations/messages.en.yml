@@ -40,6 +40,7 @@ oro:
         block_titles:
             general.label:       General Information
             fields.label:        Fields
+            attribute.label:     Attribute
             other.label:         Other
             associations.label:  Communication & Collaboration
 
@@ -85,6 +86,9 @@ oro:
                     searchable: Searchable
                     sortable: Sortable
                     filterable: Filterable
+                    filter_by:
+                        label: Filter by
+                        tooltip: 'This field defines the type of filtering to be applied to the attribute. It will be applied only to fields that have string representation in the search index.'
                     enabled: Enabled
                     visible: Visible
 
@@ -92,6 +96,9 @@ oro:
             field_name.label: Name
             type.label:       Data Type
             records_count.label: Number of records
+            filter_by:
+                exact_value.label: Exact value
+                fuzzy_search.label: Fuzzy search
 
         info:
             new_field.label:     New Field
