@@ -3,10 +3,7 @@
 
 {% if saved %}
     {% set data = {
-        flashMessage: {
-            type: 'success',
-            text: 'oro.note.note_saved'|trans,
-        },
+        flashMessage: 'oro.note.note_saved'|trans,
         triggerSuccess: true,
         remove: true
     } %}

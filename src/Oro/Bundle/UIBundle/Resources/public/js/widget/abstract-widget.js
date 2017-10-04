@@ -781,7 +781,7 @@ define(function(require) {
                 var message = content.flashMessage;
 
                 if (_.isString(message)) {
-                    messenger.notificationFlashMessage('success', message);
+                    message = {type: 'success', text: message};
                 }
 
                 messenger.notificationFlashMessage(message.type, message.text);

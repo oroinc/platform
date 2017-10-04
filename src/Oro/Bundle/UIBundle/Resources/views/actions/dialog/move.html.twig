@@ -1,9 +1,6 @@
 {% if saved is defined and saved %}
     {% set data = {
-        flashMessage: {
-            type: 'success',
-            text: 'oro.ui.jstree.move.success.label'|trans({'%nodes%': nodesName}),
-        },
+        flashMessage: 'oro.ui.jstree.move.success.label'|trans({'%nodes%': nodesName}),
         triggerSuccess: true,
         trigger: [{
             eventBroker: 'widget',

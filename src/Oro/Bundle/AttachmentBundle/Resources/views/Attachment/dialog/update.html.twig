@@ -1,5 +1,5 @@
 {% if saved is defined and saved %}
-    {% set messageText = (update is defined and update) ? 'Attachment updated successfully' : 'Attachment created successfully' %}
+    {% set messageText = update|default(false) ? 'Attachment updated successfully' : 'Attachment created successfully' %}
     {% set data = {
         flashMessage: messageText|trans,
         triggerSuccess: true,

@@ -10,7 +10,7 @@
 
         {{ data|json_encode|raw }}
     {% else %}
-        <div class="widget-content">
+        <div class="{% block widget_class %}widget-content{% endblock %}">
             {% block widget_content_inner %}
                 {% block messages %}
                     {% if messages is defined and messages|length %}
