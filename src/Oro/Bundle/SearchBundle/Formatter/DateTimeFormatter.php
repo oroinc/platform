@@ -8,8 +8,12 @@ class DateTimeFormatter
 
     public function format(\DateTime $dateTimeValue)
     {
-        $dateTimeValue->setTimezone(new \DateTimeZone('UTC'));
-        $dateTimeString = $dateTimeValue->format(self::DATETIME_FORMAT);
+        $dateTimeValueToFormat = clone $dateTimeValue;
+        $dateTimeValueToFormat->setTimezone(new \DateTimeZone('UTC'));
+        $dateTimeString = $dateTimeValueToFormat->format(self::DATETIME_FORMAT);
+
+        unset($dateTimeValueToFormat);
+
         return $dateTimeString;
     }
 }

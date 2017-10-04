@@ -365,3 +365,10 @@ services:
     oro_datagrid.multi_grid_provider.link:
         tags:
             - { name: oro_service_link, service: oro_datagrid.multi_grid_provider }
+
+    oro_datagrid.layout.data_provider.row_view_theme:
+        class: 'Oro\Bundle\DataGridBundle\Layout\DataProvider\RowViewThemeProvider'
+        arguments:
+            - '@oro_product.datagrid_theme_helper'
+        tags:
+            - { name: layout.data_provider, alias: oro_datagrid_row_view_theme }
