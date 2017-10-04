@@ -12,7 +12,6 @@ use Psr\Log\LoggerInterface;
 class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQuery
 {
     const IMAGE_CONFIG_NAME = 'upload_image_mime_types';
-    const CONFIG_VALUE_TYPE = 'scalar';
     const CONFIG_SECTION = 'oro_attachment';
 
     /**
@@ -53,13 +52,11 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $row = $this->fetchConfigRow($logger);
-
-        if ($row) {
+        foreach ($this->fetchConfigRows($logger) as $row) {
             $id = $row['id'];
             $existingMimeTypes = !empty($row['text_value']) ? explode("\r\n", $row['text_value']) : [];
             // we must store client`s already added custom mime types + our new types without duplicates.
-            $updatedMimeTypes = implode("\r\n", array_unique(array_merge($this->mimeTypes, $existingMimeTypes)));
+            $updatedMimeTypes = implode("\r\n", array_unique(array_merge($existingMimeTypes, $this->mimeTypes)));
             $this->updateConfigValue($id, $updatedMimeTypes, $logger, $dryRun);
         }
     }
@@ -69,13 +66,13 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
      *
      * @return array
      */
-    private function fetchConfigRow(LoggerInterface $logger)
+    private function fetchConfigRows(LoggerInterface $logger)
     {
-        $sql = 'SELECT c.id, c.text_value FROM oro_config_value AS c WHERE c.name = ?';
-        $parameters = [self::IMAGE_CONFIG_NAME];
-        $this->logQuery($logger, $sql);
+        $sql = 'SELECT c.id, c.text_value FROM oro_config_value AS c WHERE c.name = ? AND c.section = ?';
+        $parameters = [self::IMAGE_CONFIG_NAME, self::CONFIG_SECTION];
+        $this->logQuery($logger, $sql, $parameters);
 
-        return $this->connection->fetchAssoc($sql, $parameters);
+        return $this->connection->fetchAll($sql, $parameters);
     }
 
     /**
