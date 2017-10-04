@@ -9,7 +9,7 @@
             {% set showNonAuthorized = item.extras.show_non_authorized is defined and item.extras.show_non_authorized %}
             {% set displayable = item.extras.isAllowed or showNonAuthorized %}
             {% if displayable %}
-                <div class="tab-pane"
+                <div class="tab-pane{% if item.extras.active_if_first_is_empty|default(false) %} active{% endif %}"
                      id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-content">
                     {% set options = {'tabTitle': item.label} %}
                     {% set options = {'defaultUrl': path("oro_default")} %}

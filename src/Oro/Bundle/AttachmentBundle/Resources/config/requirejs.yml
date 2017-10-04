@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oroattachment/js/app/views/attachment-view': 'bundles/oroattachment/js/app/views/attachment-view.js'

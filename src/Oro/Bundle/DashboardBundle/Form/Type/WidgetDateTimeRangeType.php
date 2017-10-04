@@ -33,8 +33,8 @@ class WidgetDateTimeRangeType extends AbstractType
                 'date_type' => 'select[name][name!=date_part]',
                 'date_part' => 'select[name=date_part]',
                 'value'     => [
-                    'start' => 'input[name=\"' . $view->vars['full_name'] . '[value][start]\"]',
-                    'end'   => 'input[name=\"' . $view->vars['full_name'] . '[value][end]\"]'
+                    'start' => 'input[name="' . $view->vars['full_name'] . '[value][start]"]',
+                    'end'   => 'input[name="' . $view->vars['full_name'] . '[value][end]"]'
                 ]
             ]
         ];

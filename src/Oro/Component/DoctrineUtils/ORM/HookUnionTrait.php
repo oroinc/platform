@@ -2,6 +2,12 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
+use Doctrine\ORM\Query;
+
+/**
+ * Trait can be used to add UNION query to SQL string
+ * that can be constructed after walking down AST nodes
+ */
 trait HookUnionTrait
 {
     /**
@@ -21,10 +27,12 @@ trait HookUnionTrait
      */
     public function hookUnion($sql)
     {
-        $hookIdentifier = $this->getQuery()->getHint(self::$walkerHookUnionKey);
-        $unionQuery = $this->getQuery()->getHint(self::$walkerHookUnionValue);
+        /** @var Query $query */
+        $query = $this->getQuery();
+        $hookIdentifier = $query->getHint(self::$walkerHookUnionKey);
+        $unionQuery = $query->getHint(self::$walkerHookUnionValue);
         if ($hookIdentifier && $unionQuery && stripos($sql, $hookIdentifier) !== false) {
-            $sql = str_ireplace($hookIdentifier, ' UNION '. $unionQuery, $sql);
+            $sql = str_ireplace($hookIdentifier, '', $sql).' UNION '. $unionQuery;
         }
 
         return $sql;

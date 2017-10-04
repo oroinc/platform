@@ -48,8 +48,14 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
      */
     public function getConfiguration($gridName)
     {
+        $id = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
+        if (!$id) {
+            throw new \RuntimeException(
+                sprintf('Segment id not found in "%s" gridName.', $gridName)
+            );
+        }
+
         if (empty($this->configuration[$gridName])) {
-            $id                = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
             $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
             $segment           = $segmentRepository->find($id);
 

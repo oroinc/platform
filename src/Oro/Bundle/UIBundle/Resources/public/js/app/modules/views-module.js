@@ -23,9 +23,21 @@ define([
             mainMenu: '#main-menu',
             userMenu: '#top-page .user-menu',
             breadcrumb: '#breadcrumb',
+            leftPanel: '#left-panel',
             beforeContentAddition: '#before-content-addition',
             messages: '#flash-messages .flash-messages-holder'
         }
+    });
+
+    /**
+     * Init SidePanelView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/side-panel-view'
+    ], function(SidePanelView) {
+        BaseController.addToReuse('leftPanel', SidePanelView, {
+            el: 'region:leftPanel'
+        });
     });
 
     /**
