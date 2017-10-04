@@ -28,6 +28,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\Stopwatch\Stopwatch;
+use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
 
 /**
@@ -165,6 +166,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
         $driver->waitPageToLoad();
     }
 
@@ -205,8 +207,6 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
-
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -382,6 +382,42 @@ class OroMainContext extends MinkContext implements
             $message,
             $title
         ));
+    }
+
+    /**
+     * Assert alert is not present
+     * Example: Then I should not see alert
+     *
+     * @Then I should not see alert
+     */
+    public function iShouldNotSeeAlert()
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        try {
+            $session->accept_alert();
+            $alertMessage = $session->getAlert_text();
+        } catch (NoAlertOpenError $e) {
+            return;
+        }
+
+        self::fail('Expect to see no alert but alert with "'.$alertMessage.'" message is present');
+    }
+
+    /**
+     * Assert that no malicious scripts present on page
+     * Example: Then I should not see malicious scripts
+     *
+     * @Then I should not see malicious scripts
+     */
+    public function iShouldNotSeeMaliciousScripts()
+    {
+        $this->assertPageNotContainsText('<script>');
+        $this->assertPageNotContainsText('<Script>');
+        $this->assertPageNotContainsText('&lt;script&gt;');
+        $this->assertPageNotContainsText('&lt;Script&gt;');
     }
 
     /**
@@ -658,15 +694,23 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeModalWithElements($dialogName, TableNode $table)
     {
-        $modal = $this->elementFactory->createElement($dialogName);
+        $modals = $this->elementFactory->findAllElements($dialogName);
 
-        self::assertTrue($modal->isValid(), 'There is no modal on page at this moment');
-        self::assertTrue($modal->isVisible(), 'There is no visible modal on page at this moment');
+        $dialog = null;
+
+        foreach ($modals as $modal) {
+            if ($modal->isValid() && $modal->isVisible()) {
+                $dialog = $modal;
+                break;
+            }
+        }
+
+        self::assertNotNull($dialog, 'There is no modal on page at this moment');
 
         foreach ($table->getRows() as $row) {
             list($elementName, $expectedTitle) = $row;
 
-            $element = $modal->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
+            $element = $dialog->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
             self::assertTrue($element->isValid(), sprintf('Element with "%s" text not found', $expectedTitle));
         }
     }

@@ -6,7 +6,11 @@
 
 {% set content = render(options.url) %}
 {% if content|length %}
-    <div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }} data-layout="separate">
+    {% set separateLayout = options.separateLayout is not defined or options.separateLayout %}
+    {% set separateLayoutContent %}
+        {% if separateLayout %} data-layout="separate"{% endif %}
+    {% endset %}
+    <div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }}{{ separateLayoutContent }}>
         {% if options.elementFirst %}
             {{ content|raw }}
         {% endif %}

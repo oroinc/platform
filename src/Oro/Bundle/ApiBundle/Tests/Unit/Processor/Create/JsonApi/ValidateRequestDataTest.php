@@ -69,8 +69,13 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($requestData, $expectedError, $pointer)
-    {
+    public function testProcessWithInvalidRequestData(
+        $requestData,
+        $expectedError,
+        $pointer,
+        $title = 'request data constraint',
+        $statusCode = 400
+    ) {
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
 
@@ -87,9 +92,10 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $pointer = (array)$pointer;
         $this->assertCount(count($expectedError), $errors);
         foreach ($errors as $key => $error) {
-            $this->assertEquals('request data constraint', $error->getTitle());
+            $this->assertEquals($title, $error->getTitle());
             $this->assertEquals($expectedError[$key], $error->getDetail());
             $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
+            $this->assertEquals($statusCode, $error->getStatusCode());
         }
     }
 
@@ -124,6 +130,8 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['type' => 'test', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property of the primary data object should match the requested resource',
                 '/data/type',
+                'conflict constraint',
+                409
             ],
         ];
     }

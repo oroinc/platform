@@ -117,10 +117,9 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
                 'gridParameters' => [],
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
-            'securityToken' => null,
         ], $body);
 
-        if (! isset($body['jobId'], $body['securityToken'], $body['parameters']['gridName'], $body['format'])) {
+        if (! isset($body['jobId'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');
 
             return false;
@@ -129,12 +128,6 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
         $this->writer = $this->writerChain->getWriter($body['format']);
         if (! $this->writer instanceof FileStreamWriter) {
             $this->logger->critical(sprintf('Invalid format: "%s"', $body['format']));
-
-            return false;
-        }
-
-        if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical('Cannot set security token');
 
             return false;
         }

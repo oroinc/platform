@@ -41,6 +41,35 @@ class ScrollData
     }
 
     /**
+     * @param string|int $blockId
+     * @return bool
+     */
+    public function hasBlock($blockId): bool
+    {
+        return isset($this->data[self::DATA_BLOCKS][$blockId]);
+    }
+
+    /**
+     * @param int|string $blockId
+     * @param string|null $title
+     * @param int|null $priority
+     * @param string|null $class
+     * @param bool $useSubBlockDivider
+     * @throws \InvalidArgumentException
+     */
+    public function changeBlock($blockId, $title = null, $priority = null, $class = null, $useSubBlockDivider = null)
+    {
+        if (!$this->hasBlock($blockId)) {
+            throw new \InvalidArgumentException(sprintf('Block with id "%s" has not been found', $blockId));
+        }
+
+        $block = $this->data[self::DATA_BLOCKS][$blockId];
+        $block = $this->setBlockData($block, $title, $priority, $class, $useSubBlockDivider);
+
+        $this->data[self::DATA_BLOCKS][$blockId] = $block;
+    }
+
+    /**
      * @param $title
      * @param null $priority
      * @param null $class
@@ -55,11 +84,29 @@ class ScrollData
         $useSubBlockDivider = true,
         array $block = []
     ) {
-        $block[self::TITLE] = $title;
-        $block[self::USE_SUB_BLOCK_DIVIDER] = $useSubBlockDivider;
-
         if (!isset($block[self::SUB_BLOCKS])) {
             $block[self::SUB_BLOCKS] = [];
+        }
+
+        return $this->setBlockData($block, $title, $priority, $class, $useSubBlockDivider);
+    }
+
+    /**
+     * @param array $block
+     * @param string|null $title
+     * @param int|null $priority
+     * @param string|null $class
+     * @param bool|null $useSubBlockDivider
+     * @return array
+     */
+    private function setBlockData(array $block, $title, $priority, $class, $useSubBlockDivider)
+    {
+        if (null !== $title) {
+            $block[self::TITLE] = $title;
+        }
+
+        if (null !== $useSubBlockDivider) {
+            $block[self::USE_SUB_BLOCK_DIVIDER] = $useSubBlockDivider;
         }
 
         if (null !== $priority) {
@@ -116,6 +163,26 @@ class ScrollData
         $this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS][] = $subBlock;
 
         return $this->getLastKey($this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS]);
+    }
+
+    /**
+     * @param int|string $blockId
+     * @param string|null $title
+     * @return int
+     */
+    public function addSubBlockAsFirst($blockId, $title = null)
+    {
+        $this->assertBlockDefined($blockId);
+
+        $subBlock = [self::DATA => []];
+
+        if (null !== $title) {
+            $subBlock[self::TITLE] = $title;
+        }
+
+        array_unshift($this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS], $subBlock);
+
+        return 0;
     }
 
     /**

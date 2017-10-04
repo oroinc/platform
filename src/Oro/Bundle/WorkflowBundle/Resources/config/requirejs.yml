@@ -21,6 +21,7 @@ config:
         'oroworkflow/js/app/components/activate-form-widget-component': 'bundles/oroworkflow/js/app/components/activate-form-widget-component.js'
         'oroworkflow/js/app/views/workflow-activate-btn-view': 'bundles/oroworkflow/js/app/views/workflow-activate-btn-view.js'
         'oroworkflow/js/app/views/workflow-deactivate-btn-view': 'bundles/oroworkflow/js/app/views/workflow-deactivate-btn-view.js'
+        'oroworkflow/js/app/views/process-status-toggle-btn-view': 'bundles/oroworkflow/js/app/views/process-status-toggle-btn-view.js'
         'oroworkflow/js/app/views/workflow-form-view': 'bundles/oroworkflow/js/app/views/workflow-form-view.js'
         'oroworkflow/js/app/views/transition/transition-error-view': 'bundles/oroworkflow/js/app/views/transition/transition-error-view.js'
         'oroworkflow/js/app/components/button-component': 'bundles/oroworkflow/js/app/components/button-component.js'

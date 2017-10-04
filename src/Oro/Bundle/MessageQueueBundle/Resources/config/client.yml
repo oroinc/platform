@@ -9,6 +9,16 @@ services:
         arguments:
             - []
 
+    oro_message_queue.client.security_aware_driver_factory:
+        class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory'
+        public: false
+        decorates: oro_message_queue.client.driver_factory
+        arguments:
+            - '@oro_message_queue.client.security_aware_driver_factory.inner'
+            - [] # security agnostic topics
+            - '@security.token_storage'
+            - '@oro_security.token_serializer'
+
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
         factory: ['@oro_message_queue.client.driver_factory', 'create']

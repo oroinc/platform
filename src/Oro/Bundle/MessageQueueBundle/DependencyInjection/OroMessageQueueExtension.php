@@ -99,6 +99,7 @@ class OroMessageQueueExtension extends Extension
         }
 
         $this->setPersistenceServicesAndProcessors($config, $container);
+        $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
     }
 
     /**
@@ -132,6 +133,24 @@ class OroMessageQueueExtension extends Extension
         }
         if (!empty($config['persistent_processors'])) {
             $resetExtensionDefinition->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
+        }
+    }
+
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     */
+    protected function setSecurityAgnosticTopicsAndProcessors(array $config, ContainerBuilder $container)
+    {
+        if (!empty($config['security_agnostic_topics'])) {
+            $container
+                ->getDefinition('oro_message_queue.client.security_aware_driver_factory')
+                ->replaceArgument(1, $config['security_agnostic_topics']);
+        }
+        if (!empty($config['security_agnostic_processors'])) {
+            $container
+                ->getDefinition('oro_message_queue.consumption.security_aware_extension')
+                ->replaceArgument(0, $config['security_agnostic_processors']);
         }
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -100,7 +102,7 @@ abstract class ValidateRequestData implements ProcessorInterface
             false
         );
         if ($dataClassName !== $this->context->getClassName()) {
-            $this->addError(
+            $this->addConflictError(
                 $this->buildPointer($pointer, JsonApiDoc::TYPE),
                 sprintf(
                     'The \'%s\' property of the primary data object should match the requested resource',
@@ -337,6 +339,18 @@ abstract class ValidateRequestData implements ProcessorInterface
     protected function addError($pointer, $message)
     {
         $error = Error::createValidationError(Constraint::REQUEST_DATA, $message)
+            ->setSource(ErrorSource::createByPointer($pointer));
+
+        $this->context->addError($error);
+    }
+
+    /**
+     * @param string $pointer
+     * @param string $message
+     */
+    protected function addConflictError($pointer, $message)
+    {
+        $error = Error::createValidationError(Constraint::CONFLICT, $message, Response::HTTP_CONFLICT)
             ->setSource(ErrorSource::createByPointer($pointer));
 
         $this->context->addError($error);

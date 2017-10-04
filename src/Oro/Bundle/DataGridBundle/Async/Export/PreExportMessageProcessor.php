@@ -112,17 +112,10 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
-            'securityToken' => null,
         ], $body);
 
-        if (! isset($body['securityToken'], $body['parameters']['gridName'], $body['format'])) {
+        if (! isset($body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
-        if (! $this->setSecurityToken($body['securityToken'])) {
-            $this->logger->critical('Cannot set security token');
 
             return false;
         }

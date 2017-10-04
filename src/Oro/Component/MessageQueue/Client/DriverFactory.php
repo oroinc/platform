@@ -1,17 +1,16 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
-class DriverFactory
+class DriverFactory implements DriverFactoryInterface
 {
-    /**
-     * @var string[]
-     */
+    /** @var array [connection class => driver class, ...] */
     private $connectionToDriverMap;
 
     /**
-     * @param array $connectionToDriverMap The array must have next structure ['connectionClass' => 'driverClass']
+     * @param array $connectionToDriverMap [connection class => driver class, ...]
      */
     public function __construct(array $connectionToDriverMap)
     {
@@ -19,10 +18,7 @@ class DriverFactory
     }
 
     /**
-     * @param ConnectionInterface $connection
-     * @param Config     $config
-     *
-     * @return DriverInterface
+     * {@inheritdoc}
      */
     public function create(ConnectionInterface $connection, Config $config)
     {

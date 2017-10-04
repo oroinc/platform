@@ -499,6 +499,10 @@ services:
         class: %oro_security.encoder.mcrypt.class%
         arguments: [ %kernel.secret% ]
 
+    oro_security.encoder.repetitive_crypter:
+        class: Oro\Bundle\SecurityBundle\Encoder\RepetitiveCrypter
+        arguments: [ %kernel.secret% ]
+
     oro_security.acl_helper:
         class: %oro_security.acl_helper.class%
         arguments:

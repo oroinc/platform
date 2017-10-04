@@ -27,8 +27,6 @@
             'aCss': 'btn-success dialog-form-renderer no-hash',
             'iCss': 'fa-share-square-o'
         }) }}
-
-        {{ _emailMacros.renderPreviewDialog(form.vars.id, form.vars.value.subject) }}
     {% endif %}
 
     {% if form.vars.value.id and is_granted('oro_email_emailtemplate_clone') %}

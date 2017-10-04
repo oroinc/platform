@@ -351,6 +351,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
         $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
+        $suites = array_merge($suites, $container->getParameter('suite.configurations'));
         $container->setParameter('suite.configurations', $suites);
     }
 

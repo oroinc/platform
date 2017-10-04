@@ -78,6 +78,7 @@ services:
     oro_api.create.create_entity:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CreateEntity
         arguments:
+            - '@oro_api.doctrine_helper'
             - '@oro_api.entity_instantiator'
         tags:
             - { name: oro.api.processor, action: create, group: load_data, priority: -10 }

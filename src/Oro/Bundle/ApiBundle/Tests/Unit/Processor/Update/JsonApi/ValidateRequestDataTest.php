@@ -64,8 +64,13 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($requestData, $expectedError, $pointer)
-    {
+    public function testProcessWithInvalidRequestData(
+        $requestData,
+        $expectedError,
+        $pointer,
+        $title = 'request data constraint',
+        $statusCode = 400
+    ) {
         $this->context->setId('1');
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
@@ -83,9 +88,10 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $pointer = (array)$pointer;
         $this->assertCount(count($expectedError), $errors);
         foreach ($errors as $key => $error) {
-            $this->assertEquals('request data constraint', $error->getTitle());
+            $this->assertEquals($title, $error->getTitle());
             $this->assertEquals($expectedError[$key], $error->getDetail());
             $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
+            $this->assertEquals($statusCode, $error->getStatusCode());
         }
     }
 
@@ -124,6 +130,8 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['id' => '10', 'type' => 'products', 'attributes' => ['foo' => 'bar']]],
                 'The \'id\' property of the primary data object should match \'id\' parameter of the query sting',
                 '/data/id',
+                'conflict constraint',
+                409
             ],
             [
                 ['data' => ['id' => '1', 'attributes' => ['foo' => 'bar']]],
@@ -134,6 +142,8 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['id' => '1', 'type' => 'test', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property of the primary data object should match the requested resource',
                 '/data/type',
+                'conflict constraint',
+                409
             ],
             [
                 ['data' => ['id' => '1', 'type' => 'products']],

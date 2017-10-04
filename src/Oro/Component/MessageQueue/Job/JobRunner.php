@@ -76,11 +76,12 @@ class JobRunner
     {
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $this->rootJob);
 
-        $jobRunner = $this->getJobRunnerForChildJob($this->rootJob);
+        $this->jobExtension->onPreCreateDelayed($childJob);
 
+        $jobRunner = $this->getJobRunnerForChildJob($this->rootJob);
         $createResult = call_user_func($startCallback, $jobRunner, $childJob);
 
-        $this->jobExtension->onCreateDelayed($childJob, $createResult);
+        $this->jobExtension->onPostCreateDelayed($childJob, $createResult);
 
         return $createResult;
     }

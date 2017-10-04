@@ -7,3 +7,5 @@ oro:
                 not_blank: "This group should not be blank."
             filters:
                 not_blank: "Filters should not be blank."
+        not_accessible_class: "Class '%className%' is not accessible"
+        not_accessible_class_column: "Column '%columnName%' of '%className%' is not accessible"

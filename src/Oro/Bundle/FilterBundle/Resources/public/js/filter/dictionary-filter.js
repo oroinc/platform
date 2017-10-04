@@ -230,7 +230,8 @@ define(function(require) {
                 selectedChoiceLabel: selectedChoiceLabel,
                 selectedChoice: value.type,
                 choices: this.choices,
-                name: this.name
+                name: this.name,
+                renderMode: this.renderMode
             }));
 
             this._appendFilter($filter);
