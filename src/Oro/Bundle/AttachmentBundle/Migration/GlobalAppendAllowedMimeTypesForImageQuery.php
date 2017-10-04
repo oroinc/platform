@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 /**
  * This class allows to update global image mime types config with new values
  */
-class GlobalSetAllowedMimeTypesForImageQuery extends ParametrizedMigrationQuery
+class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQuery
 {
     const IMAGE_CONFIG_NAME = 'upload_image_mime_types';
     const CONFIG_VALUE_TYPE = 'scalar';
@@ -71,7 +71,7 @@ class GlobalSetAllowedMimeTypesForImageQuery extends ParametrizedMigrationQuery
      */
     private function fetchConfigRow(LoggerInterface $logger)
     {
-        $sql = 'SELECT c.id, c.text_value FROM oro_config_value as c WHERE c.name = ?';
+        $sql = 'SELECT c.id, c.text_value FROM oro_config_value AS c WHERE c.name = ?';
         $parameters = [self::IMAGE_CONFIG_NAME];
         $this->logQuery($logger, $sql);
 

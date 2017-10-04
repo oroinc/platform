@@ -4,10 +4,10 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
-use Oro\Bundle\AttachmentBundle\Migration\GlobalSetAllowedMimeTypesForImageQuery;
+use Oro\Bundle\AttachmentBundle\Migration\GlobalAppendAllowedMimeTypesForImageQuery;
 use Psr\Log\LoggerInterface;
 
-class GlobalSetAllowedMimeTypesForImageQueryTest extends \PHPUnit_Framework_TestCase
+class GlobalAppendAllowedMimeTypesForImageQueryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var array
@@ -28,7 +28,7 @@ class GlobalSetAllowedMimeTypesForImageQueryTest extends \PHPUnit_Framework_Test
     private $connection;
 
     /**
-     * @var GlobalSetAllowedMimeTypesForImageQuery
+     * @var GlobalAppendAllowedMimeTypesForImageQuery
      */
     private $updateAttachmentOptionQuery;
 
@@ -36,7 +36,7 @@ class GlobalSetAllowedMimeTypesForImageQueryTest extends \PHPUnit_Framework_Test
     {
         $this->connection = $this->createMock(Connection::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->updateAttachmentOptionQuery = new GlobalSetAllowedMimeTypesForImageQuery($this->mimeTypes);
+        $this->updateAttachmentOptionQuery = new GlobalAppendAllowedMimeTypesForImageQuery($this->mimeTypes);
     }
 
     public function testExecuteWithoutRowResult()
