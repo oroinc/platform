@@ -54,6 +54,17 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.security_aware_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension'
+        public: false
+        arguments:
+            - [] # security agnostic processors
+            - '@security.token_storage'
+            - '@oro_security.token_serializer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:

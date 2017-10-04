@@ -1,4 +1,6 @@
 {% set data = data|merge({
+    disableActions: data.disableActions|default(false),
+    disableSearch: data.disableSearch|default(false),
     treeOptions: {
         view: 'oroui/js/app/views/jstree/base-tree-view'
     }|merge(data.treeOptions|default({})),
@@ -31,16 +33,18 @@
                     {% endif %}
                 {% endblock label %}
                 {% block actions %}
+                    {% if not data.disableActions %}
                     <div class="jstree-actions dropdown btn-group"
                         data-page-component-view="{{ data.actionsOptions|json_encode }}">
                     </div>
+                    {% endif %}
                 {% endblock actions %}
             {% endblock header %}
         </div>
         <div data-collapse-container>
             {% block content %}
                 {% block search %}
-                    {% if not data.disableSearch|default(false) and data.treeOptions.data|default([]) %}
+                    {% if not data.disableSearch and data.treeOptions.data|default([]) %}
                     <div class="jstree-search-component">
                         <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
                         <span data-name="clear-search" class="jstree-search-component__clear hide">

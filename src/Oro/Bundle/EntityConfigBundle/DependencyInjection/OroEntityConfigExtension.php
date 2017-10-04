@@ -22,5 +22,6 @@ class OroEntityConfigExtension extends Extension
         $loader->load('form_type.yml');
         $loader->load('importexport.yml');
         $loader->load('block_types.yml');
+        $loader->load('attribute_types.yml');
     }
 }

@@ -159,7 +159,7 @@ define(function(require) {
 
             this.subview('highlight', new HighlightTextView({
                 el: this.el,
-                viewGroup: 'configuration',
+                viewGroup: this.viewGroup,
                 highlightSelectors: ['.jstree-search']
             }));
 

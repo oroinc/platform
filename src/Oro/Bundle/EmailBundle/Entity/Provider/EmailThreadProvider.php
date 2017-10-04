@@ -136,7 +136,7 @@ class EmailThreadProvider
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $queryBuilder->join('e.emailUsers', 'eu')
-                ->where($queryBuilder->expr()->eq('thread', ':thread'))
+                ->where($queryBuilder->expr()->eq('e.thread', ':thread'))
                 ->setParameter('thread', $thread)
                 ->orderBy('e.sentAt', Criteria::DESC);
 

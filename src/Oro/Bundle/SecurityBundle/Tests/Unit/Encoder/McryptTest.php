@@ -39,6 +39,7 @@ class McryptTest extends \PHPUnit_Framework_TestCase
 
         $newInstance = new Mcrypt($key);
         $this->assertEquals($someData, $newInstance->decryptData($encrypted));
+        $this->assertNotEquals($encrypted, $newInstance->encryptData($someData));
     }
 
     public function keyDataProvider()
