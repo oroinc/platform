@@ -65,6 +65,23 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.database_connections_clearer:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\DatabaseConnectionsClearer
+        public: false
+        arguments:
+            - '@service_container'
+            - '%doctrine.connections%'
+        tags:
+            - { name: oro_message_queue.consumption.clearer, priority: 10 }
+
+    oro_message_queue.consumption.container_clearer:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: oro_message_queue.consumption.clearer }
+
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:

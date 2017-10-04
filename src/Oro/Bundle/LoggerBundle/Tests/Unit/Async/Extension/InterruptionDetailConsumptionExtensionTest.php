@@ -55,6 +55,27 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit_Framework_Test
         self::assertAttributeEquals($messageProcessorClass, 'lastProcessorClassName', $this->extension);
     }
 
+    public function testOnIdleShouldClearRememberedProcessor()
+    {
+        $messageProcessor = $this->createMock(MessageProcessorInterface::class);
+        $message = $this->createMock(MessageInterface::class);
+        $messageProcessorClass = get_class($messageProcessor);
+
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setMessageProcessor($messageProcessor);
+        $context->setMessage($message);
+
+        $this->messageProcessorClassProvider->expects(self::once())
+            ->method('getMessageProcessorClass')
+            ->with(self::identicalTo($messageProcessor), self::identicalTo($message))
+            ->willReturn($messageProcessorClass);
+
+        $this->extension->onPostReceived($context);
+        $this->extension->onIdle($context);
+
+        self::assertAttributeSame(null, 'lastProcessorClassName', $this->extension);
+    }
+
     public function testOnInterruptedWithoutLastProcessorClassName()
     {
         $logger = $this->createMock(LoggerInterface::class);

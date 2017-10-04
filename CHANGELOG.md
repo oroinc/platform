@@ -5,12 +5,16 @@
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
+#### MessageQueueBundle
+* Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
 ### Changed
 #### EntityConfigBundle
 * Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
 #### MessageQueue Component
 * Interface `Oro\Component\MessageQueue\Job\ExtensionInterface`
     * renamed method `onCreateDelayed` to `onPostCreateDelayed`
+#### MessageQueueBundle
+* Method `setPersistentServices` was moved from `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension` to `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer`
 #### SearchBundle
 * Entity `Oro\Bundle\WebsiteSearchBundle\Entity\IndexDecimal`:
     * changed decimal field `value`:
