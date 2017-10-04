@@ -296,7 +296,8 @@ abstract class AbstractMenuController extends Controller
             BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];
         $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
-        if (!count($menu->getChildren())) {
+
+        if (!count($menu->getChildren()) && !array_key_exists('type', $menu->getExtras())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
         }
 
