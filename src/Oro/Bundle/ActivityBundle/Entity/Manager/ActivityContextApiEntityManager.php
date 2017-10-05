@@ -82,8 +82,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
      */
     public function getActivityContext($class, $id)
     {
-        $currentUser = $this->securityTokenStorage->getToken()->getUser();
-        $userClass   = ClassUtils::getClass($currentUser);
         $entity      = $this->doctrineHelper->getEntity($class, $id);
         $result = [];
 
@@ -97,10 +95,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         foreach ($targets as $target) {
             $targetClass = ClassUtils::getClass($target);
             $targetId = $target->getId();
-
-            if ($userClass === $targetClass && $currentUser->getId() === $targetId) {
-                continue;
-            }
 
             $item          = [];
             $config        = $entityProvider->getConfig($targetClass);
