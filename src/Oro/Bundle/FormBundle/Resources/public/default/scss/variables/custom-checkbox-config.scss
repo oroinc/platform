@@ -2,12 +2,17 @@
 
 // Default
 $checkbox-icon-size: auto;
+
+$checkbox-icon-font-size: 17px !default;
+$checkbox-icon-font-size--l: 32px !default;
 $checkbox-icon-min-width: 15px;
 $checkbox-icon-border: 1px solid transparent;
 $checkbox-icon-bg-color: transparent;
 $checkbox-icon-checked: $fa-var-check-square;
 $checkbox-icon-unchecked: $fa-var-square-o;
 $checkbox-icon-indeterminate: $fa-var-minus-square;
+$checkbox-icon-circle-unchecked: $fa-var-circle-thin;
+$checkbox-icon-circle-checked: $fa-var-check-circle;
 
 // Absolute state
 

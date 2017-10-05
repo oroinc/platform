@@ -14,6 +14,10 @@
                 color: get-color('ui', 'focus');
 
                 @include fa-icon($checkbox-icon-checked);
+
+                &--circle {
+                    @include fa-icon($checkbox-icon-circle-checked);
+                }
             }
         }
 
@@ -43,11 +47,21 @@
 
             min-width: $checkbox-icon-min-width;
 
-            font-size: 17px;
+            font-size: $checkbox-icon-font-size;
             line-height: 1;
         }
 
         @include fa-icon($checkbox-icon-unchecked);
+
+        &--circle {
+            @include fa-icon($checkbox-icon-circle-unchecked);
+        }
+
+        &--size-l {
+            &:before {
+                font-size: $checkbox-icon-font-size--l;
+            }
+        }
     }
 
     &__text {
