@@ -35,8 +35,10 @@
 * Removed `renderResetButton()` macro from Oro/Bundle/WorkflowBundle/Resources/views/macros.html.twig. Also removed usage of this macro from two files:
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/button.html.twig`
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/buttons.html.twig`
+#### OroBehatExtension
+* Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
-## 2.4.0 (Unreleased)
+## 2.4.0
 
 ### Added
 #### CacheBundle
