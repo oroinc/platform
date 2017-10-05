@@ -1,6 +1,8 @@
 ## 2.5.0 (Unreleased)
 
 ### Added
+#### ApiBundle
+* Added additional syntax for data filters: `key[operator_name]=value`. For example `GET /api/users?filter[id][neq]=2` can be used instead of `GET /api/users?filter[id]!=2`. The supported operators are `eq`, `neq`, `lt`, `lte`, `gt` and `gte`.
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
