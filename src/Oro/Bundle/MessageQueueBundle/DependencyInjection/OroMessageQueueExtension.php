@@ -125,14 +125,13 @@ class OroMessageQueueExtension extends Extension
      */
     protected function setPersistenceServicesAndProcessors(array $config, ContainerBuilder $container)
     {
-        $resetExtensionDefinition = $container
-            ->getDefinition('oro_message_queue.consumption.container_reset_extension');
-
         if (!empty($config['persistent_services'])) {
-            $resetExtensionDefinition->addMethodCall('setPersistentServices', [$config['persistent_services']]);
+            $container->getDefinition('oro_message_queue.consumption.container_clearer')
+                ->addMethodCall('setPersistentServices', [$config['persistent_services']]);
         }
         if (!empty($config['persistent_processors'])) {
-            $resetExtensionDefinition->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
+            $container->getDefinition('oro_message_queue.consumption.container_reset_extension')
+                ->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
         }
     }
 

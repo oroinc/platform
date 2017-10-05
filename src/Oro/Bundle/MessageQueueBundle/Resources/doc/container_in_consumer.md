@@ -7,15 +7,22 @@ Container reset
 As each consumer processes all messages at one thread, there are cases when some services have an internal state
 and this state can be changed during processing a message and these changes can affect processing of the next message.
 
-To prevent this problem, before processing a message all services are removed from the dependency injection
+To prevent this problem, after processing a message all services are removed from the dependency injection
 container by [ContainerResetExtension](../../Consumption/Extension/ContainerResetExtension.php) extension.
-As result, each message is processed by "fresh" state of services.
+As result, each message is processed by "fresh" state of services. See [persistent processors](#persistent-processors)
+and [persistent services](#persistent-services) sections if you want to change this behaviour.
+
+If it is required to perform additional actions before the container reset, you can create a class implements
+[ClearerInterface](../../Consumption/Extension/ClearerInterface.php) and register it in the container with
+tag `oro_message_queue.consumption.clearer`. The `priority` attribute can be used to change the execution order
+of your clearer. The higher the priority, the earlier the clearer is executed.
+
 
 Persistent processors
 ---------------------
 
 The removing services from the container may affect the consumer performance dramatically because the initialization
-of services may be an expensive operation. This is the reason why the container is not cleared before executing of
+of services may be an expensive operation. This is the reason why the container is not cleared after executing of
 some processors that can work correctly with "dirty" state of services. The list of such processors can
 be configured by *Resources/config/oro/app.yml* or the application configuration file. Here is an example:
 
@@ -26,7 +33,7 @@ oro_message_queue:
 ```
 
 This config file inform the [ContainerResetExtension](../../Consumption/Extension/ContainerResetExtension.php) that
-the container should not be cleared before executing the `oro_message_queue.client.route_message_processor` processor.
+the container should not be cleared after executing the `oro_message_queue.client.route_message_processor` processor.
 
 Persistent services
 -------------------
@@ -67,7 +74,7 @@ Cache state
 -----------
 
 The loading of some types of caches may be quite expensive operation. This is the reason why some cache providers
-was added to the `persistent_services` list to prevent removing them from the container before processing of a message.
+was added to the `persistent_services` list to prevent removing them from the container after processing of a message.
 
 To synchronize such caches between different processes the [CacheState](../../Consumption/CacheState.php) service
 is used. The method `renewChangeDate` should be called after a cache is changed. The method `getChangeDate`
