@@ -68,6 +68,17 @@ class SearchIndexRepository extends EntityRepository implements DBALPersisterInt
     }
 
     /**
+     * Get grouped data calculated based on requirements from query
+     *
+     * @param Query $query
+     * @return array
+     */
+    public function getGroupedData(Query $query)
+    {
+        return $this->getDriverRepo()->getGroupedData($query);
+    }
+
+    /**
      * Set array with additional drivers
      *
      * @param array $drivers

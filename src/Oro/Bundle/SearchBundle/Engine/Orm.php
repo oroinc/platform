@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
+use Oro\Bundle\SearchBundle\Query\LazyResult;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -42,45 +43,56 @@ class Orm extends AbstractEngine
      */
     protected function doSearch(Query $query)
     {
-        $results       = [];
+        $resultsCallback = function () use ($query) {
+            $results = [];
+            $searchResults = $this->getIndexRepository()->search($query);
+            if ($searchResults) {
+                foreach ($searchResults as $item) {
+                    $originalItem = $item;
+                    if (is_array($item)) {
+                        $item = $item['item'];
+                    }
 
-        $searchResults = $this->getIndexRepository()->search($query);
-        if (($query->getCriteria()->getMaxResults() > 0 || $query->getCriteria()->getFirstResult() > 0)) {
-            $recordsCount = $this->getIndexRepository()->getRecordsCount($query);
-        } else {
-            $recordsCount = count($searchResults);
-        }
-        if ($searchResults) {
-            foreach ($searchResults as $item) {
-                $originalItem = $item;
-                if (is_array($item)) {
-                    $item = $item['item'];
+                    $results[] = new ResultItem(
+                        $item['entity'],
+                        $item['recordId'],
+                        $item['title'],
+                        null,
+                        $this->mapper->mapSelectedData($query, $originalItem),
+                        $this->mapper->getEntityConfig($item['entity'])
+                    );
                 }
-
-                /**
-                 * Search result can contains duplicates and we can not use HYDRATE_OBJECT because of performance issue.
-                 * @todo: update after fix BAP-7166. Remove check for existing result.
-                 */
-                $id = $item['id'];
-                if (isset($results[$id])) {
-                    continue;
-                }
-
-                $results[$id] = new ResultItem(
-                    $item['entity'],
-                    $item['recordId'],
-                    $item['title'],
-                    null,
-                    $this->mapper->mapSelectedData($query, $originalItem),
-                    $this->mapper->getEntityConfig($item['entity'])
-                );
             }
-        }
+
+            return $results;
+        };
+
+        $recordsCountCallback = function () use ($query) {
+            return $this->getIndexRepository()->getRecordsCount($query);
+        };
+
+        $groupedDataCallback = function () use ($query) {
+            return $this->getIndexRepository()->getGroupedData($query);
+        };
 
         return [
-            'results'       => $results,
-            'records_count' => $recordsCount
+            'results'       => $resultsCallback,
+            'records_count' => $recordsCountCallback,
+            'grouped_data'  => $groupedDataCallback,
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildResult(Query $query, array $data)
+    {
+        return new LazyResult(
+            $query,
+            $data['results'],
+            $data['records_count'],
+            $data['grouped_data']
+        );
     }
 
     /**

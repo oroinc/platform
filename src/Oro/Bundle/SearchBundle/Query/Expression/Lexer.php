@@ -12,6 +12,7 @@ class Lexer
         Query::KEYWORD_SELECT,
         Query::KEYWORD_FROM,
         Query::KEYWORD_WHERE,
+        Query::KEYWORD_GROUP_BY,
 
         Query::KEYWORD_AND,
         Query::KEYWORD_OR,

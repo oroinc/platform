@@ -47,8 +47,9 @@ abstract class AbstractEngine implements EngineInterface
      * Search query with query builder
      * Must return array
      * array(
-     *   'results' - array of Oro\Bundle\SearchBundle\Query\Result\Item objects
-     *   'records_count' - count of records without limit parameters in query
+     *   'results' - array of Oro\Bundle\SearchBundle\Query\Result\Item objects or callable to get it
+     *   'records_count' - count of records without limit parameters in query or callable to get it
+     *   'grouped_data' - results of grouping operations or callable to get it
      * )
      *
      * @param Query $query
@@ -69,13 +70,28 @@ abstract class AbstractEngine implements EngineInterface
         // search must be performed as fast as possible and it might return lots of entities (10M and more)
         // it's important to not trigger any additional or processing for all entities here
         $searchResult = $this->doSearch($query);
-        $result       = new Result($query, $searchResult['results'], $searchResult['records_count']);
+        $result = $this->buildResult($query, $searchResult);
 
         if ($this->logQueries) {
             $this->logQuery($result);
         }
 
         return $result;
+    }
+
+    /**
+     * @param Query $query
+     * @param array $data
+     * @return Result
+     */
+    protected function buildResult(Query $query, array $data)
+    {
+        return new Result(
+            $query,
+            $data['results'],
+            $data['records_count'],
+            $data['grouped_data']
+        );
     }
 
     /**
