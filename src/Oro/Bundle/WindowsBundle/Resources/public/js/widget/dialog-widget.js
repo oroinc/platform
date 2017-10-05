@@ -292,16 +292,13 @@ define(function(require) {
             return this.widget.parent();
         },
 
-        getActionsElement: function(wrapperClass) {
+        getActionsElement: function() {
             if (!this.actionsEl) {
                 this.actionsEl = $('<div class="pull-right"/>').appendTo(
                     $('<div class="form-actions widget-actions"/>').appendTo(
                         this.widget.dialog('actionsContainer')
                     )
                 );
-            }
-            if (wrapperClass) {
-                this.actionsEl[0].className = wrapperClass;
             }
             return this.actionsEl;
         },
