@@ -108,13 +108,8 @@ class ContextsSelectType extends AbstractType
         }
 
         $result = [];
-        $user   = $this->tokenStorage->getToken()->getUser();
         foreach ($targetEntities as $target) {
-            // Exclude current user
             $targetClass = ClassUtils::getClass($target);
-            if (ClassUtils::getClass($user) === $targetClass && $user->getId() === $target->getId()) {
-                continue;
-            }
 
             $title = $this->entityNameResolver->getName($target);
             if ($label = $this->getClassLabel($targetClass)) {

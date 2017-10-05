@@ -51,13 +51,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
 
         if (is_array($value) || $value instanceof Collection) {
             $result = [];
-            $user   = $this->securityTokenStorage->getToken()->getUser();
             foreach ($value as $target) {
-                // Exclude current user
                 $targetClass = ClassUtils::getClass($target);
-                if (ClassUtils::getClass($user) === $targetClass && $user->getId() === $target->getId()) {
-                    continue;
-                }
 
                 $result[] = json_encode(
                     [
