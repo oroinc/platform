@@ -330,3 +330,11 @@ services:
         class: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration
         arguments:
             - '@oro_integration.manager.types_registry'
+
+    oro_integration.event_listener.integration_sync:
+        class: Oro\Bundle\IntegrationBundle\EventListener\IntegrationSyncListener
+        arguments:
+            - '@oro_message_queue.client.driver'
+        tags:
+            - { name: kernel.event_listener, event: oro_integration.event.sync_before, method: syncBefore }
+            - { name: kernel.event_listener, event: oro_integration.event.sync_after, method: syncAfter }
