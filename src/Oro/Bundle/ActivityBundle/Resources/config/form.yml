@@ -8,7 +8,6 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity_config.config_manager'
             - '@translator'
-            - '@security.token_storage'
             - '@event_dispatcher'
             - '@oro_entity.entity_name_resolver'
             - '@oro_featuretoggle.checker.feature_checker'

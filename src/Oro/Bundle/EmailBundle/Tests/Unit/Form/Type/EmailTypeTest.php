@@ -220,10 +220,6 @@ class EmailTypeTest extends TypeTestCase
         $translator = $this->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityTokenStorage =
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -244,7 +240,6 @@ class EmailTypeTest extends TypeTestCase
             $this->em,
             $configManager,
             $translator,
-            $securityTokenStorage,
             $eventDispatcher,
             $entityTitleResolver,
             $this->createMock(FeatureChecker::class)
