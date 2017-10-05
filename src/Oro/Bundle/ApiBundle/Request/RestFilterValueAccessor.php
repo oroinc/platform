@@ -170,10 +170,26 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         );
 
         if (false !== $matchResult) {
+            $operatorNameMap = $this->getOperatorNameMap();
             foreach ($matches as $match) {
                 $key = rawurldecode($match['key']);
                 $group = rawurldecode($match['group']);
                 $path = rawurldecode($match['path']);
+                $operator = rawurldecode($match['operator']);
+
+                // check if a filter is provided as "key[operator name]=value"
+                if (substr($path, -1) === ']') {
+                    $pos = strrpos($path, '[');
+                    if (false !== $pos) {
+                        $lastElement = substr($path, $pos + 1, -1);
+                        if (isset($operatorNameMap[$lastElement])) {
+                            $operator = $lastElement;
+                            $key = substr($key, 0, -(strlen($path) - $pos));
+                            $path = substr($path, 0, $pos);
+                        }
+                    }
+                }
+
                 $normalizedKey = $key;
                 if (empty($path)) {
                     $path = $key;
@@ -182,13 +198,8 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
                     $normalizedKey = $group . '[' . $path . ']';
                 }
 
-                $this->addParsed(
-                    $group,
-                    $normalizedKey,
-                    $path,
-                    rawurldecode($match['value']),
-                    rawurldecode($match['operator'])
-                )->setSourceKey($key);
+                $this->addParsed($group, $normalizedKey, $path, rawurldecode($match['value']), $operator)
+                    ->setSourceKey($key);
             }
         }
     }
@@ -210,13 +221,8 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
                     foreach ($val as $subKey => $subValue) {
                         $paramKey = $group . '[' . $subKey . ']';
                         if (is_array($subValue) && $this->isValueWithOperator($subValue)) {
-                            $this->addParsed(
-                                $group,
-                                $paramKey,
-                                $subKey,
-                                current($subValue),
-                                key($subValue)
-                            )->setSourceKey($paramKey);
+                            $this->addParsed($group, $paramKey, $subKey, current($subValue), key($subValue))
+                                ->setSourceKey($paramKey);
                         } else {
                             $this->addParsed($group, $paramKey, $subKey, $subValue, '=')->setSourceKey($paramKey);
                         }
@@ -243,7 +249,10 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
 
         return
             is_string($key)
-            && in_array($key, $this->getOperators(), true);
+            && (
+                in_array($key, $this->getOperators(), true)
+                || array_key_exists($key, $this->getOperatorNameMap())
+            );
     }
 
     /**
@@ -256,6 +265,10 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         if ('<>' === $operator) {
             return '!=';
         }
+        $operatorNameMap = $this->getOperatorNameMap();
+        if (isset($operatorNameMap[$operator])) {
+            $operator = $operatorNameMap[$operator];
+        }
 
         return $operator;
     }
@@ -266,6 +279,14 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     protected function getOperators()
     {
         return ['=', '!=', '>', '<', '>=', '<=', '<>'];
+    }
+
+    /**
+     * @return array [operator name => operator, ...]
+     */
+    protected function getOperatorNameMap()
+    {
+        return ['eq' => '=', 'neq' => '!=', 'gt' => '>', 'lt' => '<', 'gte' => '>=', 'lte' => '<='];
     }
 
     /**
