@@ -1,12 +1,14 @@
 {% if saved is defined and saved %}
     {% set messageText = update|default(false) ? 'Attachment updated successfully' : 'Attachment created successfully' %}
-    {% set data = {
-        flashMessage: messageText|trans,
-        triggerSuccess: true,
-        remove: true
+    {% set widgetResponse = {
+        widget: {
+            message: messageText|trans,
+            triggerSuccess: true,
+            remove: true
+        }
     } %}
 
-    {{ data|json_encode|raw }}
+    {{ widgetResponse|json_encode|raw }}
 {% else %}
 <div class="widget-content">
     {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}

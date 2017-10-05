@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var ExportConfigurableTemplateView;
+    var ExportConfigurableTemplateWidgetView;
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
     var widgetManager = require('oroui/js/widget-manager');
     var exportHandler = require('oroimportexport/js/export-handler');
     var messenger = require('oroui/js/messenger');
 
-    ExportConfigurableTemplateView = BaseView.extend({
+    ExportConfigurableTemplateWidgetView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['downloadMessage', 'wid']),
 
         events: {
@@ -46,5 +46,5 @@ define(function(require) {
         }
     });
 
-    return ExportConfigurableTemplateView;
+    return ExportConfigurableTemplateWidgetView;
 });

@@ -2,13 +2,15 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% if saved %}
-    {% set data = {
-        flashMessage: 'oro.note.note_saved'|trans,
-        triggerSuccess: true,
-        remove: true
+    {% set widgetResponse = {
+        widget: {
+            message: 'oro.note.note_saved'|trans,
+            triggerSuccess: true,
+            remove: true
+        }
     } %}
 
-    {{ data|json_encode|raw }}
+    {{ widgetResponse|json_encode|raw }}
 {% else %}
     <div class="widget-content">
         <div class="form-container">

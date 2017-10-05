@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowFormView;
+    var WorkflowFormWidgetView;
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
     var widgetManager = require('oroui/js/widget-manager');
@@ -10,11 +10,11 @@ define(function(require) {
     var TransitionEventHandlers = require('oroworkflow/js/transition-event-handlers');
 
     /**
-     * @export  oroworkflow/js/app/views/workflow-form-view
-     * @class   oro.WorkflowFormView
+     * @export  oroworkflow/js/app/views/workflow-form-widget-view
+     * @class   oro.WorkflowFormWidgetView
      * @extends Backbone.View
      */
-    WorkflowFormView = BaseView.extend({
+    WorkflowFormWidgetView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['widgetAlias', 'saveAndTransitButtonSelector']),
 
         initialize: function() {
@@ -22,7 +22,7 @@ define(function(require) {
 
             widgetManager.getWidgetInstanceByAlias(this.widgetAlias, this._bindWidgetEvents.bind(this));
 
-            WorkflowFormView.__super__.initialize.apply(this, arguments);
+            WorkflowFormWidgetView.__super__.initialize.apply(this, arguments);
         },
 
         onSaveAndTransit: function(e) {
@@ -34,11 +34,11 @@ define(function(require) {
         },
 
         _bindEvents: function() {
-            $(this.saveAndTransitButtonSelector).on('click.' + this.cid, this.onSaveAndTransit.bind(this));
+            $(this.saveAndTransitButtonSelector).on('click' + this.eventNamespace(), this.onSaveAndTransit.bind(this));
         },
 
         _unbindEvents: function() {
-            $(this.saveAndTransitButtonSelector).off('.' + this.cid);
+            $(this.saveAndTransitButtonSelector).off(this.eventNamespace());
         },
 
         _bindWidgetEvents: function(widget) {
@@ -64,9 +64,9 @@ define(function(require) {
         dispose: function() {
             this._unbindEvents();
 
-            WorkflowFormView.__super__.dispose.apply(this, arguments);
+            WorkflowFormWidgetView.__super__.dispose.apply(this, arguments);
         }
     });
 
-    return WorkflowFormView;
+    return WorkflowFormWidgetView;
 });

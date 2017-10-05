@@ -764,7 +764,8 @@ define(function(require) {
             }
 
             try {
-                return $.parseJSON(content);
+                var parsedJson = $.parseJSON(content);
+                return parsedJson.widget;
             } catch (e) {}
 
             return null;
@@ -777,8 +778,8 @@ define(function(require) {
          * @private
          */
         _onJsonContentResponse: function(content) {
-            if (_.has(content, 'flashMessage')) {
-                var message = content.flashMessage;
+            if (_.has(content, 'message')) {
+                var message = content.message;
 
                 if (_.isString(message)) {
                     message = {type: 'success', text: message};
@@ -796,18 +797,15 @@ define(function(require) {
 
                 _.each(events, function(event) {
                     var eventBroker = this._getEventBroker(event);
+                    var eventFunction = this._getEventFunction(event);
 
                     if (_.isObject(event)) {
                         var args = [event.name].concat(event.args);
-                        eventBroker.trigger.apply(eventBroker, args);
+                        eventBroker[eventFunction].apply(eventBroker, args);
                     } else {
-                        eventBroker.trigger(event);
+                        eventBroker[eventFunction](event);
                     }
                 }, this);
-            }
-
-            if (_.has(content, 'execute')) {
-                mediator.execute(content.execute);
             }
 
             if (_.has(content, 'triggerSuccess') && content.triggerSuccess) {
@@ -822,6 +820,10 @@ define(function(require) {
 
         _getEventBroker: function(event) {
             return event.eventBroker === 'widget' ? this : mediator;
+        },
+
+        _getEventFunction: function(event) {
+            return event.eventFunction === 'execute' ? 'execute' : 'trigger';
         },
 
         _triggerContentLoadEvents: function(content) {

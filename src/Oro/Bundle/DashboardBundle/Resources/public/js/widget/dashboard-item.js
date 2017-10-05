@@ -262,7 +262,12 @@ define([
          * @private
          */
         _onContentLoad: function(content) {
-            this.setTitle($(content).data('widget-title'));
+            var title = $(content).data('widget-title');
+
+            if (title) {
+                this.setTitle(title);
+            }
+
             DashboardItemWidget.__super__._onContentLoad.apply(this, arguments);
         }
     });

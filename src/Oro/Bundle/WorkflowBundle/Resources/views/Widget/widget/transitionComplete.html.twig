@@ -1,22 +1,26 @@
 {% if transitionSuccess  %}
-    {% set responseData = {
-        trigger: [{
-            eventBroker: 'widget',
-            name: 'transitionSuccess',
-            args: [response|json_encode]
-        }],
+    {% set widgetResponse = {
+        widget: {
+            trigger: [{
+                eventBroker: 'widget',
+                name: 'transitionSuccess',
+                args: [response]
+            }],
+        }
     } %}
 {% else %}
-    {% set responseData = {
-        trigger: [{
-            eventBroker: 'widget',
-            name: 'transitionFailure',
-            args: [{
-                status: responseCode,
-                message: responseMessage
-            }]
-        }],
+    {% set widgetResponse = {
+        widget: {
+            trigger: [{
+                eventBroker: 'widget',
+                name: 'transitionFailure',
+                args: [{
+                    status: responseCode,
+                    message: responseMessage
+                }]
+            }],
+        }
     } %}
 {% endif %}
 
-{{ responseData|json_encode|raw }}
+{{ widgetResponse|json_encode|raw }}

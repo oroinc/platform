@@ -1,14 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var AddressBookView;
+    var AddressBookWidgetView;
     var BaseView = require('oroui/js/app/views/base/view');
     var AddressBook = require('oroaddress/js/address-book');
     var widgetManager = require('oroui/js/widget-manager');
     var routing = require('routing');
     var _ = require('underscore');
 
-    AddressBookView = BaseView.extend({
+    AddressBookWidgetView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'addressListUrl', 'addressCreateUrl', 'addressUpdateRoute', 'addressDeleteRoute', 'addresses', 'wid'
         ]),
@@ -58,5 +58,5 @@ define(function(require) {
         }
     });
 
-    return AddressBookView;
+    return AddressBookWidgetView;
 });

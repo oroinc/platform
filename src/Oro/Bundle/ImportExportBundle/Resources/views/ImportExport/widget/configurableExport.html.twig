@@ -1,15 +1,15 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% set exportConfigurableViewOptions = {
+{% set exportConfigurableWidgetViewOptions = {
     view: {
-        view: 'oroimportexport/js/app/views/export-configurable-view',
+        view: 'oroimportexport/js/app/views/export-configurable-widget-view',
         wid: app.request.get('_wid'),
         errorMessage: 'Errors occured during file export.'|trans
     }
 } %}
 
 <div class="widget-content import-widget-content">
-    <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableViewOptions) }}>
+    <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableWidgetViewOptions) }}>
         <form method="post"
               data-nohash="true"
               id="{{ form.vars.id }}"

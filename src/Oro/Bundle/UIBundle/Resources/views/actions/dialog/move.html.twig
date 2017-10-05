@@ -1,16 +1,18 @@
 {% if saved is defined and saved %}
-    {% set data = {
-        flashMessage: 'oro.ui.jstree.move.success.label'|trans({'%nodes%': nodesName}),
-        triggerSuccess: true,
-        trigger: [{
-            eventBroker: 'widget',
-            name: 'formSave',
-            args: [changed],
-        }],
-        remove: true
+    {% set widgetResponse = {
+        widget: {
+            message: 'oro.ui.jstree.move.success.label'|trans({'%nodes%': nodesName}),
+            triggerSuccess: true,
+            trigger: [{
+                eventBroker: 'widget',
+                name: 'formSave',
+                args: [changed],
+            }],
+            remove: true
+        }
     } %}
 
-    {{ data|json_encode|raw }}
+    {{ widgetResponse|json_encode|raw }}
 {% else %}
     {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
     <div class="widget-content">

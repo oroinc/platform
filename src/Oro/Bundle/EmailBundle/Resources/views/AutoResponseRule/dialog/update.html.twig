@@ -2,16 +2,18 @@
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
 
 {% if saved %}
-    {% set data = {
-        triggerSuccess: true,
-        trigger: [{
-            name: 'auto_response_rule:save',
-            args: [form.vars.value.id],
-        }],
-        remove: true
+    {% set widgetResponse = {
+        widget: {
+            triggerSuccess: true,
+            trigger: [{
+                name: 'auto_response_rule:save',
+                args: [form.vars.value.id],
+            }],
+            remove: true
+        }
     } %}
 
-    {{ data|json_encode|raw }}
+    {{ widgetResponse|json_encode|raw }}
 {% else %}
     <div class="widget-content">
         {% set pageComponent = {

@@ -1,15 +1,15 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% set exportConfigurableTemplateViewOptions = {
+{% set exportConfigurableTemplateWidgetViewOptions = {
     view: {
-        view: 'oroimportexport/js/app/views/export-configurable-template-view',
+        view: 'oroimportexport/js/app/views/export-configurable-template-widget-view',
         wid: app.request.get('_wid'),
         downloadMessage: 'Downloading data template...'|trans
     }
 } %}
 
 <div class="widget-content import-widget-content">
-    <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableTemplateViewOptions) }}>
+    <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableTemplateWidgetViewOptions) }}>
         <form method="post"
               data-nohash="true"
               id="{{ form.vars.id }}"

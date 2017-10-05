@@ -9,6 +9,7 @@ define(function(require) {
     var DialogWidget = require('oro/dialog-widget');
     var ImportDialogWidget = require('oroimportexport/js/widget/import-dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
+    var __ = require('orotranslation/js/translator');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
     var ImportExportManager = function(options) {
@@ -86,7 +87,9 @@ define(function(require) {
                 url: routing.generate(this.options.importRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importTitle
-                }
+                },
+                successMessage: __('oro.importexport.import.success.message'),
+                errorMessage: __('oro.importexport.import.form_fail.message')
             });
         },
 
@@ -95,7 +98,9 @@ define(function(require) {
                 url: routing.generate(this.options.importValidationRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importValidationTitle
-                }
+                },
+                successMessage: __('oro.importexport.import_validation.success.message'),
+                errorMessage: __('oro.importexport.import_validation.form_fail.message')
             });
         },
 

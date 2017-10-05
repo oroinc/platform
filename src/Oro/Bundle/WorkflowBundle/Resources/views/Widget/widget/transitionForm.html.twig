@@ -1,16 +1,17 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% if saved %}
-    {% set arg = data is defined and data ? data|json_encode : null %}
-    {% set responseData = {
-        trigger: [{
-            eventBroker: 'widget',
-            name: 'formSave',
-            args: [arg],
-        }],
+    {% set widgetResponse = {
+        widget: {
+            trigger: [{
+                eventBroker: 'widget',
+                name: 'formSave',
+                args: [data|default(null)],
+            }],
+        }
     } %}
 
-    {{ responseData|json_encode|raw }}
+    {{ widgetResponse|json_encode|raw }}
 {% else %}
     <div class="{% block transition_widget_class %}widget-content{% endblock %}">
         {% block transition_widget %}

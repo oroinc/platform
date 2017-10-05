@@ -1,11 +1,13 @@
 {% if saved is defined and saved %}
-    {% set data = {
-        flashMessage: 'oro.dashboard.widget.configuration.success'|trans,
-        triggerSuccess: true,
-        remove: true
+    {% set widgetResponse = {
+        widget: {
+            message: 'oro.dashboard.widget.configuration.success'|trans,
+            triggerSuccess: true,
+            remove: true
+        }
     } %}
 
-    {{ data|json_encode|raw }}
+    {{ widgetResponse|json_encode|raw }}
 {% else %}
     <div class="widget-content widget-configuration">
         <div class="form-container">

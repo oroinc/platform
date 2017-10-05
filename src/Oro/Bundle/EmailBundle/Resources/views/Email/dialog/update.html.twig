@@ -9,14 +9,16 @@
 
 {% block page_container %}
     {% if saved %}
-        {% set data = {
-            flashMessage: 'oro.email.the_email_was_sent'|trans,
-            triggerSuccess: true,
-            trigger: ['datagrid:doRefresh:attachment-grid', 'widget:doRefresh:email-thread'],
-            remove: true
+        {% set widgetResponse = {
+            widget: {
+                message: 'oro.email.the_email_was_sent'|trans,
+                triggerSuccess: true,
+                trigger: ['datagrid:doRefresh:attachment-grid', 'widget:doRefresh:email-thread'],
+                remove: true
+            }
         } %}
 
-        {{ data|json_encode|raw }}
+        {{ widgetResponse|json_encode|raw }}
     {% else %}
         <div class="widget-content email-form">
             {% block page_container_before_form %}{% endblock %}

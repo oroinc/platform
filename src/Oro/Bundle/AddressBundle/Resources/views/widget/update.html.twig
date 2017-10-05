@@ -1,13 +1,15 @@
 {% if saved %}
-    {% set data = {
-        trigger: [{
-            eventBroker: 'widget',
-            name: 'formSave',
-            args: [form.vars.value.id],
-        }],
+    {% set widgetResponse = {
+        widget: {
+            trigger: [{
+                eventBroker: 'widget',
+                name: 'formSave',
+                args: [form.vars.value.id],
+            }],
+        }
     } %}
 
-    {{ data|json_encode|raw }}
+    {{ widgetResponse|json_encode|raw }}
 {% else %}
     {# Quick address update form template #}
     <div class="widget-content">

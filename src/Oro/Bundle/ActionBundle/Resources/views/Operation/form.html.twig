@@ -1,16 +1,18 @@
 {% block widget_content %}
     {% if response is defined %}
-        {% set data = {
-            trigger: [{
-                eventBroker: 'widget',
-                name: 'formSave',
-                args: [response|json_encode],
-            }],
+        {% set widgetResponse = {
+            widget: {
+                trigger: [{
+                    eventBroker: 'widget',
+                    name: 'formSave',
+                    args: [response],
+                }],
+            }
         } %}
 
-        {{ data|json_encode|raw }}
+        {{ widgetResponse|json_encode|raw }}
     {% else %}
-        <div class="{% block widget_class %}widget-content{% endblock %}">
+        <div class="{% block widget_content_class %}widget-content{% endblock %}">
             {% block widget_content_inner %}
                 {% block messages %}
                     {% if messages is defined and messages|length %}
