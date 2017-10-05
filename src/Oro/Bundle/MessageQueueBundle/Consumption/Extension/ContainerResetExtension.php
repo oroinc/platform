@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
-use Symfony\Component\DependencyInjection\ResettableContainerInterface;
-
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
@@ -21,55 +17,23 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
  */
 class ContainerResetExtension extends AbstractExtension implements ChainExtensionAwareInterface
 {
-    /**
-     * The services that should not be removed during the container reset.
-     *
-     * @var string[]
-     */
-    private $persistentServices = [];
-
-    /**
-     * The processors that can work without the container reset.
-     *
-     * @var array [processor name => TRUE, ...]
-     */
+    /** @var array [processor name => TRUE, ...] */
     private $persistentProcessors = [];
 
-    /** @var ContainerInterface|ResettableContainerInterface|IntrospectableContainerInterface|null */
-    private $container;
-
-    /** @var ExtensionInterface|null */
-    private $rootChainExtension;
+    /** @var ClearerInterface[] */
+    private $clearers;
 
     /**
-     * @param ContainerInterface $container
+     * @param ClearerInterface[] $clearers
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(array $clearers)
     {
-        if ($container instanceof ResettableContainerInterface
-            && $container instanceof IntrospectableContainerInterface
-        ) {
-            $this->container = $container;
-        }
+        $this->clearers = $clearers;
     }
 
     /**
-     * Sets the services that should not be removed during the container reset.
-     * The given services are added in addition to already set services.
-     *
-     * @param string[] $persistentServices
-     */
-    public function setPersistentServices(array $persistentServices)
-    {
-        $this->persistentServices = array_merge(
-            $this->persistentServices,
-            $persistentServices
-        );
-    }
-
-    /**
-     * Sets the processors that can work without the container reset.
-     * The given processors are added in addition to already set processors.
+     * Adds the processors that can work without the container reset.
+     * The given processors are added in addition to already added processors.
      *
      * @param string[] $persistentProcessors
      */
@@ -86,55 +50,25 @@ class ContainerResetExtension extends AbstractExtension implements ChainExtensio
      */
     public function setChainExtension(ExtensionInterface $chainExtension)
     {
-        $this->rootChainExtension = $chainExtension;
+        foreach ($this->clearers as $clearer) {
+            if ($clearer instanceof ChainExtensionAwareInterface) {
+                $clearer->setChainExtension($chainExtension);
+            }
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onPreReceived(Context $context)
+    public function onPostReceived(Context $context)
     {
-        if (null === $this->container) {
-            return;
-        }
-
-        if (isset($this->persistentProcessors[$this->getProcessorName($context)])) {
-            return;
-        }
-
-        $context->getLogger()->info('Reset the container');
-
-        // reset state of not persistent extensions
-        if ($this->rootChainExtension instanceof ResettableExtensionInterface) {
-            $this->rootChainExtension->reset();
-        }
-
-        // save persistent services
-        $persistentServices = [];
-        foreach ($this->persistentServices as $serviceId) {
-            if ($this->container->initialized($serviceId)) {
-                $persistentServices[$serviceId] = $this->container->get($serviceId);
+        $processorName = $context->getMessage()->getProperty(Config::PARAMETER_PROCESSOR_NAME);
+        if (!isset($this->persistentProcessors[$processorName])) {
+            // delegate the container reset to clearers
+            $logger = $context->getLogger();
+            foreach ($this->clearers as $clearer) {
+                $clearer->clear($logger);
             }
         }
-
-        // remove all services from the container
-        $this->container->reset();
-        // clear the memory and prevent segmentation fault that might sometimes occur in "unserialize" function
-        gc_collect_cycles();
-
-        // restore persistent services in the container
-        foreach ($persistentServices as $serviceId => $serviceInstance) {
-            $this->container->set($serviceId, $serviceInstance);
-        }
-    }
-
-    /**
-     * @param Context $context
-     *
-     * @return string
-     */
-    private function getProcessorName(Context $context)
-    {
-        return $context->getMessage()->getProperty(Config::PARAMETER_PROCESSOR_NAME);
     }
 }

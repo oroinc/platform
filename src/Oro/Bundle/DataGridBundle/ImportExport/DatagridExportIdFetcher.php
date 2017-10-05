@@ -84,16 +84,13 @@ class DatagridExportIdFetcher implements ContextAwareInterface
             new OrmResultBeforeQuery($this->grid, $qb)
         );
 
-        if (!empty($qb->getDQLPart('groupBy'))
-            || !empty($qb->getDQLPart('having'))
-            || !empty($qb->getDQLPart('orderBy'))
-        ) {
+        if (!empty($qb->getDQLPart('groupBy')) || !empty($qb->getDQLPart('having'))) {
             return array();
         }
 
         $qb
             ->indexBy($alias, $alias . '.'. $name)
-            ->select($alias . '.' . $name, $alias . '.' . $name)
+            ->select($alias . '.' . $name)
             ->setFirstResult(null)
             ->setMaxResults(null);
 
