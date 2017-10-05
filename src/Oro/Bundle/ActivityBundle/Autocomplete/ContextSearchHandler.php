@@ -213,16 +213,9 @@ class ContextSearchHandler implements ConverterInterface
      */
     protected function convertItems(array $items)
     {
-        $user = $this->token->getToken()->getUser();
-
         $result = [];
         /** @var Item $item */
         foreach ($items as $item) {
-            // Exclude current user from result
-            if (ClassUtils::getClass($user) === $item->getEntityName() && $user->getId() === $item->getRecordId()) {
-                continue;
-            }
-
             $result[] = $this->convertItem($item);
         }
 
