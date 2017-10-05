@@ -17,13 +17,21 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         parent::configureEntityNode($node);
         $node
             ->arrayNode(EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES)
-                ->prototype('scalar')->end()
+                ->prototype('scalar')->cannotBeEmpty()->end()
             ->end()
             ->booleanNode(EntityDefinitionConfig::DISABLE_INCLUSION)->end()
             ->booleanNode(EntityDefinitionConfig::DISABLE_FIELDSET)->end()
             ->booleanNode(EntityDefinitionConfig::DISABLE_META_PROPERTIES)->end()
             ->scalarNode(EntityDefinitionConfig::DELETE_HANDLER)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionConfig::DOCUMENTATION_RESOURCE)->cannotBeEmpty()->end();
+            ->arrayNode(EntityDefinitionConfig::DOCUMENTATION_RESOURCE)
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(function ($v) {
+                        return [$v];
+                    })
+                ->end()
+                ->prototype('scalar')->cannotBeEmpty()->end()
+            ->end();
     }
 
     /**
@@ -34,6 +42,9 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         $config = parent::postProcessConfig($config);
         if (empty($config[EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES])) {
             unset($config[EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES]);
+        }
+        if (empty($config[EntityDefinitionConfig::DOCUMENTATION_RESOURCE])) {
+            unset($config[EntityDefinitionConfig::DOCUMENTATION_RESOURCE]);
         }
 
         return $config;
