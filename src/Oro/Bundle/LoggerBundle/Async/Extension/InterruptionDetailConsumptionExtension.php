@@ -53,6 +53,15 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
     }
 
     /**
+     * @param Context $context
+     */
+    public function onIdle(Context $context)
+    {
+        // reset the extension state if no messages to process
+        $this->lastProcessorClassName = null;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function onInterrupted(Context $context)
