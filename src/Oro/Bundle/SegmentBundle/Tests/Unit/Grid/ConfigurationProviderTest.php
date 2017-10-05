@@ -115,4 +115,13 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
             'not valid' => [['empty array'], false]
         ];
     }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Segment id not found in "oro_segment_grid_" gridName.
+     */
+    public function testDoNotProcessInvalidSegmentGridName()
+    {
+        $this->provider->getConfiguration(Segment::GRID_PREFIX);
+    }
 }

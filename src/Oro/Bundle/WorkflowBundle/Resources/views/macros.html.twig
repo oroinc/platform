@@ -104,36 +104,6 @@
     }) }}
 {% endmacro %}
 
-{% macro renderResetButton(data, blockId) %}
-    {% set resetButtonId = 'workflow-item-' ~ data.workflow_item_id ~ '-reset' %}
-    <a href="javascript:void(0);"
-       data-url="{{ data.url }}"
-       title="{{ data.title }}"
-       class="btn icons-holder-text btn-primary"
-       id="{{ resetButtonId }}">
-            <i class="fa-repeat"></i>
-            {{ data.title }}
-    </a>
-
-    <script type="text/javascript">
-        require(['jquery', 'oroworkflow/js/reset-handler'],
-            function($, workflowResetHandler) {
-                'use strict';
-
-                $(function() {
-                    var resetBtn = $('#{{ blockId }}').find('#{{ resetButtonId }}');
-                    resetBtn.data('executor', function() {
-                        workflowResetHandler.call(resetBtn);
-                    });
-                    resetBtn.on('click', function(e) {
-                        e.preventDefault();
-                        $(this).data('executor').call();
-                    });
-                });
-            });
-    </script>
-{% endmacro %}
-
 {% macro renderGoToTranslationsIconByLink(link, large) %}
     <span class="workflow-translatable-field">
         <a target="_blank" href="{{ link|raw }}" title="{{ 'oro.workflow.action.workflow.go_to_translations'|trans}}">

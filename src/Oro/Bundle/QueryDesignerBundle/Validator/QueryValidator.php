@@ -5,6 +5,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\ORMException;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -43,6 +44,9 @@ class QueryValidator extends ConstraintValidator
      */
     protected $isDebug;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * Constructor
      *
@@ -73,10 +77,14 @@ class QueryValidator extends ConstraintValidator
             return;
         }
 
-        $gridPrefix = $value->getGridPrefix();
-        $builder    = $this->getBuilder($gridPrefix);
+        $uniqueId = uniqid('grid', true);
+        if ($this->doctrineHelper && $entityId = $this->doctrineHelper->getSingleEntityIdentifier($value, false)) {
+            $uniqueId = $entityId;
+        }
+        $gridName = $value->getGridPrefix().$uniqueId;
+        $builder = $this->getBuilder($gridName);
 
-        $builder->setGridName($gridPrefix);
+        $builder->setGridName($gridName);
         $builder->setSource($value);
 
         $message = $this->translator->trans($constraint->message);
@@ -120,5 +128,13 @@ class QueryValidator extends ConstraintValidator
         }
 
         throw new InvalidConfigurationException('Builder is missing');
+    }
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
     }
 }

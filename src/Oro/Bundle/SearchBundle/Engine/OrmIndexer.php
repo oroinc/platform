@@ -7,7 +7,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 
@@ -24,14 +23,12 @@ class OrmIndexer extends AbstractIndexer
      * @param DoctrineHelper $doctrineHelper
      * @param ObjectMapper $mapper
      * @param EntityNameResolver $entityNameResolver
-     * @param DbalStorer $dbalStorer
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper,
-        EntityNameResolver $entityNameResolver,
-        DbalStorer $dbalStorer
+        EntityNameResolver $entityNameResolver
     ) {
         parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
     }

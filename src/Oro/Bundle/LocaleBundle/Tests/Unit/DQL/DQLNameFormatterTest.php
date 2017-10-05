@@ -4,6 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\DQL;
 
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
+use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface;
 
 class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
 {
@@ -105,6 +108,52 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . '))',
                 ' - %last_name%',
                 $this->createMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider suggestedFieldNamesDataProvider
+     *
+     * @param string|object $class
+     * @param array $expected
+     */
+    public function testGetSuggestedFieldNames($class, array $expected)
+    {
+        $this->assertEquals($expected, $this->formatter->getSuggestedFieldNames($class));
+    }
+
+    public function suggestedFieldNamesDataProvider()
+    {
+        return [
+
+            [
+                'class' => FirstNameInterface::class,
+                'expected' => ['first_name' => 'firstName']
+            ],
+            [
+                'class' => FirstLastNameAwareInterface::class,
+                'expected' => ['first_name' => 'firstName', 'last_name' => 'lastName']
+            ],
+            [
+                'class' => FullNameInterface::class,
+                'expected' => [
+                    'first_name' => 'firstName',
+                    'middle_name' => 'middleName',
+                    'last_name' => 'lastName',
+                    'prefix' => 'namePrefix',
+                    'suffix' => 'nameSuffix',
+                ],
+            ],
+            [
+                'class' => $this->createMock(FullNameInterface::class),
+                'expected' => [
+                    'first_name' => 'firstName',
+                    'middle_name' => 'middleName',
+                    'last_name' => 'lastName',
+                    'prefix' => 'namePrefix',
+                    'suffix' => 'nameSuffix',
+                ],
             ],
         ];
     }
