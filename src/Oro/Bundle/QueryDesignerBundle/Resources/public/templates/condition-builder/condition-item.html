@@ -1,0 +1,8 @@
+<a class="close" href="#">&times;</a>
+<div class="condition-item<% if (criteria !== 'condition-item') { %> <%- criteria %><% } %>" data-role="condition-content"></div>
+<% if (!_.isEmpty(validation)) { %>
+<input class="select2-focusser select2-offscreen" type="checkbox"
+       name="<%= 'condition_item_' + Date.now() %>"
+       data-validation="<%- JSON.stringify(validation) %>"
+<% if (!_.isEmpty(value)) { %>checked<% } %> />
+<% } %>

@@ -17,9 +17,12 @@ define(function(require) {
     require('orosegment/js/segment-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
-    require('oroquerydesigner/js/condition-builder');
 
     SegmentComponent = BaseComponent.extend({
+        requiredSiblingComponents: {
+            conditionBuilderComponent: 'condition-builder'
+        },
+
         defaults: {
             entityChoice: '',
             valueSource: '',
@@ -30,10 +33,6 @@ define(function(require) {
                 fieldsData: [],
                 confirmMessage: '',
                 loadEvent: 'fieldsLoaded'
-            },
-            filters: {
-                criteriaList: '',
-                conditionBuilder: ''
             },
             grouping: {
                 editor: {},
@@ -48,7 +47,6 @@ define(function(require) {
                 itemTemplate: ''
             },
             select2FieldChoiceTemplate: '',
-            select2SegmentChoiceTemplate: '',
             entities: [],
             metadata: {},
             initEntityChangeEvents: true
@@ -62,7 +60,7 @@ define(function(require) {
                 }, this);
 
                 this.processOptions(options);
-                this.$storage = $(this.options.valueSource);
+                this.initStorage();
 
                 this.initEntityFieldsUtil();
                 this.$fieldsLoader = this.initFieldsLoader();
@@ -78,6 +76,13 @@ define(function(require) {
                 this.form = this.$storage.parents('form');
                 this.form.submit(_.bind(this.onBeforeSubmit, this));
             }, this));
+        },
+
+        initStorage: function() {
+            this.$storage = $(this.options.valueSource);
+            this.$storage.on('change.' + this.cid, function() {
+                this.trigger('updateData', this.load());
+            }.bind(this));
         },
 
         initEntityChangeEvents: function() {
@@ -184,6 +189,7 @@ define(function(require) {
 
             this.trigger('dispose:before');
             delete this.options;
+            this.$storage.off('.' + this.cid);
             delete this.$storage;
             SegmentComponent.__super__.dispose.call(this);
         },
@@ -258,14 +264,6 @@ define(function(require) {
                 this.options.columnFieldChoiceOptions = {};
             }
             _.defaults(this.options.columnFieldChoiceOptions, this.options.fieldChoiceOptions);
-
-            // options for segment choice
-            this.options.segmentChoiceOptions = {};
-            $.extend(true, this.options.segmentChoiceOptions, this.options.fieldChoiceOptions, {
-                select2: {
-                    formatSelectionTemplate: $(this.options.select2SegmentChoiceTemplate).text()
-                }
-            });
         },
 
         /**
@@ -584,52 +582,17 @@ define(function(require) {
         },
 
         configureFilters: function() {
-            var self = this;
-            var options = this.options.filters;
-            var metadata = this.options.metadata;
-            var $builder = $(options.conditionBuilder);
-            var $criteria = $(options.criteriaList);
-
-            if (_.isEmpty($builder) || _.isEmpty($criteria)) {
-                // there's no filter
-                return;
-            }
-
-            // mixin extra options to condition-builder's field choice
-            var $fieldCondition = $criteria.find('[data-criteria=condition-item]');
-            if (!_.isEmpty($fieldCondition)) {
-                $.extend(true, $fieldCondition.data('options'), {
-                    fieldChoice: this.options.fieldChoiceOptions,
-                    filters: metadata.filters,
-                    hierarchy: metadata.hierarchy
-                });
-            }
-
-            var $segmentCondition = $criteria.find('[data-criteria=condition-segment]');
-            if (!_.isEmpty($segmentCondition)) {
-                $.extend(true, $segmentCondition.data('options'), {
-                    segmentChoice: this.options.segmentChoiceOptions,
-                    filters: metadata.filters
-                });
-            }
-            $builder.conditionBuilder({
-                criteriaListSelector: options.criteriaList
-            });
-
-            $builder.conditionBuilder('setValue', this.load('filters'));
-            $builder.on('changed', function() {
-                self.save($builder.conditionBuilder('getValue'), 'filters');
+            this.conditionBuilderComponent.view.setValue(this.load('filters'));
+            this.listenTo(this.conditionBuilderComponent.view, 'change', function(value) {
+                this.save(value, 'filters');
             });
 
             this.on('resetData', function(data) {
                 data.filters = [];
-                $builder.conditionBuilder('setValue', data.filters);
-            });
-
-            this.once('dispose:before', function() {
-                if ($builder.conditionBuilder('instance')) {
-                    $builder.conditionBuilder('destroy');
-                }
+                this.conditionBuilderComponent.view.setValue(data.filters);
+            }, this);
+            this.on('updateData', function(data) {
+                this.conditionBuilderComponent.view.setValue(data.filters);
             }, this);
         }
     }, {

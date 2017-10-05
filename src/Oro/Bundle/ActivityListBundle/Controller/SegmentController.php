@@ -42,8 +42,9 @@ class SegmentController extends Controller
                             'oro.query_designer.condition_builder.choose_entity_field'
                         ),
                     ],
-                ]
-            ]
+                ],
+            ],
+            'params' => $params,
         ];
 
         $dispatcher = $this->getEventDispatcher();
@@ -56,6 +57,7 @@ class SegmentController extends Controller
 
         return [
             'activityConditionOptions' => $event->getOptions(),
+            'params' => $params,
         ];
     }
 

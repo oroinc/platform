@@ -25,6 +25,30 @@
 .drop-area-over .drop-area-marker {
   display: none;
 }
+.condition-operator {
+  margin: 6px 0;
+  text-transform: uppercase;
+  .btn-group {
+    .btn {
+      font-weight: bold;
+      padding: 0 6px;
+      height: auto;
+      line-height: 20px;
+    }
+    .btn-mini .caret {
+      margin-top: 9px;
+    }
+  }
+  .dropdown-menu {
+    min-width: initial;
+    .selected > a {
+      font-weight: bold;
+    }
+  }
+  &.hide-operator{
+    display: none;
+  }
+}
 .conditions-group {
   width: 100%;
   list-style: none;
@@ -42,10 +66,14 @@
     border: dashed 3px #E1E1E1;
     margin: 34px 0 0 0;
     position: relative;
-    &:nth-child(1) {
-      margin-top: 0;
-      margin-bottom: 34px;
-    }
+  }
+  .sortable-placeholder:nth-child(1),
+  .condition-operator+.sortable-placeholder {
+    margin-top: 0;
+    margin-bottom: 34px;
+  }
+  .sortable-placeholder:only-child {
+    margin: 0;
   }
   &.drag-start-from-first {
     > li.sortable-placeholder:nth-child(2) {
@@ -53,32 +81,10 @@
         margin-bottom: 34px;
     }
   }
-  .hide-operator > .operator{
-    display: none;
-  }
   .condition {
     position: relative;
     &.controls {
       margin-left: 0;
-    }
-    .operator {
-      margin: 6px 0;
-      text-transform: uppercase;
-      .btn{
-        font-weight: bold;
-        padding: 0 6px;
-        height: auto;
-        line-height: 20px;
-      }
-      .btn-mini .caret {
-        margin-top: 9px;
-      }
-      .dropdown-menu {
-        min-width: initial;
-        .selected > a {
-          font-weight: bold;
-        }
-      }
     }
     .conditions-group {
       min-height: 138px;
@@ -98,7 +104,7 @@
     & > .close {
       margin-right: 4px;
     }
-    &[data-criteria=conditions-group] {
+    &[data-criteria^=conditions-group] {
       & > .close {
         background-color: white;
         color: #ccc;
@@ -116,14 +122,6 @@
       }
       &.validation-error > .close {
         margin-top: -17px;
-      }
-      &:not(:first-child) {
-        & > .close {
-          margin-top: 7px;
-        }
-        &.validation-error > .close {
-          margin-top: -2px
-        }
       }
     }
   }

@@ -257,7 +257,7 @@ define(function(require) {
 
         changeFilterType: function(value) {
             var startSeparatorEndSelector =
-                [this.selectors.startContainer,this.selectors.separator, this.selectors.endContainer].join(',');
+                [this.selectors.startContainer, this.selectors.separator, this.selectors.endContainer].join(',');
             var startSeparatorSelector = [this.selectors.startContainer, this.selectors.separator].join(',');
             var separatorEndSelector = [this.selectors.separator, this.selectors.endContainer].join(',');
             var type = parseInt(value, 10);

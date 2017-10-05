@@ -23,7 +23,7 @@ define(function(require) {
                 var firstOption = _.first(this.selectOptions);
                 if (_.isString(firstOption)) {
                     this.selectedValue = firstOption;
-                } else if (_.isObject(firstOption) && _.has(firstOption, 'value')){
+                } else if (_.isObject(firstOption) && _.has(firstOption, 'value')) {
                     this.selectedValue = firstOption.value;
                 } else {
                     this.selectedValue = _.first(_.values(firstOption));
@@ -79,15 +79,25 @@ define(function(require) {
 
         _onSelect: function(e) {
             e.preventDefault();
-            var $target = $(e.target);
-            this.selectedValue = $target.data('value');
+            this.select($(e.target).data('value'));
+        },
+
+        select: function(value) {
+            this.selectedValue = value;
+            var escapedValue = value.replace(/[&<>"'`]/g, function(a) {return '\\' + a;});
+            var $option = this.$('[data-value="' + escapedValue + '"]');
             this.$('.dropdown-menu li').removeClass('selected');
-            $target.closest('li').addClass('selected');
-            this.$('.current-label').text($target.text());
-            this.$el.attr('data-value', this.selectedValue).data('value', this.selectedValue).trigger({
-                type: 'change',
-                value: this.selectedValue,
-            });
+            $option.closest('li').addClass('selected');
+            this.$('.current-label').text($option.text());
+            this.trigger('change', this.selectedValue);
+        },
+
+        getValue: function() {
+            return this.selectedValue;
+        },
+
+        setValue: function(value) {
+            this.select(value);
         }
     });
 

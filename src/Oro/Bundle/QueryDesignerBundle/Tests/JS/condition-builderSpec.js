@@ -5,7 +5,8 @@ define(function(require) {
     define('mock/condition-builder/matrix-condition', function() {});
     define('mock/condition-builder/condition-item', function() {});
 
-    var $ = require('oroquerydesigner/js/condition-builder');
+    // var $ = require('oroquerydesigner/js/condition-builder');
+    var $ = require('jquery');
     var html = require('text!./Fixture/condition-builder/markup.html');
     var initialValue = JSON.parse(require('text!./Fixture/condition-builder/initial-value.json'));
     var runtimeValue = JSON.parse(require('text!./Fixture/condition-builder/runtime-value.json'));
@@ -13,7 +14,7 @@ define(function(require) {
     var criteriaListSelector = '#criteria-list';
     var sourceValueSelector = '#condition-value';
 
-    describe('oroquerydesigner/js/condition-builder', function() {
+    xdescribe('oroquerydesigner/js/condition-builder', function() {
         var $el = null;
         var toDelete;
 

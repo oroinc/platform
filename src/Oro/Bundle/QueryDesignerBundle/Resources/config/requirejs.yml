@@ -1,6 +1,6 @@
 config:
     paths:
-        'oroquerydesigner/js/condition-builder': 'bundles/oroquerydesigner/js/condition-builder.js'
+        'oroquerydesigner/js/app/views/condition-builder/condition-builder-view': 'bundles/oroquerydesigner/js/app/views/condition-builder/condition-builder-view.js'
         'oroquerydesigner/js/app/views/abstract-condition-view': 'bundles/oroquerydesigner/js/app/views/abstract-condition-view.js'
         'oroquerydesigner/js/app/views/field-condition-view': 'bundles/oroquerydesigner/js/app/views/field-condition-view.js'
         'oroquerydesigner/js/app/views/aggregated-field-condition-view': 'bundles/oroquerydesigner/js/app/views/aggregated-field-condition-view.js'
@@ -10,7 +10,7 @@ config:
         'oroquerydesigner/js/items-manager/entity-field-model': 'bundles/oroquerydesigner/js/items-manager/entity-field-model.js'
 
         'oroquerydesigner/js/app/components/column-form': 'bundles/oroquerydesigner/js/app/components/column-form.js'
-        'oroquerydesigner/js/app/components/condition-builder': 'bundles/oroquerydesigner/js/app/components/condition-builder.js'
+        'oroquerydesigner/js/app/components/condition-builder-component': 'bundles/oroquerydesigner/js/app/components/condition-builder-component.js'
         'oroquerydesigner/js/app/views/date-grouping-view': 'bundles/oroquerydesigner/js/app/views/date-grouping-view.js'
 
         'oroquerydesigner/js/enum-filter-initialized': 'bundles/oroquerydesigner/js/enum-filter-initialized.js'

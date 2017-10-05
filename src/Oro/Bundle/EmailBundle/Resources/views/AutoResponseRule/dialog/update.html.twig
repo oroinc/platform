@@ -44,8 +44,8 @@
                             <div class="controls">
                                 {{ QD.query_designer_condition_builder({
                                     'id': 'oro_email_autoresponserule-condition-builder',
-                                    'criteria_list_id': 'filter-criteria-list',
                                     'entity_choice_id': 'oro_email_autoresponserule_entity',
+                                    'metadata': metadata
                                 }) }}
                             </div>
                         </div>
@@ -59,16 +59,12 @@
                 </fieldset>
             {{ form_end(form) }}
             {{ oro_form_js_validation(form) }}
+            <div{{ UI.renderPageComponentAttributes({
+                'module': 'oroemail/js/app/components/auto-response-rule-component',
+                'options': {
+                    data: data
+                }
+            }) }}></div>
         </div>
-        <script>
-            require([
-                'oroemail/js/app/components/auto-response-rule-component',
-            ], function(AutoResponseRuleComponent) {
-                new AutoResponseRuleComponent({{ {
-                    data: data,
-                    metadata: metadata,
-                }|json_encode|raw }});
-            });
-        </script>
     {% endif %}
 </div>

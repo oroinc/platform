@@ -1,12 +1,20 @@
 ## 2.5.0 (Unreleased)
 
 ### Added
+####ActivityListBundle
+* Added `ActivityConditionView` as substitution for removed `oroactivity.activityCondition` jQuery widget.
+####DataAuditBundle
+* Added `DataAuditConditionView` as substitution for removed `oroauditquerydesigner.dataAuditCondition` jQuery widget.
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
+#### QueryDesignerBundle
+* Added `ConditionBuilderView` as substitution for removed `oroquerydesigner.conditionBuilder` jQuery widget.
+* Added `AbstractConditionView` and `FieldConditionView`  as substitution for removed `oroquerydesigner.fieldCondition` jQuery widget.
+* Added `AggregatedFieldConditionView` as substitution for removed `oroauditquerydesigner.aggregatedFieldCondition` jQuery widget.
 ### Changed
 #### EntityConfigBundle
 * Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
@@ -24,6 +32,16 @@
 #### SearchBundle
 * Class `Oro/Bundle/SearchBundle/Engine/Orm/DBALPersistenceDriverTrait` is deprecated. The functionality was merged into `BaseDriver`
 ### Removed
+####ActivityListBundle
+* Refactored setup of ActivityCondition for QueryDesigner's ConditionBuilder. 
+    * jQuery widget `oroactivity.activityCondition` replaced with `ActivityConditionView` Backbone view, removed unused extensions support in its options.
+    * Removed class `Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener`.
+####DataAuditBundle
+* jQuery widget `oroauditquerydesigner.dataAuditCondition` replaced with `DataAuditConditionView` Backbone view.
+#### QueryDesignerBundle
+* jQuery widget `oroquerydesigner.conditionBuilder` replaced with `ConditionBuilderView` Backbone view.
+* jQuery widget `oroquerydesigner.fieldCondition` refactored into `AbstractConditionView` and `FieldConditionView` Backbone views.
+* jQuery widget `oroauditquerydesigner.aggregatedFieldCondition` replaced with `AggregatedFieldConditionView` Backbone view.
 #### SearchBundle
 * Removed service `oro_search.search.engine.storer`
 #### SecurityBundle

@@ -135,6 +135,10 @@ define(function(require) {
             var template;
             var options = this.options.select2;
 
+            if (options.formatSelectionTemplateSelector) {
+                options.formatSelectionTemplate = $(options.formatSelectionTemplateSelector).text();
+            }
+
             if (options.formatSelectionTemplate) {
                 if (_.isFunction(options.formatSelectionTemplate)) {
                     template = options.formatSelectionTemplate;

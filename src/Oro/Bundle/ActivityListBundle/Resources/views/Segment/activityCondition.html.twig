@@ -1,3 +1,13 @@
+{% set activityConditionOptions = {
+    filters: params.metadata.filters|default([]),
+    hierarchy: params.metadata.hierarchy|default({}),
+    fieldChoice: {
+        select2: {
+            formatSelectionTemplateSelector: params.column_chain_template_selector|default(null),
+        },
+    },
+}|merge_recursive(activityConditionOptions|default({})) %}
+
 <li class="option" data-criteria="condition-activity"
     data-module="oroactivitylist/js/app/views/activity-condition-view"
     data-options="{{ activityConditionOptions|json_encode }}">

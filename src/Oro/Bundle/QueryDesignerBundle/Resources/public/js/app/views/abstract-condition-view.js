@@ -10,6 +10,11 @@ define(function(require) {
     AbstractConditionView = BaseView.extend({
         template: conditionTemplate,
 
+        /**
+         * @type {Object}
+         */
+        value: undefined,
+
         getDefaultOptions: function() {
             return {
                 choiceInputClass: 'select',
@@ -27,6 +32,7 @@ define(function(require) {
 
         constructor: function(options) {
             this.options = _.defaults(options, this.getDefaultOptions());
+            _.extend(this, _.defaults(_.pick(options, 'value')));
             AbstractConditionView.__super__.constructor.call(this, options);
         },
 
@@ -147,7 +153,6 @@ define(function(require) {
         _onUpdate: function() {
             var value = this._collectValue();
             this.setValue(value);
-            this.$el.trigger('changed');
         },
 
         _collectValue: function() {
@@ -188,11 +193,12 @@ define(function(require) {
         },
 
         getValue: function() {
-            return $.extend(true, {}, this.$el.data('value'));
+            return $.extend(true, {}, this.value);
         },
 
         setValue: function(value) {
-            this.$el.data('value', value);
+            this.value = value;
+            this.trigger('change', value);
         },
 
         getChoiceInputValue: function() {
