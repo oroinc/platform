@@ -133,26 +133,31 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testDocumentationResource()
+    public function testDocumentationResources()
     {
         $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasDocumentationResource());
-        $this->assertNull($config->getDocumentationResource());
+        $this->assertFalse($config->hasDocumentationResources());
+        $this->assertSame([], $config->getDocumentationResources());
 
-        $config->setDocumentationResource('resource link');
-        $this->assertTrue($config->hasDocumentationResource());
-        $this->assertEquals('resource link', $config->getDocumentationResource());
-        $this->assertEquals(['documentation_resource' => 'resource link'], $config->toArray());
+        $config->setDocumentationResources(['resource link']);
+        $this->assertTrue($config->hasDocumentationResources());
+        $this->assertEquals(['resource link'], $config->getDocumentationResources());
+        $this->assertEquals(['documentation_resource' => ['resource link']], $config->toArray());
 
-        $config->setDocumentationResource(null);
-        $this->assertFalse($config->hasDocumentationResource());
-        $this->assertNull($config->getDocumentationResource());
+        $config->setDocumentationResources('another resource link');
+        $this->assertTrue($config->hasDocumentationResources());
+        $this->assertEquals(['another resource link'], $config->getDocumentationResources());
+        $this->assertEquals(['documentation_resource' => ['another resource link']], $config->toArray());
+
+        $config->setDocumentationResources(null);
+        $this->assertFalse($config->hasDocumentationResources());
+        $this->assertSame([], $config->getDocumentationResources());
         $this->assertEquals([], $config->toArray());
 
-        $config->setDocumentationResource('resource link');
-        $config->setDocumentationResource('');
-        $this->assertFalse($config->hasDocumentationResource());
-        $this->assertNull($config->getDocumentationResource());
+        $config->setDocumentationResources(['resource link']);
+        $config->setDocumentationResources([]);
+        $this->assertFalse($config->hasDocumentationResources());
+        $this->assertSame([], $config->getDocumentationResources());
         $this->assertEquals([], $config->toArray());
     }
 

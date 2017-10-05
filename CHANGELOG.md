@@ -3,6 +3,7 @@
 ### Added
 #### ApiBundle
 * Added additional syntax for data filters: `key[operator_name]=value`. For example `GET /api/users?filter[id][neq]=2` can be used instead of `GET /api/users?filter[id]!=2`. The supported operators are `eq`, `neq`, `lt`, `lte`, `gt` and `gte`.
+* Added possibility to specify **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
@@ -10,6 +11,11 @@
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
 ### Changed
+#### ApiBundle
+* Class `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
+    * method `hasDocumentationResource` was renamed to `hasDocumentationResources`
+    * method `getDocumentationResource` was renamed to `getDocumentationResources`
+    * method `setDocumentationResource` was renamed to `setDocumentationResources`
 #### EntityConfigBundle
 * Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
 #### MessageQueue Component
