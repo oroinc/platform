@@ -5,7 +5,6 @@ define(function(require) {
     var choiceTemplate = require('tpl!orofilter/templates/filter/embedded/simple-choice-filter.html');
     var $ = require('jquery');
     var _ = require('underscore');
-    var base64 = require('base64');
     var __ = require('orotranslation/js/translator');
     var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
     var ChoiceFilter = require('oro/filter/choice-filter');
@@ -222,14 +221,6 @@ define(function(require) {
         _collectValue: function() {
             var value = ActivityConditionView.__super__._collectValue.call(this);
             return _.omit(value, 'columnName');
-        },
-
-        getValue: function() {
-            var value = ActivityConditionView.__super__.getValue.call(this);
-            if (value.columnName) {
-                value.columnName = base64.decode(value.columnName);
-            }
-            return value;
         }
     });
 
