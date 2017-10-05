@@ -90,7 +90,7 @@ define(function(require) {
             return value;
         },
 
-        getColumnName: function() {
+        getChoiceInputValue: function() {
             var entity = this.$choiceInput.data('entity');
             return this.filter ? _.result(this.filter.entity_ids, entity) : null;
         }

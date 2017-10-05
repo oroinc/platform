@@ -44,7 +44,8 @@ define(function(require) {
                 criterion: {
                     data: {
                         filterType: 'hasActivity',
-                        activityType: {}
+                        activityType: {},
+                        activityFieldName: ''
                     }
                 }
             }, this.getValue());
@@ -198,23 +199,29 @@ define(function(require) {
                     filterType: this.activityFilter.getType(),
                     activityType: this.typeFilter.getValue(),
                     filter: filter,
-                    entityClassName: $(this.options.entitySelector).val()
+                    entityClassName: $(this.options.entitySelector).val(),
+                    activityFieldName: this.getChoiceInputValue()
                 }
             };
         },
 
-        _getFilterValue: function() {
+        _getInitialChoiceInputValue: function() {
             var criterion = _.result(this.getValue(), 'criterion');
-            if (criterion && criterion.data && criterion.data.filter && criterion.data.filter.data) {
-                return criterion.data.filter.data;
+            if (criterion) {
+                return _.result(criterion.data, 'activityFieldName');
             }
         },
 
-        setValue: function(value) {
-            if (value.columnName) {
-                value.columnName = base64.encode(value.columnName);
+        _getFilterValue: function() {
+            var criterion = _.result(this.getValue(), 'criterion');
+            if (criterion && criterion.data) {
+                return _.result(criterion.data.filter, 'data');
             }
-            ActivityConditionView.__super__.setValue.call(this, value);
+        },
+
+        _collectValue: function() {
+            var value = ActivityConditionView.__super__._collectValue.call(this);
+            return _.omit(value, 'columnName');
         },
 
         getValue: function() {

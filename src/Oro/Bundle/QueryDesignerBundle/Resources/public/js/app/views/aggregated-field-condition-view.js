@@ -99,10 +99,6 @@ define(function(require) {
             return value;
         },
 
-        getColumnName: function() {
-            return this.$choiceInput.inputWidget('val');
-        },
-
         _getColumnLabel: function() {
             return _.result(this.$choiceInput.inputWidget('data'), 'text');
         },

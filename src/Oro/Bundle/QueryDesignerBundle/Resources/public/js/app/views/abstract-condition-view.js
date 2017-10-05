@@ -44,11 +44,11 @@ define(function(require) {
             this.initChoiceInput();
             this.$filterContainer = this.$('.' + this.options.filterContainerClass);
 
-            var columnName = _.result(this.getValue(), 'columnName');
+            var choiceInputValue = this._getInitialChoiceInputValue();
 
-            if (columnName) {
-                this.setChoiceInputValue(columnName);
-                this._renderFilter(columnName).then(function() {
+            if (choiceInputValue) {
+                this.setChoiceInputValue(choiceInputValue);
+                this._renderFilter(choiceInputValue).then(function() {
                     this._resolveDeferredRender();
                 }.bind(this));
             } else {
@@ -59,8 +59,8 @@ define(function(require) {
         },
 
         _onChoiceInputChanged: function(e, fieldId) {
-            var columnName = _.result(this.getValue(), 'columnName');
-            if (columnName !== fieldId) {
+            var choiceInputValue = this._getInitialChoiceInputValue();
+            if (choiceInputValue !== fieldId) {
                 $(':focus').blur();
                 // reset current value on field change
                 this.setValue({});
@@ -155,7 +155,7 @@ define(function(require) {
 
             if (!this._hasEmptyFilter()) {
                 value = {
-                    columnName: this.getColumnName(),
+                    columnName: this.getChoiceInputValue(),
                     criterion: this._getFilterCriterion()
                 };
             }
@@ -179,6 +179,10 @@ define(function(require) {
             return !this.filter || this.filter.isEmptyValue();
         },
 
+        _getInitialChoiceInputValue: function() {
+            return _.result(this.getValue(), 'columnName');
+        },
+
         setChoiceInputValue: function(name) {
             this.getChoiceInputWidget().setValue(name);
         },
@@ -191,7 +195,7 @@ define(function(require) {
             this.$el.data('value', value);
         },
 
-        getColumnName: function() {
+        getChoiceInputValue: function() {
             return this.$choiceInput.inputWidget('val');
         },
 
