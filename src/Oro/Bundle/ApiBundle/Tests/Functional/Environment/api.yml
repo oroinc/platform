@@ -84,3 +84,26 @@ api:
                     renamedName:
                         exclude: false
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestWithoutIdGenerator: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCompositeIdentifier:
+            fields:
+                renamedKey1:
+                    property_path: key1
+            filters:
+                fields:
+                    name: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
+            identifier_field_names: ['key']
+            fields:
+                id:
+                    exclude: true
+            filters:
+                fields:
+                    name: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomCompositeIdentifier:
+            identifier_field_names: ['key1', 'key2']
+            fields:
+                databaseId:
+                    property_path: id
+            filters:
+                fields:
+                    name: ~

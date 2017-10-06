@@ -11,8 +11,10 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCust
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
@@ -46,6 +48,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->completeEntityDefinitionHelper = new CompleteEntityDefinitionHelper(
             $this->doctrineHelper,
+            new EntityIdHelper(),
             new CompleteAssociationHelper($this->configProvider),
             $this->customAssociationHelper,
             $this->exclusionProvider,
@@ -1115,6 +1118,49 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForIdentifierFieldsOnlyAndHasConfiguredIdFields()
+    {
+        $config = $this->createConfigObject([
+            'identifier_field_names' => ['field1'],
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null,
+                'field2' => [
+                    'exclude' => true
+                ],
+                'field3' => [
+                    'property_path' => 'realField3'
+                ],
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+        $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['field1'],
+                'fields'                 => [
+                    'field1' => null
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForIdentifierFieldsOnlyWithIgnoredPropertyPath()
     {
         $config = $this->createConfigObject([
@@ -1191,6 +1237,40 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenNoIdFieldInConfigAndHasConfiguredIdFields()
+    {
+        $config = $this->createConfigObject([
+            'identifier_field_names' => ['field1'],
+            'fields'                 => []
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+        $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['field1'],
+                'fields'                 => [
+                    'field1' => null
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForIdentifierFieldsOnlyWithRenamedIdFieldInConfig()
     {
         $config = $this->createConfigObject([
@@ -1224,6 +1304,46 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 'fields'                 => [
                     'renamedId' => [
                         'property_path' => 'name'
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWithRenamedIdFieldInConfigAndHasConfiguredIdFields()
+    {
+        $config = $this->createConfigObject([
+            'identifier_field_names' => ['field1'],
+            'fields'                 => [
+                'field1' => [
+                    'property_path' => 'realField1'
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+        $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['field1'],
+                'fields'                 => [
+                    'field1' => [
+                        'property_path' => 'realField1'
                     ]
                 ]
             ],
@@ -1445,5 +1565,159 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ],
             $config
         );
+    }
+
+    /**
+     * @dataProvider completeCustomIdentifierDataProvider
+     */
+    public function testCompleteCustomIdentifier(
+        $targetAction,
+        $usesIdGenerator,
+        $config,
+        $expectedConfig
+    ) {
+        $config = $this->createConfigObject($config);
+        $context = new ConfigContext();
+        $context->setTargetAction($targetAction);
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $rootEntityMetadata->expects($this->any())
+            ->method('usesIdGenerator')
+            ->willReturn($usesIdGenerator);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig($expectedConfig, $config);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function completeCustomIdentifierDataProvider()
+    {
+        return [
+            'CREATE action, id generator, configured custom id'              => [
+                'targetAction'    => ApiActions::CREATE,
+                'usesIdGenerator' => true,
+                'config'          => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => []
+                ],
+                'expectedConfig'  => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => [
+                        'id'    => [
+                            'form_options' => [
+                                'mapped' => false
+                            ]
+                        ],
+                        'field' => null,
+                    ]
+                ]
+            ],
+            'UPDATE action, id generator, configured custom id'              => [
+                'targetAction'    => ApiActions::UPDATE,
+                'usesIdGenerator' => true,
+                'config'          => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => []
+                ],
+                'expectedConfig'  => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => [
+                        'id'    => [
+                            'form_options' => [
+                                'mapped' => false
+                            ]
+                        ],
+                        'field' => null,
+                    ]
+                ]
+            ],
+            'another action, id generator, configured custom id'             => [
+                'targetAction'    => ApiActions::GET,
+                'usesIdGenerator' => true,
+                'config'          => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => []
+                ],
+                'expectedConfig'  => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => [
+                        'id'    => null,
+                        'field' => null,
+                    ]
+                ]
+            ],
+            'no id generator, configured custom id'                          => [
+                'targetAction'    => ApiActions::CREATE,
+                'usesIdGenerator' => false,
+                'config'          => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => []
+                ],
+                'expectedConfig'  => [
+                    'identifier_field_names' => ['field'],
+                    'fields'                 => [
+                        'id'    => null,
+                        'field' => null,
+                    ]
+                ]
+            ],
+            'id generator, configured custom id equals to entity id'         => [
+                'targetAction'    => ApiActions::CREATE,
+                'usesIdGenerator' => true,
+                'config'          => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => []
+                ],
+                'expectedConfig'  => [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id'    => null,
+                        'field' => null,
+                    ]
+                ]
+            ],
+            'id generator, configured custom id equals to renamed entity id' => [
+                'targetAction'    => ApiActions::CREATE,
+                'usesIdGenerator' => true,
+                'config'          => [
+                    'identifier_field_names' => ['renamedId'],
+                    'fields'                 => [
+                        'renamedId' => [
+                            'property_path' => 'id'
+                        ]
+                    ]
+                ],
+                'expectedConfig'  => [
+                    'identifier_field_names' => ['renamedId'],
+                    'fields'                 => [
+                        'renamedId' => [
+                            'property_path' => 'id'
+                        ],
+                        'field'     => null,
+                    ]
+                ]
+            ],
+        ];
     }
 }

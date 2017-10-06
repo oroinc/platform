@@ -8,8 +8,9 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
 {
     /** @var array */
     protected $methodMap = [
-        EntityDefinitionConfig::POST_SERIALIZE        => 'setPostSerializeHandler',
-        EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER => 'setFormEventSubscribers',
+        EntityDefinitionConfig::DOCUMENTATION_RESOURCE => 'setDocumentationResources',
+        EntityDefinitionConfig::POST_SERIALIZE         => 'setPostSerializeHandler',
+        EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER  => 'setFormEventSubscribers',
     ];
 
     /** @var ConfigLoaderFactory */
