@@ -1,9 +1,12 @@
 ## 2.5.0 (Unreleased)
 
 ### Added
-####ActivityListBundle
+#### ActivityListBundle
 * Added `ActivityConditionView` as substitution for removed `oroactivity.activityCondition` jQuery widget.
-####DataAuditBundle
+#### ApiBundle
+* Added additional syntax for data filters: `key[operator_name]=value`. For example `GET /api/users?filter[id][neq]=2` can be used instead of `GET /api/users?filter[id]!=2`. The supported operators are `eq`, `neq`, `lt`, `lte`, `gt` and `gte`.
+* Added possibility to specify **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
+#### DataAuditBundle
 * Added `DataAuditConditionView` as substitution for removed `oroauditquerydesigner.dataAuditCondition` jQuery widget.
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
@@ -15,7 +18,14 @@
 * Added `ConditionBuilderView` as substitution for removed `oroquerydesigner.conditionBuilder` jQuery widget.
 * Added `AbstractConditionView` and `FieldConditionView`  as substitution for removed `oroquerydesigner.fieldCondition` jQuery widget.
 * Added `AggregatedFieldConditionView` as substitution for removed `oroauditquerydesigner.aggregatedFieldCondition` jQuery widget.
+#### SyncBundle
+* Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
 ### Changed
+#### ApiBundle
+* Class `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
+    * method `hasDocumentationResource` was renamed to `hasDocumentationResources`
+    * method `getDocumentationResource` was renamed to `getDocumentationResources`
+    * method `setDocumentationResource` was renamed to `setDocumentationResources`
 #### EntityConfigBundle
 * Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
 #### MessageQueue Component
@@ -32,11 +42,11 @@
 #### SearchBundle
 * Class `Oro/Bundle/SearchBundle/Engine/Orm/DBALPersistenceDriverTrait` is deprecated. The functionality was merged into `BaseDriver`
 ### Removed
-####ActivityListBundle
+#### ActivityListBundle
 * Refactored setup of ActivityCondition for QueryDesigner's ConditionBuilder. 
     * jQuery widget `oroactivity.activityCondition` replaced with `ActivityConditionView` Backbone view, removed unused extensions support in its options.
     * Removed class `Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener`.
-####DataAuditBundle
+#### DataAuditBundle
 * jQuery widget `oroauditquerydesigner.dataAuditCondition` replaced with `DataAuditConditionView` Backbone view.
 #### QueryDesignerBundle
 * jQuery widget `oroquerydesigner.conditionBuilder` replaced with `ConditionBuilderView` Backbone view.
@@ -51,8 +61,10 @@
 * Removed `renderResetButton()` macro from Oro/Bundle/WorkflowBundle/Resources/views/macros.html.twig. Also removed usage of this macro from two files:
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/button.html.twig`
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/buttons.html.twig`
+#### OroBehatExtension
+* Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
-## 2.4.0 (Unreleased)
+## 2.4.0
 
 ### Added
 #### CacheBundle
