@@ -344,7 +344,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             $container
         );
 
-        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_reset_extension');
+        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_clearer');
         $this->assertEquals(
             [
                 'setPersistentServices',

@@ -48,9 +48,9 @@ class DataProviderDecorator
             if (!method_exists($this->dataProvider, $name)) {
                 throw new \BadMethodCallException(
                     sprintf(
-                        'In the data provider "%s" does not exist method "%s".',
-                        get_class($this->dataProvider),
-                        $name
+                        'Method "%s" not found in "%s".',
+                        $name,
+                        get_class($this->dataProvider)
                     )
                 );
             }
@@ -58,7 +58,7 @@ class DataProviderDecorator
         } else {
             throw new \BadMethodCallException(
                 sprintf(
-                    'Method "%s" cannot be called. The called method in data provider should beginning with "%s".',
+                    'Method "%s" cannot be called. The called method should begin with "%s".',
                     $name,
                     implode('", "', $this->methodPrefixes)
                 )

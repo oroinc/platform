@@ -9,9 +9,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 
 /**
- * Normalizes a value of "orderBy" type for REST requests.
+ * Converts a string represents "orderBy" type to an associative array.
+ * The array has the following schema: [field name => sorting direction, ...].
  * Expected format of a string value: field1,-field2,...
  * The "-" is used as shortcut for DESC.
+ * Provides a regular expression that can be used to validate that a string represents a value of the "orderBy" type.
  */
 class NormalizeOrderBy implements ProcessorInterface
 {

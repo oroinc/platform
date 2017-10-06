@@ -117,18 +117,12 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                 'field3'        => [
                     'property_path' => 'realField3'
                 ],
-                'field4'        => [
-                    'property_path' => 'realField4'
-                ],
                 'association1'  => null,
                 'association2'  => [
                     'exclude' => true
                 ],
                 'association3'  => [
                     'property_path' => 'realAssociation3'
-                ],
-                'association4'  => [
-                    'property_path' => 'realAssociation4'
                 ],
             ]
         ];
@@ -137,8 +131,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $metadata->addField($this->createFieldMetadata('field1'));
         $metadata->addField($this->createFieldMetadata('field2'));
         $metadata->addField($this->createFieldMetadata('field3'));
-        $metadata->addField($this->createFieldMetadata('realField4'));
-        $metadata->addField($this->createFieldMetadata('field5'));
+        $metadata->addField($this->createFieldMetadata('field4'));
         $metadata->addAssociation(
             $this->createAssociationMetadata('association1', 'Test\Association1Target')
         );
@@ -146,13 +139,10 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata('association2', 'Test\Association2Target')
         );
         $metadata->addAssociation(
-            $this->createAssociationMetadata('realAssociation3', 'Test\Association3Target')
+            $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
         $metadata->addAssociation(
-            $this->createAssociationMetadata('realAssociation4', 'Test\Association4Target')
-        );
-        $metadata->addAssociation(
-            $this->createAssociationMetadata('association5', 'Test\Association5Target')
+            $this->createAssociationMetadata('association4', 'Test\Association4Target')
         );
 
         $this->doctrineHelper->expects($this->once())
@@ -167,15 +157,11 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata = new EntityMetadata();
         $expectedMetadata->addField($this->createFieldMetadata('field1'));
         $expectedMetadata->addField($this->createFieldMetadata('field3'));
-        $expectedMetadata->addField($this->createFieldMetadata('field4'));
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata('association1', 'Test\Association1Target')
         );
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
-        );
-        $expectedMetadata->addAssociation(
-            $this->createAssociationMetadata('association4', 'Test\Association4Target')
         );
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());

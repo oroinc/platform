@@ -21,6 +21,9 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class DatagridExportIdFetcherTest extends OrmTestCase
 {
     protected $em;
@@ -106,7 +109,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $qb
             ->expects($this->once())
             ->method('select')
-            ->with('RootAlias.IdentifierName', 'RootAlias.IdentifierName')
+            ->with('RootAlias.IdentifierName')
             ->willReturn($qb);
 
         $qb
@@ -212,73 +215,6 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             ->expects($this->once())
             ->method('getDQLPart')
             ->willReturn(true);
-
-        $dataSource = $this->createDatasourceMock($qb);
-
-        $grid = $this->createDatagridMock($gridConfig, $dataSource);
-
-        $context = $this->createContextMock();
-        $context
-            ->expects($this->at(0))
-            ->method('hasOption')
-            ->with('gridName')
-            ->willReturn(true);
-
-        $context
-            ->expects($this->at(1))
-            ->method('getOption')
-            ->with('gridName')
-            ->willReturn('someGridName');
-
-        $context
-            ->expects($this->at(2))
-            ->method('getOption')
-            ->with('gridParameters')
-            ->willReturn('someGridParameters');
-
-        $context
-            ->expects($this->at(3))
-            ->method('setValue')
-            ->with('columns', 'SomeColumns');
-
-        $manager = $this->createManagerMock();
-        $manager
-            ->expects($this->once())
-            ->method('getDatagrid')
-            ->with('someGridName', 'someGridParameters')
-            ->willReturn($grid);
-
-        $gridManagerLink = $this->createGridManagerLinkMock();
-        $gridManagerLink
-            ->expects($this->once())
-            ->method('getService')
-            ->willReturn($manager);
-
-        $eventDispatcher = $this->createEventDispatcherMock();
-        $eventDispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME);
-
-        $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher);
-        $fetcher->setImportExportContext($context);
-
-        $result = $fetcher->getGridDataIds();
-
-        $this->assertEquals([], $result);
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testQueryWithoutTransformWithOrderBy()
-    {
-        $qb = $this->em
-                   ->getRepository('Test:Test')
-                   ->createQueryBuilder('e')
-                   ->orderBy('e.id', 'ASC');
-
-        $gridConfig = $this->createDatagridConfigurationMock();
 
         $dataSource = $this->createDatasourceMock($qb);
 
@@ -473,7 +409,8 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     {
         $qb = $this->em
             ->getRepository('Test:Test')
-            ->createQueryBuilder('e');
+            ->createQueryBuilder('e')
+            ->orderBy('e.id', 'ASC');
 
         $gridConfig = $this->createDatagridConfigurationMock();
 
@@ -526,9 +463,9 @@ class DatagridExportIdFetcherTest extends OrmTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT t0_.id AS id_0, t0_.id AS id_1 FROM test_table t0_',
+            'SELECT t0_.id AS id_0 FROM test_table t0_ ORDER BY t0_.id ASC',
             [
-                ['id_0'  => 1, 'id_1' => 1]
+                ['id_0'  => 1]
             ]
         );
 

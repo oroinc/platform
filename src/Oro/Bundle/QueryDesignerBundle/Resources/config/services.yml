@@ -85,6 +85,8 @@ services:
             - '@oro_datagrid.datagrid.builder'
             - '@translator'
             - %kernel.debug%
+        calls:
+            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.query_validator }
 

@@ -34,7 +34,7 @@ class WindowsFileCacheIsolatorTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'session_handler' => 'snc_redis.session.handler',
-                'expected result' => false,
+                'expected result' => true,
             ],
         ];
     }

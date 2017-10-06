@@ -300,6 +300,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
         arguments:
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 100 }
@@ -334,8 +335,11 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_instantiator'
+            - '@oro_api.entity_loader'
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -45 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -45 }
@@ -353,6 +357,8 @@ services:
         arguments:
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -50 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -50 }
@@ -451,6 +457,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.criteria_connector'
+            - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -100 }
             - { name: oro.api.processor, action: delete, group: build_query, priority: -100 }
@@ -496,6 +503,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_loader'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -10 }
