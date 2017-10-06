@@ -11,6 +11,7 @@ services:
         public: false
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
             - '@oro_api.entity_metadata_factory'
             - '@oro_api.load_metadata.factory.object'
             - '@oro_api.load_metadata.factory.entity'

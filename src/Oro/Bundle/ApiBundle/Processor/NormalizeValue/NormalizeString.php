@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
+/**
+ * Converts a string to string (actually a value is kept as is
+ * because a sting value does not required any transformation).
+ * Provides a regular expression that can be used to validate a string value.
+ */
 class NormalizeString extends AbstractProcessor
 {
     const REQUIREMENT = '.+';

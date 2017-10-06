@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 /**
@@ -28,14 +29,16 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
     /**
      * @param EntitySerializer   $entitySerializer
      * @param DoctrineHelper     $doctrineHelper
+     * @param EntityIdHelper     $entityIdHelper
      * @param AssociationManager $associationManager
      */
     public function __construct(
         EntitySerializer $entitySerializer,
         DoctrineHelper $doctrineHelper,
+        EntityIdHelper $entityIdHelper,
         AssociationManager $associationManager
     ) {
-        parent::__construct($entitySerializer, $doctrineHelper);
+        parent::__construct($entitySerializer, $doctrineHelper, $entityIdHelper);
         $this->associationManager = $associationManager;
     }
 

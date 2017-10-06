@@ -74,18 +74,12 @@ class HtmlTagExtension extends \Twig_Extension
     /**
      * @param string $html
      * @param array $tags
-     * @param array $attrs
      * @return string
      */
-    public function htmlTagTrim($html, array $tags = [], array $attrs = [])
+    public function htmlTagTrim($html, array $tags = [])
     {
         foreach ($tags as $tag) {
             $pattern = '/(<' . $tag . '[^>]*>)((.|\s)*?)(<\/' . $tag . '>)|(<' . $tag . '[^>]*>)/i';
-            $html = preg_replace($pattern, '', $html);
-        }
-
-        foreach ($attrs as $attr) {
-            $pattern = '/(' . $attr . '\=\".*?\")|(' . $attr . '\=\'.*?\')/i';
             $html = preg_replace($pattern, '', $html);
         }
 

@@ -153,10 +153,15 @@ class NormalizeRequestData implements ProcessorInterface
                 $this->addValidationError(Constraint::ENTITY_TYPE, $this->buildPointer($pointer, JsonApiDoc::TYPE))
                     ->setDetail('Not acceptable entity type.');
             } else {
+                $targetMetadata = null;
+                if (null !== $associationMetadata) {
+                    $targetMetadata = $associationMetadata->getTargetMetadata();
+                }
                 $entityId = $this->normalizeEntityId(
                     $this->buildPointer($pointer, JsonApiDoc::ID),
                     $entityClass,
-                    $entityId
+                    $entityId,
+                    $targetMetadata
                 );
             }
         }
@@ -206,13 +211,14 @@ class NormalizeRequestData implements ProcessorInterface
     }
 
     /**
-     * @param string $pointer
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * @param string              $pointer
+     * @param string              $entityClass
+     * @param mixed               $entityId
+     * @param EntityMetadata|null $entityMetadata
      *
      * @return mixed
      */
-    protected function normalizeEntityId($pointer, $entityClass, $entityId)
+    protected function normalizeEntityId($pointer, $entityClass, $entityId, EntityMetadata $entityMetadata = null)
     {
         // keep the id of the primary and an included entity as is
         $includedEntities = $this->context->getIncludedEntities();
@@ -225,8 +231,13 @@ class NormalizeRequestData implements ProcessorInterface
             return $entityId;
         }
 
+        // keep the id as is if the entity metadata is undefined
+        if (null === $entityMetadata) {
+            return $entityId;
+        }
+
         try {
-            return $this->entityIdTransformer->reverseTransform($entityClass, $entityId);
+            return $this->entityIdTransformer->reverseTransform($entityId, $entityMetadata);
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $pointer)
                 ->setInnerException($e);
