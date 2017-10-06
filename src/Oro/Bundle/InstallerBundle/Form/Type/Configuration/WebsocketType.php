@@ -85,6 +85,20 @@ class WebsocketType extends AbstractType
                         'title' => 'form.configuration.websocket.frontend.port.tooltip'
                     ],
                 )
+            )
+            ->add(
+                'oro_installer_websocket_frontend_path',
+                'text',
+                [
+                    'label' => 'form.configuration.websocket.frontend.path',
+                    'required' => false,
+                    'constraints' => [
+                        new Assert\Type(['type' => 'string']),
+                    ],
+                    'attr' => [
+                        'title' => 'form.configuration.websocket.frontend.path.tooltip'
+                    ],
+                ]
             );
     }
 
