@@ -63,6 +63,11 @@ class Job
     /**
      * @var \DateTime
      */
+    protected $lastActiveAt;
+
+    /**
+     * @var \DateTime
+     */
     protected $stoppedAt;
 
     /**
@@ -269,6 +274,24 @@ class Job
     public function setStartedAt(\DateTime $startedAt)
     {
         $this->startedAt = $startedAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getLastActiveAt()
+    {
+        return $this->lastActiveAt;
+    }
+    /**
+     * @param \DateTime $lastActiveAt
+     *
+     * @return $this
+     */
+    public function setLastActiveAt(\DateTime $lastActiveAt)
+    {
+        $this->lastActiveAt = $lastActiveAt;
+        return $this;
     }
 
     /**
