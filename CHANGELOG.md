@@ -10,6 +10,8 @@
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
+#### SyncBundle
+* Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
 ### Changed
 #### ApiBundle
 * Class `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
