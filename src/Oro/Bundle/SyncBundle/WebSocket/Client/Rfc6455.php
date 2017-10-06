@@ -13,10 +13,8 @@ class Rfc6455
     protected $socket;
 
     /**
-     *
-     * @param string $host
-     * @param int $port
-     *
+     * @param $host
+     * @param $port
      * @return resource
      */
     public function connect($host, $port)
@@ -27,7 +25,7 @@ class Rfc6455
 
         $websocketKey = base64_encode($this->generateRandomString(16));
 
-        $header  = "GET /echo HTTP/1.1\r\n";
+        $header  = "GET / HTTP/1.1\r\n";
         $header .= 'Host: ' . $host . ':' . $port . "\r\n";
         $header .= "Upgrade: websocket\r\n";
         $header .= "Connection: Upgrade\r\n";
@@ -35,7 +33,7 @@ class Rfc6455
         $header .= "Sec-WebSocket-Version: 13\r\n";
         $header .= "\r\n";
 
-        $this->socket = @stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, self::SOCKET_TIMEOUT);
+        $this->socket = @stream_socket_client("tcp://{$host}:{$port}/", $errno, $errstr, self::SOCKET_TIMEOUT);
 
         if (!$this->socket) {
             throw new \RuntimeException(sprintf('WebSocket connection error (%u): %s', $errno, $errstr));

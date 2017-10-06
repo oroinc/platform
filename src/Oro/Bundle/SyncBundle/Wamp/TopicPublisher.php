@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SyncBundle\Wamp;
 
+use Ratchet\Wamp\ServerProtocol;
+
 class TopicPublisher
 {
     /**
@@ -30,7 +32,7 @@ class TopicPublisher
      */
     public function __construct($host = '127.0.0.1', $port = 8080)
     {
-        if ('*' == $host) {
+        if ('*' === $host) {
             $host = '127.0.0.1';
         }
 
@@ -56,7 +58,7 @@ class TopicPublisher
         $ws->sendData(
             json_encode(
                 array(
-                    \Ratchet\Wamp\ServerProtocol::MSG_PUBLISH,
+                    ServerProtocol::MSG_PUBLISH,
                     $topic,
                     $msg,
                 )
