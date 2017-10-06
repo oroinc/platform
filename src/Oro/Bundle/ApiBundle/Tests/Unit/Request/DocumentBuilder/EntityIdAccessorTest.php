@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi\JsonApiDocument;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ArrayAccessor;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
 class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +17,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->entityIdAccessor = new EntityIdAccessor(
             new ArrayAccessor(),
@@ -33,7 +34,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->entityIdTransformer->expects($this->once())
             ->method('transform')
-            ->with(123)
+            ->with(123, self::identicalTo($metadata))
             ->willReturn('transformedId');
 
         $this->assertEquals(
@@ -68,7 +69,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->entityIdTransformer->expects($this->once())
             ->method('transform')
-            ->with(['id1' => 123, 'id2' => 456])
+            ->with(['id1' => 123, 'id2' => 456], self::identicalTo($metadata))
             ->willReturn('transformedId');
 
         $this->assertEquals(
@@ -120,7 +121,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->entityIdTransformer->expects($this->once())
             ->method('transform')
-            ->with(null)
+            ->with(null, self::identicalTo($metadata))
             ->willReturn(null);
 
         $this->entityIdAccessor->getEntityId($entity, $metadata);
@@ -139,7 +140,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->entityIdTransformer->expects($this->once())
             ->method('transform')
-            ->with(123)
+            ->with(123, self::identicalTo($metadata))
             ->willReturn('');
 
         $this->entityIdAccessor->getEntityId($entity, $metadata);

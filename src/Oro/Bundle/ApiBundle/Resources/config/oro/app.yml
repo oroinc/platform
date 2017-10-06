@@ -49,6 +49,8 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        composite_identifier:
+            factory: ['@oro_api.filter_factory.composite_identifier', 'createFilter']
         association:
             factory: ['@oro_api.filter_factory.extended_association', 'createFilter']
         primaryField:

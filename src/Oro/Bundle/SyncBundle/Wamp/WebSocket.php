@@ -17,11 +17,12 @@ class WebSocket
      *
      * @param string $host Host to connect to. Default is localhost (127.0.0.1).
      * @param int    $port Port to connect to. Default is 8080.
+     * @param string $path Request path. Default is ""
      */
-    public function __construct($host = '127.0.0.1', $port = 8080)
+    public function __construct($host = '127.0.0.1', $port = 8080, $path = '')
     {
         $this->version = new Rfc6455();
-        $this->socket = $this->version->connect($host, $port);
+        $this->socket = $this->version->connect($host, $port, $path);
     }
 
     public function __destruct()

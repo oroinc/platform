@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteFiltersTest extends ConfigProcessorTestCase
 {
@@ -18,9 +19,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new CompleteFilters($this->doctrineHelper);
     }
@@ -524,6 +523,275 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         ]
                     ],
                 ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testProcessForIdentifierFieldFilters()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id' => null
+            ]
+        ];
+
+        $filters = [
+            'fields' => []
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getFieldDataType')
+            ->with(self::identicalTo($rootEntityMetadata), 'id')
+            ->willReturn('integer');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id' => [
+                        'data_type'   => 'integer',
+                        'allow_array' => true
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testProcessForRenamedIdentifierFieldFilters()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['renamedId'],
+            'fields'                 => [
+                'renamedId' => [
+                    'property_path' => 'id'
+                ]
+            ]
+        ];
+
+        $filters = [
+            'fields' => []
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getFieldDataType')
+            ->with(self::identicalTo($rootEntityMetadata), 'id')
+            ->willReturn('integer');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'renamedId' => [
+                        'data_type'   => 'integer',
+                        'allow_array' => true
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testProcessForIdentifierFieldFiltersWhenFieldDataTypeIsUnknown()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id' => null
+            ]
+        ];
+
+        $filters = [
+            'fields' => []
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getFieldDataType')
+            ->with(self::identicalTo($rootEntityMetadata), 'id')
+            ->willReturn(null);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id' => [
+                        'data_type'   => 'string',
+                        'allow_array' => true
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testProcessForIdentifierFieldFiltersWhenFilterIaAlreadyConfigured()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id' => null
+            ]
+        ];
+
+        $filters = [
+            'fields' => [
+                'id' => [
+                    'data_type'   => 'string',
+                    'allow_array' => false
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getFieldDataType');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id' => [
+                        'data_type' => 'string'
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testProcessForIdentifierFieldFiltersWhenNoFieldInConfig()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => []
+        ];
+
+        $filters = [
+            'fields' => []
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getFieldDataType');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all'
             ],
             $this->context->getFilters()
         );

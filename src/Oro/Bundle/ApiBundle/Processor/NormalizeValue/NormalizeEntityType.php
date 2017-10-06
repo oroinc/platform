@@ -5,7 +5,8 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 /**
- * Converts entity class name to entity type.
+ * Converts entity class name to entity type
+ * Provides a regular expression that can be used to validate entity class name.
  */
 class NormalizeEntityType extends AbstractProcessor
 {

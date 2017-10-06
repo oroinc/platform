@@ -40,7 +40,7 @@ class NormalizeEntityId implements ProcessorInterface
 
         try {
             $context->setId(
-                $this->entityIdTransformer->reverseTransform($context->getClassName(), $entityId)
+                $this->entityIdTransformer->reverseTransform($entityId, $context->getMetadata())
             );
         } catch (\Exception $e) {
             $context->addError(

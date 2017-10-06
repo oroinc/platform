@@ -52,7 +52,8 @@ class EntityIdAccessor
                 );
             }
             $result = $this->entityIdTransformer->transform(
-                $this->propertyAccessor->getValue($entity, $fieldName)
+                $this->propertyAccessor->getValue($entity, $fieldName),
+                $metadata
             );
         } elseif ($idFieldNamesCount > 1) {
             $id = [];
@@ -68,7 +69,7 @@ class EntityIdAccessor
                 }
                 $id[$fieldName] = $this->propertyAccessor->getValue($entity, $fieldName);
             }
-            $result = $this->entityIdTransformer->transform($id);
+            $result = $this->entityIdTransformer->transform($id, $metadata);
         } else {
             throw new RuntimeException(
                 sprintf(

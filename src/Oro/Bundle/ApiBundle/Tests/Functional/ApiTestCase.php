@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -173,18 +175,32 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param mixed $entityId
+     * @param string $entityClass
+     * @param mixed  $entityId
      *
      * @return string|null
      */
-    protected function getRestApiEntityId($entityId)
+    protected function getRestApiEntityId($entityClass, $entityId)
     {
         if (null === $entityId) {
             return null;
         }
 
+        $config = $this->getContainer()->get('oro_api.config_provider')->getConfig(
+            $entityClass,
+            Version::LATEST,
+            $this->getRequestType(),
+            [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+        );
+        $metadata = $this->getContainer()->get('oro_api.metadata_provider')->getMetadata(
+            $entityClass,
+            Version::LATEST,
+            $this->getRequestType(),
+            $config->getDefinition()
+        );
+
         return $this->getContainer()->get('oro_api.rest.entity_id_transformer')
-            ->transform($entityId);
+            ->transform($entityId, $metadata);
     }
 
     /**
