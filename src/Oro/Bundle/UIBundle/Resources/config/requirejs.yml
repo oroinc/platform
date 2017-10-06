@@ -276,8 +276,6 @@ config:
         'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
         'oroui/js/app/views/jstree/subtree-action-view': 'bundles/oroui/js/app/views/jstree/subtree-action-view.js'
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
-
-        'oroui/js/app/views/scroll-view': 'bundles/oroui/js/app/views/scroll-view.js'
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/init-lightgallery

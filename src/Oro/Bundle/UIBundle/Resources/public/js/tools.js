@@ -200,17 +200,6 @@ define(function(require) {
         },
 
         /**
-         * Simple browser check
-         *
-         * @param {Array}{String} browsers
-         * @returns {boolean}
-         */
-        isBrowser: function(browsers) {
-            var regExp = new RegExp('(' + _.isArray(browsers) ? browsers.join('|') : browsers + ')');
-            return regExp.test(navigator.userAgent);
-        },
-
-        /**
          * Loads dynamic list of modules and execute callback function with passed modules
          *
          * @param {Object.<string, string>|Array.<string>|string} modules
@@ -342,7 +331,6 @@ define(function(require) {
             return event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ||
                 event.which === mouseMiddleButton;
         },
-
 
         /**
          * Gets an XPath for an element which describes its hierarchical location.
