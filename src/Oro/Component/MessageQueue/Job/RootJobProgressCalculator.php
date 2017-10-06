@@ -27,6 +27,7 @@ class RootJobProgressCalculator
     public function calculate(Job $job)
     {
         $rootJob = $job->isRoot() ? $job : $job->getRootJob();
+        $rootJob->setLastActiveAt(new \DateTime());
         $children = $rootJob->getChildJobs();
         $numberOfChildren = count($children);
         if (0 === $numberOfChildren) {

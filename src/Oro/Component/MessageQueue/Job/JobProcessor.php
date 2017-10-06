@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
 
-    class JobProcessor
+class JobProcessor
 {
     /**
      * @var JobConfigurationProviderInterface
@@ -101,6 +101,7 @@ use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
         $job->setStatus(Job::STATUS_NEW);
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
+        $job->setLastActiveAt(new \DateTime());
         $job->setStartedAt(new \DateTime());
         $job->setJobProgress(0);
         $job->setUnique((bool) $unique);
