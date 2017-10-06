@@ -56,6 +56,7 @@ services:
         class: Oro\Bundle\ApiBundle\Form\Type\EntityType
         arguments:
             - '@doctrine'
+            - '@oro_api.entity_loader'
         tags:
             - { name: oro.api.form.type, alias: oro_api_entity }
 
@@ -64,6 +65,7 @@ services:
         arguments:
             - '@property_accessor'
             - '@doctrine'
+            - '@oro_api.entity_loader'
         tags:
             - { name: oro.api.form.type, alias: oro_api_nested_association }
 

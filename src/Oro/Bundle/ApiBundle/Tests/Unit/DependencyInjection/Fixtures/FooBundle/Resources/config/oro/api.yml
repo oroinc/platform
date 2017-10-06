@@ -23,6 +23,8 @@ api:
         Test\Entity6:
             fields:
                 field1: ~
+        Test\Entity7:
+            documentation_resource: entity7_foo.md
         Test\Entity11: ~
         Test\Entity12:
             exclude: false
