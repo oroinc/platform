@@ -60,7 +60,7 @@ class SetLocationHeader implements ProcessorInterface
             $context->getClassName(),
             $context->getRequestType()
         );
-        $entityId = $this->entityIdTransformer->transform($context->getId());
+        $entityId = $this->entityIdTransformer->transform($context->getId(), $context->getMetadata());
         $location = $this->router->generate(
             'oro_rest_api_get',
             ['entity' => $entityType, 'id' => $entityId],

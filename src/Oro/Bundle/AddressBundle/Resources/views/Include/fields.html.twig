@@ -25,26 +25,20 @@
     {{ form_widget(form, attr) }}
     {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
     {% set regionView = regionView|default('oroaddress/js/region/view') %}
-    {% set regionCollection = regionCollection|default('oroaddress/js/region/collection') %}
 
-    <script type="text/javascript">
-        require(['jquery', '{{ regionView }}', '{{ regionCollection }}'],
-        function($, RegionView, RegionCollection){
-            $(function() {
-                /** @type oro.region.View */
-                new RegionView({
-                    el: $('#{{ country_field.vars.id }}'),
-                    target: $('#{{ id }}'),
-                    simpleEl: $('#{{ region_text_field.vars.id }}'),
-                    collection: new RegionCollection([], {
-                        route: {{ form.parent.vars.region_route|default('oro_api_country_get_regions')|json_encode|raw }}
-                    }),
-                    showSelect: {{ showSelect|json_encode|raw }},
-                    regionRequired: {{ required|json_encode|raw }}
-                });
-            });
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        view: {
+            _sourceElement: '#' ~ country_field.vars.id,
+            view: regionView,
+            target: '#' ~ id ,
+            simpleEl: '#' ~ region_text_field.vars.id,
+            collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),
+            showSelect: showSelect,
+            regionRequired: required
+        }
+    }) }}></div>
 
     <style type="text/css">
         {% if showSelect %}
@@ -153,24 +147,13 @@
 
 {% macro oro_collection_validate_types_js(context) %}
     {% if context.form.vars.prototype.types is defined %}
-        <script type="text/javascript">
-            require(['jquery'],
-            function($){
-                $(function() {
-                    var container = $('#{{ context.id }}');
-                    /**
-                     * Allow only 1 item with selected type
-                     */
-                    container.on('click', '[name$="[types][]"]', function() {
-                        if (this.checked) {
-                            container.find('[name$="[types][]"][value="' + this.value + '"]').each(function (idx, el) {
-                                el.checked = false;
-                            });
-                            this.checked = true;
-                        }
-                    });
-                });
-            });
-        </script>
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+        <div {{ UI.renderPageComponentAttributes({
+            view: {
+                _sourceElement: '#' ~ context.id,
+                view: 'oroaddress/js/app/views/address-collection-view',
+            }
+        }) }}></div>
     {% endif %}
 {% endmacro %}

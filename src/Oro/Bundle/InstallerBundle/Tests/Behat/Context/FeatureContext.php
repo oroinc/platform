@@ -32,8 +32,10 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Or
     {
         /** @var Form $form */
         $form = $this->createElement('OroForm');
+        $password = $this->getParameter('database_password');
+        $password = is_scalar($password) ? $password : '';
         $table = new TableNode([
-            ['Password', $this->getParameter('database_password')]
+            ['Password', $password]
         ]);
         $form->fill($table);
     }

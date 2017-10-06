@@ -8,7 +8,6 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ContextsToViewTransformer implements DataTransformerInterface
@@ -19,24 +18,18 @@ class ContextsToViewTransformer implements DataTransformerInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /* @var TokenStorageInterface */
-    protected $securityTokenStorage;
-
     /** @var bool */
     protected $collectionModel;
 
     /**
      * @param EntityManager         $entityManager
-     * @param TokenStorageInterface $securityTokenStorage
      * @param bool                  $collectionModel True if result should be Collection instead of array
      */
     public function __construct(
         EntityManager $entityManager,
-        TokenStorageInterface $securityTokenStorage,
         $collectionModel = false
     ) {
         $this->entityManager = $entityManager;
-        $this->securityTokenStorage = $securityTokenStorage;
         $this->collectionModel = $collectionModel;
     }
 
@@ -51,13 +44,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
 
         if (is_array($value) || $value instanceof Collection) {
             $result = [];
-            $user   = $this->securityTokenStorage->getToken()->getUser();
             foreach ($value as $target) {
-                // Exclude current user
                 $targetClass = ClassUtils::getClass($target);
-                if (ClassUtils::getClass($user) === $targetClass && $user->getId() === $target->getId()) {
-                    continue;
-                }
 
                 $result[] = json_encode(
                     [

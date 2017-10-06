@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId;
 use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class NormalizeEntityIdTest extends FormProcessorTestCase
@@ -19,7 +21,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->processor = new NormalizeEntityId($this->entityIdTransformer);
     }
@@ -47,10 +49,11 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     {
         $this->context->setClassName('Test\Class');
         $this->context->setId('123');
+        $this->context->setMetadata(new EntityMetadata());
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getClassName(), $this->context->getId())
+            ->with($this->context->getId(), self::identicalTo($this->context->getMetadata()))
             ->willReturn(123);
 
         $this->processor->process($this->context);
@@ -62,10 +65,11 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     {
         $this->context->setClassName('Test\Class');
         $this->context->setId('123');
+        $this->context->setMetadata(new EntityMetadata());
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getClassName(), $this->context->getId())
+            ->with($this->context->getId(), self::identicalTo($this->context->getMetadata()))
             ->willThrowException(new \Exception('some error'));
 
         $this->processor->process($this->context);

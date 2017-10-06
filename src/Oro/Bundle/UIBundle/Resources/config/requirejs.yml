@@ -209,6 +209,7 @@ config:
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view.js'
         'oroui/js/app/views/content-sidebar-view': 'bundles/oroui/js/app/views/content-sidebar-view.js'
         'oroui/js/app/views/highlight-text-view': 'bundles/oroui/js/app/views/highlight-text-view.js'
+        'oroui/js/app/views/side-panel-view': 'bundles/oroui/js/app/views/side-panel-view.js'
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
