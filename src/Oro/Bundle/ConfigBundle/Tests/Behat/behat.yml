@@ -1,5 +1,10 @@
 oro_behat_extension:
   elements:
+    Google Integration Settings Tooltip Icon:
+      selector:
+        type: xpath
+        locator: '//span[contains(., "Google Integration Settings")]/.././/i[contains(@class, "fa-info-circle") and contains(@class, "tooltip-icon")]'
+
     SystemConfigForm:
       selector: "div[id^='configuration-options-block']"
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm
