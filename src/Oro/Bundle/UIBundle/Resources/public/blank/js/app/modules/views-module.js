@@ -23,6 +23,17 @@ define(function(require) {
     });
 
     /**
+     * Init PageMessagesView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/messages-view'
+    ], function(PageMessagesView) {
+        BaseController.addToReuse('messages', PageMessagesView, {
+            el: 'region:messages'
+        });
+    });
+
+    /**
      * Init PageContentView
      */
     BaseController.loadBeforeAction([

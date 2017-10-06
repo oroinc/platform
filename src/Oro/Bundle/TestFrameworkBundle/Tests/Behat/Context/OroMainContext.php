@@ -1699,4 +1699,16 @@ class OroMainContext extends MinkContext implements
             );
         }
     }
+
+    /**
+     * Scroll element info viewport
+     *
+     * @When /^(?:|I )scroll to "(?P<elementName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )focus on "(?P<elementName>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToElement($elementName)
+    {
+        $element = $this->elementFactory->createElement($elementName);
+        $element->focus();
+    }
 }
