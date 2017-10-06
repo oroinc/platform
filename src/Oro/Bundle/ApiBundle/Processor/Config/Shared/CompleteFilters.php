@@ -39,6 +39,7 @@ class CompleteFilters extends CompleteSection
 
         /** @var FiltersConfig $section */
         $this->completePreConfiguredFieldFilters($section, $metadata, $definition);
+        $this->completeIdentifierFieldFilters($section, $metadata, $definition);
         $this->completeIndexedFieldFilters($section, $metadata, $definition);
         $this->completeAssociationFilters($section, $metadata, $definition);
         $this->completeExtendedAssociationFilters($section, $metadata, $definition);
@@ -75,6 +76,41 @@ class CompleteFilters extends CompleteSection
             }
             if (!$filter->hasArrayAllowed()) {
                 $filter->setArrayAllowed();
+            }
+        }
+    }
+
+    /**
+     * @param FiltersConfig          $filters
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function completeIdentifierFieldFilters(
+        FiltersConfig $filters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        foreach ($idFieldNames as $fieldName) {
+            $field = $definition->getField($fieldName);
+            if (null !== $field) {
+                $filter = $filters->getOrAddField($fieldName);
+                if (!$filter->hasDataType()) {
+                    $dataType = $field->getDataType();
+                    if (!$dataType) {
+                        $dataType = $this->doctrineHelper->getFieldDataType(
+                            $metadata,
+                            $field->getPropertyPath($fieldName)
+                        );
+                        if (!$dataType) {
+                            $dataType = DataType::STRING;
+                        }
+                    }
+                    $filter->setDataType($dataType);
+                }
+                if (!$filter->hasArrayAllowed()) {
+                    $filter->setArrayAllowed();
+                }
             }
         }
     }

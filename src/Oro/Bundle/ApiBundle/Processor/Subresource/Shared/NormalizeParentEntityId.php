@@ -41,7 +41,7 @@ class NormalizeParentEntityId implements ProcessorInterface
 
         try {
             $context->setParentId(
-                $this->entityIdTransformer->reverseTransform($context->getParentClassName(), $parentEntityId)
+                $this->entityIdTransformer->reverseTransform($parentEntityId, $context->getParentMetadata())
             );
         } catch (\Exception $e) {
             $context->addError(

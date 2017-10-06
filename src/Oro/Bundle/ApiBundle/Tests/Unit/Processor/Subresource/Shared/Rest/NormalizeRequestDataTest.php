@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest\NormalizeRequestData;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 
 class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
@@ -23,7 +24,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->processor = new NormalizeRequestData($this->entityIdTransformer);
     }
@@ -41,6 +42,9 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsCollection($isCollection);
+        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata->setClassName($targetClass);
+        $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         return $associationMetadata;
     }
@@ -68,13 +72,13 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
     public function testNormalizeDataForToOneAssociation()
     {
         $parentMetadata = new EntityMetadata();
-        $parentMetadata->addAssociation(
+        $associationMetadata = $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with('Test\Class', 'val')
+            ->with('val', self::identicalTo($associationMetadata->getTargetMetadata()))
             ->willReturn('normalizedVal');
 
         $this->context->setRequestData(['val']);
@@ -119,7 +123,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
     public function testNormalizeDataForToManyAssociation()
     {
         $parentMetadata = new EntityMetadata();
-        $parentMetadata->addAssociation(
+        $associationMetadata = $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );
 
@@ -127,8 +131,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ->method('reverseTransform')
             ->willReturnMap(
                 [
-                    ['Test\Class', 'val1', 'normalizedVal1'],
-                    ['Test\Class', 'val2', 'normalizedVal2'],
+                    ['val1', $associationMetadata->getTargetMetadata(), 'normalizedVal1'],
+                    ['val2', $associationMetadata->getTargetMetadata(), 'normalizedVal2'],
                 ]
             );
 

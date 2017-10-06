@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 /**
  * Converts entity type to entity class name.
+ * Provides a regular expression that can be used to validate entity type.
  */
 class NormalizeEntityClass extends AbstractProcessor
 {

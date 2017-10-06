@@ -93,8 +93,7 @@ class SimpleFilterFactory implements FilterFactoryInterface
     protected function instantiateFilter($filterType, $dataType)
     {
         if (isset($this->factories[$filterType])) {
-            $factory = $this->factories[$filterType][0];
-            $factoryMethod = $this->factories[$filterType][1];
+            list($factory, $factoryMethod) = $this->factories[$filterType];
 
             return $factory->$factoryMethod($dataType);
         }
@@ -111,8 +110,10 @@ class SimpleFilterFactory implements FilterFactoryInterface
      */
     protected function getFilterParameters($filterType)
     {
-        return isset($this->factories[$filterType])
-            ? $this->factories[$filterType][2]
-            : $this->filters[$filterType][1];
+        if (isset($this->factories[$filterType])) {
+            return $this->factories[$filterType][2];
+        }
+
+        return $this->filters[$filterType][1];
     }
 }

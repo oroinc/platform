@@ -9,10 +9,10 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class ExtendedAssociationFilterFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
     protected $associationManager;
 
     /** @var ExtendedAssociationFilterFactory */
@@ -20,12 +20,8 @@ class ExtendedAssociationFilterFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->valueNormalizer = $this->getMockBuilder(ValueNormalizer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->associationManager = $this->getMockBuilder(AssociationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $this->associationManager = $this->createMock(AssociationManager::class);
 
         $this->factory = new ExtendedAssociationFilterFactory(
             $this->valueNormalizer,

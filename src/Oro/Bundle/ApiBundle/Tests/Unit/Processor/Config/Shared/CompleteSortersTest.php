@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteSorters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteSortersTest extends ConfigProcessorTestCase
 {
@@ -18,9 +19,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new CompleteSorters($this->doctrineHelper);
     }
@@ -105,8 +104,10 @@ class CompleteSortersTest extends ConfigProcessorTestCase
     public function testProcessForNotCompletedSorters()
     {
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id'           => null,
                 'field1'       => null,
                 'field2'       => [
                     'exclude' => true
@@ -176,6 +177,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
+                    'id'           => null,
                     'field1'       => null,
                     'field2'       => [
                         'exclude' => true
