@@ -45,6 +45,8 @@ api:
             fields:
                 field1: ~
         Test\Entity6: ~
+        Test\Entity7:
+            documentation_resource: entity7_bar.md
         Test\Entity10: ~
         Test\Entity12:
             exclude: true

@@ -522,7 +522,7 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
         );
     }
 
-    public function testCompleteExtendedAssociationWhenOneOfTargetHasCombinedIdentifier()
+    public function testCompleteExtendedAssociationWhenOneOfTargetHasCompositeIdentifier()
     {
         $config = $this->createConfigObject([
             'fields' => [

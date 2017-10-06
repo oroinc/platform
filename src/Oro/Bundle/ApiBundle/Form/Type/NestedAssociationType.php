@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NestedAssociationTransformer;
 use Oro\Bundle\ApiBundle\Form\EventListener\NestedAssociationListener;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class NestedAssociationType extends AbstractType
 {
@@ -22,14 +23,22 @@ class NestedAssociationType extends AbstractType
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var EntityLoader */
+    protected $entityLoader;
+
     /**
      * @param PropertyAccessorInterface $propertyAccessor
      * @param ManagerRegistry           $doctrine
+     * @param EntityLoader              $entityLoader
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor, ManagerRegistry $doctrine)
-    {
+    public function __construct(
+        PropertyAccessorInterface $propertyAccessor,
+        ManagerRegistry $doctrine,
+        EntityLoader $entityLoader
+    ) {
         $this->propertyAccessor = $propertyAccessor;
         $this->doctrine = $doctrine;
+        $this->entityLoader = $entityLoader;
     }
 
     /**
@@ -39,7 +48,9 @@ class NestedAssociationType extends AbstractType
     {
         $builder
             ->addEventSubscriber(new NestedAssociationListener($this->propertyAccessor, $options['config']))
-            ->addViewTransformer(new NestedAssociationTransformer($this->doctrine, $options['metadata']));
+            ->addViewTransformer(
+                new NestedAssociationTransformer($this->doctrine, $this->entityLoader, $options['metadata'])
+            );
     }
 
     /**

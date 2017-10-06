@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -34,9 +33,6 @@ class ContextsSelectType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /* @var TokenStorageInterface */
-    protected $tokenStorage;
-
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
@@ -50,7 +46,6 @@ class ContextsSelectType extends AbstractType
      * @param EntityManager            $entityManager
      * @param ConfigManager            $configManager
      * @param TranslatorInterface      $translator
-     * @param TokenStorageInterface    $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
      * @param EntityNameResolver       $entityNameResolver
      * @param FeatureChecker           $featureChecker
@@ -59,7 +54,6 @@ class ContextsSelectType extends AbstractType
         EntityManager $entityManager,
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        TokenStorageInterface $securityTokenStorage,
         EventDispatcherInterface $dispatcher,
         EntityNameResolver $entityNameResolver,
         FeatureChecker $featureChecker
@@ -67,7 +61,6 @@ class ContextsSelectType extends AbstractType
         $this->entityManager      = $entityManager;
         $this->configManager      = $configManager;
         $this->translator         = $translator;
-        $this->tokenStorage       = $securityTokenStorage;
         $this->dispatcher         = $dispatcher;
         $this->entityNameResolver = $entityNameResolver;
         $this->featureChecker     = $featureChecker;
@@ -81,7 +74,6 @@ class ContextsSelectType extends AbstractType
         $builder->resetViewTransformers();
         $contextsToViewTransformer = new ContextsToViewTransformer(
             $this->entityManager,
-            $this->tokenStorage,
             $options['collectionModel']
         );
         $builder->addViewTransformer($contextsToViewTransformer);
@@ -108,13 +100,8 @@ class ContextsSelectType extends AbstractType
         }
 
         $result = [];
-        $user   = $this->tokenStorage->getToken()->getUser();
         foreach ($targetEntities as $target) {
-            // Exclude current user
             $targetClass = ClassUtils::getClass($target);
-            if (ClassUtils::getClass($user) === $targetClass && $user->getId() === $target->getId()) {
-                continue;
-            }
 
             $title = $this->entityNameResolver->getName($target);
             if ($label = $this->getClassLabel($targetClass)) {
