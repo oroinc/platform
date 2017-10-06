@@ -2,6 +2,9 @@ parameters:
     oro_message_queue.job.unique_job_table_name: 'oro_message_queue_job_unique'
 
 services:
+    oro_message_queue.job.configuration_provider:
+        class: 'Oro\Bundle\MessageQueueBundle\Provider\JobConfigurationProvider'
+
     oro_message_queue.job.storage:
         class: 'Oro\Component\MessageQueue\Job\JobStorage'
         arguments:
@@ -14,6 +17,8 @@ services:
         arguments:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.client.message_producer'
+        calls:
+            - ['setJobConfigurationProvider', ['@oro_message_queue.job.configuration_provider']]
 
     oro_message_queue.job.runner:
         class: 'Oro\Component\MessageQueue\Job\JobRunner'

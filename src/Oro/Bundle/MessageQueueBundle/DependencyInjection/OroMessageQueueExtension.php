@@ -100,6 +100,7 @@ class OroMessageQueueExtension extends Extension
 
         $this->setPersistenceServicesAndProcessors($config, $container);
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
+        $this->setJobConfigurationProvider($config, $container);
     }
 
     /**
@@ -151,6 +152,18 @@ class OroMessageQueueExtension extends Extension
             $container
                 ->getDefinition('oro_message_queue.consumption.security_aware_extension')
                 ->replaceArgument(0, $config['security_agnostic_processors']);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    protected function setJobConfigurationProvider(array $config, ContainerBuilder $container)
+    {
+        if (!empty($config['job'])) {
+            $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
+            $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['job']]);
         }
     }
 }
