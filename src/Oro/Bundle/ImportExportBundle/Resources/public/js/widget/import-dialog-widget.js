@@ -14,7 +14,6 @@ define(function(require) {
      */
     ImportDialogWidget = BaseDialogView.extend({
         _onContentLoad: function(content) {
-            console.log(this);
             if (_.has(content, 'success')) {
                 if (content.success) {
                     messenger.notificationFlashMessage('success', this.options.successMessage);

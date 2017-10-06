@@ -764,8 +764,7 @@ define(function(require) {
             }
 
             try {
-                var parsedJson = $.parseJSON(content);
-                return parsedJson.widget;
+                return $.parseJSON(content);
             } catch (e) {}
 
             return null;
@@ -778,8 +777,10 @@ define(function(require) {
          * @private
          */
         _onJsonContentResponse: function(content) {
-            if (_.has(content, 'message')) {
-                var message = content.message;
+            var widgetResponse = content.widget || {};
+
+            if (_.has(widgetResponse, 'message')) {
+                var message = widgetResponse.message;
 
                 if (_.isString(message)) {
                     message = {type: 'success', text: message};
@@ -788,8 +789,8 @@ define(function(require) {
                 messenger.notificationFlashMessage(message.type, message.text);
             }
 
-            if (_.has(content, 'trigger')) {
-                var events = content.trigger;
+            if (_.has(widgetResponse, 'trigger')) {
+                var events = widgetResponse.trigger;
 
                 if (!_.isObject(events)) {
                     events = [events];
@@ -808,14 +809,16 @@ define(function(require) {
                 }, this);
             }
 
-            if (_.has(content, 'triggerSuccess') && content.triggerSuccess) {
+            if (_.has(widgetResponse, 'triggerSuccess') && widgetResponse.triggerSuccess) {
                 mediator.trigger('widget_success:' + this.getAlias());
                 mediator.trigger('widget_success:' + this.getWid());
             }
 
-            if (_.has(content, 'remove') && content.remove) {
+            if (_.has(widgetResponse, 'remove') && widgetResponse.remove) {
                 this.remove();
             }
+
+            this.trigger('contentLoad', content, this);
         },
 
         _getEventBroker: function(event) {
