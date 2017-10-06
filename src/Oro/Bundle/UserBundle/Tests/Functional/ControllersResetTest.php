@@ -98,7 +98,8 @@ class ControllersResetTest extends WebTestCase
         $form = $crawler->selectButton('Reset')->form();
         $this->client->submit($form);
         $result = $this->client->getResponse();
-        $this->assertContains('widget.remove', $result->getContent());
+        $expectedResponse = '{"widget":{"trigger":[{"eventFunction":"execute","name":"refreshPage"}],"remove":true}}';
+        $this->assertContains($expectedResponse, $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
         $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
