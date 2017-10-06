@@ -733,8 +733,8 @@ define(function(require) {
             var json  = this._getJson(content);
 
             if (json) {
-                return this._onJsonContentResponse(json);
-            } // if response is not JSON use default handler
+                content = '<div class="widget-content"></div>'; // set empty response to cover base functionality
+            }
 
             delete this.loading;
             this.disposePageComponents();
@@ -750,6 +750,10 @@ define(function(require) {
                     }, this));
             } else {
                 this._triggerContentLoadEvents();
+            }
+
+            if (json) {
+                this._onJsonContentResponse(json);
             }
         },
 
@@ -817,8 +821,6 @@ define(function(require) {
             if (_.has(widgetResponse, 'remove') && widgetResponse.remove) {
                 this.remove();
             }
-
-            this.trigger('contentLoad', content, this);
         },
 
         _getEventBroker: function(event) {
