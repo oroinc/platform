@@ -23,7 +23,7 @@ class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
             return;
         }
 
-        $entityId = $this->getRestApiEntityId($entityId);
+        $entityId = $this->getRestApiEntityId($entityClass, $entityId);
         $entityType = $this->getEntityType($entityClass);
 
         $parameters = [

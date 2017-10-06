@@ -1,13 +1,24 @@
 ## 2.5.0 (Unreleased)
 
 ### Added
+#### ApiBundle
+* Added an additional syntax for data filters: `key[operator_name]=value`. For example `GET /api/users?filter[id][neq]=2` can be used instead of `GET /api/users?filter[id]!=2`. The supported operators are `eq`, `neq`, `lt`, `lte`, `gt` and `gte`.
+* Added a possibility to specify **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
+* Added a possibility to configure own identifier field(s) instead of the database primary key. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#using-a-non-primary-key-to-identify-entity)
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
+#### SyncBundle
+* Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
 ### Changed
+#### ApiBundle
+* Class `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
+    * method `hasDocumentationResource` was renamed to `hasDocumentationResources`
+    * method `getDocumentationResource` was renamed to `getDocumentationResources`
+    * method `setDocumentationResource` was renamed to `setDocumentationResources`
 #### EntityConfigBundle
 * Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
 #### MessageQueue Component
@@ -33,8 +44,10 @@
 * Removed `renderResetButton()` macro from Oro/Bundle/WorkflowBundle/Resources/views/macros.html.twig. Also removed usage of this macro from two files:
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/button.html.twig`
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/buttons.html.twig`
+#### OroBehatExtension
+* Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
-## 2.4.0 (Unreleased)
+## 2.4.0
 
 ### Added
 #### CacheBundle

@@ -24,6 +24,7 @@ class ControllersResetTest extends WebTestCase
 
     public function testSetPasswordAction()
     {
+        $this->markTestSkipped('unskip after fixing BAP-15609');
         /** @var User $user */
         $user = $this->getReference('simple_user');
         $oldPassword = $user->getPassword();
@@ -51,6 +52,7 @@ class ControllersResetTest extends WebTestCase
 
         $this->assertNotNull($user->getPasswordChangedAt());
         $newPassword = $user->getPassword();
+        
         $this->assertNotEquals($oldPassword, $newPassword);
     }
 

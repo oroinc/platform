@@ -143,7 +143,6 @@ services:
     oro_activity.form.handler.autocomplete:
         class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler
         arguments:
-            - '@security.token_storage'
             - '@translator'
             - '@oro_search.index'
             - '@oro_activity.manager'
@@ -189,7 +188,6 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_activity.manager'
-            - '@security.token_storage'
             - '@oro_entity_config.config_manager'
             - '@router'
             - '@oro_entity.entity_alias_resolver'
