@@ -36,6 +36,18 @@ invalid_exclusion_policy:
     expected: []
     error: 'The value "invalid" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
 
+documentation_resource:
+    config:
+        documentation_resource: test.md
+    expected:
+        documentation_resource: [test.md]
+
+empty_documentation_resource:
+    config:
+        documentation_resource: ''
+    expected: []
+    error: 'The path "entity.documentation_resource.0" cannot contain an empty value, but got "".'
+
 empty_order_by:
     config:
         order_by: []
@@ -62,6 +74,12 @@ empty_identifier_field_names:
     config:
         identifier_field_names: []
     expected: []
+
+empty_identifier_field_name:
+    config:
+        identifier_field_names: ['']
+    expected: []
+    error: 'The path "entity.identifier_field_names.0" cannot contain an empty value, but got "".'
 
 invalid_identifier_field_names:
     config:
@@ -215,6 +233,7 @@ invalid_value_for_disable_meta_properties:
 all_attributes:
     config:
         exclusion_policy: all
+        documentation_resource: [test.md]
         order_by:
             id: DESC
         max_results: 50
@@ -225,6 +244,7 @@ all_attributes:
         post_serialize: [class, method]
     expected:
         exclusion_policy: all
+        documentation_resource: [test.md]
         order_by:
             id: DESC
         max_results: 50

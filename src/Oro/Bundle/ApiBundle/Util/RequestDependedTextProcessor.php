@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * The class that helps to process "{@request:...}" placeholders in a text.
+ */
 class RequestDependedTextProcessor
 {
     const START_REQUEST_TAG = '{@request:';
@@ -21,6 +24,10 @@ class RequestDependedTextProcessor
     }
 
     /**
+     * Checks whether the given text contains "{@request:...}" placeholders and, if so, do the following:
+     * * replaces placeholders related to the specific request type with their content
+     * * removes placeholders that are not related to the specific request type
+     *
      * @param string      $text
      * @param RequestType $requestType
      *

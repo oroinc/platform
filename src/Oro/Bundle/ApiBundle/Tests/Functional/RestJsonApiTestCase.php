@@ -437,6 +437,46 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
+     * Sends DELETE request for a relationship of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function deleteRelationship(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'DELETE',
+            $this->getUrl('oro_rest_api_delete_relationship', $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->getEntityManager()->clear();
+
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                Response::HTTP_NO_CONTENT,
+                $entityType,
+                'delete relationship'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
      * Asserts the response content contains the the given data.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
@@ -570,7 +610,13 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
+     * Saves a response content to a YAML file.
+     * If the first parameter is a file name, the file will be saved in the `responses` directory
+     * near to PHP file contains the test.
+     *
      * @param string   $fileName The file name or full path to the output file
+     *                           Also it can be NULL or empty string, in this case the response content
+     *                           will be written in to the console
      * @param Response $response
      */
     protected function dumpYmlTemplate($fileName, Response $response)
@@ -606,10 +652,14 @@ class RestJsonApiTestCase extends ApiTestCase
         // replace "data: {}" with "data: []" to correct representation of empty collection
         $content = preg_replace('/(\s+data: ){\s*}$/m', '$1[]', $content);
 
-        if ($this->isRelativePath($fileName)) {
-            $fileName = $this->getTestResourcePath('responses', $fileName);
+        if ($fileName) {
+            if ($this->isRelativePath($fileName)) {
+                $fileName = $this->getTestResourcePath('responses', $fileName);
+            }
+            file_put_contents($fileName, $content);
+        } else {
+            echo "\n" . $content;
         }
-        file_put_contents($fileName, $content);
     }
 
     /**

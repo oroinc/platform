@@ -4,6 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
 
+/**
+ * Converts a string to DateTime object.
+ * Provides a regular expression that can be used to validate that a string represents a date-time value.
+ */
 class NormalizeDateTime extends AbstractProcessor
 {
     const REQUIREMENT = '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?';

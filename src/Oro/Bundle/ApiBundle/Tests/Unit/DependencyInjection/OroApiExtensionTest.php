@@ -116,6 +116,9 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
                             'field1' => []
                         ]
                     ],
+                    'Test\Entity7'  => [
+                        'documentation_resource' => ['entity7_bar.md', 'entity7_foo.md']
+                    ],
                     'Test\Entity10' => [],
                     'Test\Entity11' => [],
                     'Test\Entity12' => [

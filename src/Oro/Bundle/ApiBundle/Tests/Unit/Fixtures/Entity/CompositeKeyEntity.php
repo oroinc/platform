@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,6 +26,17 @@ class CompositeKeyEntity
      * @ORM\GeneratedValue(strategy="NONE")
      */
     protected $title;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="CompositeKeyEntity")
+     * @ORM\JoinTable(name="composite_key_entity_children")
+     **/
+    protected $children;
+
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -56,5 +68,33 @@ class CompositeKeyEntity
     public function setTitle($title)
     {
         $this->title = $title;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param CompositeKeyEntity $child
+     */
+    public function addChild(CompositeKeyEntity $child)
+    {
+        if (!$this->children->contains($child)) {
+            $this->children->add($child);
+        }
+    }
+
+    /**
+     * @param CompositeKeyEntity $child
+     */
+    public function removeChild(CompositeKeyEntity $child)
+    {
+        if ($this->children->contains($child)) {
+            $this->children->removeElement($child);
+        }
     }
 }

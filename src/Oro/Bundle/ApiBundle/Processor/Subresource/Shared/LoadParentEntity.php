@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 /**
  * Loads the parent entity from the database.
@@ -15,12 +16,17 @@ class LoadParentEntity implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var EntityLoader */
+    protected $entityLoader;
+
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param EntityLoader   $entityLoader
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, EntityLoader $entityLoader)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityLoader = $entityLoader;
     }
 
     /**
@@ -44,9 +50,11 @@ class LoadParentEntity implements ProcessorInterface
             }
         }
 
-        $parentEntity = $this->doctrineHelper
-            ->getEntityRepositoryForClass($parentEntityClass)
-            ->find($context->getParentId());
+        $parentEntity = $this->entityLoader->findEntity(
+            $parentEntityClass,
+            $context->getParentId(),
+            $context->getParentMetadata()
+        );
         $context->setParentEntity($parentEntity);
     }
 }
