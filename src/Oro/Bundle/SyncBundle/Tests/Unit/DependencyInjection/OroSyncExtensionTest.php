@@ -30,7 +30,8 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
             OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST,
             OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT,
             OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST,
-            OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT
+            OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT,
+            OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH
         ];
         $configurationParams = array_intersect_key($configurationParams, array_flip($websocketParams));
 
@@ -57,7 +58,8 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'params'   => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  => '8080'
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH  => '',
                 ],
                 'expected' => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS  => '0.0.0.0',
@@ -66,14 +68,17 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '8080',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => '',
                 ]
             ],
             [
                 'params'   => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST  => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH  => '',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  => '1.1.1.1',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '1010'
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '1010',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => 'websocket',
                 ],
                 'expected' => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS  => '0.0.0.0',
@@ -82,8 +87,9 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '1010',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => 'websocket',
                 ]
-            ]
+            ],
         ];
     }
 }

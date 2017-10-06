@@ -1,4 +1,10 @@
-## 2.4.0 (Unreleased)
+## 2.4.1 (Unreleased)
+
+### Added
+#### SyncBundle
+* Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
+
+## 2.4.0 (2017-09-29)
 
 ### Added
 #### CacheBundle
@@ -121,7 +127,6 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
         calls:
             - [setSegmentQueryConverterFactoryLink, ['@oro_segment.query.segment_query_converter_factory.link']]
     ```
-
 ## 2.3.0 (2017-07-28)
 
 ### Added
