@@ -47,7 +47,7 @@
 #### OroBehatExtension
 * Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
-## 2.4.0
+## 2.4.0 (2017-09-29)
 
 ### Added
 #### CacheBundle
