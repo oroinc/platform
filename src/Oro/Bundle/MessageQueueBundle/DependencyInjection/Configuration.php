@@ -59,8 +59,16 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->arrayNode('security_agnostic_processors')
                 ->prototype('scalar')->end()
+            ->end()
+            ->arrayNode('job')->children()
+                ->arrayNode('time_before_stale')
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
+                    ->useAttributeAsKey('job_name')
+                    ->prototype('scalar')
+                    ->info('DateTime expression - how long job can stay inactive before its consider old')
+                ->end()
             ->end();
-
         return $tb;
     }
 }

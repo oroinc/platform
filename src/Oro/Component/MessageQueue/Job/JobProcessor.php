@@ -4,9 +4,16 @@ namespace Oro\Component\MessageQueue\Job;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
+use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
 
-class JobProcessor
+    class JobProcessor
 {
+    /**
+     * @var JobConfigurationProviderInterface
+     */
+    private $jobConfigurationProvider;
+
     /**
      * @var JobStorage
      */
@@ -25,6 +32,28 @@ class JobProcessor
     {
         $this->jobStorage = $jobStorage;
         $this->producer = $producer;
+    }
+
+    /**
+     * @param JobConfigurationProviderInterface $jobConfigurationProvider
+     * @return $this
+     */
+    public function setJobConfigurationProvider(JobConfigurationProviderInterface $jobConfigurationProvider)
+    {
+        $this->jobConfigurationProvider = $jobConfigurationProvider;
+
+        return $this;
+    }
+
+    /**
+     * @return JobConfigurationProviderInterface
+     */
+    public function getJobConfigurationProvider()
+    {
+        if (!$this->jobConfigurationProvider) {
+            return new NullJobConfigurationProvider();
+        }
+        return $this->jobConfigurationProvider;
     }
 
     /**
