@@ -4,10 +4,11 @@ define(function(require) {
     var ConditionsGroupView;
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var BaseConditionView = require('oroquerydesigner/js/app/views/condition-builder/base-condition-view');
+    var AbstractConditionContainerView =
+        require('oroquerydesigner/js/app/views/condition-builder/abstract-condition-container-view');
     var template = require('tpl!oroquerydesigner/templates/condition-builder/conditions-group.html');
 
-    ConditionsGroupView = BaseConditionView.extend({
+    ConditionsGroupView = AbstractConditionContainerView.extend({
         template: template,
 
         render: function() {

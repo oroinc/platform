@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var BaseConditionView;
+    var AbstractConditionContainerView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    BaseConditionView = BaseView.extend({
+    AbstractConditionContainerView = BaseView.extend({
         tagName: 'li',
         className: 'condition controls',
 
@@ -51,7 +51,7 @@ define(function(require) {
             if (!this.eventBus) {
                 throw new Error('Missing required option `eventBus` of ConditionView');
             }
-            BaseConditionView.__super__.constructor.call(this, options);
+            AbstractConditionContainerView.__super__.constructor.call(this, options);
         },
 
         dispose: function() {
@@ -64,17 +64,17 @@ define(function(require) {
             }, this);
             delete this.$content;
 
-            BaseConditionView.__super__.dispose.call(this);
+            AbstractConditionContainerView.__super__.dispose.call(this);
         },
 
         getTemplateData: function() {
-            var data = BaseConditionView.__super__.getTemplateData.call(this);
+            var data = AbstractConditionContainerView.__super__.getTemplateData.call(this);
             _.extend(data, _.pick(this, 'criteria', 'value', 'validation'));
             return data;
         },
 
         render: function() {
-            BaseConditionView.__super__.render.call(this);
+            AbstractConditionContainerView.__super__.render.call(this);
             this.$content = this.$('[data-role="condition-content"]:first');
             return this;
         },
@@ -94,5 +94,5 @@ define(function(require) {
         }
     });
 
-    return BaseConditionView;
+    return AbstractConditionContainerView;
 });

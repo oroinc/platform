@@ -5,13 +5,14 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var BaseConditionView = require('oroquerydesigner/js/app/views/condition-builder/base-condition-view');
+    var AbstractConditionContainerView =
+        require('oroquerydesigner/js/app/views/condition-builder/abstract-condition-container-view');
     var template = require('tpl!oroquerydesigner/templates/condition-builder/condition-item.html');
 
-    ConditionItemView = BaseConditionView.extend({
+    ConditionItemView = AbstractConditionContainerView.extend({
         template: template,
 
-        requiredOptions: BaseConditionView.prototype.requiredOptions.concat(['view', 'viewOptions']),
+        requiredOptions: AbstractConditionContainerView.prototype.requiredOptions.concat(['view', 'viewOptions']),
 
         render: function() {
             ConditionItemView.__super__.render.call(this);
