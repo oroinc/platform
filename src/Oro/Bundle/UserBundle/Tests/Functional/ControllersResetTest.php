@@ -24,6 +24,7 @@ class ControllersResetTest extends WebTestCase
 
     public function testSetPasswordAction()
     {
+        $this->markTestSkipped('unskip after fixing BAP-15609');
         /** @var User $user */
         $user = $this->getReference('simple_user');
         $oldPassword = $user->getPassword();
@@ -56,6 +57,7 @@ class ControllersResetTest extends WebTestCase
 
     public function testSendEmailAction()
     {
+        $this->markTestSkipped('unskip after fixing BAP-15609');
         $this->client->request(
             'POST',
             $this->getUrl('oro_user_reset_send_email'),
@@ -106,6 +108,7 @@ class ControllersResetTest extends WebTestCase
 
     public function testMassPasswordResetAction()
     {
+        $this->markTestSkipped('unskip after fixing BAP-15609');
         /** @var User $user */
         $user = $this->getReference('simple_user');
         /** @var User $user2 */
