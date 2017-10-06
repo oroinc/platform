@@ -15,10 +15,8 @@ class Rfc6455
     protected $socket;
 
     /**
-     *
-     * @param string $host
-     * @param int $port
-     *
+     * @param $host
+     * @param $port
      * @return resource
      */
     public function connect($host, $port)
@@ -37,13 +35,13 @@ class Rfc6455
         $header .= "Sec-WebSocket-Version: 13\r\n";
         $header .= "\r\n";
 
-        $this->socket = @stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, self::SOCKET_TIMEOUT);
+        $this->socket = @stream_socket_client("tcp://{$host}:{$port}/", $errno, $errstr, self::SOCKET_TIMEOUT);
 
         if (!$this->socket) {
             throw new \RuntimeException(sprintf('WebSocket connection error (%u): %s', $errno, $errstr));
         }
 
-        stream_set_blocking($this->socket, false);
+
         stream_set_timeout($this->socket, self::SOCKET_TIMEOUT);
 
         if (!fwrite($this->socket, $header)) {
@@ -61,6 +59,10 @@ class Rfc6455
                 static::SERVER_HANDSHAKE_STATUS_LINE,
                 $serverHandshake
             ));
+        }
+
+        if (stream_set_blocking($this->socket, false) === false) {
+            throw new \RuntimeException('WebSocket non-blocking setup failed.');
         }
 
         return $this->socket;
