@@ -63,11 +63,6 @@ services:
     # REST API processors
     #
 
-    oro_api.normalize_value.rest.string:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeString
-        tags:
-            - { name: oro.api.processor, action: normalize_value, requestType: rest, priority: 10 }
-
     oro_api.normalize_value.rest.datetime:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDateTime
         tags:
