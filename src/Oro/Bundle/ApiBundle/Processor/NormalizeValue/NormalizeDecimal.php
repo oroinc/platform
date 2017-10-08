@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
 /**
- * Converts a string to floating point number (float data type).
+ * Converts a string to floating point number (string data type).
  * Provides a regular expression that can be used to validate that a string represents a number value.
  */
-class NormalizeNumber extends AbstractProcessor
+class NormalizeDecimal extends AbstractProcessor
 {
     const REQUIREMENT = '-?\d*\.?\d+';
 
@@ -15,7 +15,7 @@ class NormalizeNumber extends AbstractProcessor
      */
     protected function getDataTypeString()
     {
-        return 'number';
+        return 'decimal';
     }
 
     /**
@@ -23,7 +23,7 @@ class NormalizeNumber extends AbstractProcessor
      */
     protected function getDataTypePluralString()
     {
-        return 'numbers';
+        return 'decimals';
     }
 
     /**
@@ -39,15 +39,14 @@ class NormalizeNumber extends AbstractProcessor
      */
     protected function normalizeValue($value)
     {
-        $normalizedSrcValue = $value;
-        if (0 === strpos($normalizedSrcValue, '.')) {
-            $normalizedSrcValue = '0' . $normalizedSrcValue;
-        } elseif (0 === strpos($normalizedSrcValue, '-.')) {
-            $normalizedSrcValue = '-0' . substr($normalizedSrcValue, 1);
+        $normalizedValue = $value;
+        if (0 === strpos($normalizedValue, '.')) {
+            $normalizedValue = '0' . $normalizedValue;
+        } elseif (0 === strpos($normalizedValue, '-.')) {
+            $normalizedValue = '-0' . substr($normalizedValue, 1);
         }
 
-        $normalizedValue = (float)$value;
-        if (((string)$normalizedValue) !== $normalizedSrcValue) {
+        if (((string)(float)$value) !== $normalizedValue) {
             throw new \UnexpectedValueException(
                 sprintf('Expected %s value. Given "%s".', $this->getDataTypeString(), $value)
             );

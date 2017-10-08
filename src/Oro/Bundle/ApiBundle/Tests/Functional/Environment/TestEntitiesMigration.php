@@ -21,6 +21,7 @@ class TestEntitiesMigration implements Migration
         $this->createTestWithoutIdGeneratorTable($schema);
         $this->createTestCompositeIdentifierTable($schema);
         $this->createTestCustomIdentifierTables($schema);
+        $this->createTestAllDataTypesTable($schema);
     }
 
     /**
@@ -244,5 +245,39 @@ class TestEntitiesMigration implements Migration
         $table2Children->addIndex(['child_id']);
         $table2Children->addForeignKeyConstraint($table2, ['parent_id'], ['id']);
         $table2Children->addForeignKeyConstraint($table2, ['child_id'], ['id']);
+    }
+
+    /**
+     * Create test_api_composite_id table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestAllDataTypesTable(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_all_data_types')) {
+            return;
+        }
+
+        $table = $schema->createTable('test_api_all_data_types');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('field_string', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('field_text', 'text', ['notnull' => false]);
+        $table->addColumn('field_int', 'integer', ['notnull' => false]);
+        $table->addColumn('field_smallint', 'smallint', ['notnull' => false]);
+        $table->addColumn('field_bigint', 'bigint', ['notnull' => false]);
+        $table->addColumn('field_boolean', 'boolean', ['notnull' => false]);
+        $table->addColumn('field_decimal', 'decimal', ['notnull' => false, 'precision' => 10, 'scale' => 6]);
+        $table->addColumn('field_float', 'float', ['notnull' => false]);
+        $table->addColumn('field_array', 'array', ['notnull' => false]);
+        $table->addColumn('field_simple_array', 'simple_array', ['notnull' => false]);
+        $table->addColumn('field_json_array', 'json_array', ['notnull' => false]);
+        $table->addColumn('field_datetime', 'datetime', ['notnull' => false]);
+        $table->addColumn('field_date', 'date', ['notnull' => false]);
+        $table->addColumn('field_time', 'time', ['notnull' => false]);
+        $table->addColumn('field_guid', 'guid', ['notnull' => false]);
+        $table->addColumn('field_percent', 'percent', ['notnull' => false]);
+        $table->addColumn('field_money', 'money', ['notnull' => false]);
+        $table->addColumn('field_duration', 'duration', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
     }
 }

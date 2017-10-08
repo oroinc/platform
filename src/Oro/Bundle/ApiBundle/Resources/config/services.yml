@@ -357,7 +357,7 @@ services:
         class: Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry
         public: false
         arguments:
-            - []
+            - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerConfigurationCompilerPass
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.entity_id_transformer:
