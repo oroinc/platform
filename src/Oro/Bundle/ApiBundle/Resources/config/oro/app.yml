@@ -39,6 +39,8 @@ oro_api:
         boolean: ~
         integer:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        smallint:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         bigint:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         unsignedInteger:
@@ -47,7 +49,18 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         float:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        date:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        time:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        guid: ~
+        percent:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        money:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        duration:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         composite_identifier:
             factory: ['@oro_api.filter_factory.composite_identifier', 'createFilter']
@@ -90,17 +103,18 @@ oro_api:
         - form.type_guesser.validator
 
     form_type_guesses:
-        # default types
+        boolean:
+            form_type: oro_api_boolean
         integer:
             form_type: integer
         smallint:
             form_type: integer
         bigint:
-            form_type: integer
-        boolean:
-            form_type: oro_api_boolean
+            form_type: oro_api_number
+            options:
+                scale: 0
         decimal:
-            form_type: number
+            form_type: oro_api_number
         float:
             form_type: number
         date:
@@ -117,8 +131,6 @@ oro_api:
                 view_timezone: UTC
                 with_seconds: true
                 widget: single_text
-        duration:
-            form_type: oro_duration
         datetime:
             form_type: datetime
             options:
@@ -137,11 +149,14 @@ oro_api:
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
         text:
             form_type: textarea
-        # custom types
         percent:
             form_type: percent
         money:
-            form_type: money
+            form_type: oro_api_number
+            options:
+                scale: 4
+        duration:
+            form_type: oro_duration
 
     actions:
         get_list:
