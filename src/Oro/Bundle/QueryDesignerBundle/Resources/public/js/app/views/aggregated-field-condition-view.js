@@ -29,9 +29,13 @@ define(function(require) {
                 select2ResultsCallback: this.fieldChoiceResultsCallback.bind(this),
                 applicableConditionsCallback: this.applicableConditionsCallback.bind(this)
             });
-            var select2Opts = _.clone(this.options.fieldChoice.select2);
+            var select2Opts = this.options.fieldChoice.select2;
             if (select2Opts && select2Opts.formatSelectionTemplate) {
-                select2Opts.formatSelectionTemplate = this.compileSelectionTpl(select2Opts.formatSelectionTemplate);
+                this.options.fieldChoice = _.extend({}, this.options.fieldChoice, {
+                    select2: _.extend({}, select2Opts, {
+                        formatSelectionTemplate: this.compileSelectionTpl(select2Opts.formatSelectionTemplate)
+                    })
+                });
             }
 
             AggregatedFieldConditionView.__super__.render.call(this);

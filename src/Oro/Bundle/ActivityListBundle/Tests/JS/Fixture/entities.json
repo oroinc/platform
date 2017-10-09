@@ -1,0 +1,18 @@
+{
+    "$activity": {
+        "label":"",
+        "name":"$activity",
+        "fields":[
+            {
+                "label":"Created at",
+                "name":"$createdAt",
+                "type":"datetime"
+            },
+            {
+                "label":"Updated at",
+                "name":"$updatedAt",
+                "type":"datetime"
+            }
+        ]
+    }
+}

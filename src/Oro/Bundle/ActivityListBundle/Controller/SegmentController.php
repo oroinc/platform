@@ -26,11 +26,11 @@ class SegmentController extends Controller
         $params = $request->attributes->get('params', []);
         $conditionOptions = [
             'activityConditionOptions' => [
-                'listOption'     => $this->forward(
+                'listOptions'     => json_decode($this->forward(
                     'OroActivityListBundle:Api/Rest/ActivityList:getActivityListOption',
                     [],
                     ['_format' => 'json']
-                )->getContent(),
+                )->getContent()),
                 'entitySelector' => sprintf('[data-ftid=%s]', $params['entity_choice_id']),
                 'fieldsLoaderSelector' =>  sprintf(
                     '[data-ftid=%soro_api_querydesigner_fields_entity]',

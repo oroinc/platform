@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var SegmentConditionView;
-    var $ = require('jquery');
     var _ = require('underscore');
     var SegmentFilter = require('orosegment/js/filter/segment-filter');
     var AbstractConditionView = require('oroquerydesigner/js/app/views/abstract-condition-view');
@@ -58,8 +57,6 @@ define(function(require) {
             var filterOptions = this.options.filters[filterId];
             var filter = new (SegmentFilter.extend(filterOptions))();
             this._appendFilter(filter);
-            // There are no async operations so return a resolved promise just for consistency
-            return $.Deferred().resolve().promise();
         },
 
         /**

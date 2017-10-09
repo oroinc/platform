@@ -101,7 +101,14 @@ define(function(require) {
          *
          * @property
          */
-        picker: tools.isMobile() ? DatePickerView : VariableDatePickerView,
+        pickerConstructor: null,
+
+        /**
+         * View constructor for picker element
+         *
+         * @property
+         */
+        variablePickerConstructor: null,
 
         /**
          * Additional date widget options that might be passed to filter
@@ -239,6 +246,11 @@ define(function(require) {
             delete this.emptyPart;
             delete this.emptyValue;
             DateFilter.__super__.dispose.call(this);
+        },
+
+        _getPickerConstructor: function() {
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DatePickerView :
+                VariableDatePickerView;
         },
 
         onChangeFilterType: function(e) {
@@ -398,6 +410,7 @@ define(function(require) {
             var pickerView;
             var options;
             var value = this.criteriaValueSelectors.value;
+            var Picker = this._getPickerConstructor();
             for (name in value) {
                 if (!value.hasOwnProperty(name)) {
                     continue;
@@ -406,7 +419,7 @@ define(function(require) {
                 options = this._getPickerConfigurationOptions({
                     el: this.$(selector)
                 });
-                pickerView = new this.picker(options);
+                pickerView = new Picker(options);
                 this.subview(name, pickerView);
             }
         },

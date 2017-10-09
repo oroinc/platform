@@ -17,7 +17,7 @@ define(function(require) {
         getDefaultOptions: function() {
             var defaultOptions = ActivityConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {
-                listOption: {},
+                listOptions: {},
                 filters: {},
                 entitySelector: null,
                 filterContainer: '<span class="active-filter">',
@@ -50,7 +50,7 @@ define(function(require) {
             }, this.getValue());
 
             this._attachActivityFilter(data.criterion.data.filterType);
-            this._attachTypeFilter(JSON.parse(this.options.listOption), data.criterion.data.activityType);
+            this._attachTypeFilter(this.options.listOptions, data.criterion.data.activityType);
 
             var filterOptions = _.findWhere(this.options.filters, {
                 type: 'datetime'
@@ -58,8 +58,6 @@ define(function(require) {
             if (!filterOptions) {
                 throw new Error('Cannot find filter "datetime"');
             }
-
-            this._resolveDeferredRender();
         },
 
         _attachActivityFilter: function(filterType) {
@@ -79,8 +77,8 @@ define(function(require) {
             this.listenTo(this.activityFilter, 'update typeChange', this._onUpdate);
         },
 
-        _attachTypeFilter: function(listOption, activityType) {
-            var typeChoices = _.mapObject(listOption, _.property('label'));
+        _attachTypeFilter: function(listOptions, activityType) {
+            var typeChoices = _.mapObject(listOptions, _.property('label'));
 
             this.typeFilter = new MultiSelectFilter({
                 showLabel: false,
@@ -221,6 +219,14 @@ define(function(require) {
         _collectValue: function() {
             var value = ActivityConditionView.__super__._collectValue.call(this);
             return _.omit(value, 'columnName');
+        },
+
+        setActivityExistence: function(value) {
+            this.activityFilter.setValue({type: value});
+        },
+
+        setActivityTypes: function(values) {
+            this.typeFilter.setValue({value: values});
         }
     });
 

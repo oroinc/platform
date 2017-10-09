@@ -31,7 +31,7 @@ define(function(require) {
         },
 
         constructor: function(options) {
-            this.options = _.defaults(options, this.getDefaultOptions());
+            this.options = _.defaults({}, options, this.getDefaultOptions());
             _.extend(this, _.defaults(_.pick(options, 'value')));
             AbstractConditionView.__super__.constructor.call(this, options);
         },
@@ -43,7 +43,6 @@ define(function(require) {
         },
 
         render: function() {
-            this._deferredRender();
             AbstractConditionView.__super__.render.call(this);
 
             this.$choiceInput = this.$('.' + this.options.choiceInputClass);
@@ -53,12 +52,12 @@ define(function(require) {
             var choiceInputValue = this._getInitialChoiceInputValue();
 
             if (choiceInputValue) {
+                this._deferredRender();
                 this.setChoiceInputValue(choiceInputValue);
-                this._renderFilter(choiceInputValue).then(function() {
+                this.once('filter-appended', function() {
                     this._resolveDeferredRender();
                 }.bind(this));
-            } else {
-                this._resolveDeferredRender();
+                this._renderFilter(choiceInputValue);
             }
 
             return this;
@@ -146,7 +145,7 @@ define(function(require) {
             this.$filterContainer.empty().append(filter.$el);
             this.filter = filter;
             this.listenTo(this.filter, 'update typeChange', this._onUpdate);
-            this._resolveDeferredRender();
+            this.trigger('filter-appended');
             this._onUpdate();
         },
 
@@ -189,7 +188,17 @@ define(function(require) {
         },
 
         setChoiceInputValue: function(name) {
+            var deferred = $.Deferred();
+            var columnName = _.result(this.getValue(), 'columnName');
+            if (columnName !== name) {
+                this.once('filter-appended', function() {
+                    deferred.resolve();
+                });
+            } else {
+                deferred.resolve();
+            }
             this.getChoiceInputWidget().setValue(name);
+            return deferred.promise();
         },
 
         getValue: function() {
@@ -228,7 +237,6 @@ define(function(require) {
          * Finds filter constructor, prepares its options, creates and appends it to the view.
          *
          * @param {String} fieldId
-         * @return {Promise} will be resolved when filter render is finished
          * @abstract
          * @protected
          */

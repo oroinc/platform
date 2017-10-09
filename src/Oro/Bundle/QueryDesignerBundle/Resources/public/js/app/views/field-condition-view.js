@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var FieldConditionView;
-    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
@@ -21,7 +20,6 @@ define(function(require) {
         },
 
         _renderFilter: function(fieldId) {
-            var deferred = $.Deferred();
             var filterOptions = this._createFilterOptions(fieldId);
             var moduleName = mapFilterModuleName(filterOptions.type);
             var requires = [moduleName];
@@ -41,7 +39,6 @@ define(function(require) {
                     clearTimeout(showLoadingTimeout);
                     var filter = new (Filter.extend(filterOptions))();
                     this._appendFilter(filter);
-                    deferred.resolve();
                 }, this);
                 if (modules.length > 1) {
                     var optionResolver = modules[1];
@@ -51,7 +48,6 @@ define(function(require) {
                     appendFilter();
                 }
             }, this));
-            return deferred.promise();
         },
 
         _createFilterOptions: function(fieldId) {
