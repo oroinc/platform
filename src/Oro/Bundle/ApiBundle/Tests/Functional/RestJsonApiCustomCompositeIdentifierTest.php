@@ -423,7 +423,7 @@ class RestJsonApiCustomCompositeIdentifierTest extends RestJsonApiTestCase
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter[name]' => 'Item+3']
+            ['filter[name]' => 'Item 3']
         );
 
         $this->assertResponseContains(

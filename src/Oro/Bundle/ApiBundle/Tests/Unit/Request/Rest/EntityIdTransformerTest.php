@@ -35,8 +35,6 @@ class EntityIdTransformerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [123, '123'],
-            ['key 1', 'key+1'],
-            ['key&1\'1', 'key%261%271'],
             [['id1' => 123, 'id2' => 456], 'id1=123;id2=456'],
             [['id1' => 'key 1', 'id2' => 'key&1\'1'], 'id1=key+1;id2=key%261%271'],
         ];
@@ -61,33 +59,6 @@ class EntityIdTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(123, $result);
     }
 
-    public function testReverseTransformForSingleIdentifierContainsEncodedChars()
-    {
-        $entityClass = 'Test\Class';
-        $value = urlencode('key 1&1\'1');
-
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
-        $metadata->setIdentifierFieldNames(['id']);
-        $metadata->addField(new FieldMetadata('id'))->setDataType('string');
-
-        $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
-        $this->assertSame('key 1&1\'1', $result);
-    }
-
-    public function testReverseTransformForSingleIdentifierContainsEncodedCharsThatAlreadyDecoded()
-    {
-        $entityClass = 'Test\Class';
-        $value = 'key 1&1\'1';
-
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
-        $metadata->setIdentifierFieldNames(['id']);
-        $metadata->addField(new FieldMetadata('id'))->setDataType('string');
-
-        $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
-        $this->assertSame('key 1&1\'1', $result);
-    }
 
     public function testReverseTransformForSingleIdentifierWhenFieldDataTypeIsString()
     {

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Makes sure that the filters configuration contains all supported filters
@@ -17,6 +18,19 @@ use Oro\Bundle\ApiBundle\Request\DataType;
  */
 class CompleteFilters extends CompleteSection
 {
+    /** @var array [data type => true, ...] */
+    protected $disallowArrayDataTypes;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param string[]       $disallowArrayDataTypes
+     */
+    public function __construct(DoctrineHelper $doctrineHelper, array $disallowArrayDataTypes)
+    {
+        parent::__construct($doctrineHelper);
+        $this->disallowArrayDataTypes = array_fill_keys($disallowArrayDataTypes, true);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -58,24 +72,27 @@ class CompleteFilters extends CompleteSection
         $filtersFields = $filters->getFields();
         foreach ($filtersFields as $fieldName => $filter) {
             $propertyPath = $filter->getPropertyPath();
-            if (!$propertyPath) {
-                $field = $definition->getField($fieldName);
-                if ($field) {
-                    $propertyPath = $field->getPropertyPath();
+            $field = $definition->getField($fieldName);
+            if (null !== $field) {
+                $propertyPath = $field->getPropertyPath();
+                if (!$filter->hasDataType()) {
+                    $dataType = $field->getDataType();
+                    if ($dataType) {
+                        $filter->setDataType($dataType);
+                    }
                 }
             }
             if (!$propertyPath) {
                 $propertyPath = $fieldName;
             }
-            if (!$metadata->hasField($propertyPath)) {
-                continue;
-            }
 
-            if (!$filter->hasDataType()) {
-                $filter->setDataType($metadata->getTypeOfField($propertyPath));
+            $dataType = $filter->getDataType();
+            if (!$dataType && $metadata->hasField($propertyPath)) {
+                $dataType = $metadata->getTypeOfField($propertyPath);
+                $filter->setDataType($dataType);
             }
-            if (!$filter->hasArrayAllowed()) {
-                $filter->setArrayAllowed();
+            if (!$filter->hasArrayAllowed() && $dataType) {
+                $filter->setArrayAllowed(!isset($this->disallowArrayDataTypes[$dataType]));
             }
         }
     }
@@ -132,9 +149,11 @@ class CompleteFilters extends CompleteSection
                 $filter = $filters->getOrAddField($fieldName);
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
+                } else {
+                    $dataType = $filter->getDataType();
                 }
                 if (!$filter->hasArrayAllowed()) {
-                    $filter->setArrayAllowed();
+                    $filter->setArrayAllowed(!isset($this->disallowArrayDataTypes[$dataType]));
                 }
             }
         }
