@@ -626,7 +626,7 @@ abstract class AbstractQueryConverter
                 $context->checkOperator($token);
                 $this->processOperator($token);
                 $context->setLastTokenType(FiltersParserContext::OPERATOR_TOKEN);
-            } elseif (is_array($token) && isset($token['columnName'])) {
+            } elseif (is_array($token) && isset($token['criterion'])) {
                 $context->checkFilter($token);
                 $this->processFilter($token);
                 $context->setLastTokenType(FiltersParserContext::FILTER_TOKEN);
@@ -658,7 +658,7 @@ abstract class AbstractQueryConverter
      */
     protected function processFilter($filter)
     {
-        $columnName     = $filter['columnName'];
+        $columnName     = array_key_exists('columnName', $filter) ? $filter['columnName'] : '';
         $fieldName      = $this->getFieldName($columnName);
         $columnAliasKey = $this->buildColumnAliasKey($columnName);
         $tableAlias     = $this->getTableAliasForColumn($columnName);
@@ -795,6 +795,36 @@ abstract class AbstractQueryConverter
             $mainEntityJoinId
         );
 
+        $this->virtualColumnExpressions[$columnName] = $query['select']['expr'];
+        $key = sprintf('%s::%s', $className, $fieldName);
+        if (!isset($this->virtualColumnOptions[$key])) {
+            $options = $query['select'];
+            unset($options['expr']);
+            $this->virtualColumnOptions[$key] = $options;
+        }
+    }
+
+    /**
+     * Checks if the given column is a virtual field and if so, generates and saves table aliases for it
+     *
+     * @param string $columnName
+     */
+    protected function addTableAliasesForVirtualFieldWithParentJoinId($columnName, $mainEntityJoinId)
+    {
+        if (isset($this->virtualColumnExpressions[$columnName])) {
+            // already processed
+            return;
+        }
+        $className = $this->getEntityClassName($columnName);
+        $fieldName = $this->getFieldName($columnName);
+        if (!$className || !$this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
+            // not a virtual field
+            return;
+        }
+        $query = $this->registerVirtualColumnQueryAliases(
+            $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName),
+            $mainEntityJoinId
+        );
         $this->virtualColumnExpressions[$columnName] = $query['select']['expr'];
         $key = sprintf('%s::%s', $className, $fieldName);
         if (!isset($this->virtualColumnOptions[$key])) {
@@ -1049,6 +1079,16 @@ abstract class AbstractQueryConverter
         }
 
         if (!$hasVirtualRelation) {
+            return;
+        }
+
+        // check if last field is virtual, if yes, add tableAlias to related virtual field. check BAP-15414 and OPS-637
+        $isLastVirtualField = $this->virtualFieldProvider->isVirtualField(
+            $this->getEntityClassName($columnName),
+            $this->getFieldName($columnName)
+        );
+        if ($isLastVirtualField) {
+            $this->addTableAliasesForVirtualFieldWithParentJoinId($columnName, $columnJoinId);
             return;
         }
 

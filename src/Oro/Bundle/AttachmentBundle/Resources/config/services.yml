@@ -40,6 +40,8 @@ services:
             - '@router'
             - %oro_attachment.files%
             - '@oro_entity_extend.association_manager'
+            - '%kernel.debug%'
+            - '%oro_attachment.debug_images%'
         calls:
             - [setFileManager, ['@oro_attachment.file_manager']]
 

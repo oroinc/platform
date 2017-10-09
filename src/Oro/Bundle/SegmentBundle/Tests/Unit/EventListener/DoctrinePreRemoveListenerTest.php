@@ -7,7 +7,6 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 use Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener;
@@ -24,19 +23,14 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrinePreRemoveListener */
     protected $listener;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
-
     protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()->getMock();
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()->getMock();
 
-        $this->listener = new DoctrinePreRemoveListener($this->configManager, $this->doctrineHelper);
+        $this->listener = new DoctrinePreRemoveListener($this->configManager);
     }
 
     /**
@@ -91,8 +85,8 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
             ->method('massRemoveByEntities')
             ->with($entities);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepository')
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
             ->will($this->returnValue($repository));
 
         $args = new PostFlushEventArgs($this->entityManager);
@@ -142,8 +136,8 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
                     return array($currentEntity->getId());
                 }
             ));
-        $this->doctrineHelper->expects($this->exactly($callCount))
-            ->method('getEntityMetadata')
+        $this->entityManager->expects($this->exactly($callCount))
+            ->method('getClassMetadata')
             ->will($this->returnValue($metadata));
     }
 }

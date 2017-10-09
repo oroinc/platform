@@ -122,17 +122,21 @@ class ImportExportContext extends OroFeatureContext implements
         self::assertEquals(200, $response->getStatusCode());
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * This method strictly compares data from the downloaded file
      *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" with processor "(?P<processorName>([\w\s\.]+))" contains the following data:$/
      *
-     * @param string    $entity
+     * @param string $entity
+     * @param string $processorName
      * @param TableNode $expectedEntities
      */
-    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities)
+    //@codingStandardsIgnoreEnd
+    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities, $processorName = null)
     {
-        $filePath = $this->performExport($entity);
+        $filePath = $this->performExport($entity, $processorName);
 
         try {
             $handler = fopen($filePath, 'rb');

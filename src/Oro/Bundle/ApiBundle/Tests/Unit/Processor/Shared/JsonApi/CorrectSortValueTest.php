@@ -6,9 +6,12 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CorrectSortValue;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -24,9 +27,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     {
         parent::setUp();
 
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->processor = new CorrectSortValue($this->doctrineHelper, $this->valueNormalizer);
     }
@@ -71,7 +72,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     public function testProcess($className, $config, $orderBy, $expectedOrderBy)
     {
         $sortFilterValue = new FilterValue('sort', $orderBy);
-        $filterValueAccessor = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
         $filterValueAccessor->expects($this->once())
             ->method('get')
             ->with('sort')
@@ -87,41 +88,44 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         $this->assertEquals($expectedOrderBy, $sortFilterValue->getValue());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function processProvider()
     {
         return [
             'sort by identifier field (ASC)'                                                       => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                Entity\User::class,
                 null,
                 ['id' => 'ASC'],
                 ['id' => 'ASC']
             ],
             'sort by identifier field (DESC)'                                                      => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                Entity\User::class,
                 null,
                 ['id' => 'DESC'],
                 ['id' => 'DESC']
             ],
             'sort by several fields'                                                               => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                Entity\User::class,
                 null,
                 ['id' => 'ASC', 'label' => 'DESC'],
                 ['id' => 'ASC', 'label' => 'DESC']
             ],
             'sort by "id" field when identifier field has different name'                          => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                Entity\Category::class,
                 null,
                 ['id' => 'ASC'],
                 ['name' => 'ASC']
             ],
             'sort by several fields including "id" field when identifier field has different name' => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                Entity\Category::class,
                 null,
                 ['id' => 'DESC', 'label' => 'ASC'],
                 ['name' => 'DESC', 'label' => 'ASC']
             ],
             'sort by renamed identifier field'                                                     => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                Entity\User::class,
                 [
                     'fields' => [
                         'renamedId' => [
@@ -133,7 +137,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
                 ['renamedId' => 'ASC']
             ],
             'sort by "id" field when identifier field has different name and renamed'              => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                Entity\Category::class,
                 [
                     'fields' => [
                         'renamedId' => [
@@ -143,6 +147,60 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
                 ],
                 ['id' => 'ASC'],
                 ['renamedId' => 'ASC']
+            ],
+            'sort by "id" field when identifier fields exist in config (ASC)'                      => [
+                Entity\Category::class,
+                [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'property_path' => 'name'
+                        ]
+                    ]
+                ],
+                ['id' => 'ASC'],
+                ['id' => 'ASC']
+            ],
+            'sort by "id" field when identifier fields exist in config (DESC)'                     => [
+                Entity\Category::class,
+                [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'property_path' => 'name'
+                        ]
+                    ]
+                ],
+                ['id' => 'DESC'],
+                ['id' => 'DESC']
+            ],
+            'sort by "id" field for composite identifier (ASC)'                                    => [
+                Entity\Category::class,
+                [
+                    'identifier_field_names' => ['id', 'label'],
+                    'fields'                 => [
+                        'id'    => [
+                            'property_path' => 'name'
+                        ],
+                        'label' => null
+                    ]
+                ],
+                ['id' => 'ASC'],
+                ['id' => 'ASC', 'label' => 'ASC']
+            ],
+            'sort by "id" field for composite identifier (DESC)'                                   => [
+                Entity\Category::class,
+                [
+                    'identifier_field_names' => ['id', 'label'],
+                    'fields'                 => [
+                        'id'    => [
+                            'property_path' => 'name'
+                        ],
+                        'label' => null
+                    ]
+                ],
+                ['id' => 'DESC'],
+                ['id' => 'DESC', 'label' => 'DESC']
             ],
         ];
     }
@@ -174,7 +232,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
             ->method('normalizeValue')
             ->with($defaultValue, DataType::ORDER_BY, $this->context->getRequestType(), false)
             ->willReturn($normalizedDefaultValue);
-        $filterValueAccessor = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
         $filterValueAccessor->expects($this->once())
             ->method('set')
             ->willReturnCallback(
@@ -197,21 +255,21 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     {
         return [
             'identifier field as default value'                                                => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                Entity\User::class,
                 null,
                 'id',
                 ['id' => 'ASC'],
                 ['id' => 'ASC']
             ],
             '"id" field as default value when identifier field has different name'             => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                Entity\Category::class,
                 null,
                 'id',
                 ['id' => 'ASC'],
                 ['name' => 'ASC']
             ],
             '"id" field as default value when identifier field has different name and renamed' => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                Entity\Category::class,
                 [
                     'fields' => [
                         'renamedId' => [
@@ -223,6 +281,20 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
                 ['id' => 'ASC'],
                 ['renamedId' => 'ASC']
             ],
+            '"id" field as default value when identifier fields exist in config'               => [
+                Entity\Category::class,
+                [
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'property_path' => 'name'
+                        ]
+                    ]
+                ],
+                'id',
+                ['id' => 'ASC'],
+                ['id' => 'ASC']
+            ],
         ];
     }
 
@@ -232,8 +304,8 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
             'sort',
             new SortFilter(DataType::ORDER_BY)
         );
-        $this->context->setFilterValues($this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface'));
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
+        $this->context->setFilterValues($this->createMock(FilterValueAccessorInterface::class));
+        $this->context->setClassName(Entity\User::class);
         $this->processor->process($this->context);
 
         $filterValues = $this->context->getFilterValues();
@@ -242,8 +314,8 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessNoFilter()
     {
-        $this->context->setFilterValues($this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface'));
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
+        $this->context->setFilterValues($this->createMock(FilterValueAccessorInterface::class));
+        $this->context->setClassName(Entity\User::class);
         $this->processor->process($this->context);
 
         $filterValues = $this->context->getFilterValues();

@@ -344,7 +344,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             $container
         );
 
-        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_reset_extension');
+        $extensionDefinition = $container->getDefinition('oro_message_queue.consumption.container_clearer');
         $this->assertEquals(
             [
                 'setPersistentServices',
@@ -385,5 +385,77 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             $extensionDefinition->getMethodCalls()[0]
         );
+    }
+
+    public function testSetSecurityAgnosticTopics()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'client' => null,
+                    'security_agnostic_topics' => ['some_topic']
+                ]
+            ],
+            $container
+        );
+
+        $driverFactoryDefinition = $container->getDefinition('oro_message_queue.client.security_aware_driver_factory');
+        $this->assertEquals(
+            ['some_topic'],
+            $driverFactoryDefinition->getArgument(1)
+        );
+    }
+
+    public function testSetSecurityAgnosticProcessors()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'security_agnostic_processors' => ['some_processor']
+                ]
+            ],
+            $container
+        );
+
+        $driverFactoryDefinition = $container->getDefinition('oro_message_queue.consumption.security_aware_extension');
+        $this->assertEquals(
+            ['some_processor'],
+            $driverFactoryDefinition->getArgument(0)
+        );
+    }
+
+    public function testSetHeartbeatUpdatePeriodOption()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'consumer' => ['heartbeat_update_period' => 10]
+                ]
+            ],
+            $container
+        );
+
+        $this->assertEquals(10, $container->getParameter('oro_message_queue.consumer_heartbeat_update_period'));
     }
 }

@@ -111,6 +111,13 @@ define([
         allowClear: true,
 
         /**
+         * Is used for states in template
+         * @property {String} 'dropdown-mode' | 'toggle-mode'
+         * @default ''
+         */
+        renderMode: '',
+
+        /**
          * Initialize.
          *
          * @param {Object} options
@@ -118,7 +125,7 @@ define([
          */
         initialize: function(options) {
             var opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
-                'templateSelector', 'templateTheme', 'template');
+                'templateSelector', 'templateTheme', 'template', 'renderMode');
             _.extend(this, opts);
 
             this._defineTemplate();
@@ -252,6 +259,16 @@ define([
                 this._onValueUpdated(this.value, oldValue);
             }
             return this;
+        },
+
+        /**
+         * Set renderMode to filter
+         * @param {String} value
+         */
+        setRenderMode: function(value) {
+            if (_.isString(value) && value.length) {
+                this.renderMode = value;
+            }
         },
 
         /**

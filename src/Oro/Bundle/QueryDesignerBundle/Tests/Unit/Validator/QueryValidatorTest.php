@@ -3,6 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 
 use Doctrine\DBAL\DBALException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator;
@@ -254,6 +255,66 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getProviders')
             ->will($this->returnValue([]));
+
+        $this->validator->validate(new Segment(), $this->constraint);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Builder is missing
+     */
+    public function testExistingEntityValidation()
+    {
+        $helper = $this->createMock(DoctrineHelper::class);
+        $this->validator->setDoctrineHelper($helper);
+
+        $helper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(1);
+
+        $provider = $this
+            ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $provider
+            ->expects($this->once())
+            ->method('isApplicable')
+            ->with(Segment::GRID_PREFIX.'1')
+            ->will($this->returnValue(false));
+
+        $this->chainConfigurationProvider
+            ->expects($this->once())
+            ->method('getProviders')
+            ->will($this->returnValue([$provider]));
+
+        $this->validator->validate(new Segment(), $this->constraint);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Builder is missing
+     */
+    public function testNewEntityValidation()
+    {
+        $helper = $this->createMock(DoctrineHelper::class);
+        $this->validator->setDoctrineHelper($helper);
+
+        $helper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(null);
+
+        $provider = $this
+            ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $provider
+            ->expects($this->once())
+            ->method('isApplicable')
+            ->with($this->stringStartsWith(Segment::GRID_PREFIX.'grid'))
+            ->will($this->returnValue(false));
+
+        $this->chainConfigurationProvider
+            ->expects($this->once())
+            ->method('getProviders')
+            ->will($this->returnValue([$provider]));
 
         $this->validator->validate(new Segment(), $this->constraint);
     }

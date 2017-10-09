@@ -8,7 +8,8 @@ define([
 
     var defaultOptions = {
         port: 80,
-        debug: false
+        debug: false,
+        path: ''
     };
 
     /**
@@ -64,7 +65,15 @@ define([
         connect: function() {
             if (!this.session) {
                 var protocol = this.options.secure ? 'wss' : 'ws';
-                var wsuri = protocol + '://' + this.options.host + ':' + this.options.port;
+                var wsuri = [
+                    protocol,
+                    '://',
+                    this.options.host,
+                    ':',
+                    this.options.port,
+                    '/',
+                    this.options.path.replace(/\/+$/, '')
+                ].join('');
                 ab.connect(wsuri, _.bind(this.onConnect, this), _.bind(this.onHangup, this), this.options);
             }
         },

@@ -16,9 +16,6 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
     /** @var CacheProvider */
     private $cache;
 
-    /** @var OwnerTreeInterface */
-    private $tree;
-
     /**
      * @param DatabaseChecker $databaseChecker
      * @param CacheProvider   $cache
@@ -57,7 +54,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
      */
     public function warmUpCache()
     {
-        $this->ensureTreeLoaded();
+        $this->cache->save(self::CACHE_KEY, $this->loadTree());
     }
 
     /**
@@ -65,30 +62,13 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface
      */
     public function getTree()
     {
-        $this->ensureTreeLoaded();
-
-        return $this->tree;
-    }
-
-    /**
-     * Makes sure that tree data are loaded and cached
-     */
-    protected function ensureTreeLoaded()
-    {
-        if (null !== $this->tree) {
-            // the tree is already loaded
-            return;
+        $tree = $this->cache->fetch(self::CACHE_KEY);
+        if (!$tree) {
+            $tree = $this->loadTree();
+            $this->cache->save(self::CACHE_KEY, $tree);
         }
 
-        if (null === $this->cache) {
-            $this->tree = $this->loadTree();
-        } else {
-            $this->tree = $this->cache->fetch(self::CACHE_KEY);
-            if (!$this->tree) {
-                $this->tree = $this->loadTree();
-                $this->cache->save(self::CACHE_KEY, $this->tree);
-            }
-        }
+        return $tree;
     }
 
     /**

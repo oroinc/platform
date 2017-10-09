@@ -145,6 +145,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                             ],
                         ],
                         'form_options' => [
+                            'validation_groups' => ['Default', 'Optional'],
                             'attribute_fields' => [
                                 'attribute_1' => [
                                     'form_type' => 'test type',
@@ -244,6 +245,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                             ]
                         ],
                         'form_options' => [
+                            'validation_groups' => ['Default', 'Optional'],
                             'attribute_fields' => [
                                 'attribute_1' => [
                                     'form_type' => 'test type',

@@ -54,6 +54,7 @@ class FormatExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
+            new \Twig_SimpleFunction('asset_path', [$this, 'generateUrlWithoutFrontController']),
             new \Twig_SimpleFunction('oro_format_filename', [$this, 'formatFilename']),
         ];
     }
@@ -76,6 +77,26 @@ class FormatExtension extends \Twig_Extension
     public function format($parameter, $formatterName, array $formatterArguments = [])
     {
         return $this->getFormatterManager()->format($parameter, $formatterName, $formatterArguments);
+    }
+
+    /**
+     * @param string $name
+     * @param array $parameters
+     * @return string
+     */
+    public function generateUrlWithoutFrontController($name, $parameters = [])
+    {
+        $router = $this->container->get('router');
+
+        $prevBaseUrl = $router->getContext()->getBaseUrl();
+        $baseUrlWithoutFrontController = preg_replace('/\/[\w_]+\.php$/', '', $prevBaseUrl);
+        $router->getContext()->setBaseUrl($baseUrlWithoutFrontController);
+
+        $url = $router->generate($name, $parameters);
+
+        $router->getContext()->setBaseUrl($prevBaseUrl);
+
+        return $url;
     }
 
     /**

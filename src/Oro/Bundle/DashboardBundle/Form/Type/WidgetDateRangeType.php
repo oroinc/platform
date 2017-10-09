@@ -72,12 +72,12 @@ class WidgetDateRangeType extends AbstractType
             ),
             'templateSelector'       => '#date-filter-template-wo-actions',
             'criteriaValueSelectors' => [
-                'type'      => 'select[name=date_part], input[name$=\"[type]\"]',
-                'date_type' => 'input[name$=\"[type]\"]',
+                'type'      => 'select[name=date_part], input[name$="[type]"]',
+                'date_type' => 'input[name$="[type]"]',
                 'date_part' => 'select[name=date_part]',
                 'value'     => [
-                    'start' => 'input[name=\"' . $view->vars['full_name'] . '[value][start]\"]',
-                    'end'   => 'input[name=\"' . $view->vars['full_name'] . '[value][end]\"]'
+                    'start' => 'input[name="' . $view->vars['full_name'] . '[value][start]"]',
+                    'end'   => 'input[name="' . $view->vars['full_name'] . '[value][end]"]'
                 ]
             ]
         ];

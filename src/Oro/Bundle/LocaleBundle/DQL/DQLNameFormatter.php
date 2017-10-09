@@ -162,4 +162,20 @@ class DQLNameFormatter
 
         return $nameParts;
     }
+
+    /**
+     * @param string|object $class
+     * @return array
+     */
+    public function getSuggestedFieldNames($class)
+    {
+        $fields = [];
+        foreach ($this->namePartsMap as $part => $metadata) {
+            if (is_a($class, $metadata['interface'], true)) {
+                $fields[$part] = $metadata['suggestedFieldName'];
+            }
+        }
+
+        return $fields;
+    }
 }

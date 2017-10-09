@@ -93,7 +93,7 @@ class QueueConsumer
 
         $extension = $this->extension;
         if (null !== $runtimeExtension) {
-            $extension = new ChainExtension([$extension, $runtimeExtension]);
+            $extension = new ChainExtension([$runtimeExtension, $extension]);
         }
         $extension->onStart($context);
 
@@ -168,8 +168,11 @@ class QueueConsumer
                 'properties' => $message->getProperties()
             ]);
 
+            $executionTime = 0;
             if (!$context->getStatus()) {
+                $startTime = (int)(microtime(true) * 1000);
                 $status = $messageProcessor->process($message, $session);
+                $executionTime = (int)(microtime(true) * 1000) - $startTime;
                 $context->setStatus($status);
             }
 
@@ -190,7 +193,10 @@ class QueueConsumer
                     throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));
             }
 
-            $logger->notice(sprintf('Message processed: %s', $statusForLog));
+            $logger->notice('Message processed: {status}. Execution time: {time} ms', [
+                'status' => $statusForLog,
+                'time'   => $executionTime
+            ]);
 
             $extension->onPostReceived($context);
         } else {

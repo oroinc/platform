@@ -1,21 +1,19 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Extension;
+
+use Psr\Log\LoggerInterface;
 
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
-use Psr\Log\LoggerInterface;
 
 class SignalExtension extends AbstractExtension
 {
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $interruptConsumption = false;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $logger;
 
     /**
@@ -23,9 +21,11 @@ class SignalExtension extends AbstractExtension
      */
     public function onStart(Context $context)
     {
-        if (false == extension_loaded('pcntl')) {
+        if (!extension_loaded('pcntl')) {
             throw new LogicException('The pcntl extension is required in order to catch signals.');
         }
+
+        $this->logger = $context->getLogger();
 
         pcntl_signal(SIGTERM, [$this, 'handleSignal']);
         pcntl_signal(SIGQUIT, [$this, 'handleSignal']);
@@ -39,18 +39,8 @@ class SignalExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context)
     {
-        $this->logger = $context->getLogger();
-
         pcntl_signal_dispatch();
 
-        $this->interruptExecutionIfNeeded($context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function onPreReceived(Context $context)
-    {
         $this->interruptExecutionIfNeeded($context);
     }
 
@@ -77,9 +67,9 @@ class SignalExtension extends AbstractExtension
     /**
      * @param Context $context
      */
-    public function interruptExecutionIfNeeded(Context $context)
+    protected function interruptExecutionIfNeeded(Context $context)
     {
-        if (false == $context->isExecutionInterrupted() && $this->interruptConsumption) {
+        if ($this->interruptConsumption && !$context->isExecutionInterrupted()) {
             $this->logger->debug('Interrupt execution');
             $context->setExecutionInterrupted($this->interruptConsumption);
             $context->setInterruptedReason('Interrupt execution.');

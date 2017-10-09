@@ -123,6 +123,7 @@ label, input, button, select, textarea { font-size:13px; color:#777;}
   &.header-tooltips {
     display: inline;
     float: none;
+    margin-left: -20px;
     .oro-popover-content {
       line-height: 20px;
     }
@@ -3035,6 +3036,10 @@ span.validation-failed {
     li.dropdown.open.active .caret {
       border-top-color: @gray !important;
       border-bottom-color: @gray !important;
+    }
+
+    li.dropdown:first-child .pull-right {
+      left: 0;
     }
   }
 

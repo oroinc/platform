@@ -3,28 +3,37 @@
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Doctrine\ORM\ORMException;
+
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 abstract class AbstractEntityAssociationTransformer implements DataTransformerInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var EntityLoader */
+    protected $entityLoader;
+
     /** @var AssociationMetadata */
     protected $metadata;
 
     /**
      * @param ManagerRegistry     $doctrine
+     * @param EntityLoader        $entityLoader
      * @param AssociationMetadata $metadata
      */
-    public function __construct(ManagerRegistry $doctrine, AssociationMetadata $metadata)
-    {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        EntityLoader $entityLoader,
+        AssociationMetadata $metadata
+    ) {
         $this->doctrine = $doctrine;
+        $this->entityLoader = $entityLoader;
         $this->metadata = $metadata;
     }
 
@@ -105,7 +114,7 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
         }
         $entity = null;
         try {
-            $entity = $manager->getRepository($entityClass)->find($entityId);
+            $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->metadata->getTargetMetadata());
         } catch (ORMException $e) {
             throw new TransformationFailedException(
                 sprintf(

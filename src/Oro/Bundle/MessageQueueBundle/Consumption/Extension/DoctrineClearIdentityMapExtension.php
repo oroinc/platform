@@ -1,34 +1,57 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
+
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class DoctrineClearIdentityMapExtension extends AbstractExtension
+class DoctrineClearIdentityMapExtension extends AbstractExtension implements ResettableExtensionInterface
 {
-    /**
-     * @var RegistryInterface
-     */
-    protected $registry;
+    /** @var ContainerInterface|IntrospectableContainerInterface */
+    private $container;
+
+    /** @var ManagerRegistry|null */
+    private $doctrine;
 
     /**
-     * @param RegistryInterface $registry
+     * @param ContainerInterface $container
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ContainerInterface $container)
     {
-        $this->registry = $registry;
+        $this->container = $container;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onPreReceived(Context $context)
+    public function reset()
     {
-        foreach ($this->registry->getManagers() as $name => $manager) {
-            $context->getLogger()->debug(sprintf('Clear identity map for manager "%s"', $name));
+        $this->doctrine = null;
+    }
 
-            $manager->clear();
+    /**
+     * {@inheritdoc}
+     */
+    public function onPostReceived(Context $context)
+    {
+        if (null === $this->doctrine) {
+            $this->doctrine = $this->container->get('doctrine');
+        }
+
+        $logger = $context->getLogger();
+        $managers = $this->doctrine->getManagerNames();
+        foreach ($managers as $name => $serviceId) {
+            if ($this->container->initialized($serviceId)) {
+                $logger->debug(sprintf('Clear identity map for manager "%s"', $name));
+
+                $manager = $this->doctrine->getManager($name);
+                $manager->clear();
+            }
         }
     }
 }

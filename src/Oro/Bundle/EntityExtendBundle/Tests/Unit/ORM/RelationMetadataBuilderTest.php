@@ -7,13 +7,11 @@ use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder;
-
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -70,6 +68,61 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @dataProvider statesToSkipDataProvider
+     */
+    public function testShouldSkipBuildForSpecifiedStateOfTargetEntity($state)
+    {
+        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+        $fieldName   = 'srcField';
+        $fieldType   = RelationType::MANY_TO_ONE;
+        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+
+        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
+
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($this->getEntityConfig($entityClass, ['state' => $state]));
+
+        $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
+        $relationKey     = ExtendHelper::buildRelationKey(
+            $entityClass,
+            $fieldName,
+            RelationType::MANY_TO_ONE,
+            $targetEntityClass
+        );
+        $extendConfig    = $this->getEntityConfig(
+            $entityClass,
+            [
+                'relation' => [
+                    $relationKey => [
+                        'field_id'        => $fieldId,
+                        'owner'           => true,
+                        'target_entity'   => $targetEntityClass,
+                        'target_field_id' => null
+                    ]
+                ],
+                'schema'   => [
+                    'relation' => [
+                        $fieldName => []
+                    ]
+                ]
+            ]
+        );
+
+        $this->builder->build($metadataBuilder, $extendConfig);
+
+        self::assertFalse($metadataBuilder->getClassMetadata()->hasAssociation($fieldName));
+    }
+
+    public function statesToSkipDataProvider()
+    {
+        return [
+            [ExtendScope::STATE_NEW],
+            [ExtendScope::STATE_DELETE]
+        ];
+    }
+
     public function testBuildManyToOne()
     {
         $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
@@ -82,7 +135,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -170,7 +223,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -263,7 +316,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -370,7 +423,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $targetEntityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -467,7 +520,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -550,7 +603,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -637,7 +690,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -753,7 +806,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -840,7 +893,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -962,7 +1015,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -1085,7 +1138,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -1237,7 +1290,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 
@@ -1304,6 +1357,90 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    public function testBuildManyToManyTargetSideWithAdditionalCascadeOption()
+    {
+        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+
+        $fieldName = 'srcField';
+        $fieldType = RelationType::MANY_TO_MANY;
+        $fieldId   = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+
+        $targetEntityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2';
+        $targetFieldName   = 'targetField';
+        $targetFieldType   = RelationType::MANY_TO_MANY;
+        $targetFieldId     = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => ExtendScope::STATE_ACTIVE
+            ]
+        );
+
+        $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
+
+
+        $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
+        $relationKey     = ExtendHelper::buildRelationKey(
+            $entityClass,
+            $fieldName,
+            RelationType::MANY_TO_ONE,
+            $targetEntityClass
+        );
+        $extendConfig    = $this->getEntityConfig(
+            $entityClass,
+            [
+                'relation' => [
+                    $relationKey => [
+                        'field_id'        => $fieldId,
+                        'owner'           => false,
+                        'target_entity'   => $targetEntityClass,
+                        'target_field_id' => $targetFieldId,
+                        'cascade'         => ['persist']
+                    ]
+                ],
+                'schema'   => [
+                    'relation' => [
+                        $fieldName => []
+                    ]
+                ]
+            ]
+        );
+
+        $this->builder->build($metadataBuilder, $extendConfig);
+
+        $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
+        $this->assertEquals(
+            [
+                'sourceEntity'     => $entityClass,
+                'targetEntity'     => $targetEntityClass,
+                'fieldName'        => $fieldName,
+                'type'             => ClassMetadataInfo::MANY_TO_MANY,
+                'isOwningSide'     => false,
+                'mappedBy'         => $targetFieldName,
+                'inversedBy'       => null,
+                'cascade'          => ['persist'],
+                'joinTable'        => [],
+                'fetch'            => ClassMetadataInfo::FETCH_LAZY,
+                'isCascadeRemove'  => false,
+                'isCascadePersist' => true,
+                'isCascadeRefresh' => false,
+                'isCascadeMerge'   => false,
+                'isCascadeDetach'  => false,
+                'orphanRemoval'    => false
+            ],
+            $result
+        );
+
+        $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
+        $this->assertFalse(
+            $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testBuildManyToManyWhenOwningSiteAndInverseSideEntitiesAreEqual()
     {
         $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
@@ -1320,7 +1457,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig = $this->getEntityConfig(
             $entityClass,
             [
-                'state' => 'Active'
+                'state' => ExtendScope::STATE_ACTIVE
             ]
         );
 

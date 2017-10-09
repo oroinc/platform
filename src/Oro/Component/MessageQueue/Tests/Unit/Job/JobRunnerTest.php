@@ -356,7 +356,10 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $jobExtension = $this->createJobExtensionMock();
         $jobExtension->expects($this->once())
-            ->method('onCreateDelayed')
+            ->method('onPreCreateDelayed')
+            ->with($child);
+        $jobExtension->expects($this->once())
+            ->method('onPostCreateDelayed')
             ->with($child, true);
 
         $expRunner = null;
@@ -400,7 +403,9 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $jobExtension = $this->createJobExtensionMock();
         $jobExtension->expects($this->never())
-            ->method('onCreateDelayed');
+            ->method('onPreCreateDelayed');
+        $jobExtension->expects($this->never())
+            ->method('onPostCreateDelayed');
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('test');
@@ -425,7 +430,9 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $jobExtension = $this->createJobExtensionMock();
         $jobExtension->expects($this->never())
-            ->method('onCreateDelayed');
+            ->method('onPreCreateDelayed');
+        $jobExtension->expects($this->never())
+            ->method('onPostCreateDelayed');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Job was not found. id: "job-id"');

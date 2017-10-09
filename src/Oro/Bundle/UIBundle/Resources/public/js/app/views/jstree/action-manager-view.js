@@ -6,13 +6,29 @@ define(function(require) {
     var _ = require('underscore');
     var ActionManager = require('oroui/js/jstree-action-manager');
     var BaseView = require('oroui/js/app/views/base/view');
+    var config = require('module').config();
+    config = _.extend({
+        inlineActionsCount: null
+    }, config);
 
     ActionManagerView = BaseView.extend({
+        /**
+         * @property {Function}
+         */
+        template: require('tpl!oroui/templates/jstree-actions-wrapper.html'),
+
+        /**
+         * @property {Function}
+         */
+        inlineTemplate: require('tpl!oroui/templates/jstree-inline-actions-wrapper.html'),
+
         /**
          * @property {Object}
          */
         options: {
-            actions: {}
+            actions: {},
+            inlineActionsCount: config.inlineActionsCount,
+            inlineActionsElement: null
         },
 
         /**
@@ -50,11 +66,28 @@ define(function(require) {
         },
 
         render: function() {
+            var template;
+            if (this.options.inlineActionsCount && this.subviews.length <= this.options.inlineActionsCount) {
+                template = 'inlineTemplate';
+            }
+            if (this.options.inlineActionsElement) {
+                this.setElement($(this.options.inlineActionsElement));
+            }
+
+            this.$el.append(this.getTemplateFunction(template)(this.getTemplateData()));
+
             var $actions = this.$el.find(this.elements.actions);
             _.each(this.subviews, function(subview) {
                 $actions.append(subview.render().$el);
             }, this);
+
             return this;
+        },
+
+        getTemplateData: function() {
+            return _.extend({}, this.options, {
+                subviewsCount: this.subviews.length
+            });
         },
 
         /**

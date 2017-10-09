@@ -131,6 +131,7 @@ define(function(require) {
             if (opts.launcherMode) {
                 this.launcherMode = opts.launcherMode;
             }
+
             if (opts.link) {
                 this.link = opts.link;
             }
@@ -215,6 +216,9 @@ define(function(require) {
             this.$el.empty();
             var $el = $(this.template(this.getTemplateData()));
             this.setElement($el);
+
+            this.trigger('render');
+
             return this;
         },
 

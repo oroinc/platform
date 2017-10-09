@@ -72,7 +72,8 @@ class ACLContext extends OroFeatureContext implements
     public function iHavePermissionsForEntity($entity, $action, $accessLevel, $user)
     {
         $role = $this->getRole($user);
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $singularizedEntities = array_map(function ($element) {
@@ -90,7 +91,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -101,7 +102,8 @@ class ACLContext extends OroFeatureContext implements
     public function userHasFollowingPermissions($user, TableNode $table)
     {
         $role = $this->getRole($user);
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $this->loginAsAdmin();
@@ -119,7 +121,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -128,7 +130,8 @@ class ACLContext extends OroFeatureContext implements
      */
     public function userHasFollowingEntityPermissionsEnabled($user, TableNode $table)
     {
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $this->loginAsAdmin();
@@ -144,7 +147,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
@@ -162,7 +165,8 @@ class ACLContext extends OroFeatureContext implements
     public function iHaveSeveralPermissionsForEntity($user, $entity, $action1, $accessLevel1, $action2, $accessLevel2)
     {
         $role = $this->getRole($user);
-        $this->getMink()->setDefaultSessionName('second_session');
+        self::assertFalse($this->getMink()->isSessionStarted('system_session'));
+        $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $singularizedEntity = ucfirst(Inflector::singularize($entity));
@@ -174,7 +178,7 @@ class ACLContext extends OroFeatureContext implements
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
-        $this->getSession('second_session')->stop();
+        $this->getSession('system_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
     }
 

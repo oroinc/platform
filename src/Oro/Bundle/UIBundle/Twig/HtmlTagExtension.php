@@ -71,6 +71,11 @@ class HtmlTagExtension extends \Twig_Extension
         return $this->getHtmlTagHelper()->sanitize($string);
     }
 
+    /**
+     * @param string $html
+     * @param array $tags
+     * @return string
+     */
     public function htmlTagTrim($html, array $tags = [])
     {
         foreach ($tags as $tag) {

@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
+/**
+ * Converts a string to integer.
+ * Provides a regular expression that can be used to validate that a string represents a integer value.
+ */
 class NormalizeInteger extends AbstractProcessor
 {
     const REQUIREMENT = '-?\d+';
