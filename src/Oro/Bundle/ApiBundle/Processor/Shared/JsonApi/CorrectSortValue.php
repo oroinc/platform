@@ -115,15 +115,27 @@ class CorrectSortValue implements ProcessorInterface
         $direction,
         EntityDefinitionConfig $config = null
     ) {
-        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        foreach ($idFieldNames as $propertyPath) {
-            if (null !== $config) {
-                $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
-                if ($fieldName) {
-                    $propertyPath = $fieldName;
+        if (null === $config) {
+            $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+            foreach ($idFieldNames as $propertyPath) {
+                $result[$propertyPath] = $direction;
+            }
+        } else {
+            $idFieldNames = $config->getIdentifierFieldNames();
+            if (empty($idFieldNames)) {
+                $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+                foreach ($idFieldNames as $propertyPath) {
+                    $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
+                    if ($fieldName) {
+                        $propertyPath = $fieldName;
+                    }
+                    $result[$propertyPath] = $direction;
+                }
+            } else {
+                foreach ($idFieldNames as $fieldName) {
+                    $result[$fieldName] = $direction;
                 }
             }
-            $result[$propertyPath] = $direction;
         }
     }
 }

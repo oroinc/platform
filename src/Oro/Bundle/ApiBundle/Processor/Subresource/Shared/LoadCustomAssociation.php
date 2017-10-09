@@ -4,12 +4,14 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 abstract class LoadCustomAssociation implements ProcessorInterface
@@ -20,14 +22,22 @@ abstract class LoadCustomAssociation implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var EntityIdHelper */
+    protected $entityIdHelper;
+
     /**
      * @param EntitySerializer $entitySerializer
      * @param DoctrineHelper   $doctrineHelper
+     * @param EntityIdHelper   $entityIdHelper
      */
-    public function __construct(EntitySerializer $entitySerializer, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        EntitySerializer $entitySerializer,
+        DoctrineHelper $doctrineHelper,
+        EntityIdHelper $entityIdHelper
+    ) {
         $this->entitySerializer = $entitySerializer;
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityIdHelper = $entityIdHelper;
     }
 
     /**
@@ -99,7 +109,11 @@ abstract class LoadCustomAssociation implements ProcessorInterface
     protected function loadParentEntityData(SubresourceContext $context)
     {
         $data = $this->entitySerializer->serialize(
-            $this->getQueryBuilder($context->getParentClassName(), $context->getParentId()),
+            $this->getQueryBuilder(
+                $context->getParentClassName(),
+                $context->getParentId(),
+                $context->getParentMetadata()
+            ),
             $context->getParentConfig()
         );
 
@@ -128,18 +142,19 @@ abstract class LoadCustomAssociation implements ProcessorInterface
     }
 
     /**
-     * @param string $parentEntityClass
-     * @param mixed  $parentEntityId
+     * @param string         $parentEntityClass
+     * @param mixed          $parentEntityId
+     * @param EntityMetadata $parentEntityMetadata
      *
      * @return QueryBuilder
      */
-    protected function getQueryBuilder($parentEntityClass, $parentEntityId)
+    protected function getQueryBuilder($parentEntityClass, $parentEntityId, EntityMetadata $parentEntityMetadata)
     {
         $query = $this->doctrineHelper->getEntityRepositoryForClass($parentEntityClass)->createQueryBuilder('e');
-        $this->doctrineHelper->applyEntityIdentifierRestriction(
+        $this->entityIdHelper->applyEntityIdentifierRestriction(
             $query,
-            $parentEntityClass,
-            $parentEntityId
+            $parentEntityId,
+            $parentEntityMetadata
         );
 
         return $query;

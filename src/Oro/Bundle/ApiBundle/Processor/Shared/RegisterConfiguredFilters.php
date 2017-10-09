@@ -10,7 +10,6 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -71,11 +70,8 @@ class RegisterConfiguredFilters extends RegisterFilters
                 continue;
             }
             $propertyPath = $field->getPropertyPath($filterKey);
-            $filter = $this->createFilter($field, $propertyPath);
+            $filter = $this->createFilter($field, $propertyPath, $context);
             if (null !== $filter) {
-                if ($filter instanceof RequestAwareFilterInterface) {
-                    $filter->setRequestType($context->getRequestType());
-                }
                 if ($filter instanceof FieldAwareFilterInterface) {
                     // @todo BAP-11881. Update this code when NEQ operator for to-many collection
                     // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter

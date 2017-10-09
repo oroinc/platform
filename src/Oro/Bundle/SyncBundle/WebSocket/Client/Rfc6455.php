@@ -2,68 +2,84 @@
 
 namespace Oro\Bundle\SyncBundle\WebSocket\Client;
 
+use Oro\Bundle\SyncBundle\Exception\WebSocket;
+
 class Rfc6455
 {
     /**
      * Default socket connection timeout, in seconds
      */
     const SOCKET_TIMEOUT = 2;
-
     const SERVER_HANDSHAKE_STATUS_LINE = 'HTTP/1.1 101 Switching Protocols';
 
     /** @var resource */
     protected $socket;
 
+    /** @var string */
+    protected $remoteSocketAddress;
+
+    /** @var bool */
+    protected $blocking = false;
+
     /**
-     *
      * @param string $host
-     * @param int $port
-     *
-     * @return resource
+     * @param string|integer $port
+     * @param string $path
+     * @return resource WebSocket stream resource
+     * @throws WebSocket\Rfc6455Exception
      */
-    public function connect($host, $port)
+    public function connect($host, $port, $path = '')
     {
-        if ($this->socket) {
+        $path = trim($path, '/');
+
+        $remoteSocket = "tcp://{$host}:{$port}/{$path}";
+
+        if ($this->remoteSocketAddress === $remoteSocket && $this->socket) {
             return $this->socket;
         }
 
-        $websocketKey = base64_encode($this->generateRandomString(16));
+        $this->remoteSocketAddress = $remoteSocket;
 
-        $header  = "GET /echo HTTP/1.1\r\n";
-        $header .= 'Host: ' . $host . ':' . $port . "\r\n";
-        $header .= "Upgrade: websocket\r\n";
-        $header .= "Connection: Upgrade\r\n";
-        $header .= "Sec-WebSocket-Key: " . $websocketKey . "\r\n";
-        $header .= "Sec-WebSocket-Version: 13\r\n";
-        $header .= "\r\n";
+        $this->socket = $this->create();
 
-        $this->socket = @stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, self::SOCKET_TIMEOUT);
+        $headers = $this->getHeaders($host, $port, $path);
 
-        if (!$this->socket) {
-            throw new \RuntimeException(sprintf('WebSocket connection error (%u): %s', $errno, $errstr));
-        }
+        $this->handshake($headers);
 
-        stream_set_blocking($this->socket, false);
-        stream_set_timeout($this->socket, self::SOCKET_TIMEOUT);
+        $set_blocking = stream_set_blocking($this->socket, $this->blocking);
 
-        if (!fwrite($this->socket, $header)) {
-            throw new \RuntimeException('WebSocket write error');
-        }
-
-        $serverHandshake = fread($this->socket, 32);
-        if (!$serverHandshake) {
-            throw new \RuntimeException('WebSocket read error');
-        }
-
-        if (strpos($serverHandshake, static::SERVER_HANDSHAKE_STATUS_LINE) !== 0) {
-            throw new \RuntimeException(sprintf(
-                'Websocket server handshake expect status line to be "%s", but "%s" was returned',
-                static::SERVER_HANDSHAKE_STATUS_LINE,
-                $serverHandshake
-            ));
+        if (false === $set_blocking) {
+            throw new WebSocket\SetupFailure(
+                sprintf(
+                    'WebSocket set %sblocking stream socket failure. Can not set blocking to %s',
+                    $this->blocking ? '' : 'non-',
+                    var_export($this->blocking, 1)
+                )
+            );
         }
 
         return $this->socket;
+    }
+
+    /**
+     * @param string $host
+     * @param string|int $port
+     * @param string $path
+     * @return string
+     */
+    protected function getHeaders($host, $port, $path)
+    {
+        $webSocketKey = base64_encode($this->generateRandomString(16));
+
+        $header = "GET /{$path} HTTP/1.1\r\n";
+        $header .= "Host: {$host}:{$port}\r\n";
+        $header .= "Upgrade: websocket\r\n";
+        $header .= "Connection: Upgrade\r\n";
+        $header .= "Sec-WebSocket-Key:  {$webSocketKey}\r\n";
+        $header .= "Sec-WebSocket-Version: 13\r\n";
+        $header .= "\r\n";
+
+        return $header;
     }
 
     /**
@@ -111,10 +127,10 @@ class Rfc6455
      * Link to the original method:
      * https://github.com/hoaproject/Websocket/blob/bec469034ab9da8d09368f5e4d7e86b395f2af03/Protocol/Rfc6455.php#L226
      *
-     * @param   string  $message    Message.
-     * @param   int     $opcode     Opcode.
-     * @param   bool    $end        Whether it is the last frame of the message.
-     * @param   bool    $mask       Whether the message will be masked or not.
+     * @param   string $message Message.
+     * @param   int $opcode Opcode.
+     * @param   bool $end Whether it is the last frame of the message.
+     * @param   bool $mask Whether the message will be masked or not.
      *
      * @return string
      */
@@ -142,41 +158,8 @@ class Rfc6455
     }
 
     /**
-     * Hoa
-     *
-     *
-     * @license
-     *
-     * New BSD License
-     *
-     * Copyright © 2007-2015, Hoa community. All rights reserved.
-     *
-     * Redistribution and use in source and binary forms, with or without
-     * modification, are permitted provided that the following conditions are met:
-     *     * Redistributions of source code must retain the above copyright
-     *       notice, this list of conditions and the following disclaimer.
-     *     * Redistributions in binary form must reproduce the above copyright
-     *       notice, this list of conditions and the following disclaimer in the
-     *       documentation and/or other materials provided with the distribution.
-     *     * Neither the name of the Hoa nor the names of its contributors may be
-     *       used to endorse or promote products derived from this software without
-     *       specific prior written permission.
-     *
-     * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-     * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-     * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-     * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS AND CONTRIBUTORS BE
-     * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-     * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-     * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-     * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-     * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-     * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-     * POSSIBILITY OF SUCH DAMAGE.
-     *
-     * ============
-     * Link to the original method:
-     * https://github.com/hoaproject/Websocket/blob/bec469034ab9da8d09368f5e4d7e86b395f2af03/Protocol/Rfc6455.php#L226
+     * For the original method:
+     * @see https://github.com/hoaproject/Websocket/blob/bec469034ab9da8d09368f5e4d7e86b395f2af03/Protocol/Rfc6455.php#L226
      *
      * @param string $message
      * @param bool $mask
@@ -189,19 +172,7 @@ class Rfc6455
             return $message;
         }
 
-        $maskingKey = [];
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            $maskingKey = array_map(
-                'ord',
-                str_split(
-                    openssl_random_pseudo_bytes(4)
-                )
-            );
-        } else {
-            for ($i = 0; $i < 4; ++$i) {
-                $maskingKey[] = mt_rand(1, 255);
-            }
-        }
+        $maskingKey = array_map('ord', str_split(random_bytes(4)));
 
         for ($i = 0, $max = strlen($message); $i < $max; ++$i) {
             $message[$i] = chr(ord($message[$i]) ^ $maskingKey[$i % 4]);
@@ -213,19 +184,19 @@ class Rfc6455
     /**
      * Generate random string for a WebSocket handshake request headers
      *
-     * @param  int    $length
-     * @param  bool   $addSpaces
-     * @param  bool   $addNumbers
+     * @param  int $length
+     * @param  bool $addSpaces
+     * @param  bool $addNumbers
      * @return string
      */
     protected function generateRandomString($length = 10, $addSpaces = true, $addNumbers = true)
     {
         $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"§$%&/()=[]{}';
-        $useChars   = array();
+        $useChars = [];
 
         // select some random chars:
         for ($i = 0; $i < $length; $i++) {
-            $useChars[] = $characters[mt_rand(0, strlen($characters)-1)];
+            $useChars[] = $characters[random_int(0, strlen($characters) - 1)];
         }
 
         // add spaces and numbers:
@@ -234,7 +205,7 @@ class Rfc6455
         }
 
         if ($addNumbers === true) {
-            array_push($useChars, rand(0, 9), rand(0, 9), rand(0, 9));
+            array_push($useChars, random_int(0, 9), random_int(0, 9), random_int(0, 9));
         }
 
         shuffle($useChars);
@@ -242,5 +213,56 @@ class Rfc6455
         $randomString = trim(implode('', $useChars));
 
         return substr($randomString, 0, $length);
+    }
+
+    /**
+     * Creates stream socket client resource
+     * @throws WebSocket\SetupFailure|WebSocket\ConnectionError
+     */
+    protected function create()
+    {
+        $socket = @stream_socket_client($this->remoteSocketAddress, $errCode, $errStr, self::SOCKET_TIMEOUT);
+
+        if (!$socket) {
+            throw new WebSocket\ConnectionError(
+                sprintf('WebSocket connection error %s (%u): %s', $this->remoteSocketAddress, $errCode, $errStr)
+            );
+        }
+
+        if (false === stream_set_timeout($socket, self::SOCKET_TIMEOUT)) {
+            throw new WebSocket\SetupFailure(
+                'WebSocket set timeout failure. Can not set timeout for stream.'
+            );
+        }
+
+        return $socket;
+    }
+
+    /**
+     * @param string $header
+     */
+    protected function handshake($header)
+    {
+        if (!fwrite($this->socket, $header)) {
+            throw new WebSocket\SocketWriteError(
+                sprintf('WebSocket write error. (remote_socket: %s)', $this->remoteSocketAddress)
+            );
+        }
+
+        $serverHandshake = fread($this->socket, 32);
+        if (!$serverHandshake) {
+            throw new WebSocket\SocketReadError(
+                sprintf('WebSocket read error. (remote_socket: %s)', $this->remoteSocketAddress)
+            );
+        }
+
+        if (strpos($serverHandshake, static::SERVER_HANDSHAKE_STATUS_LINE) !== 0) {
+            throw new WebSocket\HandshakeFailure(sprintf(
+                'Websocket server handshake expect status line to be "%s", but "%s" was returned (remote_socket: %s)',
+                static::SERVER_HANDSHAKE_STATUS_LINE,
+                $serverHandshake,
+                $this->remoteSocketAddress
+            ));
+        }
     }
 }

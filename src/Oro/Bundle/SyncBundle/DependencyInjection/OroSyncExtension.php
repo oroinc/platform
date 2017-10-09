@@ -16,12 +16,15 @@ class OroSyncExtension extends Extension
 {
     const CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST  = 'websocket_host';
     const CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  = 'websocket_port';
+    const CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH  = 'websocket_path';
     const CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS  = 'websocket_bind_address';
     const CONFIG_PARAM_WEBSOCKET_BIND_PORT     = 'websocket_bind_port';
     const CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  = 'websocket_backend_host';
     const CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  = 'websocket_backend_port';
+    const CONFIG_PARAM_WEBSOCKET_BACKEND_PATH  = 'websocket_backend_path';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST = 'websocket_frontend_host';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT = 'websocket_frontend_port';
+    const CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH = 'websocket_frontend_path';
 
     /**
      * {@inheritDoc}
@@ -48,6 +51,15 @@ class OroSyncExtension extends Extension
                 self::CONFIG_PARAM_WEBSOCKET_BIND_PORT,
                 self::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT,
                 self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT
+            ]
+        );
+
+        $this->cloneParameters(
+            $container,
+            self::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH,
+            [
+                self::CONFIG_PARAM_WEBSOCKET_BACKEND_PATH,
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH
             ]
         );
     }

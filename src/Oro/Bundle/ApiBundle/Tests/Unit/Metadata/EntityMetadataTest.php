@@ -158,6 +158,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $entityMetadata->getMetaProperties());
         $this->assertFalse($entityMetadata->hasProperty('unknown'));
         $this->assertFalse($entityMetadata->hasMetaProperty('unknown'));
+        $this->assertNull($entityMetadata->getProperty('unknown'));
         $this->assertNull($entityMetadata->getMetaProperty('unknown'));
 
         $property1 = new MetaPropertyMetadata('property1');
@@ -168,6 +169,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($entityMetadata->hasProperty('property1'));
         $this->assertTrue($entityMetadata->hasMetaProperty('property1'));
+        $this->assertSame($property1, $entityMetadata->getProperty('property1'));
         $this->assertSame($property1, $entityMetadata->getMetaProperty('property1'));
 
         $entityMetadata->removeMetaProperty('property1');
@@ -187,6 +189,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $entityMetadata->getFields());
         $this->assertFalse($entityMetadata->hasProperty('unknown'));
         $this->assertFalse($entityMetadata->hasField('unknown'));
+        $this->assertNull($entityMetadata->getProperty('unknown'));
         $this->assertNull($entityMetadata->getField('unknown'));
 
         $field1 = new FieldMetadata('field1');
@@ -197,6 +200,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($entityMetadata->hasProperty('field1'));
         $this->assertTrue($entityMetadata->hasField('field1'));
+        $this->assertSame($field1, $entityMetadata->getProperty('field1'));
         $this->assertSame($field1, $entityMetadata->getField('field1'));
 
         $entityMetadata->removeField('field1');
@@ -216,6 +220,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $entityMetadata->getAssociations());
         $this->assertFalse($entityMetadata->hasProperty('unknown'));
         $this->assertFalse($entityMetadata->hasAssociation('unknown'));
+        $this->assertNull($entityMetadata->getProperty('unknown'));
         $this->assertNull($entityMetadata->getAssociation('unknown'));
 
         $association1 = new AssociationMetadata('association1');
@@ -226,6 +231,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($entityMetadata->hasProperty('association1'));
         $this->assertTrue($entityMetadata->hasAssociation('association1'));
+        $this->assertSame($association1, $entityMetadata->getProperty('association1'));
         $this->assertSame($association1, $entityMetadata->getAssociation('association1'));
 
         $entityMetadata->removeAssociation('association1');
