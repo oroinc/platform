@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityNestedObjectMetadata
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -62,6 +63,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
 
         $this->entityMetadataLoader = new EntityMetadataLoader(
             $this->doctrineHelper,
+            new EntityIdHelper(),
             $this->metadataFactory,
             $this->objectMetadataFactory,
             $this->entityMetadataFactory,
@@ -174,6 +176,197 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         );
         self::assertSame($entityMetadata, $result);
         self::assertEquals([$fieldName], $entityMetadata->getIdentifierFieldNames());
+    }
+
+    public function testForConfiguredIdentifierField()
+    {
+        $entityClass = 'Test\Class';
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['field1']);
+        $field1 = $config->addField('field1');
+        $field1->setPropertyPath('realField1');
+        $field2 = $config->addField('id');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $entityMetadata->setIdentifierFieldNames(['id']);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'realField1']);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::at(0))
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                'id',
+                self::identicalTo($field2),
+                $targetAction
+            );
+        $this->entityMetadataFactory->expects(self::at(1))
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                'field1',
+                self::identicalTo($field1),
+                $targetAction
+            );
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertEquals(['field1'], $entityMetadata->getIdentifierFieldNames());
+    }
+
+    public function testForConfiguredIdentifierFieldShouldSetHasIdentifierGeneratorToFalse()
+    {
+        $entityClass = 'Test\Class';
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['field1']);
+        $field1 = $config->addField('field1');
+        $field2 = $config->addField('id');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $entityMetadata->setIdentifierFieldNames(['id']);
+        $entityMetadata->setHasIdentifierGenerator(true);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1']);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::at(0))
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                'id',
+                self::identicalTo($field2),
+                $targetAction
+            );
+        $this->entityMetadataFactory->expects(self::at(1))
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                'field1',
+                self::identicalTo($field1),
+                $targetAction
+            );
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertEquals(['field1'], $entityMetadata->getIdentifierFieldNames());
+        self::assertFalse($entityMetadata->hasIdentifierGenerator());
+    }
+
+    public function testForConfiguredIdentifierFieldEqualsToEntityIdentifierFieldShouldKeepHasIdentifierGeneratorAsIs()
+    {
+        $entityClass = 'Test\Class';
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $field1 = $config->addField('field1');
+        $field2 = $config->addField('id');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $entityMetadata->setIdentifierFieldNames(['id']);
+        $entityMetadata->setHasIdentifierGenerator(true);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1']);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::at(0))
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                'id',
+                self::identicalTo($field2),
+                $targetAction
+            );
+        $this->entityMetadataFactory->expects(self::at(1))
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                'field1',
+                self::identicalTo($field1),
+                $targetAction
+            );
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertEquals(['id'], $entityMetadata->getIdentifierFieldNames());
+        self::assertTrue($entityMetadata->hasIdentifierGenerator());
     }
 
     public function testForExcludedField()

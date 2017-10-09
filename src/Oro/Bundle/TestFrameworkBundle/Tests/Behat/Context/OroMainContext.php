@@ -1089,6 +1089,20 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Scrolls page to first element with given text
+     *
+     * @When /^(?:|I )scroll to text "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToText($text)
+    {
+        $this->assertPageContainsText($text);
+        $element = $this->getPage()->find('named', ['content', $text]);
+        if ($element) {
+            $element->focus();
+        }
+    }
+
+    /**
      * Presses button with specified id|name|title|alt|value in some named section
      * Example: When I press "Add" in "General Information" section
      * Example: And I press "Add" in "General Information" section
@@ -1698,5 +1712,17 @@ class OroMainContext extends MinkContext implements
                 "Button with name $item still present on page (link selector, actually)"
             );
         }
+    }
+
+    /**
+     * Scroll element info viewport
+     *
+     * @When /^(?:|I )scroll to "(?P<elementName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )focus on "(?P<elementName>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToElement($elementName)
+    {
+        $element = $this->elementFactory->createElement($elementName);
+        $element->focus();
     }
 }

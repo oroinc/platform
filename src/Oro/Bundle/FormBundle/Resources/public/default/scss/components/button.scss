@@ -208,6 +208,10 @@
             margin-left: $offset-y-m;
         }
     }
+
+    &--baseline {
+        vertical-align: baseline;
+    }
 }
 
 @include breakpoint('mobile-landscape') {

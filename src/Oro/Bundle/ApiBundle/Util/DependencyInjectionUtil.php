@@ -9,9 +9,14 @@ use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Configuration;
 
+/**
+ * Provides a set of methods to simplify working with the service container.
+ */
 class DependencyInjectionUtil
 {
     /**
+     * Gets the specific service by its identifier or alias.
+     *
      * @param ContainerBuilder $container
      * @param string           $serviceId
      *
@@ -25,6 +30,8 @@ class DependencyInjectionUtil
     }
 
     /**
+     * Gets configuration of ApiBundle.
+     *
      * @param ContainerBuilder $container
      *
      * @return array
@@ -40,6 +47,55 @@ class DependencyInjectionUtil
     }
 
     /**
+     * Gets a value of the specific tag attribute.
+     *
+     * @param array  $attributes
+     * @param string $attributeName
+     * @param mixed  $defaultValue
+     *
+     * @return mixed
+     */
+    public static function getAttribute(array $attributes, $attributeName, $defaultValue)
+    {
+        if (!array_key_exists($attributeName, $attributes)) {
+            return $defaultValue;
+        }
+
+        return $attributes[$attributeName];
+    }
+
+    /**
+     * Gets a value of the "priority" attribute.
+     * If a tag does not have this attribute, 0 is returned.
+     *
+     * @param array $attributes
+     *
+     * @return int
+     */
+    public static function getPriority(array $attributes)
+    {
+        return self::getAttribute($attributes, 'priority', 0);
+    }
+
+    /**
+     * Sorts the tagged services by the priority;
+     * the higher the priority, the earlier element is added to the result list,
+     * and return flatten array of sorted services.
+     *
+     * @param array $services [priority => item, ...]
+     *
+     * @return array [item, ...]
+     */
+    public static function sortByPriorityAndFlatten(array $services)
+    {
+        krsort($services);
+
+        return call_user_func_array('array_merge', $services);
+    }
+
+    /**
+     * Registers tagged services.
+     *
      * @param ContainerBuilder $container
      * @param string           $chainServiceId
      * @param string           $tagName
@@ -57,16 +113,16 @@ class DependencyInjectionUtil
             $services = [];
             $taggedServices = $container->findTaggedServiceIds($tagName);
             foreach ($taggedServices as $id => $attributes) {
-                $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-                $services[$priority][] = new Reference($id);
+                foreach ($attributes as $tagAttributes) {
+                    $services[self::getPriority($tagAttributes)][] = new Reference($id);
+                }
             }
             if (empty($services)) {
                 return;
             }
 
             // sort by priority and flatten
-            krsort($services);
-            $services = call_user_func_array('array_merge', $services);
+            $services = self::sortByPriorityAndFlatten($services);
 
             // register
             foreach ($services as $service) {
@@ -76,7 +132,7 @@ class DependencyInjectionUtil
     }
 
     /**
-     * Replaces a regular service with the debug one
+     * Replaces a regular service with the debug one.
      *
      * @param ContainerBuilder $container
      * @param string           $serviceId

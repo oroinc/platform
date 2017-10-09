@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Filter\SelfIdentifiableFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -146,11 +145,8 @@ class RegisterDynamicFilters extends RegisterFilters
         }
 
         list($filterConfig, $propertyPath, $isCollection) = $filterInfo;
-        $filter = $this->createFilter($filterConfig, $propertyPath);
+        $filter = $this->createFilter($filterConfig, $propertyPath, $context);
         if (null !== $filter) {
-            if ($filter instanceof RequestAwareFilterInterface) {
-                $filter->setRequestType($context->getRequestType());
-            }
             // @todo BAP-11881. Update this code when NEQ operator for to-many collection
             // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
             if ($isCollection) {

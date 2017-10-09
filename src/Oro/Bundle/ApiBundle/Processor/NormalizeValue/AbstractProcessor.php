@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Provides a base implementation for different kinds of a value normalization processors.
+ */
 abstract class AbstractProcessor implements ProcessorInterface
 {
     /**

@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMessageQueueExtension extends Extension
 {
+    const HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME = 'oro_message_queue.consumer_heartbeat_update_period';
+
     /**
      * @var TransportFactoryInterface[]
      */
@@ -96,6 +98,13 @@ class OroMessageQueueExtension extends Extension
                 'oro_message_queue.client.delay_redelivered_message_extension'
             );
             $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
+        }
+
+        if (isset($config['consumer'])) {
+            $container->setParameter(
+                self::HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME,
+                $config['consumer']['heartbeat_update_period']
+            );
         }
 
         $this->setPersistenceServicesAndProcessors($config, $container);

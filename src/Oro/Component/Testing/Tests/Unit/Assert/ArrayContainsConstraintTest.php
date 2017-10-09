@@ -189,7 +189,7 @@ TEXT;
         $expectedMessage = <<<TEXT
 Failed asserting that the array contains other array.
 Errors:
-Path: "1". Error: Failed asserting that two strings are identical.
+Path: "1". Error: Failed asserting that 'anotherValue' is identical to 'value2'.
 TEXT;
 
         $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
@@ -215,8 +215,8 @@ TEXT;
         $expectedMessage = <<<TEXT
 Failed asserting that the array contains other array.
 Errors:
-Path: "0". Error: Failed asserting that two strings are identical.
-Path: "1". Error: Failed asserting that two strings are identical.
+Path: "0". Error: Failed asserting that 'value2' is identical to 'value1'.
+Path: "1". Error: Failed asserting that 'anotherValue' is identical to 'value2'.
 TEXT;
 
         $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
@@ -298,7 +298,7 @@ TEXT;
         $expectedMessage = <<<TEXT
 Failed asserting that the array contains other array.
 Errors:
-Path: "key2.key22.key221". Error: Failed asserting that two strings are identical.
+Path: "key2.key22.key221". Error: Failed asserting that 'value221_other' is identical to 'value221'.
 TEXT;
 
         $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
@@ -327,8 +327,8 @@ TEXT;
         $expectedMessage = <<<TEXT
 Failed asserting that the array contains other array.
 Errors:
-Path: "key2.0.key". Error: Failed asserting that two strings are identical.
-Path: "key2.1.key". Error: Failed asserting that two strings are identical.
+Path: "key2.0.key". Error: Failed asserting that 'value222' is identical to 'value221'.
+Path: "key2.1.key". Error: Failed asserting that 'value221' is identical to 'value222'.
 TEXT;
 
         $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);

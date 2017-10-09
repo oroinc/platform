@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -34,19 +33,18 @@ class BuildCriteria implements ProcessorInterface
         }
 
         $filters = $context->getFilters();
-        $filterValues = $context->getFilterValues();
-        /** @var FilterInterface $filter */
-        foreach ($filters as $filterKey => $filter) {
-            if ($filterValues->has($filterKey)) {
-                $value = $filterValues->get($filterKey);
+        $filterValues = $context->getFilterValues()->getAll();
+        foreach ($filterValues as $filterKey => $filterValue) {
+            if ($filters->has($filterKey)) {
+                $filter = $filters->get($filterKey);
                 try {
-                    $filter->apply($criteria, $value);
+                    $filter->apply($criteria, $filterValue);
                 } catch (\Exception $e) {
-                    $error = null === $value || !$value->getSourceKey()
+                    $error = null === $filterValue || !$filterValue->getSourceKey()
                         ? Error::createByException($e)
                         : Error::createValidationError(Constraint::FILTER)
                             ->setInnerException($e)
-                            ->setSource(ErrorSource::createByParameter($value->getSourceKey()));
+                            ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()));
                     $context->addError($error);
                 }
             }
