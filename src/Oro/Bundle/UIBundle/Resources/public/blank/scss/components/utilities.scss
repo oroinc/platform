@@ -5,7 +5,7 @@
     display: none !important; // override inline styles
 }
 
-.show {        
+.show {
     display: block !important; // override inline styles
 }
 
@@ -48,4 +48,8 @@
 
 .text-capitalize {
     text-transform: capitalize;
+}
+
+.img-fluid {
+    @include img-fluid;
 }

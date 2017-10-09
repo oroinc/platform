@@ -2,25 +2,28 @@ services:
     oro_api.data_transformer_registry:
         public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry
+        arguments:
+            - [] # transformers. They are set by \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurationCompilerPass
+            - '@oro_api.request_expression_matcher'
         lazy: true
 
     oro_api.data_transformer.datetime:
         public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\DateTimeToStringTransformer
         tags:
-            - { name: oro.api.data_transformer, dataType: datetime }
+            - { name: oro.api.data_transformer, dataType: datetime, requestType: rest }
 
     oro_api.data_transformer.date:
         public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\DateToStringTransformer
         tags:
-            - { name: oro.api.data_transformer, dataType: date }
+            - { name: oro.api.data_transformer, dataType: date, requestType: rest }
 
     oro_api.data_transformer.time:
         public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\TimeToStringTransformer
         tags:
-            - { name: oro.api.data_transformer, dataType: time }
+            - { name: oro.api.data_transformer, dataType: time, requestType: rest }
 
     oro_api.data_transformer.entity_type:
         public: false

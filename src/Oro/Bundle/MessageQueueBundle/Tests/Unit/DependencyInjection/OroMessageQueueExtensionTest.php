@@ -437,4 +437,25 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             $driverFactoryDefinition->getArgument(0)
         );
     }
+
+    public function testSetHeartbeatUpdatePeriodOption()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
+        $extension->load(
+            [
+                [
+                    'transport' => [
+                        'default' => 'null'
+                    ],
+                    'consumer' => ['heartbeat_update_period' => 10]
+                ]
+            ],
+            $container
+        );
+
+        $this->assertEquals(10, $container->getParameter('oro_message_queue.consumer_heartbeat_update_period'));
+    }
 }

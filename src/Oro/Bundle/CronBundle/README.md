@@ -21,3 +21,13 @@ If you want to make your console command auto-scheduled need to do following:
 OR
 
 - add new record to entity `Oro\Bundle\CronBundle\Entity\Schedule`
+
+## Synchronous CRON commands
+
+By default, all CRON commands are executed asynchronously by sending a message to the queue.
+
+Sometimes it is necessary to execute a CRON command immediately when CRON triggers it, without sending the message to the queue.
+
+To do this, a CRON command should implement interface [SynchronousCommandInterface](./Command/SynchronousCommandInterface.php).
+
+In this case, the command will be executed as a background process.

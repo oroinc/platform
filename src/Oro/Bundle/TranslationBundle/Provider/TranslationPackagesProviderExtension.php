@@ -66,7 +66,12 @@ class TranslationPackagesProviderExtension implements TranslationPackagesProvide
 
         $paths = [];
         foreach ($this->packages as $package) {
-            $paths[] = $manager->getInstallPath($localRepository->findPackage($package[1], '*')) . $package[2];
+            $composerPackage = $localRepository->findPackage($package[1], '*');
+            if (null === $composerPackage) {
+                continue;
+            }
+
+            $paths[] = $manager->getInstallPath($composerPackage) . $package[2];
         }
 
         return new FileLocator($paths);
