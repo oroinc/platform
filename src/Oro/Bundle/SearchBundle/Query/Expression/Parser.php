@@ -26,7 +26,7 @@ class Parser
         Query::KEYWORD_SELECT,
         Query::KEYWORD_FROM,
         Query::KEYWORD_WHERE,
-        Query::KEYWORD_GROUP_BY,
+        Query::KEYWORD_AGGREGATE,
 
         Query::KEYWORD_AND,
         Query::KEYWORD_OR,
@@ -52,7 +52,7 @@ class Parser
         Query::OPERATOR_NOT_CONTAINS,
         Query::OPERATOR_STARTS_WITH,
         Query::OPERATOR_LIKE,
-        QUERY::OPERATOR_NOT_LIKE,
+        Query::OPERATOR_NOT_LIKE,
     ];
 
     /** @var array */
@@ -76,7 +76,7 @@ class Parser
             Query::OPERATOR_EXISTS,
             Query::OPERATOR_NOT_EXISTS,
             Query::OPERATOR_LIKE,
-            QUERY::OPERATOR_NOT_LIKE,
+            Query::OPERATOR_NOT_LIKE,
         ],
         Query::TYPE_INTEGER  => [
             Query::OPERATOR_GREATER_THAN,
@@ -117,12 +117,12 @@ class Parser
     ];
 
     /** @var array */
-    protected $groupingFunctions = [
-        Query::GROUP_FUNCTION_COUNT,
-        Query::GROUP_FUNCTION_SUM,
-        Query::GROUP_FUNCTION_MAX,
-        Query::GROUP_FUNCTION_MIN,
-        Query::GROUP_FUNCTION_AVG,
+    protected $aggregatingFunctions = [
+        Query::AGGREGATE_FUNCTION_COUNT,
+        Query::AGGREGATE_FUNCTION_SUM,
+        Query::AGGREGATE_FUNCTION_MAX,
+        Query::AGGREGATE_FUNCTION_MIN,
+        Query::AGGREGATE_FUNCTION_AVG,
     ];
 
     /** @var array */
@@ -184,8 +184,8 @@ class Parser
             case Query::KEYWORD_WHERE:
                 $this->parseWhereExpression();
                 break;
-            case Query::KEYWORD_GROUP_BY:
-                $this->parseGroupByExpression();
+            case Query::KEYWORD_AGGREGATE:
+                $this->parseAggregateExpression();
                 break;
             case Query::KEYWORD_OFFSET:
                 $this->parseOffsetExpression();
@@ -293,28 +293,28 @@ class Parser
     }
 
     /**
-     * Parse group_by expression from string query
+     * Parse aggregate expression from string query
      */
-    protected function parseGroupByExpression()
+    protected function parseAggregateExpression()
     {
         /** @var Criteria $criteria */
         $criteria = $this->query->getCriteria();
 
-        // skip GROUP_BY keyword
-        $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_GROUP_BY);
+        // skip AGGREGATE keyword
+        $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE);
 
         // parse field name
         $fieldTypeToken = $this->stream->expect(Token::STRING_TYPE, $this->types, null, false);
         $field = $criteria->implodeFieldTypeName(
             $fieldTypeToken ? $fieldTypeToken->value : Query::TYPE_TEXT,
-            $this->stream->expect(Token::STRING_TYPE, null, 'Grouping field is expected')->value
+            $this->stream->expect(Token::STRING_TYPE, null, 'Aggregating field is expected')->value
         );
 
         // parse function
         $functionToken = $this->stream->expect(
             Token::STRING_TYPE,
-            $this->groupingFunctions,
-            'Grouping operation expected'
+            $this->aggregatingFunctions,
+            'Aggregating operation expected'
         );
         $function = $functionToken->value;
 
@@ -323,11 +323,11 @@ class Parser
             $this->stream->next();
         }
 
-        // parse grouping name
-        $nameToken = $this->stream->expect(Token::STRING_TYPE, null, 'Grouping name is expected');
+        // parse aggregating name
+        $nameToken = $this->stream->expect(Token::STRING_TYPE, null, 'Aggregating name is expected');
         $name = $nameToken->value;
 
-        $this->query->addGroupBy($name, $field, $function);
+        $this->query->addAggregate($name, $field, $function);
     }
 
     /**

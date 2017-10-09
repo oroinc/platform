@@ -31,7 +31,7 @@ class SearchAdvancedController extends FOSRestController
      *
      * Syntax: and(or) field_type field_name operator value
      *
-     *   group_by: Allows to builds extra grouping operations
+     *   aggregate: Allows to builds extra aggregating operations
      *
      * Syntax: field_type field_name grouping_function grouping_name
      *
@@ -70,7 +70,7 @@ class SearchAdvancedController extends FOSRestController
      *
      *  replace spaces with _ underscore for fulltext search
      *
-     * Grouping functions:
+     * Aggregating functions:
      *
      *  count
      *
@@ -98,7 +98,7 @@ class SearchAdvancedController extends FOSRestController
      *
      *  integer count !in (1, 3, 5)
      *
-     *  from demo_products group_by integer price sum price_sum
+     *  from demo_products aggregate integer price sum price_sum
      *
      * @ApiDoc(
      *  description="Get advanced search result.",

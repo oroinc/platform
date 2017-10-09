@@ -213,25 +213,25 @@ abstract class BaseDriver implements DBALPersisterInterface
      * @param Query $query
      * @return array
      */
-    public function getGroupedData(Query $query)
+    public function getAggregatedData(Query $query)
     {
-        $groupedData = [];
-        foreach ($query->getGroupBy() as $name => $options) {
+        $aggregatedData = [];
+        foreach ($query->getAggregations() as $name => $options) {
             $field = $options['field'];
             $function = $options['function'];
             list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($field);
 
             // prepare query builder to apply grouping
-            $groupedQuery = clone $query;
-            $groupedQuery->select($field);
-            $queryBuilder = $this->getRequestQB($groupedQuery, false);
+            $aggregatedQuery = clone $query;
+            $aggregatedQuery->select($field);
+            $queryBuilder = $this->getRequestQB($aggregatedQuery, false);
             /** @var Select $fieldSelectExpression */
             $fieldSelectExpression = $queryBuilder->getDQLPart('select')[1];
             $fieldSelect = (string)$fieldSelectExpression;
             $queryBuilder->resetDQLPart('select');
 
             switch ($function) {
-                case Query::GROUP_FUNCTION_COUNT:
+                case Query::AGGREGATE_FUNCTION_COUNT:
                     $queryBuilder->select([
                         $fieldSelect,
                         sprintf('%s as countValue', $queryBuilder->expr()->countDistinct('search.id'))
@@ -242,27 +242,27 @@ abstract class BaseDriver implements DBALPersisterInterface
                         $key = $row[$fieldName];
                         // skip null values to maintain similar behaviour cross all engines
                         if (null !== $key) {
-                            $groupedData[$name][(string)$key] = (int)$row['countValue'];
+                            $aggregatedData[$name][(string)$key] = (int)$row['countValue'];
                         }
                     }
                     break;
 
-                case Query::GROUP_FUNCTION_MAX:
-                case Query::GROUP_FUNCTION_MIN:
-                case Query::GROUP_FUNCTION_AVG:
-                case Query::GROUP_FUNCTION_SUM:
+                case Query::AGGREGATE_FUNCTION_MAX:
+                case Query::AGGREGATE_FUNCTION_MIN:
+                case Query::AGGREGATE_FUNCTION_AVG:
+                case Query::AGGREGATE_FUNCTION_SUM:
                     $fieldSelect = explode(' as ', $fieldSelect)[0];
                     $queryBuilder->select(sprintf('%s(%s)', $function, $fieldSelect));
-                    $groupedData[$name] = (float)$queryBuilder->getQuery()->getSingleScalarResult();
+                    $aggregatedData[$name] = (float)$queryBuilder->getQuery()->getSingleScalarResult();
                     break;
 
                 default:
-                    throw new \LogicException(sprintf('Grouping function %s is not suppored', $function));
+                    throw new \LogicException(sprintf('Aggregating function %s is not suppored', $function));
 
             }
         }
 
-        return $groupedData;
+        return $aggregatedData;
     }
 
     /**

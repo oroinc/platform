@@ -231,9 +231,9 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    public function addGroupBy($name, $field, $function)
+    public function addAggregate($name, $field, $function)
     {
-        $this->query->addGroupBy($name, $field, $function);
+        $this->query->addAggregate($name, $field, $function);
 
         return $this;
     }
@@ -241,8 +241,8 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    public function getGroupBy()
+    public function getAggregations()
     {
-        return $this->query->getGroupBy();
+        return $this->query->getAggregations();
     }
 }

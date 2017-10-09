@@ -22,29 +22,29 @@ class Result extends ArrayCollection
     protected $recordsCount = null;
 
     /**
-     * Format for count function: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
-     * Format for mathematical functions: ['<groupingName>' => <groupedValue>, ...]
+     * Format for count function: ['<aggregatingName>' => ['<fieldValue>' => <count>], ...]
+     * Format for mathematical functions: ['<aggregatingName>' => <aggregatedValue>, ...]
      *
      * @var array
      */
-    protected $groupedData = null;
+    protected $aggregatedData = null;
 
     /**
      * @param Query   $query
      * @param array   $elements
      * @param integer $recordsCount
-     * @param array   $groupedData
+     * @param array   $aggregatedData
      */
     public function __construct(
         Query $query,
         array $elements = [],
         $recordsCount = 0,
-        array $groupedData = []
+        array $aggregatedData = []
     ) {
-        $this->query        = $query;
-        $this->elements     = $elements;
+        $this->query = $query;
+        $this->elements = $elements;
         $this->recordsCount = $recordsCount;
-        $this->groupedData  = $groupedData;
+        $this->aggregatedData = $aggregatedData;
 
         parent::__construct($elements);
     }
@@ -78,15 +78,15 @@ class Result extends ArrayCollection
     }
 
     /**
-     * Return grouped data collected during the query execution
-     * Format for count function: ['<groupingName>' => ['<fieldValue>' => <count>], ...]
-     * Format for mathematical functions: ['<groupingName>' => <groupedValue>, ...]
+     * Return aggregated data collected during the query execution
+     * Format for count function: ['<aggregatingName>' => ['<fieldValue>' => <count>], ...]
+     * Format for mathematical functions: ['<aggregatingName>' => <aggregatedValue>, ...]
      *
      * @return array
      */
-    public function getGroupedData()
+    public function getAggregatedData()
     {
-        return $this->groupedData;
+        return $this->aggregatedData;
     }
 
     /**
@@ -99,7 +99,7 @@ class Result extends ArrayCollection
             'records_count' => $this->getRecordsCount(),
             'data' => [],
             'count' => $this->count(),
-            'grouped_data' => $this->getGroupedData()
+            'aggregated_data' => $this->getAggregatedData()
         ];
 
         if ($this->count()) {

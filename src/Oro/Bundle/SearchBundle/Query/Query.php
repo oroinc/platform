@@ -24,7 +24,7 @@ class Query
     const KEYWORD_OR          = 'or';
     const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
-    const KEYWORD_GROUP_BY    = 'group_by';
+    const KEYWORD_AGGREGATE   = 'aggregate';
     const KEYWORD_ORDER_BY    = 'order_by';
     const KEYWORD_AS          = 'as';
 
@@ -52,11 +52,11 @@ class Query
     const INFINITY = 10000000;
     const FINITY   = 0.000001;
 
-    const GROUP_FUNCTION_COUNT = 'count';
-    const GROUP_FUNCTION_SUM   = 'sum';
-    const GROUP_FUNCTION_MAX   = 'max';
-    const GROUP_FUNCTION_MIN   = 'min';
-    const GROUP_FUNCTION_AVG   = 'avg';
+    const AGGREGATE_FUNCTION_COUNT = 'count';
+    const AGGREGATE_FUNCTION_SUM   = 'sum';
+    const AGGREGATE_FUNCTION_MAX   = 'max';
+    const AGGREGATE_FUNCTION_MIN   = 'min';
+    const AGGREGATE_FUNCTION_AVG   = 'avg';
 
     const DELIMITER = ' ';
 
@@ -79,7 +79,7 @@ class Query
     protected $criteria;
 
     /** @var array */
-    protected $groupBy = [];
+    protected $aggregations = [];
 
     public function __construct()
     {
@@ -613,17 +613,17 @@ class Query
      * @param string $field
      * @param string $function
      */
-    public function addGroupBy($name, $field, $function)
+    public function addAggregate($name, $field, $function)
     {
-        $this->groupBy[$name] = ['field' => $field, 'function' => $function];
+        $this->aggregations[$name] = ['field' => $field, 'function' => $function];
     }
 
     /**
      * @return array ['<name>' => ['field' => <field>, 'function' => '<function>']]
      */
-    public function getGroupBy()
+    public function getAggregations()
     {
-        return $this->groupBy;
+        return $this->aggregations;
     }
 
     /**
