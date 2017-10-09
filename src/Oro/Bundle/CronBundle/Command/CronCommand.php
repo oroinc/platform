@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
+use Oro\Bundle\CronBundle\Tools\CommandRunner;
 
 class CronCommand extends ContainerAwareCommand
 {
@@ -64,14 +65,30 @@ class CronCommand extends ContainerAwareCommand
                     continue;
                 }
 
-                $output->writeln(
-                    'Scheduling run for command ' . $schedule->getCommand(),
-                    OutputInterface::VERBOSITY_DEBUG
-                );
-                $this->getCommandRunner()->run(
-                    $schedule->getCommand(),
-                    $this->resolveOptions($schedule->getArguments())
-                );
+                // in case of synchronous cron command - run it in separate process
+                if ($command instanceof SynchronousCommandInterface) {
+                    $output->writeln(
+                        'Running synchronous command ' . $schedule->getCommand(),
+                        OutputInterface::VERBOSITY_DEBUG
+                    );
+                    CommandRunner::runCommand(
+                        $schedule->getCommand(),
+                        array_merge(
+                            $schedule->getArguments(),
+                            ['--env' => $this->getContainer()->getParameter('kernel.environment')]
+                        )
+                    );
+                } else {
+                    // in case of common cron command - send the MQ message that will run this command
+                    $output->writeln(
+                        'Scheduling run for command ' . $schedule->getCommand(),
+                        OutputInterface::VERBOSITY_DEBUG
+                    );
+                    $this->getCommandRunner()->run(
+                        $schedule->getCommand(),
+                        $this->resolveOptions($schedule->getArguments())
+                    );
+                }
             } else {
                 $output->writeln('Skipping not due command '.$schedule->getCommand(), OutputInterface::VERBOSITY_DEBUG);
             }

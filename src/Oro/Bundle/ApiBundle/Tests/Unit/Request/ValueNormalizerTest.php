@@ -5,29 +5,34 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Doctrine\Common\Collections\Criteria;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue as Processor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 /**
  * Tests ValueNormalizer and normalization processors for all supported simple types
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function setUp()
     {
-        $processorFactory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $processorBag     = new ProcessorBag($processorFactory);
+        $processorFactory = $this->createMock(ProcessorFactoryInterface::class);
+        $processorBag = new ProcessorBag($processorFactory);
 
-        $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
         $entityAliasResolver->expects($this->any())
             ->method('getClassByAlias')
             ->willReturnMap([['test_entity', 'Test\Entity']]);
@@ -52,7 +57,15 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 new Processor\NormalizeBigint()
             ],
             [
+                $this->addProcessor($processorBag, 'smallint', DataType::SMALLINT),
+                new Processor\NormalizeInteger()
+            ],
+            [
                 $this->addProcessor($processorBag, 'integer', DataType::INTEGER),
+                new Processor\NormalizeInteger()
+            ],
+            [
+                $this->addProcessor($processorBag, 'duration', DataType::DURATION),
                 new Processor\NormalizeInteger()
             ],
             [
@@ -65,11 +78,23 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 $this->addProcessor($processorBag, 'decimal', DataType::DECIMAL),
-                new Processor\NormalizeNumber()
+                new Processor\NormalizeDecimal()
+            ],
+            [
+                $this->addProcessor($processorBag, 'money', DataType::MONEY),
+                new Processor\NormalizeDecimal()
             ],
             [
                 $this->addProcessor($processorBag, 'float', DataType::FLOAT),
                 new Processor\NormalizeNumber()
+            ],
+            [
+                $this->addProcessor($processorBag, 'percent', DataType::PERCENT),
+                new Processor\NormalizeNumber()
+            ],
+            [
+                $this->addProcessor($processorBag, 'guid', DataType::GUID),
+                new Processor\NormalizeString()
             ],
             [
                 $this->addProcessor($processorBag, 'entityClass', DataType::ENTITY_CLASS),
@@ -82,6 +107,14 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 $this->addProcessor($processorBag, 'rest.datetime', DataType::DATETIME, [RequestType::REST]),
                 new Processor\Rest\NormalizeDateTime()
+            ],
+            [
+                $this->addProcessor($processorBag, 'rest.date', DataType::DATE, [RequestType::REST]),
+                new Processor\Rest\NormalizeDate()
+            ],
+            [
+                $this->addProcessor($processorBag, 'rest.time', DataType::TIME, [RequestType::REST]),
+                new Processor\Rest\NormalizeTime()
             ],
             [
                 $this->addProcessor($processorBag, 'rest.order_by', DataType::ORDER_BY, [RequestType::REST]),
@@ -113,12 +146,19 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [ValueNormalizer::DEFAULT_REQUIREMENT, 'unknownType', [RequestType::REST]],
             [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::STRING, [RequestType::REST]],
             [Processor\NormalizeInteger::REQUIREMENT, DataType::INTEGER, [RequestType::REST]],
+            [Processor\NormalizeInteger::REQUIREMENT, DataType::SMALLINT, [RequestType::REST]],
+            [Processor\NormalizeInteger::REQUIREMENT, DataType::DURATION, [RequestType::REST]],
             [Processor\NormalizeBigint::REQUIREMENT, DataType::BIGINT, [RequestType::REST]],
             [Processor\NormalizeUnsignedInteger::REQUIREMENT, DataType::UNSIGNED_INTEGER, [RequestType::REST]],
             [Processor\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, [RequestType::REST]],
-            [Processor\NormalizeNumber::REQUIREMENT, DataType::DECIMAL, [RequestType::REST]],
+            [Processor\NormalizeDecimal::REQUIREMENT, DataType::DECIMAL, [RequestType::REST]],
+            [Processor\NormalizeDecimal::REQUIREMENT, DataType::MONEY, [RequestType::REST]],
             [Processor\NormalizeNumber::REQUIREMENT, DataType::FLOAT, [RequestType::REST]],
+            [Processor\NormalizeNumber::REQUIREMENT, DataType::PERCENT, [RequestType::REST]],
+            [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::GUID, [RequestType::REST]],
             [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
+            [Processor\Rest\NormalizeDate::REQUIREMENT, DataType::DATE, [RequestType::REST]],
+            [Processor\Rest\NormalizeTime::REQUIREMENT, DataType::TIME, [RequestType::REST]],
             [Processor\Rest\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]],
         ];
     }
@@ -151,6 +191,11 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST]
             ],
             [
+                $this->getArrayRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
                 $this->getArrayRequirement(Processor\NormalizeBigint::REQUIREMENT),
                 DataType::BIGINT,
                 [RequestType::REST]
@@ -161,13 +206,23 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST]
             ],
             [
+                $this->getArrayRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
                 $this->getArrayRequirement(Processor\NormalizeBoolean::REQUIREMENT),
                 DataType::BOOLEAN,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                $this->getArrayRequirement(Processor\NormalizeDecimal::REQUIREMENT),
                 DataType::DECIMAL,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                DataType::MONEY,
                 [RequestType::REST]
             ],
             [
@@ -176,8 +231,28 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST]
             ],
             [
+                $this->getArrayRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
                 $this->getArrayRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
                 DataType::DATETIME,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRequirement(Processor\Rest\NormalizeDate::REQUIREMENT),
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRequirement(Processor\Rest\NormalizeTime::REQUIREMENT),
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                ValueNormalizer::DEFAULT_REQUIREMENT,
+                DataType::GUID,
                 [RequestType::REST]
             ],
             [
@@ -229,18 +304,32 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [null, null, DataType::STRING, [RequestType::REST], false],
             [null, null, DataType::INTEGER, [RequestType::REST], true],
             [null, null, DataType::INTEGER, [RequestType::REST], false],
+            [null, null, DataType::SMALLINT, [RequestType::REST], true],
+            [null, null, DataType::SMALLINT, [RequestType::REST], false],
             [null, null, DataType::BIGINT, [RequestType::REST], true],
             [null, null, DataType::BIGINT, [RequestType::REST], false],
             [null, null, DataType::UNSIGNED_INTEGER, [RequestType::REST], true],
             [null, null, DataType::UNSIGNED_INTEGER, [RequestType::REST], false],
+            [null, null, DataType::DURATION, [RequestType::REST], true],
+            [null, null, DataType::DURATION, [RequestType::REST], false],
             [null, null, DataType::BOOLEAN, [RequestType::REST], true],
             [null, null, DataType::BOOLEAN, [RequestType::REST], false],
             [null, null, DataType::DECIMAL, [RequestType::REST], true],
             [null, null, DataType::DECIMAL, [RequestType::REST], false],
+            [null, null, DataType::MONEY, [RequestType::REST], true],
+            [null, null, DataType::MONEY, [RequestType::REST], false],
             [null, null, DataType::FLOAT, [RequestType::REST], true],
             [null, null, DataType::FLOAT, [RequestType::REST], false],
+            [null, null, DataType::PERCENT, [RequestType::REST], true],
+            [null, null, DataType::PERCENT, [RequestType::REST], false],
             [null, null, DataType::DATETIME, [RequestType::REST], true],
             [null, null, DataType::DATETIME, [RequestType::REST], false],
+            [null, null, DataType::DATE, [RequestType::REST], true],
+            [null, null, DataType::DATE, [RequestType::REST], false],
+            [null, null, DataType::TIME, [RequestType::REST], true],
+            [null, null, DataType::TIME, [RequestType::REST], false],
+            [null, null, DataType::GUID, [RequestType::REST], true],
+            [null, null, DataType::GUID, [RequestType::REST], false],
             [null, null, DataType::ORDER_BY, [RequestType::REST], true],
             ['test', 'test', DataType::STRING, [RequestType::REST], true],
             ['test', 'test', DataType::STRING, [RequestType::REST], false],
@@ -259,6 +348,28 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [-123, '-123', DataType::INTEGER, [RequestType::REST], true],
             [-123, '-123', DataType::INTEGER, [RequestType::REST], false],
             [[123, -456], '123,-456', DataType::INTEGER, [RequestType::REST], true],
+            [123, 123, DataType::SMALLINT, [RequestType::REST], true],
+            [123, 123, DataType::SMALLINT, [RequestType::REST], false],
+            [[123, 456], [123, 456], DataType::SMALLINT, [RequestType::REST], true],
+            [[123, 456], [123, 456], DataType::SMALLINT, [RequestType::REST], false],
+            [0, '0', DataType::SMALLINT, [RequestType::REST], true],
+            [0, '0', DataType::SMALLINT, [RequestType::REST], false],
+            [123, '123', DataType::SMALLINT, [RequestType::REST], true],
+            [123, '123', DataType::SMALLINT, [RequestType::REST], false],
+            [-123, '-123', DataType::SMALLINT, [RequestType::REST], true],
+            [-123, '-123', DataType::SMALLINT, [RequestType::REST], false],
+            [[123, -456], '123,-456', DataType::SMALLINT, [RequestType::REST], true],
+            [123, 123, DataType::DURATION, [RequestType::REST], true],
+            [123, 123, DataType::DURATION, [RequestType::REST], false],
+            [[123, 456], [123, 456], DataType::DURATION, [RequestType::REST], true],
+            [[123, 456], [123, 456], DataType::DURATION, [RequestType::REST], false],
+            [0, '0', DataType::DURATION, [RequestType::REST], true],
+            [0, '0', DataType::DURATION, [RequestType::REST], false],
+            [123, '123', DataType::DURATION, [RequestType::REST], true],
+            [123, '123', DataType::DURATION, [RequestType::REST], false],
+            [-123, '-123', DataType::DURATION, [RequestType::REST], true],
+            [-123, '-123', DataType::DURATION, [RequestType::REST], false],
+            [[123, -456], '123,-456', DataType::DURATION, [RequestType::REST], true],
             [123456789013245, 123456789013245, DataType::BIGINT, [RequestType::REST], true],
             [123456789013245, 123456789013245, DataType::BIGINT, [RequestType::REST], false],
             [[123456789013245, 456], [123456789013245, 456], DataType::BIGINT, [RequestType::REST], true],
@@ -304,25 +415,44 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [[true, false], [true, false], DataType::BOOLEAN, [RequestType::REST], true],
             [[true, false], [true, false], DataType::BOOLEAN, [RequestType::REST], false],
             [[true, false], '1,0', DataType::BOOLEAN, [RequestType::REST], true],
-            [123.1, 123.1, DataType::DECIMAL, [RequestType::REST], true],
-            [123.1, 123.1, DataType::DECIMAL, [RequestType::REST], false],
-            [[123.1, 456.1], [123.1, 456.1], DataType::DECIMAL, [RequestType::REST], true],
-            [[123.1, 456.1], [123.1, 456.1], DataType::DECIMAL, [RequestType::REST], false],
-            [0.0, '0', DataType::DECIMAL, [RequestType::REST], true],
-            [0.0, '0', DataType::DECIMAL, [RequestType::REST], false],
-            [123.0, '123', DataType::DECIMAL, [RequestType::REST], true],
-            [123.0, '123', DataType::DECIMAL, [RequestType::REST], false],
-            [0.01, '.01', DataType::DECIMAL, [RequestType::REST], true],
-            [0.01, '.01', DataType::DECIMAL, [RequestType::REST], false],
-            [-0.01, '-.01', DataType::DECIMAL, [RequestType::REST], true],
-            [-0.01, '-.01', DataType::DECIMAL, [RequestType::REST], false],
-            [123.1, '123.1', DataType::DECIMAL, [RequestType::REST], true],
-            [123.1, '123.1', DataType::DECIMAL, [RequestType::REST], false],
-            [-123.0, '-123', DataType::DECIMAL, [RequestType::REST], true],
-            [-123.0, '-123', DataType::DECIMAL, [RequestType::REST], false],
-            [-123.1, '-123.1', DataType::DECIMAL, [RequestType::REST], true],
-            [-123.1, '-123.1', DataType::DECIMAL, [RequestType::REST], false],
-            [[123.1, -456], '123.1,-456', DataType::DECIMAL, [RequestType::REST], true],
+            [123, 123, DataType::DECIMAL, [RequestType::REST], true],
+            [123, 123, DataType::DECIMAL, [RequestType::REST], false],
+            [[123, 456], [123, 456], DataType::DECIMAL, [RequestType::REST], true],
+            [[123, 456], [123, 456], DataType::DECIMAL, [RequestType::REST], false],
+            ['0', '0', DataType::DECIMAL, [RequestType::REST], true],
+            ['0', '0', DataType::DECIMAL, [RequestType::REST], false],
+            ['123', '123', DataType::DECIMAL, [RequestType::REST], true],
+            ['123', '123', DataType::DECIMAL, [RequestType::REST], false],
+            ['0.01', '.01', DataType::DECIMAL, [RequestType::REST], true],
+            ['0.01', '.01', DataType::DECIMAL, [RequestType::REST], false],
+            ['-0.01', '-.01', DataType::DECIMAL, [RequestType::REST], true],
+            ['-0.01', '-.01', DataType::DECIMAL, [RequestType::REST], false],
+            ['123.1', '123.1', DataType::DECIMAL, [RequestType::REST], true],
+            ['123.1', '123.1', DataType::DECIMAL, [RequestType::REST], false],
+            ['-123', '-123', DataType::DECIMAL, [RequestType::REST], true],
+            ['-123', '-123', DataType::DECIMAL, [RequestType::REST], false],
+            ['-123.1', '-123.1', DataType::DECIMAL, [RequestType::REST], true],
+            ['-123.1', '-123.1', DataType::DECIMAL, [RequestType::REST], false],
+            [['123.1', '-456'], '123.1,-456', DataType::DECIMAL, [RequestType::REST], true],
+            [123, 123, DataType::MONEY, [RequestType::REST], true],
+            [123, 123, DataType::MONEY, [RequestType::REST], false],
+            [[123, 456], [123, 456], DataType::MONEY, [RequestType::REST], true],
+            [[123, 456], [123, 456], DataType::MONEY, [RequestType::REST], false],
+            ['0', '0', DataType::MONEY, [RequestType::REST], true],
+            ['0', '0', DataType::MONEY, [RequestType::REST], false],
+            ['123', '123', DataType::MONEY, [RequestType::REST], true],
+            ['123', '123', DataType::MONEY, [RequestType::REST], false],
+            ['0.01', '.01', DataType::MONEY, [RequestType::REST], true],
+            ['0.01', '.01', DataType::MONEY, [RequestType::REST], false],
+            ['-0.01', '-.01', DataType::MONEY, [RequestType::REST], true],
+            ['-0.01', '-.01', DataType::MONEY, [RequestType::REST], false],
+            ['123.1', '123.1', DataType::MONEY, [RequestType::REST], true],
+            ['123.1', '123.1', DataType::MONEY, [RequestType::REST], false],
+            ['-123', '-123', DataType::MONEY, [RequestType::REST], true],
+            ['-123', '-123', DataType::MONEY, [RequestType::REST], false],
+            ['-123.1', '-123.1', DataType::MONEY, [RequestType::REST], true],
+            ['-123.1', '-123.1', DataType::MONEY, [RequestType::REST], false],
+            [['123.1', '-456'], '123.1,-456', DataType::MONEY, [RequestType::REST], true],
             [123.1, 123.1, DataType::FLOAT, [RequestType::REST], true],
             [123.1, 123.1, DataType::FLOAT, [RequestType::REST], false],
             [[123.1, 456.1], [123.1, 456.1], DataType::FLOAT, [RequestType::REST], true],
@@ -342,6 +472,25 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             [-123.1, '-123.1', DataType::FLOAT, [RequestType::REST], true],
             [-123.1, '-123.1', DataType::FLOAT, [RequestType::REST], false],
             [[123.1, -456], '123.1,-456', DataType::FLOAT, [RequestType::REST], true],
+            [123.1, 123.1, DataType::PERCENT, [RequestType::REST], true],
+            [123.1, 123.1, DataType::PERCENT, [RequestType::REST], false],
+            [[123.1, 456.1], [123.1, 456.1], DataType::PERCENT, [RequestType::REST], true],
+            [[123.1, 456.1], [123.1, 456.1], DataType::PERCENT, [RequestType::REST], false],
+            [0.0, '0', DataType::PERCENT, [RequestType::REST], true],
+            [0.0, '0', DataType::PERCENT, [RequestType::REST], false],
+            [123.0, '123', DataType::PERCENT, [RequestType::REST], true],
+            [123.0, '123', DataType::PERCENT, [RequestType::REST], false],
+            [0.01, '.01', DataType::PERCENT, [RequestType::REST], true],
+            [0.01, '.01', DataType::PERCENT, [RequestType::REST], false],
+            [-0.01, '-.01', DataType::PERCENT, [RequestType::REST], true],
+            [-0.01, '-.01', DataType::PERCENT, [RequestType::REST], false],
+            [123.1, '123.1', DataType::PERCENT, [RequestType::REST], true],
+            [123.1, '123.1', DataType::PERCENT, [RequestType::REST], false],
+            [-123.0, '-123', DataType::PERCENT, [RequestType::REST], true],
+            [-123.0, '-123', DataType::PERCENT, [RequestType::REST], false],
+            [-123.1, '-123.1', DataType::PERCENT, [RequestType::REST], true],
+            [-123.1, '-123.1', DataType::PERCENT, [RequestType::REST], false],
+            [[123.1, -456], '123.1,-456', DataType::PERCENT, [RequestType::REST], true],
             [
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
@@ -434,6 +583,136 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST],
                 true
             ],
+            [
+                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                DataType::DATE,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                ],
+                [
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                ],
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                [
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                ],
+                [
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                ],
+                DataType::DATE,
+                [RequestType::REST],
+                false
+            ],
+            [
+                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                '2010-01-28',
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                '2010-01-28',
+                DataType::DATE,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [
+                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('2010-01-29T00:00:00', new \DateTimeZone('UTC'))
+                ],
+                '2010-01-28,2010-01-29',
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                DataType::TIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                ],
+                [
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                ],
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                [
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                ],
+                [
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
+                ],
+                DataType::TIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                new \DateTime('1970-01-01T10:30:59', new \DateTimeZone('UTC')),
+                '10:30:59',
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                new \DateTime('1970-01-01T10:30:59', new \DateTimeZone('UTC')),
+                '10:30:59',
+                DataType::TIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [
+                    new \DateTime('1970-01-01T10:30:59', new \DateTimeZone('UTC')),
+                    new \DateTime('1970-01-01T11:45:00', new \DateTimeZone('UTC'))
+                ],
+                '10:30:59,11:45:00',
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            ['test', 'test', DataType::GUID, [RequestType::REST], true],
+            ['test', 'test', DataType::GUID, [RequestType::REST], false],
             [['fld1' => Criteria::ASC], ['fld1' => Criteria::ASC], DataType::ORDER_BY, [RequestType::REST], true],
             [['fld1' => Criteria::ASC], 'fld1', DataType::ORDER_BY, [RequestType::REST], true],
             [['fld1' => Criteria::DESC], '-fld1', DataType::ORDER_BY, [RequestType::REST], true],
@@ -488,6 +767,24 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST]
             ],
             [
+                'Expected integer value. Given "test"',
+                'test',
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected integer value. Given "1a"',
+                '1a',
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of integers. Given "1,2a".',
+                '1,2a',
+                DataType::SMALLINT,
+                [RequestType::REST]
+            ],
+            [
                 'Expected big integer value. Given "test"',
                 'test',
                 DataType::BIGINT,
@@ -536,6 +833,24 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST]
             ],
             [
+                'Expected integer value. Given "test"',
+                'test',
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
+                'Expected integer value. Given "1a"',
+                '1a',
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of integers. Given "1,2a".',
+                '1,2a',
+                DataType::DURATION,
+                [RequestType::REST]
+            ],
+            [
                 'Expected boolean value. Given "test"',
                 'test',
                 DataType::BOOLEAN,
@@ -548,33 +863,63 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "test"',
+                'Expected decimal value. Given "test"',
                 'test',
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "1a"',
+                'Expected decimal value. Given "1a"',
                 '1a',
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given ".0a"',
+                'Expected decimal value. Given ".0a"',
                 '.0a',
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "-.0a"',
+                'Expected decimal value. Given "-.0a"',
                 '-.0a',
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                'Expected an array of numbers. Given "1,2a".',
+                'Expected an array of decimals. Given "1,2a".',
                 '1,2a',
                 DataType::DECIMAL,
+                [RequestType::REST]
+            ],
+            [
+                'Expected decimal value. Given "test"',
+                'test',
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                'Expected decimal value. Given "1a"',
+                '1a',
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                'Expected decimal value. Given ".0a"',
+                '.0a',
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                'Expected decimal value. Given "-.0a"',
+                '-.0a',
+                DataType::MONEY,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of decimals. Given "1,2a".',
+                '1,2a',
+                DataType::MONEY,
                 [RequestType::REST]
             ],
             [
@@ -605,6 +950,36 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 'Expected an array of numbers. Given "1,2a".',
                 '1,2a',
                 DataType::FLOAT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given "test"',
+                'test',
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given "1a"',
+                '1a',
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given ".0a"',
+                '.0a',
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given "-.0a"',
+                '-.0a',
+                DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of numbers. Given "1,2a".',
+                '1,2a',
+                DataType::PERCENT,
                 [RequestType::REST]
             ],
             [
@@ -617,6 +992,42 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 'Expected an array of datetimes. Given "2010-01-28T15:00:00,test"',
                 '2010-01-28T15:00:00,test',
                 DataType::DATETIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected date value. Given "test"',
+                'test',
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                'Expected date value. Given "2010-01-28T15:00:00"',
+                '2010-01-28T15:00:00',
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of dates. Given "2010-01-28,test"',
+                '2010-01-28,test',
+                DataType::DATE,
+                [RequestType::REST]
+            ],
+            [
+                'Expected time value. Given "test"',
+                'test',
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected time value. Given "2010-01-28T10:30:59"',
+                '2010-01-28T10:30:59',
+                DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of times. Given "10:30:59,test"',
+                '10:30:59,test',
+                DataType::TIME,
                 [RequestType::REST]
             ],
         ];

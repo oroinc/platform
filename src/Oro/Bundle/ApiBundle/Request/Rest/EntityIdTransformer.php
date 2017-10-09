@@ -38,7 +38,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     {
         return is_array($id)
             ? http_build_query($id, '', self::COMPOSITE_ID_SEPARATOR)
-            : urlencode((string)$id);
+            : (string)$id;
     }
 
     /**
@@ -68,7 +68,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     protected function reverseTransformSingleId($value, $dataType)
     {
         if (DataType::STRING === $dataType) {
-            return urldecode($value);
+            return $value;
         }
 
         return $this->valueNormalizer->normalizeValue($value, $dataType, $this->requestType);

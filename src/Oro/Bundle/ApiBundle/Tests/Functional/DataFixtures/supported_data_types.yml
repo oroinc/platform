@@ -1,0 +1,50 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
+    TestItem1:
+        fieldString: 'String 1'
+        fieldText: 'Text 1'
+        fieldInt: 1
+        fieldSmallInt: 1
+        fieldBigInt: '123456789012345'
+        fieldBoolean: false
+        fieldDecimal: 1.234567
+        fieldFloat: 1.1
+        fieldArray: [1, 2, 3]
+        fieldSimpleArray: [1, 2, 3]
+        fieldJsonArray: {key1: value1}
+        fieldDateTime: <(new DateTime('2010-10-01 10:11:12 UTC'))>
+        fieldDate: <(new DateTime('2010-10-01 00:00:00 UTC'))>
+        fieldTime: <(new DateTime('1970-01-01 10:11:12 UTC'))>
+        fieldGuid: 'ae404bc5-c9bb-4677-9bad-21144c704734'
+        fieldPercent: 0.1
+        fieldMoney: 1.2345
+        fieldDuration: 11
+    TestItem2:
+        fieldString: 'String 2'
+        fieldInt: 2
+        fieldSmallInt: 2
+        fieldBigInt: '234567890123456'
+        fieldBoolean: true
+        fieldDecimal: 2.345678
+        fieldFloat: 2.2
+        fieldDateTime: <(new DateTime('2010-11-01 10:12:13 UTC'))>
+        fieldDate: <(new DateTime('2010-11-01 00:00:00 UTC'))>
+        fieldTime: <(new DateTime('1970-01-01 10:12:13 UTC'))>
+        fieldGuid: '12c9746c-f44d-4a84-a72c-bdf750c70568'
+        fieldPercent: 0.2
+        fieldMoney: 2.3456
+        fieldDuration: 22
+    TestItem3:
+        fieldString: 'String 3'
+        fieldInt: 3
+        fieldSmallInt: 3
+        fieldBigInt: '345678901234567'
+        fieldBoolean: false
+        fieldDecimal: 3.456789
+        fieldFloat: 3.3
+        fieldDateTime: <(new DateTime('2010-12-01 10:13:14 UTC'))>
+        fieldDate: <(new DateTime('2010-12-01 00:00:00 UTC'))>
+        fieldTime: <(new DateTime('1970-01-01 10:13:14 UTC'))>
+        fieldGuid: '311e3b02-3cd2-4228-aff3-bafe9b0826de'
+        fieldPercent: 0.3
+        fieldMoney: 3.4567
+        fieldDuration: 33

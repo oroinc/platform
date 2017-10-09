@@ -134,6 +134,13 @@ class TranslationPackDumper implements LoggerAwareInterface
         $fileLocator = $translationProvider->getPackagePaths();
 
         try {
+            $fileLocator->locate(sprintf('%s.php', $bundle->getName()));
+            return true;
+        } catch (\InvalidArgumentException $e) {
+            // nothing to do. Try another way to check
+        }
+
+        try {
             $bundlePath = preg_replace("/\\\\/", DIRECTORY_SEPARATOR, $bundle->getNamespace());
             $bundlePath .= DIRECTORY_SEPARATOR . $bundle->getName();
             $fileLocator->locate(sprintf('%s.php', $bundlePath));
