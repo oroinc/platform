@@ -199,7 +199,22 @@ class WidgetControllerTest extends WebTestCase
                     'message' => 'new message',
                     'description' => 'Test Description'
                 ],
-                'expectedMessage' => '{"widget":{"trigger":[{"eventBroker":"widget","name":"formSave","args":[{"success":true,"pageReload":true}]}]}}'
+                'expectedMessage' => json_encode([
+                    'widget' => [
+                        'trigger' => [
+                            [
+                                'eventBroker' => 'widget',
+                                'name' => 'formSave',
+                                'args' => [
+                                    [
+                                        'success' => true,
+                                        'pageReload' => true
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ])
             ],
             'operation not allowed' => [
                 'entity' => LoadTestEntityData::TEST_ENTITY_2,
