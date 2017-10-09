@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+
 /**
  * Registers services tagged by "oro.api.entity_id_transformer" tag.
  */
@@ -24,9 +26,9 @@ class EntityIdTransformerConfigurationCompilerPass implements CompilerPassInterf
         $taggedServices = $container->findTaggedServiceIds(self::TRANSFORMER_TAG);
         foreach ($taggedServices as $id => $attributes) {
             foreach ($attributes as $tagAttributes) {
-                $transformers[$this->getAttribute($tagAttributes, 'priority', 0)][] = [
+                $transformers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     new Reference($id),
-                    $this->getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
                 ];
             }
         }
@@ -35,27 +37,10 @@ class EntityIdTransformerConfigurationCompilerPass implements CompilerPassInterf
         }
 
         // sort by priority and flatten
-        krsort($transformers);
-        $transformers = call_user_func_array('array_merge', $transformers);
+        $transformers = DependencyInjectionUtil::sortByPriorityAndFlatten($transformers);
 
         // register
         $container->getDefinition(self::TRANSFORMER_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $transformers);
-    }
-
-    /**
-     * @param array  $attributes
-     * @param string $attributeName
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
-     */
-    private function getAttribute(array $attributes, $attributeName, $defaultValue)
-    {
-        if (!array_key_exists($attributeName, $attributes)) {
-            return $defaultValue;
-        }
-
-        return $attributes[$attributeName];
     }
 }

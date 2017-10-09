@@ -1,0 +1,12 @@
+<script type="text/javascript">
+    require(['orosync/js/sync', 'oroui/js/messenger'],
+        function (sync, messenger) {
+            sync.subscribe('oro/message_queue_heartbeat', function (response) {
+                messenger.notificationMessage(
+                    'error',
+                    {# A php message was used here instead of a js message because this message is used in a php code as well. #}
+                    '{{ 'oro.message_queue_job.no_alive_consumers'|trans }}'
+                );
+            });
+        });
+</script>

@@ -4,6 +4,7 @@ oro:
             job_interrupted: Job interrupted
         action:
             job_management: Access job queue
+        no_alive_consumers: The application is not configured properly (message consumers are not available). Please contact the system administrator.
 
         grid:
             action:

@@ -14,6 +14,7 @@
    - [Custom transport](#custom-transport)
    - [Key Classes](#key-classes)
  - [Unit and Functional tests](#unit-and-functional-tests)
+ - [Consumer heartbeat](#consumer-heartbeat)
  - [Resetting Symfony Container in consumer](Resources/doc/container_in_consumer.md)
  - [Security Context in consumer](Resources/doc/secutity_context.md)
 
@@ -318,3 +319,29 @@ class SomeTest extends \PHPUnit_Framework_TestCase
     }
 }
 ```
+
+## Consumer Heartbeat
+
+An administrator must be informed about the state of consumers in the system (whether there is at least one alive). 
+
+This is covered by the Consumer Heartbeat functionality that works in the following way:
+
+- On start and after every configured time period, each consumer calls the `tick` method of the [ConsumerHeartbeat](./Consumption/ConsumerHeartbeat.php)
+service that informs the system that the consumer is alive.
+- The cron command [oro:cron:message-queue:consumer_heartbeat_check](./Command/ConsumerHeartbeatCommand.php)
+is periodically executed to check consumers' state. If it does not find any alive consumers, the `oro/message_queue_state`
+socket message is sent notifying all logged-in users that the system may work incorrectly (because consumers are not available).
+- The same check is also performed when a user logs in. This is done to notify users about the problem as soon as possible.                                 
+                     
+The check period can be changed in the application configuration file using the `consumer_heartbeat_update_period` option:
+
+```yml
+oro_message_queue:
+    consumer:
+        heartbeat_update_period: 20 #the update period was set to 20 minutes 
+
+```                     
+
+The default value of the `heartbeat_update_period` option is 15 minutes.
+
+To disable the Consumer Heartbeat functionality, set the `heartbeat_update_period` option to 0.
