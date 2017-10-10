@@ -101,6 +101,13 @@ class MenuUpdateUtils
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
         }
+
+        if ($update->getDescriptions()->count()) {
+            $description = (string)$update->getDescription($localizationHelper->getCurrentLocalization());
+            if ($description) {
+                $item->setExtra('description', $description);
+            }
+        }
     }
 
     /**
