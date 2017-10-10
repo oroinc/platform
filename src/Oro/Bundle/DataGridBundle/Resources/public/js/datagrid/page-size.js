@@ -34,6 +34,11 @@ define([
         /** @property */
         hidden: false,
 
+        /** @property */
+        attributes: {
+             'data-layout': 'separate'
+        },
+
         /**
          * Initializer.
          *
@@ -135,11 +140,11 @@ define([
                 currentSizeLabel: currentSizeLabel
             })));
 
-            this.initLayout();
-
             if (this.hidden) {
                 this.$el.hide();
             }
+
+            this.initControls();
 
             return this;
         }
