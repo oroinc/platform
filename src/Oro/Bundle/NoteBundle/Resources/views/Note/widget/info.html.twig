@@ -8,7 +8,7 @@
             {{ AC.activity_contexts(entity, target, true, 'oronote/js/app/components/note-context-component') }}
         </div>
 
-        {{ UI.renderSwitchableHtmlProperty('oro.note.message.label'|trans, entity.message|e) }}
+        {{ UI.renderSwitchableHtmlProperty('oro.note.message.label'|trans, entity.message) }}
     </div>
     {% if attachment is not empty and attachment.attachmentURL %}
     <div class="note-attachments">
