@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
-    var _ = require('underscore');
     var data = JSON.parse(require('text!./Fixture/field-condition/entities.json'));
     var filters = JSON.parse(require('text!./Fixture/field-condition/filters.json'));
     var BaseView = require('oroui/js/app/views/base/view');
