@@ -1,0 +1,44 @@
+include:
+    - customer.yml
+
+Oro\Bundle\CustomerBundle\Entity\CustomerUser:
+    amanda:
+        organization: '@organization'
+        role: ['@buyer']
+        owner: '@admin'
+        website: '@website1'
+        customer: '@company_a'
+        enabled: '1'
+        confirmed: '1'
+        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
+        salt: 'fgswya1kzw0sck8ck48kosowckwo0ws'
+        email: '<xss("CustomerUser.email")>AmandaRCole@example.org'
+        username: 'AmandaRCole@example.org'
+        firstName: '<xss("CustomerUser.firstName")>'
+        lastName: '<xss("CustomerUser.lastName")>'
+
+
+Oro\Bundle\CustomerBundle\Entity\CustomerUserAddress:
+    amandaAddress1:
+        region: 'US-NY'
+        frontendOwner: '@amanda'
+        country: 'US'
+        owner: '@admin'
+        systemOrganization: '@organization'
+        primary: false
+        label: '<xss("CustomerUserAddress.label")>'
+        street: '<xss("CustomerUserAddress.street")>'
+        street2: '<xss("CustomerUserAddress.street2")>'
+        city: '<xss("CustomerUserAddress.city")>'
+        postalCode: '<xss("CustomerUserAddress.postalCode")>'
+        organization: '@organization'
+
+Oro\Bundle\CustomerBundle\Entity\CustomerUserAddressToAddressType:
+    amandaAddress1ShippingDefault:
+        address: '@amandaAddress1'
+        type: 'shipping'
+        default: true
+    amandaAddress1BillingDefault:
+        address: '@amandaAddress1'
+        type: 'billing'
+        default: true

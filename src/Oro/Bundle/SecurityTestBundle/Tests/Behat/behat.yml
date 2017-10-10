@@ -1,0 +1,21 @@
+oro_behat_extension:
+  suites:
+    OroSecurityTestBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroCheckoutBundle::FeatureContext
+        - OroConfigBundle::FeatureContext
+        - OroShoppingListBundle::ShoppingListContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroPromotionBundle::PromotionContext
+        - OroEmailBundle::EmailContext
+        - OroApplicationBundle::CommerceMainContext
+        - OroCustomerBundle::FrontendGridContext
+        - OroConfigBundle::FeatureContext
+        - OroOrderBundle::OrderContext
+        - OroShippingBundle::FeatureContext
+        - OroShoppingListBundle::FeatureContext
+        - OroSecurityTestBundle::FeatureContext
+      paths:
+        - '@OroSecurityTestBundle/Tests/Behat/Features'

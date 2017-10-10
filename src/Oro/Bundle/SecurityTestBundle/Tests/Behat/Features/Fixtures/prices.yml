@@ -1,0 +1,53 @@
+include:
+    - product.yml
+    - customer-user.yml
+
+Oro\Bundle\PricingBundle\Entity\PriceList:
+    pricelist:
+        name: 'pricelist'
+        default: true
+        setCurrencies: [['USD']]
+        active: true
+
+Oro\Bundle\CurrencyBundle\Entity\Price(local):
+    price:
+        value: '10'
+        currency: 'USD'
+
+Oro\Bundle\PricingBundle\Entity\ProductPrice:
+    productPrice1:
+        pricelist: '@pricelist'
+        product: '@product1'
+        productSku: 'SKU1'
+        quantity: 1
+        unit: '@item'
+        value: 10
+        currency: 'USD'
+
+Oro\Bundle\PricingBundle\Entity\PriceListToCustomer:
+    priceListToCustomer:
+        customer: '@company_a'
+        pricelist: '@pricelist'
+        website: '@website1'
+        sortOrder: 200
+
+Oro\Bundle\PricingBundle\Entity\CombinedProductPrice:
+   combinedProductPrice1:
+        pricelist: '@combinedPriceList'
+        product: '@product1'
+        productSku: 'SKU1'
+        quantity: 1
+        unit: '@item'
+        value: 10
+        currency: 'USD'
+
+Oro\Bundle\PricingBundle\Entity\CombinedPriceListToWebsite:
+    combinedPriceListToWebsite:
+        pricelist: '@combinedPriceList'
+        website: '@website1'
+
+Oro\Bundle\CustomerBundle\Entity\CustomerUserSettings:
+    customerUserSetting:
+        customerUser: '@amanda'
+        __construct: ['@website1']
+        currency: 'USD'

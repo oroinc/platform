@@ -1,0 +1,2 @@
+urls:
+    - { route: 'oro_customer_frontend_customer_user_profile' }

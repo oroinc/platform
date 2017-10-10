@@ -1,0 +1,37 @@
+Oro\Bundle\CustomerBundle\Entity\CustomerGroup:
+    all_customers:
+        name: '<xss("CustomerGroup.name")>'
+
+Oro\Bundle\CustomerBundle\Entity\Customer:
+    company_a:
+        name: '<xss("Customer.name")>'
+        organization: '@organization'
+        owner: '@admin'
+        group: '@all_customers'
+
+Oro\Bundle\CustomerBundle\Entity\CustomerAddress:
+    customerAddress1:
+        owner: '@admin'
+        systemOrganization: '@organization'
+        frontendOwner: '@company_a'
+        country: 'US'
+        region: 'US-FL'
+        primary: false
+        label: '<xss("CustomerAddress.label")>'
+        street: '<xss("CustomerAddress.street")>'
+        street2: '<xss("CustomerAddress.street2")>'
+        city: '<xss("CustomerAddress.city")>'
+        postalCode: '<xss("CustomerAddress.postalCode")>'
+        organization: '@organization'
+
+Oro\Bundle\CustomerBundle\Entity\CustomerAddressToAddressType:
+    customerAddress1ShippingDefault:
+        address: '@customerAddress1'
+        type: 'shipping'
+        default: true
+
+Oro\Bundle\CustomerBundle\Entity\CustomerAddressToAddressType:
+    customerAddress1ShippingDefault:
+        address: '@customerAddress1'
+        type: 'billing'
+        default: true

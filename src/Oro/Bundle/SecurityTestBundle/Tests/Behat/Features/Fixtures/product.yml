@@ -1,0 +1,38 @@
+include:
+    - business-unit.yml
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    productName1:
+        string: 'Product1'
+    productDescription1:
+        text: 'Product1 Descr'
+    productShortDescription1:
+        text: 'Product1 Short Descr'
+    categoryName1:
+        string: 'NewCategory'
+
+Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision:
+    precision1:
+        unit: '@item'
+        precision: '1'
+
+Oro\Bundle\ProductBundle\Entity\Product:
+    product1:
+        sku: 'PSKU1'
+        type: 'simple'
+        organization: '@organization'
+        owner: '@businessUnit'
+        primaryUnitPrecision: '@precision1'
+        unitPrecisions: ['@precision1']
+        attributeFamily: '@defaultProductFamily'
+        addName: ['@productName1']
+        addDescription: ['@productDescription1']
+        addShortDescription: ['@productShortDescription1']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+
+Oro\Bundle\CatalogBundle\Entity\Category:
+    categoryLightingProducts:
+        addTitle: ['@categoryName1']
+        setParentCategory: [1]
+        addProduct: ['@product1']
