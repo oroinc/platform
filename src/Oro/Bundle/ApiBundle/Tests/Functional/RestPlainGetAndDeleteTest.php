@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 
 class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
@@ -144,13 +145,13 @@ class RestPlainGetAndDeleteTest extends RestPlainApiTestCase
             // single identifier
             return $content[0][reset($idFields)];
         } else {
-            // combined identifier
+            // composite identifier
             $requirements = [];
             foreach ($idFields as $field) {
                 $requirements[$field] = $content[0][$field];
             }
 
-            return implode(',', $requirements);
+            return http_build_query($requirements, '', EntityIdTransformer::COMPOSITE_ID_SEPARATOR);
         }
     }
 }

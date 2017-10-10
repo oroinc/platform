@@ -51,6 +51,7 @@ services:
         arguments:
             - '@oro_api.entity_serializer'
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
             - '@oro_entity_extend.association_manager'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: load_data }
@@ -60,6 +61,7 @@ services:
         arguments:
             - '@oro_api.entity_serializer'
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
             - '@oro_api.entity_title_provider'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false }

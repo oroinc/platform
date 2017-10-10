@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 
 use Behat\Testwork\Cli\Controller;
 use Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber;
-use Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,9 +13,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class InteractiveExecutionController implements Controller
 {
     /**
-     * @var StepDurationMeasureSubscriber
+     * @var InteractiveExecutionSubscriber
      */
-    protected $subscriber;
+    private $subscriber;
 
     /**
      * @var EventDispatcherInterface
@@ -24,7 +23,7 @@ class InteractiveExecutionController implements Controller
     private $eventDispatcher;
 
     /**
-     * @param StepDurationMeasureSubscriber $subscriber
+     * @param InteractiveExecutionSubscriber $subscriber
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(InteractiveExecutionSubscriber $subscriber, EventDispatcherInterface $eventDispatcher)

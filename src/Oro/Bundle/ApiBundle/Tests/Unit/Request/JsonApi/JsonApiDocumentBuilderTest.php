@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
@@ -16,9 +19,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
 
     protected function setUp()
     {
-        $valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
         $valueNormalizer->expects($this->any())
             ->method('normalizeValue')
             ->willReturnCallback(
@@ -35,12 +36,12 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 }
             );
 
-        $entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $entityIdTransformer->expects($this->any())
             ->method('transform')
             ->willReturnCallback(
-                function ($id) {
-                    return (string)$id;
+                function ($id, EntityMetadata $metadata) {
+                    return sprintf('%s::%s', $metadata->getClassName(), $id);
                 }
             );
 
@@ -131,7 +132,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'          => 'test_entity',
-                    'id'            => '123',
+                    'id'            => 'Test\Entity::123',
                     'meta'          => [
                         'meta1' => 'Meta1',
                     ],
@@ -143,7 +144,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                         'category'      => [
                             'data' => [
                                 'type' => 'test_category',
-                                'id'   => '456'
+                                'id'   => 'Test\Category::456'
                             ]
                         ],
                         'group'         => [
@@ -152,18 +153,18 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                         'role'          => [
                             'data' => [
                                 'type' => 'test_role',
-                                'id'   => '789'
+                                'id'   => 'Test\Role::789'
                             ]
                         ],
                         'categories'    => [
                             'data' => [
                                 [
                                     'type' => 'test_category',
-                                    'id'   => '456'
+                                    'id'   => 'Test\Category::456'
                                 ],
                                 [
                                     'type' => 'test_category',
-                                    'id'   => '457'
+                                    'id'   => 'Test\Category::457'
                                 ]
                             ]
                         ],
@@ -177,11 +178,11 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'data' => [
                                 [
                                     'type' => 'test_role',
-                                    'id'   => '789'
+                                    'id'   => 'Test\Role::789'
                                 ],
                                 [
                                     'type' => 'test_role',
-                                    'id'   => '780'
+                                    'id'   => 'Test\Role::780'
                                 ]
                             ]
                         ],
@@ -189,11 +190,11 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'data' => [
                                 [
                                     'type' => 'test_role',
-                                    'id'   => '789'
+                                    'id'   => 'Test\Role::789'
                                 ],
                                 [
                                     'type' => 'test_role',
-                                    'id'   => '780'
+                                    'id'   => 'Test\Role::780'
                                 ]
                             ]
                         ],
@@ -208,14 +209,14 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'included' => [
                     [
                         'type'       => 'test_role',
-                        'id'         => '789',
+                        'id'         => 'Test\Role::789',
                         'attributes' => [
                             'name' => 'Role1'
                         ]
                     ],
                     [
                         'type'       => 'test_role',
-                        'id'         => '780',
+                        'id'         => 'Test\Role::780',
                         'attributes' => [
                             'name' => 'Role2'
                         ]
@@ -274,7 +275,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'data'     => [
                     [
                         'type'          => 'test_entity',
-                        'id'            => '123',
+                        'id'            => 'Test\Entity::123',
                         'meta'          => [
                             'meta1' => 'Meta1',
                         ],
@@ -286,7 +287,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'category'      => [
                                 'data' => [
                                     'type' => 'test_category',
-                                    'id'   => '456'
+                                    'id'   => 'Test\Category::456'
                                 ]
                             ],
                             'group'         => [
@@ -295,18 +296,18 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'role'          => [
                                 'data' => [
                                     'type' => 'test_role',
-                                    'id'   => '789'
+                                    'id'   => 'Test\Role::789'
                                 ]
                             ],
                             'categories'    => [
                                 'data' => [
                                     [
                                         'type' => 'test_category',
-                                        'id'   => '456'
+                                        'id'   => 'Test\Category::456'
                                     ],
                                     [
                                         'type' => 'test_category',
-                                        'id'   => '457'
+                                        'id'   => 'Test\Category::457'
                                     ]
                                 ]
                             ],
@@ -320,11 +321,11 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                                 'data' => [
                                     [
                                         'type' => 'test_role',
-                                        'id'   => '789'
+                                        'id'   => 'Test\Role::789'
                                     ],
                                     [
                                         'type' => 'test_role',
-                                        'id'   => '780'
+                                        'id'   => 'Test\Role::780'
                                     ]
                                 ]
                             ],
@@ -340,14 +341,14 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'included' => [
                     [
                         'type'       => 'test_role',
-                        'id'         => '789',
+                        'id'         => 'Test\Role::789',
                         'attributes' => [
                             'name' => 'Role1'
                         ]
                     ],
                     [
                         'type'       => 'test_role',
-                        'id'         => '780',
+                        'id'         => 'Test\Role::780',
                         'attributes' => [
                             'name' => 'Role2'
                         ]
@@ -382,17 +383,17 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'          => 'test_entity',
-                    'id'            => '123',
+                    'id'            => 'Test\Entity::123',
                     'relationships' => [
                         'categories' => [
                             'data' => [
                                 [
                                     'type' => 'test_category1',
-                                    'id'   => '456'
+                                    'id'   => 'Test\CategoryWithoutAlias::456'
                                 ],
                                 [
                                     'type' => 'test_category2',
-                                    'id'   => '457'
+                                    'id'   => 'Test\CategoryWithoutAlias::457'
                                 ]
                             ]
                         ]
@@ -401,14 +402,14 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'included' => [
                     [
                         'type'       => 'test_category1',
-                        'id'         => '456',
+                        'id'         => 'Test\CategoryWithoutAlias::456',
                         'attributes' => [
                             'name' => 'Category1'
                         ]
                     ],
                     [
                         'type'       => 'test_category2',
-                        'id'         => '457',
+                        'id'         => 'Test\CategoryWithoutAlias::457',
                         'attributes' => [
                             'name' => 'Category2'
                         ]
@@ -443,17 +444,17 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'          => 'test_entity',
-                    'id'            => '123',
+                    'id'            => 'Test\Entity::123',
                     'relationships' => [
                         'categories' => [
                             'data' => [
                                 [
                                     'type' => 'test_category1',
-                                    'id'   => '456'
+                                    'id'   => 'Test\Category::456'
                                 ],
                                 [
                                     'type' => 'test_category',
-                                    'id'   => '457'
+                                    'id'   => 'Test\Category::457'
                                 ]
                             ]
                         ]
@@ -462,14 +463,14 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'included' => [
                     [
                         'type'       => 'test_category1',
-                        'id'         => '456',
+                        'id'         => 'Test\Category::456',
                         'attributes' => [
                             'name' => 'Category1'
                         ]
                     ],
                     [
                         'type'       => 'test_category',
-                        'id'         => '457',
+                        'id'         => 'Test\Category::457',
                         'attributes' => [
                             'name' => 'Category2'
                         ]
@@ -499,7 +500,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '123',
+                    'id'         => 'Test\Entity::123',
                     'attributes' => [
                         'missingToOne'  => null,
                         'missingToMany' => []
@@ -533,7 +534,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '123',
+                    'id'         => 'Test\Entity::123',
                     'attributes' => [
                         'category' => $expected
                     ]
@@ -586,7 +587,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '123',
+                    'id'         => 'Test\Entity::123',
                     'attributes' => [
                         'categories' => $expected
                     ]
@@ -642,7 +643,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '123',
+                    'id'         => 'Test\Entity::123',
                     'attributes' => [
                         'category' => $expected
                     ]
@@ -684,7 +685,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '123',
+                    'id'         => 'Test\Entity::123',
                     'attributes' => [
                         'categories' => $expected
                     ]
@@ -736,7 +737,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '123',
+                    'id'         => 'Test\Entity::123',
                     'attributes' => [
                         'category' => $expected
                     ]
@@ -787,7 +788,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '123',
+                    'id'         => 'Test\Entity::123',
                     'attributes' => [
                         'categories' => $expected
                     ]
@@ -875,7 +876,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type'       => 'test_entity',
-                    'id'         => '1',
+                    'id'         => 'Test\Entity::1',
                     'attributes' => [
                         'association' => [
                             'id'            => 123,
@@ -968,7 +969,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'data'     => [
                     'type' => 'test_entity',
-                    'id'   => '123',
+                    'id'   => 'Test\Entity::123',
                     'meta' => [
                         'resultMeta1' => 'Meta1',
                     ],

@@ -36,13 +36,12 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithUnknownIdentifierFields()
+    public function testProcessWithUnknownIdentifierAndFieldNamedId()
     {
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'id'   => null,
-                'type' => null,
+                'id' => null,
             ]
         ];
 
@@ -53,12 +52,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
-                    'classId'   => [
-                        'property_path' => 'id'
-                    ],
-                    'classType' => [
-                        'property_path' => 'type'
-                    ],
+                    'id' => null,
                 ]
             ],
             $this->context->getResult()
@@ -71,8 +65,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id'],
             'fields'                 => [
-                'id'   => null,
-                'type' => null,
+                'id' => null,
             ]
         ];
 
@@ -84,10 +77,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
-                    'id'        => null,
-                    'classType' => [
-                        'property_path' => 'type'
-                    ],
+                    'id' => null,
                 ]
             ],
             $this->context->getResult()
@@ -102,7 +92,6 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'fields'                 => [
                 'name' => null,
                 'id'   => null,
-                'type' => null,
             ]
         ];
 
@@ -114,14 +103,11 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
-                    'id'        => [
+                    'id'      => [
                         'property_path' => 'name'
                     ],
-                    'classId'   => [
+                    'classId' => [
                         'property_path' => 'id'
-                    ],
-                    'classType' => [
-                        'property_path' => 'type'
                     ],
                 ]
             ],
@@ -129,14 +115,41 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithCompositeIdentifier()
+    public function testProcessWithIdentifierNotNamedIdAndHasFieldNamedIdButDoesNotHaveIdentifierField()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['name'],
+            'fields'                 => [
+                'id' => null,
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['name'],
+                'fields'                 => [
+                    'classId' => [
+                        'property_path' => 'id'
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWithCompositeIdentifierWhenFieldNamedIdIsPartOfIdentifier()
     {
         $config = [
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id', 'id1'],
             'fields'                 => [
-                'id'   => null,
-                'type' => null,
+                'id'  => null,
+                'id1' => null,
             ]
         ];
 
@@ -148,9 +161,90 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['classId', 'id1'],
                 'fields'                 => [
-                    'classId'   => [
+                    'classId' => [
                         'property_path' => 'id'
                     ],
+                    'id1'     => null,
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWithCompositeIdentifierWhenFieldNamedIdIsPartOfIdentifierAndHasPropertyPath()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id', 'id1'],
+            'fields'                 => [
+                'id'  => [
+                    'property_path' => 'realId'
+                ],
+                'id1' => null,
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['classId', 'id1'],
+                'fields'                 => [
+                    'classId' => [
+                        'property_path' => 'realId'
+                    ],
+                    'id1'     => null,
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWithCompositeIdentifierWhenNoFieldNamedIdInIdentifier()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id1', 'id2'],
+            'fields'                 => [
+                'id1' => null,
+                'id2' => null,
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id1', 'id2'],
+                'fields'                 => [
+                    'id1' => null,
+                    'id2' => null,
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWhenExistsFieldNamedType()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'type' => null,
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
                     'classType' => [
                         'property_path' => 'type'
                     ],
@@ -160,14 +254,73 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenReservedFieldsHavePropertyPath()
+    public function testProcessWhenIdentifierFieldNamedIdHasPropertyPath()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id' => [
+                    'property_path' => 'realId'
+                ],
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => [
+                        'property_path' => 'realId'
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWhenFieldNamedIdHasPropertyPath()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['name'],
+            'fields'                 => [
+                'name' => null,
+                'id'   => [
+                    'property_path' => 'realId'
+                ],
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'      => [
+                        'property_path' => 'name'
+                    ],
+                    'classId' => [
+                        'property_path' => 'realId'
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessWhenFieldNamedTypeHasPropertyPath()
     {
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'id'   => [
-                    'property_path' => 'realId'
-                ],
                 'type' => [
                     'property_path' => 'realType'
                 ],
@@ -181,9 +334,6 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
-                    'classId'   => [
-                        'property_path' => 'realId'
-                    ],
                     'classType' => [
                         'property_path' => 'realType'
                     ],
@@ -202,10 +352,12 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
     public function testProcessWhenIdFieldWithGuessedNameAlreadyExists()
     {
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['name'],
+            'fields'                 => [
                 'id'      => null,
                 'classId' => null,
+                'name'    => null,
             ]
         ];
 

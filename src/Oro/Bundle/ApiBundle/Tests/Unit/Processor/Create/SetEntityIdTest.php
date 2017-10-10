@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\SetEntityId;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 class SetEntityIdTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    protected $entityIdHelper;
 
     /** @var SetEntityId */
     protected $processor;
@@ -17,17 +19,14 @@ class SetEntityIdTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
 
-        $this->processor = new SetEntityId($this->doctrineHelper);
+        $this->processor = new SetEntityId($this->entityIdHelper);
     }
 
     public function testProcessWhenEntityIdDoesNotExistInContext()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->entityIdHelper->expects($this->never())
             ->method('setEntityIdentifier');
 
         $this->context->setResult(new \stdClass());
@@ -36,7 +35,7 @@ class SetEntityIdTest extends FormProcessorTestCase
 
     public function testProcessWhenEntityDoesNotExistInContext()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->entityIdHelper->expects($this->never())
             ->method('setEntityIdentifier');
 
         $this->context->setId(123);
@@ -45,7 +44,7 @@ class SetEntityIdTest extends FormProcessorTestCase
 
     public function testProcessForUnsupportedEntity()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->entityIdHelper->expects($this->never())
             ->method('setEntityIdentifier');
 
         $this->context->setId(123);
@@ -53,69 +52,35 @@ class SetEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForEntityUsesIdGenerator()
     {
         $entity = new \stdClass();
+        $metadata = new EntityMetadata();
+        $metadata->setHasIdentifierGenerator(true);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadataForClass')
-            ->with(get_class($entity), false)
-            ->willReturn(null);
-        $this->doctrineHelper->expects($this->never())
+        $this->entityIdHelper->expects($this->never())
             ->method('setEntityIdentifier');
 
         $this->context->setId(123);
         $this->context->setClassName(get_class($entity));
+        $this->context->setMetadata($metadata);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
     }
 
-    public function testProcessForManageableEntityUsesIdGenerator()
-    {
-        $entity = new \stdClass();
-
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->once())
-            ->method('usesIdGenerator')
-            ->willReturn(true);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadataForClass')
-            ->with(get_class($entity), false)
-            ->willReturn($metadata);
-        $this->doctrineHelper->expects($this->never())
-            ->method('setEntityIdentifier');
-
-        $this->context->setId(123);
-        $this->context->setClassName(get_class($entity));
-        $this->context->setResult($entity);
-        $this->processor->process($this->context);
-    }
-
-    public function testProcessForManageableEntityWithoutIdGenerator()
+    public function testProcessForEntityWithoutIdGenerator()
     {
         $entityId = 123;
         $entity = new \stdClass();
+        $metadata = new EntityMetadata();
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->once())
-            ->method('usesIdGenerator')
-            ->willReturn(false);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadataForClass')
-            ->with(get_class($entity), false)
-            ->willReturn($metadata);
-        $this->doctrineHelper->expects($this->once())
+        $this->entityIdHelper->expects($this->once())
             ->method('setEntityIdentifier')
             ->with($this->identicalTo($entity), $entityId, $this->identicalTo($metadata));
 
         $this->context->setId($entityId);
         $this->context->setClassName(get_class($entity));
+        $this->context->setMetadata($metadata);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
     }

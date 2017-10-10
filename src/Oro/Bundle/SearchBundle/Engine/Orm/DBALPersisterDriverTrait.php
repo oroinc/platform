@@ -14,6 +14,7 @@ use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 
 /**
  * @property EntityManagerInterface $entityManager
+ * @deprecated sience 1.5. Please use the BaseDriver.
  */
 trait DBALPersisterDriverTrait
 {
@@ -24,13 +25,13 @@ trait DBALPersisterDriverTrait
      * [
      *     spl_object_hash => [
      *         'id'         => id of the item,
-               'entity'     => class of the entity,
-               'alias'      => alias of the entity,
-               'record_id'  => id of the entity,
-               'title'      => title of the entity,
-               'changed'    => changed attribute,
-               'created_at' => when the Item was created,
-               'updated_at' => when the Item was updated,
+     *         'entity'     => class of the entity,
+     *         'alias'      => alias of the entity,
+     *         'record_id'  => id of the entity,
+     *         'title'      => title of the entity,
+     *         'changed'    => changed attribute,
+     *         'created_at' => when the Item was created,
+     *         'updated_at' => when the Item was updated,
      *     ],
      *     ...
      * ]

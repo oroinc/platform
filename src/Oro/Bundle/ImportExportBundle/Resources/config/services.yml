@@ -2,7 +2,7 @@ parameters:
     oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
     oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
     oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
-    oro_importexport.export.size_of_batch:                    100
+    oro_importexport.export.size_of_batch:                    5000
 
 services:
     oro_importexport.template_fixture.entity_registry:

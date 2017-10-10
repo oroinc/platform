@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
+/**
+ * Converts a string to boolean.
+ * Provides a regular expression that can be used to validate that a string represents a boolean value.
+ */
 class NormalizeBoolean extends AbstractProcessor
 {
     const REQUIREMENT = '0|1|true|false|yes|no';

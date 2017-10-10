@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFilterKeys;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
@@ -70,7 +71,7 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
     {
         return [
             [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                Entity\User::class,
                 [
                     'id'   => [
                         'expectedKey' => 'filter[id]',
@@ -83,7 +84,7 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
                 ]
             ],
             [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                Entity\Category::class,
                 [
                     'name'  => [
                         'expectedKey' => 'filter[id]',

@@ -1674,4 +1674,46 @@ TEXT;
         $gridPaginator = $this->elementFactory->createElement('GridToolbarPaginator', $gridPaginatorContainer);
         $gridPaginator->clickLink($lnk);
     }
+
+    /**
+     * Example: I should see next rows in "Discounts" table:
+     *   | Description | Discount |
+     *   | Amount      | -$2.00   |
+     *
+     * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table$/
+     * @param TableNode $expectedTableNode
+     * @param string $elementName
+     */
+    public function iShouldSeeNextRowsInTable(TableNode $expectedTableNode, $elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $rows = $table->getRows();
+        $expectedRows = $expectedTableNode->getRows();
+        $headers = array_shift($expectedRows);
+
+        foreach ($expectedRows as $rowKey => $expectedRow) {
+            self::assertEquals($expectedRow, $rows[$rowKey]->getCellValues($headers));
+        }
+    }
+
+    /**
+     * Example: I should see no records in "Discounts" table
+     *
+     * @Then /^I should see no records in "(?P<elementName>[\w\s]+)" table$/
+     * @param string $elementName
+     */
+    public function iShouldSeeNoRecordsInTable($elementName)
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $rows = $table->getRows();
+        self::assertCount(0, $rows);
+    }
 }

@@ -3,13 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * All the supported data-types of an incoming values which are implemented "out of the box".
+ * Provides a list of all the supported data-types of an incoming values which are implemented "out of the box".
  * New data-types can be added by implementing a value normalization processors.
- * @see Oro\Bundle\ApiBundle\Request\ValueNormalizer
+ * @see \Oro\Bundle\ApiBundle\Request\ValueNormalizer
+ * Also provides a set of methods to simplify work with definition of complex data-types,
+ * like nested and extended associations.
  */
 final class DataType
 {
     const INTEGER          = 'integer';
+    const SMALLINT         = 'smallint';
     const BIGINT           = 'bigint';
     const UNSIGNED_INTEGER = 'unsignedInteger';
     const STRING           = 'string';
@@ -17,6 +20,12 @@ final class DataType
     const DECIMAL          = 'decimal';
     const FLOAT            = 'float';
     const DATETIME         = 'datetime';
+    const DATE             = 'date';
+    const TIME             = 'time';
+    const PERCENT          = 'percent';
+    const MONEY            = 'money';
+    const DURATION         = 'duration';
+    const GUID             = 'guid';
     const ENTITY_TYPE      = 'entityType';
     const ENTITY_CLASS     = 'entityClass';
     const ORDER_BY         = 'orderBy';

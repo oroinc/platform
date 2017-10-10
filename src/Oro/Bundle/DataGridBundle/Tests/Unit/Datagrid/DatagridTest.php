@@ -3,7 +3,12 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 
 class DatagridTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +17,7 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
     /** @var Datagrid */
     protected $grid;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var Acceptor|\PHPUnit_Framework_MockObject_MockObject */
     protected $acceptor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -20,10 +25,10 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->acceptor = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Acceptor')
+        $this->acceptor = $this->getMockBuilder(Acceptor::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $this->parameters = $this->createMock(ParameterBag::class);
 
         $this->grid = new Datagrid(self::TEST_NAME, DatagridConfiguration::create([]), $this->parameters);
         $this->grid->setAcceptor($this->acceptor);
@@ -48,7 +53,8 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDatasource()
     {
-        $dataSource = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockBuilder $dataSource */
+        $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
 
         $this->assertNull($this->grid->getDatasource());
         $this->grid->setDatasource($dataSource);
@@ -77,18 +83,21 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetData()
     {
-        $dataSource = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockBuilder $dataSource */
+        $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
         $this->grid->setDatasource($dataSource);
-
-        $resultFQCN = 'Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject';
 
         $this->acceptor->expects($this->once())->method('acceptDatasource')
             ->with($dataSource);
         $this->acceptor->expects($this->once())->method('acceptResult')
-            ->with($this->isInstanceOf($resultFQCN));
+            ->with($this->isInstanceOf(ResultsObject::class));
 
         $result = $this->grid->getData();
-        $this->assertInstanceOf($resultFQCN, $result);
+        $this->assertInstanceOf(ResultsObject::class, $result);
+
+        // acceptDatasource() and acceptResult() should not be called any more
+        $result = $this->grid->getData();
+        $this->assertInstanceOf(ResultsObject::class, $result);
     }
 
     /**
@@ -96,7 +105,8 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAcceptedDataSource()
     {
-        $dataSource = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockBuilder $dataSource */
+        $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
         $this->grid->setDatasource($dataSource);
 
         $this->acceptor->expects($this->once())->method('acceptDatasource')
@@ -111,13 +121,11 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetMetaData()
     {
-        $resultFQCN = 'Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject';
-
         $this->acceptor->expects($this->once())->method('acceptMetadata')
-            ->with($this->isInstanceOf($resultFQCN));
+            ->with($this->isInstanceOf(MetadataObject::class));
 
         $result = $this->grid->getMetadata();
-        $this->assertInstanceOf($resultFQCN, $result);
+        $this->assertInstanceOf(MetadataObject::class, $result);
     }
 
     public function testGetParameters()

@@ -1,7 +1,12 @@
 // @theme: blank;
 
-.hidden {
+.hidden,
+.hide {
     display: none !important; // override inline styles
+}
+
+.show {
+    display: block !important; // override inline styles
 }
 
 .disabled {
@@ -19,4 +24,32 @@
 .disable-touch-scrolling {
     overflow: hidden;
     visibility: hidden;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+.text-capitalize {
+    text-transform: capitalize;
+}
+
+.img-fluid {
+    @include img-fluid;
 }

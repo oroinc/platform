@@ -15,13 +15,21 @@
 
                 {% if form.emptyFile is defined%}
                 {% set inputId = form.emptyFile.vars.id %}
-                {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
-                <div id="{{ divId }}" class="well well-small oro_attachment_file">
+
+                {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+                <div id="{{ divId }}" class="well well-small oro_attachment_file" {{ UI.renderPageComponentAttributes({
+                    view: {
+                        view: 'oroattachment/js/app/views/attachment-view',
+                        inputSelector: '#' ~ inputId,
+                    }
+                }) }}>
+
                     {{ oro_file_view(parentEntity, fieldName, value) }}
                     {{ form_row(form.emptyFile) }}
                     {% if form.vars.allow_delete %}
-                        <button id="{{ buttonId }}"
+                        <button data-role="remove"
                                 class="btn btn-action btn-link delete"
                                 type="button"
                                 data-related="{{ form.emptyFile.vars.name }}"
@@ -29,18 +37,6 @@
                         ></button>
                     {% endif %}
                 </div>
-                <script type="text/javascript">
-                    require(['jquery'],
-                    function($){
-                        $(function() {
-                            $(document).on('click', '#{{ buttonId }}', function() {
-                                $('#{{ divId }}').hide();
-                                $('#{{ inputId }}').val('true');
-                                return false;
-                            });
-                        });
-                    });
-                </script>
                 {% else %}
                     <div class="well well-small oro_attachment_file">
                         {{ oro_file_view(parentEntity, fieldName, value) }}
@@ -78,28 +74,27 @@
 
                 {% if form.emptyFile is defined%}
                 {% set inputId = form.emptyFile.vars.id %}
-                {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
-                <div id="{{ divId }}" class="attachment_item">
+
+                {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+                <div id="{{ divId }}" class="attachment_item" {{ UI.renderPageComponentAttributes({
+                    view: {
+                        view: 'oroattachment/js/app/views/attachment-view',
+                        inputSelector: '#' ~ inputId,
+                    }
+                }) }}>
                     <i class="fa-paperclip"></i>
                     <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
                         {{  value.originalFilename }}
                     </a>
                     ({{ file_size(value.fileSize) }})
                     {{ form_row(form.emptyFile) }}
-                    <i id = "{{ buttonId }}" class="btn btn-link fa-close remove-attachment" type="button" data-related="{{ form.emptyFile.vars.name }}"></i>
-                    <script type="text/javascript">
-                        require(['jquery'],
-                            function($){
-                                $(function() {
-                                    $(document).on('click', '#{{ buttonId }}', function() {
-                                        $('#{{ divId }}').hide();
-                                        $('#{{ inputId }}').val('true');
-                                        return false;
-                                    });
-                                });
-                            });
-                    </script>
+                    <i data-role="remove"
+                       class="btn btn-link fa-close remove-attachment"
+                       type="button"
+                       data-related="{{ form.emptyFile.vars.name }}"
+                    ></i>
                 </div>
                 {% else %}
                     <div class="well well-small oro_attachment_file">
