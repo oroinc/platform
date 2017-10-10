@@ -165,8 +165,24 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         if ($this->columnAliases && $columnAlias) {
             $columnNames = array_flip($this->columnAliases);
             $columnName = $columnNames[$columnAlias];
-            $prefixedColumnName = $this->getTableAliasForColumn($columnName) . '.' . $columnName;
+            $prefixedColumnName = $this->getPrefixedColumnName($columnName);
             $this->qb->addOrderBy($prefixedColumnName, $columnSorting);
         }
+    }
+
+    /**
+     * @param string $columnName
+     * @return string
+     */
+    protected function getPrefixedColumnName($columnName)
+    {
+        $joinId =  $this->joinIdHelper->buildColumnJoinIdentifier($columnName);
+        if (array_key_exists($joinId, $this->virtualColumnOptions)
+            && array_key_exists($columnName, $this->virtualColumnExpressions)
+        ) {
+            return $this->virtualColumnExpressions[$columnName];
+        }
+
+        return $this->getTableAliasForColumn($columnName) . '.' . $columnName;
     }
 }
