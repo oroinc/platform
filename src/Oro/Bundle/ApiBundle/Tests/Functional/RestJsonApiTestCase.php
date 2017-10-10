@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -58,7 +59,15 @@ class RestJsonApiTestCase extends ApiTestCase
             foreach ($parameters['filter'] as $key => $filter) {
                 $filter = self::processTemplateData($filter);
                 if (is_array($filter)) {
-                    $filter = implode(',', $filter);
+                    if (ArrayUtil::isAssoc($filter)) {
+                        foreach ($filter as $k => $v) {
+                            if (is_array($v)) {
+                                $filter[$k] = implode(',', $v);
+                            }
+                        }
+                    } else {
+                        $filter = implode(',', $filter);
+                    }
                 }
                 $parameters['filter'][$key] = $filter;
             }
