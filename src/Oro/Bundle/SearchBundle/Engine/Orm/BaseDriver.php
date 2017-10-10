@@ -258,7 +258,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
                 default:
                     throw new \LogicException(sprintf('Aggregating function %s is not suppored', $function));
-
             }
         }
 

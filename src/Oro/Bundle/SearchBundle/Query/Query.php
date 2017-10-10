@@ -612,10 +612,14 @@ class Query
      * @param string $name
      * @param string $field
      * @param string $function
+     *
+     * @return $this
      */
     public function addAggregate($name, $field, $function)
     {
         $this->aggregations[$name] = ['field' => $field, 'function' => $function];
+
+        return $this;
     }
 
     /**

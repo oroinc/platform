@@ -245,4 +245,10 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         return $this->query->getAggregations();
     }
+
+    public function __clone()
+    {
+        $this->query = clone $this->query;
+        $this->result = null;
+    }
 }

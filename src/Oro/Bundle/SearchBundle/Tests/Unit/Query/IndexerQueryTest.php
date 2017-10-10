@@ -9,6 +9,9 @@ use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_VALUE = 'test_value';
@@ -62,9 +65,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->searchIndexer);
-        unset($this->innerQuery);
-        unset($this->query);
+        unset($this->searchIndexer, $this->innerQuery, $this->query);
     }
 
     /**
@@ -245,5 +246,25 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_VALUE);
 
         $this->assertEquals($this->query, $this->query->setFrom(self::TEST_VALUE));
+    }
+
+    public function testClone()
+    {
+        $result1 = $this->prepareResult();
+        $result2 = $this->prepareResult();
+
+        $this->searchIndexer->expects($this->exactly(2))
+            ->method('query')
+            ->with($this->innerQuery)
+            ->willReturnOnConsecutiveCalls($result1, $result2);
+
+        $this->assertSame($result1, $this->query->getResult());
+        $this->assertSame($this->innerQuery, $this->query->getQuery());
+
+        $newQuery = clone $this->query;
+
+        $this->assertSame($result2, $newQuery->getResult());
+        $this->assertNotSame($this->innerQuery, $newQuery->getQuery());
+        $this->assertEquals($this->innerQuery, $newQuery->getQuery());
     }
 }
