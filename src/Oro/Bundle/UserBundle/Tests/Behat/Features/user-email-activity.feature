@@ -66,6 +66,8 @@ Scenario: Forward email
   And press "Send"
   Then should see "Fwd: Re: Work for you" email in activity list
 
+@skip
+#unskip in scope of BAP-15695
 Scenario: Delete contexts
   When I collapse "Fwd: Re: Work for you" in activity list
   And delete all contexts from collapsed email
