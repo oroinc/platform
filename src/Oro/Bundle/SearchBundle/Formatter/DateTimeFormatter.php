@@ -6,6 +6,13 @@ class DateTimeFormatter
 {
     const DATETIME_FORMAT = 'Y-m-d H:i:s';
 
+    /**
+     * Format \DateTime object into string format by specific format in DateTimeFormatter::DATETIME_FORMAT
+     *
+     * @param \DateTime $dateTimeValue
+     *
+     * @return string
+     */
     public function format(\DateTime $dateTimeValue)
     {
         $dateTimeValueToFormat = clone $dateTimeValue;
