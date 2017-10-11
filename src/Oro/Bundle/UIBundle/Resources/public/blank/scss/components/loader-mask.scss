@@ -46,6 +46,10 @@ body.loading {
         line-height:  24px;
 
         background: $loader-mask-frame-bg;
+        border: $loader-mask-frame-border;
+
+        border-radius: $loader-mask-frame-border-radius;
+        box-shadow: $loader-mask-frame-box-shadow;
 
         transform: translate(-50%, -50%);
 
