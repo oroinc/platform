@@ -3,5 +3,5 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
 
   Scenario: Check store front for XSS vulnerability
     Given I signed in as AmandaRCole@example.org on the store frontend
-    And I should not see XSS at any page of "frontend urls"
-    And I should not see alert
+    When I visiting pages listed in "frontend urls"
+    Then I should not get XSS vulnerabilities

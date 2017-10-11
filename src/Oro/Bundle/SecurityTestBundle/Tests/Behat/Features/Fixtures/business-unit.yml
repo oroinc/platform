@@ -1,4 +1,0 @@
-Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
-    businessUnit:
-        name: '<xss("BusinessUnit.name")>'
-        organization: '@organization'

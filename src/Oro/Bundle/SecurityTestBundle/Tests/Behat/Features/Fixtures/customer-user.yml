@@ -4,7 +4,7 @@ include:
 Oro\Bundle\CustomerBundle\Entity\CustomerUser:
     amanda:
         organization: '@organization'
-        role: ['@buyer']
+        role: ['@front_admin', '@buyer']
         owner: '@admin'
         website: '@website1'
         customer: '@company_a'

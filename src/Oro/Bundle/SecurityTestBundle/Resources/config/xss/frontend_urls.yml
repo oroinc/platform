@@ -1,0 +1,16 @@
+urls:
+    # User Profile, Customer, Customer User
+    - { route: 'oro_customer_frontend_customer_user_profile' }
+    - { route: 'oro_customer_frontend_customer_user_profile_update' }
+    - { route: 'oro_customer_frontend_customer_user_index' }
+
+    # Shopping list
+    - { route: 'oro_shopping_list_frontend_view', parameters: { id: '@shoppinglist1.id' } }
+
+    # Product related
+    - { route: 'oro_frontend_root' }
+    - { route: 'oro_product_frontend_product_index' }
+    - { route: 'oro_website_search_results' }
+    - { route: 'oro_website_search_results', parameters: { search: '<script>(window.xss=window.xss||[]).push("website_search")</script>' } }
+    - { route: 'oro_catalog_frontend_product_allproducts' }
+    - { route: 'oro_product_frontend_product_view', parameters: { id: '@product1.id' } }

@@ -3,8 +3,14 @@ Oro\Bundle\CustomerBundle\Entity\CustomerGroup:
         name: '<xss("CustomerGroup.name")>'
 
 Oro\Bundle\CustomerBundle\Entity\Customer:
+    company_root:
+        name: 'Customer root <xss("Customer.name(parent)")>'
+        organization: '@organization'
+        owner: '@admin'
+        group: '@all_customers'
     company_a:
         name: '<xss("Customer.name")>'
+        parent: '@company_root'
         organization: '@organization'
         owner: '@admin'
         group: '@all_customers'
@@ -15,14 +21,20 @@ Oro\Bundle\CustomerBundle\Entity\CustomerAddress:
         systemOrganization: '@organization'
         frontendOwner: '@company_a'
         country: 'US'
-        region: 'US-FL'
-        primary: false
+        primary: true
         label: '<xss("CustomerAddress.label")>'
         street: '<xss("CustomerAddress.street")>'
         street2: '<xss("CustomerAddress.street2")>'
         city: '<xss("CustomerAddress.city")>'
         postalCode: '<xss("CustomerAddress.postalCode")>'
-        organization: '@organization'
+        phone: '<xss("CustomerAddress.phone")>'
+        organization: '<xss("CustomerAddress.organization")>'
+        regionText: '<xss("CustomerAddress.regionText")>'
+        namePrefix: '<xss("CustomerAddress.namePrefix")>'
+        firstName: '<xss("CustomerAddress.firstName")>'
+        middleName: '<xss("CustomerAddress.middleName")>'
+        lastName: '<xss("CustomerAddress.lastName")>'
+        nameSuffix: '<xss("CustomerAddress.nameSuffix")>'
 
 Oro\Bundle\CustomerBundle\Entity\CustomerAddressToAddressType:
     customerAddress1ShippingDefault:
