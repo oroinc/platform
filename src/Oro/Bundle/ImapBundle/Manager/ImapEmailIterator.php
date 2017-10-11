@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Manager;
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
+use Psr\Log\LoggerInterface;
 
 class ImapEmailIterator implements \Iterator, \Countable
 {
@@ -63,6 +64,14 @@ class ImapEmailIterator implements \Iterator, \Countable
     public function setBatchSize($batchSize)
     {
         $this->iterator->setBatchSize($batchSize);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->iterator->setLogger($logger);
     }
 
     /**

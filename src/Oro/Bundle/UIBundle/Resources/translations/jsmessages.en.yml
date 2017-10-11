@@ -95,7 +95,6 @@ oro:
         jstree:
             move_node_error: "You can not move node {{ nodeText }} here."
             no_node_selected_error: "You didn't select any node"
-            move_success: '{{ nodes }} was successfully moved'
             actions:
                 expand: 'Expand all'
                 collapse: 'Collapse all'

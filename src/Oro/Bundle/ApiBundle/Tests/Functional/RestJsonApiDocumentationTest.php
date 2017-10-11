@@ -41,7 +41,6 @@ class RestJsonApiDocumentationTest extends RestJsonApiTestCase
 
     public function testDocumentation()
     {
-        $this->markTestSkipped('BAP-15563');
         $view = 'rest_json_api';
         /** @var ApiDocExtractor $apiDocExtractor */
         $apiDocExtractor = $this->getContainer()->get('nelmio_api_doc.extractor.api_doc_extractor');
