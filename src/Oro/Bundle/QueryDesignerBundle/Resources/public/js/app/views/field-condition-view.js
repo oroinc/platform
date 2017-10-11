@@ -38,7 +38,9 @@ define(function(require) {
                 var appendFilter = _.bind(function() {
                     clearTimeout(showLoadingTimeout);
                     var filter = new (Filter.extend(filterOptions))();
-                    this._appendFilter(filter);
+                    if (!this.disposed) {
+                        this._appendFilter(filter);
+                    }
                 }, this);
                 if (modules.length > 1) {
                     var optionResolver = modules[1];

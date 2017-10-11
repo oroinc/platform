@@ -12,6 +12,11 @@
                 "label":"Updated at",
                 "name":"$updatedAt",
                 "type":"datetime"
+            },
+            {
+                "label":"Id",
+                "name":"id",
+                "type":"integer"
             }
         ]
     }

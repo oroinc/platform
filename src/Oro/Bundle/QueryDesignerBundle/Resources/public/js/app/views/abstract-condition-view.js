@@ -65,7 +65,10 @@ define(function(require) {
 
         _onChoiceInputChanged: function(e, fieldId) {
             var choiceInputValue = this._getInitialChoiceInputValue();
-            if (choiceInputValue !== fieldId) {
+            if (!fieldId) {
+                this._removeFilter();
+                e.stopPropagation();
+            } else if (choiceInputValue !== fieldId) {
                 $(':focus').blur();
                 // reset current value on field change
                 this.setValue({});
@@ -149,6 +152,16 @@ define(function(require) {
             this._onUpdate();
         },
 
+        _removeFilter: function() {
+            if (this.filter) {
+                this.stopListening(this.filter);
+                this.filter.dispose();
+                this.$filterContainer.empty();
+                delete this.filter;
+                this.trigger('filter-removed');
+            }
+        },
+
         _onUpdate: function() {
             var value = this._collectValue();
             this.setValue(value);
@@ -191,7 +204,7 @@ define(function(require) {
             var deferred = $.Deferred();
             var columnName = _.result(this.getValue(), 'columnName');
             if (columnName !== name) {
-                this.once('filter-appended', function() {
+                this.once('filter-appended filter-removed', function() {
                     deferred.resolve();
                 });
             } else {

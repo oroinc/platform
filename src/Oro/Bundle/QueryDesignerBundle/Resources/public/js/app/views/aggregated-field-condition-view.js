@@ -30,12 +30,17 @@ define(function(require) {
                 applicableConditionsCallback: this.applicableConditionsCallback.bind(this)
             });
             var select2Opts = this.options.fieldChoice.select2;
-            if (select2Opts && select2Opts.formatSelectionTemplate) {
-                this.options.fieldChoice = _.extend({}, this.options.fieldChoice, {
-                    select2: _.extend({}, select2Opts, {
-                        formatSelectionTemplate: this.compileSelectionTpl(select2Opts.formatSelectionTemplate)
-                    })
-                });
+
+            if (select2Opts) {
+                var templateString = select2Opts.formatSelectionTemplate ||
+                    $(select2Opts.formatSelectionTemplateSelector).text();
+                if (templateString) {
+                    this.options.fieldChoice = _.extend({}, this.options.fieldChoice, {
+                        select2: _.extend({}, select2Opts, {
+                            formatSelectionTemplate: this.compileSelectionTpl(templateString)
+                        })
+                    });
+                }
             }
 
             AggregatedFieldConditionView.__super__.render.call(this);
@@ -43,16 +48,22 @@ define(function(require) {
             this.listenTo(this.options.columnsCollection, {
                 'remove': function(model) {
                     if (model.get('label') === this._getColumnLabel()) {
-                        this.trigger('close');
+                        this._onRelatedColumnRemoved();
                     }
                 },
                 'change:func change:label': function(model) {
                     if (model.previous('label') === this._getColumnLabel()) {
-                        this.trigger('close');
+                        this._onRelatedColumnRemoved();
                     }
                 }
             });
             return this;
+        },
+
+        _onRelatedColumnRemoved: function() {
+            this.setChoiceInputValue('').then(function() {
+                this.trigger('close');
+            }.bind(this));
         },
 
         compileSelectionTpl: function(template) {

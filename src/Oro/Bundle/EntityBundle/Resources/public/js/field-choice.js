@@ -37,9 +37,8 @@ define(function(require) {
         _create: function() {
             this._on({
                 change: function(e) {
-                    if (e.added) {
-                        this.element.trigger('changed', e.added.id);
-                    }
+                    var id = _.result(e.added, 'id');
+                    this.element.trigger('changed', id);
                 }
             });
 
@@ -135,16 +134,17 @@ define(function(require) {
             var template;
             var options = this.options.select2;
 
-            if (options.formatSelectionTemplateSelector) {
-                options.formatSelectionTemplate = $(options.formatSelectionTemplateSelector).text();
-            }
-
             if (options.formatSelectionTemplate) {
                 if (_.isFunction(options.formatSelectionTemplate)) {
                     template = options.formatSelectionTemplate;
                 } else {
                     template = _.template(options.formatSelectionTemplate);
                 }
+            } else if (options.formatSelectionTemplateSelector) {
+                template = _.template($(options.formatSelectionTemplateSelector).text());
+            }
+
+            if (template) {
                 options.formatSelection = _.bind(function(item) {
                     var result;
                     if (item !== null) {

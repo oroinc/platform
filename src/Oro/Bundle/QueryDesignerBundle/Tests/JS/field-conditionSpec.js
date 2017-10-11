@@ -24,6 +24,7 @@ define(function(require) {
                 }
                 field.entity = entity;
                 entity.fieldsIndex[field.name] = field;
+
             });
         });
         return data;
