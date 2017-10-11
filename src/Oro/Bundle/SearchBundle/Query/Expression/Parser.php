@@ -314,7 +314,7 @@ class Parser
         $functionToken = $this->stream->expect(
             Token::STRING_TYPE,
             $this->aggregatingFunctions,
-            'Aggregating operation expected'
+            'Aggregating function expected'
         );
         $function = $functionToken->value;
 

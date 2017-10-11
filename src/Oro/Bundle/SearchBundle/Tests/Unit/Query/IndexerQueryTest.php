@@ -248,6 +248,22 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->query, $this->query->setFrom(self::TEST_VALUE));
     }
 
+    public function testAggregationAccessors()
+    {
+        $this->assertEquals([], $this->query->getAggregations());
+
+        $this->query->addAggregate('test_name1', 'test_field1', 'test_function1');
+        $this->query->addAggregate('test_name2', 'test_field2', 'test_function2');
+
+        $this->assertEquals(
+            [
+                'test_name1' => ['field' => 'test_field1', 'function' => 'test_function1'],
+                'test_name2' => ['field' => 'test_field2', 'function' => 'test_function2'],
+            ],
+            $this->query->getAggregations()
+        );
+    }
+
     public function testClone()
     {
         $result1 = $this->prepareResult();
