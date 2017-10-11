@@ -1,5 +1,7 @@
 @ticket-BAP-10957
 @automatically-ticket-tagged
+@skip
+#unskip in scope of BAP-15695
 Feature: User email activity
   In order to have ability send email to user
   As OroCRM sales rep
