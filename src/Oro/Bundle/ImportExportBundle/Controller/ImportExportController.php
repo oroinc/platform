@@ -154,7 +154,7 @@ class ImportExportController extends Controller
      * @param Request $request
      * @param string $processorAlias
      *
-     * @return array
+     * @return JsonResponse
      */
     public function importValidateAction(Request $request, $processorAlias)
     {
