@@ -147,7 +147,7 @@ class ActivityListListener
     {
         foreach ($collections as $hash => $collection) {
             $ownerEntity = $collection->getOwner();
-            if (null === $this->doctrineHelper->getSingleEntityIdentifier($ownerEntity)) {
+            if (null === $this->doctrineHelper->getSingleEntityIdentifier($ownerEntity, false)) {
                 continue;
             }
 

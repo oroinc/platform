@@ -28,11 +28,14 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: string, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: guid, priority: -10 }
 
     oro_api.normalize_value.integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: integer, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: smallint, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: duration, priority: -10 }
 
     oro_api.normalize_value.bigint:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBigint
@@ -50,14 +53,16 @@ services:
             - { name: oro.api.processor, action: normalize_value, dataType: boolean, priority: -10 }
 
     oro_api.normalize_value.decimal:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeDecimal
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: decimal, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: money, priority: -10 }
 
-    oro_api.normalize_value.float:
+    oro_api.normalize_value.number:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: float, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: percent, priority: -10 }
 
     #
     # REST API processors
@@ -67,6 +72,16 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDateTime
         tags:
             - { name: oro.api.processor, action: normalize_value, requestType: rest, dataType: datetime, priority: -10 }
+
+    oro_api.normalize_value.rest.date:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDate
+        tags:
+            - { name: oro.api.processor, action: normalize_value, requestType: rest, dataType: date, priority: -10 }
+
+    oro_api.normalize_value.rest.time:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeTime
+        tags:
+            - { name: oro.api.processor, action: normalize_value, requestType: rest, dataType: time, priority: -10 }
 
     oro_api.normalize_value.rest.order_by:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeOrderBy

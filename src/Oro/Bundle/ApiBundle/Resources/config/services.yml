@@ -75,8 +75,18 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
 
+    oro_api.entity_loader:
+        class: Oro\Bundle\ApiBundle\Util\EntityLoader
+        public: false
+        arguments:
+            - '@doctrine'
+
     oro_api.entity_accessor:
         class: Oro\Bundle\ApiBundle\Util\EntityDataAccessor
+        public: false
+
+    oro_api.entity_id_helper:
+        class: Oro\Bundle\ApiBundle\Util\EntityIdHelper
         public: false
 
     oro_api.entity_metadata_factory:
@@ -343,12 +353,20 @@ services:
         arguments:
             - '@service_container'
 
+    oro_api.entity_id_transformer_registry:
+        class: Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry
+        public: false
+        arguments:
+            - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerConfigurationCompilerPass
+            - '@oro_api.request_expression_matcher'
+
     oro_api.rest.entity_id_transformer:
         class: Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer
         public: false
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.entity_id_transformer, requestType: rest }
 
     oro_api.exception_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor
@@ -530,6 +548,12 @@ services:
             - '@property_accessor'
         tags:
             - { name: oro.api.filter_factory, priority: -10 }
+
+    oro_api.filter_factory.composite_identifier:
+        class: Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilterFactory
+        public: false
+        arguments:
+            - '@oro_api.entity_id_transformer_registry'
 
     oro_api.filter_factory.extended_association:
         class: Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilterFactory

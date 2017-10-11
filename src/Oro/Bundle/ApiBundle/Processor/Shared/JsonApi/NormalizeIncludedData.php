@@ -6,16 +6,22 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
@@ -32,31 +38,52 @@ class NormalizeIncludedData implements ProcessorInterface
     /** @var EntityInstantiator */
     protected $entityInstantiator;
 
+    /** @var EntityLoader */
+    protected $entityLoader;
+
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
     /** @var EntityIdTransformerInterface */
     protected $entityIdTransformer;
 
+    /** @var ConfigProvider */
+    protected $configProvider;
+
+    /** @var MetadataProvider */
+    protected $metadataProvider;
+
     /** @var FormContext */
     protected $context;
+
+    /** @var EntityMetadata[] */
+    private $entityMetadata;
 
     /**
      * @param DoctrineHelper               $doctrineHelper
      * @param EntityInstantiator           $entityInstantiator
+     * @param EntityLoader                 $entityLoader
      * @param ValueNormalizer              $valueNormalizer
      * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param ConfigProvider               $configProvider
+     * @param MetadataProvider             $metadataProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
+        EntityLoader $entityLoader,
         ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer
+        EntityIdTransformerInterface $entityIdTransformer,
+        ConfigProvider $configProvider,
+        MetadataProvider $metadataProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityInstantiator = $entityInstantiator;
+        $this->entityLoader = $entityLoader;
         $this->valueNormalizer = $valueNormalizer;
         $this->entityIdTransformer = $entityIdTransformer;
+        $this->configProvider = $configProvider;
+        $this->metadataProvider = $metadataProvider;
     }
 
     /**
@@ -81,6 +108,7 @@ class NormalizeIncludedData implements ProcessorInterface
         }
 
         $this->context = $context;
+        $this->entityMetadata = [];
         try {
             $includedEntities = $this->loadIncludedEntities($includedData);
             if (null !== $includedEntities) {
@@ -89,6 +117,7 @@ class NormalizeIncludedData implements ProcessorInterface
             }
         } finally {
             $this->context = null;
+            $this->entityMetadata = null;
         }
     }
 
@@ -255,8 +284,9 @@ class NormalizeIncludedData implements ProcessorInterface
         if (!$updateFlag) {
             return $entityId;
         }
+
         try {
-            return $this->entityIdTransformer->reverseTransform($entityClass, $entityId);
+            return $this->entityIdTransformer->reverseTransform($entityId, $this->getEntityMetadata($entityClass));
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $pointer)
                 ->setInnerException($e);
@@ -275,9 +305,11 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     protected function getEntity($pointer, $entityClass, $entityId, $updateFlag)
     {
-        return $updateFlag
-            ? $this->getExistingEntity($pointer, $entityClass, $entityId)
-            : $this->entityInstantiator->instantiate($entityClass);
+        if ($updateFlag) {
+            return $this->getExistingEntity($pointer, $entityClass, $entityId);
+        }
+
+        return $this->entityInstantiator->instantiate($entityClass);
     }
 
     /**
@@ -289,7 +321,7 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     protected function getExistingEntity($pointer, $entityClass, $entityId)
     {
-        $entity = $this->doctrineHelper->getEntityManagerForClass($entityClass)->find($entityClass, $entityId);
+        $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->getEntityMetadata($entityClass));
         if (null !== $entity) {
             return $entity;
         }
@@ -297,6 +329,38 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->addValidationError(Constraint::ENTITY, $pointer, 'The entity does not exist.');
 
         return null;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return EntityMetadata
+     */
+    protected function getEntityMetadata($entityClass)
+    {
+        if (isset($this->entityMetadata[$entityClass])) {
+            return $this->entityMetadata[$entityClass];
+        }
+
+        $version = $this->context->getVersion();
+        $requestType = $this->context->getRequestType();
+        $config = $this->configProvider->getConfig(
+            $entityClass,
+            $version,
+            $requestType,
+            [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+        );
+
+        $metadata = $this->metadataProvider->getMetadata(
+            $entityClass,
+            $version,
+            $requestType,
+            $config->getDefinition()
+        );
+
+        $this->entityMetadata[$entityClass] = $metadata;
+
+        return $metadata;
     }
 
     /**

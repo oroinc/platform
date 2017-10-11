@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
@@ -57,20 +58,23 @@ class NormalizeRequestData implements ProcessorInterface
         $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);
         if (null !== $associationMetadata) {
             $targetEntityClass = $associationMetadata->getTargetClassName();
+            $targetMetadata = $associationMetadata->getTargetMetadata();
             if ($this->context->isCollection()) {
                 $associationData = [];
                 foreach ($associationValue as $key => $value) {
                     $associationData[] = $this->normalizeRelationId(
                         $associationName . '.' . $key,
                         $targetEntityClass,
-                        $value
+                        $value,
+                        $targetMetadata
                     );
                 }
             } elseif (null !== $associationValue) {
                 $associationData = $this->normalizeRelationId(
                     $associationName,
                     $targetEntityClass,
-                    $associationValue
+                    $associationValue,
+                    $targetMetadata
                 );
             } else {
                 $associationData = null;
@@ -83,31 +87,32 @@ class NormalizeRequestData implements ProcessorInterface
     }
 
     /**
-     * @param string $propertyPath
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * @param string         $propertyPath
+     * @param string         $entityClass
+     * @param mixed          $entityId
+     * @param EntityMetadata $entityMetadata
      *
      * @return array ['class' => entity class, 'id' => entity id]
      */
-    protected function normalizeRelationId($propertyPath, $entityClass, $entityId)
+    protected function normalizeRelationId($propertyPath, $entityClass, $entityId, EntityMetadata $entityMetadata)
     {
         return [
             'class' => $entityClass,
-            'id'    => $this->normalizeEntityId($propertyPath, $entityClass, $entityId)
+            'id'    => $this->normalizeEntityId($propertyPath, $entityId, $entityMetadata)
         ];
     }
 
     /**
-     * @param string $propertyPath
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * @param string         $propertyPath
+     * @param mixed          $entityId
+     * @param EntityMetadata $entityMetadata
      *
      * @return mixed
      */
-    protected function normalizeEntityId($propertyPath, $entityClass, $entityId)
+    protected function normalizeEntityId($propertyPath, $entityId, EntityMetadata $entityMetadata)
     {
         try {
-            return $this->entityIdTransformer->reverseTransform($entityClass, $entityId);
+            return $this->entityIdTransformer->reverseTransform($entityId, $entityMetadata);
         } catch (\Exception $e) {
             $error = Error::createValidationError(Constraint::ENTITY_ID)
                 ->setInnerException($e)

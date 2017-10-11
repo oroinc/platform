@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 /**
  * Creates new instance of the entity.
@@ -23,16 +24,24 @@ class CreateEntity implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var EntityLoader */
+    protected $entityLoader;
+
     /** @var EntityInstantiator */
     protected $entityInstantiator;
 
     /**
      * @param DoctrineHelper     $doctrineHelper
+     * @param EntityLoader       $entityLoader
      * @param EntityInstantiator $entityInstantiator
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EntityInstantiator $entityInstantiator)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EntityLoader $entityLoader,
+        EntityInstantiator $entityInstantiator
+    ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityLoader = $entityLoader;
         $this->entityInstantiator = $entityInstantiator;
     }
 
@@ -52,7 +61,9 @@ class CreateEntity implements ProcessorInterface
         $entityId = $context->getId();
         if ($entityId && $this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $metadata = $context->getMetadata();
-            if (!$metadata->hasIdentifierGenerator() && $this->isEntityExist($entityClass, $entityId)) {
+            if (!$metadata->hasIdentifierGenerator()
+                && null !== $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
+            ) {
                 $context->addError(
                     Error::createValidationError(Constraint::CONFLICT, 'The entity already exists')
                         ->setStatusCode(Response::HTTP_CONFLICT)
@@ -62,19 +73,5 @@ class CreateEntity implements ProcessorInterface
         if (!$context->hasErrors()) {
             $context->setResult($this->entityInstantiator->instantiate($entityClass));
         }
-    }
-
-    /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return bool
-     */
-    private function isEntityExist($entityClass, $entityId)
-    {
-        $existingEntity = $this->doctrineHelper->getEntityManagerForClass($entityClass)
-            ->find($entityClass, $entityId);
-
-        return null !== $existingEntity;
     }
 }

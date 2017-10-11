@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityId;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
@@ -38,10 +39,11 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
+        $this->context->setParentMetadata(new EntityMetadata());
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getParentClassName(), $this->context->getParentId())
+            ->with($this->context->getParentId(), self::identicalTo($this->context->getParentMetadata()))
             ->willReturn(123);
 
         $this->processor->process($this->context);
@@ -53,10 +55,11 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
+        $this->context->setParentMetadata(new EntityMetadata());
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getParentClassName(), $this->context->getParentId())
+            ->with($this->context->getParentId(), self::identicalTo($this->context->getParentMetadata()))
             ->willThrowException(new \Exception('some error'));
 
         $this->processor->process($this->context);

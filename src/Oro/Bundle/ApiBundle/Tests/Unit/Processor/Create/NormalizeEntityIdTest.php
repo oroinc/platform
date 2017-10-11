@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Create\NormalizeEntityId;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class NormalizeEntityIdTest extends FormProcessorTestCase
@@ -20,7 +21,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->processor = new NormalizeEntityId($this->entityIdTransformer);
     }
@@ -70,7 +71,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getClassName(), $this->context->getId())
+            ->with($this->context->getId(), self::identicalTo($metadata))
             ->willReturn(123);
 
         $this->processor->process($this->context);
@@ -89,7 +90,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with($this->context->getClassName(), $this->context->getId())
+            ->with($this->context->getId(), self::identicalTo($metadata))
             ->willThrowException(new \Exception('some error'));
 
         $this->processor->process($this->context);
