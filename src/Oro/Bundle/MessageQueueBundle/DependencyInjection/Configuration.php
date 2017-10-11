@@ -59,6 +59,17 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->arrayNode('security_agnostic_processors')
                 ->prototype('scalar')->end()
+            ->end()
+            ->arrayNode('consumer')
+                ->children()
+                    ->integerNode('heartbeat_update_period')
+                        ->min(0)
+                        ->defaultValue(15)
+                        ->info(
+                            'Consumer heartbeat update period in minutes. To disable the checks, set this option to 0'
+                        )
+                    ->end()
+                ->end()
             ->end();
 
         return $tb;

@@ -28,7 +28,7 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
      */
     private function getEntityId($key)
     {
-        return urlencode($key);
+        return $key;
     }
 
     public function testGetList()
@@ -301,7 +301,7 @@ class RestJsonApiCustomIdentifierTest extends RestJsonApiTestCase
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter[name]' => 'Item+3']
+            ['filter[name]' => 'Item 3']
         );
 
         $this->assertResponseContains(

@@ -1,0 +1,8 @@
+// @theme: blank;
+
+.page-area-container {
+    width: $page-area-container-width;
+    max-width: $page-area-container-max-width;
+
+    @include make-container($gutter: $page-area-container-offset-inner);
+}
