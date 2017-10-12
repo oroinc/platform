@@ -49,7 +49,7 @@ abstract class AbstractEngine implements EngineInterface
      * array(
      *   'results' - array of Oro\Bundle\SearchBundle\Query\Result\Item objects or callable to get it
      *   'records_count' - count of records without limit parameters in query or callable to get it
-     *   'grouped_data' - results of grouping operations or callable to get it
+     *   'aggregated_data' - results of aggregating operations or callable to get it
      * )
      *
      * @param Query $query
@@ -90,7 +90,7 @@ abstract class AbstractEngine implements EngineInterface
             $query,
             $data['results'],
             $data['records_count'],
-            $data['grouped_data']
+            $data['aggregated_data']
         );
     }
 

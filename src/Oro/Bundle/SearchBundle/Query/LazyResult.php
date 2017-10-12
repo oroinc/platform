@@ -16,19 +16,19 @@ class LazyResult extends Result
     protected $recordsCountCallback;
 
     /** @var \Closure */
-    protected $groupedDataCallback;
+    protected $aggregatedDataCallback;
 
     /**
      * @param Query            $query
      * @param \Closure|array   $elements
      * @param \Closure|integer $recordsCount
-     * @param \Closure|array   $groupedData
+     * @param \Closure|array   $aggregatedData
      */
     public function __construct(
         Query $query,
         $elements = [],
         $recordsCount = 0,
-        $groupedData = []
+        $aggregatedData = []
     ) {
         $this->query = $query;
 
@@ -45,10 +45,10 @@ class LazyResult extends Result
             $this->recordsCount = $recordsCount;
         }
 
-        if ($groupedData instanceof \Closure) {
-            $this->groupedDataCallback = $groupedData;
+        if ($aggregatedData instanceof \Closure) {
+            $this->aggregatedDataCallback = $aggregatedData;
         } else {
-            $this->groupedData = $groupedData;
+            $this->aggregatedData = $aggregatedData;
         }
 
         // parent constructor is not called intentionally to make sure that properties will not be initialized
@@ -104,13 +104,13 @@ class LazyResult extends Result
     /**
      * {@inheritdoc}
      */
-    public function getGroupedData()
+    public function getAggregatedData()
     {
-        if (null === $this->groupedData) {
-            $this->groupedData = call_user_func($this->groupedDataCallback);
+        if (null === $this->aggregatedData) {
+            $this->aggregatedData = call_user_func($this->aggregatedDataCallback);
         }
 
-        return $this->groupedData;
+        return $this->aggregatedData;
     }
 
     /**

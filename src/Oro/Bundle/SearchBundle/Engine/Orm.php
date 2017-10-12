@@ -71,14 +71,14 @@ class Orm extends AbstractEngine
             return $this->getIndexRepository()->getRecordsCount($query);
         };
 
-        $groupedDataCallback = function () use ($query) {
-            return $this->getIndexRepository()->getGroupedData($query);
+        $aggregatedDataCallback = function () use ($query) {
+            return $this->getIndexRepository()->getAggregatedData($query);
         };
 
         return [
-            'results'       => $resultsCallback,
+            'results' => $resultsCallback,
             'records_count' => $recordsCountCallback,
-            'grouped_data'  => $groupedDataCallback,
+            'aggregated_data' => $aggregatedDataCallback,
         ];
     }
 
@@ -91,7 +91,7 @@ class Orm extends AbstractEngine
             $query,
             $data['results'],
             $data['records_count'],
-            $data['grouped_data']
+            $data['aggregated_data']
         );
     }
 
