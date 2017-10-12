@@ -1,12 +1,13 @@
+include:
+    - catalog.yml
+
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     productName1:
-        string: 'Product1'
+        string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
     productDescription1:
-        text: 'Product1 Descr'
+        text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
     productShortDescription1:
-        text: 'Product1 Short Descr'
-    categoryName1:
-        string: 'NewCategory'
+        text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
 
 Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision:
     precision1:
@@ -27,9 +28,3 @@ Oro\Bundle\ProductBundle\Entity\Product:
         addShortDescription: ['@productShortDescription1']
         inventoryStatus: '@enumInventoryStatuses'
         status: 'enabled'
-
-Oro\Bundle\CatalogBundle\Entity\Category:
-    categoryLightingProducts:
-        addTitle: ['@categoryName1']
-        setParentCategory: [1]
-        addProduct: ['@product1']

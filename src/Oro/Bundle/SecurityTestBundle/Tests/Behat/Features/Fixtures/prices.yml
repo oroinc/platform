@@ -4,7 +4,7 @@ include:
 
 Oro\Bundle\PricingBundle\Entity\PriceList:
     pricelist:
-        name: 'pricelist'
+        name: '<xss("PriceList.name")>'
         default: true
         setCurrencies: [['USD']]
         active: true

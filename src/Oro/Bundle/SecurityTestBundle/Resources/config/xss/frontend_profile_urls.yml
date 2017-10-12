@@ -1,0 +1,17 @@
+urls:
+    # User Profile, Customer, Customer User, Addresses, Roles
+    - { route: 'oro_customer_frontend_customer_user_profile' }
+    - { route: 'oro_customer_frontend_customer_user_profile_update' }
+    - { route: 'oro_customer_frontend_customer_user_index' }
+    - { route: 'oro_customer_frontend_customer_user_view', parameters: { id: '@amanda.id' } }
+    - { route: 'oro_customer_frontend_customer_user_create' }
+    - { route: 'oro_customer_frontend_customer_user_address_index' }
+    - { route: 'oro_customer_frontend_customer_user_update', parameters: { id: '@amanda.id' } }
+    - { route: 'oro_customer_frontend_customer_user_address_create', parameters: { entityId: '@amanda.id' } }
+    - { route: 'oro_customer_frontend_customer_user_address_update', parameters: { entityId: '@amanda.id', id: '@amandaAddress1.id' } }
+    - { route: 'oro_customer_frontend_customer_address_create', parameters: { entityId: '@company_a.id' } }
+    - { route: 'oro_customer_frontend_customer_address_update', parameters: { entityId: '@company_a.id', id: '@customerAddress1.id' } }
+    - { route: 'oro_customer_frontend_customer_user_role_index' }
+    - { route: 'oro_customer_frontend_customer_user_role_create' }
+    - { route: 'oro_customer_frontend_customer_user_role_view', parameters: { id: '@xss_role.id' } }
+    - { route: 'oro_customer_frontend_customer_user_role_update', parameters: { id: '@xss_role.id' } }

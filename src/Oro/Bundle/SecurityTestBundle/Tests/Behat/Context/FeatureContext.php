@@ -35,6 +35,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function visitingPagesListedIn($value)
     {
+        $this->foundXss = [];
         foreach ($this->getUrlsToProcess($value) as $url) {
             $this->visitPath($this->getUrl($url));
             $this->getDriver()->waitPageToLoad();
@@ -120,8 +121,6 @@ class FeatureContext extends OroFeatureContext implements
         $urls = [];
         $value = str_replace(' ', '_', $value);
         try {
-            // TODO> Move this config outside and place near vectors storage
-            // TODO< to be able to configure XSS check at 1 place
             /** @var array $value */
             $value = Yaml::parse(
                 file_get_contents(sprintf(__DIR__ . '/../../../Resources/config/xss/%s.yml', $value))
