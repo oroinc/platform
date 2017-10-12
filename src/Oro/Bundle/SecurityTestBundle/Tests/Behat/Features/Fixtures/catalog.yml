@@ -4,9 +4,14 @@ include:
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     categoryName1:
         string: '<xss("LocalizedFallbackValue.string(Category.name)")>'
+    categoryName1_1:
+        string: '<xss("LocalizedFallbackValue.string(Category.name)")>'
 
 Oro\Bundle\CatalogBundle\Entity\Category:
     category1:
         addTitle: ['@categoryName1']
         setParentCategory: [1]
         addProduct: ['@simple_product']
+    category1_1:
+        addTitle: ['@categoryName1_1']
+        setParentCategory: ['@category1']
