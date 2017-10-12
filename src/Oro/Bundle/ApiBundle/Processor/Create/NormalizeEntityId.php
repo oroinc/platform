@@ -38,14 +38,15 @@ class NormalizeEntityId implements ProcessorInterface
             return;
         }
 
-        if ($context->getMetadata()->hasIdentifierGenerator()) {
+        $metadata = $context->getMetadata();
+        if ($metadata->hasIdentifierGenerator()) {
             // keep an entity identifier as is if the entity has a generator for identifier value
             return;
         }
 
         try {
             $context->setId(
-                $this->entityIdTransformer->reverseTransform($context->getClassName(), $entityId)
+                $this->entityIdTransformer->reverseTransform($entityId, $metadata)
             );
         } catch (\Exception $e) {
             $context->addError(

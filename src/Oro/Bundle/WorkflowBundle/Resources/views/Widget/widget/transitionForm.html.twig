@@ -1,62 +1,55 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-<div class="widget-content">
-    {% block transition_widget %}
-        {% block transition_js %}
-            {% if saved %}
-                <script type="text/javascript">
-                    require(['oroui/js/widget-manager'],
-                    function(widgetManager){
-                        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                            widget.trigger(
-                                'formSave',
-                                {% if data is defined and data %}
-                                    {{ data|json_encode|raw }}
-                                {% else %}
-                                    null
-                                {% endif %}
-                            );
-                        });
-                    });
-                </script>
-            {% elseif form.vars.errors|length > 0 %}
-                <script type="text/javascript">
-                    require(['oroui/js/widget-manager'],
-                    function(widgetManager){
-                        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                            widget.trigger('formSaveError');
-                        });
-                    });
-                </script>
-                <div class="alert alert-error">
+{% if saved %}
+    {% set widgetResponse = {
+        widget: {
+            trigger: [{
+                eventBroker: 'widget',
+                name: 'formSave',
+                args: [data|default(null)],
+            }],
+        }
+    } %}
+
+    {{ widgetResponse|json_encode|raw }}
+{% else %}
+    <div class="{% block transition_widget_class %}widget-content{% endblock %}">
+        {% block transition_widget %}
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-error" {{  UI.renderPageComponentAttributes({
+                    view: {
+                        view: 'oroworkflow/js/app/views/transition/transition-error-view',
+                        wid: app.request.get('_wid')
+                    }
+                }) }}>
                     {{ form_errors(form) }}
                 </div>
             {% endif %}
-        {% endblock transition_js %}
 
-        {% block transition_form %}
-            {% set frontendMessage = transition.frontendOptions.message %}
-            {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
-            {% if transitionMessage == frontendMessage.content %}
-                {# if no translation for message then do not show message #}
-                {% set transitionMessage = '' %}
-            {% endif %}
+            {% block transition_form %}
+                {% set frontendMessage = transition.frontendOptions.message %}
+                {% set transitionMessage = frontendMessage.content|trans(frontendMessage.message_parameters, 'workflows') %}
+                {% if transitionMessage == frontendMessage.content %}
+                    {# if no translation for message then do not show message #}
+                    {% set transitionMessage = '' %}
+                {% endif %}
 
-            {% if transitionMessage %}
-                <div class="alert">{{ transitionMessage }}</div>
-            {% endif %}
-            <form method="post"
-                  data-nohash="true"
-                  data-disable-autofocus="true"
-                  {% if transition.displayType != 'dialog' %}data-collect="true"{% endif %}
-                  id="{{ form.vars.id }}"
-                  name="{{ form.vars.name }}"
-                  action="{{ app.request.uri }}"
-                  class="form-dialog oro-workflow-transition-form"
-            {% if transition.frontendOptions.pageComponent is defined %}{{ UI.renderPageComponentAttributes(transition.frontendOptions.pageComponent) }}{% endif %}>
-                {{ form_row(form) }}
-            </form>
-            {{ oro_form_js_validation(form) }}
-        {% endblock transition_form %}
-    {% endblock transition_widget %}
-</div>
+                {% if transitionMessage %}
+                    <div class="alert">{{ transitionMessage }}</div>
+                {% endif %}
+                <form method="post"
+                      data-nohash="true"
+                      data-disable-autofocus="true"
+                      {% if transition.displayType != 'dialog' %}data-collect="true"{% endif %}
+                      id="{{ form.vars.id }}"
+                      name="{{ form.vars.name }}"
+                      action="{{ app.request.uri }}"
+                      class="form-dialog oro-workflow-transition-form"
+                      {% if transition.frontendOptions.pageComponent is defined %}{{ UI.renderPageComponentAttributes(transition.frontendOptions.pageComponent) }}{% endif %}>
+                    {{ form_row(form) }}
+                </form>
+                {{ oro_form_js_validation(form) }}
+            {% endblock transition_form %}
+        {% endblock transition_widget %}
+    </div>
+{% endif %}

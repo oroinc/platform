@@ -253,7 +253,17 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
     private function isSame($expected, $actual, array $path)
     {
         try {
-            \PHPUnit_Framework_Assert::assertSame($expected, $actual);
+            if (is_string($actual) && is_string($expected)) {
+                if ($actual !== $expected) {
+                    throw new \PHPUnit_Framework_ExpectationFailedException(sprintf(
+                        'Failed asserting that \'%s\' is identical to \'%s\'.',
+                        $actual,
+                        $expected
+                    ));
+                }
+            } else {
+                \PHPUnit_Framework_Assert::assertSame($expected, $actual);
+            }
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 

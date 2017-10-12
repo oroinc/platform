@@ -23,6 +23,8 @@ oro_message_queue:
     job:
         time_before_stale:
             default: '30 minutes'
+    consumer:
+        heartbeat_update_period: 15
 
 monolog:
     channels:

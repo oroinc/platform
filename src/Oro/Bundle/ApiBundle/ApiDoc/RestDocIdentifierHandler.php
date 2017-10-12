@@ -80,7 +80,7 @@ class RestDocIdentifierHandler
             return $this->getIdFieldRequirement($metadata->getField(reset($idFields))->getDataType());
         }
 
-        // combined identifier
+        // composite identifier
         $requirements = [];
         foreach ($idFields as $field) {
             $requirements[] = $field . '=' . $this->getIdFieldRequirement($metadata->getField($field)->getDataType());

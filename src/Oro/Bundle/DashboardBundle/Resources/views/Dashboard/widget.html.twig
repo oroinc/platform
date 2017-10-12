@@ -12,7 +12,7 @@
     {% endif %}
 {% endif %}
 
-<div id="{{ widgetContentId }}" class="invisible widget-content {{ widgetType }}-widget-content {{ widgetClass }}-widget-content">
+<div id="{{ widgetContentId }}" class="invisible widget-content {{ widgetType }}-widget-content {{ widgetClass }}-widget-content" data-widget-title="{{ widgetTitle }}">
     {% block content %}
     {% endblock %}
     {% if widgetConfiguration is defined %}
@@ -59,14 +59,4 @@
             {% endif %}
         </div>
     {% endblock %}
-    <script type="text/javascript">
-        require(['jquery', 'underscore', 'oroui/js/widget-manager'],
-        function($, _, widgetManager){
-            widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
-                {% if widgetTitle is not empty %}
-                widget.setTitle({{ widgetTitle|json_encode|raw }});
-                {% endif %}
-            });
-        });
-    </script>
 </div>

@@ -67,6 +67,15 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('job_name')
                     ->prototype('scalar')
                     ->info('DateTime expression - how long job can stay inactive before its consider old')
+            ->arrayNode('consumer')
+                ->children()
+                    ->integerNode('heartbeat_update_period')
+                        ->min(0)
+                        ->defaultValue(15)
+                        ->info(
+                            'Consumer heartbeat update period in minutes. To disable the checks, set this option to 0'
+                        )
+                    ->end()
                 ->end()
             ->end();
         return $tb;

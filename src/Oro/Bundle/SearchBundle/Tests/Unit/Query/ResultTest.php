@@ -11,79 +11,94 @@ use Oro\Bundle\SearchBundle\Query\Query;
 class ResultTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Result
+     * @var array
      */
-    private $result;
+    protected $items = [];
 
     /**
      * @var Result
      */
-    private $result1;
+    protected $result;
+
+    /**
+     * @var Result
+     */
+    protected $result1;
+
+    /**
+     * @var array
+     */
+    protected static $aggregatedData = [
+        'test_name' => [
+            'field' => 'test_field_name',
+            'function' => Query::AGGREGATE_FUNCTION_COUNT
+        ]
+    ];
 
     protected function setUp()
     {
         $product = new Product();
         $product->setName('test product');
 
-        $items[] = new Item(
+        $this->items[] = new Item(
             'OroTestBundle:test',
             1,
             'test title',
             'http://example.com',
             [],
-            array(
+            [
                  'alias' => 'test_product',
                  'label' => 'test product',
-                 'fields' => array(
-                     array(
+                 'fields' => [
+                     [
                          'name'          => 'name',
                          'target_type'   => 'text',
-                     ),
-                 ),
-            )
+                     ],
+                 ],
+            ]
         );
-        $items[] = new Item(
+        $this->items[] = new Item(
             'OroTestBundle:test',
             2,
             'test title 2',
             'http://example.com',
             [],
-            array(
+            [
                  'alias' => 'test_product',
                  'label' => 'test product',
-                 'fields' => array(
-                     array(
+                 'fields' => [
+                     [
                          'name'          => 'name',
                          'target_type'   => 'text',
-                     ),
-                 ),
-            )
+                     ],
+                 ],
+            ]
         );
-        $items[] = new Item(
+        $this->items[] = new Item(
             'OroTestBundle:test',
             3,
             'test title 3',
             'http://example.com',
             [],
-            array(
+            [
                  'alias' => 'test_product',
                  'label' => 'test product',
-                 'fields' => array(
-                     array(
+                 'fields' => [
+                     [
                          'name'          => 'name',
                          'target_type'   => 'text',
-                     ),
-                 ),
-            )
+                     ],
+                 ],
+            ]
         );
 
         $query = new Query();
         $query
-            ->from(array('OroTestBundle:test', 'OroTestBundle:product'))
+            ->from(['OroTestBundle:test', 'OroTestBundle:product'])
             ->andWhere('name', Query::OPERATOR_CONTAINS, 'test string', Query::TYPE_TEXT);
 
-        $this->result = new Result($query, $items, 3);
-        $this->result1 = new Result($query, array(), 0);
+        $this->result = new Result($query, $this->items, 3, self::$aggregatedData);
+        $this->result1 = new Result($query, [], 0);
     }
 
     public function testGetQuery()
@@ -116,5 +131,16 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test title 3', $resultArray['data'][2]['record_string']);
 
         $this->result1->toSearchResultData();
+    }
+
+    public function testGetAggregatedData()
+    {
+        $this->assertSame(self::$aggregatedData, $this->result->getAggregatedData());
+        $this->assertSame([], $this->result1->getAggregatedData());
+    }
+
+    public function testToArray()
+    {
+        $this->assertEquals($this->items, $this->result->toArray());
     }
 }

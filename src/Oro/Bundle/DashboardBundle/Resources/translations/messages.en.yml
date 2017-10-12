@@ -89,6 +89,8 @@ oro:
         form.choose_business_unit: Choose a business unit...
 
         widget:
+            configuration:
+                success: Widget has been successfully configured
             big_number:
                 choose_metrics: Choose Metrics
                 metrics: Metrics

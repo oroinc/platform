@@ -2,44 +2,54 @@
 
 namespace Oro\Bundle\ApiBundle\DataTransformer;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+
 /**
- * Field data transformers registry.
- * @see Oro\Component\EntitySerializer\EntityDataTransformer
+ * Contains all data transformers
+ * and allows to get a transformer suitable for a specific request type.
+ * @see \Oro\Component\EntitySerializer\EntityDataTransformer
  */
 class DataTransformerRegistry
 {
-    /** @var array */
-    protected $transformers = [];
+    /** @var array [data type => [[transformer, request type expression], ...], ...] */
+    private $transformers;
+
+    /** @var RequestExpressionMatcher */
+    private $matcher;
 
     /**
-     * Registers a data transformer for a given data type.
-     *
-     * @param string $dataType
-     * @param mixed  $transformer Can be the id of a service in DIC,
-     *                            an instance of "Oro\Component\EntitySerializer\DataTransformerInterface"
-     *                            or "Symfony\Component\Form\DataTransformerInterface",
-     *                            or function ($class, $property, $value, $config, $context) : mixed.
+     * @param array                    $transformers [data type => [[transformer, request type expression], ...], ...]
+     * @param RequestExpressionMatcher $matcher
      */
-    public function addDataTransformer($dataType, $transformer)
+    public function __construct(array $transformers, RequestExpressionMatcher $matcher)
     {
-        $this->transformers[$dataType] = $transformer;
+        $this->transformers = $transformers;
+        $this->matcher = $matcher;
     }
 
     /**
      * Returns a data transformer for a given data type.
      *
-     * @param string $dataType
+     * @param string      $dataType
+     * @param RequestType $requestType
      *
      * @return mixed|null Can be NULL,
-     *                    the id of a service in DIC,
      *                    an instance of "Oro\Component\EntitySerializer\DataTransformerInterface"
-     *                    or "Symfony\Component\Form\DataTransformerInterface",
-     *                    or function ($class, $property, $value, $config, $context) : mixed.
+     *                    or "Symfony\Component\Form\DataTransformerInterface".
      */
-    public function getDataTransformer($dataType)
+    public function getDataTransformer($dataType, RequestType $requestType)
     {
-        return isset($this->transformers[$dataType])
-            ? $this->transformers[$dataType]
-            : null;
+        $result = null;
+        if (isset($this->transformers[$dataType])) {
+            foreach ($this->transformers[$dataType] as list($transformer, $expression)) {
+                if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
+                    $result = $transformer;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 }
