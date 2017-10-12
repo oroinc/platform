@@ -9,4 +9,4 @@ Oro\Bundle\CatalogBundle\Entity\Category:
     category1:
         addTitle: ['@categoryName1']
         setParentCategory: [1]
-        addProduct: ['@product1']
+        addProduct: ['@simple_product']

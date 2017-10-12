@@ -1,3 +1,14 @@
+# TODO: upsells, crossels, variants, matrix 1, matrix 2
+# TODO: attribute family with group that contains XSS payload in label
+
+# Test simple product default page
+# Test simple product changed attribute family with group containing XSS
+# Test configurable product 1 attribute
+# Test configurable product 2 attributes
+# Test configurable product 3 attributes
+# Each of those products has all products as up sells and cross sells
+# All this products must be checked at all places where them may be rendered (SL, Checkout, RFQ, Order, Catalog, Search)
+
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     productName1:
         string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
@@ -5,15 +16,33 @@ Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
         text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
     productShortDescription1:
         text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
+    brandName:
+        string: '<xss("LocalizedFallbackValue.string(Brand.name)")>'
+    brandDescription:
+        text: '<xss("LocalizedFallbackValue.string(Brand.brandDescription)")>'
+    brandShortDescription:
+        text: '<xss("LocalizedFallbackValue.string(Brand.brandShortDescription)")>'
 
 Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision:
     precision1:
         unit: '@item'
         precision: '1'
 
+Oro\Bundle\ProductBundle\Entity\Brand:
+    brand:
+        owner: '@business_unit'
+        organization: '@organization'
+        addName: ['@brandName']
+        addDescription: ['@brandDescription']
+        addShortDescription: ['@brandShortDescription']
+
 Oro\Bundle\ProductBundle\Entity\Product:
-    product1:
-        sku: 'PSKU1'
+    simple_product:
+        sku: '<xss("Product.sku")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        skuUppercase: '<xss("Product.skuUppercase")>'
         type: 'simple'
         organization: '@organization'
         owner: '@business_unit'

@@ -10,7 +10,7 @@ Oro\Bundle\ShoppingListBundle\Entity\ShoppingList:
 
 Oro\Bundle\ShoppingListBundle\Entity\LineItem:
     lineitem1:
-        product: '@product1'
+        product: '@simple_product'
         quantity: '1'
         unit: '@item'
         customerUser: '@amanda'

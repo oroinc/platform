@@ -10,7 +10,7 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
     When I visiting pages listed in "frontend profile urls"
     Then I should not get XSS vulnerabilities
 
-  Scenario: Check store catalog pages front for XSS vulnerability
+  Scenario: Check store front catalog pages for XSS vulnerability
     Given I proceed as the Admin
     And login as administrator
     And I go to System/ Configuration
@@ -21,4 +21,43 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
     Then I should see "Configuration saved" flash message
     When I proceed as the User
     And I visiting pages listed in "frontend catalog urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check store front product view pages with default template for XSS vulnerability
+    Given I proceed as the User
+    When I visiting pages listed in "frontend product view urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check store front product view pages with Short Page for XSS vulnerability
+    Given I proceed as the Admin
+    And I follow "Commerce/Design/Theme" on configuration sidebar
+    And fill "Page Templates Form" with:
+      | Use Default  | false             |
+      | Product Page | Short page        |
+    And save form
+    And I should see "Configuration saved" flash message
+    When I proceed as the User
+    And I visiting pages listed in "frontend product view urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check store front product view pages with Two columns page for XSS vulnerability
+    Given I proceed as the Admin
+    And fill "Page Templates Form" with:
+      | Use Default  | false             |
+      | Product Page | Two columns page  |
+    And save form
+    And I should see "Configuration saved" flash message
+    When I proceed as the User
+    And I visiting pages listed in "frontend product view urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check store front product view pages with List page for XSS vulnerability
+    Given I proceed as the Admin
+    And fill "Page Templates Form" with:
+      | Use Default  | false             |
+      | Product Page | List page         |
+    And save form
+    And I should see "Configuration saved" flash message
+    When I proceed as the User
+    And I visiting pages listed in "frontend product view urls"
     Then I should not get XSS vulnerabilities

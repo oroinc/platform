@@ -1,2 +1,3 @@
 urls:
-    - { route: 'oro_product_frontend_product_view', parameters: { id: '@product1.id' } }
+    # TODO: Add checks for configurable products
+    - { route: 'oro_product_frontend_product_view', parameters: { id: '@simple_product.id' } }

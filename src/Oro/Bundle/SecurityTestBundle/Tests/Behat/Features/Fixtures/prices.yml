@@ -17,7 +17,7 @@ Oro\Bundle\CurrencyBundle\Entity\Price(local):
 Oro\Bundle\PricingBundle\Entity\ProductPrice:
     productPrice1:
         pricelist: '@pricelist'
-        product: '@product1'
+        product: '@simple_product'
         productSku: 'SKU1'
         quantity: 1
         unit: '@item'
@@ -34,7 +34,7 @@ Oro\Bundle\PricingBundle\Entity\PriceListToCustomer:
 Oro\Bundle\PricingBundle\Entity\CombinedProductPrice:
    combinedProductPrice1:
         pricelist: '@combinedPriceList'
-        product: '@product1'
+        product: '@simple_product'
         productSku: 'SKU1'
         quantity: 1
         unit: '@item'
