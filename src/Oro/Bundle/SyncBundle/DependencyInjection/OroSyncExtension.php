@@ -24,6 +24,7 @@ class OroSyncExtension extends Extension
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST = 'websocket_frontend_host';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT = 'websocket_frontend_port';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH = 'websocket_frontend_path';
+    const CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH_VALUE = 'ws';
 
     /**
      * {@inheritDoc}
@@ -60,6 +61,8 @@ class OroSyncExtension extends Extension
                 self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH
             ]
         );
+
+        $this->ensurePathParameters($container);
     }
 
     /**
@@ -76,6 +79,19 @@ class OroSyncExtension extends Extension
                     $container->setParameter($target, $value);
                 }
             }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function ensurePathParameters(ContainerBuilder $container)
+    {
+        if (!$container->hasParameter(self::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST)) {
+            $container->setParameter(
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH,
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH_VALUE
+            );
         }
     }
 }
