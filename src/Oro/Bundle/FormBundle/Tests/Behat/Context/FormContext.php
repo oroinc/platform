@@ -331,7 +331,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
 
         $driver->typeIntoInput($field->getXpath(), $value);
-        $driver->blur($field->getXpath());
     }
 
     /**
