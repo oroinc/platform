@@ -9,6 +9,12 @@ class Job
     const STATUS_FAILED = 'oro.message_queue_job.status.failed';
     const STATUS_FAILED_REDELIVERED = 'oro.message_queue_job.status.failed_redelivered';
     const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
+    const STATUS_STALE = 'oro.message_queue_job.status.stale';
+
+    /**
+     * @var array
+     */
+    public static $activeStatuses = [self::STATUS_NEW, self::STATUS_RUNNING, self::STATUS_FAILED_REDELIVERED];
 
     /**
      * @var int

@@ -106,14 +106,44 @@ class JobProcessor
         $job->setJobProgress(0);
         $job->setUnique((bool) $unique);
 
+        $job = $this->saveJobAndStaleDuplicateIfQualifies($job);
+
+        return $job ?? $this->jobStorage->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
+    }
+
+    /**
+     * @param Job $job
+     * @return null|Job
+     */
+    private function saveJobAndStaleDuplicateIfQualifies($job)
+    {
         try {
             $this->jobStorage->saveJob($job);
-
             return $job;
         } catch (DuplicateJobException $e) {
+            $currentRootJob = $this->findRootJobByJobNameAndStatuses($job->getName(), Job::$activeStatuses);
+            if ($currentRootJob && $this->isJobStale($currentRootJob)) {
+                $this->staleRootJobAndChildren($currentRootJob);
+                return $this->saveJobAndStaleDuplicateIfQualifies($job);
+            }
         }
+        return null;
+    }
 
-        return $this->jobStorage->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
+    /**
+     * @param Job $job
+     * @return bool
+     */
+    protected function isJobStale(Job $job)
+    {
+        if ($job->getStatus() === Job::STATUS_STALE) {
+            return true;
+        }
+        $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
+        if ($timeBeforeStale) {
+            return $job->getLastActiveAt() < new \DateTime('- ' . $timeBeforeStale);
+        }
+        return false;
     }
 
     /**
@@ -212,6 +242,27 @@ class JobProcessor
 
         $this->sendRecalculateJobProgressMessage($job);
     }
+    
+    /**
+     * @param Job $rootJob
+     */
+    public function staleRootJobAndChildren(Job $rootJob)
+    {
+        if (!$rootJob->isRoot()) {
+            throw new \LogicException(sprintf('Can\'t stale child jobs. id: "%s"', $rootJob->getId()));
+        }
+
+        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) {
+            $rootJob->setStatus(Job::STATUS_STALE);
+            $rootJob->setStoppedAt(new \DateTime());
+            foreach ($rootJob->getChildJobs() as $childJob) {
+                if (in_array($childJob->getStatus(), Job::$activeStatuses)) {
+                    $childJob->setStatus(Job::STATUS_STALE);
+                    $childJob->setStoppedAt(new \DateTime());
+                }
+            }
+        });
+    }
 
     /**
      * @param Job $job
@@ -282,7 +333,7 @@ class JobProcessor
 
         $job = $this->jobStorage->findJobById($job->getId());
 
-        if (! in_array($job->getStatus(), [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED])) {
+        if (! in_array($job->getStatus(), Job::$activeStatuses)) {
             throw new \LogicException(sprintf(
                 'Can cancel only new or running jobs. id: "%s", status: "%s"',
                 $job->getId(),
@@ -316,10 +367,7 @@ class JobProcessor
         }
 
         foreach ($job->getChildJobs() as $childJob) {
-            if (in_array(
-                $childJob->getStatus(),
-                [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED]
-            )) {
+            if (in_array($childJob->getStatus(), Job::$activeStatuses)) {
                 $this->cancelChildJob($childJob);
             }
         }
