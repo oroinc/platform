@@ -10,10 +10,6 @@
         padding: $datagrid-header-cell-offset-inner;
 
         vertical-align: $datagrid-header-cell-vertical-align;
-
-        &:first-child {
-            padding-left: $datagrid-header-cell-first-offset-inner-left;
-        }
     }
 
     .table-bordered & {
