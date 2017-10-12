@@ -150,14 +150,12 @@ class Role extends ExtendRole implements \Serializable
      */
     public function serialize()
     {
-        return serialize(
-            [
-                $this->id,
-                $this->role,
-                $this->label,
-                is_object($this->organization) ? clone $this->organization : $this->organization
-            ]
-        );
+        $dataForSerialization = [$this->id, $this->role, $this->label];
+        if (property_exists($this, 'organization')) {
+            $dataForSerialization[] =  is_object($this->organization) ? clone $this->organization : $this->organization;
+        }
+
+        return serialize($dataForSerialization);
     }
 
     /**
@@ -165,6 +163,10 @@ class Role extends ExtendRole implements \Serializable
      */
     public function unserialize($serialized)
     {
-        list($this->id, $this->role, $this->label, $this->organization) = unserialize($serialized);
+        if (property_exists($this, 'organization')) {
+            list($this->id, $this->role, $this->label, $this->organization) = unserialize($serialized);
+        } else {
+            list($this->id, $this->role, $this->label) = unserialize($serialized);
+        }
     }
 }

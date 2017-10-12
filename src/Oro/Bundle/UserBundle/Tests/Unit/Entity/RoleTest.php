@@ -78,4 +78,21 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($isEnabled, $unserializedOrganization->isEnabled());
         $this->assertEquals($name, $unserializedOrganization->getName());
     }
+
+    public function testSerializationWithoutOrganization()
+    {
+        $firstRole = new Role();
+        $label     = 'Label';
+        $role      = 'ROLE_ID';
+        $firstRole->setRole($role);
+        $firstRole->setLabel($label);
+
+        $secondRole = new Role();
+
+        $serializedString = $firstRole->serialize();
+        $secondRole->unserialize($serializedString);
+
+        $this->assertEquals($label, $secondRole->getLabel());
+        $this->assertContains($role, $secondRole->getRole());
+    }
 }
