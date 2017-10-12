@@ -11,6 +11,7 @@ define(function(require) {
         contextsView: null,
 
         initialize: function(options) {
+            this._deferredInit();
             this.options = options;
             this.initView();
         },
@@ -27,6 +28,8 @@ define(function(require) {
                 activityClass: this.options.activityClassAlias,
                 editable: editable
             });
+
+            this.listenTo(this.contextsView, 'render', this._resolveDeferredInit.bind(this));
         }
     });
 });
