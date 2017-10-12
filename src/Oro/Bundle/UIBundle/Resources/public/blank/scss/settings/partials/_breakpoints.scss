@@ -13,6 +13,7 @@ $oro_breakpoints: (
     'mobile': '(max-width: ' + $breakpoint-mobile + ')',
     'mobile-big': '(max-width: ' +  $breakpoint-mobile-big + ')',
     'strict-mobile': '(max-width: ' + $breakpoint-mobile + ')',
+    'print': 'print',
     // Custom breakpoints
     'popup-gallery-tablet': '(max-height: 730px), (max-width: ' + $breakpoint-tablet-small + ')'
 );
