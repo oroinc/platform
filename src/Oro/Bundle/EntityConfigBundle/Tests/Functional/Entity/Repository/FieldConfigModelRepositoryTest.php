@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeData;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FieldConfigModelRepositoryTest extends WebTestCase
@@ -95,13 +96,22 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
         $attributes = $this->repository->getAttributesByClass($family->getEntityClass());
 
-        $this->assertCount(5, $attributes);
-        $this->assertInstanceOf(FieldConfigModel::class, reset($attributes));
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_1, $attributes[0]->getFieldName());
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_2, $attributes[1]->getFieldName());
-        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_1, $attributes[2]->getFieldName());
-        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_2, $attributes[3]->getFieldName());
-        $this->assertEquals(LoadAttributeData::NOT_USED_ATTRIBUTE, $attributes[4]->getFieldName());
+        // check only attributes added by this bundle because other bundles may add own attributes
+        $expectedAttributes = [
+            LoadAttributeData::SYSTEM_ATTRIBUTE_1,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_2,
+            LoadAttributeData::REGULAR_ATTRIBUTE_1,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2,
+            LoadAttributeData::NOT_USED_ATTRIBUTE
+        ];
+        foreach ($attributes as $attribute) {
+            self::assertInstanceOf(FieldConfigModel::class, $attribute);
+            $attributeName = $attribute->getFieldName();
+            if (in_array($attributeName, $expectedAttributes, true)) {
+                unset($expectedAttributes[array_search($attributeName, $expectedAttributes, true)]);
+            }
+        }
+        self::assertEquals([], $expectedAttributes);
     }
 
     public function testGetActiveAttributesByClass()
@@ -111,12 +121,23 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
         $attributes = $this->repository->getActiveAttributesByClass($family->getEntityClass());
 
-        $this->assertCount(4, $attributes);
-        $this->assertInstanceOf(FieldConfigModel::class, reset($attributes));
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_1, $attributes[0]->getFieldName());
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_2, $attributes[1]->getFieldName());
-        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_1, $attributes[2]->getFieldName());
-        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_2, $attributes[3]->getFieldName());
+        // check only attributes added by this bundle because other bundles may add own attributes
+        $expectedAttributes = [
+            LoadAttributeData::SYSTEM_ATTRIBUTE_1,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_2,
+            LoadAttributeData::REGULAR_ATTRIBUTE_1,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2,
+        ];
+        foreach ($attributes as $attribute) {
+            self::assertInstanceOf(FieldConfigModel::class, $attribute);
+            $attributeName = $attribute->getFieldName();
+            if (in_array($attributeName, $expectedAttributes, true)) {
+                unset($expectedAttributes[array_search($attributeName, $expectedAttributes, true)]);
+            }
+            $extendOptions = $attribute->toArray('extend');
+            self::assertEquals(ExtendScope::STATE_ACTIVE, $extendOptions['state'], $attributeName);
+        }
+        self::assertEquals([], $expectedAttributes);
     }
 
     public function testGetAttributesByClassAndIsSystemTrue()
@@ -126,10 +147,21 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
         $attributes = $this->repository->getAttributesByClassAndIsSystem($family->getEntityClass(), true);
 
-        $this->assertCount(2, $attributes);
-        $this->assertInstanceOf(FieldConfigModel::class, reset($attributes));
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_1, $attributes[0]->getFieldName());
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_2, $attributes[1]->getFieldName());
+        // check only attributes added by this bundle because other bundles may add own attributes
+        $expectedAttributes = [
+            LoadAttributeData::SYSTEM_ATTRIBUTE_1,
+            LoadAttributeData::SYSTEM_ATTRIBUTE_2,
+        ];
+        foreach ($attributes as $attribute) {
+            self::assertInstanceOf(FieldConfigModel::class, $attribute);
+            $attributeName = $attribute->getFieldName();
+            if (in_array($attributeName, $expectedAttributes, true)) {
+                unset($expectedAttributes[array_search($attributeName, $expectedAttributes, true)]);
+            }
+            $extendOptions = $attribute->toArray('extend');
+            self::assertEquals(ExtendScope::OWNER_SYSTEM, $extendOptions['owner'], $attributeName);
+        }
+        self::assertEquals([], $expectedAttributes);
     }
 
     public function testGetAttributesByClassAndIsSystemFalse()
@@ -139,10 +171,21 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
         $attributes = $this->repository->getAttributesByClassAndIsSystem($family->getEntityClass(), false);
 
-        $this->assertCount(3, $attributes);
-        $this->assertInstanceOf(FieldConfigModel::class, reset($attributes));
-        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_1, $attributes[0]->getFieldName());
-        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_2, $attributes[1]->getFieldName());
-        $this->assertEquals(LoadAttributeData::NOT_USED_ATTRIBUTE, $attributes[2]->getFieldName());
+        // check only attributes added by this bundle because other bundles may add own attributes
+        $expectedAttributes = [
+            LoadAttributeData::REGULAR_ATTRIBUTE_1,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2,
+            LoadAttributeData::NOT_USED_ATTRIBUTE,
+        ];
+        foreach ($attributes as $attribute) {
+            self::assertInstanceOf(FieldConfigModel::class, $attribute);
+            $attributeName = $attribute->getFieldName();
+            if (in_array($attributeName, $expectedAttributes, true)) {
+                unset($expectedAttributes[array_search($attributeName, $expectedAttributes, true)]);
+            }
+            $extendOptions = $attribute->toArray('extend');
+            self::assertEquals(ExtendScope::OWNER_CUSTOM, $extendOptions['owner'], $attributeName);
+        }
+        self::assertEquals([], $expectedAttributes);
     }
 }

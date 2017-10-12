@@ -54,6 +54,15 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.consumer_heartbeat_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension'
+        public: false
+        arguments:
+            - '%oro_message_queue.consumer_heartbeat_update_period%'
+            - '@oro_message_queue.consumption.consumer_heartbeat'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', persistent: true }
+
     oro_message_queue.consumption.security_aware_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension'
         public: false
@@ -112,3 +121,26 @@ services:
             - 'cache'
             - '@doctrine'
             - '@logger'
+
+    oro_message_queue.consumption.consumer_heartbeat:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat
+        arguments:
+            - '@oro_message_queue.consumption.consumer_state_driver.dbal'
+            - '%oro_message_queue.consumer_heartbeat_update_period%'
+
+    oro_message_queue.consumption.consumer_state_driver.dbal:
+        class: Oro\Bundle\MessageQueueBundle\Consumption\StateDriver\DbalStateDriver
+        public: false
+        arguments:
+            - 'consumers'
+            - '@doctrine'
+            - '@logger'
+
+    oro_message_queue.listener.authentication:
+        class: 'Oro\Bundle\MessageQueueBundle\EventListener\LoginListener'
+        arguments:
+            - '@oro_message_queue.consumption.consumer_heartbeat'
+            - '@translator'
+            - '%oro_message_queue.consumer_heartbeat_update_period%'
+        tags:
+            - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }

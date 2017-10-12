@@ -7,7 +7,9 @@ define(function(require) {
     var $ = require('jquery');
     var routing = require('routing');
     var DialogWidget = require('oro/dialog-widget');
+    var ImportDialogWidget = require('oroimportexport/js/widget/import-dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
+    var __ = require('orotranslation/js/translator');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11702
     var ImportExportManager = function(options) {
@@ -81,20 +83,24 @@ define(function(require) {
         },
 
         handleImport: function() {
-            this._renderDialogWidget({
+            this._renderImportDialogWidget({
                 url: routing.generate(this.options.importRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importTitle
-                }
+                },
+                successMessage: __('oro.importexport.import.success.message'),
+                errorMessage: __('oro.importexport.import.form_fail.message')
             });
         },
 
         handleImportValidation: function() {
-            this._renderDialogWidget({
+            this._renderImportDialogWidget({
                 url: routing.generate(this.options.importValidationRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importValidationTitle
-                }
+                },
+                successMessage: __('oro.importexport.import_validation.success.message'),
+                errorMessage: __('oro.importexport.import_validation.form_fail.message')
             });
         },
 
@@ -167,16 +173,26 @@ define(function(require) {
 
         /**
          * @param {Object} options
+         * @param {Object|undefined} Dialog
          * @returns {DialogWidget}
          */
-        _renderDialogWidget: function(options) {
+        _renderDialogWidget: function(options, Dialog) {
+            var Widget = Dialog ? Dialog : DialogWidget;
             var opts = $.extend(true, {}, this.options.dialogOptions, options);
 
-            var widget = new DialogWidget(opts);
+            var widget = new Widget(opts);
 
             widget.render();
 
             return widget;
+        },
+
+        /**
+         * @param {Object} options
+         * @returns {DialogWidget}
+         */
+        _renderImportDialogWidget: function(options) {
+            return this._renderDialogWidget(options, ImportDialogWidget);
         }
     });
 
