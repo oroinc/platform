@@ -83,7 +83,7 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
             ->with($stepExecution)
             ->will($this->returnValue($context));
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch');
 
         $writer = $this->getWriter();

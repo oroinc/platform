@@ -10,11 +10,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutionRestoreInterface;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
-use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
+use Oro\Bundle\IntegrationBundle\Event\WriterAfterCommitEvent;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
@@ -76,9 +76,12 @@ class PersistentBatchWriter implements
             $this->saveItems($items, $em);
             $em->commit();
 
+            $this->eventDispatcher->dispatch(WriterAfterCommitEvent::NAME, new WriterAfterCommitEvent($em));
+
             $configuration = $this->contextRegistry
                 ->getByStepExecution($this->stepExecution)
                 ->getConfiguration();
+
 
             if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
                 $this->doClear();

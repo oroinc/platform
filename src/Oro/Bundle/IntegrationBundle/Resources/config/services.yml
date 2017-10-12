@@ -355,3 +355,21 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_integration.event.sync_before, method: syncBefore }
             - { name: kernel.event_listener, event: oro_integration.event.sync_after, method: syncAfter }
+
+    oro_integration.provider.entity_stage_provider:
+        class: 'Oro\Bundle\IntegrationBundle\Provider\EntityStateProvider'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+
+    oro_integration.manager.entity_stage_manager:
+        class: 'Oro\Bundle\IntegrationBundle\Manager\EntityStateManager'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+
+    oro_integration.event_listener.entity_state_clear_listener:
+        class: 'Oro\Bundle\IntegrationBundle\EventListener\EntityStateClearListener'
+        arguments:
+            - '@oro_integration.manager.entity_stage_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_integration.writer_after_commit, method: afterCommit }
+            - { name: doctrine.event_listener, event: onClear, method: onClear }
