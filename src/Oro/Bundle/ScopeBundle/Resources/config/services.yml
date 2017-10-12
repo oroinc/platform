@@ -34,3 +34,11 @@ services:
         arguments:
             - '@oro_scope.scope_manager'
             - '@doctrine'
+
+    oro_scope.twig.extension.scope:
+        class: Oro\Bundle\ScopeBundle\Twig\ScopeExtension
+        public: false
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: twig.extension }

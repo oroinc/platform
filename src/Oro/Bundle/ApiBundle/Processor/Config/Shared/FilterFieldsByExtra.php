@@ -11,8 +11,8 @@ use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
  * Excludes fields according to requested fieldset.

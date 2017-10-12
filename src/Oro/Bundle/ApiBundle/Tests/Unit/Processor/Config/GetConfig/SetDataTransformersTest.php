@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
+use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
+
+use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataTransformers;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SetDataTransformersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerRegistry */
     protected $dataTransformerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
     /** @var SetDataTransformers */
@@ -21,14 +26,8 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->dataTransformerRegistry = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dataTransformerRegistry = $this->createMock(DataTransformerRegistry::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new SetDataTransformers(
             $this->dataTransformerRegistry,
@@ -99,18 +98,18 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                 ],
                 'field7' => [
                     'data_transformer' => [
-                        $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface')
+                        $this->createMock(DataTransformerInterface::class)
                     ]
                 ]
             ]
         ];
 
-        $timeDataTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
+        $timeDataTransformer = $this->createMock(FormDataTransformerInterface::class);
         $this->dataTransformerRegistry->expects($this->any())
             ->method('getDataTransformer')
             ->willReturnMap(
                 [
-                    ['time', $timeDataTransformer],
+                    ['time', $this->context->getRequestType(), $timeDataTransformer],
                 ]
             );
 
@@ -153,18 +152,18 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                 ],
                 'field7' => [
                     'data_transformer' => [
-                        $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface')
+                        $this->createMock(DataTransformerInterface::class)
                     ]
-                ],
+                ]
             ]
         ];
 
-        $timeDataTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
+        $timeDataTransformer = $this->createMock(FormDataTransformerInterface::class);
         $this->dataTransformerRegistry->expects($this->any())
             ->method('getDataTransformer')
             ->willReturnMap(
                 [
-                    ['time', $timeDataTransformer],
+                    ['time', $this->context->getRequestType(), $timeDataTransformer],
                 ]
             );
 
@@ -223,16 +222,16 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                             'property_path' => 'realField13'
                         ],
                     ]
-                ],
+                ]
             ]
         ];
 
-        $timeDataTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
+        $timeDataTransformer = $this->createMock(FormDataTransformerInterface::class);
         $this->dataTransformerRegistry->expects($this->any())
             ->method('getDataTransformer')
             ->willReturnMap(
                 [
-                    ['time', $timeDataTransformer],
+                    ['time', $this->context->getRequestType(), $timeDataTransformer],
                 ]
             );
 

@@ -11,10 +11,12 @@ use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
@@ -24,6 +26,9 @@ class CompleteEntityDefinitionHelper
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var EntityIdHelper */
+    protected $entityIdHelper;
 
     /** @var CompleteAssociationHelper */
     protected $associationHelper;
@@ -39,6 +44,7 @@ class CompleteEntityDefinitionHelper
 
     /**
      * @param DoctrineHelper                  $doctrineHelper
+     * @param EntityIdHelper                  $entityIdHelper
      * @param CompleteAssociationHelper       $associationHelper
      * @param CompleteCustomAssociationHelper $customAssociationHelper
      * @param ExclusionProviderInterface      $exclusionProvider
@@ -46,12 +52,14 @@ class CompleteEntityDefinitionHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
+        EntityIdHelper $entityIdHelper,
         CompleteAssociationHelper $associationHelper,
         CompleteCustomAssociationHelper $customAssociationHelper,
         ExclusionProviderInterface $exclusionProvider,
         ExpandedAssociationExtractor $expandedAssociationExtractor
     ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityIdHelper = $entityIdHelper;
         $this->associationHelper = $associationHelper;
         $this->customAssociationHelper = $customAssociationHelper;
         $this->exclusionProvider = $exclusionProvider;
@@ -100,6 +108,8 @@ class CompleteEntityDefinitionHelper
         $idFieldNames = $definition->getIdentifierFieldNames();
         if (empty($idFieldNames)) {
             $this->setIdentifierFieldNames($definition, $metadata);
+        } else {
+            $this->completeCustomIdentifier($definition, $metadata, $context->getTargetAction());
         }
         // make sure "class name" meta field is added for entity with table inheritance
         if ($metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
@@ -157,6 +167,34 @@ class CompleteEntityDefinitionHelper
     /**
      * @param EntityDefinitionConfig $definition
      * @param ClassMetadata          $metadata
+     * @param string|null            $targetAction
+     */
+    protected function completeCustomIdentifier(
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        $targetAction
+    ) {
+        if ($metadata->usesIdGenerator()
+            && (ApiActions::CREATE === $targetAction || ApiActions::UPDATE === $targetAction)
+            && !$this->entityIdHelper->isEntityIdentifierEqual($metadata->getIdentifierFieldNames(), $definition)
+        ) {
+            $propertyPaths = $metadata->getIdentifierFieldNames();
+            foreach ($propertyPaths as $propertyPath) {
+                $field = $definition->findField($propertyPath, true);
+                if (null !== $field) {
+                    $formOptions = $field->getFormOptions();
+                    if (null === $formOptions || !array_key_exists('mapped', $formOptions)) {
+                        $formOptions['mapped'] = false;
+                        $field->setFormOptions($formOptions);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ClassMetadata          $metadata
      * @param array                  $existingFields [property path => field name, ...]
      */
     protected function completeIdentifierFields(
@@ -164,7 +202,23 @@ class CompleteEntityDefinitionHelper
         ClassMetadata $metadata,
         array $existingFields
     ) {
-        $idFieldNames = $metadata->getIdentifierFieldNames();
+        // get identifier fields
+        $configuredIdFieldNames = $definition->getIdentifierFieldNames();
+        if (empty($configuredIdFieldNames)) {
+            $idFieldNames = $metadata->getIdentifierFieldNames();
+        } else {
+            $idFieldNames = [];
+            foreach ($configuredIdFieldNames as $fieldName) {
+                $field = $definition->getField($fieldName);
+                if (null !== $field) {
+                    $propertyPath = $field->getPropertyPath();
+                    if ($propertyPath) {
+                        $fieldName = $propertyPath;
+                    }
+                }
+                $idFieldNames[] = $fieldName;
+            }
+        }
         // remove all not identifier fields
         foreach ($existingFields as $propertyPath => $fieldName) {
             if (!in_array($propertyPath, $idFieldNames, true)

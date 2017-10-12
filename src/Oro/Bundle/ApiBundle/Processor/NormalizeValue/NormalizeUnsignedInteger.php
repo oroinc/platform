@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
+/**
+ * Converts a string to unsigned integer.
+ * Provides a regular expression that can be used to validate that a string represents an unsigned integer value.
+ */
 class NormalizeUnsignedInteger extends AbstractProcessor
 {
     const REQUIREMENT = '\d+';
