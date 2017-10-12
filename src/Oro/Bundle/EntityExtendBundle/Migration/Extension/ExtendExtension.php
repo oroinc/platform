@@ -164,7 +164,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $options = []
     ) {
         if ($enumCode !== ExtendHelper::buildEnumCode($enumCode)) {
-            new \InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 sprintf(
                     'The enum code "%s" must contain only lower alphabetical symbols, numbers and underscore.',
                     $enumCode

@@ -249,7 +249,10 @@ class ImportExportController extends Controller
     {
         $entityName = $request->get('entity');
 
-        $exportForm = $this->createForm('oro_importexport_export', null, ['entityName' => $entityName]);
+        $exportForm = $this->createForm('oro_importexport_export', null, [
+            'entityName' => $entityName,
+            'processorAlias' => $request->get('processorAlias') ?? null
+        ]);
 
         if ($request->isMethod('POST')) {
             $exportForm->submit($request);
