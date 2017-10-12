@@ -37,7 +37,7 @@ class EntityNameProvider
     {
         $entity = $this->doctrine->getManagerForClass($entityClass)->find($entityClass, $entityId);
         if ($entity) {
-            return $this->entityNameResolver->getName($entity);
+            return substr(0, 255, $this->entityNameResolver->getName($entity));
         }
 
         $lastObjectName = $this->findObjectNameFromLastAuditEntry($auditEntryClass, $entityClass, $entityId);

@@ -1,26 +1,12 @@
+include:
+    - product.yml
+
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     categoryName1:
         string: '<xss("LocalizedFallbackValue.string(Category.name)")>'
-    testWebCatalogName:
-        string: 'Test Web Catalog'
-    webCataogcategoryName1:
-        string: '<xss("LocalizedFallbackValue.string(Category.name)")>'
 
 Oro\Bundle\CatalogBundle\Entity\Category:
-    categoryLightingProducts:
+    category1:
         addTitle: ['@categoryName1']
         setParentCategory: [1]
         addProduct: ['@product1']
-
-Oro\Bundle\WebCatalogBundle\Entity\WebCatalog:
-    testWebCatalog:
-        name: 'Test Web Catalog'
-        description: '<xss("WebCatalog.description")>'
-        organization: '@organization'
-        owner: '@business_unit'
-
-    xssWebCatalog:
-        name: '<xss("WebCatalog.name")>'
-        description: '<xss("WebCatalog.description")>'
-        organization: '@organization'
-        owner: '@business_unit'

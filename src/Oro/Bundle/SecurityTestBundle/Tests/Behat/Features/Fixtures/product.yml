@@ -1,6 +1,3 @@
-include:
-    - catalog.yml
-
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     productName1:
         string: '<xss("LocalizedFallbackValue.string(Product.name)")>'

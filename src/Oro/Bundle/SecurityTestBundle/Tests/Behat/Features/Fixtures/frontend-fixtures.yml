@@ -1,0 +1,3 @@
+include:
+    - shopping-list.yml
+    - catalog.yml

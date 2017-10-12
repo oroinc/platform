@@ -1,0 +1,34 @@
+include:
+    - catalog.yml
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    testWebCatalogName:
+        string: 'Test Web Catalog'
+    webCataogcategoryName1:
+        string: '<xss("LocalizedFallbackValue.string(Category.name)")>'
+    nodeRootTitle:
+        string: '<xss("LocalizedFallbackValue.string(ContentNode.title)")>'
+
+Oro\Bundle\WebCatalogBundle\Entity\WebCatalog:
+    testWebCatalog:
+        name: 'Test Web Catalog'
+        description: '<xss("WebCatalog.description")>'
+        organization: '@organization'
+        owner: '@business_unit'
+
+    xssWebCatalog:
+        name: '<xss("WebCatalog.name")>'
+        description: '<xss("WebCatalog.description")>'
+        organization: '@organization'
+        owner: '@business_unit'
+
+Oro\Bundle\WebCatalogBundle\Entity\ContentVariant:
+    categoryPageContentVariant:
+        type: 'category_page'
+        categoryPageCategory: '@category1'
+
+Oro\Bundle\WebCatalogBundle\Entity\ContentNode:
+    nodeRoot:
+        addTitle: ['@nodeRootTitle']
+        addContentVariant: ['@categoryPageContentVariant']
+        webCatalog: '@testWebCatalog'
