@@ -9,6 +9,7 @@ navigation:
                     icon: fa-bar-chart-o
                 attributes:
                     class: 'only-icon'
+                    id: 'dashboard-navigation-menu'
             oro_dashboard_index:
                 label:    'oro.dashboard.menu.dashboards_list.label'
                 route:    'oro_dashboard_index'

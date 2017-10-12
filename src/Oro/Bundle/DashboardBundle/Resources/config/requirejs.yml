@@ -17,3 +17,4 @@ config:
         'orodashboard/js/app/views/widget-datetime-range-view': 'bundles/orodashboard/js/app/views/widget-datetime-range-view.js'
         'orodashboard/js/app/views/widget-date-compare-view': 'bundles/orodashboard/js/app/views/widget-date-compare-view.js'
         'orodashboard/js/app/views/widget-tabs-view': 'bundles/orodashboard/js/app/views/widget-tabs-view.js'
+        'orodashboard/js/app/views/dashboard-navigation-view': 'bundles/orodashboard/js/app/views/dashboard-navigation-view.js'
