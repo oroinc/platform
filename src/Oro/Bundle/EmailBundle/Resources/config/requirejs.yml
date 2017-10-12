@@ -15,6 +15,8 @@ config:
         'oroemail/js/app/views/email-attachment-select-view': 'bundles/oroemail/js/app/views/email-attachment-select-view.js'
         'oroemail/js/app/views/email-attachment-view': 'bundles/oroemail/js/app/views/email-attachment-view.js'
         'oroemail/js/app/views/email-sync-view': 'bundles/oroemail/js/app/views/email-sync-view.js'
+        'oroemail/js/app/views/email-translation-view': 'bundles/oroemail/js/app/views/email-translation-view.js'
+        'oroemail/js/app/views/email-attachment-context-view': 'bundles/oroemail/js/app/views/email-attachment-context-view.js'
         'oroemail/js/app/views/select2-email-recipients-view': 'bundles/oroemail/js/app/views/select2-email-recipients-view.js'
         'oroemail/js/app/views/email-folder-tree-view': 'bundles/oroemail/js/app/views/email-folder-tree-view.js'
         'oroemail/js/app/views/unread-emails-counter-view': 'bundles/oroemail/js/app/views/unread-emails-counter-view.js'

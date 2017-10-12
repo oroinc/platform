@@ -47,32 +47,6 @@
 {% endblock %}
 
 {% block oro_email_template_list_row %}
-    <script type="text/javascript">
-        require(['jquery',
-                    'oroemail/js/app/views/email-template-view',
-                    'oroemail/js/app/models/email-template-collection'],
-        function($, View, Collection) {
-            $(function () {
-                'use strict';
-                var $templateSelectorEl = $('#{{ id }}');
-                {% if includeSystemTemplates is defined and not includeSystemTemplates %}
-                    var includeSystemTemplates = false;
-                {% else %}
-                    var includeSystemTemplates = true;
-                {% endif %}
-                new View({
-                    el: $templateSelectorEl.closest('form').find('[name$="[{{ depends_on_parent_field }}]"]'),
-                    target: $templateSelectorEl,
-                    collection: new Collection(
-                        '{{ data_route }}',
-                        {{ data_route_parameter|json_encode|raw }},
-                        {{ includeNonEntity is defined and includeNonEntity ? 'true' : 'false' }},
-                        includeSystemTemplates
-                    )
-                });
-            });
-        })
-    </script>
     <script type="text/template" id="emailtemplate-chooser-template">
         <% _.each(entities, function(entity, i) { %>
         <option value="<%- entity.get('id') %>"><%- entity.get('name') %></option>
@@ -80,34 +54,40 @@
     </script>
 
     {{ form_row(form) }}
+
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set options = {
+        targetSelector: '#' ~ id,
+        _sourceElement: '[name$="[' ~ depends_on_parent_field ~ ']',
+        collectionOptions: {
+            dataRoute: data_route,
+            dataRouteParameter: data_route_parameter,
+            includeNonEntity: includeNonEntity is defined and includeNonEntity ? true : false,
+            includeSystemTemplates: includeSystemTemplates is defined and not includeSystemTemplates ? false :  true
+        }
+    } %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        view: 'oroemail/js/app/views/email-template-view',
+        options: options
+    }) }}></div>
 {% endblock %}
 
 {% block oro_email_link_to_scope_row %}
-    <script type="text/javascript">
-        require(['jquery'],
-            function($) {
-                function initLinkToScopeEl(mainEl, el) {
-                    if (parseInt($(mainEl).val())) {
-                        $(el).attr('disabled', false);
-                        $(el).parent('div').removeClass('disabled');
-                    } else {
-                        $(el).attr('disabled', true);
-                        $(el).parent('div').addClass('disabled');
-                    }
-                }
-                $(function () {
-                    var selectorEl = '{{ form.vars.id }}';
-                    var emailLinkToScopeEl = $('#' + selectorEl);
-                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form')
-                            .find('[data-ftid=oro_entity_config_type_attachment_enabled]');
-                    initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
-                    $(enableAttachmentEl).on('change', function() {
-                        initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
-                    });
-                });
-            })
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set options = {
+        enableAttachmentSelector: '[data-ftid=oro_entity_config_type_attachment_enabled]',
+        _sourceElement: '#' ~ form.vars.id,
+    } %}
+
     {{ form_row(form) }}
+
+    <div {{ UI.renderPageComponentAttributes({
+        view: 'oroemail/js/app/views/email-attachment-context-view',
+        options: options
+    }) }}></div>
 {% endblock %}
 
 {% block oro_email_attachments_row %}
@@ -151,7 +131,10 @@
 {% endblock %}
 
 {% block oro_email_emailtemplate_translatation_widget %}
-    <div class="emailtemplate-translatation oro-tabs tabbable">
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div class="emailtemplate-translatation oro-tabs tabbable" {{ UI.renderPageComponentAttributes({
+        view: 'oroemail/js/app/views/email-translation-view'
+    }) }}>
         <ul class="nav nav-tabs">
             {% spaceless %}
                 {% if simple_way %}
@@ -183,18 +166,6 @@
             {% endspaceless %}
         </div>
     </div>
-    <script type="text/javascript">
-        require(['jquery'],
-                function($) {
-                    $('.emailtemplate-translatation.oro-tabs.tabbable ul.nav.nav-tabs li a').on('show', function(e) {
-                        var target = e.target || window.event.target;
-                        var dataRelated = $(target).attr('data-related');
-                        $($(target).closest('form').find(':input.translation')).each(function(key, el) {
-                            $(el).val(dataRelated);
-                        });
-                    });
-                })
-    </script>
 {% endblock %}
 
 {% block oro_email_email_folder_tree_row %}
@@ -327,7 +298,7 @@
     {% set locale = form.vars.name %}
 
     <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
-        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
+        <a href="javascript:void(0);" data-role="change-language" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
             {{- localeLabels[locale]|default('N/A')|trans -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
         </a>
     </li>
