@@ -30,5 +30,5 @@
 }
 
 .styled-scrollbar {
-    @include styled-scrollbar($color: green, $color-bg: red, $size: 12px);
+    @include styled-scrollbar();
 }
