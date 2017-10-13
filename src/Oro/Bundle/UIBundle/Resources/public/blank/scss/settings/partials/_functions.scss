@@ -80,3 +80,18 @@
         @return $var;
     }
 }
+
+// Extended default map-merge
+// Merge two maps together into new map, w/o null keys
+
+@function map-merge-wo-null($map1, $map2) {
+    $result: map-merge($map1, $map2);
+
+    @each $key in map-keys($result) {
+        @if map-get($result, $key) === null {
+            $result: map-remove($result, $key);
+        }
+    }
+
+    @return $result;
+}

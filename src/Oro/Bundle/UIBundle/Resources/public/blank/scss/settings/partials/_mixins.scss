@@ -39,7 +39,7 @@
 @mixin breakpoint($type) {
     // $breakpoints - global variable;
 
-    @if (map_has_key($breakpoints, $type)) {
+    @if (map-has-key($breakpoints, $type) and map-get($breakpoints, $type)) {
         @media #{map-get($breakpoints, $type)} {
             @content;
         }
