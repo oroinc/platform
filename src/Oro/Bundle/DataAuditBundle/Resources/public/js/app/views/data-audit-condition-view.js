@@ -42,7 +42,11 @@ define(function(require) {
             this.auditFilter = new AuditFilterConstructor({
                 auditFilterType: data.criterion.data.auditFilter.type
             });
-            this.auditFilter.value = data.criterion.data.auditFilter.data;
+
+            var auditFilterValue = _.result(data.criterion.data.auditFilter, 'data');
+            if (auditFilterValue) {
+                this.auditFilter.value = auditFilterValue;
+            }
             this.listenTo(this.auditFilter, {
                 'update': this._onUpdate,
                 'audit-type-change': function() {

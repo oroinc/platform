@@ -16,7 +16,7 @@ define(function(require) {
         criteriaValueSelectors: _.extend({}, DateTimeFilter.prototype.criteriaValueSelectors, {
             date_type: 'select[name=audit]',
             type: 'select[name=audit]',
-            date_part: '.inner-filter-container select[name=datetime_part]',
+            date_part: '.audit-filter-container [name=datetime_part]',
             value: {
                 start: '.audit-filter-container input[name="start"]',
                 end:   '.audit-filter-container input[name="end"]'
