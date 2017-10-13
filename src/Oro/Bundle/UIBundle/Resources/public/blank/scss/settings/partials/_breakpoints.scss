@@ -8,7 +8,7 @@ $oro_breakpoints: (
     'strict-tablet': '(max-width: ' +  $breakpoint-tablet + ') and (min-width: ' + ($breakpoint-tablet-small + 1) + ')',
     'tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ')',
     'strict-tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ') and (min-width: ' + ($breakpoint-mobile-landscape + 1) + ')',
-    'mobile-landscape': '(max-width: ' +  $breakpoint-mobile-landscape + ')',
+    'mobile-landscape': 'screen and (max-width: ' +  $breakpoint-mobile-landscape + ')',
     'strict-mobile-landscape': '(max-width: ' +  $breakpoint-mobile-landscape + ') and (min-width: ' + ($breakpoint-mobile + 1) + ')',
     'mobile': '(max-width: ' + $breakpoint-mobile + ')',
     'mobile-big': '(max-width: ' +  $breakpoint-mobile-big + ')',
