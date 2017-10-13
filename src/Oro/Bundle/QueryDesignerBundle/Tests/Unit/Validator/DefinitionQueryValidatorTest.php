@@ -112,6 +112,29 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($query, $this->constraint);
     }
 
+    public function testValidateNullQueryWitSupportedRootClass()
+    {
+        $query = new QueryDesignerModel();
+        $query->setEntity('Acme\SupportedEntity');
+
+        $this->fieldsProvider->expects($this->once())
+            ->method('getFields')
+            ->willReturn(
+                [
+                    'Acme\SupportedEntity' => [
+                        'fields' => [
+                            ['name' => 'id']
+                        ]
+                    ]
+                ]
+            );
+
+        $this->context->expects($this->never())
+            ->method('buildViolation');
+
+        $this->validator->validate($query, $this->constraint);
+    }
+
     public function testValidateWitNonSupportedSimpleColumn()
     {
         $query = new QueryDesignerModel();
