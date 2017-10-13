@@ -20,6 +20,8 @@ oro_message_queue:
         - 'oro.message_queue.job.root_job_stopped'
     security_agnostic_processors:
         - 'oro_message_queue.client.route_message_processor'
+    consumer:
+        heartbeat_update_period: 15
 
 monolog:
     channels:

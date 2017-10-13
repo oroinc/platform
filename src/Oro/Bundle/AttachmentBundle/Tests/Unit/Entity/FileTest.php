@@ -114,12 +114,4 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->entity->setOriginalFilename('original.doc');
         $this->assertEquals('file.doc (original.doc)', $this->entity->__toString());
     }
-
-    public function testGetFilePath()
-    {
-        $this->assertNull($this->entity->getFilePath());
-        $filePath = __DIR__ . '/../Fixtures/testFile/test.msg';
-        $this->entity->setFile(new FileType($filePath, true));
-        $this->assertEquals(realpath($filePath), $this->entity->getFilePath());
-    }
 }

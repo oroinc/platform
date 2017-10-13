@@ -6,6 +6,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * Class Form
@@ -38,6 +39,10 @@ class Form extends Element
                     'id|name|label|value|placeholder',
                     $locator
                 );
+            }
+
+            if ($field->getAttribute('disabled')) {
+                throw new RuntimeException(sprintf('Field "%s" cannot be filled because it is disabled', $label));
             }
 
             $field = $this->wrapField($label, $field);

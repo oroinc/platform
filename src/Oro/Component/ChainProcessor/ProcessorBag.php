@@ -114,9 +114,13 @@ class ProcessorBag implements ProcessorBagInterface
         $this->ensureProcessorApplicableCheckerInitialized();
 
         $action = $context->getAction();
+        $processors = [];
+        if (!empty($this->processors[$action])) {
+            $processors = $this->processors[$action];
+        }
 
         return $this->processorIteratorFactory->createProcessorIterator(
-            isset($this->processors[$action]) ? $this->processors[$action] : [],
+            $processors,
             $context,
             $this->processorApplicableChecker,
             $this->processorFactory
@@ -195,9 +199,10 @@ class ProcessorBag implements ProcessorBagInterface
         $this->processors = [];
 
         if (!empty($this->initialData['processors'])) {
-            $groups = !empty($this->initialData['groups'])
-                ? $this->initialData['groups']
-                : [];
+            $groups = [];
+            if (!empty($this->initialData['groups'])) {
+                $groups = $this->initialData['groups'];
+            }
 
             $startCommonProcessors = [];
             $endCommonProcessors   = [];

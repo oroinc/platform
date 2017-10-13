@@ -5,6 +5,7 @@
 * Added an additional syntax for data filters: `key[operator_name]=value`. For example `GET /api/users?filter[id][neq]=2` can be used instead of `GET /api/users?filter[id]!=2`. The supported operators are `eq`, `neq`, `lt`, `lte`, `gt` and `gte`.
 * Added a possibility to specify **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
 * Added a possibility to configure own identifier field(s) instead of the database primary key. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#using-a-non-primary-key-to-identify-entity)
+* Added filters for the following data types: `smallint`, `date`, `time`, `guid`, `percent`, `money` and `duration`
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
@@ -47,7 +48,7 @@
 #### OroBehatExtension
 * Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
-## 2.4.0
+## 2.4.0 (2017-09-29)
 
 ### Added
 #### CacheBundle

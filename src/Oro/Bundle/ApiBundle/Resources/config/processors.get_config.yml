@@ -251,6 +251,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
         arguments:
             - '@oro_api.doctrine_helper'
+            - ['boolean', 'datetime', 'date', 'time']
         tags:
             - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -80 }
             - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -80 }

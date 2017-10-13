@@ -11,6 +11,7 @@ define(function(require) {
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
     var __ = require('orotranslation/js/translator');
     var errorHandler = require('oroui/js/error');
+    var messenger = require('oroui/js/messenger');
     require('jquery.form');
 
     /**
@@ -729,6 +730,12 @@ define(function(require) {
          * @private
          */
         _onContentLoad: function(content) {
+            var json  = this._getJson(content);
+
+            if (json) {
+                content = '<div class="widget-content"></div>'; // set empty response to cover base functionality
+            }
+
             delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
@@ -744,6 +751,84 @@ define(function(require) {
             } else {
                 this._triggerContentLoadEvents();
             }
+
+            if (json) {
+                this._onJsonContentResponse(json);
+            }
+        },
+
+        /**
+         * @param {String} content
+         * @returns {json|null}
+         * @private
+         */
+        _getJson: function(content) {
+            if (_.isObject(content)) {
+                return content; // return application/json content
+            }
+
+            try {
+                return $.parseJSON(content);
+            } catch (e) {}
+
+            return null;
+        },
+
+        /**
+         * Handle returned json response
+         *
+         * @param {Object} content
+         * @private
+         */
+        _onJsonContentResponse: function(content) {
+            var widgetResponse = content.widget || {};
+
+            if (_.has(widgetResponse, 'message')) {
+                var message = widgetResponse.message;
+
+                if (_.isString(message)) {
+                    message = {type: 'success', text: message};
+                }
+
+                messenger.notificationFlashMessage(message.type, message.text);
+            }
+
+            if (_.has(widgetResponse, 'trigger')) {
+                var events = widgetResponse.trigger;
+
+                if (!_.isObject(events)) {
+                    events = [events];
+                }
+
+                _.each(events, function(event) {
+                    var eventBroker = this._getEventBroker(event);
+                    var eventFunction = this._getEventFunction(event);
+
+                    if (_.isObject(event)) {
+                        var args = [event.name].concat(event.args);
+                        eventBroker[eventFunction].apply(eventBroker, args);
+                    } else {
+                        eventBroker[eventFunction](event);
+                    }
+                }, this);
+            }
+
+            if (_.has(widgetResponse, 'triggerSuccess') && widgetResponse.triggerSuccess) {
+                mediator.trigger('widget_success:' + this.getAlias());
+                mediator.trigger('widget_success:' + this.getWid());
+            }
+
+            if (_.has(widgetResponse, 'remove') && widgetResponse.remove) {
+                this.remove();
+            }
+        },
+
+        _getEventBroker: function(event) {
+            return event.eventBroker === 'widget' ? this : mediator;
+        },
+
+        _getEventFunction: function(event) {
+            return event.eventFunction === 'execute' ? 'execute' : 'trigger';
         },
 
         _triggerContentLoadEvents: function(content) {
