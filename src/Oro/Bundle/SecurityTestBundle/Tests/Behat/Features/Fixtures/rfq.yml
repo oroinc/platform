@@ -4,9 +4,9 @@ include:
 
 Oro\Bundle\RFPBundle\Entity\Request:
     rfp_request:
-        po_number: '<xss("Request.poNumber")>'
-        first_name: '<xss("Request.firstName")>'
-        last_name: '<xss("Request.lastName")>'
+        poNumber: '<xss("Request.poNumber")>'
+        firstName: '<xss("Request.firstName")>'
+        lastName: '<xss("Request.lastName")>'
         email: '<xss("Request.email")>test@test.com'
         phone: '<xss("Request.phone")>'
         company: '<xss("Request.company")>'
@@ -15,7 +15,7 @@ Oro\Bundle\RFPBundle\Entity\Request:
         cancellationReason: '<xss("Request.cancellationReason")>'
         organization: '@organization'
         owner: '@admin'
-        customer_user: '@amanda'
+        customerUser: '@amanda'
         assignedCustomerUsers: ['@amanda']
 
 Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote:
@@ -30,14 +30,14 @@ Oro\Bundle\RFPBundle\Entity\RequestProduct:
     requestproduct1:
         request: '@rfp_request'
         product: '@simple_product'
-        product_sku: '<xss("RequestProduct.productSku")>'
+        productSku: '<xss("RequestProduct.productSku")>'
         comment: '<xss("RequestProduct.comment")>'
 
 Oro\Bundle\RFPBundle\Entity\RequestProductItem:
     requestproductitem1:
-        request_product: '@requestproduct1'
+        requestProduct: '@requestproduct1'
         quantity: 1
-        product_unit: '@item'
-        product_unit_code: '<xss("RequestProductItem.productUnitCode")>'
+        productUnit: '@item'
+        productUnitCode: '<xss("RequestProductItem.productUnitCode")>'
         value: 2
         currency: 'USD'

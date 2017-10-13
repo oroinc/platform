@@ -7,3 +7,7 @@ urls:
     - { route: 'oro_rfp_frontend_request_create' }
     - { route: 'oro_rfp_frontend_request_view', parameters: { id: '@rfp_request.id' } }
     - { route: 'oro_rfp_frontend_request_update', parameters: { id: '@rfp_request.id' } }
+
+    # Quote
+    - { route: 'oro_sale_quote_frontend_index' }
+    - { route: 'oro_sale_quote_frontend_view', parameters: { id: '@quote.id' } }

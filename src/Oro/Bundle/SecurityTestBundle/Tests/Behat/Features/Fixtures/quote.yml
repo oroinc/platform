@@ -5,20 +5,42 @@ Oro\Bundle\SaleBundle\Entity\Quote:
     quote:
         organization: '@organization'
         owner: '@admin'
-        customerUser: '@amanda'
-        poNumber: '<xss("Quote.poNumber")>'
-        qid: '<xss("Quote.poNumber")>'
         website: '@website1'
+        customerUser: '@amanda'
+        shippingAddress: '@quote_address_1'
+        poNumber: '<xss("Quote.poNumber")>'
+        qid: '<xss("Quote.qid")>'
+        request: '@rfp_request'
+        shippingMethod: '<xss("Quote.shippingMethod")>'
+        shippingMethodType: '<xss("Quote.shippingMethodType")>'
 
 Oro\Bundle\SaleBundle\Entity\QuoteProduct:
-    quoteproduct{1..29}:
-        product: '@product1'
-        quote: '@quote<current()>'
-        comment: 'Seller Notes<current()>'
-        commentCustomer: 'Customer Notes<current()>'
-    quoteproductWithoutCustomerUser:
-        product: '@product1'
-        quote: '@quoteWithoutCustomerUser'
+    quoteproduct1:
+        product: '@simple_product'
+        quote: '@quote'
+        comment: '<xss("QuoteProduct.comment")>'
+        commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
+    quoteproduct2:
+        quote: '@quote'
+        comment: '<xss("QuoteProduct.comment")>'
+        commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
+        freeFormProduct: '<xss("QuoteProduct.freeFormProduct")>'
+        productSku: '<xss("QuoteProduct.productSku")>'
+    quoteproduct3:
+        product: '@simple_product'
+        quote: '@quote'
+        comment: '<xss("QuoteProduct.comment")>'
+        commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
+        productReplacement: '@simple_product'
+        productReplacementSku: '<xss("QuoteProduct.productReplacementSku")>'
+    quoteproduct4:
+        freeFormProduct: '<xss("QuoteProduct.freeFormProduct")>'
+        productSku: '<xss("QuoteProduct.productSku")>'
+        quote: '@quote'
+        comment: '<xss("QuoteProduct.comment")>'
+        commentCustomer: '<xss("QuoteProduct.commentCustomer")>'
+        freeFormProductReplacement: '<xss("QuoteProduct.freeFormProductReplacement")>'
+        productReplacementSku: '<xss("QuoteProduct.productReplacementSku")>'
 
 Oro\Bundle\CurrencyBundle\Entity\Price (local):
     price1:
@@ -26,27 +48,22 @@ Oro\Bundle\CurrencyBundle\Entity\Price (local):
         currency: USD
 
 Oro\Bundle\SaleBundle\Entity\QuoteProductOffer:
-    quoteproductoffer{1..29}:
+    quoteproductoffer{1..4}:
         quote_product: '@quoteproduct<current()>'
-        product_unit: '@item'
-        price: '@price1'
-        quantity: 5
-        allow_increments: true
-    quoteproductofferWithoutCustomerUser:
-        quote_product: '@quoteproductWithoutCustomerUser'
         product_unit: '@item'
         price: '@price1'
         quantity: 5
         allow_increments: true
 
 Oro\Bundle\SaleBundle\Entity\QuoteProductRequest:
-    quoteproductrequest{1..29}:
+    quoteproductrequest{1..4}:
         quote_product: '@quoteproduct<current()>'
         product_unit: '@item'
         price: '@price1'
         quantity: 5
-    quoteproductrequestWithoutCustomerUser:
-        quote_product: '@quoteproductWithoutCustomerUser'
-        product_unit: '@item'
-        price: '@price1'
-        quantity: 5
+
+Oro\Bundle\SaleBundle\Entity\QuoteAddress:
+    quote_address_1:
+        customerAddress: '@customerAddress1'
+        customerUserAddress: '@amandaAddress1'
+        phone: '<xss("QuoteAddress.phone")>'

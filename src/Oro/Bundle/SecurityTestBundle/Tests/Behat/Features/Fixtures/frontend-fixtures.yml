@@ -2,3 +2,4 @@ include:
     - catalog.yml
     - shopping-list.yml
     - rfq.yml
+    - quote.yml
