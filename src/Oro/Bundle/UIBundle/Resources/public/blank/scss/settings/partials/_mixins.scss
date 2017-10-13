@@ -198,16 +198,8 @@
 }
 
 // Check devices on server, if device is desktop added class to body (.desktop-version)
-@mixin only-desktop (
-    $breakpoint: 'desktop'
-) {
-    @if ($breakpoint) {
-        @include breakpoint($breakpoint) {
-            .desktop-version {
-                @content;
-            }
-        }
-    } @else {
+@mixin only-desktop {
+    @include breakpoint('desktop') {
         .desktop-version {
             @content;
         }
