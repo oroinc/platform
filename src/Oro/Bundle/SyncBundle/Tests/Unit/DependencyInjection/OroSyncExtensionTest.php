@@ -43,7 +43,9 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'params'   => [],
-                'expected' => []
+                'expected' => [
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => '',
+                ]
             ],
             [
                 'params'   => [
@@ -53,6 +55,7 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => '',
                 ]
             ],
             [
