@@ -373,6 +373,9 @@ define(function(require) {
                     return this._createConditionOperatorView(criteria, value);
                 } else {
                     criteria = this._getCriteriaOfConditionValue(value);
+                    if ('criteria' in value) {
+                        value = _.omit(value, 'criteria');
+                    }
                     return this._renderCondition(criteria, value);
                 }
             }, this);
