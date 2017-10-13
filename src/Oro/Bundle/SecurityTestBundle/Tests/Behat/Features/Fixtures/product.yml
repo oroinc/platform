@@ -1,7 +1,6 @@
 # TODO: upsells, crossels, variants, matrix 1, matrix 2
 # TODO: attribute family with group that contains XSS payload in label
 
-# Test simple product default page
 # Test simple product changed attribute family with group containing XSS
 # Test configurable product 1 attribute
 # Test configurable product 2 attributes
@@ -10,11 +9,23 @@
 # All this products must be checked at all places where them may be rendered (SL, Checkout, RFQ, Order, Catalog, Search)
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
-    productName1:
+    simple_product_name:
         string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
-    productDescription1:
+    simple_product_description:
         text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
-    productShortDescription1:
+    simple_product_short_description:
+        text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
+    configurable_product_variant_1_name:
+        string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
+    configurable_product_variant_1_description:
+        text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
+    configurable_product_variant_1_short_description:
+        text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
+    configurable_product_name:
+        string: '<xss("LocalizedFallbackValue.string(Product.name)")>'
+    configurable_product_description:
+        text: '<xss("LocalizedFallbackValue.text(Product.description)")>'
+    configurable_product_short_description:
         text: '<xss("LocalizedFallbackValue.text(Product.shortDescription)")>'
     brandName:
         string: '<xss("LocalizedFallbackValue.string(Brand.name)")>'
@@ -22,11 +33,21 @@ Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
         text: '<xss("LocalizedFallbackValue.string(Brand.brandDescription)")>'
     brandShortDescription:
         text: '<xss("LocalizedFallbackValue.string(Brand.brandShortDescription)")>'
+    tshirt_family_label:
+        string: '<xss("LocalizedFallbackValue.string(AttributeFamily.label)")>'
 
 Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision:
-    precision1:
+    precision{1..3}:
         unit: '@item'
         precision: '1'
+
+Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
+    tshirt_family:
+        entityClass: 'Oro\Bundle\ProductBundle\Entity\Product'
+        code: 'T_shirt'
+        addLabel: ['@tshirt_family_label']
+        organization: '@organization'
+        owner: '@admin'
 
 Oro\Bundle\ProductBundle\Entity\Brand:
     brand:
@@ -38,19 +59,50 @@ Oro\Bundle\ProductBundle\Entity\Brand:
 
 Oro\Bundle\ProductBundle\Entity\Product:
     simple_product:
-        sku: '<xss("Product.sku")>'
-        brand: '@brand'
-        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
-        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
-        skuUppercase: '<xss("Product.skuUppercase")>'
         type: 'simple'
         organization: '@organization'
         owner: '@business_unit'
+        sku: 'S01<xss("Product.sku")>'
+        skuUppercase: 'S01<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
         primaryUnitPrecision: '@precision1'
-        unitPrecisions: ['@precision1']
         attributeFamily: '@defaultProductFamily'
-        addName: ['@productName1']
-        addDescription: ['@productDescription1']
-        addShortDescription: ['@productShortDescription1']
+        addName: ['@simple_product_name']
+        addDescription: ['@simple_product_description']
+        addShortDescription: ['@simple_product_short_description']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+    configurable_product_variant_1:
+        type: 'simple'
+        organization: '@organization'
+        owner: '@business_unit'
+        sku: 'S02<xss("Product.sku")>'
+        skuUppercase: 'S02<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        primaryUnitPrecision: '@precision2'
+        attributeFamily: '@tshirt_family'
+        addName: ['@configurable_product_variant_1_name']
+        addDescription: ['@configurable_product_variant_1_description']
+        addShortDescription: ['@configurable_product_variant_1_short_description']
+        inventoryStatus: '@enumInventoryStatuses'
+        status: 'enabled'
+    configurable_product:
+        type: 'configurable'
+        organization: '@organization'
+        owner: '@business_unit'
+        sku: 'S03<xss("Product.sku")>'
+        skuUppercase: 'S03<xss("Product.skuUppercase")>'
+        brand: '@brand'
+        denormalizedDefaultName: '<xss("Product.denormalizedDefaultName")>'
+        denormalizedDefaultNameUppercase: '<xss("Product.denormalizedDefaultNameUppercase")>'
+        attributeFamily: '@tshirt_family'
+        primaryUnitPrecision: '@precision3'
+        addName: ['@configurable_product_name']
+        addDescription: ['@configurable_product_description']
+        addShortDescription: ['@configurable_product_short_description']
         inventoryStatus: '@enumInventoryStatuses'
         status: 'enabled'

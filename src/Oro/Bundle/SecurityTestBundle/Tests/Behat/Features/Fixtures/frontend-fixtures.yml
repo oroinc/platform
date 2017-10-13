@@ -1,3 +1,4 @@
 include:
-    - shopping-list.yml
     - catalog.yml
+    - shopping-list.yml
+    - rfq.yml

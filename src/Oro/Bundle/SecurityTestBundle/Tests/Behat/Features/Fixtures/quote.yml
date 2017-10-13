@@ -1,0 +1,52 @@
+include:
+    - rfq.yml
+
+Oro\Bundle\SaleBundle\Entity\Quote:
+    quote:
+        organization: '@organization'
+        owner: '@admin'
+        customerUser: '@amanda'
+        poNumber: '<xss("Quote.poNumber")>'
+        qid: '<xss("Quote.poNumber")>'
+        website: '@website1'
+
+Oro\Bundle\SaleBundle\Entity\QuoteProduct:
+    quoteproduct{1..29}:
+        product: '@product1'
+        quote: '@quote<current()>'
+        comment: 'Seller Notes<current()>'
+        commentCustomer: 'Customer Notes<current()>'
+    quoteproductWithoutCustomerUser:
+        product: '@product1'
+        quote: '@quoteWithoutCustomerUser'
+
+Oro\Bundle\CurrencyBundle\Entity\Price (local):
+    price1:
+        value: 5
+        currency: USD
+
+Oro\Bundle\SaleBundle\Entity\QuoteProductOffer:
+    quoteproductoffer{1..29}:
+        quote_product: '@quoteproduct<current()>'
+        product_unit: '@item'
+        price: '@price1'
+        quantity: 5
+        allow_increments: true
+    quoteproductofferWithoutCustomerUser:
+        quote_product: '@quoteproductWithoutCustomerUser'
+        product_unit: '@item'
+        price: '@price1'
+        quantity: 5
+        allow_increments: true
+
+Oro\Bundle\SaleBundle\Entity\QuoteProductRequest:
+    quoteproductrequest{1..29}:
+        quote_product: '@quoteproduct<current()>'
+        product_unit: '@item'
+        price: '@price1'
+        quantity: 5
+    quoteproductrequestWithoutCustomerUser:
+        quote_product: '@quoteproductWithoutCustomerUser'
+        product_unit: '@item'
+        price: '@price1'
+        quantity: 5

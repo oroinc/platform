@@ -1,0 +1,43 @@
+include:
+    - customer-user.yml
+    - prices.yml
+
+Oro\Bundle\RFPBundle\Entity\Request:
+    rfp_request:
+        po_number: '<xss("Request.poNumber")>'
+        first_name: '<xss("Request.firstName")>'
+        last_name: '<xss("Request.lastName")>'
+        email: '<xss("Request.email")>test@test.com'
+        phone: '<xss("Request.phone")>'
+        company: '<xss("Request.company")>'
+        role: '<xss("Request.role")>'
+        note: '<xss("Request.note")>'
+        cancellationReason: '<xss("Request.cancellationReason")>'
+        organization: '@organization'
+        owner: '@admin'
+        customer_user: '@amanda'
+        assignedCustomerUsers: ['@amanda']
+
+Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote:
+    request_additional_note:
+        request: '@rfp_request'
+        type: 'customer_note'
+        userId: 1
+        author: '<xss("RequestAdditionalNote.author")>'
+        text: '<xss("RequestAdditionalNote.text")>'
+
+Oro\Bundle\RFPBundle\Entity\RequestProduct:
+    requestproduct1:
+        request: '@rfp_request'
+        product: '@simple_product'
+        product_sku: '<xss("RequestProduct.productSku")>'
+        comment: '<xss("RequestProduct.comment")>'
+
+Oro\Bundle\RFPBundle\Entity\RequestProductItem:
+    requestproductitem1:
+        request_product: '@requestproduct1'
+        quantity: 1
+        product_unit: '@item'
+        product_unit_code: '<xss("RequestProductItem.productUnitCode")>'
+        value: 2
+        currency: 'USD'

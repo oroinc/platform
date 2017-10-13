@@ -3,24 +3,34 @@ include:
 
 Oro\Bundle\ShoppingListBundle\Entity\ShoppingList:
     shoppinglist1:
-        label: 'Shopping List 1'
         customer: '@company_a'
         customerUser: '@amanda'
         organization: '@organization'
+        label: '<xss("ShoppingList.label")>'
+        notes: '<xss("ShoppingList.notes")>'
 
 Oro\Bundle\ShoppingListBundle\Entity\LineItem:
-    lineitem1:
+    lineitem_simple:
         product: '@simple_product'
         quantity: '1'
         unit: '@item'
         customerUser: '@amanda'
         shoppingList: '@shoppinglist1'
         organization: '@organization'
+        notes: '<xss("LineItem.notes")>'
+    lineitem_configurable:
+        product: '@configurable_product_variant_1'
+        quantity: '1'
+        unit: '@item'
+        customerUser: '@amanda'
+        shoppingList: '@shoppinglist1'
+        organization: '@organization'
+        notes: '<xss("LineItem.notes")>'
 
 Oro\Bundle\ShoppingListBundle\Entity\ShoppingListTotal:
     shoppinglisttotal:
         __construct: ['@shoppinglist1','USD']
         shoppingList: '@shoppinglist1'
         currency: 'USD'
-        subtotalValue: '10'
+        subtotalValue: '20'
         valid: true

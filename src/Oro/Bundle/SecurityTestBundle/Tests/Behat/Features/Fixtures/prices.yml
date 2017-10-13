@@ -9,16 +9,19 @@ Oro\Bundle\PricingBundle\Entity\PriceList:
         setCurrencies: [['USD']]
         active: true
 
-Oro\Bundle\CurrencyBundle\Entity\Price(local):
-    price:
-        value: '10'
-        currency: 'USD'
-
 Oro\Bundle\PricingBundle\Entity\ProductPrice:
-    productPrice1:
+    simple_product_price_1:
         pricelist: '@pricelist'
         product: '@simple_product'
-        productSku: 'SKU1'
+        productSku: '<xss("ProductPrice.productSku")>'
+        quantity: 1
+        unit: '@item'
+        value: 10
+        currency: 'USD'
+    configurable_product_variant_1_price_1:
+        pricelist: '@pricelist'
+        product: '@configurable_product_variant_1'
+        productSku: '<xss("ProductPrice.productSku")>'
         quantity: 1
         unit: '@item'
         value: 10
@@ -32,10 +35,18 @@ Oro\Bundle\PricingBundle\Entity\PriceListToCustomer:
         sortOrder: 200
 
 Oro\Bundle\PricingBundle\Entity\CombinedProductPrice:
-   combinedProductPrice1:
+    simple_product_combined_price_1:
         pricelist: '@combinedPriceList'
         product: '@simple_product'
-        productSku: 'SKU1'
+        productSku: '<xss("CombinedProductPrice.productSku")>'
+        quantity: 1
+        unit: '@item'
+        value: 10
+        currency: 'USD'
+    configurable_product_variant_1_combined_price_1:
+        pricelist: '@combinedPriceList'
+        product: '@configurable_product_variant_1'
+        productSku: '<xss("CombinedProductPrice.productSku")>'
         quantity: 1
         unit: '@item'
         value: 10
