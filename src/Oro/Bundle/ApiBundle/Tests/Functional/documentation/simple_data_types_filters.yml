@@ -7,6 +7,10 @@ filters:
         requirement: '0|1|true|false|yes|no'
         type: 'boolean'
         operators: '=,!='
+    'filter[fieldCurrency]':
+        requirement: '.+'
+        type: 'string or array of string'
+        operators: '=,!='
     'filter[fieldDateTime]':
         requirement: '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
         type: 'datetime'
@@ -36,6 +40,10 @@ filters:
         type: 'integer or array of integer'
         operators: '=,!=,<,<=,>,>='
     'filter[fieldMoney]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*'
+        type: 'money or array of money'
+        operators: '=,!=,<,<=,>,>='
+    'filter[fieldMoneyValue]':
         requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*'
         type: 'money or array of money'
         operators: '=,!=,<,<=,>,>='

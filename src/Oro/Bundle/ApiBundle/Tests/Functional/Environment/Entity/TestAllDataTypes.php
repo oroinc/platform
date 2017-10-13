@@ -148,4 +148,18 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
      * @ORM\Column(name="field_duration", type="duration", nullable=true)
      */
     public $fieldDuration;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="field_money_value", type="money_value", nullable=true)
+     */
+    public $fieldMoneyValue;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="field_currency", type="currency", nullable=true)
+     */
+    public $fieldCurrency;
 }

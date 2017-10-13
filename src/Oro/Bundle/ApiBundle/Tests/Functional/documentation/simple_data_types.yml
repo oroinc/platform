@@ -7,6 +7,8 @@ parameters:
         dataType: 'bigint'
     fieldBoolean:
         dataType: 'boolean'
+    fieldCurrency:
+        dataType: 'string'
     fieldDate:
         dataType: 'date'
     fieldDateTime:
@@ -24,6 +26,8 @@ parameters:
     fieldJsonArray:
         dataType: 'object'
     fieldMoney:
+        dataType: 'money'
+    fieldMoneyValue:
         dataType: 'money'
     fieldPercent:
         dataType: 'float'
@@ -46,6 +50,8 @@ response:
         dataType: 'bigint'
     fieldBoolean:
         dataType: 'boolean'
+    fieldCurrency:
+        dataType: 'string'
     fieldDate:
         dataType: 'date'
     fieldDateTime:
@@ -63,6 +69,8 @@ response:
     fieldJsonArray:
         dataType: 'object'
     fieldMoney:
+        dataType: 'money'
+    fieldMoneyValue:
         dataType: 'money'
     fieldPercent:
         dataType: 'float'

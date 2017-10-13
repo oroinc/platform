@@ -60,6 +60,9 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         money:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        money_value:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        currency: ~
         duration:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         composite_identifier:
@@ -152,6 +155,10 @@ oro_api:
         percent:
             form_type: percent
         money:
+            form_type: oro_api_number
+            options:
+                scale: 4
+        money_value:
             form_type: oro_api_number
             options:
                 scale: 4
