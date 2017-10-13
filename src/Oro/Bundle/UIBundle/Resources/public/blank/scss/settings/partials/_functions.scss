@@ -88,7 +88,7 @@
     $result: map-merge($map1, $map2);
 
     @each $key in map-keys($result) {
-        @if map-get($result, $key) === null {
+        @if map-get($result, $key) == null {
             $result: map-remove($result, $key);
         }
     }
