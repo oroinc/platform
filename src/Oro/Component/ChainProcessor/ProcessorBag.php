@@ -31,6 +31,11 @@ class ProcessorBag implements ProcessorBagInterface
     protected $additionalApplicableCheckers = [];
 
     /**
+     * @var array [action => [group, ...], ...]
+     */
+    private $processorGroups;
+
+    /**
      * @var array
      *  [
      *      action => [
@@ -113,18 +118,7 @@ class ProcessorBag implements ProcessorBagInterface
         $this->ensureInitialized();
         $this->ensureProcessorApplicableCheckerInitialized();
 
-        $action = $context->getAction();
-        $processors = [];
-        if (!empty($this->processors[$action])) {
-            $processors = $this->processors[$action];
-        }
-
-        return $this->processorIteratorFactory->createProcessorIterator(
-            $processors,
-            $context,
-            $this->processorApplicableChecker,
-            $this->processorFactory
-        );
+        return $this->createProcessorIterator($context);
     }
 
     /**
@@ -144,20 +138,32 @@ class ProcessorBag implements ProcessorBagInterface
     {
         $this->ensureInitialized();
 
-        $result = [];
-        if (isset($this->processors[$action])) {
-            foreach ($this->processors[$action] as $processor) {
-                if (!isset($processor['attributes']['group'])) {
-                    continue;
-                }
-                $group = $processor['attributes']['group'];
-                if (!in_array($group, $result, true)) {
-                    $result[] = $group;
-                }
-            }
+        if (!isset($this->processorGroups[$action])) {
+            return [];
         }
 
-        return $result;
+        return $this->processorGroups[$action];
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return ProcessorIterator
+     */
+    protected function createProcessorIterator(ContextInterface $context)
+    {
+        $action = $context->getAction();
+        $processors = [];
+        if (!empty($this->processors[$action])) {
+            $processors = $this->processors[$action];
+        }
+
+        return $this->processorIteratorFactory->createProcessorIterator(
+            $processors,
+            $context,
+            $this->processorApplicableChecker,
+            $this->processorFactory
+        );
     }
 
     /**
@@ -197,6 +203,7 @@ class ProcessorBag implements ProcessorBagInterface
     protected function initializeProcessors()
     {
         $this->processors = [];
+        $this->processorGroups = [];
 
         if (!empty($this->initialData['processors'])) {
             $groups = [];
@@ -241,6 +248,7 @@ class ProcessorBag implements ProcessorBagInterface
     protected function getSortedProcessors($action, $actionData, $groups)
     {
         $processors = [];
+        $processorGroups = [];
         foreach ($actionData as $priority => $priorityData) {
             foreach ($priorityData as $processor) {
                 if (isset($processor['attributes']['group'])) {
@@ -254,7 +262,11 @@ class ProcessorBag implements ProcessorBagInterface
                             )
                         );
                     }
-                    $processorPriority = $this->calculatePriority($priority, $groups[$action][$group]);
+                    $groupPriority = $groups[$action][$group];
+                    $processorPriority = $this->calculatePriority($priority, $groupPriority);
+                    if (!isset($processorGroups[$group])) {
+                        $processorGroups[$group] = $groupPriority;
+                    }
                 } else {
                     $processorPriority = $this->calculatePriority($priority);
                 }
@@ -262,6 +274,9 @@ class ProcessorBag implements ProcessorBagInterface
             }
         }
         $processors = $this->sortByPriorityAndFlatten($processors);
+
+        arsort($processorGroups);
+        $this->processorGroups[$action] = array_keys($processorGroups);
 
         return $processors;
     }
@@ -272,13 +287,23 @@ class ProcessorBag implements ProcessorBagInterface
     protected function initializeProcessorApplicableChecker()
     {
         $this->processorApplicableChecker = $this->applicableCheckerFactory->createApplicableChecker();
+        $this->initializeApplicableChecker($this->processorApplicableChecker);
+    }
+
+    /**
+     * Initializes the given applicable checker
+     *
+     * @param ChainApplicableChecker $applicableChecker
+     */
+    protected function initializeApplicableChecker(ChainApplicableChecker $applicableChecker)
+    {
         if (!empty($this->additionalApplicableCheckers)) {
             $checkers = $this->sortByPriorityAndFlatten($this->additionalApplicableCheckers);
             foreach ($checkers as $checker) {
-                $this->processorApplicableChecker->addChecker($checker);
+                $applicableChecker->addChecker($checker);
             }
         }
-        foreach ($this->processorApplicableChecker as $checker) {
+        foreach ($applicableChecker as $checker) {
             // add the "priority" attribute to the ignore list,
             // as it is added by LoadProcessorsCompilerPass to processors' attributes only in debug mode
             if ($this->debug && $checker instanceof MatchApplicableChecker) {

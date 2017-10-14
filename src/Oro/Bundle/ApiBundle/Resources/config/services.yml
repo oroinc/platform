@@ -6,20 +6,30 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
 
     oro_api.processor_bag:
-        class: Oro\Component\ChainProcessor\ProcessorBag
+        class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorBag
         public: false
         arguments:
             - '@oro_api.processor_factory'
             - %kernel.debug%
             - '@oro_api.processor_applicable_checker_factory'
             - '@oro_api.processor_iterator_factory'
+            - '@oro_api.processor_applicable_checker_factory.ungrouped'
+            - '@oro_api.processor_iterator_factory.ungrouped'
 
     oro_api.processor_iterator_factory:
         class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
         public: false
 
+    oro_api.processor_iterator_factory.ungrouped:
+        class: Oro\Component\ChainProcessor\ProcessorIteratorFactory
+        public: false
+
     oro_api.processor_applicable_checker_factory:
         class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory
+        public: false
+
+    oro_api.processor_applicable_checker_factory.ungrouped:
+        class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerWithoutGroupsFactory
         public: false
 
     oro_api.processor_factory:
