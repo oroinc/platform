@@ -144,7 +144,6 @@ define(function(require) {
                 }
                 if (target.val() === 'html') {
                     this._switchWysiwygEditor(true);
-                    this._onEditorBlur();
                 }
             }
         },
@@ -152,8 +151,11 @@ define(function(require) {
         _switchWysiwygEditor: function(enabled) {
             this.options.isWysiwygEnabled = enabled;
             this.forEachComponent(function(component) {
-                if (!_.isUndefined(component.view) && !_.isUndefined(component.view.tinymceConnected)) {
-                    component.view.setEnabled(enabled);
+                var view = component.view;
+
+                if (!_.isUndefined(view) && !_.isUndefined(view.tinymceConnected)) {
+                    view.setEnabled(enabled);
+                    this.listenToOnce(view, 'TinyMCE:initialized', this._onEditorBlur.bind(this));
                 }
             });
 

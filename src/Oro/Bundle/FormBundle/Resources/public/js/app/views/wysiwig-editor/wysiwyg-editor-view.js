@@ -144,6 +144,7 @@ define(function(require) {
                             }
                         });
                     }
+                    self.trigger('TinyMCE:initialized');
                     _.delay(function() {
                         /**
                          * fixes jumping dialog on refresh page
