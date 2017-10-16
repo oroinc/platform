@@ -77,6 +77,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_segment.condition_builder_options_load, method: onLoad }
 
+    oro_dataaudit.event_listener.entity_structure_options_listener:
+        class: 'Oro\Bundle\DataAuditBundle\EventListener\EntityStructureOptionsListener'
+        arguments:
+            - '@oro_dataaudit.audit_config_provider'
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
+
     # Placeholder filter
     oro_dataaudit.placeholder.filter:
         class: 'Oro\Bundle\DataAuditBundle\Placeholder\AuditableFilter'
