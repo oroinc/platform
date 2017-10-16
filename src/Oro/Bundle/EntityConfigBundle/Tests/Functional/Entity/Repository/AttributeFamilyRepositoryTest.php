@@ -78,10 +78,10 @@ class AttributeFamilyRepositoryTest extends WebTestCase
 
         $this->assertEquals(
             [
-                $attributeId1 => $family2->getId(),
-                $attributeId2 => $family2->getId(),
-                $attributeId3 => $family1->getId(),
-                $attributeId4 => $family2->getId(),
+                $attributeId1 => [$family1->getId(), $family2->getId()],
+                $attributeId2 => [$family1->getId(), $family2->getId()],
+                $attributeId3 => [$family1->getId()],
+                $attributeId4 => [$family2->getId()],
             ],
             $this->repository->getFamilyIdsForAttributes([$attributeId1, $attributeId2, $attributeId3, $attributeId4])
         );
