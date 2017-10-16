@@ -29,16 +29,7 @@ class Executor extends JobExecutor
             }
 
             $job->execute($jobExecution);
-
-            $failureExceptions = $this->collectFailureExceptions($jobExecution);
-
-            if ($jobExecution->getStatus()->getValue() == BatchStatus::COMPLETED && !$failureExceptions) {
-                $jobResult->setSuccessful(true);
-            } else {
-                foreach ($failureExceptions as $failureException) {
-                    $jobResult->addFailureException($failureException);
-                }
-            }
+            $this->handleJobResult($jobExecution, $jobResult);
 
             // trigger save of JobExecution and JobInstance
             $this->batchJobRepository->getJobManager()->flush();

@@ -11,6 +11,7 @@ use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 use Akeneo\Bundle\BatchBundle\Job\Job;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -184,7 +185,13 @@ class JobExecutor
         foreach ($jobExecution->getAllFailureExceptions() as $failureException) {
             // in most cases this occurs in a race condition issue when couple of consumers try to process data
             // in which we have a UNIQUE constraint. workaround is to requeue a message with this job
-            if ($failureException['class'] === UniqueConstraintViolationException::class) {
+            if (is_a($failureException['class'], UniqueConstraintViolationException::class, true)) {
+                $jobResult->setNeedRedelivery(true);
+                return false;
+            }
+
+            // cases with deadlocks and duplicate inserts, fix is to requeue a message with this job
+            if (is_a($failureException['class'], ORMException::class, true)) {
                 $jobResult->setNeedRedelivery(true);
                 return false;
             }
