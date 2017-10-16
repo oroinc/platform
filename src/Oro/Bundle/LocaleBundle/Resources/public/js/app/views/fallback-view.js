@@ -15,6 +15,8 @@ define(function(require) {
     FallbackView = BaseView.extend({
         autoRender: true,
 
+        initSubviews: true,
+
         /**
          * @property {Object}
          */
@@ -70,13 +72,24 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            var self = this;
+            this.$(this.options.selectors.childItem).attr('data-skip-components', true);
+
             this._deferredRender();
             this.initLayout().done(function() {
-                self.handleLayoutInit();
-                self._resolveDeferredRender();
-            });
+                this.handleLayoutInit();
+                this._resolveDeferredRender();
+            }.bind(this));
+
             return this;
+        },
+
+        renderSubviews: function() {
+            this.initSubviews = false;
+            this.$(this.options.selectors.childItem).removeAttr('data-skip-components');
+
+            this.initLayout().done(function() {
+                this.bindEvents();
+            }.bind(this));
         },
 
         /**
@@ -99,8 +112,6 @@ define(function(require) {
 
             this.fixFallbackWidth();
             this.setStatusIcon();
-
-            this.bindEvents();
         },
 
         /**
@@ -217,6 +228,10 @@ define(function(require) {
          * Show child items
          */
         expandChildItems: function() {
+            if (this.initSubviews) {
+                this.renderSubviews();
+            }
+
             this.options.expanded = true;
             this.setStatusIcon();
         },
