@@ -31,6 +31,10 @@ class SearchAdvancedController extends FOSRestController
      *
      * Syntax: and(or) field_type field_name operator value
      *
+     *   aggregate: Allows to builds extra aggregating operations
+     *
+     * Syntax: field_type field_name grouping_function grouping_name
+     *
      *   offset: Allow to set offset of first result.
      *
      *   max_results: Set results count for the query.
@@ -66,6 +70,18 @@ class SearchAdvancedController extends FOSRestController
      *
      *  replace spaces with _ underscore for fulltext search
      *
+     * Aggregating functions:
+     *
+     *  count
+     *
+     *  sum
+     *
+     *  avg
+     *
+     *  min
+     *
+     *  max
+     *
      * Examples:
      *
      *  select (name, price) from demo_products
@@ -81,6 +97,8 @@ class SearchAdvancedController extends FOSRestController
      *  from (demo_products, demo_categories) where description ~ test offset 5 max_results 10
      *
      *  integer count !in (1, 3, 5)
+     *
+     *  from demo_products aggregate integer price sum price_sum
      *
      * @ApiDoc(
      *  description="Get advanced search result.",

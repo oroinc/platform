@@ -6,20 +6,30 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
 
     oro_api.processor_bag:
-        class: Oro\Component\ChainProcessor\ProcessorBag
+        class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorBag
         public: false
         arguments:
             - '@oro_api.processor_factory'
             - %kernel.debug%
             - '@oro_api.processor_applicable_checker_factory'
             - '@oro_api.processor_iterator_factory'
+            - '@oro_api.processor_applicable_checker_factory.ungrouped'
+            - '@oro_api.processor_iterator_factory.ungrouped'
 
     oro_api.processor_iterator_factory:
         class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
         public: false
 
+    oro_api.processor_iterator_factory.ungrouped:
+        class: Oro\Component\ChainProcessor\ProcessorIteratorFactory
+        public: false
+
     oro_api.processor_applicable_checker_factory:
         class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory
+        public: false
+
+    oro_api.processor_applicable_checker_factory.ungrouped:
+        class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerWithoutGroupsFactory
         public: false
 
     oro_api.processor_factory:
@@ -452,6 +462,7 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_data_type_converter'
 
     oro_api.rest.doc_handler.filters:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocFiltersHandler
@@ -459,6 +470,22 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_data_type_converter'
+
+    oro_api.rest.doc_data_type_converter:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter
+        public: false
+        arguments:
+            -
+                'unsignedInteger': 'integer'
+                'text': 'string'
+                'guid': 'string'
+                'json_array': 'object'
+                'simple_array': 'array'
+                'percent': 'float'
+                'currency': 'string'
+                'money_value': 'money'
+                'duration': 'integer'
 
     oro_api.api_doc.formatter.html_formatter:
         class: Oro\Bundle\ApiBundle\ApiDoc\NewHtmlFormatter
@@ -496,6 +523,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser
         arguments:
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_data_type_converter'
         tags:
             - { name: nelmio_api_doc.extractor.parser }
 
