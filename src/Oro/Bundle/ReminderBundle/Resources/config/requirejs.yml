@@ -1,3 +1,4 @@
 config:
     paths:
         'ororeminder/js/reminder-handler': 'bundles/ororeminder/js/reminder-handler.js'
+        'ororeminder/js/app/views/reminder-show-view': 'bundles/ororeminder/js/app/views/reminder-show-view.js'
