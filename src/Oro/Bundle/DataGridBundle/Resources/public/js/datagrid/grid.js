@@ -1135,6 +1135,8 @@ define(function(require) {
         _processLoadedMetadata: function(metadata) {
             _.extend(this.metadata, metadata);
             this.metadataModel.set(metadata);
+
+            mediator.trigger('backgrid:metadata-loaded', this);
         },
 
         /**

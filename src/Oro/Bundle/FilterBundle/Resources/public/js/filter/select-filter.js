@@ -243,6 +243,18 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        hide: function() {
+            // when the filter has been opened and becomes invisible - close multiselect too
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('close');
+            }
+
+            return SelectFilter.__super__.hide.apply(this, arguments);
+        },
+
+        /**
          * Initialize multiselect widget
          *
          * @protected
