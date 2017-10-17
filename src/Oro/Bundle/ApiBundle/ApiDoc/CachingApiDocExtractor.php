@@ -121,16 +121,22 @@ class CachingApiDocExtractor extends BaseExtractor implements
     {
         $this->clear($view);
 
-        $this->docViewDetector->setView($view);
-        // This method can be used several times for warming up a cache for different views.
-        // So, to avoid collisions, we need to clone routes because they may be changed by option resolvers.
-        $this->routes = [];
-        $routes = parent::getRoutes();
-        foreach ($routes as $route) {
-            $this->routes[] = clone $route;
+        $previousView = $this->docViewDetector->getView();
+        try {
+            $this->docViewDetector->setView($view);
+            // This method can be used several times for warming up a cache for different views.
+            // So, to avoid collisions, we need to clone routes because they may be changed by option resolvers.
+            $clonedRoutes = [];
+            $routes = parent::getRoutes();
+            foreach ($routes as $route) {
+                $clonedRoutes[] = clone $route;
+            }
+            $this->routes = $this->processRoutes($clonedRoutes);
+            $this->all($view);
+        } finally {
+            // restore a previous view
+            $this->docViewDetector->setView('' === $previousView ? null : $previousView);
         }
-        $this->routes = $this->processRoutes($this->routes);
-        $this->all($view);
     }
 
     /**
