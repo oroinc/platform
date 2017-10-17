@@ -68,10 +68,7 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
     }
 
     /**
-     * @param Channel  $integration
-     * @param Status[] $processedConnectorsStatuses Array of connector sync statuses which was processed before
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isAllowed(Channel $integration, array $processedConnectorsStatuses)
     {

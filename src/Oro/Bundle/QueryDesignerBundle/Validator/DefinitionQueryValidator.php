@@ -53,8 +53,14 @@ class DefinitionQueryValidator extends ConstraintValidator
             return;
         }
 
+        $definition = json_decode($value->getDefinition(), true);
+        // return if definition is empty
+        if (null === $definition) {
+            return;
+        }
+
         // validate definition field identifiers
-        $fieldsIdentifiers = $this->getDefinitionFieldIdentifiers(json_decode($value->getDefinition(), true));
+        $fieldsIdentifiers = $this->getDefinitionFieldIdentifiers($definition);
         foreach ($fieldsIdentifiers as $fieldIdentifier) {
             $this->validateIdentityString($rootClass, $fieldIdentifier, $constraint);
         }

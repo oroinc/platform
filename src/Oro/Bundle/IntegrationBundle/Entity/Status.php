@@ -21,6 +21,7 @@ class Status
 {
     const STATUS_COMPLETED = 1;
     const STATUS_FAILED    = 2;
+    const STATUS_REQUEUE   = 3;
 
     /**
      * @var integer

@@ -99,7 +99,16 @@ class SyncProcessor extends AbstractSyncProcessor
                 if (!$this->isConnectorAllowed($connector, $integration, $processedConnectorStatuses)) {
                     continue;
                 }
+                if (!$this->isConnectorAllowedParametrized(
+                    $connector,
+                    $integration,
+                    $processedConnectorStatuses,
+                    $parameters
+                )) {
+                    continue;
+                }
                 $status = $this->processIntegrationConnector($integration, $connector, $parameters);
+                $this->onProcessIntegrationConnector($status);
 
                 $isSuccess = $isSuccess && $this->isIntegrationConnectorProcessSuccess($status);
                 $processedConnectorStatuses[$connector->getType()] = $status;
@@ -110,6 +119,13 @@ class SyncProcessor extends AbstractSyncProcessor
         }
 
         return $isSuccess;
+    }
+
+    /**
+     * @param Status $status
+     */
+    protected function onProcessIntegrationConnector(Status $status)
+    {
     }
 
     /**
@@ -193,6 +209,38 @@ class SyncProcessor extends AbstractSyncProcessor
     ) {
         if ($connector instanceof AllowedConnectorInterface
             && !$connector->isAllowed($integration, $processedConnectorStatuses)
+        ) {
+            $this->logger->info(
+                sprintf(
+                    'Connector with type "%s" is not allowed and it\'s processing is skipped.',
+                    $connector->getType()
+                )
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether connector is allowed to process. Logs information if connector is not allowed.
+     *
+     * @param ConnectorInterface $connector
+     * @param Integration        $integration
+     * @param Status[]           $processedConnectorStatuses
+     * @param array              $parameters
+     *
+     * @return bool
+     */
+    protected function isConnectorAllowedParametrized(
+        ConnectorInterface $connector,
+        Integration $integration,
+        array $processedConnectorStatuses,
+        array $parameters = []
+    ) {
+        if ($connector instanceof ParametrizedAllowedConnectorInterface
+            && !$connector->isAllowedParametrized($integration, $processedConnectorStatuses, $parameters)
         ) {
             $this->logger->info(
                 sprintf(
@@ -303,7 +351,11 @@ class SyncProcessor extends AbstractSyncProcessor
             $exceptions = implode(PHP_EOL, $exceptions);
 
             $this->logger->error($exceptions);
-            $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
+            $statusCode = Status::STATUS_FAILED;
+            if ($jobResult->needRedelivery()) {
+                $statusCode = Status::STATUS_REQUEUE;
+            }
+            $status->setCode($statusCode)->setMessage($exceptions);
         }
 
         $this->addConnectorStatusAndFlush($integration, $status);

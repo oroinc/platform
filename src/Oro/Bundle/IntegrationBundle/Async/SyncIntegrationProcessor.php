@@ -1,20 +1,22 @@
 <?php
 namespace Oro\Bundle\IntegrationBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
 use Doctrine\ORM\EntityManagerInterface;
 
 use Oro\Bundle\IntegrationBundle\Authentication\Token\IntegrationTokenAwareTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-
+use Oro\Bundle\IntegrationBundle\Provider\RedeliverableInterface;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
+
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
+
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -113,7 +115,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
             return self::REJECT;
         }
 
-        $jobName = 'oro_integration:sync_integration:'.$body['integration_id'];
+        $jobName = $this->prepareJobName($body);
         $ownerId = $message->getMessageId();
 
         if (! $ownerId) {
@@ -129,17 +131,36 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         $this->setTemporaryIntegrationToken($integration);
         $integration->getTransport()->getSettingsBag()->set('page_size', $body['transport_batch_size']);
 
-        $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($integration, $body) {
-            $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
-            $processor->getLoggerStrategy()->setLogger($this->logger);
+        $result = $this->jobRunner->runUnique(
+            $ownerId,
+            $jobName,
+            function () use ($integration, $body) {
+                $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
+                $processor->getLoggerStrategy()->setLogger($this->logger);
+                $status = $processor->process(
+                    $integration,
+                    $body['connector'],
+                    $body['connector_parameters']
+                );
 
-            return $processor->process(
-                $integration,
-                $body['connector'],
-                $body['connector_parameters']
-            );
-        });
+                if ($processor instanceof RedeliverableInterface && $processor->needRedelivery()) {
+                    return MessageProcessorInterface::REQUEUE;
+                }
 
-        return $result ? self::ACK : self::REJECT;
+                return $status ? MessageProcessorInterface::ACK : MessageProcessorInterface::REJECT;
+            }
+        );
+
+        return $result ?: MessageProcessorInterface::REJECT;
+    }
+
+    /**
+     * @param array $body
+     *
+     * @return string
+     */
+    protected function prepareJobName(array $body)
+    {
+        return 'oro_integration:sync_integration:' . $body['integration_id'];
     }
 }
