@@ -14,6 +14,7 @@ define(function(require) {
             this._deferredInit();
             this.options = options;
             this.initView();
+            this.listenTo(this.contextsView, 'render', this._resolveDeferredInit.bind(this));
         },
 
         initView: function() {
@@ -28,8 +29,6 @@ define(function(require) {
                 activityClass: this.options.activityClassAlias,
                 editable: editable
             });
-
-            this.listenTo(this.contextsView, 'render', this._resolveDeferredInit.bind(this));
         }
     });
 });
