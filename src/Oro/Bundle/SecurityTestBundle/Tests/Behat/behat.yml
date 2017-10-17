@@ -22,3 +22,11 @@ oro_behat_extension:
         - OroSecurityTestBundle::FeatureContext
       paths:
         - '@OroSecurityTestBundle/Tests/Behat/Features'
+
+  elements:
+    Entity Select Button:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: '.entity-select-btn'
+    Close Dialog Button:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: '.ui-dialog-titlebar-close'

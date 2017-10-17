@@ -39,6 +39,7 @@ class FeatureContext extends OroFeatureContext implements
         foreach ($this->getUrlsToProcess($value) as $url) {
             $this->visitPath($this->getUrl($url));
             $this->getDriver()->waitPageToLoad();
+            $this->checkEntitySelectDialogsForXss();
             $this->collectXssAfterStep();
         }
     }
@@ -133,5 +134,23 @@ class FeatureContext extends OroFeatureContext implements
         }
 
         return $urls;
+    }
+
+    private function checkEntitySelectDialogsForXss()
+    {
+        $entitySelectButtons = $this->findAllElements('Entity Select Button');
+        if (count($entitySelectButtons) > 0) {
+            foreach ($entitySelectButtons as $entitySelectButton) {
+                $entitySelectButton->focus();
+                if ($entitySelectButton->isVisible()) {
+                    $entitySelectButton->click();
+                    $this->getDriver()->waitForAjax();
+                    $this->collectXssAfterStep();
+                    $closeBtn = $this->createElement('Close Dialog Button');
+                    $closeBtn->focus();
+                    $closeBtn->click();
+                }
+            }
+        }
     }
 }
