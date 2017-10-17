@@ -1,6 +1,6 @@
 // @theme: blank;
 
-// @return the value in a nested map;
+// @return the value with a nested map;
 // $map: (
 //     'main': (
 //         'foo': 'bar',
@@ -106,7 +106,7 @@
 //     'tablet': null,
 //     'mobile': '(max-width: 640px)'
 // );
-// @return the value in a merged breakpoints;
+// @return the value with a merged breakpoints;
 // $breakpoints: (
 //     'desktop''(min-width: 1200px)',
 //     'mobile': '(max-width: 640px)'
