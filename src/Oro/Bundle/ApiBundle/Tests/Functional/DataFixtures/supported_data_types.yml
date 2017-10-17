@@ -18,6 +18,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldPercent: 0.1
         fieldMoney: 1.2345
         fieldDuration: 11
+        fieldMoneyValue: 1.2345
+        fieldCurrency: 'USD'
     TestItem2:
         fieldString: 'String 2'
         fieldInt: 2
@@ -33,6 +35,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldPercent: 0.2
         fieldMoney: 2.3456
         fieldDuration: 22
+        fieldMoneyValue: 2.3456
+        fieldCurrency: 'UAH'
     TestItem3:
         fieldString: 'String 3'
         fieldInt: 3
@@ -48,3 +52,5 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldPercent: 0.3
         fieldMoney: 3.4567
         fieldDuration: 33
+        fieldMoneyValue: 3.4567
+        fieldCurrency: 'EUR'

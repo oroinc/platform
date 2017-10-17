@@ -21,14 +21,22 @@ class RestDocIdentifierHandler
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var ApiDocDataTypeConverter */
+    protected $dataTypeConverter;
+
     /**
-     * @param RestDocViewDetector $docViewDetector
-     * @param ValueNormalizer     $valueNormalizer
+     * @param RestDocViewDetector     $docViewDetector
+     * @param ValueNormalizer         $valueNormalizer
+     * @param ApiDocDataTypeConverter $dataTypeConverter
      */
-    public function __construct(RestDocViewDetector $docViewDetector, ValueNormalizer $valueNormalizer)
-    {
+    public function __construct(
+        RestDocViewDetector $docViewDetector,
+        ValueNormalizer $valueNormalizer,
+        ApiDocDataTypeConverter $dataTypeConverter
+    ) {
         $this->docViewDetector = $docViewDetector;
         $this->valueNormalizer = $valueNormalizer;
+        $this->dataTypeConverter = $dataTypeConverter;
     }
 
     /**
@@ -59,7 +67,7 @@ class RestDocIdentifierHandler
         $annotation->addRequirement(
             self::ID_ATTRIBUTE,
             [
-                'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
+                'dataType'    => $this->dataTypeConverter->convertDataType($dataType),
                 'requirement' => $this->getIdRequirement($metadata),
                 'description' => CompleteDescriptions::ID_DESCRIPTION
             ]

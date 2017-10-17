@@ -55,7 +55,7 @@ class JobProcessor
      * @param string $jobName
      * @param bool   $unique
      *
-     * @return Job
+     * @return Job|null
      */
     public function findOrCreateRootJob($ownerId, $jobName, $unique = false)
     {
@@ -65,6 +65,11 @@ class JobProcessor
 
         if (! $jobName) {
             throw new \LogicException('Job name must not be empty');
+        }
+
+        $job = $this->jobStorage->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
+        if ($job) {
+            return $job;
         }
 
         $job = $this->jobStorage->createJob();
@@ -78,12 +83,11 @@ class JobProcessor
 
         try {
             $this->jobStorage->saveJob($job);
-
-            return $job;
         } catch (DuplicateJobException $e) {
+            return null;
         }
 
-        return $this->jobStorage->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
+        return $job;
     }
 
     /**
