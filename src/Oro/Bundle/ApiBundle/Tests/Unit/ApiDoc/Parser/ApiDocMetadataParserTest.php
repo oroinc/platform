@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
+use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -16,14 +17,22 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ApiDocDataTypeConverter */
+    protected $dataTypeConverter;
+
     /** @var ApiDocMetadataParser */
     protected $parser;
 
     protected function setUp()
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $this->dataTypeConverter = $this->createMock(ApiDocDataTypeConverter::class);
 
-        $this->parser = new ApiDocMetadataParser($this->valueNormalizer);
+        $this->dataTypeConverter->expects(self::any())
+            ->method('convertDataType')
+            ->willReturnArgument(0);
+
+        $this->parser = new ApiDocMetadataParser($this->valueNormalizer, $this->dataTypeConverter);
     }
 
     public function testSupportsWithoutMetadata()

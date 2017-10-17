@@ -114,6 +114,8 @@ api:
                     fieldPercent: ~
                     fieldMoney: ~
                     fieldDuration: ~
+                    fieldMoneyValue: ~
+                    fieldCurrency: ~
             sorters:
                 fields:
                     fieldString: ~
@@ -130,3 +132,5 @@ api:
                     fieldPercent: ~
                     fieldMoney: ~
                     fieldDuration: ~
+                    fieldMoneyValue: ~
+                    fieldCurrency: ~

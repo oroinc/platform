@@ -29,6 +29,7 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: string, priority: -10 }
             - { name: oro.api.processor, action: normalize_value, dataType: guid, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: currency, priority: -10 }
 
     oro_api.normalize_value.integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger
@@ -57,6 +58,7 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: decimal, priority: -10 }
             - { name: oro.api.processor, action: normalize_value, dataType: money, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: money_value, priority: -10 }
 
     oro_api.normalize_value.number:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
