@@ -1,0 +1,62 @@
+Oro\Bundle\OrderBundle\Entity\OrderAddress:
+    orderAddress:
+        customerAddress: '@customerAddress1'
+        customerUserAddress: '@amandaAddress1'
+        phone: '<xss("OrderAddress.phone")>'
+
+Oro\Bundle\OrderBundle\Entity\Order:
+    order1:
+        organization: '@organization'
+        owner: '@admin'
+        customer: '@company_a'
+        website: '@website1'
+        billingAddress: '@orderAddress'
+        shippingAddress: '@orderAddress'
+        poNumber: '<xss("Order.poNumber")>'
+        customerNotes: '<xss("Order.customerNotes")>'
+        customerNotes: '<xss("Order.customerNotes")>'
+        sourceEntityClass: 'Oro\Bundle\ShoppingListBundle\Entity\ShoppingList'
+        sourceEntityId: '@shoppinglist1->id'
+        identifier: '<xss("Order.identifier")>'
+        sourceEntityIdentifier: '<xss("Order.sourceEntityIdentifier")>'
+        currency: USD
+
+Oro\Bundle\OrderBundle\Entity\OrderShippingTracking:
+    order1_shipping_tracking:
+        method: '<xss("OrderShippingTracking.method")>'
+        number: '<xss("OrderShippingTracking.number")>'
+        order: '@order1'
+
+Oro\Bundle\CurrencyBundle\Entity\Price (local):
+    price1:
+        value: 5
+        currency: USD
+
+Oro\Bundle\OrderBundle\Entity\OrderLineItem:
+    order_line_item1:
+        product: '@simple_product'
+        productSku: '<xss("OrderLineItem.productSku")>'
+        order: '@order1'
+        price: '@price1'
+        quantity: 1
+        productUnit: '@item'
+        productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
+        comment: '<xss("OrderLineItem.comment")>'
+    order_line_item2:
+        product: '@configurable_product_variant_1'
+        productSku: '<xss("OrderLineItem.productSku")>'
+        order: '@order1'
+        price: '@price1'
+        quantity: 1
+        productUnit: '@item'
+        productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
+        comment: '<xss("OrderLineItem.comment")>'
+    order_line_item3:
+        freeFormProduct: '<xss("OrderLineItem.freeFormProduct")>'
+        productSku: '<xss("OrderLineItem.productSku")>'
+        order: '@order1'
+        price: '@price1'
+        quantity: 1
+        productUnit: '@item'
+        productUnitCode: '<xss("OrderLineItem.productUnitCode")>'
+        comment: '<xss("OrderLineItem.comment")>'
