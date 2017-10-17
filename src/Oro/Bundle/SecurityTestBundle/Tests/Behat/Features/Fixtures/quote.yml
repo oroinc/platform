@@ -67,3 +67,14 @@ Oro\Bundle\SaleBundle\Entity\QuoteAddress:
         customerAddress: '@customerAddress1'
         customerUserAddress: '@amandaAddress1'
         phone: '<xss("QuoteAddress.phone")>'
+
+Oro\Bundle\SaleBundle\Entity\QuoteDemand:
+    quote_demand:
+        quote: '@quote'
+        subtotal: 100
+        total: 100
+        totalCurrency: 'USD'
+
+Oro\Bundle\SaleBundle\Entity\QuoteProductDemand:
+    quoteproductdemand{1..4}:
+        __construct: ['@quote_demand', '@quoteproductoffer<current()>', 1]

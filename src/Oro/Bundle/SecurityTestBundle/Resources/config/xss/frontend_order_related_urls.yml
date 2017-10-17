@@ -1,13 +1,14 @@
 urls:
-    # Shopping list
-    - { route: 'oro_shopping_list_frontend_view', parameters: { id: '@shoppinglist1.id' } }
-
-    # RFP Request
-    - { route: 'oro_rfp_frontend_request_index' }
-    - { route: 'oro_rfp_frontend_request_create' }
-    - { route: 'oro_rfp_frontend_request_view', parameters: { id: '@rfp_request.id' } }
-    - { route: 'oro_rfp_frontend_request_update', parameters: { id: '@rfp_request.id' } }
-
-    # Quote
-    - { route: 'oro_sale_quote_frontend_index' }
-    - { route: 'oro_sale_quote_frontend_view', parameters: { id: '@quote.id' } }
+#    # Shopping list
+#    - { route: 'oro_shopping_list_frontend_view', parameters: { id: '@shoppinglist1.id' } }
+#
+#    # RFP Request
+#    - { route: 'oro_rfp_frontend_request_index' }
+#    - { route: 'oro_rfp_frontend_request_create' }
+#    - { route: 'oro_rfp_frontend_request_view', parameters: { id: '@rfp_request.id' } }
+#    - { route: 'oro_rfp_frontend_request_update', parameters: { id: '@rfp_request.id' } }
+#
+#    # Quote
+#    - { route: 'oro_sale_quote_frontend_index' }
+#    - { route: 'oro_sale_quote_frontend_view', parameters: { id: '@quote.id' } }
+    - { route: 'oro_sale_quote_frontend_choice', parameters: { id: '@quote_demand.id' } }
