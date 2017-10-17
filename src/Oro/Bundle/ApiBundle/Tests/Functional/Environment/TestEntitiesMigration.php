@@ -278,6 +278,8 @@ class TestEntitiesMigration implements Migration
         $table->addColumn('field_percent', 'percent', ['notnull' => false]);
         $table->addColumn('field_money', 'money', ['notnull' => false]);
         $table->addColumn('field_duration', 'duration', ['notnull' => false]);
+        $table->addColumn('field_money_value', 'money_value', ['notnull' => false]);
+        $table->addColumn('field_currency', 'currency', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
     }
 }

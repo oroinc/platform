@@ -227,4 +227,28 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         return $this->query->getCriteria();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addAggregate($name, $field, $function)
+    {
+        $this->query->addAggregate($name, $field, $function);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAggregations()
+    {
+        return $this->query->getAggregations();
+    }
+
+    public function __clone()
+    {
+        $this->query = clone $this->query;
+        $this->result = null;
+    }
 }

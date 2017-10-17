@@ -35,31 +35,49 @@ class ExportType extends AbstractType
         $builder->add(
             'processorAlias',
             'choice',
-            array(
-                'label' => 'oro.importexport.export.processor',
-                'choices' => $this->getExportProcessorsChoices($options['entityName']),
+            [
+                'label' => 'oro.importexport.export.popup.options.label',
+                'choices' => $this->getExportProcessorsChoices($options),
                 'required' => true,
                 'placeholder' => false,
-            )
+            ]
         );
     }
 
     /**
-     * @param string $entityName
+     * @param array $options
      * @return array
      */
-    protected function getExportProcessorsChoices($entityName)
+    protected function getExportProcessorsChoices($options)
     {
+        $entityName = $options['entityName'];
+        $processorAlias = $options['processorAlias'] ?? null;
+        
         $aliases = $this->processorRegistry->getProcessorAliasesByEntity(
-            ProcessorRegistry::TYPE_EXPORT,
+            $this->getProcessorType(),
             $entityName
         );
-        $result = array();
+
+        if (is_array($processorAlias) && count($processorAlias) > 0) {
+            $aliases = array_intersect($aliases, $processorAlias);
+        } elseif (is_string($processorAlias)) {
+            $aliases = array_intersect($aliases, [$processorAlias]);
+        }
+
+        $result = [];
         foreach ($aliases as $alias) {
             $result[$alias] = $this->generateProcessorLabel($alias);
         }
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getProcessorType()
+    {
+        return ProcessorRegistry::TYPE_EXPORT;
     }
 
     /**
@@ -76,17 +94,15 @@ class ExportType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'data_class' => ExportData::class,
-            )
-        );
-        $resolver->setRequired(array('entityName'));
-        $resolver->setAllowedTypes(
-            array(
-                'entityName' => 'string'
-            )
-        );
+        $resolver->setDefaults([
+            'data_class' => ExportData::class,
+            'processorAlias' => null
+        ]);
+        $resolver->setRequired(['entityName']);
+        $resolver->setAllowedTypes([
+            'entityName' => 'string',
+            'processorAlias' => ['string', 'array', 'null']
+        ]);
     }
 
     /**
