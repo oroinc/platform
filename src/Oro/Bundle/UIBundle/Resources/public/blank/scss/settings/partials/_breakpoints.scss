@@ -21,4 +21,4 @@ $oro_breakpoints: (
 // Variable for extend native breakpoints is empty by default;
 $custom-breakpoints: () !default;
 
-$breakpoints: map-merge-wo-null($oro_breakpoints, $custom-breakpoints) !default;
+$breakpoints: merge-breakpoints($oro_breakpoints, $custom-breakpoints) !default;

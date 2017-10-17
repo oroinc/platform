@@ -95,3 +95,24 @@
 
     @return $result;
 }
+
+// Merge breakpoints
+// $old-breakpoints: (
+//     'desktop': '(min-width: 1100px)',
+//     'tablet': '(max-width: 1099px )'
+// );
+// $new-breakpoints: (
+//     'desktop': '(min-width: 1200px)',
+//     'tablet': null,
+//     'mobile': '(max-width: 640px)'
+// );
+// @return the value in a merged breakpoints;
+// $breakpoints: (
+//     'desktop''(min-width: 1200px)',
+//     'mobile': '(max-width: 640px)'
+// );
+// Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
+
+@function merge-breakpoints($breakpoints1, $news-breakpoint2) {
+    @return  map-merge-wo-null($breakpoints1, $news-breakpoint2);
+}
