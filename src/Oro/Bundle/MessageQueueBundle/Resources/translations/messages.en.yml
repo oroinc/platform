@@ -18,7 +18,7 @@ oro:
                 createdAt: Created At
                 startedAt: Started At
                 stoppedAt: Stopped At
-
+                lastActiveAt: LastActive At
         menu:
             label: Jobs
             shortcut.label: Jobs List
@@ -32,6 +32,7 @@ oro:
             unique: Unique
             interrupted: Interrupted
             name: Job "%name%"
+            lastActiveAt: Last Active At
 
         status:
             new: New
@@ -40,3 +41,4 @@ oro:
             success: Success
             failed: Failed
             failed_redelivered: Failed Redelivered
+            stale: Stale

@@ -19,7 +19,12 @@ class RootJobProgressCalculator
     /**
      * @var array
      */
-    protected static $stopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED];
+    protected static $stopStatuses = [
+        Job::STATUS_SUCCESS,
+        Job::STATUS_FAILED,
+        Job::STATUS_CANCELLED,
+        Job::STATUS_STALE
+    ];
 
     /**
      * @param Job $job

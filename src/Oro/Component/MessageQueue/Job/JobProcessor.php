@@ -206,6 +206,7 @@ class JobProcessor
         $job->setStartedAt(new \DateTime());
 
         $this->jobStorage->saveJob($job);
+        $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
@@ -235,12 +236,21 @@ class JobProcessor
         $job->setJobProgress(1);
         $job->setStoppedAt(new \DateTime());
         $this->jobStorage->saveJob($job);
-
+        $this->updateJobLastActiveAtAndSave($job->getRootJob());
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
         ]);
 
         $this->sendRecalculateJobProgressMessage($job);
+    }
+
+    /**
+     * @param Job $job
+     */
+    private function updateJobLastActiveAtAndSave(Job $job)
+    {
+        $job->setLastActiveAt(new \DateTime());
+        $this->jobStorage->saveJob($job);
     }
     
     /**
@@ -287,6 +297,7 @@ class JobProcessor
         $job->setStoppedAt(new \DateTime());
 
         $this->jobStorage->saveJob($job);
+        $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
@@ -316,6 +327,7 @@ class JobProcessor
 
         $job->setStatus(Job::STATUS_FAILED_REDELIVERED);
         $this->jobStorage->saveJob($job);
+        $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
                 'jobId' => $job->getId()
@@ -349,6 +361,7 @@ class JobProcessor
         }
 
         $this->jobStorage->saveJob($job);
+        $this->updateJobLastActiveAtAndSave($job->getRootJob());
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
