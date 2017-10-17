@@ -42,11 +42,10 @@ define(function(require) {
         },
 
         onConditionChange: function() {
-            var isEmptyValue;
             var value = this.subview('criterion').getValue();
+            var isEmptyValue = _.isEmpty(_.omit(value, 'criteria'));
             if (!tools.isEqualsLoosely(value, this.value)) {
-                this.value = value;
-                isEmptyValue = _.isEmpty(this.value);
+                this.value = !isEmptyValue ? value : {};
                 this.$('>input[name^=condition_item_]').prop('checked', !isEmptyValue);
                 if (!isEmptyValue && this.criteria !== 'condition-item') {
                     this.value.criteria = this.criteria;

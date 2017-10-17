@@ -373,9 +373,6 @@ define(function(require) {
                     return this._createConditionOperatorView(criteria, value);
                 } else {
                     criteria = this._getCriteriaOfConditionValue(value);
-                    if ('criteria' in value) {
-                        value = _.omit(value, 'criteria');
-                    }
                     return this._renderCondition(criteria, value);
                 }
             }, this);
@@ -430,7 +427,8 @@ define(function(require) {
             var group;
             var condition;
 
-            if (!this._isPlaceholderInValidPosition(ui.item, ui.item)) {
+            if (ui.sender && !$.contains(this.el, ui.sender[0]) ||
+                !this._isPlaceholderInValidPosition(ui.item, ui.item)) {
                 $(e.target).sortable('cancel');
                 return;
             }
@@ -573,6 +571,11 @@ define(function(require) {
             var condition = this.getConditionViewOfElement($condition);
             var value = condition ? condition.getValue() : null;
             var isValid;
+
+            if (!$.contains(this.el, $condition[0]) || !$.contains(this.el, $placeholder[0])) {
+                return false;
+            }
+
             switch (criteria) {
                 case 'aggregated-condition-item':
                     // at the and of root condition (if group of aggregated items does not exist yet)
