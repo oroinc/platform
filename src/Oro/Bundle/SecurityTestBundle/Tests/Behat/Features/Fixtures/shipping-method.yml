@@ -1,0 +1,15 @@
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    flatRateLabel:
+        string: '<xss("LocalizedFallbackValue.string(FlatRateSettings.label)")>'
+
+Oro\Bundle\FlatRateShippingBundle\Entity\FlatRateSettings:
+    flatRateSettings:
+        addLabel: ['@flatRateLabel']
+
+Oro\Bundle\IntegrationBundle\Entity\Channel:
+    flatRateIntegration:
+        type: 'flat_rate'
+        name: '<xss("Channel.name(Shipping)")>'
+        enabled: true
+        organization: '@organization'
+        transport: '@flatRateSettings'

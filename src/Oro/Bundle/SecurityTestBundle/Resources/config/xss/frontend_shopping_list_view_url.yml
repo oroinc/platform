@@ -1,0 +1,2 @@
+urls:
+    - { route: 'oro_shopping_list_frontend_view', parameters: { id: '@shoppinglist1.id' } }

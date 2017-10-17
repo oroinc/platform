@@ -1,10 +1,16 @@
+@fixture-OroSecurityTestBundle:shipping-method.yml
+@fixture-OroSecurityTestBundle:shipping-method-rule.yml
+@fixture-OroSecurityTestBundle:payment-method.yml
+@fixture-OroSecurityTestBundle:payment-method-rule.yml
 @fixture-OroSecurityTestBundle:frontend-fixtures.yml
 Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible pages
 
-  Scenario: Check store front profile pages for XSS vulnerability
+  Scenario: Create different window session
     Given sessions active:
-      | Admin          |first_session |
-      | User           |second_session|
+      | Admin  |first_session |
+      | User   |second_session|
+
+  Scenario: Check store front profile pages for XSS vulnerability
     Given I proceed as the User
     And I signed in as AmandaRCole@example.org on the store frontend
     When I visiting pages listed in "frontend profile urls"
@@ -74,4 +80,23 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
     And I should see "Configuration saved" flash message
     When I proceed as the User
     And I visiting pages listed in "frontend product view urls"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check multi step checkout for XSS vulnerability
+    Given I visiting pages listed in "frontend shopping list view url"
+    And I click "Create Order"
+    And I click "Continue"
+    And I click "Continue"
+    And I click "Continue"
+    And I click "Continue"
+    Then I should not get XSS vulnerabilities
+
+  Scenario: Check one step step checkout for XSS vulnerability
+    Given I proceed as the Admin
+    And I go to System/ Workflows
+    And I click Activate "Single Page Checkout" in grid
+    And I click "Activate"
+    Then I proceed as the User
+    And I visiting pages listed in "frontend shopping list view url"
+    And I click "Create Order"
     Then I should not get XSS vulnerabilities

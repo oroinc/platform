@@ -1,0 +1,20 @@
+Oro\Bundle\RuleBundle\Entity\Rule:
+    paymentRule:
+        name: '<xss("Rule.name(Payment)")>'
+        enabled: true
+        sortOrder: 1
+
+Oro\Bundle\PaymentBundle\Entity\PaymentMethodConfig:
+    paymentMethodConfig:
+        type: '<("payment_term_".@paymentTermIntegration->id)>'
+
+Oro\Bundle\PaymentBundle\Entity\PaymentMethodsConfigsRule:
+    paymentMethodsConfigsRule:
+        rule: '@paymentRule'
+        methodConfigs: ['@paymentMethodConfig']
+        currency: 'USD'
+        organization: '@organization'
+
+Oro\Bundle\PaymentTermBundle\Entity\PaymentTerm:
+    paymentTerm:
+        label: '<xss("PaymentTerm.label")>'

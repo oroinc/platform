@@ -1,0 +1,18 @@
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    paymentTermLabel:
+        string: '<xss("LocalizedFallbackValue.string(PaymentTermSettings.label)")>'
+    paymentTermShortLabel:
+        string: '<xss("LocalizedFallbackValue.string(PaymentTermSettings.shortLabel)")>'
+
+Oro\Bundle\PaymentTermBundle\Entity\PaymentTermSettings:
+    paymentTermSettings:
+        addLabel: ['@paymentTermLabel']
+        addShortLabel: ['@paymentTermShortLabel']
+
+Oro\Bundle\IntegrationBundle\Entity\Channel:
+    paymentTermIntegration:
+        type: 'payment_term'
+        name: '<xss("Channel.name(Payment)")>'
+        enabled: true
+        organization: '@organization'
+        transport: '@paymentTermSettings'
