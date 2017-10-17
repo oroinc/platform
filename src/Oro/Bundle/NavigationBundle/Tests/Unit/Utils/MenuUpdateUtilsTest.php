@@ -5,6 +5,8 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Utils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\Testing\Unit\EntityTrait;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
@@ -59,17 +61,37 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
             ->getChild('item-1-1')
             ->getChild('item-1-1-1');
 
+        $firstLocalization = new Localization();
+        $this->setValue($firstLocalization, 'id', 1);
+        $secondLocalization = new Localization();
+        $this->setValue($secondLocalization, 'id', 2);
+
         $update = new MenuUpdateStub();
         $update->setKey('item-1-1-1');
         $update->setParentKey('item-2');
         $update->setUri('URI');
+        $update->addDescription(
+            (new LocalizedFallbackValue())
+                ->setString('first test description')
+                ->setLocalization($firstLocalization)
+        );
+        $update->addDescription(
+            (new LocalizedFallbackValue())
+                ->setString('second test description')
+                ->setLocalization($secondLocalization)
+        );
 
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setUri('URI');
+        $expectedItem->setExtra('description', 'second test description');
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
+        $localizationHelper->expects($this->atLeastOnce())
+            ->method('getCurrentLocalization')
+            ->willReturn($secondLocalization);
+
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
         $this->assertEquals($expectedItem, $item);

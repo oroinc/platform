@@ -1,5 +1,29 @@
 {# Address book widget to use on view entity pages #}
-<div class="widget-content">
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set addressBookOptions = {
+    view: {
+        view: 'oroaddress/js/app/views/address-book-widget-view',
+        wid: app.request.get('_wid'),
+        addresses: render(addressListUrl),
+        addressListUrl: addressListUrl,
+        addressCreateUrl: addressCreateUrl,
+        addressUpdateRoute: {
+            route: addressUpdateRoute,
+            params: {
+                (ownerParam):  entity.id,
+            }
+        },
+        addressDeleteRoute: {
+            route: addressDeleteRoute,
+            params: {
+                (ownerParam):  entity.id,
+            }
+        },
+    }
+} %}
+
+<div class="widget-content" {{ UI.renderPageComponentAttributes(addressBookOptions) }}>
     {# JS template for address view #}
     {% include "OroAddressBundle:Js:address.js.twig" %}
 
@@ -10,44 +34,4 @@
         {% endif %}
     </div>
     <div class="list-box map-box" id="address-book"></div>
-
-    <script type="text/javascript">
-    require(['jquery', 'underscore', 'routing', 'oroaddress/js/address-book', 'oroui/js/widget-manager'],
-    function($, _, routing, AddressBook, widgetManager) {
-        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget){
-            /** @type oroaddress.AddressBook */
-            var addressBook = new AddressBook({
-                el: '#address-book',
-                addressListUrl: {{ addressListUrl|json_encode|raw }},
-                addressCreateUrl: {{ addressCreateUrl|json_encode|raw }},
-                addressUpdateUrl: function() {
-                    var address = arguments[0];
-                    return routing.generate(
-                        '{{ addressUpdateRoute }}',
-                        {
-                            '{{ ownerParam }}': {{ entity.id|json_encode|raw }},
-                            'id': address.get('id')
-                        }
-                    )
-                },
-                addressDeleteUrl: function() {
-                    var address = arguments[0];
-                    return routing.generate(
-                        '{{ addressDeleteRoute }}',
-                        {
-                            '{{ ownerParam }}': {{ entity.id|json_encode|raw }},
-                            'addressId': address.get('id')
-                        }
-                    )
-                }
-            });
-            widget.getAction('add_address', 'adopted', function(action) {
-                action.on('click', _.bind(addressBook.createAddress, addressBook));
-            });
-            addressBook
-                .getCollection()
-                .reset({{ render(addressListUrl) }});
-        });
-    });
-    </script>
 </div>

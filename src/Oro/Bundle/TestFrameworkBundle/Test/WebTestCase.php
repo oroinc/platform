@@ -1077,6 +1077,10 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getTestResourcePath($folderName, $fileName)
     {
+        if (!$folderName) {
+            return $this->getCurrentDir() . DIRECTORY_SEPARATOR . $fileName;
+        }
+
         return $this->getCurrentDir() . DIRECTORY_SEPARATOR .  $folderName . DIRECTORY_SEPARATOR . $fileName;
     }
 

@@ -154,7 +154,7 @@ class ImportExportController extends Controller
      * @param Request $request
      * @param string $processorAlias
      *
-     * @return array
+     * @return JsonResponse
      */
     public function importValidateAction(Request $request, $processorAlias)
     {
@@ -249,7 +249,10 @@ class ImportExportController extends Controller
     {
         $entityName = $request->get('entity');
 
-        $exportForm = $this->createForm('oro_importexport_export', null, ['entityName' => $entityName]);
+        $exportForm = $this->createForm('oro_importexport_export', null, [
+            'entityName' => $entityName,
+            'processorAlias' => $request->get('processorAlias') ?? null
+        ]);
 
         if ($request->isMethod('POST')) {
             $exportForm->submit($request);
