@@ -182,6 +182,8 @@ services:
         arguments:
             - '@oro_integration.manager.types_registry.link'
             - '@doctrine'
+        tags:
+            - { name: doctrine.event_listener, event: onClear }
 
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
