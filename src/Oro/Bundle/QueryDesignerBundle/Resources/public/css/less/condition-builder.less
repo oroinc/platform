@@ -2,6 +2,25 @@
 
 @spacerHeight: 10px;
 
+.btn-link() {
+  background-color: transparent;
+  background-image: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  border-color: transparent;
+  cursor: pointer;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  font-weight: normal;
+  outline: none;
+  color: @linkColor;
+  &:hover, &:focus {
+    color: @linkColorHover;
+  }
+}
+
 .drop-area-marker {
   position: absolute;
   border: dashed 3px #ddd;
@@ -213,14 +232,10 @@
     background: none;
   }
   button.select-filter-widget {
-    font-weight: normal;
+    .btn-link();
     vertical-align: baseline;
     line-height: inherit;
     padding: 0;
-    color: @linkColor;
-    &:hover, &:focus {
-      color: @linkColorHover;
-    }
   }
   .active-filter {
     display: inline;
@@ -233,6 +248,31 @@
     }
     .caret {
       display: none;
+    }
+    .filter-update {
+      display: none;
+    }
+    .choice-filter {
+      >.btn-group {
+        display: inline;
+        .btn.dropdown-toggle {
+          .btn-link();
+          padding-left: 0;
+          padding-right: 5px;
+        }
+        .dropdown-menu {
+          margin-top: 13px;
+        }
+      }
+      .value-field-frame {
+        display: inline;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+      .filter-value {
+        display: inline;
+      }
+
     }
   }
   .ui-timepicker-input {

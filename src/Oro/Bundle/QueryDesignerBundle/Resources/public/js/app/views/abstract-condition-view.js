@@ -78,7 +78,7 @@ define(function(require) {
         },
 
         _onFilterChange: function(e) {
-            if (this.filter && !$(e.target).is('[data-fake-front-field]')) {
+            if (this.filter && $.contains(this.filter.el, e.target) && !$(e.target).is('[data-fake-front-field]')) {
                 this.filter.applyValue();
             }
         },

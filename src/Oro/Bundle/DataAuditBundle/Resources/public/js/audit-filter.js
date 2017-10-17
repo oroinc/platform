@@ -23,6 +23,8 @@ define(function(require) {
             }
         }),
 
+        choiceDropdownSelector: '.audit-filter-type .dropdown-menu',
+
         selectors: {
             startContainer: '.audit-filter-container .filter-start-date',
             separator: '.audit-filter-container .filter-separator',
