@@ -1,33 +1,16 @@
 {% extends 'OroDataGridBundle:Grid/widget:widget.html.twig' %}
 
 {% block widget_content %}
-    {# Replace row click action with triggering of grid-row-select event #}
-    <script type="text/javascript">
-        require(['oroui/js/mediator', 'oroui/js/widget-manager'],
-        function(mediator, widgetManager) {
-            var gridName = {{ gridName|json_encode|raw }};
-            mediator.bind('datagrid_create_before', function(options) {
-                if (options.name == gridName) {
-                    {% if multiselect %}
-                    options.multiSelectRowEnabled = true;
-                    {% else %}
-                    options.rowClickAction = function(data) {
-                        return {
-                            run: function() {
-                                widgetManager.getWidgetInstance(
-                                    {{ app.request.get('_wid')|json_encode|raw }},
-                                    function(widget) {
-                                        widget.trigger('grid-row-select', data);
-                                    }
-                                );
-                            }
-                        }
-                    };
-                    {% endif %}
-                }
-            });
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'orodatagrid/js/app/components/datagrid-row-select-widget-component',
+        options: {
+            wid: app.request.get('_wid'),
+            gridName: gridName,
+            multiSelect: false
+        }
+    }) }}></div>
 
     {% set renderParams = renderParams|merge({'routerEnabled': false}) %}
     {{ parent() }}
