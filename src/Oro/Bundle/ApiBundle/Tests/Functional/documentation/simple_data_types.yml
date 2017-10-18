@@ -1,0 +1,86 @@
+parameters:
+    id:
+        dataType: 'integer'
+    fieldArray:
+        dataType: 'array'
+    fieldBigInt:
+        dataType: 'bigint'
+    fieldBoolean:
+        dataType: 'boolean'
+    fieldCurrency:
+        dataType: 'string'
+    fieldDate:
+        dataType: 'date'
+    fieldDateTime:
+        dataType: 'datetime'
+    fieldDecimal:
+        dataType: 'decimal'
+    fieldDuration:
+        dataType: 'integer'
+    fieldFloat:
+        dataType: 'float'
+    fieldGuid:
+        dataType: 'string'
+    fieldInt:
+        dataType: 'integer'
+    fieldJsonArray:
+        dataType: 'object'
+    fieldMoney:
+        dataType: 'money'
+    fieldMoneyValue:
+        dataType: 'money'
+    fieldPercent:
+        dataType: 'float'
+    fieldSimpleArray:
+        dataType: 'array'
+    fieldSmallInt:
+        dataType: 'smallint'
+    fieldString:
+        dataType: 'string'
+    fieldText:
+        dataType: 'string'
+    fieldTime:
+        dataType: 'time'
+response:
+    id:
+        dataType: 'integer'
+    fieldArray:
+        dataType: 'array'
+    fieldBigInt:
+        dataType: 'bigint'
+    fieldBoolean:
+        dataType: 'boolean'
+    fieldCurrency:
+        dataType: 'string'
+    fieldDate:
+        dataType: 'date'
+    fieldDateTime:
+        dataType: 'datetime'
+    fieldDecimal:
+        dataType: 'decimal'
+    fieldDuration:
+        dataType: 'integer'
+    fieldFloat:
+        dataType: 'float'
+    fieldGuid:
+        dataType: 'string'
+    fieldInt:
+        dataType: 'integer'
+    fieldJsonArray:
+        dataType: 'object'
+    fieldMoney:
+        dataType: 'money'
+    fieldMoneyValue:
+        dataType: 'money'
+    fieldPercent:
+        dataType: 'float'
+    fieldSimpleArray:
+        dataType: 'array'
+    fieldSmallInt:
+        dataType: 'smallint'
+    fieldString:
+        dataType: 'string'
+    fieldText:
+        dataType: 'string'
+    fieldTime:
+        dataType: 'time'
