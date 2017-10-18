@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 
+use Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -24,9 +25,19 @@ class ApiDocMetadataParser implements ParserInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    public function __construct(ValueNormalizer $valueNormalizer)
-    {
+    /** @var ApiDocDataTypeConverter */
+    protected $dataTypeConverter;
+
+    /**
+     * @param ValueNormalizer         $valueNormalizer
+     * @param ApiDocDataTypeConverter $dataTypeConverter
+     */
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        ApiDocDataTypeConverter $dataTypeConverter
+    ) {
         $this->valueNormalizer = $valueNormalizer;
+        $this->dataTypeConverter = $dataTypeConverter;
     }
 
     /**
@@ -134,7 +145,7 @@ class ApiDocMetadataParser implements ParserInterface
         return [
             'description' => $config->getDescription(),
             'required'    => !$metadata->isNullable(),
-            'dataType'    => $metadata->getDataType()
+            'dataType'    => $this->dataTypeConverter->convertDataType($metadata->getDataType())
         ];
     }
 
@@ -155,7 +166,7 @@ class ApiDocMetadataParser implements ParserInterface
             'required'    => !$metadata->isNullable()
         ];
         $dataType = $metadata->getDataType();
-        $result['dataType'] = $dataType;
+        $result['dataType'] = $this->dataTypeConverter->convertDataType($dataType);
         if (!DataType::isAssociationAsField($dataType)) {
             $result['subType'] = $this->getEntityType($metadata->getTargetClassName(), $requestType);
             $actualType = null;

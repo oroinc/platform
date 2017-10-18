@@ -22,10 +22,11 @@ If you wish to disable some mass action you should specify:
 ``` yml
 datagrids:
     users-grid:
-    ...
-    mass_actions:
-        delete:
-            enabled: false
+        ...
+        options:
+            mass_actions:
+                delete:
+                    enabled: false
 ```
 
 In case of more complicated mass types you should register your service with `oro_datagrid.extension.mass_action.type` tag:
