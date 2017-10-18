@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnClearEventArgs;
@@ -212,9 +213,13 @@ class IndexListener implements OptionalListenerInterface
             $meta = $entityManager->getClassMetadata($className);
 
             foreach ($meta->getAssociationMappings() as $association) {
-                if (!empty($association['inversedBy']) && $association['type'] === ClassMetadataInfo::MANY_TO_ONE) {
-                    $associationValue = $this->getAssociationValue($entity, $association);
-                    if ($associationValue !== false) {
+                $associationValue = $this->getAssociationValue($entity, $association);
+                if ($associationValue !== false) {
+                    if ($associationValue instanceof Collection) {
+                        foreach ($associationValue->toArray() as $value) {
+                            $entitiesToReindex[spl_object_hash($value)] = $value;
+                        }
+                    } else {
                         $entitiesToReindex[spl_object_hash($associationValue)] = $associationValue;
                     }
                 }
@@ -260,11 +265,13 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function getAssociationValue($entity, array $association)
     {
+        $relationField = $this->getRelationField($association);
+        if ($relationField === null) {
+            return false;
+        }
+
         $targetClass = $association['targetEntity'];
-        $changedIndexedFields = $this->getIntersectChangedIndexedFields(
-            $targetClass,
-            [$association['inversedBy']]
-        );
+        $changedIndexedFields = $this->getIntersectChangedIndexedFields($targetClass, [$relationField]);
         if (!$changedIndexedFields) {
             return false;
         }
@@ -326,6 +333,10 @@ class IndexListener implements OptionalListenerInterface
         $entityConfig = $this->mappingProvider->getEntityConfig($className);
 
         foreach ($entityConfig['fields'] as $fieldConfig) {
+            if ($fieldConfig['name'] === null) {
+                continue;
+            }
+
             $this->entitiesIndexedFieldsCache[$className][$fieldConfig['name']] = $fieldConfig['name'];
         }
 
@@ -343,5 +354,27 @@ class IndexListener implements OptionalListenerInterface
     protected function getIntersectChangedIndexedFields($className, array $changedFields)
     {
         return array_intersect($this->getEntityIndexedFields($className), $changedFields);
+    }
+
+    /**
+     * @param array $association
+     *
+     * @return string
+     */
+    private function getRelationField(array $association)
+    {
+        if ($association['type'] === ClassMetadataInfo::MANY_TO_MANY) {
+            if ($association['mappedBy'] !== null) {
+                return $association['mappedBy'];
+            }
+
+            return $association['inversedBy'];
+        }
+
+        if ($association['type'] === ClassMetadataInfo::MANY_TO_ONE) {
+            return $association['inversedBy'];
+        }
+
+        return null;
     }
 }
