@@ -7,8 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactoryInterface;
 
 /**
  * Creates an applicable checker that should be used to check whether API processor should be executed or not.
+ * This factory can be used only for actions that do not contain groups.
  */
-class ProcessorApplicableCheckerFactory implements ProcessorApplicableCheckerFactoryInterface
+class ProcessorApplicableCheckerWithoutGroupsFactory implements ProcessorApplicableCheckerFactoryInterface
 {
     /**
      * {@inheritdoc}
@@ -17,7 +18,7 @@ class ProcessorApplicableCheckerFactory implements ProcessorApplicableCheckerFac
     {
         $applicableChecker = new ChainApplicableChecker();
         $applicableChecker->addChecker(
-            new MatchApplicableChecker(['group'], ['class', 'parentClass'])
+            new MatchApplicableChecker([], ['class', 'parentClass'])
         );
 
         return $applicableChecker;

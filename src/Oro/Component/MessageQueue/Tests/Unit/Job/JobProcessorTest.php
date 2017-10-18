@@ -52,6 +52,11 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('saveJob')
             ->with($this->identicalTo($job))
         ;
+        $storage
+            ->expects(static::once())
+            ->method('findRootJobByOwnerIdAndJobName')
+            ->with('owner-id', 'job-name')
+        ;
 
         $processor = new JobProcessor($storage, $this->createMessageProducerMock());
 
@@ -66,7 +71,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('owner-id', $job->getOwnerId());
     }
 
-    public function testShouldCatchDuplicateJobAndTryToFindJobByOwnerId()
+    public function testShouldCatchDuplicateJobAndReturnNull()
     {
         $job = new Job();
 
@@ -86,8 +91,31 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('findRootJobByOwnerIdAndJobName')
             ->with('owner-id', 'job-name')
-            ->will($this->returnValue($job))
         ;
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
+
+        $result = $processor->findOrCreateRootJob('owner-id', 'job-name', true);
+
+        static::assertNull($result);
+    }
+
+    public function testFindOrCreateRootJobFindJobAndReturn()
+    {
+        $job = new Job();
+
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects(static::never())
+            ->method('createJob');
+        $storage
+            ->expects(static::never())
+            ->method('saveJob');
+        $storage
+            ->expects(static::once())
+            ->method('findRootJobByOwnerIdAndJobName')
+            ->with('owner-id', 'job-name')
+            ->willReturn($job);
 
         $processor = new JobProcessor($storage, $this->createMessageProducerMock());
 
