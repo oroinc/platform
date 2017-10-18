@@ -139,8 +139,7 @@ class JobStorage
                 $job = $em->find($this->entityClass, $job->getId(), LockMode::PESSIMISTIC_WRITE);
 
                 $lockCallback($job);
-                $em->persist($job);
-                $em->flush();
+                $em->flush($job);
 
                 if ($job->getStoppedAt()) {
                     $connection->delete($this->uniqueTableName, ['name' => $job->getOwnerId()]);

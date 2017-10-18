@@ -111,9 +111,7 @@ class JobProcessor
         $job->setJobProgress(0);
         $job->setUnique((bool) $unique);
 
-        $job = $this->saveJobAndStaleDuplicateIfQualifies($job);
-
-        return $job ?? $this->jobStorage->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
+        return $this->saveJobAndStaleDuplicateIfQualifies($job);
     }
 
     /**
@@ -270,10 +268,12 @@ class JobProcessor
         $this->jobStorage->saveJob($rootJob, function (Job $rootJob) {
             $rootJob->setStatus(Job::STATUS_STALE);
             $rootJob->setStoppedAt(new \DateTime());
+
             foreach ($rootJob->getChildJobs() as $childJob) {
                 if (in_array($childJob->getStatus(), Job::$activeStatuses)) {
                     $childJob->setStatus(Job::STATUS_STALE);
                     $childJob->setStoppedAt(new \DateTime());
+                    $this->jobStorage->saveJob($childJob);
                 }
             }
         });

@@ -152,7 +152,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($job);
 
         $storage
-            ->expects($this->never())
+            ->expects($this->once())
             ->method('findRootJobByOwnerIdAndJobName');
 
         $processor = new JobProcessor($storage, $this->createMessageProducerMock());
@@ -370,7 +370,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -439,7 +439,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -509,7 +509,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -579,7 +579,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -719,7 +719,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('saveJob')
             ->with($childNewJob);
         $storage
-            ->expects($this->at(3))
+            ->expects($this->at(4))
             ->method('saveJob')
             ->with($childRedeliveredJob);
 
