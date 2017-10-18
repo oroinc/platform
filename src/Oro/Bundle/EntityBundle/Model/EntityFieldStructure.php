@@ -135,10 +135,14 @@ class EntityFieldStructure
     /**
      * @param string $name
      * @param mixed $value
+     *
+     * @return $this
      */
     public function addOption($name, $value)
     {
         $this->options[$name] = $value;
+
+        return $this;
     }
 
     /**
