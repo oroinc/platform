@@ -8,6 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider;
 
 class XssProvider extends BaseProvider
 {
+    protected static $idx = 0;
+
     /**
      * @var XssPayloadProvider
      */
@@ -30,8 +32,9 @@ class XssProvider extends BaseProvider
      */
     public function xss($identifier = 'XSS', $payloadType = 'script')
     {
-        $jsPayload = sprintf('(window.xss=window.xss||[]).push(\'%s\');', $identifier);
+        $elementId = 'p' . ++self::$idx;
+        $jsPayload = sprintf('_x(\'%s\', \'%s\');', $elementId, $identifier);
 
-        return sprintf($this->payloadProvider->getPayload($payloadType, $jsPayload));
+        return sprintf($this->payloadProvider->getPayload($payloadType, $jsPayload, $elementId));
     }
 }

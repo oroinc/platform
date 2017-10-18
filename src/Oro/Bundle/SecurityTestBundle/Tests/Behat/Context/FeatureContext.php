@@ -61,7 +61,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function collectXssAfterStep()
     {
-        $newXss = $this->getSession()->evaluateScript('return window.xss || null;');
+        $newXss = $this->getSession()->evaluateScript('return window._xssDataStorage || null;');
         if ($newXss) {
             $url = $this->getSession()->getCurrentUrl();
             if (!array_key_exists($url, $this->foundXss)) {
@@ -76,14 +76,18 @@ class FeatureContext extends OroFeatureContext implements
      */
     private function getXssReport()
     {
-        $error = 'Found XSS:';
+        $errorStr = ['Found XSS:'];
         foreach ($this->foundXss as $url => $fields) {
-            $error .= PHP_EOL . $url;
-            $error .= PHP_EOL . "\t" . implode(PHP_EOL . "\t", $fields);
-        }
-        $error .= PHP_EOL;
+            $errorStr[] = $url;
 
-        return $error;
+            $elements = [];
+            foreach ($fields as $fieldData) {
+                $elements[] = "\t" . sprintf('XPath: %s; Field: %s', $fieldData['element'], $fieldData['cause']);
+            }
+            $errorStr = array_merge($errorStr, array_unique($elements));
+        }
+
+        return implode(PHP_EOL, $errorStr);
     }
 
     /**

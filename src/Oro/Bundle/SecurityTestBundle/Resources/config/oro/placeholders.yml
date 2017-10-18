@@ -1,0 +1,10 @@
+placeholders:
+    placeholders:
+        requirejs_config_extend:
+            items:
+                oro_security_test_xss_helper:
+                    order: 200
+
+    items:
+        oro_security_test_xss_helper:
+            template: OroSecurityTestBundle::xss_helper_js.html.twig
