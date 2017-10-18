@@ -33,6 +33,8 @@
         * `precision` changed from `10` to `21`.
         * `scale` changed from `2` to `6`.
 * Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](./src/Oro/Bundle/SearchBundle/Resources/doc/date-time-formatter.md) 
+#### WorkflowBundle
+* The property `restrictions` was excluded from output results of the method "Get Workflow Definition" (`/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}`).
 ### Deprecated
 #### SearchBundle
 * Class `Oro/Bundle/SearchBundle/Engine/Orm/DBALPersistenceDriverTrait` is deprecated. The functionality was merged into `BaseDriver`
