@@ -37,7 +37,7 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class Role extends ExtendRole
+class Role extends ExtendRole implements \Serializable
 {
     const PREFIX_ROLE = 'ROLE_';
 
@@ -143,5 +143,30 @@ class Role extends ExtendRole
     public function getPrefix()
     {
         return static::PREFIX_ROLE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        $dataForSerialization = [$this->id, $this->role, $this->label];
+        if (property_exists($this, 'organization')) {
+            $dataForSerialization[] =  is_object($this->organization) ? clone $this->organization : $this->organization;
+        }
+
+        return serialize($dataForSerialization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        if (property_exists($this, 'organization')) {
+            list($this->id, $this->role, $this->label, $this->organization) = unserialize($serialized);
+        } else {
+            list($this->id, $this->role, $this->label) = unserialize($serialized);
+        }
     }
 }
