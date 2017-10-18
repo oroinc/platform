@@ -268,6 +268,20 @@ services:
         tags:
             - { name: oro_dashboard.value.converter, alias: oro_type_widget_sort_by }
 
+    oro_dashboard.widget_config_value.widget_entity_select.converter:
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter
+        abstract: true
+        arguments:
+            - '@oro_security.acl_helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_entity.doctrine_helper'
+            - '@doctrine.orm.entity_manager'
+
+    oro_dashboard.widget_config_value.widget_enum_select.converter:
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEnumSelectConverter
+        parent: oro_dashboard.widget_config_value.widget_entity_select.converter
+        abstract: true
+
     oro_dashboard.form.type.widget_date:
         class: %oro_dashboard.form.type.widget_date.class%
         tags:
