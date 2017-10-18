@@ -89,7 +89,14 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('jobs')
                         ->useAttributeAsKey('job_name')
                         ->info('Number of seconds of inactivity to qualify jobs of this type as stale.
-                        To disable staling jobs for given job type set this option to -1')
+                        To disable staling jobs for given job type set this option to -1. 
+                        Key can be whole job name or a part of it from the beginning of string to any "."')
+                        ->example("
+                        jobs:
+                            bundle_name.processor_name.entity_name.user: X
+                            bundle_name.processor_name.entity_name: Y
+                            bundle_name.processor_name: Z
+                        ")
                         ->prototype('integer')->end()
                     ->end()
                 ->end()
