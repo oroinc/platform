@@ -60,9 +60,9 @@ datagrids:
             multiple_sorting: true|false # is multisorting mode enabled ? False by default
             disable_default_sorting: true|false # When set to true, no default sorting will be applied
             disable_not_selected_option: true|false # When set to true, not_selected option will not appear on sorting dropdown. But it will appear in next cases (even if disable_not_selected_option set to true):
-            # 1. If a customer already selected 'not_selected' option earlier.
-            # 2. If the 'default' option is empty or not defined
-            # 3. If the 'disable_default_sorting' option is set to true
+              1. If a customer already selected 'not_selected' option earlier.
+              2. If the 'default' option is empty or not defined
+              3. If the 'disable_default_sorting' option is set to true
 ```
 
 **Note:** _Customization could be done using `apply_callback` options_
