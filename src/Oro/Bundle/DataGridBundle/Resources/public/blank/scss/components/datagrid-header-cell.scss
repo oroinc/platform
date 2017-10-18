@@ -88,3 +88,15 @@
         }
     }
 }
+
+@include breakpoint('print') {
+    .grid-header-cell {
+        &.action-column {
+            &:empty {
+                &:before {
+                    display: none;
+                }
+            }
+        }
+    }
+}
