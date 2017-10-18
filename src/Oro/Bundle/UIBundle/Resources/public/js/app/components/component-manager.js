@@ -107,7 +107,8 @@ define([
 
                 this.$el.find('[' + dataAttr + ']').each(function() {
                     var $elem = $(this);
-                    if (self._isInOwnLayout($elem) || $elem.closest('[data-skip-components]').length !== 0) {
+                    if (self._isInOwnLayout($elem)) {
+                        console.log($elem);
                         return;
                     }
 
