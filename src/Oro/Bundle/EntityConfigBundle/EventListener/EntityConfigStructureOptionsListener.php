@@ -29,8 +29,6 @@ class EntityConfigStructureOptionsListener
         foreach ($data as $entityStructure) {
             $className = $entityStructure->getClassName();
             $fields = $entityStructure->getFields();
-            $isEntityConfigurable = $this->configProvider->hasConfig($className);
-            $entityStructure->addOption(self::OPTION_NAME, $isEntityConfigurable);
             foreach ($fields as $field) {
                 $isFieldConfigurable = $this->configProvider->hasConfig($className, $field->getName());
                 $field->addOption(self::OPTION_NAME, $isFieldConfigurable);

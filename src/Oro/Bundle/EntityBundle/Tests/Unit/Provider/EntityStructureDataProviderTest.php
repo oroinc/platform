@@ -9,10 +9,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityStructureDataProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityWithFieldsProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityWithFieldsProvider;
 
     /** @var EntityStructureDataProvider */

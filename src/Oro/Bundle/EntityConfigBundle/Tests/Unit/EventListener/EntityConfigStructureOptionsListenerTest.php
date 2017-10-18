@@ -32,11 +32,6 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit_Framework_TestCa
             ->method('getClassName')
             ->willReturn(\stdClass::class);
 
-        $entity->expects($this->once())
-            ->method('addOption')
-            ->with(EntityConfigStructureOptionsListener::OPTION_NAME, true)
-            ->willReturn($entity);
-
         $field = $this->createMock(EntityFieldStructure::class);
 
         $field->expects($this->once())
@@ -47,13 +42,14 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit_Framework_TestCa
             ->method('addOption')
             ->with(EntityConfigStructureOptionsListener::OPTION_NAME, true)
             ->willReturn($field);
+        $fields = [$field];
 
         $entity->expects($this->once())
             ->method('getFields')
-            ->willReturn([$field]);
+            ->willReturn($fields);
 
         $this->entityConfigProvider
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(count($fields)))
             ->method('hasConfig')
             ->withConsecutive(
                 [\stdClass::class],
