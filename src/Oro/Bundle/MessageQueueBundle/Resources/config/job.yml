@@ -4,6 +4,7 @@ parameters:
 services:
     oro_message_queue.job.configuration_provider:
         class: 'Oro\Bundle\MessageQueueBundle\Provider\JobConfigurationProvider'
+        public: false
 
     oro_message_queue.job.storage:
         class: 'Oro\Component\MessageQueue\Job\JobStorage'

@@ -169,9 +169,9 @@ class OroMessageQueueExtension extends Extension
      */
     protected function setJobConfigurationProvider(array $config, ContainerBuilder $container)
     {
-        if (!empty($config['job'])) {
+        if (!empty($config['time_before_stale'])) {
             $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
-            $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['job']]);
+            $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['time_before_stale']]);
         }
     }
 }

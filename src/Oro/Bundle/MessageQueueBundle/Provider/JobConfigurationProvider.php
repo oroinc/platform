@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 
 class JobConfigurationProvider implements JobConfigurationProviderInterface
 {
-    const TIME_BEFORE_STALE_KEY = 'time_before_stale';
+    const JOBS_ARRAY_KEY = 'jobs';
     const JOB_NAME_DEFAULT_KEY = 'default';
     /**
      * @var array
@@ -17,9 +17,9 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
      */
     public function getTimeBeforeStaleForJobName($jobName)
     {
-        return $this->configuration[self::TIME_BEFORE_STALE_KEY][$jobName] ??
-            $this->configuration[self::TIME_BEFORE_STALE_KEY][self::JOB_NAME_DEFAULT_KEY] ??
-            null;
+        return $this->configuration[self::JOBS_ARRAY_KEY][$jobName]
+            ?? $this->configuration[self::JOB_NAME_DEFAULT_KEY]
+            ?? null;
     }
     /**
      * @param array $jobConfiguration

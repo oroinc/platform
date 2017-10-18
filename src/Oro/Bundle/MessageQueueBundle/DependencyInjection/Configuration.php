@@ -71,13 +71,26 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
-            ->arrayNode('job')
+            ->arrayNode('time_before_stale')
+                ->example("
+                time_before_stale:
+                    default: X
+                    jobs:
+                        some_job_type_name: Y
+                ")
                 ->children()
-                    ->arrayNode('time_before_stale')
-                        ->requiresAtLeastOneElement()
+                    ->integerNode('default')
+                        ->min(-1)
+                        ->info('Number of seconds of inactivity to qualify job as stale. 
+                        If this attribute is not set or it is set to -1 jobs will never be qualified as stale. 
+                        It means that if a unique Job is not properly removed after finish it will be blocking other 
+                        Jobs of that type, until it will be manually interrupted')
+                    ->end()
+                    ->arrayNode('jobs')
                         ->useAttributeAsKey('job_name')
-                        ->info('DateTime expression - how long job can stay inactive before its consider old')
-                        ->prototype('scalar')->end()
+                        ->info('Number of seconds of inactivity to qualify jobs of this type as stale.
+                        To disable staling jobs for given job type set this option to -1')
+                        ->prototype('integer')->end()
                     ->end()
                 ->end()
             ->end();

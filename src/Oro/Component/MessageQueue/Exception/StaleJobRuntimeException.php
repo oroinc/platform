@@ -2,7 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Exception;
 
-class StaleJobRuntimeException extends \RuntimeException
+use Oro\Component\MessageQueue\Consumption\Exception\RejectMessageExceptionInterface;
+
+class StaleJobRuntimeException extends \RuntimeException implements RejectMessageExceptionInterface
 {
     /**
      * @return StaleJobRuntimeException

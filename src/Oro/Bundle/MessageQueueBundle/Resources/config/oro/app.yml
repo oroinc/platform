@@ -20,9 +20,9 @@ oro_message_queue:
         - 'oro.message_queue.job.root_job_stopped'
     security_agnostic_processors:
         - 'oro_message_queue.client.route_message_processor'
-    job:
-        time_before_stale:
-            default: '30 minutes'
+    time_before_stale:
+        default: 1800
+        jobs: ~
     consumer:
         heartbeat_update_period: 15
 

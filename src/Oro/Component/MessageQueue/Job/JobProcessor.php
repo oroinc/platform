@@ -143,8 +143,8 @@ class JobProcessor
             return true;
         }
         $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
-        if ($timeBeforeStale) {
-            return $job->getLastActiveAt() < new \DateTime('- ' . $timeBeforeStale);
+        if ($timeBeforeStale && $timeBeforeStale != -1) {
+            return $job->getLastActiveAt() < new \DateTime('- ' . $timeBeforeStale. 'second');
         }
         return false;
     }

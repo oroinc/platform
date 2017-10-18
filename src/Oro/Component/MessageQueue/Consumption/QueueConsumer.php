@@ -7,7 +7,7 @@ use Psr\Log\NullLogger;
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
-use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
+use Oro\Component\MessageQueue\Consumption\Exception\RejectMessageExceptionInterface;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -121,7 +121,7 @@ class QueueConsumer
                 $session->close();
 
                 return;
-            } catch (StaleJobRuntimeException $exception) {
+            } catch (RejectMessageExceptionInterface $exception) {
                 $context->setException($exception);
                 $context->getMessageConsumer()->reject($context->getMessage());
                 $session->close();
