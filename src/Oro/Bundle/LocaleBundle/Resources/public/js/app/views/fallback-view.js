@@ -72,7 +72,7 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            this.$(this.options.selectors.childItem).attr('data-skip-components', true);
+            this.$(this.options.selectors.childItem).attr('data-layout', 'separate');
 
             this._deferredRender();
             this.initLayout().done(function() {
@@ -85,7 +85,7 @@ define(function(require) {
 
         renderSubviews: function() {
             this.initSubviews = false;
-            this.$(this.options.selectors.childItem).removeAttr('data-skip-components');
+            this.$(this.options.selectors.childItem).removeAttr('data-layout');
 
             this.initLayout().done(function() {
                 this.bindEvents();
