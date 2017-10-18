@@ -54,8 +54,9 @@ define(function(require) {
             var $currentTarget = $(event.currentTarget);
             var fieldName = $currentTarget.attr('name');
             var entityKey = parseInt($currentTarget.val());
+            var mergeSelector = '.merge-entity-representative[data-entity-field-name="' + fieldName + '"]';
 
-            this.$('.merge-entity-representative[data-entity-field-name="' + fieldName + '"]').each(function(index, item) {
+            this.$(mergeSelector).each(function(index, item) {
                 var $item = $(item);
                 if ($item.data('entity-key') !== entityKey) {
                     $item.addClass('entity-merge-not-selected');

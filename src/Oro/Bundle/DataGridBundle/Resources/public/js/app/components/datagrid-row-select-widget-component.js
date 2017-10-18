@@ -18,6 +18,8 @@ define(function(require) {
         },
 
         onDataGridCreateBefore: function(options) {
+            var self = this;
+
             if (options.name !== this.gridName) {
                 return;
             }
@@ -28,7 +30,7 @@ define(function(require) {
                 options.rowClickAction = function(data) {
                     return {
                         run: function() {
-                            widgetManager.getWidgetInstance(this.wid, function(widget) {
+                            widgetManager.getWidgetInstance(self.wid, function(widget) {
                                 widget.trigger('grid-row-select', data);
                             });
                         }
