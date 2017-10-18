@@ -207,7 +207,14 @@ define(function(require) {
          * Handles content load event and sets focus on first form input
          */
         onContentUpdated: function() {
+            this.focusContent();
+        },
+
+        focusContent: function() {
             this.$('form:first').focusFirstInput();
+            if (!$.contains(this.el, document.activeElement)) {
+                this.widget.closest('.ui-dialog').trigger('focus');
+            }
         },
 
         /**

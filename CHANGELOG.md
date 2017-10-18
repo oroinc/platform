@@ -31,7 +31,9 @@
 * Entity `Oro\Bundle\WebsiteSearchBundle\Entity\IndexDecimal`:
     * changed decimal field `value`:
         * `precision` changed from `10` to `21`.
-        * `scale` changed from `2` to `6`.  
+        * `scale` changed from `2` to `6`.
+#### WorkflowBundle
+* The property `restrictions` was excluded from output results of the method "Get Workflow Definition" (`/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}`).
 ### Deprecated
 #### SearchBundle
 * Class `Oro/Bundle/SearchBundle/Engine/Orm/DBALPersistenceDriverTrait` is deprecated. The functionality was merged into `BaseDriver`
