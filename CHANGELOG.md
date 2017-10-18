@@ -20,6 +20,9 @@
     * method `hasDocumentationResource` was renamed to `hasDocumentationResources`
     * method `getDocumentationResource` was renamed to `getDocumentationResources`
     * method `setDocumentationResource` was renamed to `setDocumentationResources`
+#### EntityBundle
+* Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
+* Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))
 #### EntityConfigBundle
 * Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
 #### MessageQueue Component
