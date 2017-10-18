@@ -108,7 +108,6 @@ define([
                 this.$el.find('[' + dataAttr + ']').each(function() {
                     var $elem = $(this);
                     if (self._isInOwnLayout($elem)) {
-                        console.log($elem);
                         return;
                     }
 
