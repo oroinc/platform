@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityTestBundle\Tests\Behat\Context;
 
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
@@ -39,7 +40,7 @@ class FeatureContext extends OroFeatureContext implements
         foreach ($this->getUrlsToProcess($value) as $url) {
             $this->visitPath($this->getUrl($url));
             $this->getDriver()->waitPageToLoad();
-            $this->checkEntitySelectDialogsForXss();
+            $this->checkSelect2ForXss();
             $this->collectXssAfterStep();
         }
     }
@@ -56,7 +57,6 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
-     * Read XSS identifiers stored in window.xss JavaScript global variable. Variable is defined in XssPayloadProvider
      * @AfterStep
      */
     public function collectXssAfterStep()
@@ -69,6 +69,7 @@ class FeatureContext extends OroFeatureContext implements
             }
             $this->foundXss[$url] = array_merge($this->foundXss[$url], $newXss);
         }
+        $this->getSession()->evaluateScript('window._xssDataStorage = [];');
     }
 
     /**
@@ -140,19 +141,19 @@ class FeatureContext extends OroFeatureContext implements
         return $urls;
     }
 
-    private function checkEntitySelectDialogsForXss()
+    private function checkSelect2ForXss()
     {
-        $entitySelectButtons = $this->findAllElements('Entity Select Button');
-        if (count($entitySelectButtons) > 0) {
-            foreach ($entitySelectButtons as $entitySelectButton) {
-                $entitySelectButton->focus();
-                if ($entitySelectButton->isVisible()) {
-                    $entitySelectButton->click();
-                    $this->getDriver()->waitForAjax();
-                    $this->collectXssAfterStep();
-                    $closeBtn = $this->createElement('Close Dialog Button');
-                    $closeBtn->focus();
-                    $closeBtn->click();
+        /** @var Select2Entity[] $autocompletes */
+        $autocompletes = $this->findAllElements('Entity Autocomplete');
+        $body = $this->createElement('Body');
+        if (count($autocompletes) > 0) {
+            foreach ($autocompletes as $autocomplete) {
+                $dialog = $autocomplete->openSelectEntityPopup();
+                if ($dialog) {
+                    $dialog->close();
+
+                    $autocomplete->getResultSet();
+                    $body->click();
                 }
             }
         }

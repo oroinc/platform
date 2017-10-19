@@ -24,9 +24,11 @@ oro_behat_extension:
         - '@OroSecurityTestBundle/Tests/Behat/Features'
 
   elements:
-    Entity Select Button:
+    Entity Autocomplete:
+      selector: '.entity-create-or-select-container input.select2'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
+    Body:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector: '.entity-select-btn'
-    Close Dialog Button:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector: '.ui-dialog-titlebar-close'
+      selector: 'body'
+
+

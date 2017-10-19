@@ -164,11 +164,16 @@ class Select2Entity extends Element implements ClearableInterface
     {
         if (!$this->isOpen()) {
             $openArrow = $this->getParent()->find('css', '.select2-arrow');
-            // Although ajax is already loaded element need some extra time to appear by js animation
-            $openArrow->waitFor(60, function (NodeElement $element) {
-                return $element->isVisible();
-            });
-            $openArrow->click();
+            if ($openArrow) {
+                $this->focus();
+                // Although ajax is already loaded element need some extra time to appear by js animation
+                $openArrow->waitFor(60, function (NodeElement $element) {
+                    return $element->isVisible();
+                });
+                if ($openArrow->isVisible()) {
+                    $openArrow->click();
+                }
+            }
         }
     }
 
@@ -212,10 +217,16 @@ class Select2Entity extends Element implements ClearableInterface
      */
     public function openSelectEntityPopup()
     {
-        $this->getParent()->getParent()->find('css', '.entity-select-btn')->click();
-        $this->getDriver()->waitForAjax();
+        $entitySelectButton = $this->getParent()->getParent()->find('css', '.entity-select-btn');
+        $entitySelectButton->focus();
+        if ($entitySelectButton->isVisible()) {
+            $entitySelectButton->click();
+            $this->getDriver()->waitForAjax();
 
-        return $this->elementFactory->createElement('UiDialog');
+            return $this->elementFactory->createElement('UiDialog');
+        }
+
+        return null;
     }
 
     public function clear()
