@@ -8,9 +8,12 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
@@ -25,6 +28,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use MessageQueueExtension;
+
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
@@ -208,7 +213,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new PreExportMessageProcessor(
             $jobRunner,
-            $this->createMessageProducerMock(),
+            self::getMessageProducer(),
             $tokenSerializer,
             $tokenStorage,
             $dependentJob,
@@ -246,6 +251,22 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PreExportMessageProcessor::ACK, $result);
+        self::assertMessageSent(
+            Topics::EXPORT,
+            new Message(
+                [
+                    'jobName'        => 'test',
+                    'processorAlias' => 'test',
+                    'securityToken' => 'test',
+                    'outputFormat'   => 'csv',
+                    'organizationId' => '22',
+                    'exportType'     => 'export',
+                    'options'        => [],
+                    'jobId'          => 10
+                ],
+                MessagePriority::LOW
+            )
+        );
     }
 
     /**
