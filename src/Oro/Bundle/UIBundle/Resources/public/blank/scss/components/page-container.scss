@@ -9,3 +9,9 @@
     margin: $page-container-config-offset;
     padding: $page-container-config-inner-offset;
 }
+
+@include breakpoint('print') {
+    .page-container {
+        min-height: initial;
+    }
+}
