@@ -1,3 +1,14 @@
+## 2.3.2 (Unreleased)
+
+### Added
+#### MessageQueue Component
+* Added Stale Jobs functionality
+    * Added method `setJobConfigurationProvider` to `Oro\Component\MessageQueue\Job\JobProcessor`
+    * Added new state oro.message_queue_job.status.stale
+    * Added new interface `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` 
+#### MessageQueueBundle
+* Added configuration for Stale Jobs
+
 ## 2.3.1 (2017-07-28)
 
 ### Changed
