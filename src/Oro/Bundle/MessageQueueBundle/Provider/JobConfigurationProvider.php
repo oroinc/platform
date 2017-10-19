@@ -11,7 +11,7 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
     /**
      * @var array
      */
-    private $configuration;
+    private $configuration = [];
 
     /**
      * {@inheritdoc}
@@ -21,6 +21,14 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
         return $this->checkKeyByJobNameOrItsPart($jobName)
             ?? $this->configuration[self::JOB_NAME_DEFAULT_KEY]
             ?? null;
+    }
+
+    /**
+     * @param array $jobConfiguration
+     */
+    public function setConfiguration(array $jobConfiguration)
+    {
+        $this->configuration = $jobConfiguration;
     }
 
     /**
@@ -42,12 +50,5 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
         }
 
         return null;
-    }
-    /**
-     * @param array $jobConfiguration
-     */
-    public function setConfiguration(array $jobConfiguration)
-    {
-        $this->configuration = $jobConfiguration;
     }
 }
