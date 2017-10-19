@@ -34,11 +34,6 @@ define([
         /** @property */
         hidden: false,
 
-        /** @property */
-        attributes: {
-             'data-layout': 'separate'
-        },
-
         /**
          * Initializer.
          *
