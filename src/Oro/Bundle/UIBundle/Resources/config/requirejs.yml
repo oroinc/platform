@@ -13,9 +13,6 @@ config:
         'jquery.minicolors':
             deps:
                 - 'jquery'
-        'bootstrap-popover':
-            deps:
-                - 'bootstrap-tooltip'
         'jquery.datepair':
             deps:
                 - 'jquery'
@@ -62,6 +59,7 @@ config:
         'bootstrap-popover':
             deps:
                 - 'jquery'
+                - 'bootstrap-tooltip'
         'bootstrap-scrollspy':
             deps:
                 - 'jquery'

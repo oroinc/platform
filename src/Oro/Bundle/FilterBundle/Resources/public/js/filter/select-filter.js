@@ -142,8 +142,8 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
-            _.extend(this, opts);
+            var opts = _.pick(options, 'choices', 'dropdownContainer', 'widgetOptions');
+            $.extend(true, this, opts);
 
             this._setChoices(this.choices);
 

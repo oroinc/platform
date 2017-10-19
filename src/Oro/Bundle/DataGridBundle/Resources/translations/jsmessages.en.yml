@@ -142,6 +142,9 @@ oro:
             decimal:
                 ascending: Low to High
                 descending: High to Low
+            datetime:
+                ascending: Oldest first
+                descending: Newest first
         export:
             success.message: Export started successfully. You will receive email notification upon completion.
             fail.message: Could not start export, please try again.

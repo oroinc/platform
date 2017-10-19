@@ -139,14 +139,17 @@
             <div class="controls">
                 {{ form_row(form.entity) }}
                 {{ form_row(form.definition) }}
+                {% set metadata = oro_query_filter_metadata() %}
+                {% set column_chain_template_id = 'column-chain-template' %}
                 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
-                {{ QD.query_designer_column_chain_template('column-chain-template') }}
+                {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
                 {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
                 {{ segmentQD.query_designer_condition_builder({
                     'id': name ~ '-condition-builder',
-                    'criteria_list_id': 'filter-criteria-list',
                     'entity_choice_id': widgetType ~ '_' ~ name ~ '_entity',
-                    'disable_audit': true
+                    'disable_audit': true,
+                    'metadata': metadata,
+                    'column_chain_template_selector': '#' ~ column_chain_template_id,
                 }) }}
 
                 {% set fieldsData = {} %}
@@ -167,15 +170,11 @@
                         fieldsData:        fieldsData,
                         confirmMessage:    name|replace('_', '.') ~ '.change_entity_confirmation',
                     },
-                    filters: {
-                        criteriaList:     '#filter-criteria-list',
-                        conditionBuilder: '#' ~ name ~ '-condition-builder'
-                    },
                     entities:                   oro_query_filter_entities(),
-                    metadata:                   oro_query_filter_metadata(),
+                    metadata:                   metadata,
                     disable_audit:              true,
                     initEntityChangeEvents:     false,
-                    select2FieldChoiceTemplate: '#column-chain-template',
+                    select2FieldChoiceTemplate: '#' ~ column_chain_template_id,
                 } %}
                 {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
                 <div
