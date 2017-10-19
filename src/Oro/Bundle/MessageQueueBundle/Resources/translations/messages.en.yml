@@ -18,7 +18,7 @@ oro:
                 createdAt: Created At
                 startedAt: Started At
                 stoppedAt: Stopped At
-                lastActiveAt: LastActive At
+                lastActiveAt: Last Active At
         menu:
             label: Jobs
             shortcut.label: Jobs List
