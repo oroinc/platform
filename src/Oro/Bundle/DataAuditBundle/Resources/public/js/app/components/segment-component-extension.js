@@ -18,46 +18,39 @@ define([
                 }
             });
 
-            var originalConfigureFilters = segment.configureFilters;
-            segment.configureFilters = function() {
-                var $criteria = $(this.options.filters.criteriaList);
-
-                var $dataAuditCondition = $criteria.find('[data-criteria=condition-data-audit]');
-                if (!_.isEmpty($dataAuditCondition)) {
-                    this.on('auditFieldsLoaded', function(className, data) {
-                        $dataAuditCondition.toggle(className in data);
-                    });
-                    $.extend(true, $dataAuditCondition.data('options'), {
-                        fieldChoice: this.options.fieldChoiceOptions,
-                        filters: this.options.auditFilters,
-                        hierarchy: this.options.metadata.hierarchy
-                    });
-                    var fieldsData = this.$auditFieldsLoader.fieldsLoader('getFieldsData');
-                    $dataAuditCondition.toggle(this.$entityChoice.val() in fieldsData);
-                }
-
-                originalConfigureFilters.apply(this, arguments);
-            };
-
             var originalInitFieldsLoader = segment.initFieldsLoader;
             segment.initFieldsLoader = function() {
-                this.$auditFieldsLoader = originalInitFieldsLoader.call(this, this.options.auditFieldsLoader);
+                var auditFieldsLoaderOptions = this.options.auditFieldsLoader;
+                this.$auditFieldsLoader = originalInitFieldsLoader.call(this, auditFieldsLoaderOptions);
 
                 return originalInitFieldsLoader.apply(this, arguments);
             };
 
+            var originalConfigureFilters = segment.configureFilters;
+            segment.configureFilters = function() {
+                var $condition = this.conditionBuilderComponent.view.getCriteriaOrigin('condition-data-audit');
+                if ($condition.length) {
+                    var toggleCondition = function(entityClassName, data) {
+                        $condition.toggle(entityClassName in data);
+                    };
+                    toggleCondition(this.$entityChoice.val(), this.$auditFieldsLoader.fieldsLoader('getFieldsData'));
+                    this.on(this.options.auditFieldsLoader.loadEvent, toggleCondition);
+                }
+                originalConfigureFilters.apply(this, arguments);
+            };
+
             var originalInitEntityChangeEvents = segment.initEntityChangeEvents;
             segment.initEntityChangeEvents = function() {
-                this.trigger(
-                    this.options.auditFieldsLoader.loadEvent,
-                    this.$auditFieldsLoader.val(),
-                    this.$auditFieldsLoader.fieldsLoader('getFieldsData')
-                );
-                this.$auditFieldsLoader.on('fieldsloaderupdate', _.bind(function(e, data) {
-                    var entityClassName = this.$entityChoice.val();
-                    var $criteriaList = $(this.options.filters.criteriaList);
-                    $criteriaList.find('[data-criteria=condition-data-audit]').toggle(entityClassName in data);
-                }, this));
+                var loadHandler = function() {
+                    this.trigger(
+                        this.options.auditFieldsLoader.loadEvent,
+                        this.$auditFieldsLoader.val(),
+                        this.$auditFieldsLoader.fieldsLoader('getFieldsData')
+                    );
+                }.bind(this);
+
+                loadHandler();
+                this.$auditFieldsLoader.on('fieldsloaderupdate', loadHandler);
 
                 return originalInitEntityChangeEvents.apply(this, arguments);
             };

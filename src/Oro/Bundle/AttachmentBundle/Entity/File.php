@@ -381,16 +381,4 @@ class File extends ExtendFile implements FileExtensionInterface
             $this->id = null;
         }
     }
-
-    /**
-     * @return string|null
-     */
-    public function getFilePath()
-    {
-        if (null === $this->file) {
-            return null;
-        }
-
-        return $this->file->getRealPath();
-    }
 }

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -14,11 +12,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
+use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class CreateEntityTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityLoader */
+    protected $entityLoader;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityInstantiator */
     protected $entityInstantiator;
@@ -34,9 +36,14 @@ class CreateEntityTest extends FormProcessorTestCase
         parent::setUp();
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityLoader = $this->createMock(EntityLoader::class);
         $this->entityInstantiator = $this->createMock(EntityInstantiator::class);
 
-        $this->processor = new CreateEntity($this->doctrineHelper, $this->entityInstantiator);
+        $this->processor = new CreateEntity(
+            $this->doctrineHelper,
+            $this->entityLoader,
+            $this->entityInstantiator
+        );
     }
 
     public function testProcessWithoutEntityId()
@@ -108,18 +115,13 @@ class CreateEntityTest extends FormProcessorTestCase
         $metadata = new EntityMetadata();
         $metadata->setHasIdentifierGenerator(false);
 
-        $em = $this->createMock(EntityManager::class);
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityManagerForClass')
-            ->with($entityClass)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('find')
-            ->with($entityClass, $entityId)
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with($entityClass, $entityId, self::identicalTo($metadata))
             ->willReturn(null);
         $this->entityInstantiator->expects(self::once())
             ->method('instantiate')
@@ -141,18 +143,13 @@ class CreateEntityTest extends FormProcessorTestCase
         $metadata = new EntityMetadata();
         $metadata->setHasIdentifierGenerator(false);
 
-        $em = $this->createMock(EntityManager::class);
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityManagerForClass')
-            ->with($entityClass)
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('find')
-            ->with($entityClass, $entityId)
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with($entityClass, $entityId, self::identicalTo($metadata))
             ->willReturn(new Entity\Product());
         $this->entityInstantiator->expects(self::never())
             ->method('instantiate');

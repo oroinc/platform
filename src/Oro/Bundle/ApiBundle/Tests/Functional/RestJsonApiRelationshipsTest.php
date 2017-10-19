@@ -20,7 +20,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
             return;
         }
 
-        $entityId = $this->getRestApiEntityId($entityId);
+        $entityId = $this->getRestApiEntityId($entityClass, $entityId);
         $entityType = $this->getEntityType($entityClass);
 
         $resourceObjectId = $this->checkGetRelationshipRequest(

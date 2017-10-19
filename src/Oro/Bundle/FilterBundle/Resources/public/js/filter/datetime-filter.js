@@ -34,13 +34,6 @@ define(function(require) {
         inputClass: config.inputClass,
 
         /**
-         * View constructor for picker element
-         *
-         * @property
-         */
-        picker: tools.isMobile() ? DateTimePickerView : VariableDateTimePickerView,
-
-        /**
          * Selectors for filter data
          *
          * @property
@@ -63,6 +56,11 @@ define(function(require) {
         events: {
             // timepicker triggers this event on mousedown and hides picker's dropdown
             'hideTimepicker input': '_preventClickOutsideCriteria'
+        },
+
+        _getPickerConstructor: function() {
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables ? DateTimePickerView :
+                VariableDateTimePickerView;
         },
 
         _renderCriteria: function() {

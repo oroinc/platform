@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
 {
@@ -23,185 +23,102 @@ class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
         ]);
     }
 
-    /**
-     * @param string       $entityClass          The FQCN of an entity
-     * @param integer      $expectedStatusCode   expected status code of a response
-     * @param array        $params               request parameters
-     * @param array|string $expects              response expectation
-     * @param string|null  $idsReplacementMethod method to be used for ids correction
-     * @param string       $identifier           attribute name value to reach referenced object
-     *
-     * @dataProvider getParamsAndExpectation
-     */
-    public function testGetEntity(
-        $entityClass,
-        $expectedStatusCode,
-        $params,
-        $expects,
-        $idsReplacementMethod = null,
-        $identifier = null
-    ) {
-        $entityType = $this->getEntityType($entityClass);
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
-            $params
+    public function testFilterByField()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter' => ['name' => 'TestEmployee1']]
         );
 
-        self::assertApiResponseStatusCodeEquals($response, $expectedStatusCode, $entityType, 'get list');
-
-        $expects = $this->loadResponseData($expects);
-        if ($idsReplacementMethod && $identifier) {
-            $expects = $this->{$idsReplacementMethod}($expects, $identifier);
-        }
-        $this->assertResponseContains($expects, $response);
-    }
-
-    /**
-     * @return array
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function getParamsAndExpectation()
-    {
-        return [
-            'filter by field'                                                                              => [
-                'className'  => 'Oro\Bundle\UserBundle\Entity\User',
-                'statusCode' => 200,
-                'params'     => [
-                    'filter' => [
-                        'email' => 'admin@example.com'
-                    ],
-                    'fields' => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
-                    ]
-                ],
-                'expects'    => 'output_1.yml'
-            ],
-            'filter by field of 2nd level related entity (user.owner)'                                     => [
-                'className'  => 'Oro\Bundle\UserBundle\Entity\User',
-                'statusCode' => 200,
-                'params'     => [
-                    'filter' => [
-                        'owner.name' => 'Main'
-                    ],
-                    'fields' => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
-                    ]
-                ],
-                'expects'    => 'output_1.yml'
-            ],
-            'filter by field of 3rd level related entity (user.owner.organization)'                        => [
-                'className'    => 'Oro\Bundle\UserBundle\Entity\User',
-                'statusCode'   => 200,
-                'params'       => [
-                    'filter' => [
-                        'owner.owner.email' => 'TestBusinessUnit1@local.com'
-                    ],
-                    'fields' => [
-                        'users' => 'username'
-                    ],
-                    'page'   => [
-                        'size' => 3
-                    ]
-                ],
-                'expects'      => 'output_filters_3.yml',
-                'replacements' => 'replaceUserIdsInExpectation',
-                'identifier'   => 'username'
-            ],
-            'filter by field of related entity with no result'                                             => [
-                'className'  => TestEmployee::class,
-                'statusCode' => 200,
-                'params'     => [
-                    'filter' => [
-                        'department' => 999999999999999
-                    ],
-                    'page'   => [
-                        'size' => 3
-                    ]
-                ],
-                'expects'    => ['data' => []],
-            ],
-            'filter by wrong field name'                                                                   => [
-                'className'  => TestEmployee::class,
-                'statusCode' => 400,
-                'params'     => [
-                    'filter' => [
-                        'wrongFieldName' => 'value'
-                    ],
-                    'page'   => [
-                        'size' => 3
-                    ]
-                ],
-                'expects'    => [
-                    'errors' => [
-                        [
-                            'status' => '400',
-                            'title'  => 'filter constraint',
-                            'detail' => 'The filter is not supported.',
-                            'source' => [
-                                'parameter' => 'filter[wrongFieldName]'
-                            ]
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee1->id)>',
+                        'attributes' => [
+                            'name' => 'TestEmployee1'
                         ]
                     ]
-                ],
+                ]
             ],
-            'filter by field of related entity (employee.department)'                                      => [
-                'className'    => TestEmployee::class,
-                'statusCode'   => 200,
-                'params'       => [
-                    'filter' => [
-                        'department.name' => 'TestDepartment1'
-                    ],
-                    'page'   => [
-                        'size' => 3
+            $response
+        );
+    }
+
+    public function testFilterByFieldOfAssociation()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter' => ['department.name' => 'TestDepartment2']]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee2->id)>',
+                        'attributes' => [
+                            'name' => 'TestEmployee2'
+                        ]
                     ]
-                ],
-                'expects'      => 'output_filters_1.yml',
-                'replacements' => 'replaceTestEmployeeIdsInExpectation',
-                'identifier'   => 'name'
+                ]
             ],
-        ];
+            $response
+        );
     }
 
-    /**
-     * @param array  $expectation
-     * @param string $identifier
-     *
-     * @return array
-     */
-    protected function replaceTestEmployeeIdsInExpectation(array $expectation, $identifier)
+    public function testFilterByFieldOfSecondLevelAssociation()
     {
-        foreach ($expectation['data'] as $index => $data) {
-            $referenceName = $data['attributes'][$identifier];
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter' => ['department.owner.name' => '@business_unit->name']]
+        );
 
-            /** @var TestEmployee $referenceObject */
-            $referenceObject = $this->getReference($referenceName);
-            $expectation['data'][$index]['id'] = (string) $referenceObject->getId();
-            $expectation['data'][$index]['relationships']['department']['data']['id']
-                = (string) $referenceObject->getDepartment()->getId();
-        }
-
-        return $expectation;
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee1->id)>',
+                        'attributes' => [
+                            'name' => 'TestEmployee1'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
     }
 
-    /**
-     * @param array  $expectation
-     * @param string $identifier
-     *
-     * @return array
-     */
-    protected function replaceUserIdsInExpectation(array $expectation, $identifier)
+    public function testFilterByWrongFieldName()
     {
-        foreach ($expectation['data'] as $index => $data) {
-            $referenceName = $data['attributes'][$identifier];
+        $response = $this->cget(
+            ['entity' => $this->getEntityType(TestEmployee::class)],
+            ['filter' => ['wrongFieldName' => 'value']],
+            [],
+            false
+        );
 
-            /** @var User $referenceObject */
-            $referenceObject = $this->getReference($referenceName);
-            $expectation['data'][$index]['id'] = (string) $referenceObject->getId();
-        }
-
-        return $expectation;
+        self::assertResponseStatusCodeEquals($response, 400);
+        $this->assertResponseContains(
+            [
+                'errors' => [
+                    [
+                        'status' => '400',
+                        'title'  => 'filter constraint',
+                        'detail' => 'The filter is not supported.',
+                        'source' => [
+                            'parameter' => 'filter[wrongFieldName]'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
     }
 }

@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Model;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 
+/**
+ * @property OrganizationInterface $organization
+ */
 abstract class ExtendRole extends AbstractRole
 {
     /**

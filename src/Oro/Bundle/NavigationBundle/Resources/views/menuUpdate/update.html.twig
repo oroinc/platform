@@ -43,7 +43,7 @@
                     'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
                 }) }}
             {% else %}
-                {% if menuItem.displayed %}
+                {% if entity.active %}
                     {# Hide button #}
                     <div class="pull-right btn-group icons-holder">
                         {{ UI.ajaxButton({

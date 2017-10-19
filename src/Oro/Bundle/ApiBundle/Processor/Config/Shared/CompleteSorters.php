@@ -33,10 +33,50 @@ class CompleteSorters extends CompleteSection
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $fields = array_merge(
-            array_keys($this->doctrineHelper->getIndexedFields($metadata)),
+        $this->completeSorters(
+            $section,
+            $definition,
+            $definition->getIdentifierFieldNames()
+        );
+        $this->completeSortersByPropertyPath(
+            $section,
+            $definition,
+            array_keys($this->doctrineHelper->getIndexedFields($metadata))
+        );
+        $this->completeSortersByPropertyPath(
+            $section,
+            $definition,
             array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
         );
+    }
+
+    /**
+     * @param EntityConfigInterface  $section
+     * @param EntityDefinitionConfig $definition
+     * @param string[]               $fields
+     */
+    protected function completeSorters(
+        EntityConfigInterface $section,
+        EntityDefinitionConfig $definition,
+        array $fields
+    ) {
+        foreach ($fields as $fieldName) {
+            if ($definition->hasField($fieldName)) {
+                $section->getOrAddField($fieldName);
+            }
+        }
+    }
+
+    /**
+     * @param EntityConfigInterface  $section
+     * @param EntityDefinitionConfig $definition
+     * @param string[]               $fields
+     */
+    protected function completeSortersByPropertyPath(
+        EntityConfigInterface $section,
+        EntityDefinitionConfig $definition,
+        array $fields
+    ) {
         foreach ($fields as $propertyPath) {
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
             if ($fieldName) {

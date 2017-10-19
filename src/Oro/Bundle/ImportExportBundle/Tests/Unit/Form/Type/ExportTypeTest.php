@@ -31,28 +31,33 @@ class ExportTypeTest extends FormIntegrationTestCase
         $this->exportType = new ExportType($this->processorRegistry);
     }
 
-    public function testSubmit()
-    {
+    /**
+     * @param array $processorAliasesFromRegistry
+     * @param array $processorAliasesPassedToForm
+     * @param array $expectedChoices
+     * @param       $usedAlias
+     * @dataProvider processorAliassesDataProvider
+     */
+    public function testSubmit(
+        array $processorAliasesFromRegistry,
+        $processorAliasesPassedToForm,
+        array $expectedChoices,
+        $usedAlias
+    ) {
         $entityName = 'TestEntity';
-        $processorAliases = [
-            'first_alias',
-            'second_alias'
-        ];
-        $expectedChoices = [
-            new ChoiceView('first_alias', 'first_alias', 'oro.importexport.export.first_alias'),
-            new ChoiceView('second_alias', 'second_alias', 'oro.importexport.export.second_alias')
-        ];
-        $usedAlias = 'second_alias';
 
         $this->processorRegistry->expects($this->any())
             ->method('getProcessorAliasesByEntity')
             ->with(ProcessorRegistry::TYPE_EXPORT, $entityName)
-            ->willReturn($processorAliases);
+            ->willReturn($processorAliasesFromRegistry);
 
-        $form = $this->factory->create($this->exportType, null, ['entityName' => $entityName]);
+        $form = $this->factory->create($this->exportType, null, [
+            'entityName' => $entityName,
+            'processorAlias' => $processorAliasesPassedToForm
+        ]);
 
         $processorAliasConfig = $form->get('processorAlias')->getConfig();
-        $this->assertEquals('oro.importexport.export.processor', $processorAliasConfig->getOption('label'));
+        $this->assertEquals('oro.importexport.export.popup.options.label', $processorAliasConfig->getOption('label'));
         $this->assertEquals(
             $expectedChoices,
             $form->get('processorAlias')->createView()->vars['choices']
@@ -67,5 +72,45 @@ class ExportTypeTest extends FormIntegrationTestCase
         $data = $form->getData();
         $this->assertInstanceOf(ExportData::class, $data);
         $this->assertEquals($usedAlias, $data->getProcessorAlias());
+    }
+
+    /**
+     * @return array
+     */
+    public function processorAliassesDataProvider()
+    {
+        return [
+            [
+                ['first_alias', 'second_alias'],
+                ['first_alias', 'second_alias'],
+                [
+                    new ChoiceView('first_alias', 'first_alias', 'oro.importexport.export.first_alias'),
+                    new ChoiceView('second_alias', 'second_alias', 'oro.importexport.export.second_alias')
+                ],
+                'second_alias'
+            ],
+            [
+                ['first_alias', 'second_alias', 'third_alias'],
+                ['first_alias'],
+                [
+                    new ChoiceView('first_alias', 'first_alias', 'oro.importexport.export.first_alias')
+                ],
+                'first_alias'
+            ],
+            [
+                ['first_alias', 'second_alias', 'third_alias'],
+                'first_alias',
+                [
+                    new ChoiceView('first_alias', 'first_alias', 'oro.importexport.export.first_alias')
+                ],
+                'first_alias'
+            ],
+            [
+                [],
+                ['first_alias'],
+                [],
+                null
+            ],
+        ];
     }
 }

@@ -1,15 +1,35 @@
 ## 2.5.0 (Unreleased)
 
 ### Added
+#### ActivityListBundle
+* Added `ActivityConditionView` as substitution for removed `oroactivity.activityCondition` jQuery widget.
+#### ApiBundle
+* Added an additional syntax for data filters: `key[operator_name]=value`. For example `GET /api/users?filter[id][neq]=2` can be used instead of `GET /api/users?filter[id]!=2`. The supported operators are `eq`, `neq`, `lt`, `lte`, `gt` and `gte`.
+* Added a possibility to specify **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
+* Added a possibility to configure own identifier field(s) instead of the database primary key. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#using-a-non-primary-key-to-identify-entity)
+* Added filters for the following data types: `smallint`, `date`, `time`, `guid`, `percent`, `money` and `duration`
+#### DataAuditBundle
+* Added `DataAuditConditionView` as substitution for removed `oroauditquerydesigner.dataAuditCondition` jQuery widget.
 #### EntityConfigBundle
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
+#### QueryDesignerBundle
+* Added `ConditionBuilderView` as substitution for removed `oroquerydesigner.conditionBuilder` jQuery widget.
+* Added `AbstractConditionView` and `FieldConditionView`  as substitution for removed `oroquerydesigner.fieldCondition` jQuery widget.
+* Added `AggregatedFieldConditionView` as substitution for removed `oroauditquerydesigner.aggregatedFieldCondition` jQuery widget.
+#### SyncBundle
+* Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
 ### Changed
+#### ApiBundle
+* Class `Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig`
+    * method `hasDocumentationResource` was renamed to `hasDocumentationResources`
+    * method `getDocumentationResource` was renamed to `getDocumentationResources`
+    * method `setDocumentationResource` was renamed to `setDocumentationResources`
 #### EntityConfigBundle
-* Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
+* Implementation should be registered as a service with the `oro_entity_config.attribute_type` tag.
 #### MessageQueue Component
 * Interface `Oro\Component\MessageQueue\Job\ExtensionInterface`
     * renamed method `onCreateDelayed` to `onPostCreateDelayed`
@@ -19,11 +39,24 @@
 * Entity `Oro\Bundle\WebsiteSearchBundle\Entity\IndexDecimal`:
     * changed decimal field `value`:
         * `precision` changed from `10` to `21`.
-        * `scale` changed from `2` to `6`.  
+        * `scale` changed from `2` to `6`.
+* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](./src/Oro/Bundle/SearchBundle/Resources/doc/date-time-formatter.md) 
+#### WorkflowBundle
+* The property `restrictions` was excluded from output results of the method "Get Workflow Definition" (`/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}`).
 ### Deprecated
 #### SearchBundle
 * Class `Oro/Bundle/SearchBundle/Engine/Orm/DBALPersistenceDriverTrait` is deprecated. The functionality was merged into `BaseDriver`
 ### Removed
+#### ActivityListBundle
+* Refactored setup of ActivityCondition for QueryDesigner's ConditionBuilder. 
+    * jQuery widget `oroactivity.activityCondition` replaced with `ActivityConditionView` Backbone view, removed unused extensions support in its options.
+    * Removed class `Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener`.
+#### DataAuditBundle
+* jQuery widget `oroauditquerydesigner.dataAuditCondition` replaced with `DataAuditConditionView` Backbone view.
+#### QueryDesignerBundle
+* jQuery widget `oroquerydesigner.conditionBuilder` replaced with `ConditionBuilderView` Backbone view.
+* jQuery widget `oroquerydesigner.fieldCondition` refactored into `AbstractConditionView` and `FieldConditionView` Backbone views.
+* jQuery widget `oroauditquerydesigner.aggregatedFieldCondition` replaced with `AggregatedFieldConditionView` Backbone view.
 #### SearchBundle
 * Removed service `oro_search.search.engine.storer`
 #### SecurityBundle
@@ -33,8 +66,10 @@
 * Removed `renderResetButton()` macro from Oro/Bundle/WorkflowBundle/Resources/views/macros.html.twig. Also removed usage of this macro from two files:
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/button.html.twig`
     * `Oro/Bundle/WorkflowBundle/Resources/views/Widget/widget/buttons.html.twig`
+#### OroBehatExtension
+* Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
-## 2.4.0 (Unreleased)
+## 2.4.0 (2017-09-29)
 
 ### Added
 #### CacheBundle

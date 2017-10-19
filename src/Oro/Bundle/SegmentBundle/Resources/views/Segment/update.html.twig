@@ -134,10 +134,10 @@
                 'data': [
                     segmentQD.query_designer_condition_builder({
                         'id': type ~ '-condition-builder',
-                        'criteria_list_id': 'filter-criteria-list',
                         'entity_choice_id': 'oro_segment_form_entity',
                         'currentSegmentId': entity.id|default(null),
-                        'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE')
+                        'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE'),
+                        'metadata': metadata,
                     })
                 ]
             },

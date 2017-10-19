@@ -800,6 +800,15 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: When I scroll to top
+     * @When /^I scroll to top$/
+     */
+    public function scrollTop()
+    {
+        $this->getSession()->executeScript('window.scrollTo(0,0);');
+    }
+
+    /**
      * Click on button in modal window
      * Example: Given I click "Edit" in modal window
      * Example: When I click "Save and Close" in modal window
@@ -1086,6 +1095,20 @@ class OroMainContext extends MinkContext implements
             $result,
             sprintf('Element "%s" is present when it should not', $element)
         );
+    }
+
+    /**
+     * Scrolls page to first element with given text
+     *
+     * @When /^(?:|I )scroll to text "(?P<text>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToText($text)
+    {
+        $this->assertPageContainsText($text);
+        $element = $this->getPage()->find('named', ['content', $text]);
+        if ($element) {
+            $element->focus();
+        }
     }
 
     /**
@@ -1698,5 +1721,17 @@ class OroMainContext extends MinkContext implements
                 "Button with name $item still present on page (link selector, actually)"
             );
         }
+    }
+
+    /**
+     * Scroll element info viewport
+     *
+     * @When /^(?:|I )scroll to "(?P<elementName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )focus on "(?P<elementName>(?:[^"]|\\")*)"$/
+     */
+    public function iScrollToElement($elementName)
+    {
+        $element = $this->elementFactory->createElement($elementName);
+        $element->focus();
     }
 }

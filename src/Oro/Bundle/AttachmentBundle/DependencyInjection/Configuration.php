@@ -41,6 +41,7 @@ EOF;
 image/gif
 image/jpeg
 image/png
+image/svg+xml
 EOF;
 
         SettingsBuilder::append(

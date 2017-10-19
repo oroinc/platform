@@ -278,6 +278,13 @@ services:
         tags:
             - { name: form.type, alias: oro_textlist }
 
+    oro_form.type.textarea:
+        class: 'Oro\Bundle\FormBundle\Form\Type\OroTextareaType'
+        arguments:
+            - '@oro_ui.html_tag_helper'
+        tags:
+            - { name: form.type, alias: oro_textarea }
+
     oro_form.type.oro_entity_create_or_select_inline:
         class: %oro_form.type.oro_entity_create_or_select_inline.class%
         arguments:

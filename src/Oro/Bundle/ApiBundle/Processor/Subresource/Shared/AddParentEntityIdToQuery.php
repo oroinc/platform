@@ -47,6 +47,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             return;
         }
 
+        $parentConfig = $context->getParentConfig();
         $path = ConfigUtil::explodePropertyPath($this->getAssociationName($context));
         $pathLength = count($path);
         $parentJoinAlias = 'e';
@@ -58,7 +59,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
                 $parentClassName = $context->getParentClassName();
                 $isCollection = $context->isCollection();
             } else {
-                $parentFieldConfig = $context->getParentConfig()->findFieldByPath($parentPath, true);
+                $parentFieldConfig = $parentConfig->findFieldByPath($parentPath, true);
                 $parentClassName = $parentFieldConfig->getTargetClass();
                 $isCollection = $parentFieldConfig->getTargetEntity()
                     ->findField($fieldName, true)
@@ -74,9 +75,32 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             );
             $parentJoinAlias = $joinAlias;
         }
-        $query
-            ->andWhere(sprintf('%s = :parent_entity_id', $parentJoinAlias))
-            ->setParameter('parent_entity_id', $context->getParentId());
+
+        $parentId = $context->getParentId();
+        $parentIdFieldNames = $parentConfig->getIdentifierFieldNames();
+        if (!is_array($parentId) && count($parentIdFieldNames) === 1) {
+            $query
+                ->andWhere(sprintf(
+                    '%s.%s = :parent_entity_id',
+                    $parentJoinAlias,
+                    $parentConfig->getField($parentIdFieldNames[0])->getPropertyPath($parentIdFieldNames[0])
+                ))
+                ->setParameter('parent_entity_id', $parentId);
+        } else {
+            $i = 0;
+            foreach ($parentIdFieldNames as $fieldName) {
+                $i++;
+                $parameterName = sprintf('parent_entity_id%d', $i);
+                $query
+                    ->andWhere(sprintf(
+                        '%s.%s = :%s',
+                        $parentJoinAlias,
+                        $parentConfig->getField($fieldName)->getPropertyPath($fieldName),
+                        $parameterName
+                    ))
+                    ->setParameter($parameterName, $parentId[$fieldName]);
+            }
+        }
     }
 
     /**
