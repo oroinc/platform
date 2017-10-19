@@ -12,3 +12,7 @@ Feature: Commerce admin area MUST NOT contain XSS vulnerabilities on all accessi
   Scenario: Check store front profile pages for XSS vulnerability
     When I visiting pages listed in "backend sales urls"
     Then I should not get XSS vulnerabilities
+
+  Scenario: Check store front profile pages for XSS vulnerability
+    When I visiting pages listed in "backend customers urls"
+    Then I should not get XSS vulnerabilities

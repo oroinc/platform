@@ -26,3 +26,9 @@ urls:
     - { route: 'oro_pricing_price_list_create' }
     - { route: 'oro_pricing_price_list_view', parameters: { id: '@pricelist.id' } }
     - { route: 'oro_pricing_price_list_update', parameters: { id: '@pricelist.id' } }
+
+    # Payment Terms
+    - { route: 'oro_payment_term_index' }
+    - { route: 'oro_payment_term_create' }
+    - { route: 'oro_payment_term_view', parameters: { id: '@paymentTerm.id' } }
+    - { route: 'oro_payment_term_update', parameters: { id: '@paymentTerm.id' } }
