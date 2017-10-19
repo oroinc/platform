@@ -108,7 +108,7 @@ class SyncProcessor extends AbstractSyncProcessor
                     continue;
                 }
                 $status = $this->processIntegrationConnector($integration, $connector, $parameters);
-                $this->onProcessIntegrationConnector($status);
+                $this->onProcessIntegrationConnector($connector, $parameters, $status);
 
                 $isSuccess = $isSuccess && $this->isIntegrationConnectorProcessSuccess($status);
                 $processedConnectorStatuses[$connector->getType()] = $status;
@@ -122,9 +122,11 @@ class SyncProcessor extends AbstractSyncProcessor
     }
 
     /**
+     * @param ConnectorInterface $connector
+     * @param array $parameters
      * @param Status $status
      */
-    protected function onProcessIntegrationConnector(Status $status)
+    protected function onProcessIntegrationConnector(ConnectorInterface $connector, array $parameters, Status $status)
     {
     }
 
