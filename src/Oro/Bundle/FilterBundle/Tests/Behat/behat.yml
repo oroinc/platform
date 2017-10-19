@@ -1,7 +1,7 @@
 oro_behat_extension:
   elements:
     FiltersConditionBuilder:
-      selector: ".ui-widget-oroquerydesigner-condition-builder"
+      selector: ".condition-builder .condition-container"
     FilterConditionDropdown:
       selector:
         type: xpath
@@ -11,7 +11,7 @@ oro_behat_extension:
     LastConditionItem:
         selector:
             type: 'xpath'
-            locator: "//div[contains(@id, '-condition-builder')]//a[contains(., 'Choose')][last()]"
+            locator: "//div[contains(@class, 'condition-container')]//a[contains(., 'Choose')][last()]"
   suites:
     OroFilterBundle:
       contexts:

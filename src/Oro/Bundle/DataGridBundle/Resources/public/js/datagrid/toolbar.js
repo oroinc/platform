@@ -92,12 +92,10 @@ define([
             }
 
             if (options.addSorting) {
-                this.subviews.sortingDropdown = new this.sortingDropdown(
-                    _.defaults({
-                        collection: this.collection,
-                        columns: options.columns
-                    }, options.addSorting)
-                );
+                this.subviews.sortingDropdown = new this.sortingDropdown({
+                    collection: this.collection,
+                    columns: options.columns
+                });
             }
 
             if (options.actions) {
