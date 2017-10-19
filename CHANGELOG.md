@@ -10,8 +10,13 @@
 * Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
 #### MessageQueue Component
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
+* Added Stale Jobs functionality
+    * Added method `setJobConfigurationProvider` to `Oro\Component\MessageQueue\Job\JobProcessor`
+    * Added new state oro.message_queue_job.status.stale
+    * Added new interface `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` 
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
+* Added configuration for Stale Jobs
 #### SyncBundle
 * Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
 ### Changed
