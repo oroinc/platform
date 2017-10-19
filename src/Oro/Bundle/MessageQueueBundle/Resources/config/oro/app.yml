@@ -14,6 +14,9 @@ oro_message_queue:
         - 'oro_message_queue.job.calculate_root_job_status_processor'
         - 'oro_message_queue.job.calculate_root_job_progress_processor'
         - 'oro_message_queue.job.dependent_job_processor'
+    time_before_stale:
+        default: 1800
+        jobs: ~
 
 monolog:
     channels:

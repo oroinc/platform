@@ -9,7 +9,12 @@ use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\Topics;
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class JobProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeCreatedWithRequiredArguments()
@@ -121,6 +126,97 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->findOrCreateRootJob('owner-id', 'job-name', true);
 
         $this->assertSame($job, $result);
+    }
+
+    public function testShouldCatchDuplicateCheckIfItIsStaleAndChangeStatus()
+    {
+        $job = new Job();
+        $job->setChildJobs([]);
+
+        $jobConfigurationProvider = $this->createJobConfigurationProviderMock();
+        $jobConfigurationProvider
+            ->expects($this->once())
+            ->method('getTimeBeforeStaleForJobName')
+            ->will($this->returnValue('0'));
+
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('createJob')
+            ->will($this->returnValue($job));
+
+        $storage
+            ->method('saveJob')
+            ->willReturnOnConsecutiveCalls($this->throwException(new DuplicateJobException()), $job);
+
+        $storage
+            ->expects($this->once())
+            ->method('findRootJobByJobNameAndStatuses')
+            ->willReturn($job);
+
+        $storage
+            ->expects($this->once())
+            ->method('findRootJobByOwnerIdAndJobName');
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
+        $processor->setJobConfigurationProvider($jobConfigurationProvider);
+
+        $result = $processor->findOrCreateRootJob('owner-id', 'job-name', true);
+
+        $this->assertSame($job, $result);
+    }
+
+    public function testStaleRootJobAndChildrenWillChangeStatusForRootAndRunningChildren()
+    {
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $childJob1 = new Job();
+        $childJob1->setId(11);
+        $childJob1->setStatus(Job::STATUS_RUNNING);
+        $childJob1->setRootJob($rootJob);
+        $childJob2 = new Job();
+        $childJob2->setId(12);
+        $childJob2->setStatus(Job::STATUS_SUCCESS);
+        $childJob2->setRootJob($rootJob);
+        $rootJob->addChildJob($childJob1);
+        $rootJob->addChildJob($childJob2);
+        $storage = $this->createJobStorage();
+
+        $storage
+            ->method('findJobById')
+            ->withConsecutive([1], [11], [12])
+            ->willReturnOnConsecutiveCalls($rootJob, $childJob1, $childJob2);
+
+        $storage
+            ->expects($this->at(0))
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
+            }));
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
+        $processor->staleRootJobAndChildren($rootJob);
+        $this->assertSame(Job::STATUS_STALE, $rootJob->getStatus());
+        $this->assertSame(Job::STATUS_STALE, $childJob1->getStatus());
+        $this->assertSame(Job::STATUS_SUCCESS, $childJob2->getStatus());
+    }
+
+    public function testStaleRootJobAndChildrenShouldThrowForNonRootJob()
+    {
+        $rootJob = new Job();
+        $childJob = new Job();
+        $childJob->setRootJob($rootJob);
+        $childJob->setStatus(Job::STATUS_RUNNING);
+        $storage = $this->createJobStorage();
+
+        $storage
+            ->expects($this->never())
+            ->method('findJobById');
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Can\'t stale child jobs. id: ""');
+        $processor->staleRootJobAndChildren($childJob);
     }
 
     public function testCreateChildJobShouldThrowIfNameIsEmpty()
@@ -277,7 +373,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -346,7 +442,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -359,7 +455,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->exactly(2))
+            ->expects($this->any())
             ->method('send')
         ;
 
@@ -416,7 +512,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -486,7 +582,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->createJobStorage();
         $storage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -499,7 +595,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->exactly(2))
+            ->expects($this->any())
             ->method('send')
         ;
 
@@ -626,7 +722,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('saveJob')
             ->with($childNewJob);
         $storage
-            ->expects($this->at(3))
+            ->expects($this->at(4))
             ->method('saveJob')
             ->with($childRedeliveredJob);
 
@@ -745,5 +841,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     private function createMessageProducerMock()
     {
         return $this->createMock(MessageProducer::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobConfigurationProviderInterface
+     */
+    private function createJobConfigurationProviderMock()
+    {
+        return $this->createMock(JobConfigurationProviderInterface::class);
     }
 }
