@@ -659,15 +659,19 @@ abstract class BaseDriver implements DBALPersisterInterface
         $fieldParameter = 'field' . $index;
         $qb->setParameter($fieldParameter, $fieldName);
 
-        $joinCondition = "$joinAlias.field = :$fieldParameter";
+        if (is_array($fieldName)) {
+            $joinCondition = "$joinAlias.field IN (:$fieldParameter)";
+        } else {
+            $joinCondition = "$joinAlias.field = :$fieldParameter";
+        }
+
+        $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
 
         switch ($condition) {
             case Query::OPERATOR_EXISTS:
-                $qb->innerJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
-                return null;
+                return "$joinAlias.id IS NOT NULL";
 
             case Query::OPERATOR_NOT_EXISTS:
-                $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
                 return "$joinAlias.id IS NULL";
 
             default:
