@@ -8,8 +8,7 @@
 {% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
 {% set exportAllowed = hasExportProcessor and is_granted('oro_importexport_export') %}
 {% if exportAllowed %}
-    {% set isExportPopupRequired = exportProcessor is iterable %}
-    {% set exportProcessor = exportProcessor is iterable ? exportProcessor[0] : exportProcessor %}
+    {% set isExportPopupRequired = exportProcessor is iterable and exportProcessor|length > 1 %}
 {% endif %}
 {% set exportLabel = exportLabel|default('oro.importexport.export.label'|trans) %}
 

@@ -20,7 +20,7 @@ class FieldConfigModelRepository extends EntityRepository
             return [];
         }
 
-        $attributes = $this->getBaseAttrubuteQueryBuilderByIds($ids)
+        $attributes = $this->getBaseAttributeQueryBuilderByIds($ids)
             ->indexBy('f', 'f.id')
             ->getQuery()
             ->getResult();
@@ -34,7 +34,7 @@ class FieldConfigModelRepository extends EntityRepository
      */
     public function getAttributesByIdsWithIndex(array $ids)
     {
-        $attributes = $this->getBaseAttrubuteQueryBuilderByIds($ids)
+        $attributes = $this->getBaseAttributeQueryBuilderByIds($ids)
             ->indexBy('f', 'f.id')
             ->getQuery()
             ->getResult();
@@ -104,7 +104,7 @@ class FieldConfigModelRepository extends EntityRepository
      * @param array $ids
      * @return \Doctrine\ORM\QueryBuilder
      */
-    private function getBaseAttrubuteQueryBuilderByIds(array $ids)
+    private function getBaseAttributeQueryBuilderByIds(array $ids)
     {
         $queryBuilder = $this->getBaseAttributeQueryBuilder()
             ->andWhere('f.id IN (:ids)')

@@ -12,8 +12,6 @@ Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
       create: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
       update: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
       delete: '<p>Description for NAME field for DELETE action</p>'
-    createdat: []
-    updatedat: []
   filters:
     id: 'Description for ID filter'
     name: 'Description for NAME filter'
@@ -22,7 +20,6 @@ Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
   subresources:
     contacts:
         get_subresource: '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>'
-Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group: []
 Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Emphasize_In_Class_Name:
   fields:
     emphasize_in_field_name:

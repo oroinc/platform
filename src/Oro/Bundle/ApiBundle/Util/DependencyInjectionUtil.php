@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -144,6 +145,7 @@ class DependencyInjectionUtil
         $debugServiceClassName = 'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor'
     ) {
         $definition = $container->findDefinition($serviceId);
+        $isPublic = $definition->isPublic();
         $definition->setPublic(false);
         $container->setDefinition($serviceId . '.debug.parent', $definition);
         $debugDefinition = new Definition(
@@ -155,6 +157,6 @@ class DependencyInjectionUtil
         );
         $debugDefinition->setPublic(false);
         $container->setDefinition($serviceId . '.debug', $debugDefinition);
-        $container->setAlias($serviceId, $serviceId . '.debug');
+        $container->setAlias($serviceId, new Alias($serviceId . '.debug', $isPublic));
     }
 }

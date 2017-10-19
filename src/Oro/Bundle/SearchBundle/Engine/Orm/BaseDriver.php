@@ -11,6 +11,7 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
@@ -206,6 +207,61 @@ abstract class BaseDriver implements DBALPersisterInterface
         $qb->select($qb->expr()->countDistinct('search.id'));
 
         return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param Query $query
+     * @return array
+     */
+    public function getAggregatedData(Query $query)
+    {
+        $aggregatedData = [];
+        foreach ($query->getAggregations() as $name => $options) {
+            $field = $options['field'];
+            $function = $options['function'];
+            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($field);
+
+            // prepare query builder to apply grouping
+            $aggregatedQuery = clone $query;
+            $aggregatedQuery->select($field);
+            $queryBuilder = $this->getRequestQB($aggregatedQuery, false);
+            /** @var Select $fieldSelectExpression */
+            $fieldSelectExpression = $queryBuilder->getDQLPart('select')[1];
+            $fieldSelect = (string)$fieldSelectExpression;
+            $queryBuilder->resetDQLPart('select');
+
+            switch ($function) {
+                case Query::AGGREGATE_FUNCTION_COUNT:
+                    $queryBuilder->select([
+                        $fieldSelect,
+                        sprintf('%s as countValue', $queryBuilder->expr()->countDistinct('search.id'))
+                    ]);
+                    $queryBuilder->groupBy($fieldName);
+
+                    foreach ($queryBuilder->getQuery()->getArrayResult() as $row) {
+                        $key = $row[$fieldName];
+                        // skip null values to maintain similar behaviour cross all engines
+                        if (null !== $key) {
+                            $aggregatedData[$name][(string)$key] = (int)$row['countValue'];
+                        }
+                    }
+                    break;
+
+                case Query::AGGREGATE_FUNCTION_MAX:
+                case Query::AGGREGATE_FUNCTION_MIN:
+                case Query::AGGREGATE_FUNCTION_AVG:
+                case Query::AGGREGATE_FUNCTION_SUM:
+                    $fieldSelect = explode(' as ', $fieldSelect)[0];
+                    $queryBuilder->select(sprintf('%s(%s)', $function, $fieldSelect));
+                    $aggregatedData[$name] = (float)$queryBuilder->getQuery()->getSingleScalarResult();
+                    break;
+
+                default:
+                    throw new \LogicException(sprintf('Aggregating function %s is not suppored', $function));
+            }
+        }
+
+        return $aggregatedData;
     }
 
     /**
@@ -603,15 +659,19 @@ abstract class BaseDriver implements DBALPersisterInterface
         $fieldParameter = 'field' . $index;
         $qb->setParameter($fieldParameter, $fieldName);
 
-        $joinCondition = "$joinAlias.field = :$fieldParameter";
+        if (is_array($fieldName)) {
+            $joinCondition = "$joinAlias.field IN (:$fieldParameter)";
+        } else {
+            $joinCondition = "$joinAlias.field = :$fieldParameter";
+        }
+
+        $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
 
         switch ($condition) {
             case Query::OPERATOR_EXISTS:
-                $qb->innerJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
-                return null;
+                return "$joinAlias.id IS NOT NULL";
 
             case Query::OPERATOR_NOT_EXISTS:
-                $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
                 return "$joinAlias.id IS NULL";
 
             default:

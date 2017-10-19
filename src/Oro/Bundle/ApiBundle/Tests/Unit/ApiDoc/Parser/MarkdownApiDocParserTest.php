@@ -6,6 +6,7 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,22 +62,22 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
         return [
             'known action'                     => [
                 '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'get_list'
             ],
             'names should be case insensitive' => [
                 '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'GET_LIST'
             ],
             'unknown action'                   => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'unknown'
             ],
             'unknown actions group'            => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                Entity\Group::class,
                 'get'
             ],
             'unknown class'                    => [
@@ -105,59 +106,59 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
         return [
             'only common doc exists'                                               => [
                 '<p>Description for ID field</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'id',
                 'get'
             ],
             'only common doc exists (requested common doc)'                        => [
                 '<p>Description for ID field</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'id'
             ],
             'common doc should be used'                                            => [
                 '<p>Description for NAME field</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'name',
                 'get'
             ],
             'common doc should be used (requested common doc)'                     => [
                 '<p>Description for NAME field</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'name'
             ],
             'action doc should be used'                                            => [
                 '<p>Description for NAME field for DELETE action</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'name',
                 'delete'
             ],
             'action doc should be used (the first action in #### create, update)'  => [
                 '<p>Description for NAME field for CREATE and UPDATE actions</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'name',
                 'create'
             ],
             'action doc should be used (the second action in #### create, update)' => [
                 '<p>Description for NAME field for CREATE and UPDATE actions</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'name',
                 'update'
             ],
             'names should be case insensitive'                                     => [
                 '<p>Description for NAME field for CREATE and UPDATE actions</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'NAME',
                 'CREATE'
             ],
             'unknown field'                                                        => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'unknown',
                 'get'
             ],
             'unknown fields group'                                                 => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                Entity\Group::class,
                 'name',
                 'get'
             ],
@@ -188,22 +189,22 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
         return [
             'known filter'                     => [
                 'Description for NAME filter',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'name'
             ],
             'names should be case insensitive' => [
                 'Description for NAME filter',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'NAME'
             ],
             'unknown field'                    => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'unknown'
             ],
             'unknown filters group'            => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                Entity\Group::class,
                 'name'
             ],
             'unknown class'                    => [
@@ -232,25 +233,25 @@ class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
         return [
             'known sub-resource'               => [
                 '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'contacts',
                 'get_subresource'
             ],
             'names should be case insensitive' => [
                 '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'CONTACTS',
                 'GET_SUBRESOURCE'
             ],
             'unknown sub-resource'             => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account',
+                Entity\Account::class,
                 'unknown',
                 'get_subresource'
             ],
             'unknown subresources group'       => [
                 null,
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                Entity\Group::class,
                 'contacts',
                 'get_subresource'
             ],

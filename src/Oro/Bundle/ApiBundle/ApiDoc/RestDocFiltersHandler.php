@@ -23,14 +23,22 @@ class RestDocFiltersHandler
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var ApiDocDataTypeConverter */
+    protected $dataTypeConverter;
+
     /**
-     * @param RestDocViewDetector $docViewDetector
-     * @param ValueNormalizer     $valueNormalizer
+     * @param RestDocViewDetector     $docViewDetector
+     * @param ValueNormalizer         $valueNormalizer
+     * @param ApiDocDataTypeConverter $dataTypeConverter
      */
-    public function __construct(RestDocViewDetector $docViewDetector, ValueNormalizer $valueNormalizer)
-    {
+    public function __construct(
+        RestDocViewDetector $docViewDetector,
+        ValueNormalizer $valueNormalizer,
+        ApiDocDataTypeConverter $dataTypeConverter
+    ) {
         $this->docViewDetector = $docViewDetector;
         $this->valueNormalizer = $valueNormalizer;
+        $this->dataTypeConverter = $dataTypeConverter;
     }
 
     /**
@@ -144,6 +152,8 @@ class RestDocFiltersHandler
      */
     protected function getFilterType($dataType, $isArrayAllowed)
     {
+        $dataType = $this->dataTypeConverter->convertDataType($dataType);
+
         return $isArrayAllowed
             ? sprintf('%1$s or array of %1$s', $dataType)
             : $dataType;
