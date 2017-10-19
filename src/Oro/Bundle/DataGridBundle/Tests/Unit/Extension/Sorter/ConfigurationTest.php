@@ -38,24 +38,27 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'empty'                => [
                 'configs'  => [[]],
                 'expected' => [
-                    Configuration::COLUMNS_KEY         => [],
-                    Configuration::DEFAULT_SORTERS_KEY => [],
+                    Configuration::COLUMNS_KEY                     => [],
+                    Configuration::DEFAULT_SORTERS_KEY             => [],
+                    Configuration::DISABLE_NOT_SELECTED_OPTION_KEY => false
                 ],
             ],
             'with all options set' => [
                 'configs'  => [[
-                    Configuration::COLUMNS_KEY                 => [],
-                    Configuration::MULTISORT_KEY               => true,
-                    Configuration::DEFAULT_SORTERS_KEY         => [],
-                    Configuration::TOOLBAR_SORTING_KEY         => false,
-                    Configuration::DISABLE_DEFAULT_SORTING_KEY => true,
+                    Configuration::COLUMNS_KEY                     => [],
+                    Configuration::MULTISORT_KEY                   => true,
+                    Configuration::DEFAULT_SORTERS_KEY             => [],
+                    Configuration::TOOLBAR_SORTING_KEY             => false,
+                    Configuration::DISABLE_DEFAULT_SORTING_KEY     => true,
+                    Configuration::DISABLE_NOT_SELECTED_OPTION_KEY => true
                 ]],
                 'expected' => [
-                    Configuration::COLUMNS_KEY                 => [],
-                    Configuration::MULTISORT_KEY               => true,
-                    Configuration::DEFAULT_SORTERS_KEY         => [],
-                    Configuration::TOOLBAR_SORTING_KEY         => false,
-                    Configuration::DISABLE_DEFAULT_SORTING_KEY => true,
+                    Configuration::COLUMNS_KEY                     => [],
+                    Configuration::MULTISORT_KEY                   => true,
+                    Configuration::DEFAULT_SORTERS_KEY             => [],
+                    Configuration::TOOLBAR_SORTING_KEY             => false,
+                    Configuration::DISABLE_DEFAULT_SORTING_KEY     => true,
+                    Configuration::DISABLE_NOT_SELECTED_OPTION_KEY => true
                 ]
             ]
         ];

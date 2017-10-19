@@ -21,7 +21,7 @@
     * method `getDocumentationResource` was renamed to `getDocumentationResources`
     * method `setDocumentationResource` was renamed to `setDocumentationResources`
 #### EntityConfigBundle
-* Implementation should be registered as service with tag `oro_entity_config.attribute_type`.
+* Implementation should be registered as a service with the `oro_entity_config.attribute_type` tag.
 #### MessageQueue Component
 * Interface `Oro\Component\MessageQueue\Job\ExtensionInterface`
     * renamed method `onCreateDelayed` to `onPostCreateDelayed`
@@ -32,6 +32,7 @@
     * changed decimal field `value`:
         * `precision` changed from `10` to `21`.
         * `scale` changed from `2` to `6`.
+* Added the Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter class that should be used to format the \DateTime object in a specific string. [Documentation](./src/Oro/Bundle/SearchBundle/Resources/doc/date-time-formatter.md) 
 #### WorkflowBundle
 * The property `restrictions` was excluded from output results of the method "Get Workflow Definition" (`/api/rest/{version}/workflowdefinition/{workflowDefinition}.{_format}`).
 ### Deprecated
