@@ -8,7 +8,10 @@ use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
@@ -22,6 +25,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use MessageQueueExtension;
+
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
@@ -216,7 +221,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new PreExportMessageProcessor(
             $jobRunner,
-            $this->createMessageProducerMock(),
+            self::getMessageProducer(),
             $tokenSerializer,
             $tokenStorage,
             $dependentJob,
@@ -237,6 +242,26 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PreExportMessageProcessor::ACK, $result);
+        self::assertMessageSent(
+            Topics::EXPORT,
+            new Message(
+                [
+                    'format'       => 'csv',
+                    'batchSize'    => 100,
+                    'parameters'   => [
+                        'gridName'       => 'grid_name',
+                        'gridParameters' => [],
+                        'format_type'    => 'excel'
+                    ],
+                    'exportType'   => 'export',
+                    'securityToken' => 'token',
+                    'jobName'      => 'grid_name',
+                    'outputFormat' => 'csv',
+                    'jobId'        => 10
+                ],
+                MessagePriority::LOW
+            )
+        );
     }
 
     /**
