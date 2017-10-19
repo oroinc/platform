@@ -2,7 +2,7 @@
 @fixture-OroSecurityTestBundle:shipping-method-rule.yml
 @fixture-OroSecurityTestBundle:payment-method.yml
 @fixture-OroSecurityTestBundle:payment-method-rule.yml
-@fixture-OroSecurityTestBundle:frontend-fixtures.yml
+@fixture-OroSecurityTestBundle:commerce-fixtures.yml
 @fixture-OroSecurityTestBundle:order.yml
 Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible pages
 

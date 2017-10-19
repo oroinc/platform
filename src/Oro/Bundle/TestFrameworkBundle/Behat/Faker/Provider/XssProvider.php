@@ -8,6 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider;
 
 class XssProvider extends BaseProvider
 {
+    /**
+     * @var int
+     */
     protected static $idx = 0;
 
     /**

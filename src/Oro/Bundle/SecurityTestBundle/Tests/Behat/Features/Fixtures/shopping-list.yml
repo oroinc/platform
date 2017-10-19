@@ -6,6 +6,7 @@ Oro\Bundle\ShoppingListBundle\Entity\ShoppingList:
         customer: '@company_a'
         customerUser: '@amanda'
         organization: '@organization'
+        website: '@website1'
         label: '<xss("ShoppingList.label")>'
         notes: '<xss("ShoppingList.notes")>'
 

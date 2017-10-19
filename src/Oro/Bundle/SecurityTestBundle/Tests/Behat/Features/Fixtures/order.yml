@@ -14,7 +14,6 @@ Oro\Bundle\OrderBundle\Entity\Order:
         shippingAddress: '@orderAddress'
         poNumber: '<xss("Order.poNumber")>'
         customerNotes: '<xss("Order.customerNotes")>'
-        customerNotes: '<xss("Order.customerNotes")>'
         sourceEntityClass: 'Oro\Bundle\ShoppingListBundle\Entity\ShoppingList'
         sourceEntityId: '@shoppinglist1->id'
         identifier: '<xss("Order.identifier")>'

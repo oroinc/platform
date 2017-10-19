@@ -5,6 +5,7 @@ include:
 Oro\Bundle\PricingBundle\Entity\PriceList:
     pricelist:
         name: '<xss("PriceList.name")>'
+        productAssignmentRule: product.id > 0 and product.sku not matches '<xss("PriceList.productAssignmentRule")>'
         default: true
         setCurrencies: [['USD']]
         active: true
@@ -26,6 +27,24 @@ Oro\Bundle\PricingBundle\Entity\ProductPrice:
         unit: '@item'
         value: 10
         currency: 'USD'
+
+Oro\Bundle\PricingBundle\Entity\PriceRule:
+    price_rule_1:
+        currency: 'USD'
+        quantity: 1
+        productUnit: '@item'
+        ruleCondition: product.id == 0 and product.sku not matches '<xss("PriceRule.ruleCondition")>'
+        rule: product.id not matches '<xss("PriceRule.ruleCondition")>'
+        priceList: '@pricelist'
+        priority: 1
+    price_rule_2:
+        currencyExpression: '<xss("PriceRule.currencyExpression")>'
+        quantityExpression: '<xss("PriceRule.quantityExpression")>'
+        productUnitExpression: '<xss("PriceRule.productUnitExpression")>'
+        ruleCondition: product.id == 0 and product.sku not matches '<xss("PriceRule.ruleCondition")>'
+        rule: product.id not matches '<xss("PriceRule.ruleCondition")>'
+        priceList: '@pricelist'
+        priority: 2
 
 Oro\Bundle\PricingBundle\Entity\PriceListToCustomer:
     priceListToCustomer:
