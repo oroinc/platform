@@ -1,0 +1,27 @@
+<div>
+    <% if (obj.popoverContent) { %>
+    <div class="field-condition-date-popover">
+        <i class="fa-info-circle" data-content="<%= popoverContent %>" data-placement="bottom" data-toggle="popover"></i>
+    </div>
+    <% } %>
+    <span> <%= _.__('oro.filter.embedded.choice.field_to_value') %> </span>
+    <span class="audit-type-filter-container"></span>
+    <span class="value-label"><%= _.__('oro.dataaudit.data_audit_condition.value') %></span>
+    <span class="value-that-label"><%= _.__('oro.dataaudit.data_audit_condition.value_that') %></span>
+    <span class="inner-filter-container"></span>
+    <div class="separator"></div>
+    <span class="audit-filter">
+        <span> <%= _.__('oro.dataaudit.data_audit_condition.in_the_interval') %> </span>
+        <span class="audit-filter-type"><%= parts.join('') %></span>:
+        <div class="audit-filter-container">
+            <div class="filter-start-date">
+                <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
+            </div>
+            <span class="filter-separator">-</span>
+            <div class="filter-end-date">
+                <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
+            </div>
+            <input type="hidden" name="datetime_part" value="value">
+        </div>
+    </span>
+</div>

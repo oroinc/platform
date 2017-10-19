@@ -76,19 +76,7 @@ define([
             AbstractFilter.prototype.initialize.apply(this, arguments);
         },
 
-        /**
-         * Render filter template
-         *
-         * @return {*}
-         */
-        render: function($segmentChoice) {
-            var data = this.choices[this.getValue().value];
-            if (data !== undefined) {
-                data.text = data.label;
-                data.id = 'segment_' + data.value;
-                $segmentChoice.segmentChoice('setSelectedData', data);
-            }
-
+        render: function() {
             return this;
         },
 
@@ -114,6 +102,10 @@ define([
                 type: null,
                 value: this.value.value
             };
+        },
+
+        getSelectedLabel: function() {
+            return _.result(this.choices[this.value.value], 'label');
         }
     });
 
