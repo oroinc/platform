@@ -133,7 +133,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $jobConfigurationProvider
             ->expects($this->once())
             ->method('getTimeBeforeStaleForJobName')
-            ->will($this->returnValue('0 millisecond'));
+            ->will($this->returnValue('0'));
 
         $storage = $this->createJobStorage();
         $storage

@@ -34,10 +34,10 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
         ) {
             return $this->configuration[self::JOBS_ARRAY_KEY][$jobName];
         }
-        preg_match_all("/(\w+)\.*/", $jobName, $jobNameParts);
-        array_pop($jobNameParts[1]);
-        if (count($jobNameParts[1])) {
-            return $this->checkKeyByJobNameOrItsPart(implode(".", $jobNameParts[1]));
+        $jobNameParts = explode(".", $jobName);
+        array_pop($jobNameParts);
+        if (count($jobNameParts)) {
+            return $this->checkKeyByJobNameOrItsPart(implode(".", $jobNameParts));
         }
         return null;
     }
