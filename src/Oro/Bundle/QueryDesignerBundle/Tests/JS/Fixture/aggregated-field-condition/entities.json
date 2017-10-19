@@ -1,0 +1,13 @@
+{
+    "Oro\\Bundle\\AccountBundle\\Entity\\Account": {
+        "label": "Account",
+        "name": "Oro\\Bundle\\AccountBundle\\Entity\\Account",
+        "fields": [
+            {
+                "name": "id",
+                "type": "integer",
+                "label": "Id"
+            }
+        ]
+    }
+}

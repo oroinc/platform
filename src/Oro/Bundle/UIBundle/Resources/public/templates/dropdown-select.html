@@ -1,0 +1,16 @@
+<% if (useButtonGroup) { %>
+    <div class="dropdown btn-group">
+<% } %>
+        <a href="#" class="<%= buttonClass %> dropdown-toggle" data-toggle="dropdown">
+            <span class="current-label"><%= selectedLabel %></span><% if (useCaret) { %> <span class="caret"></span><% } %>
+        </a>
+        <ul class="dropdown-menu">
+            <% _.each(options, function (option) { %>
+                <li<% if (option.selected) { %> class="selected"<% } %>>
+                    <a href="#" data-value="<%- option.value %>"><%- option.label %></a>
+                </li>
+            <% }); %>
+        </ul>
+<% if (useButtonGroup) { %>
+    </div>
+<% } %>

@@ -37,9 +37,8 @@ define(function(require) {
         _create: function() {
             this._on({
                 change: function(e) {
-                    if (e.added) {
-                        this.element.trigger('changed', e.added.id);
-                    }
+                    var id = _.result(e.added, 'id');
+                    this.element.trigger('changed', id);
                 }
             });
 
@@ -88,6 +87,9 @@ define(function(require) {
                     instance = self.element.data('select2');
                     var pagePath = (instance && instance.pagePath) || '';
                     var results = self._select2Data(pagePath);
+                    if (_.isFunction(self.options.select2ResultsCallback)) {
+                        results = self.options.select2ResultsCallback(results);
+                    }
                     return {
                         more: false,
                         pagePath: pagePath,
@@ -133,8 +135,17 @@ define(function(require) {
             var options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
-                template = _.template(options.formatSelectionTemplate);
-                options.formatSelection = $.proxy(function(item) {
+                if (_.isFunction(options.formatSelectionTemplate)) {
+                    template = options.formatSelectionTemplate;
+                } else {
+                    template = _.template(options.formatSelectionTemplate);
+                }
+            } else if (options.formatSelectionTemplateSelector) {
+                template = _.template($(options.formatSelectionTemplateSelector).text());
+            }
+
+            if (template) {
+                options.formatSelection = _.bind(function(item) {
                     var result;
                     if (item !== null) {
                         result = this.formatChoice(item.id, template);
@@ -190,7 +201,11 @@ define(function(require) {
         },
 
         getApplicableConditions: function(fieldId) {
-            return this.util.getApplicableConditions(fieldId);
+            var applicableConditions = this.util.getApplicableConditions(fieldId);
+            if (_.isFunction(this.options.applicableConditionsCallback)) {
+                applicableConditions = this.options.applicableConditionsCallback(applicableConditions, fieldId);
+            }
+            return applicableConditions;
         },
 
         /**

@@ -34,6 +34,8 @@ define(function(require) {
             type: 'input[type="hidden"]:last'
         },
 
+        choiceDropdownSelector: '.choice-filter .dropdown-menu',
+
         /**
          * @property {boolean}
          */
@@ -106,6 +108,11 @@ define(function(require) {
             return this;
         },
 
+        getType: function() {
+            var value = this._readDOMValue();
+            return value.type;
+        },
+
         /**
          * @inheritDoc
          */
@@ -129,6 +136,7 @@ define(function(require) {
             }));
             this._appendFilter($filter);
             this._updateDOMValue();
+            this._updateValueField();
             this._criteriaRenderd = true;
             this._isRenderingInProgress = false;
         },
@@ -255,10 +263,12 @@ define(function(require) {
          * @inheritDoc
          */
         _onValueUpdated: function(newValue, oldValue) {
-            // synchronize choice selector with new value
-            this.$('.choice-filter .dropdown-menu').each(function() {
+            this.$(this.choiceDropdownSelector).each(function() {
                 var $menu = $(this);
                 var name = $menu.data('name') || 'type';
+                if (oldValue[name] === newValue[name]) {
+                    return;
+                }
 
                 $menu.find('li a').each(function() {
                     var item = $(this);

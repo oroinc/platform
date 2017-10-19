@@ -10,27 +10,23 @@ class SegmentConditionBuilderOptionsListenerTest extends \PHPUnit_Framework_Test
     public function testListener()
     {
         $options = [
-            'criteriaListSelector' => '#selector',
-            'entityChoiceSelector' => '#selector2',
-            'onFieldsUpdate' => [
-                'toggleCriteria' => [
-                    'condition-item',
-                    'condition-segment',
-                    'conditions-group',
-                ],
+            'criteriaListSelector' => '.selector',
+            'entityChoiceSelector' => '.selector2',
+            'fieldsRelatedCriteria' => [
+                'condition-item',
+                'condition-segment',
+                'conditions-group',
             ],
         ];
 
         $expectedOptions = [
-            'criteriaListSelector' => '#selector',
-            'entityChoiceSelector' => '#selector2',
-            'onFieldsUpdate' => [
-                'toggleCriteria' => [
-                    'condition-item',
-                    'condition-segment',
-                    'conditions-group',
-                    'condition-data-audit',
-                ],
+            'criteriaListSelector' => '.selector',
+            'entityChoiceSelector' => '.selector2',
+            'fieldsRelatedCriteria' => [
+                'condition-item',
+                'condition-segment',
+                'conditions-group',
+                'condition-data-audit',
             ],
         ];
 
