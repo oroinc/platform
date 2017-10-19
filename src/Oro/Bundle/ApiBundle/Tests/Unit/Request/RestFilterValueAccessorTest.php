@@ -448,6 +448,19 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFilterFromQueryStringShouldOverrideFilterFromRequestBody()
+    {
+        $request = Request::create(
+            'http://test.com?prm1=val1',
+            'DELETE',
+            ['prm1' => ['!=' => 'val2']]
+        );
+        $accessor = new RestFilterValueAccessor($request);
+
+        $this->assertCount(1, $accessor->getAll());
+        $this->assertEquals($this->getFilterValue('prm1', 'val1', '=', 'prm1'), $accessor->get('prm1'));
+    }
+
     public function testOverrideExistingFilterValue()
     {
         $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
