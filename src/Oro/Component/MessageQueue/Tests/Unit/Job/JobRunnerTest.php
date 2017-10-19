@@ -295,9 +295,8 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         $jobProcessor->expects($this->once())
             ->method('findOrCreateRootJob')
             ->will($this->returnValue($root));
-        $jobExtension = $this->createJobExtensionMock();
 
-        $jobRunner = new JobRunner($jobProcessor, $jobExtension);
+        $jobRunner = new JobRunner($jobProcessor);
 
         $this->expectException(StaleJobRuntimeException::class);
         $this->expectExceptionMessage('Cannot run jobs in status stale, id: "10"');
@@ -554,9 +553,8 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         $jobProcessor->expects($this->once())
             ->method('findJobById')
             ->will($this->returnValue($job));
-        $jobExtension = $this->createJobExtensionMock();
 
-        $jobRunner = new JobRunner($jobProcessor, $jobExtension);
+        $jobRunner = new JobRunner($jobProcessor);
 
         $this->expectException(StaleJobRuntimeException::class);
         $this->expectExceptionMessage('Cannot run jobs in status stale, id: "11"');
