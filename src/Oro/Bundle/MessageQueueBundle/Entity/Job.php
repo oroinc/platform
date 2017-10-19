@@ -92,6 +92,13 @@ class Job extends BaseJob
     /**
      * @var \DateTime
      *
+     * @ORM\Column(name="last_active_at", type="datetime", nullable=true)
+     */
+    protected $lastActiveAt;
+
+    /**
+     * @var \DateTime
+     *
      * @ORM\Column(name="stopped_at", type="datetime", nullable=true)
      */
     protected $stoppedAt;

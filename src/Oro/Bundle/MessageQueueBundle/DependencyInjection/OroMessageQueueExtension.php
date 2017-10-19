@@ -100,6 +100,7 @@ class OroMessageQueueExtension extends Extension
         }
 
         $this->setPersistenceServicesAndProcessors($config, $container);
+        $this->setJobConfigurationProvider($config, $container);
     }
 
     /**
@@ -132,6 +133,18 @@ class OroMessageQueueExtension extends Extension
         if (!empty($config['persistent_processors'])) {
             $container->getDefinition('oro_message_queue.consumption.container_reset_extension')
                 ->addMethodCall('setPersistentProcessors', [$config['persistent_processors']]);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    protected function setJobConfigurationProvider(array $config, ContainerBuilder $container)
+    {
+        if (!empty($config['time_before_stale'])) {
+            $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
+            $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['time_before_stale']]);
         }
     }
 }

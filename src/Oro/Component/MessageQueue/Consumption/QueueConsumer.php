@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
+use Oro\Component\MessageQueue\Consumption\Exception\RejectMessageExceptionInterface;
 use Psr\Log\NullLogger;
 
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
@@ -129,6 +130,11 @@ class QueueConsumer
                 $session->close();
 
                 return;
+            } catch (RejectMessageExceptionInterface $exception) {
+                $context->setException($exception);
+                $context->getMessageConsumer()->reject($context->getMessage());
+                $session->close();
+                throw $exception;
             } catch (\Exception $exception) {
                 $context->setExecutionInterrupted(true);
                 $context->setException($exception);

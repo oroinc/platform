@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -280,6 +281,35 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         });
     }
 
+    public function testRunUniqueShouldThrowIfStaleJobIsGiven()
+    {
+        $root = new Job();
+        $root->setId(10);
+        $child = new Job();
+        $child->setRootJob($root);
+        $child->setStoppedAt(new \DateTime());
+        $root->addChildJob($child);
+        $root->setStatus(Job::STATUS_STALE);
+
+        $jobProcessor = $this->createJobProcessorMock();
+        $jobProcessor->expects($this->once())
+            ->method('findOrCreateRootJob')
+            ->will($this->returnValue($root));
+        $jobExtension = $this->createJobExtensionMock();
+
+        $jobRunner = new JobRunner($jobProcessor, $jobExtension);
+
+        $this->expectException(StaleJobRuntimeException::class);
+        $this->expectExceptionMessage('Cannot run jobs in status stale, id: "10"');
+        $jobRunner->runUnique(
+            'owner-id',
+            'job-name',
+            function () {
+                return true;
+            }
+        );
+    }
+
     public function testCreateDelayedShouldCreateChildJobAndCallCallback()
     {
         $root = new Job();
@@ -512,6 +542,30 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         $jobRunner->runDelayed('job-id', function (JobRunner $runner, Job $job) {
             return true;
         });
+    }
+
+    public function testRunDelayedShouldThrowIfStaleJobIsGiven()
+    {
+        $job = new Job();
+        $job->setId(11);
+        $job->setStatus(Job::STATUS_STALE);
+
+        $jobProcessor = $this->createJobProcessorMock();
+        $jobProcessor->expects($this->once())
+            ->method('findJobById')
+            ->will($this->returnValue($job));
+        $jobExtension = $this->createJobExtensionMock();
+
+        $jobRunner = new JobRunner($jobProcessor, $jobExtension);
+
+        $this->expectException(StaleJobRuntimeException::class);
+        $this->expectExceptionMessage('Cannot run jobs in status stale, id: "11"');
+        $jobRunner->runDelayed(
+            'job-id',
+            function () {
+                return true;
+            }
+        );
     }
 
     /**
