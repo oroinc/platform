@@ -69,7 +69,7 @@ define(function(require) {
                             '<div data-page-component-name="component-c" ' +
                                 'data-page-component-module="js/needs-a-component" ' +
                                 'data-page-component-options="' + dataAttr({
-                                    requiredSiblingComponents: {
+                                    relatedSiblingComponents: {
                                         componentA: 'component-e'// change component name of dependent on
                                     }
                                 }) + '"></div>',
@@ -141,13 +141,11 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    spyOn(manager, '_handleError');
                     manager.init().then(done);
                 });
 
-                it('check error', function() {
-                    expect(manager._handleError).toHaveBeenCalled();
-                    expect(manager._handleError.calls.mostRecent().args[1].message).toContain('component-b');
+                it('has to be undefined', function() {
+                    expect(manager.get('component-a').componentB).toBeUndefined();
                 });
             });
 
@@ -159,20 +157,20 @@ define(function(require) {
                             '<div data-page-component-name="component-a" ' +
                                 'data-page-component-module="js/needs-b-component" ' +
                                 'data-page-component-options="' + dataAttr({
-                                    requiredSiblingComponents: {
+                                    relatedSiblingComponents: {
                                         componentB: false // attempt to remove dependency over option
                                     }
                                 }) + '"></div>',
+                                '<div data-page-component-name="component-b" ' +
+                                    'data-page-component-module="js/no-needs-component"></div>',
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    spyOn(manager, '_handleError');
                     manager.init().then(done);
                 });
 
-                it('check error', function() {
-                    expect(manager._handleError).toHaveBeenCalled();
-                    expect(manager._handleError.calls.mostRecent().args[1].message).toContain('component-b');
+                it('reference on sibling component nevertheless established', function() {
+                    expect(manager.get('component-a').componentB).toBe(manager.get('component-b'));
                 });
             });
 

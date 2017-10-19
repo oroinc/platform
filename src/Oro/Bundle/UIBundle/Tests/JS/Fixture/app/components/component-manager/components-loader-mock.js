@@ -5,26 +5,26 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     var ComponentNeedsB = BaseComponent.extend({
-        requiredSiblingComponents: {
+        relatedSiblingComponents: {
             componentB: 'component-b'
         }
     });
 
     var ComponentNeedsCE = BaseComponent.extend({
-        requiredSiblingComponents: {
+        relatedSiblingComponents: {
             componentC: 'component-c',
             componentE: 'component-e'
         }
     });
 
     var ComponentNeedsA = BaseComponent.extend({
-        requiredSiblingComponents: {
+        relatedSiblingComponents: {
             componentA: 'component-a'
         }
     });
 
     var ComponentExtendNoNeedA = ComponentNeedsA.extend({
-        requiredSiblingComponents: {
+        relatedSiblingComponents: {
             componentA: false
         }
     });

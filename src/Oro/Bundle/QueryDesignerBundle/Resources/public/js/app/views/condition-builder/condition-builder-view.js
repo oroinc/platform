@@ -427,17 +427,16 @@ define(function(require) {
             var group;
             var condition;
 
-            if (ui.sender && !$.contains(this.el, ui.sender[0]) ||
-                !this._isPlaceholderInValidPosition(ui.item, ui.item)) {
-                $(e.target).sortable('cancel');
-                return;
-            }
-
-            if (ui.sender && ui.sender.is(this.$criteriaList)) {
-                // new condition
-                if (ui.placeholder && ui.placeholder.hasClass('hide')) {
-                    return;
+            if (ui.placeholder && ui.placeholder.hasClass('hide') ||
+                ui.sender && !$.contains(this.el, ui.sender[0]) ||
+                !this._isPlaceholderInValidPosition(ui.item, ui.item)
+            ) {
+                $(ui.sender || e.target).sortable('cancel');
+                if (ui.item.data('clone')) {
+                    ui.item.detach();
                 }
+            } else if (ui.sender && ui.sender.is(this.$criteriaList)) {
+                // new condition
                 var criteria = ui.item.data('criteria');
                 if (criteria !== 'aggregated-condition-item' || this._getConditionsGroupAggregated()) {
                     // regular condition
@@ -449,21 +448,14 @@ define(function(require) {
                 group = this.getConditionViewOfElement(ui.item.parent());
                 condition.$el.insertBefore(ui.item);
                 group.assignConditionSubview(condition);
-            } else {
+            } else if (!ui.sender) {
                 // existing condition rearrange
-                group = this.getConditionViewOfElement(e.target);
+                group = this.getConditionViewOfElement(ui.item.parent());
                 condition = this.getConditionViewOfElement(ui.item);
-                if (!ui.sender && this.getConditionViewOfElement(ui.item.parent()) !== group) {
-                    // parent group change without ui.sender is ignored
-                    // (first execution of pair executions: 1. item is detached, 2. item is attached to new group)
-                    return;
-                } else if (ui.sender) {
-                    // attach to new parent group
-                    var oldGroup = this.getConditionViewOfElement(ui.sender);
-                    if (oldGroup !== group) {
-                        oldGroup.unassignConditionSubview(condition);
-                        group.assignConditionSubview(condition);
-                    }
+                var oldGroup = this.getConditionViewOfElement(e.target);
+                if (oldGroup !== group) {
+                    oldGroup.unassignConditionSubview(condition);
+                    group.assignConditionSubview(condition);
                 }
             }
 

@@ -264,13 +264,13 @@ define(function(require) {
                 return;
             }
 
-            var dependencies = this._getRequiredSiblingComponentNames(Component, options);
+            var dependencies = this._getComponentDependencies(Component, options);
 
             if (_.isEmpty(dependencies)) {
                 this._initializeComponent(initDeferred, options, Component);
             } else {
                 try {
-                    dependencies = this._resolveRequiredSiblingComponent(name, dependencies);
+                    dependencies = this._resolveRelatedSiblings(name, dependencies);
                 } catch (e) {
                     this._handleError(null, e);
                     // prevent interface from blocking by loader
@@ -279,7 +279,7 @@ define(function(require) {
                 }
 
                 $.when.apply($, _.values(dependencies)).then(function() {
-                    options[BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME] = dependencies;
+                    options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME] = dependencies;
                     this._initializeComponent(initDeferred, options, Component);
                 }.bind(this));
             }
@@ -326,11 +326,11 @@ define(function(require) {
          * @return {Object.<string, string>} where key is internal name for component's instance,
          *                                  value is component's name in componentManager
          */
-        _getRequiredSiblingComponentNames: function(Component, options) {
-            var dependencies = BaseComponent.getRequiredSiblingComponentNames(Component);
+        _getComponentDependencies: function(Component, options) {
+            var dependencies = BaseComponent.getRelatedSiblingComponentNames(Component);
 
             // options can only change componentName of existing dependency, can not make it falsy
-            var updateFromOptions = _.result(options, BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME);
+            var updateFromOptions = _.result(options, BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME);
             _.each(updateFromOptions, function(componentName, dependencyName) {
                 if (componentName && dependencies[dependencyName]) {
                     dependencies[dependencyName] = componentName;
@@ -345,10 +345,10 @@ define(function(require) {
          *
          * @param {string} componentName name of current component
          * @param {Object.<string, string>} dependencies
-         * @throws error on circular dependency and missing required sibling
+         * @throws error on circular dependency
          * @return {Object.<string, BaseComponent|Promise|undefined>}
          */
-        _resolveRequiredSiblingComponent: function(componentName, dependencies) {
+        _resolveRelatedSiblings: function(componentName, dependencies) {
             var deps = _.mapObject(dependencies, function(siblingComponentName, dependencyName) {
                 if (this.initPromises[siblingComponentName]) {
                     if (!this._hasCircularDependency(componentName, siblingComponentName)) {
@@ -364,8 +364,7 @@ define(function(require) {
                 } else if (this.get(siblingComponentName)) {
                     return this.get(siblingComponentName);
                 } else {
-                    throw new Error('Can not find required sibling component "' + siblingComponentName +
-                        '" for "' + componentName + '" component');
+                    return void 0;
                 }
             }, this);
 

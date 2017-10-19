@@ -23,9 +23,11 @@ define(function(require) {
             } else {
                 $elem1.insertAfter($elem2);
             }
-            // emulates remove handler of sortable
-            builderView
-                ._onStructureUpdate({target: $sender[0]}, {sender: null, item: $elem1});
+            if (!$sender.is(builderView.$criteriaList)) {
+                // emulates remove handler of sortable
+                builderView
+                    ._onStructureUpdate({target: $sender[0]}, {sender: null, item: $elem1});
+            }
             // emulates update handler of sortable, call handler directly
             builderView
                 ._onStructureUpdate({target: $elem2.parent()[0]}, {sender: $sender, item: $elem1});

@@ -18,7 +18,7 @@ define([
     BaseComponent = function(options) {
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
-        _.extend(this, options[BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME]);
+        _.extend(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
         this.initialize(options);
         this.delegateListeners();
     };
@@ -27,8 +27,8 @@ define([
     _.extend(BaseComponent, {
         /**
          * The component may have a dependency on other components of the same componentManager (siblingComponents)
-         * Dependencies can be declared in the components's prototype as `requiredSiblingComponents` property
-         *      requiredSiblingComponents: {
+         * Dependencies can be declared in the components's prototype as `relatedSiblingComponents` property
+         *      relatedSiblingComponents: {
          *          builder: 'condition-builder',
          *          grid: 'account-grid'
          *      },
@@ -38,12 +38,12 @@ define([
          *
          * Names can be changed over components options
          *      new MyComponent({
-         *          requiredSiblingComponents: {
+         *          relatedSiblingComponents: {
          *              grid: 'my-account-grid'
          *          }
          *      });
          */
-        REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME: 'requiredSiblingComponents',
+        RELATED_SIBLING_COMPONENTS_PROPERTY_NAME: 'relatedSiblingComponents',
 
         /**
          * Takes from Backbone standard extend method
@@ -59,8 +59,8 @@ define([
          *                                  value is component's name in componentManager
          * @static
          */
-        getRequiredSiblingComponentNames: function(Component) {
-            var PROP = BaseComponent.REQUIRED_SIBLING_COMPONENTS_PROPERTY_NAME;
+        getRelatedSiblingComponentNames: function(Component) {
+            var PROP = BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME;
             var dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
             dependencies.push(_.result(Component.prototype, PROP));
             dependencies = _.extend.apply(null, [{}].concat(dependencies));
@@ -124,7 +124,7 @@ define([
             this.unsubscribeAllEvents();
             this.stopListening();
             this.off();
-            var siblingComponents = _.keys(BaseComponent.getRequiredSiblingComponentNames(this.constructor));
+            var siblingComponents = _.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
 
             // dispose and remove all own properties
             _.each(this, function(item, name) {

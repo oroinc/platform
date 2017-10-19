@@ -7,7 +7,7 @@ define([
     'use strict';
 
     var AutoResponseRuleComponent = BaseComponent.extend({
-        requiredSiblingComponents: {
+        relatedSiblingComponents: {
             conditionBuilderComponent: 'condition-builder'
         },
 

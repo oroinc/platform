@@ -19,7 +19,7 @@ define(function(require) {
     require('oroui/js/items-manager/table');
 
     SegmentComponent = BaseComponent.extend({
-        requiredSiblingComponents: {
+        relatedSiblingComponents: {
             conditionBuilderComponent: 'condition-builder'
         },
 
@@ -582,6 +582,10 @@ define(function(require) {
         },
 
         configureFilters: function() {
+            if (!this.conditionBuilderComponent) {
+                // there's no condition builder
+                return;
+            }
             this.conditionBuilderComponent.view.setValue(this.load('filters'));
             this.listenTo(this.conditionBuilderComponent.view, 'change', function(value) {
                 this.save(value, 'filters');

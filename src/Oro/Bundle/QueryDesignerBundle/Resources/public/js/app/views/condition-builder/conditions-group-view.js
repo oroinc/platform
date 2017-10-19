@@ -31,7 +31,7 @@ define(function(require) {
             return _.map(this.$('>.conditions-group>[data-condition-cid]'), function(elem) {
                 var cid = elem.getAttribute('data-condition-cid');
                 var conditionView = this.subview('condition:' + cid);
-                return conditionView.getValue();
+                return conditionView && conditionView.getValue();
             }.bind(this));
         },
 
