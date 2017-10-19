@@ -30,9 +30,13 @@ class GroupChoiceField extends Element
         $values = true === is_array($values) ? $values : [$values];
 
         foreach ($values as $label) {
-            $checkbox = $this->getCheckbox($label);
-            self::assertNotNull($checkbox, sprintf('Can\'t find checkbox with "%s" label', $label));
-            $this->getCheckbox($label)->check();
+            $choice = $this->getChoice($label);
+
+            if ('checkbox' === strtolower($choice->getAttribute('type'))) {
+                $choice->check();
+            } else {
+                $choice->click();
+            }
         }
     }
 
@@ -49,22 +53,26 @@ class GroupChoiceField extends Element
     }
 
     /**
-     * Find all checkboxes and return them with label as array like:
+     * Find all checkboxes or radio buttons and return them with label as array like:
      * array('Label Name' => NodeElement)
      * @return NodeElement[]
      */
     protected function findChoices()
     {
-        $checkboxes = $this->findAll('css', 'input[type=checkbox]');
-        self::assertNotCount(0, $checkboxes, 'Not found any checkboxes in GroupChoiceField');
+        $radioElements = $this->findAll('css', 'input[type=radio]');
+        $checkboxElements = $this->findAll('css', 'input[type=checkbox]');
+
+        $elements = array_merge($radioElements, $checkboxElements);
+
+        self::assertNotCount(0, $elements, 'Not found any checkboxes or radio buttons in GroupChoiceField');
         $choices = [];
 
-        /** @var NodeElement $checkbox */
-        foreach ($checkboxes as $checkbox) {
-            $label = $this->find('css', sprintf('label[for=%s]', $checkbox->getAttribute('id')));
-            self::assertNotNull($label, 'Can\'t find label for checkbox');
+        /** @var NodeElement $element */
+        foreach ($elements as $element) {
+            $label = $this->find('css', sprintf('label[for=%s]', $element->getAttribute('id')));
+            self::assertNotNull($label, 'Can\'t find label for checkbox or radio button');
 
-            $choices[$label->getText()] = $checkbox;
+            $choices[$label->getText()] = $element;
         }
 
         return $choices;
@@ -72,16 +80,19 @@ class GroupChoiceField extends Element
 
     /**
      * @param string $label
-     * @return NodeElement|null
+     * @return NodeElement
      */
-    protected function getCheckbox($label)
+    protected function getChoice($label)
     {
         $choices = array_intersect_key(
             $this->choices,
-            array_flip(preg_grep(sprintf('/%s/i', $label), array_keys($this->choices)))
+            array_flip(preg_grep(sprintf('/%s/i', preg_quote($label)), array_keys($this->choices)))
         );
         self::assertCount(1, $choices, sprintf('Too many results for "%s" label', $label));
 
-        return array_shift($choices);
+        $choice = array_shift($choices);
+        self::assertNotNull($choice, sprintf('Can\'t find checkbox or radio button with "%s" label', $label));
+
+        return $choice;
     }
 }
