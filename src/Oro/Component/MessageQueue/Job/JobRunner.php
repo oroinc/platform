@@ -145,7 +145,6 @@ class JobRunner
         }
     }
 
-
     /**
      * @param Job $rootJob
      *

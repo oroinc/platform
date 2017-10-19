@@ -7,10 +7,11 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
 {
     const JOBS_ARRAY_KEY = 'jobs';
     const JOB_NAME_DEFAULT_KEY = 'default';
+
     /**
      * @var array
      */
-    private $configuration;
+    private $configuration = [];
 
     /**
      * {@inheritdoc}
@@ -20,6 +21,14 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
         return $this->checkKeyByJobNameOrItsPart($jobName)
             ?? $this->configuration[self::JOB_NAME_DEFAULT_KEY]
             ?? null;
+    }
+
+    /**
+     * @param array $jobConfiguration
+     */
+    public function setConfiguration(array $jobConfiguration)
+    {
+        $this->configuration = $jobConfiguration;
     }
 
     /**
@@ -34,18 +43,12 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
         ) {
             return $this->configuration[self::JOBS_ARRAY_KEY][$jobName];
         }
-        $jobNameParts = explode(".", $jobName);
+        $jobNameParts = explode('.', $jobName);
         array_pop($jobNameParts);
         if (count($jobNameParts)) {
-            return $this->checkKeyByJobNameOrItsPart(implode(".", $jobNameParts));
+            return $this->checkKeyByJobNameOrItsPart(implode('.', $jobNameParts));
         }
+
         return null;
-    }
-    /**
-     * @param array $jobConfiguration
-     */
-    public function setConfiguration(array $jobConfiguration)
-    {
-        $this->configuration = $jobConfiguration;
     }
 }

@@ -289,6 +289,7 @@ class Job
     {
         return $this->lastActiveAt;
     }
+
     /**
      * @param \DateTime $lastActiveAt
      *

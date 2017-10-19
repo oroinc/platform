@@ -7,6 +7,13 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
 
+/**
+ * JobProcessor is a main class responsible for processing jobs, shifting it's responsibilities to other classes
+ * is quite difficult and would make it less readable.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class JobProcessor
 {
     /**
@@ -137,14 +144,14 @@ class JobProcessor
      * @param Job $job
      * @return bool
      */
-    protected function isJobStale(Job $job)
+    private function isJobStale(Job $job)
     {
         if ($job->getStatus() === Job::STATUS_STALE) {
             return true;
         }
         $timeBeforeStale = $this->getJobConfigurationProvider()->getTimeBeforeStaleForJobName($job->getName());
         if ($timeBeforeStale !== null && $timeBeforeStale != -1) {
-            return $job->getLastActiveAt() < new \DateTime('- ' . $timeBeforeStale. 'second');
+            return $job->getLastActiveAt() <= new \DateTime('- ' . $timeBeforeStale. ' seconds');
         }
         return false;
     }
@@ -259,7 +266,7 @@ class JobProcessor
     /**
      * @param Job $rootJob
      */
-    public function staleRootJobAndChildren(Job $rootJob)
+    private function staleRootJobAndChildren(Job $rootJob)
     {
         if (!$rootJob->isRoot()) {
             throw new \LogicException(sprintf('Can\'t stale child jobs. id: "%s"', $rootJob->getId()));
