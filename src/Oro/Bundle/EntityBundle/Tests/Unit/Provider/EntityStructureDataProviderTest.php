@@ -35,7 +35,7 @@ class EntityStructureDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(EntityStructureDataProvider::EVENT_OPTIONS, $event)
+            ->with(EntityStructureOptionsEvent::EVENT_NAME, $event)
             ->willReturn($event);
 
         $this->entityWithFieldsProvider

@@ -7,6 +7,8 @@ use Symfony\Component\EventDispatcher\Event;
 
 class EntityStructureOptionsEvent extends Event
 {
+    const EVENT_NAME = 'oro_entity.structure.options';
+
     /** @var array|EntityStructure[] */
     protected $data = [];
 

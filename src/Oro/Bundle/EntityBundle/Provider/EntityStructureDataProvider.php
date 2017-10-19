@@ -9,8 +9,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityStructureDataProvider
 {
-    const EVENT_OPTIONS = 'oro_entity.structure.options';
-
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -39,7 +37,7 @@ class EntityStructureDataProvider
         $event = new EntityStructureOptionsEvent();
         $event->setData($entityStructures);
 
-        return $this->eventDispatcher->dispatch(self::EVENT_OPTIONS, $event)->getData();
+        return $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event)->getData();
     }
 
     /**
