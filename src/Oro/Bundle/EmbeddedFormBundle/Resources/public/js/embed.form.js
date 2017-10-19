@@ -78,7 +78,7 @@ var ORO = (function(ORO) {
                     if (!scripts.hasOwnProperty(k)) {
                         continue;
                     }
-                    
+
                     realTag = document.createElement('script');
 
                     if (scripts[k].hasAttribute('src')) {
