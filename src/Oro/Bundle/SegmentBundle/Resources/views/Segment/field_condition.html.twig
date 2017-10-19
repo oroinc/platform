@@ -1,15 +1,17 @@
 {% set fieldConditionOptions = {
+    filters: params.metadata.filters|default([]),
+    hierarchy: params.metadata.hierarchy|default({}),
     fieldChoice: {
         select2: {
-            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans,
+            formatSelectionTemplateSelector: params.column_chain_template_selector|default(null),
         },
-        fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]'
-    }
-} %}
+        fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]',
+    },
+}|merge_recursive(params.fieldConditionOptions|default({})) %}
 
 <li class="option" data-criteria="condition-item"
-    data-module="oroquerydesigner/js/field-condition"
-    data-widget="fieldCondition"
+    data-module="oroquerydesigner/js/app/views/field-condition-view"
     data-options="{{ fieldConditionOptions|json_encode }}">
     {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
 </li>

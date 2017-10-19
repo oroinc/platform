@@ -3,25 +3,23 @@
 namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
-use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
-use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -109,11 +107,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
             } catch (UnselectableFolderException $e) {
                 $this->processUnselectableFolderException($folder);
-            } catch (InvalidEmailFormatException $e) {
-                $folder->setSyncEnabled(false);
-                $this->logger->info(
-                    sprintf('The folder "%s" has unsupported email format and was skipped and disabled.', $folderName)
-                );
             }
             $this->em->flush($folder);
 
@@ -167,6 +160,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $emails = $this->getEmailIterator($origin, $imapFolder, $folder);
         $count = $processed = $invalid = $totalInvalid = 0;
         $emails->setIterationOrder(false);
+        $emails->setLogger($this->logger);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {

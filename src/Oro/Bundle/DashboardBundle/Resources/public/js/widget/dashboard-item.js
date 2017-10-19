@@ -80,6 +80,11 @@ define([
             this.options.templateParams.allowEdit = this.options.allowEdit;
             this.options.templateParams.collapsed = options.state.expanded;
             this.options.templateParams.showConfig = this.options.showConfig;
+
+            if (!this.options.title) {
+                this.options.title = this.$el.data('widget-title');
+            }
+
             DashboardItemWidget.__super__.initialize.apply(this, arguments);
         },
 
@@ -248,6 +253,22 @@ define([
         onConfigure: function() {
             this.trigger('configure', this.$el, this);
             mediator.trigger('widget:dashboard:configure:' + this.getWid(), this.$el, this);
+        },
+
+        /**
+         * Handle loaded content.
+         *
+         * @param {String} content
+         * @private
+         */
+        _onContentLoad: function(content) {
+            var title = $(content).data('widget-title');
+
+            if (title) {
+                this.setTitle(title);
+            }
+
+            DashboardItemWidget.__super__._onContentLoad.apply(this, arguments);
         }
     });
 

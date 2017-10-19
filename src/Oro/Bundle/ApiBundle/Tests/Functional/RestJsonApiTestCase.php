@@ -486,7 +486,26 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * Asserts the response content contains the the given data.
+     * Loads the response content.
+     *
+     * @param string $fileName
+     * @param string $folderName
+     *
+     * @return array
+     */
+    protected function loadYamlData($fileName, $folderName = null)
+    {
+        if ($this->isRelativePath($fileName)) {
+            $fileName = $this->getTestResourcePath($folderName, $fileName);
+        }
+        $file = $this->getContainer()->get('file_locator')->locate($fileName);
+        self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $fileName));
+
+        return Yaml::parse(file_get_contents($file));
+    }
+
+    /**
+     * Loads the response content.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      *
@@ -495,13 +514,7 @@ class RestJsonApiTestCase extends ApiTestCase
     protected function loadResponseData($expectedContent)
     {
         if (is_string($expectedContent)) {
-            if ($this->isRelativePath($expectedContent)) {
-                $expectedContent = $this->getTestResourcePath('responses', $expectedContent);
-            }
-            $file = $this->getContainer()->get('file_locator')->locate($expectedContent);
-            self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $expectedContent));
-
-            $expectedContent = Yaml::parse(file_get_contents($file));
+            $expectedContent = $this->loadYamlData($expectedContent, 'responses');
         }
 
         return self::processTemplateData($expectedContent);

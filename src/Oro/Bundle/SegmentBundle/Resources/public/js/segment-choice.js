@@ -49,6 +49,10 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             var template;
             var options = this.options.select2;
 
+            if (options.formatSelectionTemplateSelector) {
+                options.formatSelectionTemplate = $(options.formatSelectionTemplateSelector).text();
+            }
+
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
                 options.formatSelection = function(item) {

@@ -281,6 +281,7 @@ oro:
         received_at.label:        Received at
         recipients.label:         Recipients
         send_email:               Send email
+        the_email_was_sent:       The email was sent
         sent_at.label:            Sent at
         sent_by.label:            sent by {{ user }}
         subject:

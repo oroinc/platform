@@ -11,7 +11,9 @@ class EmailTemplateTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        return $this->decodeTemplateVariables($value);
+        $value = $this->decodeTemplateVariables($value);
+
+        return $this->decodeHtmlSpecialCharsFromTwigTags($value);
     }
 
     /**
@@ -19,7 +21,9 @@ class EmailTemplateTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return $this->decodeTemplateVariables($value);
+        $value = $this->decodeTemplateVariables($value);
+
+        return $this->decodeHtmlSpecialCharsFromTwigTags($value);
     }
 
     /**
@@ -35,6 +39,24 @@ class EmailTemplateTransformer implements DataTransformerInterface
             '/%7B%7B.*%7D%7D/',
             function ($matches) {
                 return urldecode(reset($matches));
+            },
+            $value
+        );
+    }
+
+    /**
+     * Decodes all html special chars in the twig tags '{% %}' and '{{ }}' for example '{% if variable &gt; 1 %}'
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    private function decodeHtmlSpecialCharsFromTwigTags($value)
+    {
+        return preg_replace_callback(
+            '/({{|{%)[^}]+(%}|}})/',
+            function ($matches) {
+                return htmlspecialchars_decode(reset($matches));
             },
             $value
         );

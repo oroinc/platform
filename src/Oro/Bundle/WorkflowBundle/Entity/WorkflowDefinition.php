@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use JMS\Serializer\Annotation as JMS;
+
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -176,6 +178,7 @@ class WorkflowDefinition implements DomainObjectInterface
      *      orphanRemoval=true,
      *      cascade={"all"}
      * )
+     * @JMS\Exclude
      */
     protected $restrictions;
 
