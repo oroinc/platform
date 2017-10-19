@@ -66,7 +66,7 @@ class Configuration implements ConfigurationInterface
                         ->min(-1)
                         ->info('Number of seconds of inactivity to qualify job as stale. 
                             If this attribute is not set or it is set to -1 jobs will never be qualified as stale. 
-                            It means that if a unique Job is not properly removed after finish it will be blocking other 
+                            It means that if a unique Job is not properly removed after finish it will be blocking other
                             Jobs of that type, until it will be manually interrupted')
                     ->end()
                     ->arrayNode('jobs')
