@@ -32,7 +32,7 @@ define(function(require) {
 
         constructor: function(options) {
             this.options = _.defaults({}, options, this.getDefaultOptions());
-            _.extend(this, _.defaults(_.pick(options, 'value')));
+            _.extend(this, _.pick(options, 'value'));
             AbstractConditionView.__super__.constructor.call(this, options);
         },
 
@@ -64,16 +64,19 @@ define(function(require) {
         },
 
         _onChoiceInputChanged: function(e, fieldId) {
+            this._handleChoiceInputChange(fieldId);
+            e.stopPropagation();
+        },
+
+        _handleChoiceInputChange: function(fieldId) {
             var choiceInputValue = this._getInitialChoiceInputValue();
             if (!fieldId) {
                 this._removeFilter();
-                e.stopPropagation();
             } else if (choiceInputValue !== fieldId) {
                 $(':focus').blur();
                 // reset current value on field change
                 this.setValue({});
                 this._renderFilter(fieldId);
-                e.stopPropagation();
             }
         },
 
@@ -210,8 +213,14 @@ define(function(require) {
             } else {
                 deferred.resolve();
             }
-            this.getChoiceInputWidget().setValue(name);
+            this._setChoiceInputValue(name);
             return deferred.promise();
+        },
+
+        _setChoiceInputValue: function(value) {
+            // @todo remove implementation after refactoring and throw the exception
+            this.getChoiceInputWidget().setValue(value);
+            // throw new Error('method `_setChoiceInputValue` should be implemented in a descendant');
         },
 
         getValue: function() {
@@ -243,6 +252,7 @@ define(function(require) {
          * @abstract
          */
         getChoiceInputWidget: function() {
+            // @todo remove method after refactoring
             throw new Error('method `getChoiceInputWidget` should be implemented in a descendant');
         },
 

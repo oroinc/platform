@@ -11,12 +11,12 @@
                 formatSelectionTemplateSelector: '#' ~ segment_selection_template_id,
                 ajax: {
                     url: 'oro_api_get_segment_items',
-                    quietMillis: 100,
-                }
+                    quietMillis: 100
+                },
+                pageLimit: params.page_limit|default(10)
             },
             fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]',
-            currentSegment: params.currentSegmentId|default(null),
-            pageLimit: params.page_limit|default(10)
+            currentSegment: params.currentSegmentId|default(null)
         }
     }|merge_recursive(params.segmentConditionOptions|default({})) %}
     {% set conditionBuilderOptions = {

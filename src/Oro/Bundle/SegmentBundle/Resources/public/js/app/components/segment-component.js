@@ -14,7 +14,6 @@ define(function(require) {
     var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
     require('oroentity/js/field-choice');
     require('oroentity/js/fields-loader');
-    require('orosegment/js/segment-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
 
@@ -586,6 +585,16 @@ define(function(require) {
                 // there's no condition builder
                 return;
             }
+
+            var setRootEntity = function(entity) {
+                // defines the selected entity in the options of all criteria conditions
+                this.conditionBuilderComponent.view.updateCriteriaOptions({
+                    rootEntity: entity
+                });
+            }.bind(this);
+            setRootEntity(this.entityFieldsUtil.entity);
+            this.on('fieldsLoaded', setRootEntity);
+
             this.conditionBuilderComponent.view.setValue(this.load('filters'));
             this.listenTo(this.conditionBuilderComponent.view, 'change', function(value) {
                 this.save(value, 'filters');

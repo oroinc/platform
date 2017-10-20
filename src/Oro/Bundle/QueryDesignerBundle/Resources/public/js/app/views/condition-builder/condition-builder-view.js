@@ -266,6 +266,17 @@ define(function(require) {
             this.$criteriaList.find('[data-criteria="' + criteriaName + '"]').toggleClass('disabled', !isEnabled);
         },
 
+        /**
+         * Applies options update for all criteria
+         *
+         * @param {Object} optionsUpdate
+         */
+        updateCriteriaOptions: function(optionsUpdate) {
+            this.$criteriaList.find('[data-criteria][data-options]').each(function(i, elem) {
+                _.extend($(elem).data('options'), optionsUpdate);
+            });
+        },
+
         _initCriteriaList: function() {
             return this.$criteriaList.sortable(this.options.criteriaList);
         },
