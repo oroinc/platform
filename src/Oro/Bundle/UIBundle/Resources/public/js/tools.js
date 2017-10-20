@@ -188,7 +188,7 @@ define(function(require) {
          * Are we have touch screen
          */
         isTouchDevice: function()  {
-            return ('ontouchstart' in window) ||
+            return ('ontouchstart' in window && window.ontouchstart) ||
                 ('DocumentTouch' in window && document instanceof window.DocumentTouch);
         },
 
