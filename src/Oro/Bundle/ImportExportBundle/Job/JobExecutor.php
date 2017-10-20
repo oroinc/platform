@@ -11,7 +11,7 @@ use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 use Akeneo\Bundle\BatchBundle\Job\Job;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
