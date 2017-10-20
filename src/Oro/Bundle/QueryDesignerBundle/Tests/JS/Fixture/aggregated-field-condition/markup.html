@@ -1,0 +1,10 @@
+<script type="text/template" id="format-selection-template">
+    <span class="entity-field-path">
+        <% _.each(obj, function (item, index, list) { if (index > 0) { %><% if (index === 1) { %>
+            <span><%= item.field.entity.label %></span>
+        <% } %>
+        <% if (index !== list.length - 1) { %>
+            <span><%= item.field.label %></span>
+        <% } else { %><b><%= item.field.label %></b><% } %><% }}) %>
+    </span>
+</script>

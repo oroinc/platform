@@ -58,7 +58,6 @@ class Form extends Element
             self::assertNotNull($field, sprintf("Field `%s` not found", $label));
 
             $field = $this->wrapField($label, $field);
-            echo $field->getOuterHtml();
 
             $expectedValue = self::normalizeValue($value);
             $fieldValue = self::normalizeValue($field->getValue());
