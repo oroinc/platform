@@ -17,3 +17,7 @@ Feature: Commerce admin area MUST NOT contain XSS vulnerabilities on all accessi
   Scenario: Check backend customers pages for XSS vulnerability
     When I visiting pages listed in "backend customers urls"
     Then I should not get XSS vulnerabilities
+
+  Scenario: Check backend marketing pages for XSS vulnerability
+    When I visiting pages listed in "backend marketing urls"
+    Then I should not get XSS vulnerabilities

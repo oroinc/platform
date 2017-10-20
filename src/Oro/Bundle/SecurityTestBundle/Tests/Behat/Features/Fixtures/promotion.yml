@@ -1,0 +1,161 @@
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    order_promotion_label:
+        string: '<xss("LocalizedFallbackValue.string(Promotion.label)")>'
+    order_promotion_description:
+        text: '<xss("LocalizedFallbackValue.string(Promotion.description)")>'
+    line_item_promotion_label:
+        string: '<xss("LocalizedFallbackValue.string(Promotion.label)")>'
+    line_item_promotion_description:
+        text: '<xss("LocalizedFallbackValue.string(Promotion.description)")>'
+    bogo_promotion_label:
+        string: '<xss("LocalizedFallbackValue.string(Promotion.label)")>'
+    bogo_promotion_description:
+        text: '<xss("LocalizedFallbackValue.string(Promotion.description)")>'
+    shipping_promotion_label:
+        string: '<xss("LocalizedFallbackValue.string(Promotion.label)")>'
+    shipping_promotion_description:
+        text: '<xss("LocalizedFallbackValue.string(Promotion.description)")>'
+
+Oro\Bundle\SegmentBundle\Entity\Segment:
+    promotion_segment_{1..4}:
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
+        name: '<xss("Segment.name")>'
+        description: '<xss("Segment.description")>'
+        type: 'dynamic'
+        entity: 'Oro\Bundle\ProductBundle\Entity\Product'
+        definition: '{"filters":[[{"columnName":"id","criterion":{"filter":"number","data":{"value":0,"type":2}}}]],"columns":[{"name":"id","label":"id","sorting":null,"func":null},{"name":"sku","label":"sku","sorting":null,"func":null}]}'
+
+Oro\Bundle\PromotionBundle\Entity\DiscountConfiguration:
+    order_discount_configuration:
+        type: 'order'
+        options:
+            discount_type: 'amount'
+            discount_currency: 'USD'
+            discount_value: 1
+    line_item_discount_configuration:
+        type: 'line_item'
+        options:
+            discount_type: 'amount'
+            discount_currency: 'USD'
+            discount_product_unit_code: 'item'
+            discount_value: 1
+            apply_to: 'each_item'
+            maximum_qty: 100
+    bogo_discount_configuration:
+        type: 'buy_x_get_y'
+        options:
+            discount_type: 'amount'
+            discount_value: 2
+            discount_currency: 'USD'
+            buy_x: 1
+            get_y: 1
+            discount_product_unit_code: 'liter'
+            discount_apply_to: 'apply_to_each_y'
+    shipping_discount_configuration:
+        type: 'shipping'
+        options:
+            discount_type: 'amount'
+            discount_currency: 'USD'
+            discount_value: 2
+            shipping_options:
+                shipping_method: '<("flat_rate_".@flatRateIntegration->id)>'
+                shipping_method_type: 'primary'
+
+Oro\Bundle\RuleBundle\Entity\Rule:
+    order_promotion_rule:
+        enabled: true
+        sortOrder: 1
+        name: '<xss("Rule.name")>'
+        expression: customerUser.email != '<xss("Rule.expression")>'
+    line_item_promotion_rule:
+        enabled: true
+        sortOrder: 2
+        name:  '<xss("Rule.name")>'
+        expression: customerUser.email != '<xss("Rule.expression")>'
+    bogo_promotion_rule:
+        enabled: true
+        sortOrder: 3
+        name:  '<xss("Rule.name")>'
+        expression: customerUser.email != '<xss("Rule.expression")>'
+    shipping_promotion_rule:
+        enabled: true
+        sortOrder: 4
+        name:  '<xss("Rule.name")>'
+        expression: customerUser.email != '<xss("Rule.expression")>'
+
+Oro\Bundle\PromotionBundle\Entity\Promotion:
+    order_promotion:
+        addLabel: ['@order_promotion_label']
+        addDescription: ['@order_promotion_description']
+        addScope: [1]
+        productsSegment: '@promotion_segment_1'
+        rule: '@order_promotion_rule'
+        discountConfiguration: '@order_discount_configuration'
+        organization: '@xss_organization'
+        owner: '@xss_user'
+        useCoupons: true
+    line_item_promotion:
+        addLabel: ['@line_item_promotion_label']
+        addDescription: ['@line_item_promotion_description']
+        addScope: [1]
+        productsSegment: '@promotion_segment_2'
+        rule: '@line_item_promotion_rule'
+        discountConfiguration: '@line_item_discount_configuration'
+        organization: '@xss_organization'
+        owner: '@xss_user'
+        useCoupons: true
+    bogo_promotion:
+        addLabel: ['@bogo_promotion_label']
+        addDescription: ['@bogo_promotion_description']
+        addScope: [1]
+        productsSegment: '@promotion_segment_3'
+        rule: '@bogo_promotion_rule'
+        discountConfiguration: '@bogo_discount_configuration'
+        organization: '@xss_organization'
+        owner: '@xss_user'
+        useCoupons: true
+    shipping_promotion:
+        addLabel: ['@shipping_promotion_label']
+        addDescription: ['@shipping_promotion_description']
+        addScope: [1]
+        productsSegment: '@promotion_segment_4'
+        rule: '@shipping_promotion_rule'
+        discountConfiguration: '@shipping_discount_configuration'
+        organization: '@xss_organization'
+        owner: '@xss_user'
+        useCoupons: true
+
+Oro\Bundle\PromotionBundle\Entity\Coupon:
+    coupon_1:
+        owner: '@xss_business_unit'
+        organization: '@xss_organization'
+        code: '<xss("Coupon.code")>'
+        promotion: '@order_promotion'
+        enabled: true
+        usesPerPerson: 100
+        usesPerCoupon: 100
+    coupon_2:
+        owner: '@xss_business_unit'
+        organization: '@xss_organization'
+        code: '<xss("Coupon.code")>'
+        promotion: '@line_item_promotion'
+        enabled: true
+        usesPerPerson: 100
+        usesPerCoupon: 100
+    coupon_3:
+        owner: '@xss_business_unit'
+        organization: '@xss_organization'
+        code: '<xss("Coupon.code")>'
+        promotion: '@bogo_promotion'
+        enabled: true
+        usesPerPerson: 100
+        usesPerCoupon: 100
+    coupon_4:
+        owner: '@xss_business_unit'
+        organization: '@xss_organization'
+        code: '<xss("Coupon.code")>'
+        promotion: '@shipping_promotion'
+        enabled: true
+        usesPerPerson: 100
+        usesPerCoupon: 100

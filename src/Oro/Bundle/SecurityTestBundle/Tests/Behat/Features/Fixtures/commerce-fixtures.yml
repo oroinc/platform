@@ -3,3 +3,4 @@ include:
     - shopping-list.yml
     - rfq.yml
     - quote.yml
+    - promotion.yml

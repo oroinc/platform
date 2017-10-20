@@ -1,0 +1,42 @@
+urls:
+    # Promotions
+    - { route: 'oro_promotion_index' }
+    - { route: 'oro_promotion_create' }
+    - { route: 'oro_promotion_update', parameters: { id: '@order_promotion.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_promotion_update', parameters: { id: '@line_item_promotion.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_promotion_update', parameters: { id: '@bogo_promotion.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_promotion_update', parameters: { id: '@shipping_promotion.id' }, options: { disable_select2_checks: true } }
+    - { route: 'oro_promotion_view', parameters: { id: '@order_promotion.id' } }
+    - { route: 'oro_promotion_view', parameters: { id: '@line_item_promotion.id' } }
+    - { route: 'oro_promotion_view', parameters: { id: '@bogo_promotion.id' } }
+    - { route: 'oro_promotion_view', parameters: { id: '@shipping_promotion.id' } }
+
+    # Coupons
+    - { route: 'oro_promotion_coupon_index' }
+    - { route: 'oro_promotion_coupon_create' }
+    - { route: 'oro_promotion_coupon_view', parameters: { id: '@coupon_1.id' } }
+    - { route: 'oro_promotion_coupon_update', parameters: { id: '@coupon_1.id' }, options: { disable_select2_checks: true } }
+#
+#    # Web Catalogs
+#    - { route: 'oro_rfp_request_index' }
+#    - { route: 'oro_rfp_request_view', parameters: { id: '@rfp_request.id' } }
+#    - { route: 'oro_rfp_request_update', parameters: { id: '@rfp_request.id' } }
+#    - { route: 'oro_rfp_request_create_order', parameters: { id: '@rfp_request.id' } }
+#
+#    # Landing Pages
+#    - { route: 'oro_order_index' }
+#    - { route: 'oro_order_create' }
+#    - { route: 'oro_order_view', parameters: { id: '@order1.id' } }
+#    - { route: 'oro_order_update', parameters: { id: '@order1.id' } }
+#
+#    # Content Blocks
+#    - { route: 'oro_pricing_price_list_index' }
+#    - { route: 'oro_pricing_price_list_create' }
+#    - { route: 'oro_pricing_price_list_view', parameters: { id: '@pricelist.id' } }
+#    - { route: 'oro_pricing_price_list_update', parameters: { id: '@pricelist.id' }, options: { disable_select2_checks: true } }
+#
+#    #Customer Login Pages
+#    - { route: 'oro_payment_term_index' }
+#    - { route: 'oro_payment_term_create' }
+#    - { route: 'oro_payment_term_view', parameters: { id: '@paymentTerm.id' } }
+#    - { route: 'oro_payment_term_update', parameters: { id: '@paymentTerm.id' }, options: { disable_select2_checks: true } }
