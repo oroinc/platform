@@ -272,6 +272,24 @@ class Manager
     }
 
     /**
+     * @param string $permission
+     * @param int $organizationId
+     *
+     * @return array
+     */
+    public function findAllowedDashboardsShortenedInfo($permission = 'VIEW', $organizationId = null)
+    {
+        $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+            ->createQueryBuilder('dashboard')
+            ->select('dashboard.id, dashboard.label');
+        if ($organizationId) {
+            $qb->andWhere($qb->expr()->eq('dashboard.organization', ':organizationId'))
+                ->setParameter('organizationId', $organizationId);
+        }
+        return $this->aclHelper->apply($qb, $permission)->execute();
+    }
+
+    /**
      * Set current dashboard as active for passed user
      *
      * @param DashboardModel $dashboard

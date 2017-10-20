@@ -62,16 +62,36 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
         $storedCronTrigger1 = (new TransitionCronTrigger())->setCron('2 * * * *');
         $storedEventTrigger2 = (new TransitionEventTrigger())->setEvent('update');
 
-        $repository = $this->repositoryRetrieval();
-        $repository->expects($this->once())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository
+            ->expects(static::once())
             ->method('findBy')
             ->with(['workflowDefinition' => 'workflow'])
             ->willReturn([$storedCronTrigger1, $storedEventTrigger2]);
 
-        $this->updateDecider->expects($this->once())->method('decide')->with(
-            [$storedCronTrigger1, $storedEventTrigger2],
-            $triggersBag->getTriggers()
-        )->willReturn([[$newCronTrigger1, $newEventTrigger2], [$storedCronTrigger1, $storedEventTrigger2]]);
+        $cronTriggerRepository = $this->createMock(EntityRepository::class);
+        $cronTriggerRepository
+            ->expects(static::once())
+            ->method('findBy')
+            ->with(['workflowDefinition' => 'workflow'])
+            ->willReturn([$newCronTrigger1]);
+
+        $this->doctrineHelper->expects(static::any())
+            ->method('getEntityRepositoryForClass')
+            ->withConsecutive([BaseTransitionTrigger::class], [TransitionCronTrigger::class])
+            ->willReturnOnConsecutiveCalls($repository, $cronTriggerRepository);
+
+        $this->updateDecider
+            ->expects(static::once())
+            ->method('decide')
+            ->with(
+                [$storedCronTrigger1, $storedEventTrigger2],
+                $triggersBag->getTriggers()
+            )
+            ->willReturn([
+                [$newCronTrigger1, $newEventTrigger2],
+                [$storedCronTrigger1, $storedEventTrigger2]
+            ]);
 
         $em = $this->emRetrieval();
 
@@ -83,13 +103,13 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
         $em->expects($this->at(3))->method('persist')->with($newEventTrigger2);
 
         $em->expects($this->once())->method('flush');
-        $this->cronScheduler->expects($this->once())->method('flush');
+        $this->cronScheduler->expects(static::exactly(2))->method('flush');
         $this->cache->expects($this->once())->method('build');
 
         $this->updater->updateTriggers($triggersBag);
     }
 
-    public function testUpdateTriggersNoActions()
+    public function testUpdateTriggersNoActionsForTriggersButUpdateCronSchedule()
     {
         $definition = (new WorkflowDefinition())->setName('workflow');
         $newTrigger1 = (new TransitionCronTrigger())->setCron('1 * * * *');
@@ -100,16 +120,38 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
         $storedTrigger1 = (new TransitionCronTrigger())->setCron('2 * * * *');
         $storedTrigger2 = (new TransitionEventTrigger())->setEvent('update');
 
-        $repository = $this->repositoryRetrieval();
-        $repository->expects($this->once())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository
+            ->expects(static::once())
             ->method('findBy')
             ->with(['workflowDefinition' => 'workflow'])
             ->willReturn([$storedTrigger1, $storedTrigger2]);
+
+        $cronTriggerRepository = $this->createMock(EntityRepository::class);
+        $cronTriggerRepository
+            ->expects(static::once())
+            ->method('findBy')
+            ->with(['workflowDefinition' => 'workflow'])
+            ->willReturn([$storedTrigger1]);
+
+        $this->doctrineHelper->expects(static::any())
+            ->method('getEntityRepositoryForClass')
+            ->withConsecutive([BaseTransitionTrigger::class], [TransitionCronTrigger::class])
+            ->willReturnOnConsecutiveCalls($repository, $cronTriggerRepository);
 
         $this->updateDecider->expects($this->once())
             ->method('decide')
             ->with([$storedTrigger1, $storedTrigger2], $triggersBag->getTriggers())
             ->willReturn([[], []]); //all abstain by decider
+
+        $this->cronScheduler
+            ->expects(static::once())
+            ->method('addSchedule')
+            ->with($storedTrigger1);
+
+        $this->cronScheduler
+            ->expects(static::once())
+            ->method('flush');
 
         //no em actions
         $this->cache->expects($this->never())->method('build');
