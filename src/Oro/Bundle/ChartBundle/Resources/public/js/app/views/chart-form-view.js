@@ -37,7 +37,6 @@ define(function(request) {
             });
 
             this.updateChartFormVisibility();
-            this.getNameChoiceElement().on('change', _.bind(this.updateChartFormVisibility, this));
         },
 
         delegateEvents: function(events) {
