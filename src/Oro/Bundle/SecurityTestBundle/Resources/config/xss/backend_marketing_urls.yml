@@ -23,11 +23,11 @@ urls:
 #    - { route: 'oro_rfp_request_update', parameters: { id: '@rfp_request.id' } }
 #    - { route: 'oro_rfp_request_create_order', parameters: { id: '@rfp_request.id' } }
 #
-#    # Landing Pages
-#    - { route: 'oro_order_index' }
-#    - { route: 'oro_order_create' }
-#    - { route: 'oro_order_view', parameters: { id: '@order1.id' } }
-#    - { route: 'oro_order_update', parameters: { id: '@order1.id' } }
+    # Landing Pages
+    - { route: 'oro_cms_page_index' }
+    - { route: 'oro_cms_page_create' }
+    - { route: 'oro_cms_page_view', parameters: { id: '@landing_page.id' } }
+    - { route: 'oro_cms_page_update', parameters: { id: '@landing_page.id' }, options: { disable_select2_checks: true } }
 #
 #    # Content Blocks
 #    - { route: 'oro_pricing_price_list_index' }
