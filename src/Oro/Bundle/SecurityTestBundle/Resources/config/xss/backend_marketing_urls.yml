@@ -35,8 +35,8 @@ urls:
 #    - { route: 'oro_pricing_price_list_view', parameters: { id: '@pricelist.id' } }
 #    - { route: 'oro_pricing_price_list_update', parameters: { id: '@pricelist.id' }, options: { disable_select2_checks: true } }
 #
-#    #Customer Login Pages
-#    - { route: 'oro_payment_term_index' }
-#    - { route: 'oro_payment_term_create' }
-#    - { route: 'oro_payment_term_view', parameters: { id: '@paymentTerm.id' } }
-#    - { route: 'oro_payment_term_update', parameters: { id: '@paymentTerm.id' }, options: { disable_select2_checks: true } }
+    #Customer Login Pages
+    - { route: 'oro_cms_loginpage_index' }
+    - { route: 'oro_cms_loginpage_create' }
+    - { route: 'oro_cms_loginpage_view', parameters: { id: '@login_page.id' } }
+    - { route: 'oro_cms_loginpage_update', parameters: { id: '@login_page.id' }, options: { disable_select2_checks: true } }

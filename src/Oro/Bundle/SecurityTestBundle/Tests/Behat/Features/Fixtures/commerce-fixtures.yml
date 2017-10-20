@@ -5,3 +5,4 @@ include:
     - quote.yml
     - promotion.yml
     - landing-page.yml
+    - login-page.yml
