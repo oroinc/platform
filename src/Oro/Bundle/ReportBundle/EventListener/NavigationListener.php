@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReportBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -11,6 +10,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -57,38 +58,38 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
+        if (!$this->tokenAccessor->hasUser()) {
+            return;
+        }
+
         $reportsMenuItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'reports_tab');
-        if (null !== $reportsMenuItem && $this->tokenAccessor->hasUser()) {
-            $qb = $this->em->getRepository('OroReportBundle:Report')
-                ->createQueryBuilder('report')
-                ->orderBy('report.name', 'ASC');
+        if (!$reportsMenuItem || !$reportsMenuItem->isDisplayed()) {
+            return;
+        }
 
-            $excludedEntities = $this->featureChecker->getDisabledResourcesByType('entities');
-            if ($excludedEntities) {
-                $qb
-                    ->andWhere($qb->expr()->notIn('report.entity', ':excluded_entities'))
-                    ->setParameter('excluded_entities', $excludedEntities);
-            }
+        /** @var ReportRepository $repo */
+        $repo = $this->em->getRepository(Report::class);
+        $qb = $repo->getAllReportsBasicInfoQb($this->featureChecker->getDisabledResourcesByType('entities'));
 
-            $reports = $this->aclHelper->apply($qb)->execute();
+        $reports = $this->aclHelper->apply($qb)->getResult();
+        if (!$reports) {
+            return;
+        }
 
-            if (!empty($reports)) {
-                $this->addDivider($reportsMenuItem);
-                $reportMenuData = [];
-                foreach ($reports as $report) {
-                    $config = $this->entityConfigProvider->getConfig($report->getEntity());
-                    if ($this->checkAvailability($config)) {
-                        $entityLabel = $config->get('plural_label');
-                        if (!isset($reportMenuData[$entityLabel])) {
-                            $reportMenuData[$entityLabel] = [];
-                        }
-                        $reportMenuData[$entityLabel][$report->getId()] = $report->getName();
-                    }
+        $this->addDivider($reportsMenuItem);
+        $reportMenuData = [];
+        foreach ($reports as $report) {
+            $config = $this->entityConfigProvider->getConfig($report['entity']);
+            if ($this->checkAvailability($config)) {
+                $entityLabel = $config->get('plural_label');
+                if (!isset($reportMenuData[$entityLabel])) {
+                    $reportMenuData[$entityLabel] = [];
                 }
-                ksort($reportMenuData);
-                $this->buildReportMenu($reportsMenuItem, $reportMenuData);
+                $reportMenuData[$entityLabel][$report['id']] = $report['name'];
             }
         }
+        ksort($reportMenuData);
+        $this->buildReportMenu($reportsMenuItem, $reportMenuData);
     }
 
     /**
