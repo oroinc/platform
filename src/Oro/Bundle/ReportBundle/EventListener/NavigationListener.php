@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ReportBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -50,30 +51,38 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $reportsMenuItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'reports_tab');
-        if ($reportsMenuItem !== null && $this->securityFacade->hasLoggedUser()) {
-            $qb = $this->em->getRepository('OroReportBundle:Report')
-                ->createQueryBuilder('report')
-                ->orderBy('report.name', 'ASC');
-            $reports = $this->aclHelper->apply($qb)->execute();
+        if (!$this->securityFacade->hasLoggedUser()) {
+            return;
+        }
 
-            if (!empty($reports)) {
-                $this->addDivider($reportsMenuItem);
-                $reportMenuData = [];
-                foreach ($reports as $report) {
-                    $config = $this->entityConfigProvider->getConfig($report->getEntity());
-                    if ($this->checkAvailability($config)) {
-                        $entityLabel = $config->get('plural_label');
-                        if (!isset($reportMenuData[$entityLabel])) {
-                            $reportMenuData[$entityLabel] = [];
-                        }
-                        $reportMenuData[$entityLabel][$report->getId()] = $report->getName();
-                    }
+        $reportsMenuItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'reports_tab');
+        if (!$reportsMenuItem || !$reportsMenuItem->isDisplayed()) {
+            return;
+        }
+
+        /** @var ReportRepository $repo */
+        $repo = $this->em->getRepository(Report::class);
+        $qb = $repo->getAllReportsBasicInfoQb();
+
+        $reports = $this->aclHelper->apply($qb)->getResult();
+        if (!$reports) {
+            return;
+        }
+
+        $this->addDivider($reportsMenuItem);
+        $reportMenuData = [];
+        foreach ($reports as $report) {
+            $config = $this->entityConfigProvider->getConfig($report['entity']);
+            if ($this->checkAvailability($config)) {
+                $entityLabel = $config->get('plural_label');
+                if (!isset($reportMenuData[$entityLabel])) {
+                    $reportMenuData[$entityLabel] = [];
                 }
-                ksort($reportMenuData);
-                $this->buildReportMenu($reportsMenuItem, $reportMenuData);
+                $reportMenuData[$entityLabel][$report['id']] = $report['name'];
             }
         }
+        ksort($reportMenuData);
+        $this->buildReportMenu($reportsMenuItem, $reportMenuData);
     }
 
     /**
