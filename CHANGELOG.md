@@ -1,6 +1,13 @@
-## 2.4.1 (Unreleased)
+## 2.4.3 (Unreleased)
 
 ### Added
+#### MessageQueue Component
+* Added Stale Jobs functionality
+    * Added method `setJobConfigurationProvider` to `Oro\Component\MessageQueue\Job\JobProcessor`
+    * Added new state oro.message_queue_job.status.stale
+    * Added new interface `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` 
+#### MessageQueueBundle
+* Added configuration for Stale Jobs
 #### SyncBundle
 * Added parameters `websocket_frontend_path` and `websocket_backend_path`. [Usage](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/SyncBundle/README.md)
 
