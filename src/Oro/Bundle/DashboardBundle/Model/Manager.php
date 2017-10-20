@@ -262,13 +262,36 @@ class Manager
 
     /**
      * @param string $permission
+     * @param int $organizationId
      *
      * @return DashboardModel[]
      */
-    public function findAllowedDashboards($permission = 'VIEW')
+    public function findAllowedDashboards($permission = 'VIEW', $organizationId = null)
     {
         $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
+        if ($organizationId) {
+            $qb->andWhere($qb->expr()->eq('dashboard.organization', ':organizationId'))
+                ->setParameter('organizationId', $organizationId);
+        }
         return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
+    }
+
+    /**
+     * @param string $permission
+     * @param int $organizationId
+     *
+     * @return array
+     */
+    public function findAllowedDashboardsShortenedInfo($permission = 'VIEW', $organizationId = null)
+    {
+        $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+            ->createQueryBuilder('dashboard')
+            ->select('dashboard.id, dashboard.label');
+        if ($organizationId) {
+            $qb->andWhere($qb->expr()->eq('dashboard.organization', ':organizationId'))
+                ->setParameter('organizationId', $organizationId);
+        }
+        return $this->aclHelper->apply($qb, $permission)->execute();
     }
 
     /**

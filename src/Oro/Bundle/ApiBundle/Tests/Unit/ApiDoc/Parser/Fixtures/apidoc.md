@@ -27,6 +27,8 @@ Description for UPDATE action
 
 [a link to resource](http://localhost.com)
 
+    code block
+
 ## FIELDS
 
 ### id

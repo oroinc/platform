@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,7 +21,11 @@ class LocalizationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'text', ['required' => true, 'label' => 'oro.locale.localization.name.label'])
+            ->add('name', 'text', [
+                'required' => true,
+                'label' => 'oro.locale.localization.name.label',
+                StripTagsExtension::OPTION_NAME => true,
+            ])
             ->add(
                 'titles',
                 LocalizedFallbackValueCollectionType::NAME,
@@ -28,7 +33,8 @@ class LocalizationType extends AbstractType
                     'required' => true,
                     'label' => 'oro.locale.localization.title.label',
                     'options' => [
-                        'constraints' => [new NotBlank(['message' => 'oro.locale.localization.titles.blank'])]
+                        'constraints' => [new NotBlank(['message' => 'oro.locale.localization.titles.blank'])],
+                        StripTagsExtension::OPTION_NAME => true,
                     ]
                 ]
             )

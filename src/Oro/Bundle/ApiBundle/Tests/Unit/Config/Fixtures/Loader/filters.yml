@@ -26,6 +26,7 @@ full:
                 property_path: path1
                 data_type: string
                 allow_array: true
+                allow_range: true
                 description: description1
                 extra1: true
             field2:
@@ -56,6 +57,10 @@ full:
                 description: ""
             field18:
                 extra1: ~
+            field19:
+                allow_range: true
+            field20:
+                allow_range: false
         extra1: true
         extra2: ~
     expected:
@@ -66,6 +71,7 @@ full:
                 property_path: path1
                 data_type: string
                 allow_array: true
+                allow_range: true
                 description: description1
                 extra1: true
             field2:
@@ -87,6 +93,9 @@ full:
             field16: ~
             field17: ~
             field18: ~
+            field19:
+                allow_range: true
+            field20: ~
         extra1: true
 
 null_field_type:

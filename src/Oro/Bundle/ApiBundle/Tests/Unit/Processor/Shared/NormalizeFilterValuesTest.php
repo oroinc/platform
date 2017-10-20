@@ -58,8 +58,8 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
             ->method('normalizeValue')
             ->willReturnMap(
                 [
-                    ['1', 'integer', $this->context->getRequestType(), false, 1],
-                    ['test', 'string', $this->context->getRequestType(), false, 'test'],
+                    ['1', 'integer', $this->context->getRequestType(), false, false, 1],
+                    ['test', 'string', $this->context->getRequestType(), false, false, 'test'],
                 ]
             );
 
@@ -92,7 +92,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects($this->once())
             ->method('normalizeValue')
-            ->with('invalid', 'integer', $this->context->getRequestType(), false)
+            ->with('invalid', 'integer', $this->context->getRequestType(), false, false)
             ->willThrowException($exception);
 
         $this->context->setFilterValues($filterValues);
