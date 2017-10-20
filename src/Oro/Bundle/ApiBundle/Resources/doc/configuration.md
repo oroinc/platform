@@ -321,6 +321,7 @@ This section describes fields by which the result data can be filtered. It conta
     * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
     * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
+    * **allow_range** *boolean* A flag indicates whether the filter can contains a pair of "from" and "to" values. By default `false`.
     * **type** *string* The filter type. By default the filter type is equal to the **data_type** property.
     * **options** *array* The filter options.
     * **operators** *array* A list of operators supported by the filter. By default the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>** and **>=** operators, etc. Usually you need to use this parameter in case if you need to make a list of supported operators more limited.
@@ -342,8 +343,9 @@ api:
                         property_path: firstName
                         description: 'My filter description'
                     field3:
-                        data_type: boolean
-                        allow_array: false
+                        data_type: date
+                        allow_array: true
+                        allow_range: true
                     field4:
                         data_type: string
                         type: myFilter

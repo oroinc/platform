@@ -147,6 +147,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         self::TEST_CLASS_NAME
                     ],
                     [
@@ -154,12 +155,14 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         'Test\Association1Target'
                     ],
                     [
                         'association_2_entity',
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
+                        false,
                         false,
                         'Test\Association2Target'
                     ],
@@ -333,6 +336,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         self::TEST_CLASS_NAME
                     ],
                     [
@@ -340,12 +344,14 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         'Test\Association1Target'
                     ],
                     [
                         'association_2_entity',
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
+                        false,
                         false,
                         'Test\Association2Target'
                     ],
@@ -473,6 +479,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         self::TEST_CLASS_NAME
                     ],
                     [
@@ -480,12 +487,14 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
                         false,
+                        false,
                         'Test\Association1Target'
                     ],
                     [
                         'association_2_entity',
                         DataType::ENTITY_CLASS,
                         $this->context->getRequestType(),
+                        false,
                         false,
                         'Test\Association1Target1'
                     ],

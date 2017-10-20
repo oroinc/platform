@@ -47,6 +47,7 @@ abstract class RegisterFilters implements ProcessorInterface
         $filter = $this->filterFactory->createFilter($filterType, $filterOptions);
         if (null !== $filter) {
             $filter->setArrayAllowed($filterConfig->isArrayAllowed());
+            $filter->setRangeAllowed($filterConfig->isRangeAllowed());
             $filter->setDescription($filterConfig->getDescription());
             $operators = $filterConfig->getOperators();
             if (!empty($operators)) {

@@ -24,7 +24,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        $this->processor = new CompleteFilters($this->doctrineHelper, ['datetime']);
+        $this->processor = new CompleteFilters($this->doctrineHelper, ['datetime'], ['string']);
     }
 
     public function testProcessForAlreadyCompletedFilters()
@@ -143,7 +143,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'field1' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -255,7 +256,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'field1' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -307,7 +309,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type' => 'datetime'
+                        'data_type'   => 'datetime',
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -361,7 +364,63 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'field1' => [
                         'data_type'   => 'datetime',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testCompleteConfiguredFilterWhenRangeIsNotAllowedForItsDataTypeButWithConfiguredRangeAllowed()
+    {
+        $config = [
+            'exclusion_policy' => 'all'
+        ];
+        $filters = [
+            'fields' => [
+                'field1' => [
+                    'data_type'   => 'string',
+                    'allow_range' => true
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $rootEntityMetadata->expects(self::never())
+            ->method('hasField')
+            ->with('field1');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'   => 'string',
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -414,7 +473,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'field1' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -566,7 +626,55 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type' => 'datetime'
+                        'data_type'   => 'datetime',
+                        'allow_range' => true
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testCompleteFilterWhenRangeIsNotAllowedForItsDataType()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null
+            ]
+        ];
+        $filters = [];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn(['field1' => 'string']);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'   => 'string',
+                        'allow_array' => true
                     ]
                 ]
             ],
@@ -618,7 +726,61 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1' => [
-                        'data_type' => 'datetime'
+                        'data_type'   => 'datetime',
+                        'allow_range' => true
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testCompleteFilterWithConfiguredDataTypeWhenRangeIsNotAllowedForItsDataType()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null
+            ]
+        ];
+        $filters = [
+            'fields' => [
+                'field1' => [
+                    'data_type' => 'string'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn(['field1' => 'integer']);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'   => 'string',
+                        'allow_array' => true
                     ]
                 ]
             ],
@@ -671,7 +833,62 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'field1' => [
                         'data_type'   => 'datetime',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testCompleteFilterWhenRangeIsNotAllowedForItsDataTypeButWithConfiguredRangeAllowed()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null
+            ]
+        ];
+        $filters = [
+            'fields' => [
+                'field1' => [
+                    'allow_range' => true
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn(['field1' => 'string']);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'   => 'string',
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -725,7 +942,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                     'field1' => [
                         'exclude'     => true,
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -863,7 +1081,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'renamedField1' => [
                         'data_type'   => 'integer',
-                        'allow_array' => true
+                        'allow_array' => true,
+                        'allow_range' => true
                     ]
                 ]
             ],
@@ -1274,7 +1493,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForIdentifierFieldFiltersWhenFilterIaAlreadyConfigured()
+    public function testProcessForIdentifierFieldFiltersWhenFilterIsAlreadyConfigured()
     {
         $config = [
             'exclusion_policy'       => 'all',
