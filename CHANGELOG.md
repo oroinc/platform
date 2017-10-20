@@ -69,6 +69,10 @@
 #### OroBehatExtension
 * Removed --show-execution-time and --log-feature-execution-time parameters along the MeasureExecutionTimeController
 
+#### FormBundle
+* Class `OroTextareaType`<sup>[[?]](https://github.com/oroinc/platform/blob/2.3.11/src/Oro/Bundle/FormBundle/Form/Type/OroTextareaType.php "Oro\Bundle\FormBundle\Form\Type\OroTextareaType")</sup> was removed. The `strip_tags` form option should be used instead.
+* service `oro_form.type.textarea` was removed.
+
 ## 2.4.0 (2017-09-29)
 
 ### Added
