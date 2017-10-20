@@ -62,3 +62,10 @@
         color: $body-color;
     }
 }
+
+@include breakpoint('print') {
+    img {
+        max-width: 100% !important;
+        page-break-inside: avoid
+    }
+}
