@@ -69,6 +69,29 @@ var ORO = (function(ORO) {
             if (form) {
                 form.addEventListener('submit', this.onSubmit.bind(this));
             }
+
+            var scripts = this.container.querySelectorAll('script');
+            if (scripts.length > 0) {
+                var scriptsFragment = document.createDocumentFragment();
+                var realTag;
+                for (var k in scripts) {
+                    if (!scripts.hasOwnProperty(k)) {
+                        continue;
+                    }
+
+                    realTag = document.createElement('script');
+
+                    if (scripts[k].hasAttribute('src')) {
+                        realTag.setAttribute('src', scripts[k].getAttribute('src'));
+                    } else {
+                        realTag.innerHTML = scripts[k].innerHTML;
+                    }
+
+                    scripts[k].parentNode.removeChild(scripts[k]);
+                    scriptsFragment.appendChild(realTag);
+                }
+                this.container.appendChild(scriptsFragment);
+            }
         },
 
         onSubmit: function(e) {

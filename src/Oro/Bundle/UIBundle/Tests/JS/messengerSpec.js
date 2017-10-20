@@ -16,7 +16,7 @@ define([
     ];
 
     describe('oroui/js/messenger', function() {
-        it('Messanger _containsNoFlashTags method', function() {
+        it('Messenger _containsNoFlashTags method', function() {
             _.each(stringsWithNoFlashTags, function(string) {
                 expect(messenger._containsNoFlashTags(string)).toEqual(true);
             });
