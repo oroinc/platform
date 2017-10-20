@@ -36,7 +36,6 @@ define(function(require) {
         },
 
         _initCollection: function(options) {
-            console.log(options);
             this.collection = new EmailTemplateCollection(null, options);
         },
 

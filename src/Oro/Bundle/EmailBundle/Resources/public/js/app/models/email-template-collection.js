@@ -27,6 +27,7 @@ define(function(require) {
             _.extend(this, _.pick(options, ['route', 'routeId', 'includeNonEntity', 'includeSystemTemplates']));
 
             var routeParams = {};
+
             routeParams[this.routeId] = null;
 
             this.url = routing.generate(this.route, routeParams);
