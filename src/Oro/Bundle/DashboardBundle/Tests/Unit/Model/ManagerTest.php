@@ -690,6 +690,103 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFindAllowedDashboardsShortenedInfo()
+    {
+        $permission = 'EDIT';
+        $expectedInfo = [['id' => 1, 'label' => 'test label 1'], ['id' => 2, 'label' => 'test label 2']];
+
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(array('execute'))
+            ->getMockForAbstractClass();
+
+        $query->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($expectedInfo));
+
+        $this->dashboardRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('dashboard')
+            ->will($this->returnValue($queryBuilder));
+
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('dashboard.id, dashboard.label')
+            ->will($this->returnSelf());
+
+        $this->aclHelper->expects($this->once())
+            ->method('apply')
+            ->with($queryBuilder, $permission)
+            ->will($this->returnValue($query));
+
+        $this->assertEquals(
+            $expectedInfo,
+            $this->manager->findAllowedDashboardsShortenedInfo($permission)
+        );
+    }
+
+    public function testFindAllowedDashboardsShortenedInfoFilteredByOrganization()
+    {
+        $permission = 'EDIT';
+        $organizationId = 42;
+        $expectedInfo = [['id' => 1, 'label' => 'test label 1'], ['id' => 2, 'label' => 'test label 2']];
+
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(array('execute'))
+            ->getMockForAbstractClass();
+
+        $query->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($expectedInfo));
+
+        $this->dashboardRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('dashboard')
+            ->will($this->returnValue($queryBuilder));
+
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('dashboard.id, dashboard.label')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->will($this->returnSelf());
+
+        $expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')->disableOriginalConstructor()->getMock();
+        $expr->expects($this->once())
+            ->method('eq')
+            ->with('dashboard.organization', ':organizationId');
+
+        $queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expr);
+
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('organizationId', $organizationId)
+            ->will($this->returnSelf());
+
+        $this->aclHelper->expects($this->once())
+            ->method('apply')
+            ->with($queryBuilder, $permission)
+            ->will($this->returnValue($query));
+
+        $this->assertEquals(
+            $expectedInfo,
+            $this->manager->findAllowedDashboardsShortenedInfo($permission, $organizationId)
+        );
+    }
+
     public function testSetUserActiveDashboardOverrideExistOne()
     {
         $organization       = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');

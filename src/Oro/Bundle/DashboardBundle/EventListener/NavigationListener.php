@@ -30,18 +30,25 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $dashboardTab = MenuUpdateUtils::findMenuItem($event->getMenu(), 'dashboard_tab');
-        if ($dashboardTab === null || !$this->securityFacade->hasLoggedUser()) {
+        if (!$this->securityFacade->hasLoggedUser()) {
             return;
         }
 
-        $dashboards = $this->manager->findAllowedDashboards();
+        $dashboardTab = MenuUpdateUtils::findMenuItem($event->getMenu(), 'dashboard_tab');
+        if (!$dashboardTab || !$dashboardTab->isDisplayed()) {
+            return;
+        }
 
-        if (count($dashboards)>0) {
+        $dashboards = $this->manager->findAllowedDashboardsShortenedInfo(
+            'VIEW',
+            $this->securityFacade->getOrganizationId()
+        );
+
+        if ($dashboards) {
             foreach ($dashboards as $dashboard) {
-                $dashboardId = $dashboard->getId();
+                $dashboardId = $dashboard['id'];
 
-                $dashboardLabel = $dashboard->getLabel();
+                $dashboardLabel = $dashboard['label'];
                 $dashboardLabel = strlen($dashboardLabel) > 50 ? substr($dashboardLabel, 0, 50).'...' : $dashboardLabel;
 
                 $options = [

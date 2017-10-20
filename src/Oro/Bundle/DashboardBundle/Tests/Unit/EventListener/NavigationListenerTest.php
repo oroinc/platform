@@ -31,7 +31,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->manager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\Manager')
-            ->setMethods(['getDashboards', 'findAllowedDashboards'])
+            ->setMethods(['getDashboards', 'findAllowedDashboardsShortenedInfo'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -41,25 +41,37 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testOnNavigationConfigureCheckIfMenuAndUserExists()
+    public function testonnavigationconfigureWithoutUser()
+    {
+        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        $event = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityFacade->expects($this->atLeastOnce())->method('hasLoggedUser')->willReturn(false);
+        $this->manager->expects($this->never())->method('findAllowedDashboardsShortenedInfo');
+
+        $this->navigationListener->onNavigationConfigure($event);
+    }
+
+    public function testOnNavigationConfigureWithDisabledDisplaying()
     {
         /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->securityFacade->expects($this->once())->method('hasLoggedUser')->willReturn(true);
+
         $menu = $this->createMock('Knp\Menu\ItemInterface');
         $item = $this->createMock('Knp\Menu\ItemInterface');
+        $item->expects($this->once())->method('isDisplayed')->willReturn(false);
 
-        $event->expects($this->exactly(2))->method('getMenu')->will($this->returnValue($menu));
+        $event->expects($this->once())->method('getMenu')->will($this->returnValue($menu));
 
-        $this->manager->expects($this->never())->method('getDashboards');
+        $this->manager->expects($this->never())->method('findAllowedDashboardsShortenedInfo');
 
-        $menu->expects($this->at(0))->method('getChild')->will($this->returnValue(null));
-        $menu->expects($this->at(1))->method('getChild')->will($this->returnValue($item));
-        $menu->expects($this->any())->method('getChildren')->will($this->returnValue([]));
+        $menu->expects($this->once())->method('getChild')->with('dashboard_tab')->willReturn($item);
 
-        $this->navigationListener->onNavigationConfigure($event);
         $this->navigationListener->onNavigationConfigure($event);
     }
 
@@ -74,24 +86,10 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $expectedLabel = 'expected label';
         $secondExpectedLabel = 'test expected label';
 
-        $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $dashboardModel->expects($this->once())->method('getId')->will($this->returnValue($id));
-        $dashboardModel->expects($this->once())->method('getLabel')->will($this->returnValue($expectedLabel));
-
-        $secondDashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $secondDashboardModel->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($secondId));
-        $secondDashboardModel->expects($this->once())
-            ->method('getLabel')
-            ->will($this->returnValue($secondExpectedLabel));
-
-
-        $dashboards = array($dashboardModel, $secondDashboardModel);
+        $dashboards = [
+            ['id' => $id, 'label' => $expectedLabel],
+            ['id' => $secondId, 'label' => $secondExpectedLabel],
+        ];
         $menuItemAlias = $id.'_dashboard_menu_item';
         $secondMenuItemAlias = $secondId.'_dashboard_menu_item';
 
@@ -133,20 +131,23 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
                 ['divider', true, $divider]
             ]));
 
-        $item->expects($this->at(0))
+        $item->expects($this->at(1))
             ->method('addChild')
             ->with($menuItemAlias, $this->equalTo($expectedOptions))
             ->will($this->returnValue($child));
-        $item->expects($this->at(1))
+        $item->expects($this->at(2))
             ->method('addChild')
             ->with($secondMenuItemAlias, $this->equalTo($secondExpectedOptions))
             ->will($this->returnValue($child));
-        $item->expects($this->at(2))->method('addChild')->will($this->returnValue($divider));
+        $item->expects($this->at(3))->method('addChild')->will($this->returnValue($divider));
 
         $menu->expects($this->once())->method('getChild')->will($this->returnValue($item));
+        $item->expects($this->once())->method('isDisplayed')->willReturn(true);
         $event->expects($this->once())->method('getMenu')->will($this->returnValue($menu));
         $this->securityFacade->expects($this->once())->method('hasLoggedUser')->will($this->returnValue(true));
-        $this->manager->expects($this->once())->method('findAllowedDashboards')->will($this->returnValue($dashboards));
+        $this->securityFacade->expects($this->once())->method('getOrganizationId')->willReturn(null);
+        $this->manager->expects($this->once())->method('findAllowedDashboardsShortenedInfo')
+            ->willReturn($dashboards);
 
         $this->navigationListener->onNavigationConfigure($event);
     }
