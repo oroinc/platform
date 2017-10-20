@@ -6,3 +6,4 @@ include:
     - promotion.yml
     - landing-page.yml
     - login-page.yml
+    - content-block.yml

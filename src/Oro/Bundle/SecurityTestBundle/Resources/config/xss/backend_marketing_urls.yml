@@ -16,7 +16,7 @@ urls:
     - { route: 'oro_promotion_coupon_create' }
     - { route: 'oro_promotion_coupon_view', parameters: { id: '@coupon_1.id' } }
     - { route: 'oro_promotion_coupon_update', parameters: { id: '@coupon_1.id' }, options: { disable_select2_checks: true } }
-#
+
 #    # Web Catalogs
 #    - { route: 'oro_rfp_request_index' }
 #    - { route: 'oro_rfp_request_view', parameters: { id: '@rfp_request.id' } }
@@ -28,13 +28,13 @@ urls:
     - { route: 'oro_cms_page_create' }
     - { route: 'oro_cms_page_view', parameters: { id: '@landing_page.id' } }
     - { route: 'oro_cms_page_update', parameters: { id: '@landing_page.id' }, options: { disable_select2_checks: true } }
-#
-#    # Content Blocks
-#    - { route: 'oro_pricing_price_list_index' }
-#    - { route: 'oro_pricing_price_list_create' }
-#    - { route: 'oro_pricing_price_list_view', parameters: { id: '@pricelist.id' } }
-#    - { route: 'oro_pricing_price_list_update', parameters: { id: '@pricelist.id' }, options: { disable_select2_checks: true } }
-#
+
+    # Content Blocks
+    - { route: 'oro_cms_content_block_index' }
+    - { route: 'oro_cms_content_block_create' }
+    - { route: 'oro_cms_content_block_view', parameters: { id: '@content_block.id' } }
+    - { route: 'oro_cms_content_block_update', parameters: { id: '@content_block.id' }, options: { disable_select2_checks: true } }
+
     #Customer Login Pages
     - { route: 'oro_cms_loginpage_index' }
     - { route: 'oro_cms_loginpage_create' }
