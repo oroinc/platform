@@ -61,8 +61,8 @@
         targetSelector: '#' ~ id,
         _sourceElement: '[name$="[' ~ depends_on_parent_field ~ ']',
         collectionOptions: {
-            dataRoute: data_route,
-            dataRouteParameter: data_route_parameter,
+            route: data_route,
+            routeId: data_route_parameter,
             includeNonEntity: includeNonEntity is defined and includeNonEntity ? true : false,
             includeSystemTemplates: includeSystemTemplates is defined and not includeSystemTemplates ? false :  true
         }

@@ -3,6 +3,7 @@ define(function(require) {
 
     var EmailAttachmentContextView;
     var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
 
     EmailAttachmentContextView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['enableAttachmentSelector']),
@@ -10,10 +11,17 @@ define(function(require) {
         initialize: function(options) {
             EmailAttachmentContextView.__super__.initialize.apply(this, arguments);
 
-            this.attachmentSelectEl = this.$el.closest('form').find(this.enableAttachmentSelector);
-            this.attachmentSelectEl.on('change' + this.eventNamespace(), this.onAttachmentEnableToggle.bind(this));
-
             this.setVisibility();
+        },
+
+        delegateEvents: function(events) {
+            EmailAttachmentContextView.__super__.undelegateEvents.call(this, events);
+            this.$enableAttachment.on('change' + this.eventNamespace(), this.onAttachmentEnableToggle.bind(this));
+        },
+
+        undelegateEvents: function() {
+            this.$enableAttachment.off(this.eventNamespace());
+            EmailAttachmentContextView.__super__.undelegateEvents.call(this);
         },
 
         onAttachmentEnableToggle: function(e) {
@@ -21,7 +29,7 @@ define(function(require) {
         },
 
         setVisibility: function() {
-            if (parseInt(this.attachmentSelectEl.val())) {
+            if (parseInt(this.$enableAttachment.val())) {
                 this.$el.attr('disabled', false);
                 this.$el.parent('div').removeClass('disabled');
             } else {
@@ -31,11 +39,15 @@ define(function(require) {
         },
 
         dispose: function() {
+            delete this.$enableAttachment;
             EmailAttachmentContextView.__super__.dispose.apply(this, arguments);
+        },
 
-            this.attachmentSelectEl.off(this.eventNamespace());
+        constructor: function(options) {
+            this.$enableAttachment = $(options.el).closest('form').find(options.enableAttachmentSelector);
+
+            EmailAttachmentContextView.__super__.constructor.apply(this, arguments);
         }
-
     });
 
     return EmailAttachmentContextView;

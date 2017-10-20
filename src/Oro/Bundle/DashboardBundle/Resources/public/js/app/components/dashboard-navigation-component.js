@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var DashboardNavigationView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    var DashboardNavigationComponent;
+    var BaseComponent = require('oroui/js/app/components/base/component');
     var mediator = require('oroui/js/mediator');
     var dashboardUtil = require('orodashboard/js/dashboard-util');
 
-    DashboardNavigationView = BaseView.extend({
-        optionNames: BaseView.prototype.optionNames.concat(['gridName']),
+    DashboardNavigationComponent = BaseComponent.extend({
+        optionNames: BaseComponent.prototype.optionNames.concat(['gridName']),
 
         initialize: function() {
-            DashboardNavigationView.__super__.initialize.apply(this, arguments);
+            DashboardNavigationComponent.__super__.initialize.apply(this, arguments);
 
             mediator.on('datagrid:beforeRemoveRow:' + this.gridName, this.onBeforeRemoveRow);
         },
@@ -20,5 +20,5 @@ define(function(require) {
         }
     });
 
-    return DashboardNavigationView;
+    return DashboardNavigationComponent;
 });

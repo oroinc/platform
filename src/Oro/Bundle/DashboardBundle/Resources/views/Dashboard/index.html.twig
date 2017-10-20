@@ -17,8 +17,8 @@
     {{ parent() }}
 
     <div {{ UI.renderPageComponentAttributes({
-        view: {
-            view: 'orodashboard/js/app/views/dashboard-navigation-view',
+        module: 'orodashboard/js/app/components/dashboard-navigation-component',
+        options: {
             gridName: gridName
         }
     }) }}></div>

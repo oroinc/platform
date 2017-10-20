@@ -4,17 +4,12 @@ define(function(require) {
     var DataGridAllowTrackingComponent;
     var BaseComponent = require('oroui/js/app/components/base/component');
     var GridTagBuilder = require('orosync/js/content/grid-builder');
-    var _ = require('underscore');
 
     DataGridAllowTrackingComponent = BaseComponent.extend({
-        options: {
-            gridName: null
-        },
+        optionNames: BaseComponent.prototype.optionNames.concat(['gridName']),
 
-        initialize: function(options) {
-            this.options = _.extend({}, this.options, options);
-
-            GridTagBuilder.allowTracking(this.options.gridName);
+        initialize: function() {
+            GridTagBuilder.allowTracking(this.gridName);
 
             DataGridAllowTrackingComponent.__super__.initialize.apply(this, arguments);
         }

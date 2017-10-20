@@ -5,7 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
-    var Collection = require('oroemail/js/app/models/email-template-collection');
+    var EmailTemplateCollection = require('oroemail/js/app/models/email-template-collection');
 
     /**
      * @export oroemail/js/app/views/email-template-view
@@ -36,12 +36,8 @@ define(function(require) {
         },
 
         _initCollection: function(options) {
-            this.collection = new Collection(
-                options.dataRoute,
-                options.dataRouteParameter,
-                options.includeNonEntity,
-                options.includeSystemTemplates
-            );
+            console.log(options);
+            this.collection = new EmailTemplateCollection(null, options);
         },
 
         /**
