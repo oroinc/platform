@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema\v1_6;
+namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema\v1_5_1;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
