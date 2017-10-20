@@ -7,6 +7,8 @@ define(function(require) {
     var CallbackListener = require('orodatagrid/js/datagrid/listener/callback-listener');
     var WidgetManager = require('oroui/js/widget-manager');
     var MultipleEntityModel = require('oroform/js/multiple-entity/model');
+    var _ = require('underscore');
+    var $ = require('jquery');
 
     MultipleEntityComponent = BaseView.extend({
         initialize: function(options) {
@@ -38,7 +40,7 @@ define(function(require) {
         },
 
         _initializeCallback: function() {
-            new CallbackListener({
+            this.callbackListener = new CallbackListener({
                 $gridContainer: $('[data-wid="' + this.wid + '"]'),
                 gridName: this.gridName,
                 dataField: 'id',
@@ -47,20 +49,24 @@ define(function(require) {
                     var id = model.get('id');
                     if (model.get(listener.columnName)) {
                         var label = '';
+                        var extraData = [];
 
-                        for (var fieldTitle in this.fieldTitles) {
-                            var field = model.get(this.fieldTitles[fieldTitle]);
-                            if (field) {
-                                label += field + ' ';
+                        if (!_.isUndefined(this.fieldTitles)) {
+                            for (var i = 0; i < this.fieldTitles.length; i++) {
+                                var field = model.get(this.fieldTitles[i]);
+                                if (field) {
+                                    label += field + ' ';
+                                }
                             }
                         }
 
-                        var extraData = [];
-                        for (var data in this.extraData) {
-                            extraData.push({
-                                'label': this.extraData[data].label,
-                                'value': model.get(this.extraData[data].value)
-                            });
+                        if (!_.isUndefined(this.extraData)) {
+                            for (var j = 0; j < this.extraData.length; j++) {
+                                extraData.push({
+                                    'label': this.extraData[j].label,
+                                    'value': model.get(this.extraData[j].value)
+                                });
+                            }
                         }
 
                         this.addedModels[id] = new MultipleEntityModel({
