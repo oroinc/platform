@@ -365,7 +365,10 @@ define(function(require) {
             var optionsSelectors = [];
 
             _.each(filters, function(filter) {
-                this._renderFilter(filter).enable();
+                this._renderFilter(filter);
+                if (filter.visible) {
+                    filter.enable();
+                }
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
 
@@ -415,7 +418,7 @@ define(function(require) {
          * @returns {oro.filter.AbstractFilter}
          */
         _renderFilter: function(filter) {
-            if (filter.visible && !filter.isRendered()) {
+            if (!filter.isRendered()) {
                 var oldEl = filter.$el;
                 filter.setRenderMode(this.renderMode);
                 // filter rendering process replaces $el
@@ -423,6 +426,10 @@ define(function(require) {
                 // so we need to replace element which keeps place in DOM with actual filter $el after rendering
                 oldEl.replaceWith(filter.$el);
                 filter.rendered();
+
+                if (!filter.visible) {
+                    filter.hide();
+                }
             }
 
             return filter;

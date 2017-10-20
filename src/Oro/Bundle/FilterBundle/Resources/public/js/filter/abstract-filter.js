@@ -210,8 +210,6 @@ define([
         show: function() {
             if (this.visible) {
                 this.$el.css('display', 'inline-block');
-                // when the filter becomes visible and the value of the hint is not empty - show the hint
-                this.subview('hint').update(this._getCriteriaHint());
             }
             return this;
         },
@@ -223,8 +221,6 @@ define([
          */
         hide: function() {
             this.$el.hide();
-            // when the filter becomes invisible and the value of the hint is not empty - hide the hint
-            this.subview('hint').update(this.placeholder);
             return this;
         },
 
