@@ -1,9 +1,9 @@
 Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
   actions:
-    get: "<p>Description for GET action</p><ul>\n<li>list item 1</li>\n<li>list item 2</li>\n</ul>\n"
+    get: "<p>Description for GET action</p><ul>\n<li>list item 1</li>\n<li>list item 2</li>\n</ul>"
     get_list: '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>'
     create: '<p>Description for CREATE action</p><p><em>text in italic</em></p>'
-    update: '<p>Description for UPDATE action</p><p><a href="http://localhost.com">a link to resource</a></p>'
+    update: "<p>Description for UPDATE action</p><p><a href=\"http://localhost.com\">a link to resource</a></p><pre><code>code block\n</code></pre>"
   fields:
     id:
       common: '<p>Description for ID field</p>'

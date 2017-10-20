@@ -103,6 +103,8 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function visitMetadataDataProvider()
     {
@@ -129,6 +131,7 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         'multipleSorting' => false,
                         'toolbarOptions'  => [
                             'addSorting' => false,
+                            'disableNotSelectedOption' => false
                         ],
                     ],
                     'initialState'             => [Configuration::SORTERS_KEY => []],
@@ -158,6 +161,7 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         'multipleSorting' => true,
                         'toolbarOptions'  => [
                             'addSorting' => false,
+                            'disableNotSelectedOption' => false
                         ],
                     ],
                     'initialState'             => [Configuration::SORTERS_KEY => []],
@@ -194,6 +198,7 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
                         'multipleSorting' => false,
                         'toolbarOptions'  => [
                             'addSorting' => true,
+                            'disableNotSelectedOption' => false
                         ],
                     ],
                     'initialState'             => [Configuration::SORTERS_KEY => []],

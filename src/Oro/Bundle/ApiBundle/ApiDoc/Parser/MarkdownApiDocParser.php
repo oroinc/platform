@@ -172,6 +172,17 @@ class MarkdownApiDocParser
                 }
             }
         }
+        $this->normalizeLoadedData();
+    }
+
+    protected function normalizeLoadedData()
+    {
+        // strip whitespace from the beginning and end of descriptions
+        array_walk_recursive($this->loadedData, function (&$element) {
+            if (is_string($element) && $element) {
+                $element = trim($element);
+            }
+        });
     }
 
     /**
