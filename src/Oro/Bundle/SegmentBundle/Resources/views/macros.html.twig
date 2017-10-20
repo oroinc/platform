@@ -136,7 +136,6 @@
             itemContainer: '#' ~ type ~ '-column-list .item-container',
             itemTemplate:  '#' ~ type ~ '-column-row'
         },
-        columnFieldChoiceOptions:     {},
         select2FieldChoiceTemplate:   '#column-chain-template',
         entities:                     entities,
         metadata:                     metadata
@@ -153,8 +152,6 @@
                 itemTemplate:  '#oro_report-grouping-item-row'
             }
         }) %}
-    {% else %}
-        {% set widgetOptions = widgetOptions|merge({'columnFieldChoiceOptions': {exclude: ['relation_type']} }) %}
     {% endif %}
 
     {% set widgetOptions = update_segment_widget_options(widgetOptions, type) %}

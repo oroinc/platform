@@ -156,10 +156,11 @@ define(function(require) {
         },
 
         _bindFieldsLoader: function() {
-            if (!this.options.fieldsLoaderSelector) {
+            var fieldsLoaderSelector = this.options.fieldsLoaderSelector || this.element.data('fieldsLoaderSelector');
+            if (!fieldsLoaderSelector) {
                 return;
             }
-            this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
+            this.$fieldsLoader = $(fieldsLoaderSelector);
             this._on(this.$fieldsLoader, {
                 fieldsloaderupdate: function(e, data) {
                     this.setValue('');

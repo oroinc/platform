@@ -18,7 +18,14 @@ class GroupingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('columnNames', 'oro_field_choice', array('required' => true));
+            ->add(
+                'columnNames',
+                'oro_field_choice',
+                [
+                    'required'            => true,
+                    'page_component_name' => 'grouping-field-choice',
+                ]
+            );
     }
 
     /**

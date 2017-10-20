@@ -92,6 +92,9 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with(
                 [
+                    'column_column_field_choice_options' => [
+                        'exclude_fields' => ['relation_type'],
+                    ],
                     'column_column_choice_type'   => 'hidden',
                     'filter_column_choice_type'   => 'oro_entity_field_select',
                     'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',

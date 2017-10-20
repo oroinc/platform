@@ -65,10 +65,11 @@ abstract class AbstractQueryDesignerType extends AbstractType
     {
         return
             array(
-                'grouping_column_choice_type' => 'hidden',
-                'column_column_choice_type'   => 'hidden',
-                'filter_column_choice_type'   => 'oro_entity_field_select',
-                'date_grouping_choice_type'   => 'oro_entity_field_select'
+                'grouping_column_choice_type'        => 'hidden',
+                'column_column_choice_type'          => 'hidden',
+                'filter_column_choice_type'          => 'oro_entity_field_select',
+                'date_grouping_choice_type'          => 'oro_entity_field_select',
+                'column_column_field_choice_options' => [],
             );
     }
 
@@ -108,10 +109,11 @@ abstract class AbstractQueryDesignerType extends AbstractType
                     'oro_query_designer_column',
                     null,
                     array(
-                        'mapped'             => false,
-                        'column_choice_type' => $columnChoiceType,
-                        'entity'             => $entity,
-                        'auto_initialize'    => false
+                        'mapped'               => false,
+                        'column_choice_type'   => $columnChoiceType,
+                        'entity'               => $entity,
+                        'auto_initialize'      => false,
+                        'field_choice_options' => $config->getOption('column_column_field_choice_options'),
                     )
                 )
             );
