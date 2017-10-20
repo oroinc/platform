@@ -1,4 +1,4 @@
-## 2.3.2 (Unreleased)
+## 2.3.12 (Unreleased)
 
 ### Added
 #### MessageQueue Component

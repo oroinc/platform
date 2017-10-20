@@ -23,7 +23,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_5_1';
     }
 
     /**
