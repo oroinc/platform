@@ -224,11 +224,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table as $index => $row) {
             $rowNumber = $index + 1;
             foreach ($row as $columnTitle => $value) {
-                self::assertEquals(
-                    $value,
-                    $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle),
-                    sprintf('Unexpected value at %d row in grid', $rowNumber)
-                );
+                $cellValue = $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle);
+                if ($cellValue instanceof \DateTime) {
+                    $value = new \DateTime($value);
+                }
+                self::assertEquals($value, $cellValue, sprintf('Unexpected value at %d row in grid', $rowNumber));
             }
         }
     }
@@ -778,6 +778,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
      *
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
+     * @When /^(?:|when )(?:|I )filter "(?P<filterName>[\w\s\/]+)" as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)" in "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
