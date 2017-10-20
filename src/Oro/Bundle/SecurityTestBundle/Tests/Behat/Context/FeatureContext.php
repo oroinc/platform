@@ -2,16 +2,24 @@
 
 namespace Oro\Bundle\SecurityTestBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\ApplicationBundle\Tests\Behat\Context\CommerceMainContext;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
+use Oro\Bundle\SaleBundle\Entity\Quote;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use WebDriver\Exception\NoAlertOpenError;
 
 /**
  * This context test listed URLs for presence of preloaded XSS string
@@ -31,6 +39,16 @@ class FeatureContext extends OroFeatureContext implements
     private $foundXss = [];
 
     /**
+     * @var CommerceMainContext
+     */
+    private $commerceMainContext;
+
+    /**
+     * @var OroMainContext
+     */
+    private $mainContext;
+
+    /**
      * @When /^(?:|I )visiting pages listed in "(?P<value>(?:[^"]|\\")*)"$/
      * @param string $value
      */
@@ -40,9 +58,41 @@ class FeatureContext extends OroFeatureContext implements
         foreach ($this->getUrlsToProcess($value) as $url) {
             $this->visitPath($this->getUrl($url));
             $this->getDriver()->waitPageToLoad();
-            $this->checkSelect2ForXss();
+            if (empty($url['options']['disable_select2_checks'])) {
+                $this->checkSelect2ForXss();
+            }
             $this->collectXssAfterStep();
         }
+    }
+
+    /**
+     * @BeforeScenario
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+        $this->commerceMainContext = $environment->getContext(CommerceMainContext::class);
+        $this->mainContext = $environment->getContext(OroMainContext::class);
+    }
+
+    /**
+     * @When /^(?:|I )login to admin area as fixture user "(?P<value>(?:[^"]|\\")*)"$/
+     * @param string $value
+     */
+    public function loginAsFixtureUser($value)
+    {
+        $username = $this->fixtureLoader->getReference($value, 'username');
+        $this->mainContext->loginAsUserWithPassword($username);
+    }
+
+    /**
+     * @When /^(?:|I )login to store frontend as fixture customer user "(?P<value>(?:[^"]|\\")*)"$/
+     * @param string $value
+     */
+    public function loginAsFixtureCustomerUser($value)
+    {
+        $username = $this->fixtureLoader->getReference($value, 'email');
+        $this->commerceMainContext->loginAsBuyer($username);
     }
 
     /**
@@ -69,7 +119,26 @@ class FeatureContext extends OroFeatureContext implements
             }
             $this->foundXss[$url] = array_merge($this->foundXss[$url], $newXss);
         }
-        $this->getSession()->evaluateScript('window._xssDataStorage = [];');
+        $this->getSession()->executeScript('window._xssDataStorage = [];');
+    }
+
+    /**
+     * @When /^(?:|I )set quote "(?P<quote>(?:[^"]|\\")*)" status to "(?P<status>(?:[^"]|\\")*)"$/
+     * @param string $quote
+     * @param string $status
+     */
+    public function setQuoteStatus($quote, $status)
+    {
+        /** @var Quote $quote */
+        $quote = $this->fixtureLoader->getReference($quote);
+        $enumStatusClass = ExtendHelper::buildEnumValueClassName('quote_internal_status');
+        $registry = $this->getContainer()->get('doctrine');
+        /** @var EntityManager $em */
+        $em = $registry->getManagerForClass($enumStatusClass);
+        $statusEnum = $em->find($enumStatusClass, $status);
+        $quote->setInternalStatus($statusEnum);
+
+        $em->flush($quote);
     }
 
     /**
@@ -145,7 +214,6 @@ class FeatureContext extends OroFeatureContext implements
     {
         /** @var Select2Entity[] $autocompletes */
         $autocompletes = $this->findAllElements('Entity Autocomplete');
-        $body = $this->createElement('Body');
         if (count($autocompletes) > 0) {
             foreach ($autocompletes as $autocomplete) {
                 $dialog = $autocomplete->openSelectEntityPopup();
@@ -153,7 +221,7 @@ class FeatureContext extends OroFeatureContext implements
                     $dialog->close();
 
                     $autocomplete->getResultSet();
-                    $body->click();
+                    $autocomplete->close();
                 }
             }
         }

@@ -43,16 +43,16 @@ Oro\Bundle\ProductBundle\Entity\ProductUnitPrecision:
 
 Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
     tshirt_family:
+        owner: '@xss_user'
+        organization: '@xss_organization'
         entityClass: 'Oro\Bundle\ProductBundle\Entity\Product'
         code: 'T_shirt'
         addLabel: ['@tshirt_family_label']
-        organization: '@organization'
-        owner: '@admin'
 
 Oro\Bundle\ProductBundle\Entity\Brand:
     brand:
-        owner: '@business_unit'
-        organization: '@organization'
+        owner: '@xss_business_unit'
+        organization: '@xss_organization'
         addName: ['@brandName']
         addDescription: ['@brandDescription']
         addShortDescription: ['@brandShortDescription']
@@ -60,8 +60,8 @@ Oro\Bundle\ProductBundle\Entity\Brand:
 Oro\Bundle\ProductBundle\Entity\Product:
     simple_product:
         type: 'simple'
-        organization: '@organization'
-        owner: '@business_unit'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
         sku: 'S01<xss("Product.sku")>'
         skuUppercase: 'S01<xss("Product.skuUppercase")>'
         brand: '@brand'
@@ -76,8 +76,8 @@ Oro\Bundle\ProductBundle\Entity\Product:
         status: 'enabled'
     configurable_product_variant_1:
         type: 'simple'
-        organization: '@organization'
-        owner: '@business_unit'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
         sku: 'S02<xss("Product.sku")>'
         skuUppercase: 'S02<xss("Product.skuUppercase")>'
         brand: '@brand'
@@ -92,8 +92,8 @@ Oro\Bundle\ProductBundle\Entity\Product:
         status: 'enabled'
     configurable_product:
         type: 'configurable'
-        organization: '@organization'
-        owner: '@business_unit'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
         sku: 'S03<xss("Product.sku")>'
         skuUppercase: 'S03<xss("Product.skuUppercase")>'
         brand: '@brand'

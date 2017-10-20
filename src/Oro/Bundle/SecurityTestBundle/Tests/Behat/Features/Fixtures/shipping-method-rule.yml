@@ -23,4 +23,4 @@ Oro\Bundle\ShippingBundle\Entity\ShippingMethodsConfigsRule:
         rule: '@shippingRule'
         methodConfigs: ['@shippingMethodConfig']
         currency: 'USD'
-        organization: '@organization'
+        organization: '@xss_organization'

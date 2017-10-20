@@ -4,6 +4,10 @@ include:
 
 Oro\Bundle\RFPBundle\Entity\Request:
     rfp_request:
+        owner: '@xss_user'
+        organization: '@xss_organization'
+        customerUser: '@amanda'
+        assignedCustomerUsers: ['@amanda']
         poNumber: '<xss("Request.poNumber")>'
         firstName: '<xss("Request.firstName")>'
         lastName: '<xss("Request.lastName")>'
@@ -13,10 +17,6 @@ Oro\Bundle\RFPBundle\Entity\Request:
         role: '<xss("Request.role")>'
         note: '<xss("Request.note")>'
         cancellationReason: '<xss("Request.cancellationReason")>'
-        organization: '@organization'
-        owner: '@admin'
-        customerUser: '@amanda'
-        assignedCustomerUsers: ['@amanda']
 
 Oro\Bundle\RFPBundle\Entity\RequestAdditionalNote:
     request_additional_note:

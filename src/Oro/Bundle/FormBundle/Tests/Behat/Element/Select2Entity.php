@@ -6,6 +6,7 @@ use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\FormBundle\Tests\Behat\Context\ClearableInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
+use WebDriver\Key;
 
 class Select2Entity extends Element implements ClearableInterface
 {
@@ -73,16 +74,7 @@ class Select2Entity extends Element implements ClearableInterface
     public function fillSearchField($value)
     {
         $this->open();
-        /** @var NodeElement[] $inputs */
-        $inputs = array_filter(
-            $this->getPage()->findAll('css', '.select2-search input'),
-            function (NodeElement $element) {
-                return $element->isVisible();
-            }
-        );
-
-        self::assertCount(1, $inputs);
-        $this->getDriver()->typeIntoInput(array_shift($inputs)->getXpath(), $value);
+        $this->getDriver()->typeIntoInput($this->getSearchInput()->getXpath(), $value);
     }
 
     /**
@@ -179,8 +171,8 @@ class Select2Entity extends Element implements ClearableInterface
 
     public function close()
     {
-        if ($dropDownMask = $this->getPage()->find('css', '.select2-drop-mask')) {
-            $dropDownMask->click();
+        if ($this->getPage()->has('css', '.select2-drop-mask')) {
+            $this->getDriver()->typeIntoInput($this->getSearchInput()->getXpath(), Key::ESCAPE);
         } elseif ($this->isOpen()) {
             $this->getParent()->find('css', '.select2-arrow')->click();
         }
@@ -242,5 +234,22 @@ class Select2Entity extends Element implements ClearableInterface
         $span = $this->getParent()->find('css', 'span.select2-chosen');
 
         return $span ? $span->getText() : null;
+    }
+
+    /**
+     * @return NodeElement
+     */
+    private function getSearchInput()
+    {
+        $inputs = array_filter(
+            $this->getPage()->findAll('css', '.select2-search input'),
+            function (NodeElement $element) {
+                return $element->isVisible();
+            }
+        );
+
+        self::assertCount(1, $inputs);
+
+        return array_shift($inputs);
     }
 }

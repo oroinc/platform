@@ -11,5 +11,5 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
         type: 'flat_rate'
         name: '<xss("Channel.name(Shipping)")>'
         enabled: true
-        organization: '@organization'
+        organization: '@xss_organization'
         transport: '@flatRateSettings'

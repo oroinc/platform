@@ -6,8 +6,8 @@ Oro\Bundle\OrderBundle\Entity\OrderAddress:
 
 Oro\Bundle\OrderBundle\Entity\Order:
     order1:
-        organization: '@organization'
-        owner: '@admin'
+        owner: '@xss_user'
+        organization: '@xss_organization'
         customer: '@company_a'
         website: '@website1'
         billingAddress: '@orderAddress'

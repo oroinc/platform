@@ -269,10 +269,10 @@ class FixtureLoader
 
     /**
      * @param string $name
-     * @param string $instance
+     * @param string|null $instance
      * @return mixed
      */
-    public function getReference($name, $property)
+    public function getReference($name, $property = null)
     {
         return $this->aliceLoader->getReferenceRepository()->find($name, $property);
     }

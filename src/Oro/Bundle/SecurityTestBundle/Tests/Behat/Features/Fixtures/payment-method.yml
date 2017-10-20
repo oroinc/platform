@@ -14,5 +14,5 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
         type: 'payment_term'
         name: '<xss("Channel.name(Payment)")>'
         enabled: true
-        organization: '@organization'
+        organization: '@xss_organization'
         transport: '@paymentTermSettings'

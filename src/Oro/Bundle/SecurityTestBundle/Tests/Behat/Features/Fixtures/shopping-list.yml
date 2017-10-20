@@ -5,7 +5,7 @@ Oro\Bundle\ShoppingListBundle\Entity\ShoppingList:
     shoppinglist1:
         customer: '@company_a'
         customerUser: '@amanda'
-        organization: '@organization'
+        organization: '@xss_organization'
         website: '@website1'
         label: '<xss("ShoppingList.label")>'
         notes: '<xss("ShoppingList.notes")>'
@@ -17,7 +17,7 @@ Oro\Bundle\ShoppingListBundle\Entity\LineItem:
         unit: '@item'
         customerUser: '@amanda'
         shoppingList: '@shoppinglist1'
-        organization: '@organization'
+        organization: '@xss_organization'
         notes: '<xss("LineItem.notes")>'
     lineitem_configurable:
         product: '@configurable_product_variant_1'
@@ -25,7 +25,7 @@ Oro\Bundle\ShoppingListBundle\Entity\LineItem:
         unit: '@item'
         customerUser: '@amanda'
         shoppingList: '@shoppinglist1'
-        organization: '@organization'
+        organization: '@xss_organization'
         notes: '<xss("LineItem.notes")>'
 
 Oro\Bundle\ShoppingListBundle\Entity\ShoppingListTotal:

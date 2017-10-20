@@ -3,8 +3,8 @@ include:
 
 Oro\Bundle\SaleBundle\Entity\Quote:
     quote:
-        organization: '@organization'
-        owner: '@admin'
+        owner: '@xss_user'
+        organization: '@xss_organization'
         website: '@website1'
         customerUser: '@amanda'
         shippingAddress: '@quote_address_1'

@@ -7,7 +7,7 @@ urls:
     - { route: 'oro_sale_quote_index' }
     - { route: 'oro_sale_quote_create' }
     - { route: 'oro_sale_quote_view', parameters: { id: '@quote.id' } }
-    - { route: 'oro_sale_quote_update', parameters: { id: '@quote.id' } }
+    - { route: 'oro_sale_quote_update', parameters: { id: '@quote.id' }, options: { disable_select2_checks: true } }
 
     # RFP Request
     - { route: 'oro_rfp_request_index' }
@@ -25,10 +25,10 @@ urls:
     - { route: 'oro_pricing_price_list_index' }
     - { route: 'oro_pricing_price_list_create' }
     - { route: 'oro_pricing_price_list_view', parameters: { id: '@pricelist.id' } }
-    - { route: 'oro_pricing_price_list_update', parameters: { id: '@pricelist.id' } }
+    - { route: 'oro_pricing_price_list_update', parameters: { id: '@pricelist.id' }, options: { disable_select2_checks: true } }
 
     # Payment Terms
     - { route: 'oro_payment_term_index' }
     - { route: 'oro_payment_term_create' }
     - { route: 'oro_payment_term_view', parameters: { id: '@paymentTerm.id' } }
-    - { route: 'oro_payment_term_update', parameters: { id: '@paymentTerm.id' } }
+    - { route: 'oro_payment_term_update', parameters: { id: '@paymentTerm.id' }, options: { disable_select2_checks: true } }

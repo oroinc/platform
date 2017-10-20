@@ -3,22 +3,22 @@ urls:
     - { route: 'oro_customer_customer_index' }
     - { route: 'oro_customer_customer_create' }
     - { route: 'oro_customer_customer_view', parameters: { id: '@company_a.id' } }
-    - { route: 'oro_customer_customer_update', parameters: { id: '@company_a.id' } }
+    - { route: 'oro_customer_customer_update', parameters: { id: '@company_a.id' }, options: { disable_select2_checks: true } }
 
     # Customer Group
     - { route: 'oro_customer_customer_group_index' }
     - { route: 'oro_customer_customer_group_create' }
     - { route: 'oro_customer_customer_group_view', parameters: { id: '@all_customers.id' } }
-    - { route: 'oro_customer_customer_group_update', parameters: { id: '@all_customers.id' } }
+    - { route: 'oro_customer_customer_group_update', parameters: { id: '@all_customers.id' }, options: { disable_select2_checks: true } }
 
     # Customer User
     - { route: 'oro_customer_customer_user_index' }
     - { route: 'oro_customer_customer_user_create' }
     - { route: 'oro_customer_customer_user_view', parameters: { id: '@amanda.id' } }
-    - { route: 'oro_customer_customer_user_update', parameters: { id: '@amanda.id' } }
+    - { route: 'oro_customer_customer_user_update', parameters: { id: '@amanda.id' }, options: { disable_select2_checks: true } }
 
     # Customer User Role
     - { route: 'oro_customer_customer_user_role_index' }
     - { route: 'oro_customer_customer_user_role_create' }
     - { route: 'oro_customer_customer_user_role_view', parameters: { id: '@xss_role.id' } }
-    - { route: 'oro_customer_customer_user_role_update', parameters: { id: '@xss_role.id' } }
+    - { route: 'oro_customer_customer_user_role_update', parameters: { id: '@xss_role.id' }, options: { disable_select2_checks: true } }

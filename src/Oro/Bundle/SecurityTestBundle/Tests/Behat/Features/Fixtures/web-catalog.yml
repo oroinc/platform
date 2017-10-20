@@ -13,14 +13,14 @@ Oro\Bundle\WebCatalogBundle\Entity\WebCatalog:
     testWebCatalog:
         name: 'Test Web Catalog'
         description: '<xss("WebCatalog.description")>'
-        organization: '@organization'
-        owner: '@business_unit'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
 
     xssWebCatalog:
         name: '<xss("WebCatalog.name")>'
         description: '<xss("WebCatalog.description")>'
-        organization: '@organization'
-        owner: '@business_unit'
+        organization: '@xss_organization'
+        owner: '@xss_business_unit'
 
 Oro\Bundle\WebCatalogBundle\Entity\ContentVariant:
     categoryPageContentVariant:

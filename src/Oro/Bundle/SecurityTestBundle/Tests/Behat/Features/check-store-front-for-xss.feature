@@ -1,3 +1,4 @@
+@fixture-OroSecurityTestBundle:user.yml
 @fixture-OroSecurityTestBundle:shipping-method.yml
 @fixture-OroSecurityTestBundle:shipping-method-rule.yml
 @fixture-OroSecurityTestBundle:payment-method.yml
@@ -11,9 +12,9 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
       | Admin  |first_session |
       | User   |second_session|
     Given I proceed as the Admin
-    And login as administrator
+    And I login to admin area as fixture user "xss_user"
     Given I proceed as the User
-    And I signed in as AmandaRCole@example.org on the store frontend
+    And I login to store frontend as fixture customer user "amanda"
 
   Scenario: Check store front profile pages for XSS vulnerability
     Given I proceed as the User
@@ -93,12 +94,11 @@ Feature: Store front MUST NOT contain XSS vulnerabilities on all accessible page
   Scenario: Check store front order related for XSS vulnerability
     Given I proceed as the Admin
     # Enable access to RFQ edit form
+    And I go to System/ Workflows
     And I click Deactivate "RFQ Submission Flow" in grid
     And I click "Yes, Deactivate"
     # Make quote available at store front
-    Then I go to Sales/ Quotes
-    And I click "Send to Customer" on first row in grid
-    And I click "Send"
+    Then I set quote "quote" status to "sent_to_customer"
     Then I proceed as the User
     When I visiting pages listed in "frontend order related urls"
     Then I should not get XSS vulnerabilities

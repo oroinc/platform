@@ -6,33 +6,33 @@ Oro\Bundle\CustomerBundle\Entity\CustomerUserRole:
         role: xss_check
         selfManaged: true
         customer: '@company_a'
-        organization: '@organization'
+        organization: '@xss_organization'
         label: '<xss("CustomerUserRole.label")>'
 
 Oro\Bundle\CustomerBundle\Entity\CustomerUser:
     amanda:
-        organization: '@organization'
+        owner: '@xss_user'
+        organization: '@xss_organization'
         role: ['@front_admin', '@buyer', '@xss_role']
-        owner: '@admin'
         website: '@website1'
         customer: '@company_a'
         enabled: '1'
         confirmed: '1'
-        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
-        salt: 'fgswya1kzw0sck8ck48kosowckwo0ws'
-        email: '<xss("CustomerUser.email")>AmandaRCole@example.org'
-        username: 'AmandaRCole@example.org'
         namePrefix: '<xss("CustomerUser.namePrefix")>'
         firstName: '<xss("CustomerUser.firstName")>'
         middleName: '<xss("CustomerUser.middleName")>'
         lastName: '<xss("CustomerUser.lastName")>'
         nameSuffix: '<xss("CustomerUser.nameSuffix")>'
+        salt: 'fgswya1kzw0sck8ck48kosowckwo0ws'
+        email: '<xss("CustomerUser.email")>AmandaRCole@example.org'
+        username: 'AmandaRCole@example.org' # Script may be injected in this field, but customer user with such email is not able to login
+        password: '<userPassword(@amanda->email, @amanda->salt)>'
 
 Oro\Bundle\CustomerBundle\Entity\CustomerUserAddress:
     amandaAddress1:
         frontendOwner: '@amanda'
-        owner: '@admin'
-        systemOrganization: '@organization'
+        owner: '@xss_user'
+        systemOrganization: '@xss_organization'
         country: 'US'
         primary: true
         label: '<xss("CustomerUserAddress.label")>'

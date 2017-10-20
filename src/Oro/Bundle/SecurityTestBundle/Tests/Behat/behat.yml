@@ -27,8 +27,3 @@ oro_behat_extension:
     Entity Autocomplete:
       selector: '.entity-create-or-select-container input.select2'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
-    Body:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector: 'body'
-
-
