@@ -16,6 +16,9 @@ class ConfigProvider extends AbstractConfigProvider
     /** @var array */
     protected $cache = [];
 
+    /** @var array */
+    private $processing = [];
+
     /**
      * @param ActionProcessorInterface $processor
      */
@@ -45,11 +48,23 @@ class ConfigProvider extends AbstractConfigProvider
             return clone $this->cache[$cacheKey];
         }
 
+        if (isset($this->processing[$cacheKey])) {
+            throw new \LogicException(sprintf(
+                'Cannot build the configuration of "%s" because this causes the circular dependency.',
+                $className
+            ));
+        }
+
         /** @var ConfigContext $context */
         $context = $this->processor->createContext();
         $this->initContext($context, $className, $version, $requestType, $extras);
 
-        $this->processor->process($context);
+        $this->processing[$cacheKey] = true;
+        try {
+            $this->processor->process($context);
+        } finally {
+            unset($this->processing[$cacheKey]);
+        }
 
         $config = $this->buildResult($context);
 
