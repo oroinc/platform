@@ -33,7 +33,7 @@ class AjaxControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
+        $this->cacheProvider = self::getContainer()->get('oro_action.cache.provider.operations');
         $this->loadFixtures([
             'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
         ]);
@@ -78,19 +78,21 @@ class AjaxControllerTest extends WebTestCase
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 
+        $operationName = 'oro_action_test_action';
+        $entityId = $entityId ? $this->entity->getId() : null;
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_action_operation_execute',
                 [
-                    'operationName' => 'oro_action_test_action',
+                    'operationName' => $operationName,
                     'route' => $route,
                     'datagrid' => $datagrid,
-                    'entityId' => $entityId ? $this->entity->getId() : null,
+                    'entityId' => $entityId,
                     'entityClass' => $entityClass,
                 ]
             ),
-            [],
+            $this->getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid),
             [],
             $headers
         );
@@ -122,7 +124,6 @@ class AjaxControllerTest extends WebTestCase
                 'label' => $label,
                 'enabled' => true,
                 'order' => 10,
-                'applications' => ['backend', 'frontend'],
                 'frontend_options' => [],
                 'entities' => [],
                 'routes' => [],
@@ -163,7 +164,7 @@ class AjaxControllerTest extends WebTestCase
                 'datagrid' => '',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'statusCode' => Response::HTTP_NOT_FOUND,
+                'statusCode' => Response::HTTP_FORBIDDEN,
                 'message' => self::MESSAGE_DEFAULT,
             ],
             'unknown entity' => [
@@ -259,5 +260,31 @@ class AjaxControllerTest extends WebTestCase
                 'message' => self::MESSAGE_DEFAULT,
             ],
         ];
+    }
+
+    /**
+     * @param $operationName
+     * @param $entityId
+     * @param $entityClass
+     * @param $datagrid
+     *
+     * @return array
+     */
+    protected function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid)
+    {
+        $actionContext = [
+            'entityId'    => $entityId,
+            'entityClass' => $entityClass,
+            'datagrid'    => $datagrid
+        ];
+        $container = self::getContainer();
+        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
+        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
+
+        $tokenData = $container->get('oro_action.operation.execution.form_provider')
+            ->createTokenData($operation, $actionData);
+        $container->get('session')->save();
+
+        return $tokenData;
     }
 }

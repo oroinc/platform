@@ -56,6 +56,8 @@ services:
             - '@oro_action.context_accessor'
             - '@oro_action.helper.applications_url'
             - '@translator'
+        calls:
+            - [setFormProvider, ['@oro_action.operation.execution.form_provider']]
 
     oro_action.helper.applications_url:
         class: %oro_action.helper.applications_url.class%
@@ -199,3 +201,17 @@ services:
             - '@translator'
         tags:
             - { name: layout.data_provider, alias: actions }
+
+    oro_action.handler.execute_operation:
+        class: 'Oro\Bundle\ActionBundle\Handler\ExecuteOperationHandler'
+        arguments:
+            - '@request_stack'
+            - '@oro_action.operation.execution.form_provider'
+            - '@oro_action.helper.context'
+            - '@logger'
+
+    oro_action.operation.execution.form_provider:
+        class: 'Oro\Bundle\ActionBundle\Operation\Execution\FormProvider'
+        arguments:
+            - '@form.factory'
+            - '@oro_action.form.type.operation_execution'

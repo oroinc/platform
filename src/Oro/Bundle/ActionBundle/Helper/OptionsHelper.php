@@ -4,11 +4,13 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\Exception\InvalidConfigurationException;
+
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
-
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 
 class OptionsHelper
 {
@@ -26,6 +28,9 @@ class OptionsHelper
 
     /** @var ApplicationsUrlHelper */
     protected $applicationsUrlHelper;
+
+    /** @var FormProvider */
+    protected $formProvider;
 
     /**
      * @param ContextHelper $contextHelper
@@ -46,6 +51,14 @@ class OptionsHelper
         $this->contextAccessor = $contextAccessor;
         $this->applicationsUrlHelper = $applicationsUrlHelper;
         $this->translator = $translator;
+    }
+
+    /**
+     * @param FormProvider $formProvider
+     */
+    public function setFormProvider(FormProvider $formProvider)
+    {
+        $this->formProvider = $formProvider;
     }
 
     /**
@@ -134,7 +147,8 @@ class OptionsHelper
             'dialogUrl' => $dialogUrl,
             'url' => $operation->hasForm() ? $dialogUrl : $executionUrl,
         ];
-
+        $options['executionTokenData'] =
+            $this->getFormProvider()->createTokenData($operation, $actionData);
         $this->addOption($options, $frontendOptions, 'confirmation');
 
         return $options;
@@ -161,5 +175,18 @@ class OptionsHelper
         }
 
         return $data;
+    }
+
+    /**
+     * @return FormProvider
+     * @throws \Oro\Component\Action\Exception\InvalidConfigurationException
+     */
+    protected function getFormProvider()
+    {
+        if (null === $this->formProvider) {
+            throw new InvalidConfigurationException('Execution form provider was not set');
+        }
+
+        return $this->formProvider;
     }
 }

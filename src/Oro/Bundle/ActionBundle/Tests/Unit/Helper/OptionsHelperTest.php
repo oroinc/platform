@@ -5,6 +5,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\Action\Model\ContextAccessor;
+
 use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
@@ -12,8 +14,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 
 class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,6 +26,9 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 
     /** @var OptionsAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $optionsAssembler;
+
+    /** @var FormProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $formProvider;
 
     /** @var OptionsHelper */
     protected $helper;
@@ -50,7 +54,6 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->mockTranslator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
-
         $this->helper = new OptionsHelper(
             $this->contextHelper,
             $this->optionsAssembler,
@@ -58,6 +61,11 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             $this->applicationsUrlHelper,
             $this->mockTranslator
         );
+
+        $this->formProvider = $this->getMockBuilder(FormProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->helper->setFormProvider($this->formProvider);
     }
 
     /**
@@ -146,6 +154,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'executionUrl' => 'execution-url',
                         'dialogUrl' => 'dialog-url',
                         'url' => 'execution-url',
+                        'executionTokenData' => null
                     ],
                     'data' => [],
                 ],
@@ -188,6 +197,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                             'option1' => 'value1',
                             'key1' => 'value1',
                         ],
+                        'executionTokenData' => null
                     ],
                     'data' => [
                         'page-component-module' => 'module1',
@@ -223,6 +233,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'executionUrl' => 'execution-url3',
                         'dialogUrl' => 'dialog-url3',
                         'url' => 'dialog-url3',
+                        'executionTokenData' => null
                     ],
                     'data' => [],
                 ],
@@ -258,6 +269,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'executionUrl' => 'execution-url3',
                         'dialogUrl' => 'dialog-url3',
                         'url' => 'dialog-url3',
+                        'executionTokenData' => null
                     ],
                     'data' => [],
                 ],
@@ -275,7 +287,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         $definition = new OperationDefinition();
         $definition->setName($operationName)->setLabel($operationName);
 
-        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
+        $operation = $this->getMockBuilder(Operation::class)
             ->disableOriginalConstructor()
             ->setMethods(['getDefinition', 'hasForm'])
             ->getMock();
