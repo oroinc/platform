@@ -70,6 +70,7 @@ abstract class ActionTestCase extends WebTestCase
      * @param array $data
      * @param array $server
      * @param int $expectedCode
+     *
      * @return Crawler
      */
     protected function assertExecuteOperation(
@@ -80,16 +81,19 @@ abstract class ActionTestCase extends WebTestCase
         array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
         $expectedCode = Response::HTTP_OK
     ) {
-        $url = $this->getUrl(
-            $this->getOperationExecutionRoute(),
-            array_merge([
+        $operationExecutionRoute = $this->getOperationExecutionRoute();
+        $data  = array_merge(
+            [
                 'operationName' => $operationName,
-                'entityId' => $entityId,
-                'entityClass' => $entityClass,
-            ], $data)
+                'entityId'      => $entityId,
+                'entityClass'   => $entityClass
+            ],
+            $data
         );
-
-        $crawler = $this->client->request('GET', $url, [], [], $server);
+        $url = $this->getUrl($operationExecutionRoute, $data);
+        $dataGrid = isset($data['datagrid']) ? $data['datagrid'] : null;
+        $params   = $this->getOperationExecuteParams($operationName, $entityId, $entityClass, $dataGrid);
+        $crawler  = $this->client->request('POST', $url, $params, [], $server);
 
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), $expectedCode);
 
@@ -174,5 +178,35 @@ abstract class ActionTestCase extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains($message, $crawler->html());
+    }
+
+    /**
+     * @param $operationName
+     * @param $entityId
+     * @param $entityClass
+     * @param $datagrid
+     *
+     * @return array
+     */
+    protected function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid = null)
+    {
+        $actionContext = [
+            'entityId'    => $entityId,
+            'entityClass' => $entityClass,
+            'datagrid'    => $datagrid
+        ];
+        $container = self::getContainer();
+        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
+        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
+
+        $tokenData = $container
+            ->get('oro_action.operation.execution.form_provider')
+            ->createTokenData($operation, $actionData);
+        // this is done because of unclear behaviour symfony mocked token session storage
+        // which do not save data before embedded request done and created data do not available in sub request
+        // in the test environment
+        $container->get('session')->save();
+
+        return $tokenData;
     }
 }

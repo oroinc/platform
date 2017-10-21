@@ -7,11 +7,17 @@ use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslat
 
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
 
 class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
     protected $router;
+
+    /** @var FormProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $formProvider;
 
     /** @var OptionsHelper */
     protected $helper;
@@ -26,11 +32,13 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->router->expects($this->any())->method('generate')->willReturn('generated-url');
+        $this->formProvider = $this->createMock(FormProvider::class);
 
         $this->helper = new OptionsHelper(
             $this->router,
             new StubTranslator()
         );
+        $this->helper->setFormProvider($this->formProvider);
     }
 
     /**

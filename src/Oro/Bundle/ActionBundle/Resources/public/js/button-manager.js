@@ -22,6 +22,7 @@ define(function(require) {
          * @type {Object}
          */
         options: {
+            executionTokenData: null,
             widgetAlias: 'action_buttons_widget',
             fullRedirect: false,
             redirectUrl: '',
@@ -100,22 +101,55 @@ define(function(require) {
                 this.doRedirect(this.options.redirectUrl);
             } else {
                 mediator.execute('showLoading');
-
-                $.getJSON(this.options.executionUrl)
-                    .done(_.bind(function(response) {
-                        this.doResponse(response, e);
-                    }, this))
-                    .fail(_.bind(function(jqXHR) {
-                        var response = _.defaults(jqXHR.responseJSON || {}, {
-                            success: false,
-                            message: this.options.action ? this.options.action.label : ''
-                        });
-
-                        response.message = __('Could not perform action') + ': ' + response.message;
-
-                        this.doResponse(response);
-                    }, this));
+                if (this.isTokenProtected()) {
+                    var ajaxOptions = {
+                        type: 'POST',
+                        data: this.options.executionTokenData,
+                        dataType: 'json'
+                    };
+                    $.ajax(this.options.executionUrl, ajaxOptions)
+                        .done(_.bind(this.ajaxDone, this))
+                        .fail(_.bind(this.ajaxFail, this));
+                } else {
+                    $.getJSON(this.options.executionUrl)
+                        .done(_.bind(this.ajaxDone, this))
+                        .fail(_.bind(this.ajaxFail, this));
+                }
             }
+        },
+
+        /**
+         * Ajax done handler
+         *
+         * @param response
+         * @param e
+         */
+        ajaxDone: function(response, e) {
+            this.doResponse(response, e);
+        },
+
+        /**
+         * Ajax fail handler
+         *
+         * @param jqXHR
+         */
+        ajaxFail: function(jqXHR) {
+            var response = _.defaults(jqXHR.responseJSON || {}, {
+                success: false,
+                message: this.options.action ? this.options.action.label : ''
+            });
+
+            response.message = __('Could not perform action') + ': ' + response.message;
+
+            this.doResponse(response);
+        },
+
+        /**
+         * Returns whether this manager was configured to use token protection for executing actions or not.
+         * @returns {boolean}
+         */
+        isTokenProtected: function() {
+            return Boolean(this.options.executionTokenData);
         },
 
         /**
@@ -145,9 +179,6 @@ define(function(require) {
             }
 
             if (response.redirectUrl) {
-                if (e !== undefined) {
-                    e.stopImmediatePropagation();
-                }
                 this.doRedirect(response.redirectUrl);
             } else if (response.refreshGrid) {
                 mediator.execute('hideLoading');

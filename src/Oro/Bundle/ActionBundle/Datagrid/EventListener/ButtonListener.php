@@ -219,7 +219,15 @@ class ButtonListener
 
         $frontendOptions = $this->optionsHelper->getFrontendOptions($button);
 
-        return array_merge($frontendOptions['options'], $frontendOptions['data']);
+        $rowConfig = array_merge($frontendOptions['options'], $frontendOptions['data']);
+        if ($button instanceof OperationButton) {
+            $rowConfig = array_merge(
+                $rowConfig,
+                $this->optionsHelper->getExecutionTokenData($button->getOperation(), $button->getData())
+            );
+        }
+
+        return $rowConfig;
     }
 
     /**
