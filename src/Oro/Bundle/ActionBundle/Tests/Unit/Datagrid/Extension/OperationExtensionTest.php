@@ -48,7 +48,8 @@ class OperationExtensionTest extends AbstractExtensionTest
                 ]
             );
 
-        $provider = $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
+        $provider = $this->getMockBuilder('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface')
+            ->getMock();
         $provider->expects($this->any())
             ->method('getActions')
             ->willReturn(['test_config' => ['label' => 'test_label']]);
@@ -70,7 +71,9 @@ class OperationExtensionTest extends AbstractExtensionTest
         $optionsHelper->expects($this->any())
             ->method('getFrontendOptions')
             ->willReturn(['options' => ['option1' => 'value1', 'option2' => 'value2']]);
-
+        $optionsHelper->expects($this->any())
+            ->method('getExecutionTokenData')
+            ->willReturn([]);
         $this->extension = new OperationExtension(
             $this->manager,
             $contextHelper,

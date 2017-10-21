@@ -25,18 +25,20 @@ class UpdateTest extends WebTestCase
     public function testExecute()
     {
         $item = $this->getReference(LoadItems::ITEM1);
-
+        $operationName = 'UPDATE';
+        $entityId = $item->getId();
+        $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\Item';
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_action_operation_execute',
                 [
-                    'operationName' => 'UPDATE',
-                    'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\Item',
-                    'entityId' => $item->getId(),
+                    'operationName' => $operationName,
+                    'entityClass' => $entityClass,
+                    'entityId' => $entityId,
                 ]
             ),
-            [],
+            $this->getOperationExecuteParams($operationName, $entityId, $entityClass),
             [],
             ['HTTP_X-Requested-With' => 'XMLHttpRequest']
         );
@@ -55,5 +57,30 @@ class UpdateTest extends WebTestCase
             ],
             $response
         );
+    }
+
+    /**
+     * @param $operationName
+     * @param $entityId
+     * @param $entityClass
+     *
+     * @return array
+     */
+    protected function getOperationExecuteParams($operationName, $entityId, $entityClass)
+    {
+        $actionContext = [
+            'entityId'    => $entityId,
+            'entityClass' => $entityClass
+        ];
+        $container = static::getContainer();
+        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
+        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
+
+        $tokenData = $container
+            ->get('oro_action.operation.execution.form_provider')
+            ->createTokenData($operation, $actionData);
+        $container->get('session')->save();
+
+        return $tokenData;
     }
 }
