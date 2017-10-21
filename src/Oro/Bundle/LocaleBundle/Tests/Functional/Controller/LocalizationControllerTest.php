@@ -169,17 +169,19 @@ class LocalizationControllerTest extends WebTestCase
      */
     public function testDelete($id)
     {
+        $operationName = 'DELETE';
+        $entityClass = 'Oro\Bundle\LocaleBundle\Entity\Localization';
         $this->client->request(
-            'GET',
+            'POST',
             $this->getUrl(
                 'oro_action_operation_execute',
                 [
-                    'operationName' => 'DELETE',
+                    'operationName' => $operationName,
                     'entityId' => $id,
-                    'entityClass' => 'Oro\Bundle\LocaleBundle\Entity\Localization'
+                    'entityClass' => $entityClass
                 ]
             ),
-            [],
+            $this->getOperationExecuteParams($operationName, $id, $entityClass),
             [],
             ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']
         );
@@ -238,5 +240,31 @@ class LocalizationControllerTest extends WebTestCase
             ->get('doctrine')
             ->getManagerForClass('OroLocaleBundle:Localization')
             ->getRepository('OroLocaleBundle:Localization');
+    }
+
+    /**
+     * @param $operationName
+     * @param $entityId
+     * @param $entityClass
+     *
+     * @return array
+     */
+    protected function getOperationExecuteParams($operationName, $entityId, $entityClass)
+    {
+        $actionContext = [
+            'entityId'    => $entityId,
+            'entityClass' => $entityClass,
+            'datagrid'    => null
+        ];
+        $container = static::getContainer();
+        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
+        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
+
+        $tokenData = $container
+            ->get('oro_action.operation.execution.form_provider')
+            ->createTokenData($operation, $actionData);
+        $container->get('session')->save();
+
+        return $tokenData;
     }
 }
