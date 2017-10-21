@@ -84,8 +84,8 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
             identifier_field_names: ['key']
             fields:
-                id:
-                    exclude: true
+                databaseId:
+                    property_path: id
             filters:
                 fields:
                     name: ~

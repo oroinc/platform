@@ -574,4 +574,4 @@ api:
 "relations" configuration section
 ---------------------------------
 
-The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpfull for other types of API. This section is similar to the [entities](#entities-configuration-section) section.
+The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is not used for JSON.API, but can be helpful for other types of API. This section is similar to the [entities](#entities-configuration-section) section.

@@ -72,4 +72,12 @@ class ConfigProvider extends AbstractConfigProvider
 
         return clone $config;
     }
+
+    /**
+     * Removes all already built configs from the internal cache.
+     */
+    public function clearCache()
+    {
+        $this->cache = [];
+    }
 }
