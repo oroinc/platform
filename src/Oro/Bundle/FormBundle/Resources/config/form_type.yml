@@ -259,6 +259,13 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_form.extension.strip_tags:
+        class: 'Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension'
+        arguments:
+            - '@oro_ui.html_tag_helper'
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
     oro_form.type.encoded_password:
         class: %oro_form.type.encoded_password.class%
         arguments:

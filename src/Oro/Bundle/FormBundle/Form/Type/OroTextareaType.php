@@ -12,6 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Additional option can be used to strip tags for the textarea
+ *
+ * @deprecated will be removed in 2.5, please use form option 'strip_tags'
+ * Use {@see \Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension} instead
  */
 class OroTextareaType extends AbstractType
 {
